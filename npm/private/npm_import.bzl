@@ -888,6 +888,274 @@ _ATTRS = _COMMON_ATTRS | {
     "url": attr.string(),
 }
 
+_DOCS = """Import a single npm package into Bazel.
+
+Normally you'd want to use `npm_translate_lock` to import all your packages at once.
+It generates `npm_import` rules.
+You can create these manually if you want to have exact control.
+
+Bazel will only fetch the given package from an external registry if the package is
+required for the user-requested targets to be build/tested.
+
+This is a repository rule, which should be called from your `WORKSPACE` file
+or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:
+
+```starlark
+npm_import(
+    name = "npm__at_types_node__15.12.2",
+    package = "@types/node",
+    version = "15.12.2",
+    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
+)
+```
+
+In `MODULE.bazel` the same would look like so:
+
+```starlark
+npm.npm_import(
+    name = "npm__at_types_node__15.12.2",
+    package = "@types/node",
+    version = "15.12.2",
+    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",v
+)
+use_repo(npm, "npm__at_types_node__15.12.2")
+use_repo(npm, "npm__at_types_node__15.12.2__links")
+```
+
+> This is similar to Bazel rules in other ecosystems named "_import" like
+> `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
+> `go_repository` is also a model for this rule.
+
+The name of this repository should contain the version number, so that multiple versions of the same
+package don't collide.
+(Note that the npm ecosystem always supports multiple versions of a library depending on where
+it is required, unlike other languages like Go or Python.)
+
+To consume the downloaded package in rules, it must be "linked" into the link package in the
+package's `BUILD.bazel` file:
+
+```
+load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
+
+npm_link_types_node()
+```
+
+This links `@types/node` into the `node_modules` of this package with the target name `:node_modules/@types/node`.
+
+A `:node_modules/@types/node/dir` filegroup target is also created that provides the the directory artifact of the npm package.
+This target can be used to create entry points for binary target or to access files within the npm package.
+
+NB: You can choose any target name for the link target but we recommend using the `node_modules/@scope/name` and
+`node_modules/name` convention for readability.
+
+When using `npm_translate_lock`, you can link all the npm dependencies in the lock file for a package:
+
+```
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages()
+```
+
+This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
+It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the the directory artifacts of their npm packages.
+These target can be used to create entry points for binary target or to access files within the npm package.
+
+If you have a mix of `npm_link_all_packages` and `npm_link_imported_package` functions to call you can pass the
+`npm_link_imported_package` link functions to the `imported_links` attribute of `npm_link_all_packages` to link
+them all in one call. For example,
+
+```
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
+
+npm_link_all_packages(
+    imported_links = [
+        npm_link_types_node,
+    ]
+)
+```
+
+This has the added benefit of adding the `imported_links` to the convienence `:node_modules` target which
+includes all direct dependencies in that package.
+
+NB: You can pass an name to npm_link_all_packages and this will change the targets generated to "{name}/@scope/name" and
+"{name}/name". We recommend using "node_modules" as the convention for readability.
+
+To change the proxy URL we use to fetch, configure the Bazel downloader:
+
+1. Make a file containing a rewrite rule like
+
+    `rewrite (registry.npmjs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2`
+
+1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
+
+1. Point bazel to the config with a line in .bazelrc like
+common --experimental_downloader_config=.bazel_downloader_config
+
+Read more about the downloader config: <https://blog.aspect.build/configuring-bazels-downloader>
+
+[UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
+
+Args:
+    name: Name for this repository rule
+
+    package: Name of the npm package, such as `acorn` or `@types/node`
+
+    version: Version of the npm package, such as `8.4.0`
+
+    deps: A dict other npm packages this one depends on where the key is the package name and value is the version
+
+    transitive_closure: A dict all npm packages this one depends on directly or transitively where the key is the
+        package name and value is a list of version(s) depended on in the closure.
+
+    root_package: The root package where the node_modules package store is linked to.
+        Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
+
+    link_workspace: The workspace name where links will be created for this package.
+
+        This is typically set in rule sets and libraries that are to be consumed as external repositories so
+        links are created in the external repository and not the user workspace.
+
+        Can be left unspecified if the link workspace is the user workspace.
+
+    lifecycle_hooks: List of lifecycle hook `package.json` scripts to run for this package if they exist.
+
+    lifecycle_hooks_env: Environment variables set for the lifecycle hooks action for this npm
+        package if there is one.
+
+        Environment variables are defined by providing an array of "key=value" entries.
+
+        For example:
+
+        ```
+        lifecycle_hooks_env: ["PREBULT_BINARY=https://downloadurl"],
+        ```
+
+    lifecycle_hooks_execution_requirements: Execution requirements when running the lifecycle hooks.
+
+        For example:
+
+        ```
+        lifecycle_hooks_execution_requirements: ["no-sandbox', "requires-network"]
+        ```
+
+        This defaults to ["no-sandbox"] to limit the overhead of sandbox creation and copying the output
+        TreeArtifact out of the sandbox.
+
+    lifecycle_hooks_use_default_shell_env: If True, the `use_default_shell_env` attribute of lifecycle hook
+        actions is set to True.
+
+        See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
+
+        Note: [--incompatible_merge_fixed_and_default_shell_env](https://bazel.build/reference/command-line-reference#flag--incompatible_merge_fixed_and_default_shell_env)
+        is often required and not enabled by default in Bazel < 7.0.0.
+
+        This defaults to False reduce the negative effects of `use_default_shell_env`. Requires bazel-lib >= 2.4.2.
+
+    integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
+        This must match the checksum of the file downloaded.
+
+        This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.
+
+        It is a security risk to omit the checksum as remote files can change.
+
+        At best omitting this field will make your build non-hermetic.
+
+        It is optional to make development easier but should be set before shipping.
+
+    url: Optional url for this package. If unset, a default npm registry url is generated from
+        the package name and version.
+
+        May start with `git+ssh://` or `git+https://` to indicate a git repository. For example,
+
+        ```
+        git+ssh://git@github.com/org/repo.git
+        ```
+
+        If url is configured as a git repository, the commit attribute must be set to the
+        desired commit.
+
+    commit: Specific commit to be checked out if url is a git repository.
+
+    replace_package: Use the specified npm_package target when linking instead of the fetched sources for this npm package.
+
+        The injected npm_package target may optionally contribute transitive npm package dependencies on top
+        of the transitive dependencies specified in the pnpm lock file for the same package, however, these
+        transitive dependencies must not collide with pnpm lock specified transitive dependencies.
+
+        Any patches specified for this package will be not applied to the injected npm_package target. They
+        will be applied, however, to the fetches sources so they can still be useful for patching the fetched
+        `package.json` file, which is used to determine the generated bin entries for the package.
+
+        NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
+        the injected npm_package. These may be disabled explicitly using the `lifecycle_hooks` attribute.
+
+    package_visibility: Visibility of generated node_module link targets.
+
+    patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
+
+    patch_args: Arguments to pass to the patch tool.
+
+        `-p1` will usually be needed for patches generated by git.
+
+    patches: Patch files to apply onto the downloaded npm package.
+
+    custom_postinstall: Custom string postinstall script to run on the installed npm package.
+
+        Runs after any existing lifecycle hooks if any are enabled.
+
+    npm_auth: Auth token to authenticate with npm. When using Bearer authentication.
+
+    npm_auth_basic: Auth token to authenticate with npm. When using Basic authentication.
+
+        This is typically the base64 encoded string "username:password".
+
+    npm_auth_username: Auth username to authenticate with npm. When using Basic authentication.
+
+    npm_auth_password: Auth password to authenticate with npm. When using Basic authentication.
+
+    extra_build_content: Additional content to append on the generated BUILD file at the root of
+        the created repository, either as a string or a list of lines similar to
+        <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
+
+    bins: Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
+
+        This is typically derived from the "bin" attribute in the package.json
+        file of the npm package being linked.
+
+        For example:
+
+        ```
+        bins = {
+            "foo": "./foo.js",
+            "bar": "./bar.js",
+        }
+        ```
+
+        In the future, this field may be automatically populated by npm_translate_lock
+        from information in the pnpm lock file. That feature is currently blocked on
+        https://github.com/pnpm/pnpm/issues/5131.
+
+    dev: Whether this npm package is a dev dependency
+
+        DEPRECATED: this field is deprecated and will be removed in a future release.
+
+        A package should be marked as a dev dependency as part of the dependency declaration,
+        not as part of the package definition or import.
+
+    exclude_package_contents: List of glob patterns to exclude from the linked package.
+
+        This is useful for excluding files that are not needed in the linked package.
+
+        For example:
+
+        ```
+        exclude_package_contents = ["**/tests/**"]
+        ```
+
+    **kwargs: Internal use only
+"""
+
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
     bin = pkg_json.get("bin", {})
@@ -910,6 +1178,7 @@ npm_import_links_lib = struct(
 npm_import_lib = struct(
     implementation = _npm_import_rule_impl,
     attrs = _ATTRS,
+    doc = _DOCS,
 )
 
 npm_import_links = repository_rule(
@@ -922,6 +1191,8 @@ npm_import_rule = repository_rule(
     attrs = _ATTRS,
 )
 
+# TODO(3.0): remove and replace with bzlmod API
+# buildifier: disable=function-docstring
 def npm_import(
         name,
         package,
@@ -952,274 +1223,6 @@ def npm_import(
         dev = False,
         exclude_package_contents = [],
         **kwargs):
-    """Import a single npm package into Bazel.
-
-    Normally you'd want to use `npm_translate_lock` to import all your packages at once.
-    It generates `npm_import` rules.
-    You can create these manually if you want to have exact control.
-
-    Bazel will only fetch the given package from an external registry if the package is
-    required for the user-requested targets to be build/tested.
-
-    This is a repository rule, which should be called from your `WORKSPACE` file
-    or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:
-
-    ```starlark
-    npm_import(
-        name = "npm__at_types_node__15.12.2",
-        package = "@types/node",
-        version = "15.12.2",
-        integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
-    )
-    ```
-
-    In `MODULE.bazel` the same would look like so:
-
-    ```starlark
-    npm.npm_import(
-        name = "npm__at_types_node__15.12.2",
-        package = "@types/node",
-        version = "15.12.2",
-        integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",v
-    )
-    use_repo(npm, "npm__at_types_node__15.12.2")
-    use_repo(npm, "npm__at_types_node__15.12.2__links")
-    ```
-
-    > This is similar to Bazel rules in other ecosystems named "_import" like
-    > `apple_bundle_import`, `scala_import`, `java_import`, and `py_import`.
-    > `go_repository` is also a model for this rule.
-
-    The name of this repository should contain the version number, so that multiple versions of the same
-    package don't collide.
-    (Note that the npm ecosystem always supports multiple versions of a library depending on where
-    it is required, unlike other languages like Go or Python.)
-
-    To consume the downloaded package in rules, it must be "linked" into the link package in the
-    package's `BUILD.bazel` file:
-
-    ```
-    load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
-
-    npm_link_types_node()
-    ```
-
-    This links `@types/node` into the `node_modules` of this package with the target name `:node_modules/@types/node`.
-
-    A `:node_modules/@types/node/dir` filegroup target is also created that provides the the directory artifact of the npm package.
-    This target can be used to create entry points for binary target or to access files within the npm package.
-
-    NB: You can choose any target name for the link target but we recommend using the `node_modules/@scope/name` and
-    `node_modules/name` convention for readability.
-
-    When using `npm_translate_lock`, you can link all the npm dependencies in the lock file for a package:
-
-    ```
-    load("@npm//:defs.bzl", "npm_link_all_packages")
-
-    npm_link_all_packages()
-    ```
-
-    This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
-    It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the the directory artifacts of their npm packages.
-    These target can be used to create entry points for binary target or to access files within the npm package.
-
-    If you have a mix of `npm_link_all_packages` and `npm_link_imported_package` functions to call you can pass the
-    `npm_link_imported_package` link functions to the `imported_links` attribute of `npm_link_all_packages` to link
-    them all in one call. For example,
-
-    ```
-    load("@npm//:defs.bzl", "npm_link_all_packages")
-    load("@npm__at_types_node__15.12.2__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")
-
-    npm_link_all_packages(
-        imported_links = [
-            npm_link_types_node,
-        ]
-    )
-    ```
-
-    This has the added benefit of adding the `imported_links` to the convienence `:node_modules` target which
-    includes all direct dependencies in that package.
-
-    NB: You can pass an name to npm_link_all_packages and this will change the targets generated to "{name}/@scope/name" and
-    "{name}/name". We recommend using "node_modules" as the convention for readability.
-
-    To change the proxy URL we use to fetch, configure the Bazel downloader:
-
-    1. Make a file containing a rewrite rule like
-
-        `rewrite (registry.npmjs.org)/(.*) artifactory.build.internal.net/artifactory/$1/$2`
-
-    1. To understand the rewrites, see [UrlRewriterConfig] in Bazel sources.
-
-    1. Point bazel to the config with a line in .bazelrc like
-    common --experimental_downloader_config=.bazel_downloader_config
-
-    Read more about the downloader config: <https://blog.aspect.build/configuring-bazels-downloader>
-
-    [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
-
-    Args:
-        name: Name for this repository rule
-
-        package: Name of the npm package, such as `acorn` or `@types/node`
-
-        version: Version of the npm package, such as `8.4.0`
-
-        deps: A dict other npm packages this one depends on where the key is the package name and value is the version
-
-        transitive_closure: A dict all npm packages this one depends on directly or transitively where the key is the
-            package name and value is a list of version(s) depended on in the closure.
-
-        root_package: The root package where the node_modules package store is linked to.
-            Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
-
-        link_workspace: The workspace name where links will be created for this package.
-
-            This is typically set in rule sets and libraries that are to be consumed as external repositories so
-            links are created in the external repository and not the user workspace.
-
-            Can be left unspecified if the link workspace is the user workspace.
-
-        lifecycle_hooks: List of lifecycle hook `package.json` scripts to run for this package if they exist.
-
-        lifecycle_hooks_env: Environment variables set for the lifecycle hooks action for this npm
-            package if there is one.
-
-            Environment variables are defined by providing an array of "key=value" entries.
-
-            For example:
-
-            ```
-            lifecycle_hooks_env: ["PREBULT_BINARY=https://downloadurl"],
-            ```
-
-        lifecycle_hooks_execution_requirements: Execution requirements when running the lifecycle hooks.
-
-            For example:
-
-            ```
-            lifecycle_hooks_execution_requirements: ["no-sandbox', "requires-network"]
-            ```
-
-            This defaults to ["no-sandbox"] to limit the overhead of sandbox creation and copying the output
-            TreeArtifact out of the sandbox.
-
-        lifecycle_hooks_use_default_shell_env: If True, the `use_default_shell_env` attribute of lifecycle hook
-            actions is set to True.
-
-            See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
-
-            Note: [--incompatible_merge_fixed_and_default_shell_env](https://bazel.build/reference/command-line-reference#flag--incompatible_merge_fixed_and_default_shell_env)
-            is often required and not enabled by default in Bazel < 7.0.0.
-
-            This defaults to False reduce the negative effects of `use_default_shell_env`. Requires bazel-lib >= 2.4.2.
-
-        integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
-            This must match the checksum of the file downloaded.
-
-            This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.
-
-            It is a security risk to omit the checksum as remote files can change.
-
-            At best omitting this field will make your build non-hermetic.
-
-            It is optional to make development easier but should be set before shipping.
-
-        url: Optional url for this package. If unset, a default npm registry url is generated from
-            the package name and version.
-
-            May start with `git+ssh://` or `git+https://` to indicate a git repository. For example,
-
-            ```
-            git+ssh://git@github.com/org/repo.git
-            ```
-
-            If url is configured as a git repository, the commit attribute must be set to the
-            desired commit.
-
-        commit: Specific commit to be checked out if url is a git repository.
-
-        replace_package: Use the specified npm_package target when linking instead of the fetched sources for this npm package.
-
-            The injected npm_package target may optionally contribute transitive npm package dependencies on top
-            of the transitive dependencies specified in the pnpm lock file for the same package, however, these
-            transitive dependencies must not collide with pnpm lock specified transitive dependencies.
-
-            Any patches specified for this package will be not applied to the injected npm_package target. They
-            will be applied, however, to the fetches sources so they can still be useful for patching the fetched
-            `package.json` file, which is used to determine the generated bin entries for the package.
-
-            NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
-            the injected npm_package. These may be disabled explicitly using the `lifecycle_hooks` attribute.
-
-        package_visibility: Visibility of generated node_module link targets.
-
-        patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
-
-        patch_args: Arguments to pass to the patch tool.
-
-            `-p1` will usually be needed for patches generated by git.
-
-        patches: Patch files to apply onto the downloaded npm package.
-
-        custom_postinstall: Custom string postinstall script to run on the installed npm package.
-
-            Runs after any existing lifecycle hooks if any are enabled.
-
-        npm_auth: Auth token to authenticate with npm. When using Bearer authentication.
-
-        npm_auth_basic: Auth token to authenticate with npm. When using Basic authentication.
-
-            This is typically the base64 encoded string "username:password".
-
-        npm_auth_username: Auth username to authenticate with npm. When using Basic authentication.
-
-        npm_auth_password: Auth password to authenticate with npm. When using Basic authentication.
-
-        extra_build_content: Additional content to append on the generated BUILD file at the root of
-            the created repository, either as a string or a list of lines similar to
-            <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
-
-        bins: Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
-
-            This is typically derived from the "bin" attribute in the package.json
-            file of the npm package being linked.
-
-            For example:
-
-            ```
-            bins = {
-                "foo": "./foo.js",
-                "bar": "./bar.js",
-            }
-            ```
-
-            In the future, this field may be automatically populated by npm_translate_lock
-            from information in the pnpm lock file. That feature is currently blocked on
-            https://github.com/pnpm/pnpm/issues/5131.
-
-        dev: Whether this npm package is a dev dependency
-
-            DEPRECATED: this field is deprecated and will be removed in a future release.
-
-            A package should be marked as a dev dependency as part of the dependency declaration,
-            not as part of the package definition or import.
-
-        exclude_package_contents: List of glob patterns to exclude from the linked package.
-
-            This is useful for excluding files that are not needed in the linked package.
-
-            For example:
-
-            ```
-            exclude_package_contents = ["**/tests/**"]
-            ```
-
-        **kwargs: Internal use only
-    """
-
     generate_package_json_bzl = kwargs.pop("generate_package_json_bzl", True)
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
