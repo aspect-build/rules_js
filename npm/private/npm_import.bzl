@@ -853,7 +853,6 @@ _COMMON_ATTRS = {
 }
 
 _ATTRS_LINKS = _COMMON_ATTRS | {
-    "link_packages": attr.string_list_dict(),
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
     "dev": attr.bool(),
