@@ -270,6 +270,16 @@ npm.npm_translate_lock(
     verify_node_modules_ignored = "//:.bazelignore",
     verify_patches = "//examples/npm_deps/patches:patches",
 )
+npm.npm_translate_lock(
+    name = "npm-no_optional",
+    no_optional = True,
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
+npm.npm_translate_lock(
+    name = "npm-no_dev",
+    no_dev = True,
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
 
 # Configure package exclusions using tag class
 npm.npm_exclude_package_contents(
@@ -279,6 +289,8 @@ npm.npm_exclude_package_contents(
 use_repo(
     npm,
     "npm",
+    "npm-no_dev",
+    "npm-no_optional",
     "npm__fsevents__2.3.3__links",
     "npm__rollup__2.70.2",
     "npm__rollup__2.70.2__links",
