@@ -450,7 +450,7 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     patched_dependencies = {}
     lock_parse_err = None
 
-    host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(rctx), ".exe" if is_windows else ""))
+    host_yq = Label("@yq_{}//:yq{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
     yq_args = [
         str(rctx.path(host_yq)),
         str(pnpm_lock_path),
