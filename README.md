@@ -47,7 +47,7 @@ See the documentation in the [docs](docs/) folder and generated API docs at http
 
 Basic usage examples can be found under the [examples](https://github.com/aspect-build/rules_js/tree/main/examples) folder.
 
-> Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
+> Note that the examples also rely on code in the `/MODULE` file in the root of this repo.
 
 The [e2e](https://github.com/aspect-build/rules_js/tree/main/e2e) folder also has a few useful examples such as [js_image_layer](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image_oci) for containerizing a js_binary and [js_run_devserver](https://github.com/aspect-build/rules_js/tree/main/e2e/js_run_devserver), a generic rule for running a devserver in watch mode with [ibazel](https://github.com/bazelbuild/bazel-watcher).
 

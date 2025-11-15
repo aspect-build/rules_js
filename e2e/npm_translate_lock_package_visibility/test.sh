@@ -3,7 +3,6 @@ set -o errexit -o nounset -o pipefail -o xtrace
 
 # Change visibility to restricted (since bazel test //... already validated the public case works)
 sed -i 's/"some-dep": \["\/\/visibility:public"\]/"some-dep": ["\/\/packages\/nonexistent:__subpackages__"]/' MODULE.bazel
-sed -i 's/"some-dep": \["\/\/visibility:public"\]/"some-dep": ["\/\/packages\/nonexistent:__subpackages__"]/' WORKSPACE
 
 # Clear Bazel cache to ensure new visibility is loaded
 bazel clean --expunge 2>/dev/null || true
