@@ -73,13 +73,15 @@ def _npm_extension_impl(module_ctx):
 
             module_ctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
-            _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
+            npm_imports = []
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
                 module_ctx.watch(attr.pnpm_lock)
-                _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
+                npm_imports = _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
+
+            _npm_translate_lock_bzlmod(module_ctx, attr, state, npm_imports)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -132,15 +134,14 @@ _hub_repo = repository_rule(
     },
 )
 
-def _npm_translate_lock_bzlmod(mctx, attr, state, exclude_package_contents_config, replace_packages):
+def _npm_translate_lock_bzlmod(mctx, attr, state, npm_imports):
     mctx.report_progress("Generating starlark for npm dependencies")
 
     files = generate_repository_files(
         attr.name,
         attr,
         state,
-        replace_packages,
-        exclude_package_contents_config,
+        npm_imports,
     )
 
     _hub_repo(
@@ -231,6 +232,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             url = i.url,
             version = i.version,
         )
+    return imports
 
 def _npm_import_bzlmod(i):
     npm_import(
