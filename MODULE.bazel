@@ -15,6 +15,7 @@ bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "0.0.5")
 bazel_dep(name = "rules_nodejs", version = "6.3.0")
+bazel_dep(name = "yq.bzl", version = "0.3.2")
 
 tel = use_extension("@aspect_tools_telemetry//:extension.bzl", "telemetry")
 use_repo(tel, "aspect_tools_telemetry_report")
@@ -46,6 +47,11 @@ use_repo(
     "bsd_tar_windows_amd64",
     "bsd_tar_windows_arm64",
     "coreutils_toolchains",
+)
+
+yq_toolchain = use_extension("@yq.bzl//yq:extensions.bzl", "yq")
+use_repo(
+    yq_toolchain,
     "yq_darwin_amd64",
     "yq_darwin_arm64",
     "yq_linux_amd64",
