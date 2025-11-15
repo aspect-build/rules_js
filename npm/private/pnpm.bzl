@@ -132,7 +132,7 @@ def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
         result[name] = version
     return result
 
-def _convert_v9_importers(importers):
+def _convert_v9_importers(importers, no_dev, no_optional):
     # Convert pnpm lockfile v9 importers to a rules_js compatible ~v5 format.
     # Almost identical to v6 but with fewer odd edge cases.
 
@@ -140,12 +140,12 @@ def _convert_v9_importers(importers):
     for import_path, importer in importers.items():
         result[import_path] = _new_import_info(
             dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("dependencies", {})),
-            dev_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("devDependencies", {})),
-            optional_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("optionalDependencies", {})),
+            dev_dependencies = {} if no_dev else _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("devDependencies", {})),
+            optional_dependencies = {} if no_optional else _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("optionalDependencies", {})),
         )
     return result
 
-def _convert_v9_packages(packages, snapshots):
+def _convert_v9_packages(packages, snapshots, no_optional):
     # Convert pnpm lockfile v9 importers to a rules_js compatible format.
 
     # v9 split package metadata (v6 "packages" field) into 2:
@@ -199,6 +199,11 @@ def _convert_v9_packages(packages, snapshots):
 
         package_key = _convert_pnpm_v6_v9_version_peer_dep(snapshot_key)
 
+        optional = package_snapshot.get("optional", False)
+        if optional and no_optional:
+            # when no_optional attribute is set, skip optionalDependencies
+            continue
+
         # Extract the version including peerDeps+patch from the key
         version = _convert_pnpm_v6_v9_version_peer_dep(package_key[package_key.index("@", 1) + 1:])
 
@@ -210,9 +215,9 @@ def _convert_v9_packages(packages, snapshots):
             version = version,
             friendly_version = friendly_version,
             dependencies = _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, package_snapshot.get("dependencies", {})),
-            optional_dependencies = _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, package_snapshot.get("optionalDependencies", {})),
+            optional_dependencies = {} if no_optional else _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, package_snapshot.get("optionalDependencies", {})),
             has_bin = package_data.get("hasBin", False),
-            optional = package_snapshot.get("optional", False),
+            optional = optional,
             resolution = package_data["resolution"],
         )
 
@@ -226,23 +231,27 @@ def _convert_v9_packages(packages, snapshots):
 
 ######################### Pnpm API #########################
 
-def _parse_pnpm_lock_json(content):
+def _parse_pnpm_lock_json(content, no_dev, no_optional):
     """Parse the content of a pnpm-lock.yaml file.
 
     Args:
         content: lockfile content as json
+        no_dev: if True, devDependencies are not included
+        no_optional: If true, optionalDependencies are not included
 
     Returns:
         A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
     """
-    return _parse_lockfile(json.decode(content) if content else None, None)
+    return _parse_lockfile(json.decode(content) if content else None, no_dev, no_optional, None)
 
-def _parse_lockfile(parsed, err):
+def _parse_lockfile(parsed, no_dev, no_optional, err):
     """Helper function used by _parse_pnpm_lock_json.
 
     Args:
         parsed: lockfile content object
-        err: any errors from pasring
+        no_dev: if True, devDependencies are not included
+        no_optional: If true, optionalDependencies are not included
+        err: any errors from parsing
 
     Returns:
         A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
@@ -270,8 +279,8 @@ def _parse_lockfile(parsed, err):
     patched_dependencies = parsed.get("patchedDependencies", {})
 
     snapshots = parsed.get("snapshots", {})
-    importers = _convert_v9_importers(importers)
-    packages = _convert_v9_packages(packages, snapshots)
+    importers = _convert_v9_importers(importers, no_dev, no_optional)
+    packages = _convert_v9_packages(packages, snapshots, no_optional)
 
     importers = utils.sorted_map(importers)
     packages = utils.sorted_map(packages)

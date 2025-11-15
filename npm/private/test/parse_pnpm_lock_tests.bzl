@@ -6,8 +6,8 @@ load("//npm/private:pnpm.bzl", "pnpm")
 def _parse_empty_lock_test_impl(ctx):
     env = unittest.begin(ctx)
 
-    parsed_json_a = pnpm.parse_pnpm_lock_json("")
-    parsed_json_b = pnpm.parse_pnpm_lock_json("{}")
+    parsed_json_a = pnpm.parse_pnpm_lock_json("", False, False)
+    parsed_json_b = pnpm.parse_pnpm_lock_json("{}", False, False)
     expected = ({}, {}, {}, None)
 
     asserts.equals(env, expected, parsed_json_a)
@@ -99,7 +99,7 @@ def _parse_lockfile_v9_test_impl(ctx):
     "lodash@file:lodash-4.17.21.tgz": { }
   }
 }
-""")
+""", False, False)
 
     # NOTE: unknown properties in >=v9, convert to <v9 defaults for test assertions
     v9_expected_packages = dict(expected_packages)

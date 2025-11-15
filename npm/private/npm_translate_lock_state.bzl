@@ -8,6 +8,7 @@ load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npmrc.bzl", "parse_npmrc")
 load(":pnpm.bzl", "pnpm")
 load(":repository_label_store.bzl", "repository_label_store")
+load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
 
 NPM_RC_FILENAME = ".npmrc"
@@ -459,7 +460,13 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     if result.return_code:
         lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
     else:
-        importers, packages, patched_dependencies, lock_parse_err = pnpm.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+        importers, packages, patched_dependencies, lock_parse_err = pnpm.parse_pnpm_lock_json(
+            result.stdout if result.stdout != "null" else None,  # NB: yq will return the string "null" if the yaml file is empty
+            attr.no_dev,
+            attr.no_optional,
+        )
+
+    translate_to_transitive_closure(importers, packages)
 
     priv["importers"] = importers
     priv["packages"] = packages

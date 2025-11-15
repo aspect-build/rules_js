@@ -1,16 +1,8 @@
 """
-Repository rule to fetch npm packages.
-
-Load this with,
-
-```starlark
-load("@aspect_rules_js//npm:repositories.bzl", "npm_import")
-```
-
 This uses Bazel's downloader to fetch the packages.
 You can use this to redirect all fetches through a store like Artifactory.
 
-See &lt;https://blog.aspect.build/configuring-bazels-downloader&gt; for more info about how it works
+See https://blog.aspect.build/configuring-bazels-downloader for more info about how it works
 and how to configure it.
 
 See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API to fetch npm packages
@@ -858,10 +850,10 @@ _ATTRS_LINKS = _COMMON_ATTRS | {
     "dev": attr.bool(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
-    "lifecycle_hooks_execution_requirements": attr.string_list(),
+    "lifecycle_hooks_execution_requirements": attr.string_list(default = ["no-sandbox"]),
     "lifecycle_hooks_use_default_shell_env": attr.bool(),
     "transitive_closure": attr.string_list_dict(),
-    "package_visibility": attr.string_list(),
+    "package_visibility": attr.string_list(default = ["//visibility:public"]),
     "replace_package": attr.string(),
     "exclude_package_contents": attr.string_list(default = []),
 }
@@ -882,7 +874,7 @@ _ATTRS = _COMMON_ATTRS | {
     "npm_auth_password": attr.string(),
     "npm_auth_username": attr.string(),
     "patch_tool": attr.label(),
-    "patch_args": attr.string_list(),
+    "patch_args": attr.string_list(default = ["-p0"]),
     "patches": attr.label_list(),
     "url": attr.string(),
 }
@@ -1169,18 +1161,12 @@ def _make_generated_by_prefix(package, version):
         version = version,
     )
 
-npm_import_links_lib = struct(
-    implementation = _npm_import_links_rule_impl,
-    attrs = _ATTRS_LINKS,
-)
-
 npm_import_lib = struct(
-    implementation = _npm_import_rule_impl,
-    attrs = _ATTRS,
+    attrs = _ATTRS | _ATTRS_LINKS,
     doc = _DOCS,
 )
 
-npm_import_links = repository_rule(
+npm_import_links_rule = repository_rule(
     implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS,
 )
@@ -1190,45 +1176,41 @@ npm_import_rule = repository_rule(
     attrs = _ATTRS,
 )
 
-# TODO(3.0): remove and replace with bzlmod API
+# Private API for importing + linking a single npm package
+# See underlying `npm_import_rule` and `npm_import_links_rule` for details.
 # buildifier: disable=function-docstring
 def npm_import(
         name,
         package,
         version,
-        deps = {},
-        extra_build_content = "",
-        transitive_closure = {},
-        root_package = "",
-        link_workspace = "",
-        lifecycle_hooks = [],
-        lifecycle_hooks_execution_requirements = ["no-sandbox"],
-        lifecycle_hooks_env = [],
-        lifecycle_hooks_use_default_shell_env = False,
-        integrity = "",
-        url = "",
-        commit = "",
-        replace_package = None,
-        package_visibility = ["//visibility:public"],
-        patch_tool = None,
-        patch_args = ["-p0"],
-        patches = [],
-        custom_postinstall = "",
-        npm_auth = "",
-        npm_auth_basic = "",
-        npm_auth_username = "",
-        npm_auth_password = "",
-        bins = {},
-        dev = False,
-        exclude_package_contents = [],
-        **kwargs):
-    generate_package_json_bzl = kwargs.pop("generate_package_json_bzl", True)
-    generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
-    extract_full_archive = kwargs.pop("extract_full_archive", None)
-    if len(kwargs):
-        msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
-        fail(msg)
-
+        deps,
+        extra_build_content,
+        transitive_closure,
+        root_package,
+        link_workspace,
+        lifecycle_hooks,
+        lifecycle_hooks_execution_requirements,
+        lifecycle_hooks_env,
+        lifecycle_hooks_use_default_shell_env,
+        integrity,
+        url,
+        commit,
+        replace_package,
+        package_visibility,
+        patch_tool,
+        patch_args,
+        patches,
+        custom_postinstall,
+        npm_auth,
+        npm_auth_basic,
+        npm_auth_username,
+        npm_auth_password,
+        bins,
+        dev,
+        generate_bzl_library_targets,
+        generate_package_json_bzl,
+        extract_full_archive,
+        exclude_package_contents):
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
     npm_import_rule(
@@ -1249,9 +1231,7 @@ def npm_import(
         npm_auth_username = npm_auth_username,
         npm_auth_password = npm_auth_password,
         lifecycle_hooks = lifecycle_hooks,
-        extra_build_content = (
-            extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
-        ),
+        extra_build_content = extra_build_content,
         generate_package_json_bzl = generate_package_json_bzl,
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
@@ -1263,7 +1243,7 @@ def npm_import(
 
     # By convention, the `{name}{utils.links_repo_suffix}` repository contains the generated
     # code to link this npm package into one or more node_modules trees
-    npm_import_links(
+    npm_import_links_rule(
         name = "{}{}".format(name, utils.links_repo_suffix),
         package = package,
         version = version,

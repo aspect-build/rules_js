@@ -5,9 +5,9 @@ See https://bazel.build/docs/bzlmod#extension-definition
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_features//:features.bzl", "bazel_features")
-load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
+load("//npm:repositories.bzl", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
-load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
+load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
 load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
@@ -69,15 +69,19 @@ def _npm_extension_impl(module_ctx):
     # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            state, importers, packages = parse_and_verify_lock(module_ctx, attr.name, attr)
+            state = parse_and_verify_lock(module_ctx, attr.name, attr)
 
-            _npm_translate_lock_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages)
+            module_ctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
+
+            npm_imports = []
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
                 module_ctx.watch(attr.pnpm_lock)
-                _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages)
+                npm_imports = _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
+
+            _npm_translate_lock_bzlmod(module_ctx, attr, state, npm_imports)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -130,22 +134,14 @@ _hub_repo = repository_rule(
     },
 )
 
-def _npm_translate_lock_bzlmod(mctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
+def _npm_translate_lock_bzlmod(mctx, attr, state, npm_imports):
     mctx.report_progress("Generating starlark for npm dependencies")
 
     files = generate_repository_files(
         attr.name,
         attr,
-        importers,
-        packages,
-        replace_packages,
-        exclude_package_contents_config,
-        state.patched_dependencies(),
-        state.only_built_dependencies(),
-        state.root_package(),
-        state.default_registry(),
-        state.npm_registries(),
-        state.npm_auth(),
+        state,
+        npm_imports,
     )
 
     _hub_repo(
@@ -153,7 +149,7 @@ def _npm_translate_lock_bzlmod(mctx, attr, state, importers, packages, exclude_p
         contents = files,
     )
 
-def _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
+def _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages):
     registries = {}
     npm_auth = {}
     if attr.npmrc:
@@ -184,8 +180,8 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
     )
     imports = npm_translate_lock_helpers.get_npm_imports(
-        importers = importers,
-        packages = packages,
+        importers = state.importers(),
+        packages = state.packages(),
         replace_packages = replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
@@ -210,6 +206,9 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             deps = i.deps,
             integrity = i.integrity,
             generate_package_json_bzl = True,  # TODO(3.0): only if it's a direct dep?
+            extract_full_archive = None,
+            dev = False,
+            extra_build_content = "",
             generate_bzl_library_targets = attr.generate_bzl_library_targets,
             lifecycle_hooks = i.lifecycle_hooks if i.lifecycle_hooks else [],
             lifecycle_hooks_env = i.lifecycle_hooks_env,
@@ -233,10 +232,14 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             url = i.url,
             version = i.version,
         )
+    return imports
 
 def _npm_import_bzlmod(i):
     npm_import(
         name = i.name,
+        generate_package_json_bzl = True,  # Always generate package_json.bzl explicitly declared imports
+        generate_bzl_library_targets = None,
+        extract_full_archive = None,
         bins = i.bins,
         commit = i.commit,
         custom_postinstall = i.custom_postinstall,
@@ -266,36 +269,15 @@ def _npm_import_bzlmod(i):
         version = i.version,
     )
 
-def _npm_translate_lock_attrs():
-    attrs = dict(**npm_translate_lock_lib.attrs)
-
+_NPM_IMPORT_ATTRS = npm_import_lib.attrs | {
     # Add macro attrs that aren't in the rule attrs.
-    attrs["name"] = attr.string()
-    attrs["lifecycle_hooks_exclude"] = attr.string_list(default = [])
-    attrs["lifecycle_hooks_no_sandbox"] = attr.bool(default = True)
-    attrs["run_lifecycle_hooks"] = attr.bool(default = True)
+    "name": attr.string(),
 
-    # Args defaulted differently by the macro
-    attrs["npm_package_target_name"] = attr.string(default = "pkg")
-    attrs["patch_args"] = attr.string_list_dict(default = {"*": ["-p0"]})
-
-    return attrs
-
-def _npm_import_attrs():
-    attrs = dict(**npm_import_lib.attrs)
-    attrs.update(**npm_import_links_lib.attrs)
-
-    # Add macro attrs that aren't in the rule attrs.
-    attrs["name"] = attr.string()
-    attrs["lifecycle_hooks_no_sandbox"] = attr.bool(default = False)
-    attrs["run_lifecycle_hooks"] = attr.bool(default = False)
-
-    # Args defaulted differently by the macro
-    attrs["lifecycle_hooks_execution_requirements"] = attr.string_list(default = ["no-sandbox"])
-    attrs["patch_args"] = attr.string_list(default = ["-p0"])
-    attrs["package_visibility"] = attr.string_list(default = ["//visibility:public"])
-
-    return attrs
+    # Attributes only used within the module extension implementation, not passed
+    # along to the npm_import[_links] rules.
+    "lifecycle_hooks_no_sandbox": attr.bool(default = False),
+    "run_lifecycle_hooks": attr.bool(default = False),
+}
 
 _EXCLUDE_PACKAGE_CONTENT_ATTRS = {
     "package": attr.string(
@@ -371,8 +353,8 @@ npm.npm_replace_package(
 npm = module_extension(
     implementation = _npm_extension_impl,
     tag_classes = {
-        "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs(), doc = npm_translate_lock_lib.doc),
-        "npm_import": tag_class(attrs = _npm_import_attrs(), doc = npm_import_lib.doc),
+        "npm_translate_lock": tag_class(attrs = npm_translate_lock_lib.attrs, doc = npm_translate_lock_lib.doc),
+        "npm_import": tag_class(attrs = _NPM_IMPORT_ATTRS, doc = npm_import_lib.doc),
         "npm_exclude_package_contents": tag_class(attrs = _EXCLUDE_PACKAGE_CONTENT_ATTRS, doc = _EXCLUDE_PACKAGE_CONTENT_DOCS),
         "npm_replace_package": tag_class(attrs = _REPLACE_PACKAGE_ATTRS, doc = _REPLACE_PACKAGE_DOCS),
     },

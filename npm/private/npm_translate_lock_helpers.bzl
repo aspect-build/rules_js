@@ -291,7 +291,6 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         friendly_version = package_info["friendly_version"]
         deps = package_info["dependencies"]
         optional_deps = package_info["optional_dependencies"]
-        optional = package_info["optional"]
         transitive_closure = package_info["transitive_closure"]
         resolution = package_info["resolution"]
 
@@ -313,13 +312,6 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         elif not integrity and not tarball:
             msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package_key)
             fail(msg)
-
-        if attr.no_optional and optional:
-            # when no_optional attribute is set, skip optionalDependencies
-            continue
-
-        if not attr.no_optional:
-            deps = optional_deps | deps
 
         friendly_name = utils.friendly_name(name, friendly_version)
         unfriendly_name = utils.friendly_name(name, version)
@@ -454,7 +446,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
-            deps = deps,
+            deps = optional_deps | deps,
             integrity = integrity,
             link_packages = link_packages,
             name = repo_name,

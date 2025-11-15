@@ -2,7 +2,7 @@
 
 load(":utils.bzl", "utils")
 
-def gather_transitive_closure(packages, package, no_optional, cache = {}):
+def gather_transitive_closure(packages, package, cache = {}):
     """Walk the dependency tree, collecting the transitive closure of dependencies and their versions.
 
     This is needed to resolve npm dependency cycles.
@@ -12,7 +12,6 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
     Args:
         packages: dictionary from pnpm lock
         package: the package to collect deps for
-        no_optional: whether to exclude optionalDependencies
         cache: a dictionary of results from previous invocations
 
     Returns:
@@ -23,7 +22,7 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
     transitive_closure = {}
     transitive_closure[root_package["name"]] = [root_package["version"]]
 
-    stack = [_get_package_info_deps(root_package, no_optional)]
+    stack = [_get_package_info_deps(root_package)]
     iteration_max = 999999
     for i in range(0, iteration_max + 1):
         if not len(stack):
@@ -60,24 +59,22 @@ def gather_transitive_closure(packages, package, no_optional, cache = {}):
                             transitive_closure[transitive_name].append(transitive_version)
             elif package_key in packages:
                 # Recurse into the next level of dependencies
-                stack.append(_get_package_info_deps(packages[package_key], no_optional))
+                stack.append(_get_package_info_deps(packages[package_key]))
             else:
                 msg = "Unknown package key: {} ({} @ {}) in {}".format(package_key, name, version, packages.keys())
                 fail(msg)
 
     return utils.sorted_map(transitive_closure)
 
-def _get_package_info_deps(package_info, no_optional):
-    return package_info["dependencies"] if no_optional else (package_info["dependencies"] | package_info["optional_dependencies"])
+def _get_package_info_deps(package_info):
+    return package_info["dependencies"] | package_info["optional_dependencies"]
 
-def translate_to_transitive_closure(importers, packages, no_dev = False, no_optional = False):
+def translate_to_transitive_closure(importers, packages):
     """Implementation detail of translate_package_lock, converts pnpm-lock to a different dictionary with more data.
 
     Args:
         importers: workspace projects (pnpm "importers")
         packages: all package info by name
-        no_dev: if True, devDependencies are not included
-        no_optional: If true, optionalDependencies are not included
 
     Returns:
         Nested dictionary suitable for further processing in our repository rule
@@ -93,30 +90,31 @@ def translate_to_transitive_closure(importers, packages, no_dev = False, no_opti
 
     # Collect deps of each importer (workspace projects)
     importers_deps = {}
-    for importPath in importers.keys():
-        lock_importer = importers[importPath]
+    for lock_importer in importers.values():
         prod_deps = lock_importer["dependencies"]
-        dev_deps = {} if no_dev else lock_importer["dev_dependencies"]
-        opt_deps = {} if no_optional else lock_importer["optional_dependencies"]
+        dev_deps = lock_importer["dev_dependencies"]
+        opt_deps = lock_importer["optional_dependencies"]
 
         deps = prod_deps | opt_deps
         all_deps = prod_deps | dev_deps | opt_deps
 
         # Package versions mapped to alternate versions
+        # TODO(3.0): remove this and respect the lockfile properly instead (https://github.com/aspect-build/rules_js/issues/2300)
         for info in package_version_map.values():
             if info["name"] in deps:
                 deps[info["name"]] = info["version"]
             if info["name"] in all_deps:
                 all_deps[info["name"]] = info["version"]
 
-        importers_deps[importPath] = {
-            # deps this importer should pass on if it is linked as a first-party package; this does
-            # not include devDependencies
-            "deps": deps,
-            # all deps of this importer to link in the node_modules folder of that Bazel package and
-            # make available to all build targets; this includes devDependencies
-            "all_deps": all_deps,
-        }
+        # TODO(3.0): remove this property
+        # deps this importer should pass on if it is linked as a first-party package; this does
+        # not include devDependencies
+        lock_importer["deps"] = deps
+
+        # TODO(3.0): remove this property
+        # all deps of this importer to link in the node_modules folder of that Bazel package and
+        # make available to all build targets; this includes devDependencies
+        lock_importer["all_deps"] = all_deps
 
     # Collect transitive dependencies for each package
     cache = {}
@@ -124,7 +122,6 @@ def translate_to_transitive_closure(importers, packages, no_dev = False, no_opti
         transitive_closure = gather_transitive_closure(
             packages,
             package,
-            no_optional,
             cache,
         )
 

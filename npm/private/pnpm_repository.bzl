@@ -1,7 +1,8 @@
 """Repository rules to import pnpm.
 """
 
-load(":npm_import.bzl", _npm_import = "npm_import")
+load(":npm_import.bzl", _npm_import_links_rule = "npm_import_links_rule", _npm_import_rule = "npm_import_rule")
+load(":utils.bzl", "utils")
 load(":versions.bzl", "PNPM_VERSIONS")
 
 LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
@@ -32,7 +33,7 @@ def pnpm_repository(name, pnpm_version = DEFAULT_PNPM_VERSION):
         else:
             fail("pnpm_version should be string or tuple, got " + type(pnpm_version))
 
-        _npm_import(
+        _npm_import_rule(
             name = name,
             integrity = integrity,
             package = "pnpm",
@@ -43,4 +44,11 @@ def pnpm_repository(name, pnpm_version = DEFAULT_PNPM_VERSION):
                 """js_binary(name = "pnpm", data = glob(["package/**"]), entry_point = "package/dist/pnpm.cjs", visibility = ["//visibility:public"])""",
             ]),
             extract_full_archive = True,
+        )
+
+        _npm_import_links_rule(
+            name = "{}{}".format(name, utils.links_repo_suffix),
+            package = "pnpm",
+            root_package = "",
+            version = pnpm_version,
         )
