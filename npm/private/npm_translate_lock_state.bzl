@@ -522,7 +522,7 @@ def _new(rctx_name, rctx, attr):
     label_store = repository_label_store.new(rctx.path)
 
     should_update_pnpm_lock = attr.update_pnpm_lock
-    if RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV in rctx.os.environ.keys() and rctx.os.environ[RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV]:
+    if rctx.getenv(RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV):
         # Force disabled update_pnpm_lock via environment variable. This is useful for some CI use cases.
         should_update_pnpm_lock = False
 

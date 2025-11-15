@@ -251,20 +251,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     # Generate the store_bzl and associated links_* code for every npm package
     for (i, _import) in enumerate(npm_imports):
+        defs_bzl = "@%s%s//:defs.bzl" % (_import.name, utils.links_repo_suffix)
         if _import.link_packages:
             defs_bzl_header.append(
-                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", link_{i} = "npm_link_imported_package_store_internal", store_{i} = "npm_imported_package_store_internal")""".format(
+                """load("{defs_bzl}", link_{i} = "npm_link_imported_package_store_internal", store_{i} = "npm_imported_package_store_internal")""".format(
+                    defs_bzl = defs_bzl,
                     i = i,
-                    links_repo_suffix = utils.links_repo_suffix,
-                    repo_name = _import.name,
                 ),
             )
         else:
             defs_bzl_header.append(
-                """load("@@{repo_name}{links_repo_suffix}//:defs.bzl", store_{i} = "npm_imported_package_store_internal")""".format(
+                """load("{defs_bzl}", store_{i} = "npm_imported_package_store_internal")""".format(
+                    defs_bzl = defs_bzl,
                     i = i,
-                    links_repo_suffix = utils.links_repo_suffix,
-                    repo_name = _import.name,
                 ),
             )
 
@@ -340,7 +339,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 # re-export the package_json.bzl for each linkage of this package
                 for link_alias in link_aliases:
                     package_json_bzl_file_path = "{}/{}/{}".format(link_package, link_alias, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(link_alias, _PACKAGE_JSON_BZL_FILENAME)
-                    repo_package_json_bzl = "@@{repo_name}//:{package_json_bzl}".format(
+                    repo_package_json_bzl = "@{repo_name}//:{package_json_bzl}".format(
                         repo_name = _import.name,
                         package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,
                     )
