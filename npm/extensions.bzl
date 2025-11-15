@@ -261,18 +261,6 @@ def _npm_import_bzlmod(i):
         version = i.version,
     )
 
-_NPM_TRANSLATE_LOCK_ATTRS = npm_translate_lock_lib.attrs | {
-    # Add macro attrs that aren't in the rule attrs.
-    "name": attr.string(),
-    "lifecycle_hooks_exclude": attr.string_list(default = []),
-    "lifecycle_hooks_no_sandbox": attr.bool(default = True),
-    "run_lifecycle_hooks": attr.bool(default = True),
-
-    # Args defaulted differently by the macro
-    "npm_package_target_name": attr.string(default = "pkg"),
-    "patch_args": attr.string_list_dict(default = {"*": ["-p0"]}),
-}
-
 _NPM_IMPORT_ATTRS = npm_import_lib.attrs | npm_import_links_lib.attrs | {
     # Add macro attrs that aren't in the rule attrs.
     "name": attr.string(),
@@ -359,7 +347,7 @@ npm.npm_replace_package(
 npm = module_extension(
     implementation = _npm_extension_impl,
     tag_classes = {
-        "npm_translate_lock": tag_class(attrs = _NPM_TRANSLATE_LOCK_ATTRS, doc = npm_translate_lock_lib.doc),
+        "npm_translate_lock": tag_class(attrs = npm_translate_lock_lib.attrs, doc = npm_translate_lock_lib.doc),
         "npm_import": tag_class(attrs = _NPM_IMPORT_ATTRS, doc = npm_import_lib.doc),
         "npm_exclude_package_contents": tag_class(attrs = _EXCLUDE_PACKAGE_CONTENT_ATTRS, doc = _EXCLUDE_PACKAGE_CONTENT_DOCS),
         "npm_replace_package": tag_class(attrs = _REPLACE_PACKAGE_ATTRS, doc = _REPLACE_PACKAGE_DOCS),

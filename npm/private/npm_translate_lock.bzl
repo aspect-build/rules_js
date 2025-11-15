@@ -1,10 +1,4 @@
-"""Repository rule to fetch npm packages for a lockfile.
-
-Load this with,
-
-```starlark
-load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
-```
+"""Logic to fetch npm packages for a lockfile.
 
 These use Bazel's downloader to fetch the packages.
 You can use this to redirect all fetches through a store like Artifactory.
@@ -12,7 +6,7 @@ You can use this to redirect all fetches through a store like Artifactory.
 See <https://blog.aspect.build/configuring-bazels-downloader> for more info about how it works
 and how to configure it.
 
-[`npm_translate_lock`](#npm_translate_lock) is the primary user-facing API.
+The [`npm_translate_lock`](#npm_translate_lock) bazel module extension tag is the primary user-facing API.
 It uses the lockfile format from [pnpm](https://pnpm.io/motivation) because it gives us reliable
 semantics for how to dynamically lay out `node_modules` trees on disk in bazel-out.
 
@@ -26,15 +20,11 @@ Advanced users may want to directly fetch a package from npm rather than start f
 """
 
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":list_sources.bzl", "list_sources")
-load(":npm_translate_lock_generate.bzl", "generate_repository_files")
 load(":npm_translate_lock_helpers.bzl", "helpers")
-load(":npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load(":npm_translate_lock_state.bzl", "DEFAULT_ROOT_PACKAGE", "npm_translate_lock_state")
-load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", _pnpm_repository = "pnpm_repository")
 load(":utils.bzl", "utils")
 
 RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
@@ -49,19 +39,22 @@ _ATTRS = {
     "external_repository_action_cache": attr.string(default = utils.default_external_repository_action_cache()),
     "generate_bzl_library_targets": attr.bool(),
     "lifecycle_hooks_envs": attr.string_list_dict(),
+    "lifecycle_hooks": attr.string_list_dict(),
+    "lifecycle_hooks_exclude": attr.string_list(default = []),
     "lifecycle_hooks_execution_requirements": attr.string_list_dict(),
     "lifecycle_hooks_use_default_shell_env": attr.string_dict(),
-    "lifecycle_hooks": attr.string_list_dict(),
+    "lifecycle_hooks_no_sandbox": attr.bool(default = True),
     "link_workspace": attr.string(),
+    "name": attr.string(),
     "no_dev": attr.bool(),
     "no_optional": attr.bool(),
     "node_toolchain_prefix": attr.string(default = "nodejs"),
     "npm_package_lock": attr.label(),
-    "npm_package_target_name": attr.string(),
+    "npm_package_target_name": attr.string(default = "pkg"),
     "npmrc": attr.label(),
     "package_visibility": attr.string_list_dict(),
     "patch_tool": attr.label(),
-    "patch_args": attr.string_list_dict(),
+    "patch_args": attr.string_list_dict(default = {"*": ["-p0"]}),
     "patches": attr.string_list_dict(),
     "use_pnpm": attr.label(default = "@pnpm//:package/bin/pnpm.cjs"),  # bzlmod pnpm extension
     "pnpm_lock": attr.label(),
@@ -69,6 +62,7 @@ _ATTRS = {
     "public_hoist_packages": attr.string_list_dict(),
     "quiet": attr.bool(default = True),
     "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
+    "run_lifecycle_hooks": attr.bool(default = True),
     "update_pnpm_lock": attr.bool(),
     "use_home_npmrc": attr.bool(),
     "verify_node_modules_ignored": attr.label(),
@@ -369,10 +363,6 @@ Args:
 
         Can be left unspecified if the link workspace is the user workspace.
 
-    pnpm_version: pnpm version to use when generating the @pnpm repository. Set to None to not create this repository.
-
-        Can be left unspecified and the rules_js default `DEFAULT_PNPM_VERSION` will be used.
-
     use_pnpm: label of the pnpm entry point to use.
 
     npm_package_target_name: The name of linked `js_library`, `npm_package` or `JsInfo` producing targets.
@@ -434,163 +424,6 @@ See https://github.com/aspect-build/rules_js/issues/1445
     return state
 
 ################################################################################
-def _npm_translate_lock_impl(rctx):
-    rctx.report_progress("Initializing")
-
-    state = parse_and_verify_lock(rctx, rctx.name, rctx.attr)
-
-    rctx.report_progress("Generating starlark for npm dependencies")
-
-    files = generate_repository_files(
-        rctx.name,
-        rctx.attr,
-        state,
-        rctx.attr.replace_packages,
-        None,
-    )
-
-    for filename, contents in files.items():
-        rctx.file(filename, contents)
-
-    # Support bazel <v8.3 by returning None if repo_metadata is not defined
-    if not hasattr(rctx, "repo_metadata"):
-        return None
-
-    return rctx.repo_metadata(reproducible = True)
-
-npm_translate_lock_rule = repository_rule(
-    implementation = _npm_translate_lock_impl,
-    attrs = _ATTRS,
-    doc = _DOCS,
-)
-
-# TODO(3.0): remove and replace with bzlmod API
-# buildifier: disable=function-docstring
-def npm_translate_lock(
-        name,
-        pnpm_lock = None,
-        npm_package_lock = None,
-        yarn_lock = None,
-        update_pnpm_lock = False,
-        node_toolchain_prefix = "nodejs",
-        yq_toolchain_prefix = "yq",
-        preupdate = [],
-        npmrc = None,
-        use_home_npmrc = None,
-        data = [],
-        patches = {},
-        patch_tool = None,
-        patch_args = {"*": ["-p0"]},
-        custom_postinstalls = {},
-        package_visibility = {},
-        public_hoist_packages = {},
-        no_dev = False,
-        no_optional = False,
-        run_lifecycle_hooks = True,
-        lifecycle_hooks = {},
-        lifecycle_hooks_envs = {},
-        lifecycle_hooks_exclude = [],
-        lifecycle_hooks_execution_requirements = {},
-        lifecycle_hooks_no_sandbox = True,
-        lifecycle_hooks_use_default_shell_env = {},
-        bins = {},
-        verify_node_modules_ignored = None,
-        verify_patches = None,
-        quiet = True,
-        external_repository_action_cache = utils.default_external_repository_action_cache(),
-        link_workspace = None,
-        pnpm_version = DEFAULT_PNPM_VERSION,
-        use_pnpm = None,
-        npm_package_target_name = "pkg",
-        **kwargs):
-    if not bazel_lib_utils.is_bazel_7_or_greater():
-        fail("A minimum version of Bazel 7 required to use rules_js")
-
-    # Gather undocumented attributes
-    root_package = kwargs.pop("root_package", None)
-    additional_file_contents = kwargs.pop("additional_file_contents", {})
-    generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
-
-    if len(kwargs):
-        msg = "Invalid npm_translate_lock parameter '{}'".format(kwargs.keys()[0])
-        fail(msg)
-
-    if pnpm_version != None:
-        _pnpm_repository(name = "pnpm", pnpm_version = pnpm_version)
-
-    if yarn_lock:
-        data = data + [yarn_lock]
-
-    if npm_package_lock:
-        data = data + [npm_package_lock]
-
-    # convert bins to a string_list_dict to satisfy attr type in repository rule
-    bins_string_list_dict = {}
-    if type(bins) != "dict":
-        fail("Expected bins to be a dict")
-    for key, value in bins.items():
-        if type(value) == "list":
-            # The passed 'bins' value is already in the dict-of-string-list
-            # form needed by the rule. This is undocumented but necessary for
-            # the bzlmod interface to use this macro since dict-of-dicts attributes
-            # cannot be passed into module extension attrs.
-            bins_string_list_dict = bins
-            break
-        if type(value) != "dict":
-            fail("Expected values in bins to be a dicts")
-        if key not in bins_string_list_dict:
-            bins_string_list_dict[key] = []
-        for value_key, value_value in value.items():
-            bins_string_list_dict[key].append("{}={}".format(value_key, value_value))
-
-    if not update_pnpm_lock and preupdate:
-        fail("expected update_pnpm_lock to be True when preupdate are specified")
-
-    lifecycle_hooks, lifecycle_hooks_execution_requirements, lifecycle_hooks_use_default_shell_env = macro_helpers.macro_lifecycle_args_to_rule_attrs(
-        lifecycle_hooks,
-        lifecycle_hooks_exclude,
-        run_lifecycle_hooks,
-        lifecycle_hooks_no_sandbox,
-        lifecycle_hooks_execution_requirements,
-        lifecycle_hooks_use_default_shell_env,
-    )
-
-    npm_translate_lock_rule(
-        name = name,
-        pnpm_lock = pnpm_lock,
-        npm_package_lock = npm_package_lock,
-        yarn_lock = yarn_lock,
-        update_pnpm_lock = update_pnpm_lock,
-        npmrc = npmrc,
-        use_home_npmrc = use_home_npmrc,
-        patches = patches,
-        patch_tool = patch_tool,
-        patch_args = patch_args,
-        custom_postinstalls = custom_postinstalls,
-        package_visibility = package_visibility,
-        public_hoist_packages = public_hoist_packages,
-        no_dev = no_dev,
-        no_optional = no_optional,
-        lifecycle_hooks = lifecycle_hooks if lifecycle_hooks else {},
-        lifecycle_hooks_envs = lifecycle_hooks_envs,
-        lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
-        lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
-        bins = bins_string_list_dict,
-        verify_node_modules_ignored = verify_node_modules_ignored,
-        verify_patches = verify_patches,
-        external_repository_action_cache = external_repository_action_cache,
-        link_workspace = link_workspace,
-        root_package = root_package,
-        additional_file_contents = additional_file_contents,
-        generate_bzl_library_targets = generate_bzl_library_targets,
-        data = data,
-        preupdate = preupdate,
-        quiet = quiet,
-        node_toolchain_prefix = node_toolchain_prefix,
-        use_pnpm = use_pnpm,
-        yq_toolchain_prefix = yq_toolchain_prefix,
-        npm_package_target_name = npm_package_target_name,
-    )
 
 def list_patches(name, out = None, include_patterns = ["*.diff", "*.patch"], exclude_package_contents = []):
     """Write a file containing a list of all patches in the current folder to the source tree.
