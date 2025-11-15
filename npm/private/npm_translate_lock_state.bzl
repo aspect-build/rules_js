@@ -111,9 +111,6 @@ def _init_common_labels(priv, rctx, attr, label_store):
         label_store.add("npmrc", attr.npmrc)
     label_store.add_sibling("lock", "sibling_npmrc", NPM_RC_FILENAME)
 
-    # pnpm-workspace.yaml file
-    label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
-
 ################################################################################
 def _init_update_labels(priv, _, attr, label_store):
     pnpm_lock_label = label_store.label("pnpm_lock")
@@ -276,10 +273,10 @@ def _copy_unspecified_input_files(priv, rctx, attr, label_store):
     repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
 
     pnpm_lock_label = attr.pnpm_lock
+    pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME)
 
     # pnpm-workspace.yaml
-    pnpm_workspace_key = "pnpm_workspace"
-    if _has_workspaces(priv) and not _has_input_hash(priv, label_store.relative_path(pnpm_workspace_key)):
+    if _has_workspaces(priv) and not _has_input_hash(priv, PNPM_WORKSPACE_FILENAME):
         # there are workspace packages so there must be a pnpm-workspace.yaml file
         # buildifier: disable=print
         print("""
@@ -287,16 +284,25 @@ WARNING: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the 
     Add `{pnpm_workspace}` to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
 """.format(
             pnpm_lock = pnpm_lock_label,
-            pnpm_workspace = label_store.label(pnpm_workspace_key),
+            pnpm_workspace = pnpm_workspace_label,
             rctx_name = priv["rctx_name"],
         ))
-        if not utils.exists(rctx, label_store.path(pnpm_workspace_key)):
+        pnpm_workspace_path = rctx.path(pnpm_workspace_label)
+        if not pnpm_workspace_path.exists:
             msg = "ERROR: expected `{path}` to exist since the `{pnpm_lock}` file contains workspace packages".format(
-                path = label_store.path(pnpm_workspace_key),
+                path = pnpm_workspace_path,
                 pnpm_lock = pnpm_lock_label,
             )
             fail(msg)
-        _copy_input_file_legacy(priv, rctx, attr, label_store, pnpm_workspace_key)
+
+        if _should_update_pnpm_lock(priv):
+            # NB: rctx.read will convert binary files to text but that is acceptable for
+            # the purposes of calculating a hash of the file
+            _set_input_hash(
+                priv,
+                PNPM_WORKSPACE_FILENAME,
+                utils.hash(rctx.read(pnpm_workspace_path)),
+            )
 
     pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else repo_root
     rel_dir = pnpm_lock_dir.removeprefix(repo_root)
