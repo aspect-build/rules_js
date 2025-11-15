@@ -297,21 +297,40 @@ def _npm_import_attrs():
 
     return attrs
 
-def _npm_exclude_package_contents_attrs():
-    return {
-        "package": attr.string(
-            doc = "Package name to apply exclusions to. Supports wildcards like '*' for all packages.",
-            mandatory = True,
-        ),
-        "patterns": attr.string_list(
-            doc = "List of glob patterns to exclude from the specified package.",
-            default = [],
-        ),
-        "use_defaults": attr.bool(
-            doc = "Whether to use default exclusion patterns for the specified package. Defaults are as to Yarn autoclean: https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16",
-            default = False,
-        ),
-    }
+_EXCLUDE_PACKAGE_CONTENT_ATTRS = {
+    "package": attr.string(
+        doc = "Package name to apply exclusions to. Supports wildcards like '*' for all packages.",
+        mandatory = True,
+    ),
+    "patterns": attr.string_list(
+        doc = "List of glob patterns to exclude from the specified package.",
+        default = [],
+    ),
+    "use_defaults": attr.bool(
+        doc = "Whether to use default exclusion patterns for the specified package. Defaults are as to Yarn autoclean: https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16",
+        default = False,
+    ),
+}
+
+_EXCLUDE_PACKAGE_CONTENT_DOCS = """Configuration for excluding package contents from npm packages.
+
+This tag can be used multiple times to specify different exclusion patterns for different package specifiers.
+Multiple exclusion patterns for the same package are combined.
+
+The `yarn autoclean` default exclusion patterns can be included by setting `use_defaults` to `True`.
+
+Example:
+```
+npm.npm_exclude_package_contents(
+    package = "*",
+    patterns = ["**/docs/**"],
+)
+npm.npm_exclude_package_contents(
+    package = "my-package@1.2.3",
+    use_defaults = True,
+)
+```
+"""
 
 _REPLACE_PACKAGE_ATTRS = {
     "package": attr.string(
@@ -323,16 +342,7 @@ _REPLACE_PACKAGE_ATTRS = {
         mandatory = True,
     ),
 }
-
-npm = module_extension(
-    implementation = _npm_extension_impl,
-    tag_classes = {
-        "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs()),
-        "npm_import": tag_class(attrs = _npm_import_attrs()),
-        "npm_exclude_package_contents": tag_class(attrs = _npm_exclude_package_contents_attrs()),
-        "npm_replace_package": tag_class(
-            attrs = _REPLACE_PACKAGE_ATTRS,
-            doc = """Replace a package with a custom target.
+_REPLACE_PACKAGE_DOCS = """Replace a package with a custom target.
 
 This allows replacing packages declared in package.json with custom implementations.
 Multiple npm_replace_package tags can be used to replace different packages.
@@ -356,8 +366,15 @@ npm.npm_replace_package(
     package = "chalk@5.3.0",
     replacement = "@chalk_501//:pkg",
 )
-```""",
-        ),
+```"""
+
+npm = module_extension(
+    implementation = _npm_extension_impl,
+    tag_classes = {
+        "npm_translate_lock": tag_class(attrs = _npm_translate_lock_attrs(), doc = npm_translate_lock_lib.doc),
+        "npm_import": tag_class(attrs = _npm_import_attrs(), doc = npm_import_lib.doc),
+        "npm_exclude_package_contents": tag_class(attrs = _EXCLUDE_PACKAGE_CONTENT_ATTRS, doc = _EXCLUDE_PACKAGE_CONTENT_DOCS),
+        "npm_replace_package": tag_class(attrs = _REPLACE_PACKAGE_ATTRS, doc = _REPLACE_PACKAGE_DOCS),
     },
 )
 
