@@ -35,7 +35,6 @@ load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load(":npm_translate_lock_state.bzl", "DEFAULT_ROOT_PACKAGE", "npm_translate_lock_state")
 load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", _pnpm_repository = "pnpm_repository")
-load(":transitive_closure.bzl", "translate_to_transitive_closure")
 load(":utils.bzl", "utils")
 
 RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
@@ -432,35 +431,22 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     rctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
-    importers, packages = translate_to_transitive_closure(
-        state.importers(),
-        state.packages(),
-        attr.no_dev,
-        attr.no_optional,
-    )
-
-    return state, importers, packages
+    return state
 
 ################################################################################
 def _npm_translate_lock_impl(rctx):
     rctx.report_progress("Initializing")
 
-    state, importers, packages = parse_and_verify_lock(rctx, rctx.name, rctx.attr)
+    state = parse_and_verify_lock(rctx, rctx.name, rctx.attr)
 
     rctx.report_progress("Generating starlark for npm dependencies")
 
     files = generate_repository_files(
         rctx.name,
         rctx.attr,
-        importers,
-        packages,
+        state,
         rctx.attr.replace_packages,
-        state.patched_dependencies(),
-        state.only_built_dependencies(),
-        state.root_package(),
-        state.default_registry(),
-        state.npm_registries(),
-        state.npm_auth(),
+        None,
     )
 
     for filename, contents in files.items():

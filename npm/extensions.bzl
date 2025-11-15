@@ -69,15 +69,17 @@ def _npm_extension_impl(module_ctx):
     # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            state, importers, packages = parse_and_verify_lock(module_ctx, attr.name, attr)
+            state = parse_and_verify_lock(module_ctx, attr.name, attr)
 
-            _npm_translate_lock_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages)
+            module_ctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
+
+            _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
 
             # We cannot read the pnpm_lock file before it has been bootstrapped.
             # See comment in e2e/update_pnpm_lock_with_import/test.sh.
             if attr.pnpm_lock:
                 module_ctx.watch(attr.pnpm_lock)
-                _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages)
+                _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -130,22 +132,15 @@ _hub_repo = repository_rule(
     },
 )
 
-def _npm_translate_lock_bzlmod(mctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
+def _npm_translate_lock_bzlmod(mctx, attr, state, exclude_package_contents_config, replace_packages):
     mctx.report_progress("Generating starlark for npm dependencies")
 
     files = generate_repository_files(
         attr.name,
         attr,
-        importers,
-        packages,
+        state,
         replace_packages,
         exclude_package_contents_config,
-        state.patched_dependencies(),
-        state.only_built_dependencies(),
-        state.root_package(),
-        state.default_registry(),
-        state.npm_registries(),
-        state.npm_auth(),
     )
 
     _hub_repo(
@@ -153,7 +148,7 @@ def _npm_translate_lock_bzlmod(mctx, attr, state, importers, packages, exclude_p
         contents = files,
     )
 
-def _npm_lock_imports_bzlmod(module_ctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
+def _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages):
     registries = {}
     npm_auth = {}
     if attr.npmrc:
@@ -184,8 +179,8 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
     )
     imports = npm_translate_lock_helpers.get_npm_imports(
-        importers = importers,
-        packages = packages,
+        importers = state.importers(),
+        packages = state.packages(),
         replace_packages = replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
