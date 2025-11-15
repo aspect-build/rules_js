@@ -5,9 +5,9 @@ See https://bazel.build/docs/bzlmod#extension-definition
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("@bazel_features//:features.bzl", "bazel_features")
-load("//npm:repositories.bzl", "npm_import", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
+load("//npm:repositories.bzl", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
-load("//npm/private:npm_import.bzl", "npm_import_lib", "npm_import_links_lib")
+load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
 load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
@@ -205,6 +205,9 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             deps = i.deps,
             integrity = i.integrity,
             generate_package_json_bzl = True,  # TODO(3.0): only if it's a direct dep?
+            extract_full_archive = None,
+            dev = False,
+            extra_build_content = "",
             generate_bzl_library_targets = attr.generate_bzl_library_targets,
             lifecycle_hooks = i.lifecycle_hooks if i.lifecycle_hooks else [],
             lifecycle_hooks_env = i.lifecycle_hooks_env,
@@ -232,6 +235,9 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 def _npm_import_bzlmod(i):
     npm_import(
         name = i.name,
+        generate_package_json_bzl = True,  # Always generate package_json.bzl explicitly declared imports
+        generate_bzl_library_targets = None,
+        extract_full_archive = None,
         bins = i.bins,
         commit = i.commit,
         custom_postinstall = i.custom_postinstall,
@@ -261,16 +267,14 @@ def _npm_import_bzlmod(i):
         version = i.version,
     )
 
-_NPM_IMPORT_ATTRS = npm_import_lib.attrs | npm_import_links_lib.attrs | {
+_NPM_IMPORT_ATTRS = npm_import_lib.attrs | {
     # Add macro attrs that aren't in the rule attrs.
     "name": attr.string(),
+
+    # Attributes only used within the module extension implementation, not passed
+    # along to the npm_import[_links] rules.
     "lifecycle_hooks_no_sandbox": attr.bool(default = False),
     "run_lifecycle_hooks": attr.bool(default = False),
-
-    # Args defaulted differently by the macro
-    "lifecycle_hooks_execution_requirements": attr.string_list(default = ["no-sandbox"]),
-    "patch_args": attr.string_list(default = ["-p0"]),
-    "package_visibility": attr.string_list(default = ["//visibility:public"]),
 }
 
 _EXCLUDE_PACKAGE_CONTENT_ATTRS = {
