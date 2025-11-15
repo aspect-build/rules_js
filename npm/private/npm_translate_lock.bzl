@@ -68,7 +68,6 @@ _ATTRS = {
     "verify_node_modules_ignored": attr.label(),
     "verify_patches": attr.label(),
     "yarn_lock": attr.label(),
-    "yq_toolchain_prefix": attr.string(default = "yq"),
 }
 
 _DOCS = """Repository macro to generate starlark code from a lock file.
@@ -113,8 +112,6 @@ Args:
         Read more: [using update_pnpm_lock](/docs/pnpm.md#update_pnpm_lock)
 
     node_toolchain_prefix: the prefix of the node toolchain to use when generating the pnpm lockfile.
-
-    yq_toolchain_prefix: the prefix of the yq toolchain to use for parsing the pnpm lockfile.
 
     preupdate: Node.js scripts to run in this repository rule before auto-updating the pnpm lock file.
 

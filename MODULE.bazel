@@ -10,6 +10,7 @@ module(
 # Do not bump these unless rules_js requires a newer version to function.
 bazel_dep(name = "aspect_bazel_lib", version = "2.17.1")  # TODO(alexeagle): remove
 bazel_dep(name = "tar.bzl", version = "0.6.0")
+bazel_dep(name = "yq.bzl", version = "0.3.1")
 bazel_dep(name = "aspect_tools_telemetry", version = "0.2.8")
 bazel_dep(name = "bazel_features", version = "1.9.0")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
@@ -39,6 +40,11 @@ bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "t
 use_repo(
     bazel_lib_toolchains,
     "coreutils_toolchains",
+)
+
+yq_toolchain = use_extension("@yq.bzl//yq:extensions.bzl", "yq")
+use_repo(
+    yq_toolchain,
     "yq_darwin_amd64",
     "yq_darwin_arm64",
     "yq_linux_amd64",
