@@ -37,6 +37,8 @@ write_source_files(
     name = "write_npm_translate_lock",
     files = {
         "snapshots/npm_defs.bzl": "@npm//:defs.bzl",
+        "snapshots/npm_defs-no_optional.bzl": "@npm-no_optional//:defs.bzl",
+        "snapshots/npm_defs-no_dev.bzl": "@npm-no_dev//:defs.bzl",
         "snapshots/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
         "snapshots/fsevents_links_defs.bzl": "@npm__fsevents__2.3.3__links//:defs.bzl",
         "snapshots/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
