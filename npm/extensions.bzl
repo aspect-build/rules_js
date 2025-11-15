@@ -131,29 +131,6 @@ _hub_repo = repository_rule(
 )
 
 def _npm_translate_lock_bzlmod(mctx, attr, state, importers, packages, exclude_package_contents_config, replace_packages):
-    # TODO(3.0): remove this warning when replace_packages attribute is removed
-    if attr.replace_packages:
-        # buildifier: disable=print
-        print("""
-WARNING: The 'replace_packages' attribute in npm_translate_lock is DEPRECATED in bzlmod.
-
-Please migrate to using the npm.npm_replace_package() tag instead:
-
-  npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
-  npm.npm_replace_package(
-      package = "your-package@version",
-      replacement = "//your:target",
-  )
-
-The 'replace_packages' attribute will be removed in rules_js version 3.0.
-""")
-
-        # Merge replace_packages attribute with npm_replace_package tags
-        for package, replacement in attr.replace_packages.items():
-            if package in replace_packages:
-                fail("Package replacement conflict: {} specified in both replace_packages attribute and npm_replace_package tag".format(package))
-            replace_packages[package] = replacement
-
     mctx.report_progress("Generating starlark for npm dependencies")
 
     attr = struct(
@@ -182,7 +159,6 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         preupdate = attr.preupdate,
         public_hoist_packages = attr.public_hoist_packages,
         quiet = attr.quiet,
-        replace_packages = replace_packages,
         root_package = attr.root_package,
         update_pnpm_lock = attr.update_pnpm_lock,
         use_home_npmrc = attr.use_home_npmrc,
@@ -198,6 +174,7 @@ The 'replace_packages' attribute will be removed in rules_js version 3.0.
         attr,
         importers,
         packages,
+        replace_packages,
         state.patched_dependencies(),
         state.only_built_dependencies(),
         state.root_package(),
@@ -392,8 +369,21 @@ npm = module_extension(
             attrs = _REPLACE_PACKAGE_ATTRS,
             doc = """Replace a package with a custom target.
 
-This allows you to replace packages declared in package.json with custom implementations.
+This allows replacing packages declared in package.json with custom implementations.
 Multiple npm_replace_package tags can be used to replace different packages.
+
+Targets must produce `JsInfo` or `NpmPackageInfo` providers such as `js_library` or `npm_package` targets.
+
+The injected package targets may optionally contribute transitive npm package dependencies on top
+of the transitive dependencies specified in the pnpm lock file for their respective packages, however, these
+transitive dependencies must not collide with pnpm lock specified transitive dependencies.
+
+Any patches specified for the packages will be not applied to the injected package targets. They
+will be applied, however, to the fetches sources for their respecitve packages so they can still be useful
+for patching the fetched `package.json` files, which are used to determine the generated bin entries for packages.
+
+NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
+the injected package targets. These may be disabled explicitly using the `lifecycle_hooks` attribute.
 
 Example:
 ```starlark
