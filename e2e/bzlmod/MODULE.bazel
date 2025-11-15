@@ -23,7 +23,7 @@ npm.npm_translate_lock(
     name = "npm",
     # Test that lifecycle hooks can resolve node, npm as well as dep bins on that PATH.
     # This e2e test is run on Windows as well so this test coverage is here for now. Once
-    # Windows CI runs on the root WORKSPACE, coverage can be moved there.
+    # Windows CI runs on the root MODULE, coverage can be moved there.
     # See https://github.com/aspect-build/rules_js/pull/1142 for more info.
     custom_postinstalls = {
         "chalk": "node --version",
