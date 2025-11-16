@@ -258,10 +258,7 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
     # make a lookup table of package to link name for each importer
     importer_links = {}
     for import_path, importer in importers.items():
-        dependencies = importer["all_deps"]
-        if type(dependencies) != "dict":
-            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
-            fail(msg)
+        dependencies = importer["dependencies"] | importer["optional_dependencies"] | importer["dev_dependencies"]
         links = {
             "link_package": _link_package(root_package, import_path),
         }

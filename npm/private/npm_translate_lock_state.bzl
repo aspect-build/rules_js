@@ -8,7 +8,7 @@ load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npmrc.bzl", "parse_npmrc")
 load(":pnpm.bzl", "pnpm")
 load(":repository_label_store.bzl", "repository_label_store")
-load(":transitive_closure.bzl", "translate_to_transitive_closure")
+load(":transitive_closure.bzl", "calculate_transitive_closures")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
 
 NPM_RC_FILENAME = ".npmrc"
@@ -466,7 +466,7 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
             attr.no_optional,
         )
 
-    translate_to_transitive_closure(importers, packages)
+    calculate_transitive_closures(packages)
 
     priv["importers"] = importers
     priv["packages"] = packages

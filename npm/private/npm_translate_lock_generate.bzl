@@ -122,8 +122,9 @@ js_binary(name = "sync", entry_point = "noop.js")
     # Collect first-party links in importers
     for link_package, import_path in package_to_importer.items():
         importer = importers[import_path]
-        prod_deps = importer.get("deps", {})
-        for dep_package, dep_version in importer.get("all_deps", {}).items():
+        prod_deps = importer["dependencies"] | importer["optional_dependencies"]
+        all_deps = prod_deps | importer["dev_dependencies"]
+        for dep_package, dep_version in all_deps.items():
             is_dev = dep_package not in prod_deps
             if dep_version.startswith("file:"):
                 dep_key = "{}+{}".format(dep_package, dep_version)
@@ -150,7 +151,7 @@ js_binary(name = "sync", entry_point = "noop.js")
                     transitive_deps = {}
                     raw_deps = {}
                     if importers.get(dep_link, False):
-                        raw_deps = importers.get(dep_link)["deps"]
+                        raw_deps = importers[dep_link]["dependencies"] | importers[dep_link]["optional_dependencies"]
                     for raw_package, raw_version in raw_deps.items():
                         package_store_name = utils.package_store_name(raw_package, raw_version)
                         dep_store_target = '"//{root_package}:{package_store_root}/node_modules/{package_store_name}"'.format(
@@ -275,7 +276,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
             link_importer_key = package_to_importer.get(link_package)
             link_importer = importers.get(link_importer_key)
-            link_prod_deps = link_importer.get("deps", {})
 
             # the build file for the package being linked
             build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
@@ -292,7 +292,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             # for each alias of this package
             for link_alias in link_aliases:
                 is_alias = link_alias != _import.package
-                is_dev = link_alias not in link_prod_deps
+                is_dev = link_alias not in link_importer["dependencies"] and link_alias not in link_importer["optional_dependencies"]
 
                 links_pkg_bzl[link_package].append("""            link_{i}({maybe_alias}{maybe_dev})""".format(
                     i = i,
