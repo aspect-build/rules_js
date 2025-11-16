@@ -25,6 +25,9 @@ workspaces:
     e2e/gyp_no_install_script:
         icon: npm
         tasks: *e2e_tasks
+    e2e/js_binary_workspace:
+        icon: js
+        tasks: *e2e_tasks
     # rules_docker not compatible with Bazel 7.
     # See https://github.com/bazelbuild/bazel/issues/20494#issuecomment-1852401451.
     # e2e/js_image_docker:

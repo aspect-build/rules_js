@@ -1,1 +1,4 @@
+workspace/bazel-bin
+workspace/bazel-out
+workspace/bazel-testlogs
 workspace/bazel-workspace
