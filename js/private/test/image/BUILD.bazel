@@ -22,6 +22,15 @@ platform(
     visibility = ["//js/private/test/image:__subpackages__"],
 )
 
+platform(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//js/private/test/image:__subpackages__"],
+)
+
 # All these golden files can be updated with
 # bazel run //js/private/test/image:default_test_update_all
 # bazel run //js/private/test/image:custom_owner_test_update_all
@@ -115,8 +124,15 @@ make_js_image_layer(
 )
 
 platform_transition_filegroup(
-    name = "transition_js_image_layer",
+    name = "transition_js_image_layer_linux_amd64",
     testonly = True,
     srcs = [":js_image_layer_untransitioned"],
     target_platform = ":linux_amd64",
+)
+
+platform_transition_filegroup(
+    name = "transition_js_image_layer_linux_arm64",
+    testonly = True,
+    srcs = [":js_image_layer_untransitioned"],
+    target_platform = ":linux_arm64",
 )
