@@ -1,5 +1,6 @@
 {
     "name": "test-peer-types",
+    "version": "0.0.1",
     "private": true,
     "description": "A package with peer dependencies including: workspace, link, also-in-dev, odd version specifiers",
     "devDependencies": {

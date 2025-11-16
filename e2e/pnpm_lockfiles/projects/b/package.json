@@ -1,5 +1,6 @@
 {
     "name": "@scoped/b",
+    "version": "0.0.1",
     "private": true,
     "dependencies": {
         "@scoped/a": "workspace:*"
