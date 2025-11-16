@@ -263,20 +263,13 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
             "link_package": _link_package(root_package, import_path),
         }
         linked_packages = {}
-        for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("link:"):
+        for dep_package, dep_package_key in dependencies.items():
+            if dep_package_key.startswith("link:"):
                 continue
-            if dep_version.startswith("npm:"):
-                # special case for alias dependencies such as npm:alias-to@version
-                maybe_package = dep_version[4:]
-            elif dep_version not in packages:
-                maybe_package = utils.package_key(dep_package, dep_version)
+            if dep_package_key not in linked_packages:
+                linked_packages[dep_package_key] = [dep_package]
             else:
-                maybe_package = dep_version
-            if maybe_package not in linked_packages:
-                linked_packages[maybe_package] = [dep_package]
-            else:
-                linked_packages[maybe_package].append(dep_package)
+                linked_packages[dep_package_key].append(dep_package)
         links["packages"] = linked_packages
         importer_links[import_path] = links
 
@@ -371,7 +364,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
-        repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
+        repo_name = utils.package_repo_name(attr.name, package_key)
 
         # gather package visibility
         package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name, unfriendly_name)
@@ -437,7 +430,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
                     registry = utils.npm_registry_url(name, registries, default_registry)
                 url = "{}/{}".format(registry.removesuffix("/"), tarball)
         else:
-            url = utils.npm_registry_download_url(name, version, registries, default_registry)
+            url = utils.npm_registry_download_url(name, friendly_version, registries, default_registry)
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
@@ -447,6 +440,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             integrity = integrity,
             link_packages = link_packages,
             repo_name = repo_name,
+            package_key = package_key,
             package = name,
             package_visibility = package_visibility,
             patch_tool = attr.patch_tool,

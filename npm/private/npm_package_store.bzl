@@ -182,7 +182,8 @@ def _npm_package_store_impl(ctx):
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
 
-    package_store_name = utils.package_store_name(package, version)
+    package_key = "{}@{}".format(package, version)
+    package_store_name = utils.package_store_name(package_key)
     package_store_directory = None
 
     # files required to create the package store entry
@@ -340,7 +341,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
             # create a map of deps that have package store directories
             if dep_info.package_store_directory:
-                deps_map[utils.package_store_name(dep_info.package, dep_info.version)] = dep
+                deps_map[dep_info.key] = dep
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
@@ -350,21 +351,21 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
         for dep in ctx.attr.deps:
             dep_info = dep[NpmPackageStoreInfo]
-            dep_package_store_name = utils.package_store_name(dep_info.package, dep_info.version)
+            dep_package_store_name = utils.package_store_name(dep_info.key)
 
-            if package_store_name == dep_package_store_name:
+            if package_key == dep_info.key:
                 # provide the node_modules directory for this package if found in the transitive_closure
                 package_store_directory = dep_info.package_store_directory
 
             for dep_ref_dep, dep_ref_dep_aliases in dep_info.ref_deps.items():
-                dep_ref_dep_package_store_name = utils.package_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
-                if not dep_ref_dep_package_store_name in deps_map:
+                dep_ref_dep_key = dep_ref_dep[NpmPackageStoreInfo].key
+                if not dep_ref_dep_key in deps_map:
                     # This can happen in lifecycle npm package targets. We have no choice but to
                     # ignore reference back to self in dyadic circular deps in this case since a
                     # transitive dep on this npm package is impossible in an action that is
                     # outputting the package store tree artifact that circular dep would point to.
                     continue
-                actual_dep = deps_map[dep_ref_dep_package_store_name]
+                actual_dep = deps_map[dep_ref_dep_key]
                 dep_ref_def_package_store_directory = actual_dep[NpmPackageStoreInfo].package_store_directory
                 if dep_ref_def_package_store_directory:
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
@@ -415,6 +416,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             transitive_types = types_depset,
         ),
         NpmPackageStoreInfo(
+            key = package_key,
             root_package = ctx.label.package,
             package = package,
             version = version,

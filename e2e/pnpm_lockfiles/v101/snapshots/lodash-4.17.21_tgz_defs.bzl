@@ -12,12 +12,14 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "lodash"
 VERSION = "file:../vendored/lodash-4.17.21.tgz"
 _ROOT_PACKAGE = "<LOCKVERSION>"
+_KEY = "lodash@file:../vendored/lodash-4.17.21.tgz"
 _PACKAGE_STORE_NAME = "lodash@file+..+vendored+lodash-4.17.21.tgz"
 
 # Generated npm_imported_package_store_internal() wrapper target for npm package lodash@file:../vendored/lodash-4.17.21.tgz
 # buildifier: disable=function-docstring
 def npm_imported_package_store_internal():
     _npm_imported_package_store_internal(
+        key = _KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,

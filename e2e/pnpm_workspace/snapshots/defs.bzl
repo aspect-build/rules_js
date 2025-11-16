@@ -70,7 +70,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package_store_name = "vendored-b@file+vendored+b_at_lib_b_lib+b",
             src = "//vendored/b:pkg",
             package = "vendored-b",
-            version = "file:vendored/b_at_lib_b_lib+b",
+            version = "file:vendored/b(@lib/b@lib+b)",
             deps = {
                 "//:.aspect_rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
             },
