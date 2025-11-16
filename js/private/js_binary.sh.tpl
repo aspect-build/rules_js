@@ -329,7 +329,11 @@ fi
 # Change directory to user specified package if set
 if [ "${JS_BINARY__CHDIR:-}" ]; then
     logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
-    cd "$JS_BINARY__CHDIR"
+    case "$JS_BINARY__CHDIR" in
+    /*) cd "$JS_BINARY__CHDIR" ;;                             # absolute path
+    @*) cd "$JS_BINARY__CHDIR" ;;                              # @-prefixed left untouched
+    *) cd "$(resolve_execroot_bin_path "$JS_BINARY__CHDIR")" ;; # workspace/bin-relative
+    esac
 fi
 
 # Gather node options

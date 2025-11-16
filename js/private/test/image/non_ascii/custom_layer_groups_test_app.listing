@@ -4,7 +4,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/
--r-xr-xr-x  0 0      0       24076 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2
+-r-xr-xr-x  0 0      0       24348 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/
@@ -14,7 +14,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/
 -r-xr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/ㅑㅕㅣㅇ.ㄴㅅ
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/bin2_/
--r-xr-xr-x  0 0      0       24076 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/bin2_/bin2
+-r-xr-xr-x  0 0      0       24348 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/bin2_/bin2
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/bin2_node_bin/
 -r-xr-xr-x  0 0      0         133 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/bin2_node_bin/node
 -r-xr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/test/image/non_ascii/empty empty.ㄴㅅ
