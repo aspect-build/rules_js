@@ -69,36 +69,12 @@ def gather_transitive_closure(packages, package, cache = {}):
 def _get_package_info_deps(package_info):
     return package_info["dependencies"] | package_info["optional_dependencies"]
 
-def translate_to_transitive_closure(importers, packages):
-    """Implementation detail of translate_package_lock, converts pnpm-lock to a different dictionary with more data.
+def calculate_transitive_closures(packages):
+    """Calculate the transitive closure of dependencies for each package.
 
     Args:
-        importers: workspace projects (pnpm "importers")
         packages: all package info by name
-
-    Returns:
-        Nested dictionary suitable for further processing in our repository rule
     """
-
-    # Collect deps of each importer (workspace projects)
-    importers_deps = {}
-    for lock_importer in importers.values():
-        prod_deps = lock_importer["dependencies"]
-        dev_deps = lock_importer["dev_dependencies"]
-        opt_deps = lock_importer["optional_dependencies"]
-
-        deps = prod_deps | opt_deps
-        all_deps = prod_deps | dev_deps | opt_deps
-
-        # TODO(3.0): remove this property
-        # deps this importer should pass on if it is linked as a first-party package; this does
-        # not include devDependencies
-        lock_importer["deps"] = deps
-
-        # TODO(3.0): remove this property
-        # all deps of this importer to link in the node_modules folder of that Bazel package and
-        # make available to all build targets; this includes devDependencies
-        lock_importer["all_deps"] = all_deps
 
     # Collect transitive dependencies for each package
     cache = {}
@@ -111,5 +87,3 @@ def translate_to_transitive_closure(importers, packages):
 
         packages[package]["transitive_closure"] = transitive_closure
         cache[package] = transitive_closure
-
-    return (importers_deps, packages)
