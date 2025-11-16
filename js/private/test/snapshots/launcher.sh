@@ -447,7 +447,7 @@ fi
 if [ "${JS_BINARY__CHDIR:-}" ]; then
     logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
     case "$JS_BINARY__CHDIR" in
-    external/*) cd "$(resolve_execroot_src_path "$JS_BINARY__CHDIR")" ;;
+    external/*) cd "$(resolve_execroot_bin_path "$JS_BINARY__CHDIR")" ;;
     *) cd "$JS_BINARY__CHDIR" ;;
     esac
 fi
