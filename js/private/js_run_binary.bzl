@@ -316,7 +316,23 @@ WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' in
 
     # Configure working directory to `chdir` is set
     if chdir:
-        fixed_env["JS_BINARY__CHDIR"] = chdir
+        normalized_chdir = chdir
+        repo = native.repo_name()
+
+        # Normalize workspace-relative chdir for external repositories so callers can pass
+        # native.package_name() without worrying about external/ prefixing.
+        # - Leave absolute paths and already-external paths untouched.
+        # - For external repos, prefix with "external/<repo>/".
+        if (
+            repo and
+            not (chdir.startswith("external/") or chdir.startswith("/")) and
+            not chdir.startswith("@")
+        ):
+            if chdir == ".":
+                normalized_chdir = "external/{}".format(repo)
+            else:
+                normalized_chdir = "external/{}/{}".format(repo, chdir)
+        fixed_env["JS_BINARY__CHDIR"] = normalized_chdir
 
     # Configure capturing stdout, stderr and/or the exit code
     extra_outs = []
