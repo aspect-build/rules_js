@@ -58,21 +58,6 @@ _next_build_config = "next.config.mjs"
 # A label to the rules_js/contrib config file.
 _next_standalone_config = Label("next.bazel.mjs")
 
-def _nextjs_compute_chdir():
-    """Compute a chdir that works for main and external workspaces.
-
-    Returns a path under the Bazel output tree that points to this package
-    whether the target is in the main workspace or in an external repository.
-    """
-    repo = native.repo_name()
-    pkg = native.package_name()
-    if repo:
-        if pkg:
-            return "external/{}/{}".format(repo, pkg)
-        else:
-            return "external/{}".format(repo)
-    return pkg
-
 def nextjs(
         name,
         srcs,
@@ -216,7 +201,7 @@ def nextjs_build(name, config, srcs, next_js_binary, data = [], **kwargs):
         args = ["build"],
         srcs = srcs + data + [config],
         out_dirs = [_next_build_out],
-        chdir = _nextjs_compute_chdir(),
+        chdir = native.package_name(),
         mnemonic = "NextJs",
         progress_message = "Compile Next.js app %{label}",
         **kwargs
@@ -248,7 +233,7 @@ def nextjs_start(name, config, app, next_js_binary, data = [], **kwargs):
         tool = next_js_binary,
         args = ["start"],
         data = data + [app, config],
-        chdir = _nextjs_compute_chdir(),
+        chdir = native.package_name(),
         **kwargs
     )
 
@@ -277,7 +262,7 @@ def nextjs_dev(name, config, srcs, data, next_js_binary, **kwargs):
         tool = next_js_binary,
         args = ["dev"],
         data = srcs + data + [config],
-        chdir = _nextjs_compute_chdir(),
+        chdir = native.package_name(),
         **kwargs
     )
 
@@ -328,7 +313,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         args = ["build"],
         srcs = srcs + data + [":_%s.standalone_config_file" % name, config],
         out_dirs = [_next_build_out],
-        chdir = _nextjs_compute_chdir(),
+        chdir = native.package_name(),
         mnemonic = "NextJs",
         progress_message = "Compile Next.js standalone app %{label}",
         **kwargs
@@ -373,7 +358,7 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
     js_binary(
         name = name,
         entry_point = ":_{}.js".format(name),
-        chdir = _nextjs_compute_chdir(),
+        chdir = native.package_name(),
         data = data,
         **kwargs
     )
