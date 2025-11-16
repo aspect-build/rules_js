@@ -6,7 +6,7 @@ load("//js:defs.bzl", "js_image_layer")
 # buildifier: disable=function-docstring
 def assert_tar_listing(name, actual, expected):
     # Either of these two file sizes may be observed on a file like /js/private/test/image/bin
-    sanitize_cmd = "sed -E 's/23[0-9]{3}|24[0-9]{3}/xxxxx/g'"
+    sanitize_cmd = "sed -E 's/239[0-9]{2}|24[0-9]{3}/xxxxx/g'"
     actual_listing = "_{}_listing".format(name)
     native.genrule(
         name = actual_listing,

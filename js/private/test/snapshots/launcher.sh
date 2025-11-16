@@ -447,11 +447,8 @@ fi
 if [ "${JS_BINARY__CHDIR:-}" ]; then
     logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
     case "$JS_BINARY__CHDIR" in
-    /*) cd "$JS_BINARY__CHDIR" ;;                               # absolute path
-    external/*) cd "$JS_BINARY__EXECROOT/$JS_BINARY__CHDIR" ;;  # execroot-relative external repo/package
-    @*) cd "$JS_BINARY__CHDIR" ;;                               # @-prefixed left untouched
-    ../*|./*) cd "$JS_BINARY__CHDIR" ;;                         # relative path applied to current working directory
-    *) cd "$JS_BINARY__CHDIR" ;;                                # bin-relative (current working directory)
+    external/*) cd "$(resolve_execroot_src_path "$JS_BINARY__CHDIR")" ;;
+    *) cd "$JS_BINARY__CHDIR" ;;
     esac
 fi
 
