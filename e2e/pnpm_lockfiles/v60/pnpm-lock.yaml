@@ -142,32 +142,35 @@ importers:
         specifier: 5.3.1
         version: registry.npmjs.org/@types/archiver@5.3.1
       '@types/node':
-        specifier: 16.18.11
-        version: registry.npmjs.org/@types/node@16.18.11
+        specifier: 18.19.54
+        version: registry.npmjs.org/@types/node@18.19.54
       alias-only-sizzle:
-        specifier: npm:@types/sizzle@~2.3.9
-        version: registry.npmjs.org/@types/sizzle@2.3.9
+        specifier: npm:@types/sizzle@~2.3.10
+        version: registry.npmjs.org/@types/sizzle@2.3.10
       alias-types-node:
-        specifier: npm:@types/node@~16.18.11
-        version: registry.npmjs.org/@types/node@16.18.11
+        specifier: npm:@types/node@~18.19.54
+        version: registry.npmjs.org/@types/node@18.19.54
 
   ../projects/a: {}
 
   ../projects/a-types:
     dependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: registry.npmjs.org/@types/node@16.18.11
+        specifier: 18.19.54
+        version: registry.npmjs.org/@types/node@18.19.54
 
   ../projects/alts:
     dependencies:
       lodash:
-        specifier: 4.17.21
-        version: 4.17.21
-      lodash-dupe:
+        specifier: 4.0.1
+        version: 4.0.1
+      lodash-4.17.20:
+        specifier: npm:lodash@4.17.20
+        version: /lodash@4.17.20
+      lodash-4.17.21:
         specifier: npm:lodash@4.17.21
         version: /lodash@4.17.21
-      lodash-file:
+      lodash-4.17.21-file:
         specifier: file:../../vendored/lodash-4.17.21.tgz
         version: file:../vendored/lodash-4.17.21.tgz
 
@@ -178,8 +181,8 @@ importers:
         version: link:../a
     devDependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: registry.npmjs.org/@types/node@16.18.11
+        specifier: 18.19.54
+        version: registry.npmjs.org/@types/node@18.19.54
       a-types:
         specifier: workspace:*
         version: link:../a-types
@@ -192,6 +195,10 @@ importers:
       '@scoped/b':
         specifier: workspace:*
         version: link:../b
+    devDependencies:
+      a-types:
+        specifier: file:../a-types
+        version: file:../projects/a-types
 
   ../projects/d:
     dependencies:
@@ -318,7 +325,7 @@ packages:
     dependencies:
       string-width: 5.1.2
       string-width-cjs: /string-width@4.2.3
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
       strip-ansi-cjs: /strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: /wrap-ansi@7.0.0
@@ -333,7 +340,7 @@ packages:
       typescript: '>=3.7.0'
     dependencies:
       '@rollup/pluginutils': 3.1.0(rollup@3.29.4)
-      resolve: 1.22.10
+      resolve: 1.22.11
       rollup: 3.29.4
       tslib: 2.6.3
       typescript: 5.5.2
@@ -356,8 +363,8 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /ansi-regex@6.2.0:
-    resolution: {integrity: sha512-TKY5pyBkHyADOPYlRT9Lx6F544mPl0vS5Ew7BJ45hA08Q+t3GjbueLliBWN3sMICk6+y7HdyxSzC4bWS8baBdg==}
+  /ansi-regex@6.2.2:
+    resolution: {integrity: sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==}
     engines: {node: '>=12'}
     dev: false
 
@@ -368,8 +375,8 @@ packages:
       color-convert: 2.0.1
     dev: false
 
-  /ansi-styles@6.2.1:
-    resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
+  /ansi-styles@6.2.3:
+    resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
     dev: false
 
@@ -475,6 +482,14 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
+  /lodash@4.0.1:
+    resolution: {integrity: sha512-jA3EFncTLSpNOJLgZUlI7Xrsg3t/DYbgPuRVD1qbLoyUXgzUEvB0EpJimh+WBM6CUNtAyKJ1CVPD+7wE+LrraQ==}
+    dev: false
+
+  /lodash@4.17.20:
+    resolution: {integrity: sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==}
+    dev: false
+
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: false
@@ -502,8 +517,8 @@ packages:
     engines: {node: '>=8.6'}
     dev: false
 
-  /resolve@1.22.10:
-    resolution: {integrity: sha512-NPRy+/ncIMeDlTAsuqwKIiferiawhefFJtkNSW0qZJEqMEb+qBt/77B/jGeeek+F0uOeN05CDa6HXbbIgtVX4w==}
+  /resolve@1.22.11:
+    resolution: {integrity: sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ==}
     engines: {node: '>= 0.4'}
     hasBin: true
     dependencies:
@@ -550,7 +565,7 @@ packages:
     dependencies:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
     dev: false
 
   /strip-ansi@6.0.1:
@@ -560,11 +575,11 @@ packages:
       ansi-regex: 5.0.1
     dev: false
 
-  /strip-ansi@7.1.0:
-    resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
+  /strip-ansi@7.1.2:
+    resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
     engines: {node: '>=12'}
     dependencies:
-      ansi-regex: 6.2.0
+      ansi-regex: 6.2.2
     dev: false
 
   /supports-preserve-symlinks-flag@1.0.0:
@@ -581,6 +596,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
     dev: false
+
+  /undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
   /uvu@0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
@@ -606,9 +624,9 @@ packages:
     resolution: {integrity: sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ==}
     engines: {node: '>=12'}
     dependencies:
-      ansi-styles: 6.2.1
+      ansi-styles: 6.2.3
       string-width: 5.1.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
     dev: false
 
   '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz':
@@ -627,6 +645,13 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
     name: hello
     version: 1.0.0
+
+  file:../projects/a-types:
+    resolution: {directory: ../projects/a-types, type: directory}
+    name: a-types
+    dependencies:
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
+    dev: true
 
   file:../projects/c(@scoped/b@projects+b):
     resolution: {directory: ../projects/c, type: directory}
@@ -695,7 +720,7 @@ packages:
     version: 8.1.0
     dependencies:
       '@types/minimatch': registry.npmjs.org/@types/minimatch@5.1.2
-      '@types/node': registry.npmjs.org/@types/node@16.18.11
+      '@types/node': registry.npmjs.org/@types/node@18.19.54
     dev: true
 
   registry.npmjs.org/@types/minimatch@5.1.2:
@@ -704,13 +729,15 @@ packages:
     version: 5.1.2
     dev: true
 
-  registry.npmjs.org/@types/node@16.18.11:
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+  registry.npmjs.org/@types/node@18.19.54:
+    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
     name: '@types/node'
-    version: 16.18.11
+    version: 18.19.54
+    dependencies:
+      undici-types: 5.26.5
 
-  registry.npmjs.org/@types/sizzle@2.3.9:
-    resolution: {integrity: sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.9.tgz}
+  registry.npmjs.org/@types/sizzle@2.3.10:
+    resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.10.tgz}
     name: '@types/sizzle'
-    version: 2.3.9
+    version: 2.3.10
     dev: true

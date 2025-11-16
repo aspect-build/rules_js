@@ -40,7 +40,7 @@ def npm_imported_package_store(link_root_name):
             ":.aspect_rules_js/{link_root_name}/unused@0.2.2/pkg_pre_lc_lite": "unused",
             ":.aspect_rules_js/{link_root_name}/wordwrap@0.0.3/pkg": "wordwrap",
         },
-        dev = True,
+        dev_only = False,
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@_main~npm~npm__unused__0.2.2//:pkg",
@@ -53,13 +53,14 @@ def npm_imported_package_store(link_root_name):
 
 # Generated npm_package_store and npm_link_package_store targets for npm package unused@0.2.2
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, link_root_name, link_alias):
+def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
     return _npm_link_imported_package_store(
         name,
+        dev,
         link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
-        link_visibility = ["//visibility:private"],
+        link_visibility = ["//npm/private/test:__subpackages__"],
         bins = {},
         package_store_name = _PACKAGE_STORE_NAME,
         public_visibility = False,
@@ -69,12 +70,14 @@ def npm_link_imported_package_store(name, link_root_name, link_alias):
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
         name = "node_modules",
+        dev = False,
         link = None,
         fail_if_no_link = True):
     return _npm_link_imported_package(
         name,
         package = PACKAGE,
         version = VERSION,
+        dev = dev,
         root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {

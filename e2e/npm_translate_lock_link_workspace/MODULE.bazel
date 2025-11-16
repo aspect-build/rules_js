@@ -1,0 +1,37 @@
+module(name = "npm_translate_lock_link_workspace")
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+bazel_dep(name = "aspect_bazel_lib", version = "2.21.1")
+
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+)
+npm.npm_translate_lock(
+    name = "foo",
+    additional_file_contents = {
+        "BUILD.bazel": [
+            """load("//:npm_link_all_packages.bzl", "npm_link_all_packages")""",
+            """npm_link_all_packages(name = "node_modules")""",
+        ],
+        # Test that we can add statements to the generated defs bzl file
+        "npm_link_all_packages.bzl": [
+            """load("@aspect_rules_js//js:defs.bzl", _js_run_binary = "js_run_binary")""",
+            """def js_run_binary(**kwargs):
+    _js_run_binary(**kwargs)""",
+        ],
+    },
+    defs_bzl_filename = "npm_link_all_packages.bzl",
+    # We'll be linking in the @foo repository and not the repository where the pnpm-lock file is located
+    link_workspace = "foo",
+    pnpm_lock = "//foo:pnpm-lock.yaml",
+    # Override the Bazel package where pnpm-lock.yaml is located and link to the specified package instead
+    root_package = "",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "foo")

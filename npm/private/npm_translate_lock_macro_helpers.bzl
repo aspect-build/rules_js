@@ -1,7 +1,5 @@
 "Helper methods for the npm_translate_lock macro"
 
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
-
 def _macro_lifecycle_args_to_rule_attrs(lifecycle_hooks, lifecycle_hooks_exclude, run_lifecycle_hooks, lifecycle_hooks_no_sandbox, lifecycle_hooks_execution_requirements, lifecycle_hooks_use_default_shell_env):
     """Convert lifecycle-related macro args into attribute values to pass to the rule"""
 
@@ -16,14 +14,17 @@ def _macro_lifecycle_args_to_rule_attrs(lifecycle_hooks, lifecycle_hooks_exclude
         lifecycle_hooks[p] = []
 
     if "*" not in lifecycle_hooks:
-        lifecycle_hooks = dicts.add(lifecycle_hooks, {"*": ["preinstall", "install", "postinstall"]})
+        lifecycle_hooks["*"] = ["preinstall", "install", "postinstall"]
 
     # lifecycle_hooks_no_sandbox is a convenience attribute to set `"*": ["no-sandbox"]` in `lifecycle_hooks_execution_requirements`
     if lifecycle_hooks_no_sandbox:
-        if "*" not in lifecycle_hooks_execution_requirements:
-            lifecycle_hooks_execution_requirements = dicts.add(lifecycle_hooks_execution_requirements, {"*": []})
-        if "no-sandbox" not in lifecycle_hooks_execution_requirements["*"]:
-            lifecycle_hooks_execution_requirements["*"].append("no-sandbox")
+        lifecycle_hooks_execution_requirements = dict(lifecycle_hooks_execution_requirements)
+        execution_requirements = lifecycle_hooks_execution_requirements.get("*")
+        if not execution_requirements:
+            execution_requirements = []
+            lifecycle_hooks_execution_requirements["*"] = execution_requirements
+        if "no-sandbox" not in execution_requirements:
+            execution_requirements.append("no-sandbox")
 
     # Convert {"pkg": True|False} to {"pkg": "true"|"false"} and set a default value for "*"
     use_default_shell_env = {}

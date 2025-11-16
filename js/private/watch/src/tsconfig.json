@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "types": ["node"],
+        "module": "nodenext",
+        "target": "es2017",
+        "moduleResolution": "nodenext",
+        "declaration": true
+    },
+    "include": ["*.mts"]
+}

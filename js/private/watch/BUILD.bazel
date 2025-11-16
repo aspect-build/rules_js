@@ -1,0 +1,26 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
+# Export as library for usage via js 'deps' elsewhere.
+js_library(
+    name = "watch",
+    srcs = [
+        "aspect_watch_protocol.d.mts",
+        "aspect_watch_protocol.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# Export files for direct usage such as copying/write_source_files into a repo.
+exports_files([
+    "aspect_watch_protocol.d.mts",
+    "aspect_watch_protocol.mjs",
+])
+
+write_source_files(
+    name = "watch_checked",
+    files = {
+        "aspect_watch_protocol.mjs": "//js/private/watch/src:aspect_watch_protocol.mjs",
+        "aspect_watch_protocol.d.mts": "//js/private/watch/src:aspect_watch_protocol.d.mts",
+    },
+)

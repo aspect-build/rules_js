@@ -3,7 +3,6 @@ and maintain"""
 
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npmrc.bzl", "parse_npmrc")
@@ -34,7 +33,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_external_repository_action_cache(priv, attr)
 
-    _init_common_labels(priv, rctx, attr, label_store, is_windows)
+    _init_common_labels(priv, attr, label_store)
 
     _init_patches_labels(priv, rctx, attr, label_store)
 
@@ -46,13 +45,14 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         # labels only needed when updating the pnpm lock file
         _init_update_labels(priv, rctx, attr, label_store)
 
-    _init_link_workspace(priv, rctx, attr, label_store)
+    _init_link_workspace(priv, attr, label_store)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
     # TODO(windows): utils.exists is not yet support on Windows
-    pnpm_lock_exists = is_windows or utils.exists(rctx, label_store.path("pnpm_lock"))
+    pnpm_lock_path = label_store.path("pnpm_lock")
+    pnpm_lock_exists = is_windows or utils.exists(rctx, pnpm_lock_path)
     if pnpm_lock_exists:
-        _load_lockfile(priv, rctx, attr, label_store)
+        _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows)
         _init_patched_dependencies_labels(priv, rctx, attr, label_store)
 
     # May depend on lockfile state
@@ -61,7 +61,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
 
-    _init_npmrc(priv, rctx, attr, label_store)
+    _init_npmrc(priv, rctx, attr, label_store, is_windows)
 
     _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists)
 
@@ -79,7 +79,7 @@ def _validate_attrs(attr, is_windows):
         fail("only one of npm_package_lock or yarn_lock may be set")
 
 ################################################################################
-def _init_common_labels(priv, rctx, attr, label_store, is_windows):
+def _init_common_labels(priv, attr, label_store):
     # data files
     # only initialize if update_pnpm_lock is set since data files are unused otherwise
     if _should_update_pnpm_lock(priv):
@@ -114,9 +114,6 @@ def _init_common_labels(priv, rctx, attr, label_store, is_windows):
 
     # pnpm-workspace.yaml file
     label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
-
-    # yq is used for parsing the pnpm lock file
-    label_store.add("host_yq", Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(rctx), ".exe" if is_windows else "")))
 
 ################################################################################
 def _init_pnpm_labels(priv, rctx, attr, label_store):
@@ -168,12 +165,10 @@ def _init_patches_labels(priv, _, attr, label_store):
 ################################################################################
 def _init_patched_dependencies_labels(priv, _, attr, label_store):
     # Read patches from pnpm-lock.yaml `patchedDependencies`
-    patches = []
-    for patch_info in priv["patched_dependencies"].values():
-        patches.append("//%s:%s" % (label_store.label("pnpm_lock").package, patch_info.get("path")))
-
-    # Convert patch label strings to labels
-    patches = [attr.pnpm_lock.relative(p) for p in patches]
+    patches = [
+        attr.pnpm_lock.same_package_label(patch_info["path"])
+        for patch_info in priv["patched_dependencies"].values()
+    ]
 
     for i, d in enumerate(patches):
         label_store.add("patches_{}".format(i + priv["num_patches"]), d)
@@ -186,7 +181,7 @@ def _init_importer_labels(priv, label_store):
         label_store.add_sibling("lock", "package_json_{}".format(i), paths.join(p, PACKAGE_JSON_FILENAME))
 
 ################################################################################
-def _init_link_workspace(priv, _, attr, label_store):
+def _init_link_workspace(priv, attr, label_store):
     # initialize link_workspace either from pnpm_lock label or from override
     priv["link_workspace"] = attr.link_workspace if attr.link_workspace else label_store.label("pnpm_lock").repo_name
 
@@ -228,20 +223,19 @@ def _init_root_package(priv, rctx, attr, label_store):
         priv["root_package_json"] = {}
 
 ################################################################################
-def _init_npmrc(priv, rctx, attr, label_store):
+def _init_npmrc(priv, rctx, attr, label_store, is_windows):
     if not label_store.has("npmrc"):
         # check for a .npmrc next to the pnpm-lock.yaml file
-        _maybe_npmrc(priv, rctx, attr, label_store, "sibling_npmrc")
+        _maybe_npmrc(priv, rctx, attr, label_store, "sibling_npmrc", is_windows)
 
     if label_store.has("npmrc"):
         _load_npmrc(priv, rctx, label_store.path("npmrc"))
 
     if attr.use_home_npmrc:
-        _load_home_npmrc(priv, rctx)
+        _load_home_npmrc(priv, rctx, is_windows)
 
 ################################################################################
-def _maybe_npmrc(priv, rctx, attr, label_store, key):
-    is_windows = repo_utils.is_windows(rctx)
+def _maybe_npmrc(priv, rctx, attr, label_store, key, is_windows):
     if is_windows:
         # TODO(windows): utils.exists is not yet support on Windows
         return
@@ -284,7 +278,7 @@ def _copy_update_input_files(priv, rctx, attr, label_store):
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
 def _copy_unspecified_input_files(priv, rctx, attr, label_store):
-    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_lock_label = attr.pnpm_lock
 
     # pnpm-workspace.yaml
     pnpm_workspace_key = "pnpm_workspace"
@@ -459,11 +453,11 @@ def _load_npmrc(priv, rctx, npmrc_path):
         priv["default_registry"] = utils.to_registry_url(contents["registry"])
 
     (registries, auth) = helpers.get_npm_auth(contents, npmrc_path, rctx.os.environ)
-    priv["npm_registries"] = dicts.add(priv["npm_registries"], registries)
-    priv["npm_auth"] = dicts.add(priv["npm_auth"], auth)
+    priv["npm_registries"].update(registries)
+    priv["npm_auth"].update(auth)
 
 ################################################################################
-def _load_home_npmrc(priv, rctx):
+def _load_home_npmrc(priv, rctx, is_windows):
     home_directory = repo_utils.get_home_directory(rctx)
     if not home_directory:
         # buildifier: disable=print
@@ -475,21 +469,21 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     home_npmrc_path = "{}/{}".format(home_directory, NPM_RC_FILENAME)
 
     # TODO(windows): utils.exists is not yet support on Windows
-    is_windows = repo_utils.is_windows(rctx)
     if is_windows or utils.exists(rctx, home_npmrc_path):
         _load_npmrc(priv, rctx, home_npmrc_path)
 
 ################################################################################
-def _load_lockfile(priv, rctx, _, label_store):
+def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     importers = {}
     packages = {}
     patched_dependencies = {}
     lock_version = None
     lock_parse_err = None
 
+    host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(rctx), ".exe" if is_windows else ""))
     yq_args = [
-        str(label_store.path("host_yq")),
-        str(label_store.path("pnpm_lock")),
+        str(rctx.path(host_yq)),
+        str(pnpm_lock_path),
         "-o=json",
     ]
     result = rctx.execute(yq_args)
@@ -581,7 +575,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         "npm_auth": {},
         "npm_registries": {},
         "packages": {},
-        "root_package": None,
+        "root_package": attr.root_package,
         "root_package_json": {},
         "patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,

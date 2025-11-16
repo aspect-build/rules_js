@@ -61,4 +61,9 @@ require('@isaacs/cliui')
 require('alias-only-sizzle/package.json')
 
 // lodash file: reference
-require('lodash')
+const lodashPackageJson = require('lodash/package.json')
+if (lodashPackageJson.version !== '4.17.21') {
+    throw new Error(
+        `lodash aliased to file: should be version 4.17.21, got ${lodashPackageJson.version}`
+    )
+}

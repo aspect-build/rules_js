@@ -1,4 +1,7 @@
 {
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "devDependencies": {
         "chalk": "4.1.2",
         "http-server": "14.1.1",

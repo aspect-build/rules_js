@@ -20,7 +20,6 @@ for a given lockfile.
 load("@aspect_bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
 load("@aspect_bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(
     "@bazel_tools//tools/build_defs/repo:git_worker.bzl",
@@ -30,7 +29,6 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
-load("//npm/private:tar.bzl", "detect_system_tar")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
@@ -65,7 +63,7 @@ def npm_imported_package_store(link_root_name):
         deps = {deps},
         ref_deps = {ref_deps},
         lc_deps = {lc_deps},
-        dev = {dev},
+        dev_only = {dev_only},
         has_lifecycle_build_target = {has_lifecycle_build_target},
         transitive_closure_pattern = {transitive_closure_pattern},
         npm_package_target = "{npm_package_target}",
@@ -88,7 +86,7 @@ def npm_imported_package_store_internal(
         deps,
         ref_deps,
         lc_deps,
-        dev,
+        dev_only,
         has_lifecycle_build_target,
         transitive_closure_pattern,
         npm_package_target,
@@ -118,7 +116,7 @@ def npm_imported_package_store_internal(
         name = "{}/ref".format(store_target_name),
         package = package,
         version = version,
-        dev = dev,
+        dev_only = dev_only,
         tags = ["manual"],
         exclude_package_contents = exclude_package_contents,
     )
@@ -129,7 +127,7 @@ def npm_imported_package_store_internal(
         src = "{}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else npm_package_target,
         package = package,
         version = version,
-        dev = dev,
+        dev_only = dev_only,
         deps = ref_deps,
         tags = ["manual"],
         exclude_package_contents = exclude_package_contents,
@@ -141,7 +139,7 @@ def npm_imported_package_store_internal(
         src = None if transitive_closure_pattern else npm_package_target,
         package = package,
         version = version,
-        dev = dev,
+        dev_only = dev_only,
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
@@ -164,7 +162,7 @@ def npm_imported_package_store_internal(
             name = "{}/pkg_pre_lc_lite".format(store_target_name),
             package = package,
             version = version,
-            dev = dev,
+            dev_only = dev_only,
             deps = ref_deps,
             tags = ["manual"],
             exclude_package_contents = exclude_package_contents,
@@ -175,7 +173,7 @@ def npm_imported_package_store_internal(
             name = "{}/pkg_pre_lc".format(store_target_name),
             package = package,
             version = version,
-            dev = dev,
+            dev_only = dev_only,
             deps = lc_deps,
             tags = ["manual"],
             exclude_package_contents = exclude_package_contents,
@@ -235,6 +233,7 @@ def npm_imported_package_store_internal(
 
 def npm_link_imported_package_store_internal(
         name,
+        dev,
         link_root_name,
         link_alias,
         root_package,
@@ -247,6 +246,7 @@ def npm_link_imported_package_store_internal(
     # terminal package store target to link
     npm_link_package_store(
         name = name,
+        dev = dev,
         package = link_alias,
         src = "//%s:%s" % (root_package, store_target_name),
         visibility = link_visibility,
@@ -269,9 +269,10 @@ def npm_link_imported_package_store_internal(
 _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL = """\
 # Generated npm_package_store and npm_link_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
-def npm_link_imported_package_store(name, link_root_name, link_alias):
+def npm_link_imported_package_store(name, dev, link_root_name, link_alias):
     return _npm_link_imported_package_store(
         name,
+        dev,
         link_root_name,
         link_alias,
         root_package = _ROOT_PACKAGE,
@@ -288,6 +289,7 @@ def npm_link_imported_package_internal(
         name,
         package,
         version,
+        dev,
         root_package,
         link,
         link_packages,
@@ -324,6 +326,7 @@ def npm_link_imported_package_internal(
             link_target_name = "{}/{}".format(name, link_alias)
             npm_link_imported_package_store_macro(
                 name = link_target_name,
+                dev = dev,
                 link_root_name = name,
                 link_alias = link_alias,
             )
@@ -345,12 +348,14 @@ _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL = """\
 # buildifier: disable=function-docstring
 def npm_link_imported_package(
         name = "node_modules",
+        dev = False,
         link = {link_default},
         fail_if_no_link = True):
     return _npm_link_imported_package(
         name,
         package = PACKAGE,
         version = VERSION,
+        dev = dev,
         root_package = _ROOT_PACKAGE,
         link = link,
         link_packages = {link_packages},
@@ -574,16 +579,11 @@ def _download_and_extract_archive(rctx, package_json_only):
             exclude_pattern_args.append("--exclude")
             exclude_pattern_args.append(pattern)
 
+    tar = Label("@bsd_tar_{}//:tar{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
+
     # npm packages are always published with one top-level directory inside the tarball, tho the name is not predictable
     # so we use tar here which takes a --strip-components N argument instead of rctx.download_and_extract
-    tar_args = ["tar", "-xf", _TARBALL_FILENAME] + ["--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"] + exclude_pattern_args
-
-    system_tar = detect_system_tar(rctx) if rctx.attr.system_tar == "auto" else rctx.attr.system_tar
-    if system_tar == "gnu":
-        # Some packages have directory permissions missing the executable bit, which prevents GNU tar from
-        # extracting files into the directory. Delay permission restoration for directories until all files
-        # have been extracted.
-        tar_args.append("--delay-directory-restore")
+    tar_args = [tar, "-xf", _TARBALL_FILENAME] + ["--strip-components", "1", "-C", _EXTRACT_TO_DIRNAME, "--no-same-owner", "--no-same-permissions"] + exclude_pattern_args
 
     if package_json_only:
         # Try to extract package/package.json; 'package' as the root folder is the common
@@ -615,15 +615,22 @@ def _npm_import_rule_impl(rctx):
     has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
     has_patches = not (not rctx.attr.patches)
 
+    reproducible = False
     package_src = _EXTRACT_TO_DIRNAME
     if utils.is_git_repository_url(rctx.attr.url):
         _fetch_git_repository(rctx)
+        if rctx.attr.commit:
+            reproducible = True
     elif rctx.attr.extract_full_archive or has_patches or has_lifecycle_hooks:
         _download_and_extract_archive(rctx, package_json_only = False)
+        if rctx.attr.integrity:
+            reproducible = True
     else:
         # TODO: support tarball package_src with lifecycle hooks
         _download_and_extract_archive(rctx, package_json_only = True)
         package_src = _TARBALL_FILENAME
+        if rctx.attr.integrity:
+            reproducible = True
 
     # apply patches to the extracted package before reading the package.json incase
     # the patch targets the package.json itself
@@ -633,10 +640,6 @@ def _npm_import_rule_impl(rctx):
         patch_args = rctx.attr.patch_args,
         patch_directory = _EXTRACT_TO_DIRNAME,
     )
-
-    pkg_json = json.decode(rctx.read(_EXTRACT_TO_PACKAGE_JSON))
-
-    bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
     generated_by_prefix = _make_generated_by_prefix(rctx.attr.package, rctx.attr.version)
 
@@ -656,11 +659,17 @@ def _npm_import_rule_impl(rctx):
     if rctx.attr.extra_build_content:
         rctx_files["BUILD.bazel"].append("\n" + rctx.attr.extra_build_content)
 
-    if bins:
-        package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
-        package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
+    # If this package has binaries and is linked into any other packages:
+    # - generate the bin bzl and build files
+    # - write ^ into each package linking to this package.
+    if rctx.attr.link_packages:
+        pkg_json = json.decode(rctx.read(_EXTRACT_TO_PACKAGE_JSON))
+        bins = _get_bin_entries(pkg_json, rctx.attr.package)
 
-        for link_package in rctx.attr.link_packages.keys():
+        if bins:
+            package_store_name = utils.package_store_name(rctx.attr.package, rctx.attr.version)
+            package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
+
             bin_bzl = [
                 generated_by_prefix,
                 """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
@@ -704,18 +713,20 @@ bin = bin_factory("node_modules")
                 bin_struct_fields = "\n".join(bin_struct_fields),
             ))
 
-            rctx_files["{}/{}".format(link_package, _PACKAGE_JSON_BZL_FILENAME) if link_package else _PACKAGE_JSON_BZL_FILENAME] = bin_bzl
+            # Duplicate the bzl+BUILD into each linking package
+            for link_package in rctx.attr.link_packages.keys():
+                rctx_files["{}/{}".format(link_package, _PACKAGE_JSON_BZL_FILENAME) if link_package else _PACKAGE_JSON_BZL_FILENAME] = bin_bzl
 
-            build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
-            if build_file not in rctx_files:
-                rctx_files[build_file] = [generated_by_prefix]
-            if rctx.attr.generate_bzl_library_targets:
-                rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
-                rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
-                    name = link_package[link_package.rfind("/") + 1] if link_package else package_name_no_scope,
-                    src = _PACKAGE_JSON_BZL_FILENAME,
-                ))
-            rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
+                build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
+                if build_file not in rctx_files:
+                    rctx_files[build_file] = [generated_by_prefix]
+                if rctx.attr.generate_bzl_library_targets:
+                    rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
+                    rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(
+                        name = link_package[link_package.rfind("/") + 1] if link_package else package_name_no_scope,
+                        src = _PACKAGE_JSON_BZL_FILENAME,
+                    ))
+                rctx_files[build_file].append("""exports_files(["{}", "{}"])""".format(_PACKAGE_JSON_BZL_FILENAME, package_src))
 
     rules_js_metadata = {}
     if rctx.attr.lifecycle_hooks:
@@ -729,6 +740,12 @@ bin = bin_factory("node_modules")
 
     for filename, contents in rctx_files.items():
         rctx.file(filename, "\n".join(contents))
+
+    # Support bazel <v8.3 by returning None if repo_metadata is not defined
+    if not hasattr(rctx, "repo_metadata"):
+        return None
+
+    return rctx.repo_metadata(reproducible = reproducible)
 
 def _sanitize_bin_name(name):
     """ Sanitize a package name so we can use it in starlark function names """
@@ -875,7 +892,7 @@ def _npm_import_links_rule_impl(rctx):
         version = rctx.attr.version,
         package_store_name = package_store_name,
         bins = bins,
-        dev = rctx.attr.dev,
+        dev_only = rctx.attr.dev,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
         exclude_package_contents = starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents),
     )
@@ -897,6 +914,12 @@ def _npm_import_links_rule_impl(rctx):
 
     rctx.file("BUILD.bazel", "exports_files(%s)" % starlark_codegen_utils.to_list_attr([_DEFS_BZL_FILENAME]))
 
+    # Support bazel <v8.3 by returning None if repo_metadata is not defined
+    if not hasattr(rctx, "repo_metadata"):
+        return None
+
+    return rctx.repo_metadata(reproducible = True)
+
 _COMMON_ATTRS = {
     "link_packages": attr.string_list_dict(),
     "package": attr.string(mandatory = True),
@@ -904,7 +927,7 @@ _COMMON_ATTRS = {
     "version": attr.string(mandatory = True),
 }
 
-_ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
+_ATTRS_LINKS = _COMMON_ATTRS | {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(),
     "dev": attr.bool(),
@@ -916,9 +939,9 @@ _ATTRS_LINKS = dicts.add(_COMMON_ATTRS, {
     "package_visibility": attr.string_list(),
     "replace_package": attr.string(),
     "exclude_package_contents": attr.string_list(default = []),
-})
+}
 
-_ATTRS = dicts.add(_COMMON_ATTRS, {
+_ATTRS = _COMMON_ATTRS | {
     "commit": attr.string(),
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
@@ -936,13 +959,7 @@ _ATTRS = dicts.add(_COMMON_ATTRS, {
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),
     "url": attr.string(),
-    "system_tar": attr.string(
-        # The system tar type can be precomputed for performance, or "auto" to
-        # determine at rule execution time.
-        values = ["gnu", "non-gnu", "auto"],
-        default = "auto",
-    ),
-})
+}
 
 def _get_bin_entries(pkg_json, package):
     # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
@@ -1267,6 +1284,11 @@ def npm_import(
 
         dev: Whether this npm package is a dev dependency
 
+            DEPRECATED: this field is deprecated and will be removed in a future release.
+
+            A package should be marked as a dev dependency as part of the dependency declaration,
+            not as part of the package definition or import.
+
         exclude_package_contents: List of glob patterns to exclude from the linked package.
 
             This is useful for excluding files that are not needed in the linked package.
@@ -1282,7 +1304,6 @@ def npm_import(
 
     generate_bzl_library_targets = kwargs.pop("generate_bzl_library_targets", None)
     extract_full_archive = kwargs.pop("extract_full_archive", None)
-    system_tar = kwargs.pop("system_tar", "auto")
     if len(kwargs):
         msg = "Invalid npm_import parameter '{}'".format(kwargs.keys()[0])
         fail(msg)
@@ -1314,7 +1335,6 @@ def npm_import(
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
         exclude_package_contents = exclude_package_contents,
-        system_tar = system_tar,
     )
 
     has_custom_postinstall = not (not custom_postinstall)

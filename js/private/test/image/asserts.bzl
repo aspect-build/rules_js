@@ -5,6 +5,8 @@ load("//js:defs.bzl", "js_image_layer")
 
 # buildifier: disable=function-docstring
 def assert_tar_listing(name, actual, expected):
+    # Either of these two file sizes may be observed on a file like /js/private/test/image/bin
+    sanitize_cmd = "sed -E 's/239[0-9]{2}/xxxxx/g'"
     actual_listing = "_{}_listing".format(name)
     native.genrule(
         name = actual_listing,
@@ -14,7 +16,7 @@ def assert_tar_listing(name, actual, expected):
         # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
         # we need to exlude it from checksums
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
-        cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" >$@'.format(actual),
+        cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" | {} >$@'.format(actual, sanitize_cmd),
         toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
     )
 
@@ -23,7 +25,7 @@ def assert_tar_listing(name, actual, expected):
         in_file = actual_listing,
         out_file = expected,
         testonly = True,
-        tags = ["skip-on-bazel6", "skip-on-bazel8"],
+        tags = ["skip-on-bazel6", "skip-on-bazel8", "skip-on-bazel9"],
     )
 
 layers = [
@@ -50,7 +52,7 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
             "assert_{}_{}".format(name, layer)
             for layer in all_layers
         ],
-        tags = ["skip-on-bazel6", "skip-on-bazel8"],
+        tags = ["skip-on-bazel6", "skip-on-bazel8", "skip-on-bazel9"],
         testonly = True,
     )
 
@@ -100,5 +102,5 @@ echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
         testonly = True,
         in_file = name,
         out_file = name + ".expected",
-        tags = ["skip-on-bazel6", "skip-on-bazel8"],
+        tags = ["skip-on-bazel6", "skip-on-bazel8", "skip-on-bazel9"],
     )

@@ -45,18 +45,39 @@ const util = require("util");
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
-const _fs = require('node:fs');
+const fs = require('node:fs');
 const url = require('node:url');
+const esmModule = require('node:module');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND');
-function patcher(fs = _fs, roots) {
-    fs = fs || _fs;
+const PATCHED_FS_METHODS = [
+    'lstat',
+    'lstatSync',
+    'realpath',
+    'realpathSync',
+    'readlink',
+    'readlinkSync',
+    'readdir',
+    'readdirSync',
+    'opendir',
+];
+/**
+ * Function that patches the `fs` module to not escape the given roots.
+ * @returns a function to undo the patches.
+ */
+function patcher(roots) {
+    if (fs._unpatched) {
+        throw new Error('FS is already patched.');
+    }
     // Make the original version of the library available for when access to the
     // unguarded file system is necessary, such as the esbuild plugin that
     // protects against sandbox escaping that occurs through module resolution
     // in the Go binary. See
     // https://github.com/aspect-build/rules_esbuild/issues/58.
-    fs._unpatched = Object.assign({}, fs);
+    fs._unpatched = PATCHED_FS_METHODS.reduce((obj, method) => {
+        obj[method] = fs[method];
+        return obj;
+    }, {});
     roots = roots || [];
     roots = roots.filter((root) => fs.existsSync(root));
     if (!roots.length) {
@@ -245,15 +266,8 @@ function patcher(fs = _fs, roots) {
                         !isEscape(resolved, next, [escapedRoot])) {
                         return cb(null, next);
                     }
-                    // The escape from the root is not mappable back into the root; we must make
-                    // this look like a real file so we call readlink on the realpath which we
-                    // expect to return an error
-                    return origRealpath(resolved, readlinkRealpathCb);
-                    function readlinkRealpathCb(err, str) {
-                        if (err)
-                            return cb(err);
-                        return origReadlink(str, cb);
-                    }
+                    // The escape from the root is not mappable back into the root; throw EINVAL
+                    return cb(einval('readlink', args[0]));
                 }
             }
             else {
@@ -337,7 +351,7 @@ function patcher(fs = _fs, roots) {
                 const cb = once(args[args.length - 1]);
                 args[args.length - 1] = async function opendirCb(err, dir) {
                     try {
-                        cb(null, await handleDir(dir));
+                        cb(err, err ? undefined : handleDir(dir));
                     }
                     catch (err) {
                         cb(err);
@@ -346,10 +360,15 @@ function patcher(fs = _fs, roots) {
                 origOpendir(...args);
             }
             else {
-                return origOpendir(...args).then((dir) => {
-                    return handleDir(dir);
-                });
+                return origOpendir(...args).then(handleDir);
             }
+        };
+    }
+    if (fs.opendirSync) {
+        const origOpendirSync = fs.opendirSync.bind(fs);
+        fs.opendirSync = function opendirSync(...args) {
+            const dir = origOpendirSync(...args);
+            return handleDir(dir);
         };
     }
     // =========================================================================
@@ -366,6 +385,7 @@ function patcher(fs = _fs, roots) {
      * this api is available as experimental without a flag so users can access it at any time.
      */
     const promisePropertyDescriptor = Object.getOwnPropertyDescriptor(fs, 'promises');
+    let unpatchPromises;
     if (promisePropertyDescriptor) {
         const promises = {};
         promises.lstat = util.promisify(fs.lstat);
@@ -380,25 +400,36 @@ function patcher(fs = _fs, roots) {
         if (promisePropertyDescriptor.get) {
             const oldGetter = promisePropertyDescriptor.get.bind(fs);
             const cachedPromises = {};
-            promisePropertyDescriptor.get = () => {
+            function promisePropertyGetter() {
                 const _promises = oldGetter();
                 Object.assign(cachedPromises, _promises, promises);
                 return cachedPromises;
+            }
+            Object.defineProperty(fs, 'promises', Object.assign(Object.create(promisePropertyDescriptor), {
+                get: promisePropertyGetter,
+            }));
+            unpatchPromises = function unpatchFsPromises() {
+                Object.defineProperty(fs, 'promises', promisePropertyDescriptor);
             };
-            Object.defineProperty(fs, 'promises', promisePropertyDescriptor);
         }
         else {
+            const unpatchedPromises = Object.keys(promises).reduce((obj, method) => {
+                obj[method] = fs.promises[method];
+                return obj;
+            }, Object.create(fs.promises));
             // api can be patched directly
             Object.assign(fs.promises, promises);
+            unpatchPromises = function unpatchFsPromises() {
+                Object.assign(fs.promises, unpatchedPromises);
+            };
         }
     }
     // =========================================================================
     // helper functions for dirs
     // =========================================================================
-    async function handleDir(dir) {
+    function handleDir(dir) {
         const p = path.resolve(dir.path);
         const origIterator = dir[Symbol.asyncIterator].bind(dir);
-        const origRead = dir.read.bind(dir);
         dir[Symbol.asyncIterator] = function () {
             return __asyncGenerator(this, arguments, function* () {
                 var _a, e_1, _b, _c;
@@ -420,16 +451,19 @@ function patcher(fs = _fs, roots) {
                 }
             });
         };
-        dir.read = async function handleDirRead(...args) {
-            if (typeof args[args.length - 1] === 'function') {
-                const cb = args[args.length - 1];
-                args[args.length - 1] = async function handleDirReadCb(err, entry) {
-                    cb(err, entry ? await handleDirent(p, entry) : null);
-                };
-                origRead(...args);
+        const origRead = dir.read.bind(dir);
+        dir.read = async function handleDirRead(cb) {
+            if (typeof cb === 'function') {
+                origRead(function handleDirReadCb(err, entry) {
+                    if (err)
+                        return cb(err, null);
+                    handleDirent(p, entry).then(() => {
+                        cb(null, entry);
+                    }, (err) => cb(err, null));
+                });
             }
             else {
-                const entry = await origRead(...args);
+                const entry = await origRead();
                 if (entry) {
                     await handleDirent(p, entry);
                 }
@@ -438,16 +472,16 @@ function patcher(fs = _fs, roots) {
         };
         const origReadSync = dir.readSync.bind(dir);
         dir.readSync = function handleDirReadSync() {
-            return handleDirentSync(p, origReadSync()); // intentionally sync for simplicity
+            return handleDirentSync(p, origReadSync());
         };
         return dir;
     }
-    function handleDirent(p, v) {
+    async function handleDirent(p, v) {
+        if (!v.isSymbolicLink()) {
+            return v;
+        }
+        const f = path.resolve(p, v.name);
         return new Promise(function handleDirentExecutor(resolve, reject) {
-            if (!v.isSymbolicLink()) {
-                return resolve(v);
-            }
-            const f = path.resolve(p, v.name);
             return guardedReadLink(f, handleDirentReadLinkCb);
             function handleDirentReadLinkCb(str) {
                 if (f != str) {
@@ -457,11 +491,11 @@ function patcher(fs = _fs, roots) {
                 v.isSymbolicLink = () => false;
                 origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
-                        throw err;
+                        return reject(err);
                     }
                     fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
-                            throw err;
+                            return reject(err);
                         }
                         patchDirent(v, stat);
                         resolve(v);
@@ -482,6 +516,7 @@ function patcher(fs = _fs, roots) {
                 }
             }
         }
+        return v;
     }
     function nextHop(loc, cb) {
         let nested = '';
@@ -721,6 +756,18 @@ function patcher(fs = _fs, roots) {
             }
         }
     }
+    // Sync the esm modules to use the now patched fs cjs module.
+    // See: https://nodejs.org/api/esm.html#builtin-modules
+    esmModule.syncBuiltinESMExports();
+    return function revertPatch() {
+        Object.assign(fs, fs._unpatched);
+        delete fs._unpatched;
+        if (unpatchPromises) {
+            unpatchPromises();
+        }
+        // Re-sync the esm modules to revert to the unpatched module.
+        esmModule.syncBuiltinESMExports();
+    };
 }
 // =========================================================================
 // generic helper functions

@@ -143,32 +143,35 @@ importers:
         specifier: 5.3.1
         version: 5.3.1
       '@types/node':
-        specifier: 16.18.11
-        version: 16.18.11
+        specifier: 18.19.54
+        version: 18.19.54
       alias-only-sizzle:
-        specifier: npm:@types/sizzle@~2.3.9
-        version: '@types/sizzle@2.3.9'
+        specifier: npm:@types/sizzle@~2.3.10
+        version: '@types/sizzle@2.3.10'
       alias-types-node:
-        specifier: npm:@types/node@~16.18.11
-        version: '@types/node@16.18.11'
+        specifier: npm:@types/node@~18.19.54
+        version: '@types/node@18.19.54'
 
   ../projects/a: {}
 
   ../projects/a-types:
     dependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: 16.18.11
+        specifier: 18.19.54
+        version: 18.19.54
 
   ../projects/alts:
     dependencies:
       lodash:
-        specifier: 4.17.21
-        version: 4.17.21
-      lodash-dupe:
+        specifier: 4.0.1
+        version: 4.0.1
+      lodash-4.17.20:
+        specifier: npm:lodash@4.17.20
+        version: lodash@4.17.20
+      lodash-4.17.21:
         specifier: npm:lodash@4.17.21
         version: lodash@4.17.21
-      lodash-file:
+      lodash-4.17.21-file:
         specifier: file:../../vendored/lodash-4.17.21.tgz
         version: lodash@file:../vendored/lodash-4.17.21.tgz
 
@@ -179,8 +182,8 @@ importers:
         version: link:../a
     devDependencies:
       '@types/node':
-        specifier: 16.18.11
-        version: 16.18.11
+        specifier: 18.19.54
+        version: 18.19.54
       a-types:
         specifier: workspace:*
         version: link:../a-types
@@ -193,6 +196,10 @@ importers:
       '@scoped/b':
         specifier: workspace:*
         version: link:../b
+    devDependencies:
+      a-types:
+        specifier: file:../a-types
+        version: link:../a-types
 
   ../projects/d:
     dependencies:
@@ -316,26 +323,26 @@ packages:
   '@types/minimatch@5.1.2':
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==, tarball: https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz}
 
-  '@types/node@16.18.11':
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.11.tgz}
+  '@types/node@18.19.54':
+    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
 
-  '@types/sizzle@2.3.9':
-    resolution: {integrity: sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.9.tgz}
+  '@types/sizzle@2.3.10':
+    resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.10.tgz}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
 
-  ansi-regex@6.2.0:
-    resolution: {integrity: sha512-TKY5pyBkHyADOPYlRT9Lx6F544mPl0vS5Ew7BJ45hA08Q+t3GjbueLliBWN3sMICk6+y7HdyxSzC4bWS8baBdg==}
+  ansi-regex@6.2.2:
+    resolution: {integrity: sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==}
     engines: {node: '>=12'}
 
   ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
     engines: {node: '>=8'}
 
-  ansi-styles@6.2.1:
-    resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
+  ansi-styles@6.2.3:
+    resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
 
   color-convert@2.0.1:
@@ -434,6 +441,12 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
+  lodash@4.0.1:
+    resolution: {integrity: sha512-jA3EFncTLSpNOJLgZUlI7Xrsg3t/DYbgPuRVD1qbLoyUXgzUEvB0EpJimh+WBM6CUNtAyKJ1CVPD+7wE+LrraQ==}
+
+  lodash@4.17.20:
+    resolution: {integrity: sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==}
+
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
@@ -458,8 +471,8 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  resolve@1.22.10:
-    resolution: {integrity: sha512-NPRy+/ncIMeDlTAsuqwKIiferiawhefFJtkNSW0qZJEqMEb+qBt/77B/jGeeek+F0uOeN05CDa6HXbbIgtVX4w==}
+  resolve@1.22.11:
+    resolution: {integrity: sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ==}
     engines: {node: '>= 0.4'}
     hasBin: true
 
@@ -489,8 +502,8 @@ packages:
     resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
 
-  strip-ansi@7.1.0:
-    resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
+  strip-ansi@7.1.2:
+    resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
     engines: {node: '>=12'}
 
   supports-preserve-symlinks-flag@1.0.0:
@@ -504,6 +517,9 @@ packages:
     resolution: {integrity: sha512-NcRtPEOsPFFWjobJEtfihkLCZCXZt/os3zf8nTxjVH3RvTSxjrCamJpbExGvYOF+tFHc3pA65qpdwPbzjohhew==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
   uvu@0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
@@ -561,7 +577,7 @@ snapshots:
     dependencies:
       string-width: 5.1.2
       string-width-cjs: string-width@4.2.3
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
@@ -569,7 +585,7 @@ snapshots:
   '@rollup/plugin-typescript@8.2.1(rollup@2.14.0)(tslib@2.8.1)(typescript@5.5.2)':
     dependencies:
       '@rollup/pluginutils': 3.1.0(rollup@2.14.0)
-      resolve: 1.22.10
+      resolve: 1.22.11
       rollup: 2.14.0
       tslib: 2.8.1
       typescript: 5.5.2
@@ -595,23 +611,25 @@ snapshots:
   '@types/glob@8.1.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 16.18.11
+      '@types/node': 18.19.54
 
   '@types/minimatch@5.1.2': {}
 
-  '@types/node@16.18.11': {}
+  '@types/node@18.19.54':
+    dependencies:
+      undici-types: 5.26.5
 
-  '@types/sizzle@2.3.9': {}
+  '@types/sizzle@2.3.10': {}
 
   ansi-regex@5.0.1: {}
 
-  ansi-regex@6.2.0: {}
+  ansi-regex@6.2.2: {}
 
   ansi-styles@4.3.0:
     dependencies:
       color-convert: 2.0.1
 
-  ansi-styles@6.2.1: {}
+  ansi-styles@6.2.3: {}
 
   color-convert@2.0.1:
     dependencies:
@@ -680,6 +698,10 @@ snapshots:
 
   kleur@4.1.5: {}
 
+  lodash@4.0.1: {}
+
+  lodash@4.17.20: {}
+
   lodash@4.17.21: {}
 
   lodash@file:../vendored/lodash-4.17.21.tgz: {}
@@ -694,7 +716,7 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  resolve@1.22.10:
+  resolve@1.22.11:
     dependencies:
       is-core-module: 2.16.1
       path-parse: 1.0.7
@@ -722,21 +744,23 @@ snapshots:
     dependencies:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   strip-ansi@6.0.1:
     dependencies:
       ansi-regex: 5.0.1
 
-  strip-ansi@7.1.0:
+  strip-ansi@7.1.2:
     dependencies:
-      ansi-regex: 6.2.0
+      ansi-regex: 6.2.2
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
   tslib@2.8.1: {}
 
   typescript@5.5.2: {}
+
+  undici-types@5.26.5: {}
 
   uvu@0.5.6:
     dependencies:
@@ -753,6 +777,6 @@ snapshots:
 
   wrap-ansi@8.1.0:
     dependencies:
-      ansi-styles: 6.2.1
+      ansi-styles: 6.2.3
       string-width: 5.1.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2

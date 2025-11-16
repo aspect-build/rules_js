@@ -1,10 +1,12 @@
-lockfileVersion: '6.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
 importers:
+
+  .: {}
 
   ..:
     dependencies:
@@ -15,8 +17,8 @@ importers:
         specifier: file:vendored/lodash-4.17.19.tgz
         version: file:../vendored/lodash-4.17.19.tgz
       typescript:
-        specifier: ^5.8.2
-        version: 5.9.2
+        specifier: ^5.9.2
+        version: 5.9.3
     optionalDependencies:
       '@aspect-test/c':
         specifier: 2.0.2
@@ -60,7 +62,7 @@ importers:
         version: 1.0.0
       '@lib/c':
         specifier: file:../../lib/c
-        version: file:../lib/c
+        version: link:../../lib/c
 
   ../app/d:
     dependencies:
@@ -93,7 +95,7 @@ importers:
         version: 1.0.0
       alias-1:
         specifier: npm:@types/sizzle@~2.3.8
-        version: /@types/sizzle@2.3.8
+        version: '@types/sizzle@2.3.8'
 
   ../lib/c:
     dependencies:
@@ -107,100 +109,115 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(@aspect-test/c@2.0.2)
       alias-2:
-        specifier: npm:@types/node@16.18.11
-        version: /@types/node@16.18.11
+        specifier: npm:@types/node@18.19.54
+        version: '@types/node@18.19.54'
 
 packages:
 
-  /@aspect-test/a@5.0.2:
+  '@aspect-test/a@5.0.2':
     resolution: {integrity: sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==}
     hasBin: true
+
+  '@aspect-test/b@5.0.2':
+    resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
+    hasBin: true
+
+  '@aspect-test/c@2.0.2':
+    resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
+    hasBin: true
+
+  '@aspect-test/d@2.0.0':
+    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
+    hasBin: true
+    peerDependencies:
+      '@aspect-test/c': x.x.x
+
+  '@aspect-test/e@1.0.0':
+    resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
+    hasBin: true
+
+  '@aspect-test/f@1.0.0':
+    resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
+    hasBin: true
+
+  '@aspect-test/g@1.0.0':
+    resolution: {integrity: sha512-nYxZCTIw+sHZfuKsqBBL7CW3KOliEoQh0D/ynWyUoB2Vi+DT2+nuvghXqL70/eNegjQ/8hUNTRBDBN2CPgoY8A==}
+    hasBin: true
+
+  '@aspect-test/h@1.0.0':
+    resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
+    hasBin: true
+
+  '@types/node@18.19.54':
+    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==}
+
+  '@types/sizzle@2.3.8':
+    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
+
+  lodash@file:../vendored/lodash-4.17.19.tgz:
+    resolution: {integrity: sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==, tarball: file:../vendored/lodash-4.17.19.tgz}
+    version: 4.17.19
+
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
+  vendored-a@file:../vendored/a:
+    resolution: {directory: ../vendored/a, type: directory}
+
+  vendored-b@file:../vendored/b:
+    resolution: {directory: ../vendored/b, type: directory}
+    peerDependencies:
+      '@lib/b': workspace:*
+
+snapshots:
+
+  '@aspect-test/a@5.0.2':
     dependencies:
       '@aspect-test/b': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
 
-  /@aspect-test/b@5.0.2:
-    resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
-    hasBin: true
+  '@aspect-test/b@5.0.2':
     dependencies:
       '@aspect-test/a': 5.0.2
       '@aspect-test/c': 2.0.2
       '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
 
-  /@aspect-test/c@2.0.2:
-    resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
-    hasBin: true
-    requiresBuild: true
+  '@aspect-test/c@2.0.2': {}
 
-  /@aspect-test/d@2.0.0(@aspect-test/c@2.0.2):
-    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
-    hasBin: true
-    peerDependencies:
-      '@aspect-test/c': x.x.x
+  '@aspect-test/d@2.0.0(@aspect-test/c@2.0.2)':
     dependencies:
       '@aspect-test/c': 2.0.2
 
-  /@aspect-test/e@1.0.0:
-    resolution: {integrity: sha512-GyAxHYKN650db+xnimHnL2LPz65ilmQsVhCasWA7drDNQn/rfmPiEVMzjRiS7m46scXIERaBmiJMzYDf0bIUbA==}
-    hasBin: true
-    dev: false
+  '@aspect-test/e@1.0.0': {}
 
-  /@aspect-test/f@1.0.0:
-    resolution: {integrity: sha512-VjuHu/TXdK0dfMeArZoOFaBY0Z/wAjWuCNtEWDTVJftbDcBtcH3IrhLrOy0NdJu+/CjE0qLCEb78eDGniKNUFA==}
-    hasBin: true
-    dev: false
+  '@aspect-test/f@1.0.0': {}
 
-  /@aspect-test/g@1.0.0:
-    resolution: {integrity: sha512-nYxZCTIw+sHZfuKsqBBL7CW3KOliEoQh0D/ynWyUoB2Vi+DT2+nuvghXqL70/eNegjQ/8hUNTRBDBN2CPgoY8A==}
-    hasBin: true
-    dev: false
+  '@aspect-test/g@1.0.0': {}
 
-  /@aspect-test/h@1.0.0:
-    resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
-    hasBin: true
-    dev: false
+  '@aspect-test/h@1.0.0': {}
 
-  /@types/node@16.18.11:
-    resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==}
-    dev: false
+  '@types/node@18.19.54':
+    dependencies:
+      undici-types: 5.26.5
 
-  /@types/sizzle@2.3.8:
-    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
-    dev: false
+  '@types/sizzle@2.3.8': {}
 
-  /typescript@5.9.2:
-    resolution: {integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-    dev: false
+  lodash@file:../vendored/lodash-4.17.19.tgz: {}
 
-  file:../lib/c:
-    resolution: {directory: ../lib/c, type: directory}
-    name: '@lib/c'
+  typescript@5.9.3: {}
+
+  undici-types@5.26.5: {}
+
+  vendored-a@file:../vendored/a:
     dependencies:
       '@aspect-test/f': 1.0.0
-    dev: false
 
-  file:../vendored/a:
-    resolution: {directory: ../vendored/a, type: directory}
-    name: vendored-a
-    dependencies:
-      '@aspect-test/f': 1.0.0
-    dev: false
-
-  file:../vendored/b(@lib/b@lib+b):
-    resolution: {directory: ../vendored/b, type: directory}
-    id: file:../vendored/b
-    name: vendored-b
-    peerDependencies:
-      '@lib/b': workspace:*
+  vendored-b@file:../vendored/b(@lib/b@lib+b):
     dependencies:
       '@lib/b': link:../lib/b
-    dev: false
-
-  file:../vendored/lodash-4.17.19.tgz:
-    resolution: {integrity: sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==, tarball: file:../vendored/lodash-4.17.19.tgz}
-    name: lodash
-    version: 4.17.19
-    dev: false

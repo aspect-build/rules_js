@@ -4,6 +4,9 @@
     "dependencies": {
         "@scoped/a": "link:../a"
     },
+    "devDependencies": {
+        "a-types": "file:../a-types"
+    },
     "peerDependencies": {
         "@scoped/b": "workspace:*"
     }

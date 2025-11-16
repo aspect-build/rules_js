@@ -25,4 +25,9 @@ pnpm = use_extension(
     "pnpm",
     dev_dependency = True,
 )
+pnpm.pnpm(
+    name = "pnpm",
+    pnpm_version = "9.15.9",
+    pnpm_version_integrity = "sha512-aARhQYk8ZvrQHAeSMRKOmvuJ74fiaR1p5NQO7iKJiClf1GghgbrlW1hBjDolO95lpQXsfF+UA+zlzDzTfc8lMQ==",
+)
 use_repo(pnpm, "pnpm")

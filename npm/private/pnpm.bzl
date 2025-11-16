@@ -72,17 +72,6 @@ def _strip_v5_v6_default_registry(name_version):
     # Strip the default registry from the name_version string
     return name_version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH)
 
-def _convert_v5_v6_file_package(package_path, package_snapshot):
-    if "name" not in package_snapshot:
-        msg = "expected package {} to have a name field".format(package_path)
-        fail(msg)
-
-    name = package_snapshot["name"]
-    version = package_path
-    friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
-
-    return name, version, friendly_version
-
 def _strip_v5_peer_dep_or_patched_version(version):
     "Remove peer dependency or patched syntax from version string"
 
@@ -113,6 +102,7 @@ def _convert_v5_importer_dependency_map(import_path, specifiers, deps):
             version = _convert_pnpm_v5_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
         elif version.startswith("link:"):
+            # Convert link: to be relative to the workspace root instead of importer
             version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
         elif version.startswith("file:"):
             version = _convert_pnpm_v5_version_peer_dep(version)
@@ -188,18 +178,19 @@ def _convert_v5_packages(packages):
 
         package_path = _convert_pnpm_v5_version_peer_dep(package_path)
 
-        if package_path.startswith("file:"):
-            # direct reference to file
-            name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
-        elif "name" in package_snapshot and "version" in package_snapshot:
+        if "name" in package_snapshot:
             # key/path is complicated enough the real name+version are properties
             name = package_snapshot["name"]
             version = _strip_v5_default_registry_to_version(name, package_path)
-            friendly_version = package_snapshot["version"]
+            friendly_version = package_snapshot["version"] if "version" in package_snapshot else package_snapshot["id"] if "id" in package_snapshot else package_path
         elif package_path.startswith("/"):
             # a simple /name/version[_peer_info]
             name, version = package_path[1:].rsplit("/", 1)
             friendly_version = _strip_v5_peer_dep_or_patched_version(version)
+
+            if "version" in package_snapshot or "id" in package_snapshot:
+                msg = "package {} has name/version/id field but simple /pkg@version path".format(package_path)
+                fail(msg)
         else:
             msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
@@ -216,7 +207,7 @@ def _convert_v5_packages(packages):
             has_bin = package_snapshot.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
-            resolution = package_snapshot.get("resolution"),
+            resolution = package_snapshot["resolution"],
         )
 
         if package_key in result:
@@ -266,8 +257,8 @@ def _strip_v6_default_registry_to_version(name, version):
 def _convert_pnpm_v6_importer_dependency_map(import_path, deps):
     result = {}
     for name, attributes in deps.items():
-        specifier = attributes.get("specifier")
-        version = attributes.get("version")
+        specifier = attributes["specifier"]
+        version = attributes["version"]
 
         if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
             # Keep the npm: specifier for aliased dependencies
@@ -276,6 +267,7 @@ def _convert_pnpm_v6_importer_dependency_map(import_path, deps):
             version = _convert_pnpm_v6_v9_version_peer_dep(version)
             version = "npm:{}@{}".format(alias, version)
         elif version.startswith("link:"):
+            # Convert link: to be relative to the workspace root instead of importer
             version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
         elif version.startswith("file:"):
             version = _convert_pnpm_v6_v9_version_peer_dep(version)
@@ -358,18 +350,19 @@ def _convert_v6_packages(packages):
 
         package_path = _convert_pnpm_v6_v9_version_peer_dep(package_path)
 
-        if package_path.startswith("file:"):
-            # direct reference to file
-            name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
-        elif "name" in package_snapshot and "version" in package_snapshot:
+        if "name" in package_snapshot:
             # key/path is complicated enough the real name+version are properties
             name = package_snapshot["name"]
             version = _strip_v6_default_registry_to_version(name, package_path)
-            friendly_version = package_snapshot["version"]
+            friendly_version = package_snapshot["version"] if "version" in package_snapshot else package_snapshot["id"] if "id" in package_snapshot else package_path
         elif package_path.startswith("/"):
             # plain /pkg@version(_peer_info)
             name, version = package_path[1:].rsplit("@", 1)
             friendly_version = _strip_v5_peer_dep_or_patched_version(version)  # NOTE: already converted to v5 peer style
+
+            if "version" in package_snapshot or "id" in package_snapshot:
+                msg = "package {} has name/version/id field but simple /pkg@version path".format(package_path)
+                fail(msg)
         else:
             msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
             fail(msg)
@@ -386,7 +379,7 @@ def _convert_v6_packages(packages):
             has_bin = package_snapshot.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = package_snapshot.get("requiresBuild", False),
-            resolution = package_snapshot.get("resolution"),
+            resolution = package_snapshot["resolution"],
         )
 
         if package_key in result:
@@ -419,8 +412,8 @@ def _convert_pnpm_v9_package_dependency_map(snapshots, deps):
 def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
     result = {}
     for name, attributes in deps.items():
-        specifier = attributes.get("specifier")
-        version = attributes.get("version")
+        specifier = attributes["specifier"]
+        version = attributes["version"]
 
         # Transition version[(patch)(peer)(data)] to a rules_js version format
         version = _convert_pnpm_v6_v9_version_peer_dep(version)
@@ -429,9 +422,8 @@ def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
             # Keep the npm: specifier for aliased dependencies
             version = "npm:{}".format(version)
         elif version.startswith("link:"):
+            # Convert link: to be relative to the workspace root instead of importer
             version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
-        elif version.startswith("file:"):
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
 
         result[name] = version
     return result
@@ -520,7 +512,7 @@ def _convert_v9_packages(packages, snapshots):
             has_bin = package_data.get("hasBin", False),
             optional = package_snapshot.get("optional", False),
             requires_build = None,  # Unknown from lockfile in v9
-            resolution = package_data.get("resolution"),
+            resolution = package_data["resolution"],
         )
 
         if package_key in result:
@@ -618,7 +610,7 @@ def _validate_lockfile_deps(packages, importer_type, importer, deps):
                 packages.keys(),
             )
 
-            # TODO: fail instead of print
+            # TODO(3.0): fail instead of print
             # buildifier: disable=print
             print(msg)
 

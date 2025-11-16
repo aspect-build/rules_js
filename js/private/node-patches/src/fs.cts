@@ -22,28 +22,52 @@ import * as path from 'path'
 import * as util from 'util'
 
 // windows cant find the right types
-type Dir = any
-type Dirent = any
+type Dir = FsType.Dir
+type Dirent = FsType.Dirent
 
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
-const _fs = require('node:fs') as typeof FsType
+const fs = require('node:fs') as any
 const url = require('node:url') as typeof UrlType
+const esmModule = require('node:module')
 
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
 
 type HopResults = string | typeof HOP_NON_LINK | typeof HOP_NOT_FOUND
 
-export function patcher(fs: any = _fs, roots: string[]) {
-    fs = fs || _fs
+const PATCHED_FS_METHODS: ReadonlyArray<keyof typeof FsType> = [
+    'lstat',
+    'lstatSync',
+    'realpath',
+    'realpathSync',
+    'readlink',
+    'readlinkSync',
+    'readdir',
+    'readdirSync',
+    'opendir',
+]
+
+/**
+ * Function that patches the `fs` module to not escape the given roots.
+ * @returns a function to undo the patches.
+ */
+export function patcher(roots: string[]): () => void {
+    if (fs._unpatched) {
+        throw new Error('FS is already patched.')
+    }
+
     // Make the original version of the library available for when access to the
     // unguarded file system is necessary, such as the esbuild plugin that
     // protects against sandbox escaping that occurs through module resolution
     // in the Go binary. See
     // https://github.com/aspect-build/rules_esbuild/issues/58.
-    fs._unpatched = { ...fs }
+    fs._unpatched = PATCHED_FS_METHODS.reduce((obj, method) => {
+        obj[method] = fs[method]
+        return obj
+    }, {})
+
     roots = roots || []
     roots = roots.filter((root) => fs.existsSync(root))
     if (!roots.length) {
@@ -87,7 +111,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
             return origLstat(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         // override the callback
         args[args.length - 1] = function lstatCb(err: Error, stats: Stats) {
@@ -183,7 +207,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
             return origRealpath(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         args[args.length - 1] = function realpathCb(err: Error, str: string) {
             if (err) return cb(err)
@@ -206,7 +230,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
             return origRealpathNative(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         args[args.length - 1] = function nativeCb(err: Error, str: string) {
             if (err) return cb(err)
@@ -253,7 +277,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
             return origReadlink(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
 
         args[args.length - 1] = function readlinkCb(err: Error, str: string) {
             if (err) return cb(err)
@@ -283,18 +307,8 @@ export function patcher(fs: any = _fs, roots: string[]) {
                     ) {
                         return cb(null, next)
                     }
-                    // The escape from the root is not mappable back into the root; we must make
-                    // this look like a real file so we call readlink on the realpath which we
-                    // expect to return an error
-                    return origRealpath(resolved, readlinkRealpathCb)
-
-                    function readlinkRealpathCb(
-                        err: NodeJS.ErrnoException,
-                        str: string
-                    ) {
-                        if (err) return cb(err)
-                        return origReadlink(str, cb)
-                    }
+                    // The escape from the root is not mappable back into the root; throw EINVAL
+                    return cb(einval('readlink', args[0]))
                 }
             } else {
                 return cb(null, str)
@@ -349,7 +363,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
             return origReaddir(...args)
         }
 
-        const cb = once(args[args.length - 1] as any)
+        const cb = once(args[args.length - 1] as Function)
         const p = resolvePathLike(args[0])
 
         args[args.length - 1] = function readdirCb(
@@ -396,23 +410,31 @@ export function patcher(fs: any = _fs, roots: string[]) {
             // if this is not a function opendir should throw an error.
             // we call it so we don't have to throw a mock
             if (typeof args[args.length - 1] === 'function') {
-                const cb = once(args[args.length - 1] as any)
+                const cb = once(args[args.length - 1] as Function)
                 args[args.length - 1] = async function opendirCb(
                     err: Error,
                     dir: Dir
                 ) {
                     try {
-                        cb(null, await handleDir(dir))
+                        cb(err, err ? undefined : handleDir(dir))
                     } catch (err) {
                         cb(err)
                     }
                 }
                 origOpendir(...args)
             } else {
-                return origOpendir(...args).then((dir: Dir) => {
-                    return handleDir(dir)
-                })
+                return origOpendir(...args).then(handleDir)
             }
+        }
+    }
+
+    if (fs.opendirSync) {
+        const origOpendirSync = fs.opendirSync.bind(fs)
+        fs.opendirSync = function opendirSync(
+            ...args: Parameters<typeof origOpendirSync>
+        ) {
+            const dir = origOpendirSync(...args)
+            return handleDir(dir)
         }
     }
 
@@ -434,8 +456,11 @@ export function patcher(fs: any = _fs, roots: string[]) {
         fs,
         'promises'
     )
+
+    let unpatchPromises: Function
+
     if (promisePropertyDescriptor) {
-        const promises: any = {}
+        const promises: typeof fs.promises = {}
         promises.lstat = util.promisify(fs.lstat)
         // NOTE: node core uses the newer realpath function fs.promises.native instead of fs.realPath
         promises.realpath = util.promisify(fs.realpath.native)
@@ -448,15 +473,36 @@ export function patcher(fs: any = _fs, roots: string[]) {
             const oldGetter = promisePropertyDescriptor.get.bind(fs)
             const cachedPromises = {}
 
-            promisePropertyDescriptor.get = () => {
+            function promisePropertyGetter() {
                 const _promises = oldGetter()
                 Object.assign(cachedPromises, _promises, promises)
                 return cachedPromises
             }
-            Object.defineProperty(fs, 'promises', promisePropertyDescriptor)
+            Object.defineProperty(
+                fs,
+                'promises',
+                Object.assign(Object.create(promisePropertyDescriptor), {
+                    get: promisePropertyGetter,
+                })
+            )
+
+            unpatchPromises = function unpatchFsPromises() {
+                Object.defineProperty(fs, 'promises', promisePropertyDescriptor)
+            }
         } else {
+            const unpatchedPromises = Object.keys(promises).reduce(
+                (obj, method) => {
+                    obj[method] = fs.promises[method]
+                    return obj
+                },
+                Object.create(fs.promises)
+            )
+
             // api can be patched directly
             Object.assign(fs.promises, promises)
+            unpatchPromises = function unpatchFsPromises() {
+                Object.assign(fs.promises, unpatchedPromises)
+            }
         }
     }
 
@@ -464,50 +510,57 @@ export function patcher(fs: any = _fs, roots: string[]) {
     // helper functions for dirs
     // =========================================================================
 
-    async function handleDir(dir: Dir) {
+    function handleDir(dir: Dir) {
         const p = path.resolve(dir.path)
-        const origIterator = dir[Symbol.asyncIterator].bind(dir)
-        const origRead: any = dir.read.bind(dir)
 
+        const origIterator = dir[Symbol.asyncIterator].bind(dir)
         dir[Symbol.asyncIterator] = async function* () {
             for await (const entry of origIterator()) {
                 await handleDirent(p, entry)
                 yield entry
             }
         }
-        ;(dir.read as any) = async function handleDirRead(...args: any[]) {
-            if (typeof args[args.length - 1] === 'function') {
-                const cb = args[args.length - 1]
-                args[args.length - 1] = async function handleDirReadCb(
-                    err: Error,
-                    entry: Dirent
-                ) {
-                    cb(err, entry ? await handleDirent(p, entry) : null)
-                }
-                origRead(...args)
+
+        const origRead = dir.read.bind(dir)
+        dir.read = async function handleDirRead(
+            cb?: Parameters<typeof dir.read>[0]
+        ) {
+            if (typeof cb === 'function') {
+                origRead(function handleDirReadCb(err: Error, entry: Dirent) {
+                    if (err) return cb(err, null)
+                    handleDirent(p, entry).then(
+                        () => {
+                            cb(null, entry)
+                        },
+                        (err) => cb(err, null)
+                    )
+                })
             } else {
-                const entry = await origRead(...args)
+                const entry = await origRead()
                 if (entry) {
                     await handleDirent(p, entry)
                 }
                 return entry
             }
         }
-        const origReadSync: any = dir.readSync.bind(dir)
-        ;(dir.readSync as any) = function handleDirReadSync() {
-            return handleDirentSync(p, origReadSync()) // intentionally sync for simplicity
+        const origReadSync = dir.readSync.bind(dir)
+        dir.readSync = function handleDirReadSync() {
+            return handleDirentSync(p, origReadSync())
         }
 
         return dir
     }
 
-    function handleDirent(p: string, v: Dirent): Promise<Dirent> {
+    async function handleDirent(p: string, v: Dirent) {
+        if (!v.isSymbolicLink()) {
+            return v
+        }
+
+        const f = path.resolve(p, v.name)
+
         return new Promise(function handleDirentExecutor(resolve, reject) {
-            if (!v.isSymbolicLink()) {
-                return resolve(v)
-            }
-            const f = path.resolve(p, v.name)
             return guardedReadLink(f, handleDirentReadLinkCb)
+
             function handleDirentReadLinkCb(str: string) {
                 if (f != str) {
                     return resolve(v)
@@ -516,11 +569,11 @@ export function patcher(fs: any = _fs, roots: string[]) {
                 v.isSymbolicLink = () => false
                 origRealpath(f, function handleDirentRealpathCb(err, str) {
                     if (err) {
-                        throw err
+                        return reject(err)
                     }
                     fs.stat(str, function handleDirentStatCb(err, stat) {
                         if (err) {
-                            throw err
+                            return reject(err)
                         }
                         patchDirent(v, stat)
                         resolve(v)
@@ -530,7 +583,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
         })
     }
 
-    function handleDirentSync(p: string, v: Dirent | null): void {
+    function handleDirentSync(p: string, v: Dirent | null): Dirent | null {
         if (v && v.isSymbolicLink) {
             if (v.isSymbolicLink()) {
                 const f = path.resolve(p, v.name)
@@ -542,6 +595,7 @@ export function patcher(fs: any = _fs, roots: string[]) {
                 }
             }
         }
+        return v
     }
 
     function nextHop(loc: string, cb: (next: string | false) => void): void {
@@ -819,6 +873,22 @@ export function patcher(fs: any = _fs, roots: string[]) {
             }
         }
     }
+
+    // Sync the esm modules to use the now patched fs cjs module.
+    // See: https://nodejs.org/api/esm.html#builtin-modules
+    esmModule.syncBuiltinESMExports()
+
+    return function revertPatch() {
+        Object.assign(fs, fs._unpatched)
+        delete fs._unpatched
+
+        if (unpatchPromises) {
+            unpatchPromises()
+        }
+
+        // Re-sync the esm modules to revert to the unpatched module.
+        esmModule.syncBuiltinESMExports()
+    }
 }
 
 // =========================================================================
@@ -906,10 +976,10 @@ export function escapeFunction(_roots: string[]) {
     }
 }
 
-function once<T>(fn: (...args: unknown[]) => T) {
+function once(fn: Function) {
     let called = false
 
-    return function callOnce(...args: unknown[]) {
+    return function callOnce(...args: any[]) {
         if (called) return
         called = true
 

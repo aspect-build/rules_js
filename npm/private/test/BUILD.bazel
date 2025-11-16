@@ -1,8 +1,10 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
+load(":npm_package_visibility_test.bzl", "npm_package_visibility_tests")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":parse_pnpm_lock_tests.bzl", "parse_pnpm_lock_tests")
 load(":pnpm_test.bzl", "pnpm_tests")
@@ -27,6 +29,8 @@ parse_pnpm_lock_tests(name = "test_parse_pnpm_lock")
 
 generated_pkg_json_test(name = "test_generated_pkg_json")
 
+npm_package_visibility_tests(name = "test_npm_package_visibility")
+
 npm_auth_test_suite()
 
 write_source_files(
@@ -34,7 +38,7 @@ write_source_files(
     files = {
         "snapshots/npm_defs.bzl": "@npm//:defs.bzl",
         "snapshots/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
-        "snapshots/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
+        "snapshots/fsevents_links_defs.bzl": "@npm__fsevents__2.3.3__links//:defs.bzl",
         "snapshots/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
         "snapshots/package_json.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
         "snapshots/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8//npm/private/test:package_json.bzl",
@@ -42,6 +46,7 @@ write_source_files(
     tags = [
         "skip-on-bazel6",
         "skip-on-bazel8",
+        "skip-on-bazel9",
     ],
 )
 
@@ -56,6 +61,12 @@ build_test(
 
         # @fastify/send (@3.3.0) contains spaces and a ☃ character in paths
         ":node_modules/@fastify/send",
+
+        # Test scope targets (aggregated js_library for all packages in a scope)
+        ":node_modules/@fastify",
+        ":node_modules/@figma",
+        ":node_modules/@kubernetes",
+        ":node_modules/@plotly",
     ],
 )
 

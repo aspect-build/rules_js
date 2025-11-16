@@ -11,11 +11,8 @@ DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
 def _sorted_map(m):
-    result = dict()
-    for key in sorted(m.keys()):
-        result[key] = m[key]
-
-    return result
+    # TODO(zbarsky): maybe faster as `dict(sorted(m.items()))`?
+    return {k: m[k] for k in sorted(m.keys())}
 
 def _sanitize_rule_name(string):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
@@ -51,7 +48,9 @@ def _escape_target_name(name):
 def _package_store_name(pnpm_name, pnpm_version):
     "Make a package store name for a given package and version"
 
-    if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
+    if pnpm_version.startswith("link:"):
+        # Distinguish local links a 0.0.0 version. This is unlike pnpm which symlinks
+        # local links into the source tree instead of storing them in the package store.
         name = pnpm_name
         version = "0.0.0"
     elif pnpm_version.startswith("npm:"):

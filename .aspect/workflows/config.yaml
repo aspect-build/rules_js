@@ -3,214 +3,164 @@ workspaces:
     .:
         icon: js
         label: rules_js
+        tasks:
+            - bazel-9:
+                  without: true
     e2e/bzlmod:
         icon: bazel
-        tasks:
+        tasks: &e2e_tasks
             - test:
                   queue: aspect-medium
             - format:
                   without: true
             - buildifier:
                   without: true
+            - bazel-8:
+                  without: true
+            - bazel-9:
+                  without: true
+    e2e/git_dep_metadata:
+        icon: npm
+        tasks: *e2e_tasks
     e2e/gyp_no_install_script:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     # rules_docker not compatible with Bazel 7.
     # See https://github.com/bazelbuild/bazel/issues/20494#issuecomment-1852401451.
     # e2e/js_image_docker:
     e2e/js_image_oci:
         icon: linux
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
     # e2e/js_run_devserver:
     e2e/npm_link_package:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     e2e/npm_link_package-esm:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/npm_link_package-rerooted:
+        icon: npm
+        tasks: *e2e_tasks
     e2e/npm_translate_lock:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     e2e/npm_translate_lock_replace_packages:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     e2e/npm_translate_lock_empty:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock_exclude_package_contents:
+        icon: npm
+        tasks: *e2e_tasks
     e2e/npm_translate_lock_multi:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     e2e/npm_translate_lock_partial_clone:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    # No test targets. Requires running test.sh.
+    # e2e/npm_translate_lock_package_visibility:
     e2e/npm_translate_lock_subdir_patch:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     # Requires an auth token
     # e2e/npm_translate_lock_auth:
+    e2e/npm_translate_lock_disable_hooks:
+        icon: npm
+        tasks: *e2e_tasks
     # Requires an SSH token
     # e2e/npm_translate_lock_git+ssh:
     e2e/npm_translate_package_lock:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     e2e/npm_translate_yarn_lock:
         icon: yarn
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
     e2e/package_json_module:
         icon: npm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/patch_from_repo:
+        icon: npm
+        tasks: *e2e_tasks
     e2e/pnpm_lockfiles:
         icon: pnpm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/pnpm_repo_install:
+        icon: pnpm
+        tasks: *e2e_tasks
     e2e/pnpm_workspace:
         icon: pnpm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/pnpm_workspace_deps:
+        icon: pnpm
+        tasks: *e2e_tasks
     e2e/pnpm_workspace_rerooted:
         icon: pnpm
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/pnpm_version:
+        icon: pnpm
+        tasks: *e2e_tasks
     e2e/repo_mapping:
         icon: js
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/npm_translate_lock_link_workspace:
+        icon: js
+        tasks: *e2e_tasks
     e2e/runfiles:
         icon: js
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
-    e2e/rules_foo:
-        icon: js
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/stamped_package_json:
+        icon: npm
+        tasks: *e2e_tasks
     e2e/vendored_node:
         icon: js
-        tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
+        tasks: *e2e_tasks
+    e2e/vendored_tarfile:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/verify_patches:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/worker:
+        icon: js
+        tasks: *e2e_tasks
+    e2e/workspace:
+        icon: js
+        tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
+    # e2e/update_pnpm_lock:
+    # e2e/update_pnpm_lock_with_import:
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
 bazel:
-  flags:
-    - --config=ci
+    flags:
+        - --config=ci
 tasks:
     - checkout:
           update_strategy: rebase
     - test:
+          name: Bazel 7
+          id: bazel-7
+          bazel:
+              flags: ['--test_tag_filters=-skip-on-bazel7']
+          env:
+              USE_BAZEL_VERSION: '7.x'
+    - test:
+          name: Bazel 8
+          id: bazel-8
+          bazel:
+              flags: ['--test_tag_filters=-skip-on-bazel8']
+          env:
+              USE_BAZEL_VERSION: '8.x'
+    - test:
+          name: Bazel 9
+          id: bazel-9
+          bazel:
+              flags: ['--test_tag_filters=-skip-on-bazel9']
+          env:
+              USE_BAZEL_VERSION: '9.*'
     - format:
           queue: aspect-medium
     - buildifier:

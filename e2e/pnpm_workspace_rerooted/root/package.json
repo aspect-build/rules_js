@@ -1,0 +1,6 @@
+{
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
+    "private": true
+}

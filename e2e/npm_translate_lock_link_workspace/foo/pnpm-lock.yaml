@@ -1,0 +1,53 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@aspect-test/a':
+        specifier: 5.0.2
+        version: 5.0.2
+
+packages:
+
+  '@aspect-test/a@5.0.2':
+    resolution: {integrity: sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==}
+    hasBin: true
+
+  '@aspect-test/b@5.0.2':
+    resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
+    hasBin: true
+
+  '@aspect-test/c@2.0.2':
+    resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
+    hasBin: true
+
+  '@aspect-test/d@2.0.0':
+    resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
+    hasBin: true
+    peerDependencies:
+      '@aspect-test/c': x.x.x
+
+snapshots:
+
+  '@aspect-test/a@5.0.2':
+    dependencies:
+      '@aspect-test/b': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+
+  '@aspect-test/b@5.0.2':
+    dependencies:
+      '@aspect-test/a': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+
+  '@aspect-test/c@2.0.2': {}
+
+  '@aspect-test/d@2.0.0(@aspect-test/c@2.0.2)':
+    dependencies:
+      '@aspect-test/c': 2.0.2

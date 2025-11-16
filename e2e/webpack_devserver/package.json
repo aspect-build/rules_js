@@ -1,4 +1,9 @@
 {
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "fsevents"
+        ]
+    },
     "devDependencies": {
         "html-webpack-plugin": "5.5.3",
         "webpack": "5.88.1",

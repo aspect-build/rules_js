@@ -19,6 +19,7 @@ npm_translate_lock(
     data = ["//:package.json"],
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
+    pnpm_version = "9.1.1",
     preupdate = ["//:transform_package_json.js"],
     quiet = False,
     update_pnpm_lock = True,

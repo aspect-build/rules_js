@@ -162,7 +162,6 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     generate_repository_files(
         rctx,
-        state.label_store.label("pnpm_lock"),
         importers,
         packages,
         state.patched_dependencies(),
@@ -173,6 +172,12 @@ See https://github.com/aspect-build/rules_js/issues/1445
         state.npm_auth(),
         state.link_workspace(),
     )
+
+    # Support bazel <v8.3 by returning None if repo_metadata is not defined
+    if not hasattr(rctx, "repo_metadata"):
+        return None
+
+    return rctx.repo_metadata(reproducible = True)
 
 npm_translate_lock_rule = repository_rule(
     implementation = _npm_translate_lock_impl,
@@ -445,18 +450,31 @@ def npm_translate_lock(
 
             Read more: [lifecycles](/docs/pnpm.md#lifecycles)
 
-        replace_packages: A dict of package names to npm_package targets to link instead of the sources specified in the pnpm lock file for the corresponding packages.
+        replace_packages: [DEPRECATED - Use npm.npm_replace_package() tag in MODULE.bazel instead] A dict of package names to targets to link instead of the sources specified in the pnpm lock file for the corresponding packages.
 
-            The injected npm_package targets may optionally contribute transitive npm package dependencies on top
+            **Note for bzlmod users:** Use the `npm_replace_package` tag class instead:
+
+                        ```starlark
+                        npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+                        npm.npm_replace_package(
+                            package = "chalk@5.3.0",
+                            replacement = "@chalk_501//:pkg",
+                        )
+                        npm.npm_translate_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")
+                        ```
+
+            Targets must produce `JsInfo` or `NpmPackageInfo` providers such as `js_library` or `npm_package` targets.
+
+            The injected package targets may optionally contribute transitive npm package dependencies on top
             of the transitive dependencies specified in the pnpm lock file for their respective packages, however, these
             transitive dependencies must not collide with pnpm lock specified transitive dependencies.
 
-            Any patches specified for the packages will be not applied to the injected npm_package targets. They
+            Any patches specified for the packages will be not applied to the injected package targets. They
             will be applied, however, to the fetches sources for their respecitve packages so they can still be useful
             for patching the fetched `package.json` files, which are used to determine the generated bin entries for packages.
 
             NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
-            the injected npm_package targets. These may be disabled explicitly using the `lifecycle_hooks` attribute.
+            the injected package targets. These may be disabled explicitly using the `lifecycle_hooks` attribute.
 
         bins: Binary files to create in `node_modules/.bin` for packages in this lock file.
 
@@ -553,7 +571,7 @@ def npm_translate_lock(
 
         use_pnpm: label of the pnpm entry point to use.
 
-        npm_package_target_name: The name of linked `npm_package`, `js_library` or `JsInfo` producing targets.
+        npm_package_target_name: The name of linked `js_library`, `npm_package` or `JsInfo` producing targets.
 
             When targets are linked as pnpm workspace packages, the name of the target must align with this value.
 

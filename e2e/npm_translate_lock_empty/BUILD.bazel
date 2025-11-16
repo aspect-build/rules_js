@@ -12,10 +12,27 @@ build_test(
 )
 
 write_source_files(
+    name = "write_npm_translate_lock_bzlmod",
+    files = {
+        # NOTE: @npm//:repositories.bzl not generated for bzlmod
+        "snapshots/bzlmod/npm_defs.bzl": "@npm//:defs.bzl",
+    },
+    # Target names may be different on bazel versions
+    tags = ["skip-on-bazel6"],
+    target_compatible_with = select({
+        "@aspect_bazel_lib//lib:bzlmod": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+write_source_files(
     name = "write_npm_translate_lock_wksp",
     files = {
         "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
+        "snapshots/wksp/npm_defs.bzl": "@npm//:defs.bzl",
     },
+    # Target names may be different on bazel versions
+    tags = ["skip-on-bazel6"],
     target_compatible_with = select({
         "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
         "//conditions:default": [],

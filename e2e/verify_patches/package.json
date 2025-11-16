@@ -1,5 +1,8 @@
 {
     "private": true,
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
         "@aspect-test/a": "5.0.2",
         "@aspect-test/c": "2.0.2",

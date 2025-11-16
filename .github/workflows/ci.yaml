@@ -47,6 +47,7 @@ jobs:
                     e2e/js_run_devserver
                     e2e/npm_link_package
                     e2e/npm_link_package-esm
+                    e2e/npm_link_package-rerooted
                     e2e/npm_translate_lock
                     e2e/npm_translate_lock_disable_hooks
                     e2e/npm_translate_lock_empty
@@ -56,6 +57,7 @@ jobs:
                     e2e/npm_translate_package_lock
                     e2e/npm_translate_yarn_lock
                     e2e/npm_translate_lock_exclude_package_contents
+                    e2e/npm_translate_lock_package_visibility
                     e2e/package_json_module
                     e2e/patch_from_repo
                     e2e/pnpm_lockfiles
@@ -63,8 +65,9 @@ jobs:
                     e2e/pnpm_workspace
                     e2e/pnpm_workspace_deps
                     e2e/pnpm_workspace_rerooted
+                    e2e/pnpm_version
                     e2e/runfiles
-                    e2e/rules_foo
+                    e2e/npm_translate_lock_link_workspace
                     e2e/stamped_package_json
                     e2e/update_pnpm_lock
                     e2e/update_pnpm_lock_with_import
@@ -163,11 +166,21 @@ jobs:
                       bzlmod: 0
                       folder: e2e/js_image_oci
                     - bzlmod: 1
-                      folder: e2e/npm_link_package-esm
-                    - bzlmod: 1
                       folder: e2e/npm_link_package
+                      bazel-version:
+                          major: 6
                     - bzlmod: 1
-                      folder: e2e/rules_foo
+                      folder: e2e/npm_link_package-esm
+                      bazel-version:
+                          major: 6
+                    - bzlmod: 1
+                      folder: e2e/npm_link_package-rerooted
+                      bazel-version:
+                          major: 6
+                    - bzlmod: 1
+                      folder: e2e/npm_translate_lock_link_workspace
+                      bazel-version:
+                          major: 6
                     # gyp_no_install_script+patch_from_repo+js_run_devserver are broken in an usual way on 6.5.0
                     # that is not worth investigating as we're dropping Bazel 6 support soon
                     - bazel-version:
@@ -260,8 +273,8 @@ jobs:
                       ~/.cache/bazelisk
                   key: >-
                       bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
-                      ${{ hashFiles('.bazelrc', '.bazelversion', '.bazeliskrc', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
-                      ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/.bazeliskrc', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
+                      ${{ hashFiles('.bazelrc', '.bazelversion', '**/BUILD', '**/BUILD.bazel', '**/*.bzl', 'WORKSPACE', 'WORKSPACE.bazel', 'WORKSPACE.bzlmod', 'MODULE.bazel', '**/*.js', '!e2e') }}-
+                      ${{ hashFiles(format('{0}/.bazelrc', matrix.folder), format('{0}/.bazelversion', matrix.folder), format('{0}/**/BUILD', matrix.folder), format('{0}/**/BUILD.bazel', matrix.folder), format('{0}/**/*.bzl', matrix.folder), format('{0}/WORKSPACE', matrix.folder), format('{0}/WORKSPACE.bazel', matrix.folder), format('{0}/WORKSPACE.bzlmod', matrix.folder), format('{0}/MODULE.bazel', matrix.folder), format('{0}/MODULE.bazel.lock', matrix.folder), format('{0}/**/*.js', matrix.folder)) }}
                   restore-keys: |
                       bazel-cache-${{ matrix.bazel-version.version }}-${{ matrix.bzlmod }}-${{ matrix.os }}-${{ matrix.folder }}-
 
@@ -272,12 +285,6 @@ jobs:
                   # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
                   # then use .bazelversion to determine which Bazel version to use.
                   echo "${{ matrix.bazel-version.version }}" > .bazelversion
-
-            # TODO: remove this block once we have Aspect CLI Windows releases
-            - name: Don't use Aspect CLI on Windows
-              if: matrix.os == 'windows'
-              shell: bash
-              run: rm -f .bazeliskrc
 
             - name: bazel test //...
               shell: bash

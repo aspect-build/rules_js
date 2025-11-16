@@ -2,7 +2,8 @@
     "name": "js_lib_pkg_b",
     "dependencies": {
         "js_lib_pkg_a": "workspace:*",
-        "js_lib_pkg_a-alias": "link:../a"
+        "js_lib_pkg_a-alias_1": "link:../a",
+        "js_lib_pkg_a-alias_2": "link:../a"
     },
     "devDependencies": {
         "@types/node": "18.19.54"

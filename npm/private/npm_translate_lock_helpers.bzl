@@ -1,7 +1,6 @@
 """Starlark helpers for npm_translate_lock."""
 
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")
@@ -253,7 +252,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
+def _get_npm_imports(importers, packages, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
     if attr.prod and attr.dev:
         fail("prod and dev attributes cannot both be set to true")
@@ -261,7 +260,7 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
     # make a lookup table of package to link name for each importer
     importer_links = {}
     for import_path, importer in importers.items():
-        dependencies = importer.get("all_deps")
+        dependencies = importer["all_deps"]
         if type(dependencies) != "dict":
             msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
             fail(msg)
@@ -289,16 +288,16 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
     patches_used = []
     result = {}
     for package_key, package_info in packages.items():
-        name = package_info.get("name")
-        version = package_info.get("version")
-        friendly_version = package_info.get("friendly_version")
-        deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optional_dependencies")
-        dev_only = package_info.get("dev_only")
-        optional = package_info.get("optional")
-        requires_build = package_info.get("requires_build")
-        transitive_closure = package_info.get("transitive_closure")
-        resolution = package_info.get("resolution")
+        name = package_info["name"]
+        version = package_info["version"]
+        friendly_version = package_info["friendly_version"]
+        deps = package_info["dependencies"]
+        optional_deps = package_info["optional_dependencies"]
+        dev_only = package_info["dev_only"]
+        optional = package_info["optional"]
+        requires_build = package_info["requires_build"]
+        transitive_closure = package_info["transitive_closure"]
+        resolution = package_info["resolution"]
 
         resolution_type = resolution.get("type", None)
         if resolution_type == "directory":
@@ -332,7 +331,7 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
             continue
 
         if not attr.no_optional:
-            deps = dicts.add(optional_deps, deps)
+            deps = optional_deps | deps
 
         friendly_name = utils.friendly_name(name, friendly_version)
         unfriendly_name = utils.friendly_name(name, version)
@@ -386,11 +385,11 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             exclude_package_contents = _gather_package_content_excludes(attr.exclude_package_contents, name, friendly_name, unfriendly_name)
 
         # gather replace packages
-        replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
-        if len(replace_packages) > 1:
+        replace_package, _ = _gather_values_from_matching_names(True, replace_packages, name, friendly_name, unfriendly_name)
+        if len(replace_package) > 1:
             msg = "Multiple package replacements found for package {}".format(name)
             fail(msg)
-        replace_package = replace_packages[0] if replace_packages else None
+        replace_package = replace_package[0] if replace_package else None
 
         # gather custom postinstalls
         custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
@@ -405,9 +404,9 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # gather all of the importers (workspace packages) that this npm package should be linked at which names
         link_packages = {}
-        for import_path, links in importer_links.items():
+        for links in importer_links.values():
             linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key, [])
+            link_names = linked_packages.get(package_key)
             if link_names:
                 link_packages[links["link_package"]] = link_names
 
@@ -493,7 +492,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             version = version,
             bins = bins,
             package_info = package_info,
-            dev = dev_only,
+            dev_only = dev_only,
             replace_package = replace_package,
         )
 

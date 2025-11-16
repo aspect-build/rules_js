@@ -1,0 +1,11 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+# This module provides a lodash replacement package
+npm_package(
+    name = "lodash_replacement",
+    srcs = [
+        "lodash.js",
+        "package.json",
+    ],
+    visibility = ["//visibility:public"],
+)

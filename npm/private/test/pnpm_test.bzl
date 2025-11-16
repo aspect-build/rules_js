@@ -4,10 +4,11 @@ load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:pnpm_repository.bzl", "LATEST_PNPM_VERSION")
 
-def _fake_pnpm_tag(version, name = DEFAULT_PNPM_REPO_NAME, integrity = None):
+def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None):
     return struct(
         name = name,
         pnpm_version = version,
+        pnpm_version_from = pnpm_version_from,
         pnpm_version_integrity = integrity,
     )
 
@@ -17,7 +18,7 @@ def _fake_mod(is_root, *pnpm_tags):
         tags = struct(pnpm = pnpm_tags),
     )
 
-def _resolve_test(ctx, repositories = [], notes = [], modules = []):
+def _resolve_test(ctx, repositories = [], notes = [], modules = [], package_json_content = None):
     env = unittest.begin(ctx)
 
     expected = struct(
@@ -25,7 +26,7 @@ def _resolve_test(ctx, repositories = [], notes = [], modules = []):
         notes = notes,
     )
 
-    result = resolve_pnpm_repositories(modules)
+    result = resolve_pnpm_repositories(struct(modules = modules, read = lambda f: package_json_content))
 
     asserts.equals(env, expected, result)
     return unittest.end(env)
@@ -46,14 +47,32 @@ def _basic(ctx):
         ],
     )
 
+def _from_package_json_simple(ctx):
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": "1.2.3"},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
+        ],
+        package_json_content = json.encode({"packageManager": "pnpm@1.2.3"}),
+    )
+
+def _from_package_json_with_hash(ctx):
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": "1.2.3"},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
+        ],
+        package_json_content = json.encode({"packageManager": "pnpm@1.2.3+sha512.97462997561378b6f52ac5c614f3a3b923a652ad5ac987100286e4aa2d84a6a0642e9e45f3d01d30c46b12b20beb0f86aeb790bf9a82bc59db42b67fe69d1a25"}),
+    )
+
 def _override(ctx):
     # What happens when the root overrides the pnpm version.
     return _resolve_test(
         ctx,
         repositories = {"pnpm": "9.1.0"},
-        notes = [
-            """NOTE: repo 'pnpm' has multiple versions ["9.1.0", "8.6.7"]; selected 9.1.0""",
-        ],
+        notes = [],
         modules = [
             _fake_mod(
                 True,
@@ -131,6 +150,8 @@ override_test = unittest.make(_override)
 latest_test = unittest.make(_latest)
 custom_name_test = unittest.make(_custom_name)
 integrity_conflict_test = unittest.make(_integrity_conflict)
+from_package_json_simple_test = unittest.make(_from_package_json_simple)
+from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
 
 def pnpm_tests(name):
     unittest.suite(
@@ -140,4 +161,6 @@ def pnpm_tests(name):
         latest_test,
         custom_name_test,
         integrity_conflict_test,
+        from_package_json_simple_test,
+        from_package_json_with_hash_test,
     )

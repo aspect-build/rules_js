@@ -128,8 +128,8 @@ If unset, the package version in the `NpmPackageInfo` src must be set.
 If set, takes precendance over the package version in the `NpmPackageInfo` src.
 """,
     ),
-    "dev": attr.bool(
-        doc = """Whether this npm package is a dev dependency""",
+    "dev_only": attr.bool(
+        doc = """Whether this npm package is *only* a dev dependency""",
     ),
     "hardlink": attr.string(
         values = ["auto", "off", "on"],
@@ -180,9 +180,9 @@ def _npm_package_store_impl(ctx):
         version = ctx.attr.version
 
     if not package:
-        fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
+        fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
     if not version:
-        fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
+        fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
 
     package_store_name = utils.package_store_name(package, version)
     package_store_directory = None
@@ -424,7 +424,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             package_store_directory = package_store_directory,
             files = files_depset,
             transitive_files = transitive_files_depset,
-            dev = ctx.attr.dev,
+            dev = ctx.attr.dev_only,
         ),
     ]
 

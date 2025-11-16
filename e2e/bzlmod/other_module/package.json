@@ -1,4 +1,9 @@
 {
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "fsevents"
+        ]
+    },
     "dependencies": {
         "pyright": "1.1.373"
     }

@@ -12,5 +12,6 @@ try {
 }
 if (e == null) {
     throw new Error('devDependency should NOT be available')
+} else {
+    console.log('devDependency not available')
 }
-console.log('devDependency not available')

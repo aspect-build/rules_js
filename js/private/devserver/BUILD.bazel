@@ -1,0 +1,15 @@
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+
+write_source_files(
+    name = "watch_checked",
+    files = {
+        "js_run_devserver.mjs": "//js/private/devserver/src:bundle.mjs",
+    },
+)
+
+copy_to_bin(
+    name = "js_devserver_entrypoint",
+    srcs = ["js_run_devserver.mjs"],
+    visibility = ["//visibility:public"],
+)

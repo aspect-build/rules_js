@@ -216,7 +216,7 @@ function requireBraceExpansion () {
 	    var isOptions = m.body.indexOf(',') >= 0;
 	    if (!isSequence && !isOptions) {
 	      // {a},b}
-	      if (m.post.match(/,.*\}/)) {
+	      if (m.post.match(/,(?!,).*\}/)) {
 	        str = m.pre + '{' + m.body + escClose + m.post;
 	        return expand(str);
 	      }
@@ -9184,35 +9184,130 @@ function requireFileCoverage () {
 	const keyFromLoc = ({ start, end }) =>
 	    `${start.line}|${start.column}|${end.line}|${end.column}`;
 
+	const isObj = o => !!o && typeof o === 'object';
+	const isLineCol = o =>
+	    isObj(o) && typeof o.line === 'number' && typeof o.column === 'number';
+	const isLoc = o => isObj(o) && isLineCol(o.start) && isLineCol(o.end);
+	const getLoc = o => (isLoc(o) ? o : isLoc(o.loc) ? o.loc : null);
+
+	// When merging, we can have a case where two ranges cover
+	// the same block of code with `hits=1`, and each carve out a
+	// different range with `hits=0` to indicate it's uncovered.
+	// Find the nearest container so that we can properly indicate
+	// that both sections are hit.
+	// Returns null if no containing item is found.
+	const findNearestContainer = (item, map) => {
+	    const itemLoc = getLoc(item);
+	    if (!itemLoc) return null;
+	    // the B item is not an identified range in the A set, BUT
+	    // it may be contained by an identified A range. If so, then
+	    // any hit of that containing A range counts as a hit of this
+	    // B range as well. We have to find the *narrowest* containing
+	    // range to be accurate, since ranges can be hit and un-hit
+	    // in a nested fashion.
+	    let nearestContainingItem = null;
+	    let containerDistance = null;
+	    let containerKey = null;
+	    for (const [i, mapItem] of Object.entries(map)) {
+	        const mapLoc = getLoc(mapItem);
+	        if (!mapLoc) continue;
+	        // contained if all of line distances are > 0
+	        // or line distance is 0 and col dist is >= 0
+	        const distance = [
+	            itemLoc.start.line - mapLoc.start.line,
+	            itemLoc.start.column - mapLoc.start.column,
+	            mapLoc.end.line - itemLoc.end.line,
+	            mapLoc.end.column - itemLoc.end.column
+	        ];
+	        if (
+	            distance[0] < 0 ||
+	            distance[2] < 0 ||
+	            (distance[0] === 0 && distance[1] < 0) ||
+	            (distance[2] === 0 && distance[3] < 0)
+	        ) {
+	            continue;
+	        }
+	        if (nearestContainingItem === null) {
+	            containerDistance = distance;
+	            nearestContainingItem = mapItem;
+	            containerKey = i;
+	            continue;
+	        }
+	        // closer line more relevant than closer column
+	        const closerBefore =
+	            distance[0] < containerDistance[0] ||
+	            (distance[0] === 0 && distance[1] < containerDistance[1]);
+	        const closerAfter =
+	            distance[2] < containerDistance[2] ||
+	            (distance[2] === 0 && distance[3] < containerDistance[3]);
+	        if (closerBefore || closerAfter) {
+	            // closer
+	            containerDistance = distance;
+	            nearestContainingItem = mapItem;
+	            containerKey = i;
+	        }
+	    }
+	    return containerKey;
+	};
+
+	// either add two numbers, or all matching entries in a number[]
+	const addHits = (aHits, bHits) => {
+	    if (typeof aHits === 'number' && typeof bHits === 'number') {
+	        return aHits + bHits;
+	    } else if (Array.isArray(aHits) && Array.isArray(bHits)) {
+	        return aHits.map((a, i) => (a || 0) + (bHits[i] || 0));
+	    }
+	    return null;
+	};
+
+	const addNearestContainerHits = (item, itemHits, map, mapHits) => {
+	    const container = findNearestContainer(item, map);
+	    if (container) {
+	        return addHits(itemHits, mapHits[container]);
+	    } else {
+	        return itemHits;
+	    }
+	};
+
 	const mergeProp = (aHits, aMap, bHits, bMap, itemKey = keyFromLoc) => {
 	    const aItems = {};
 	    for (const [key, itemHits] of Object.entries(aHits)) {
 	        const item = aMap[key];
 	        aItems[itemKey(item)] = [itemHits, item];
 	    }
-	    for (const [key, bItemHits] of Object.entries(bHits)) {
-	        const bItem = bMap[key];
-	        const k = itemKey(bItem);
-
-	        if (aItems[k]) {
-	            const aPair = aItems[k];
-	            if (bItemHits.forEach) {
-	                // should this throw an exception if aPair[0] is not an array?
-	                bItemHits.forEach((hits, h) => {
-	                    if (aPair[0][h] !== undefined) aPair[0][h] += hits;
-	                    else aPair[0][h] = hits;
-	                });
-	            } else {
-	                aPair[0] += bItemHits;
-	            }
-	        } else {
-	            aItems[k] = [bItemHits, bItem];
-	        }
+	    const bItems = {};
+	    for (const [key, itemHits] of Object.entries(bHits)) {
+	        const item = bMap[key];
+	        bItems[itemKey(item)] = [itemHits, item];
 	    }
+	    const mergedItems = {};
+	    for (const [key, aValue] of Object.entries(aItems)) {
+	        let aItemHits = aValue[0];
+	        const aItem = aValue[1];
+	        const bValue = bItems[key];
+	        if (!bValue) {
+	            // not an identified range in b, but might be contained by one
+	            aItemHits = addNearestContainerHits(aItem, aItemHits, bMap, bHits);
+	        } else {
+	            // is an identified range in b, so add the hits together
+	            aItemHits = addHits(aItemHits, bValue[0]);
+	        }
+	        mergedItems[key] = [aItemHits, aItem];
+	    }
+	    // now find the items in b that are not in a. already added matches.
+	    for (const [key, bValue] of Object.entries(bItems)) {
+	        let bItemHits = bValue[0];
+	        const bItem = bValue[1];
+	        if (mergedItems[key]) continue;
+	        // not an identified range in b, but might be contained by one
+	        bItemHits = addNearestContainerHits(bItem, bItemHits, aMap, aHits);
+	        mergedItems[key] = [bItemHits, bItem];
+	    }
+
 	    const hits = {};
 	    const map = {};
 
-	    Object.values(aItems).forEach(([itemHits, item], i) => {
+	    Object.values(mergedItems).forEach(([itemHits, item], i) => {
 	        hits[i] = itemHits;
 	        map[i] = item;
 	    });
@@ -9459,7 +9554,7 @@ function requireFileCoverage () {
 	        ret.branches = this.computeBranchTotals('b');
 	        // Tracking additional information about branch truthiness
 	        // can be optionally enabled:
-	        if (this['bt']) {
+	        if (this.bT) {
 	            ret.branchesTrue = this.computeBranchTotals('bT');
 	        }
 	        return new CoverageSummary(ret);
@@ -9480,7 +9575,11 @@ function requireFileCoverage () {
 	]);
 
 	fileCoverage = {
-	    FileCoverage
+	    FileCoverage,
+	    // exported for testing
+	    findNearestContainer,
+	    addHits,
+	    addNearestContainerHits
 	};
 	return fileCoverage;
 }
@@ -9708,6 +9807,7 @@ var hasRequiredDebug;
 function requireDebug () {
 	if (hasRequiredDebug) return debug_1;
 	hasRequiredDebug = 1;
+
 	const debug = (
 	  typeof process === 'object' &&
 	  process.env &&
@@ -9726,6 +9826,7 @@ var hasRequiredConstants;
 function requireConstants () {
 	if (hasRequiredConstants) return constants;
 	hasRequiredConstants = 1;
+
 	// Note: this is the semver.org version of the spec that it implements
 	// Not necessarily the package version of this code.
 	const SEMVER_SPEC_VERSION = '2.0.0';
@@ -9772,6 +9873,7 @@ function requireRe () {
 	if (hasRequiredRe) return re.exports;
 	hasRequiredRe = 1;
 	(function (module, exports) {
+
 		const {
 		  MAX_SAFE_COMPONENT_LENGTH,
 		  MAX_SAFE_BUILD_LENGTH,
@@ -9850,12 +9952,14 @@ function requireRe () {
 
 		// ## Pre-release Version Identifier
 		// A numeric identifier, or a non-numeric identifier.
+		// Non-numberic identifiers include numberic identifiers but can be longer.
+		// Therefore non-numberic identifiers must go first.
 
-		createToken('PRERELEASEIDENTIFIER', `(?:${src[t.NUMERICIDENTIFIER]
-		}|${src[t.NONNUMERICIDENTIFIER]})`);
+		createToken('PRERELEASEIDENTIFIER', `(?:${src[t.NONNUMERICIDENTIFIER]
+		}|${src[t.NUMERICIDENTIFIER]})`);
 
-		createToken('PRERELEASEIDENTIFIERLOOSE', `(?:${src[t.NUMERICIDENTIFIERLOOSE]
-		}|${src[t.NONNUMERICIDENTIFIER]})`);
+		createToken('PRERELEASEIDENTIFIERLOOSE', `(?:${src[t.NONNUMERICIDENTIFIER]
+		}|${src[t.NUMERICIDENTIFIERLOOSE]})`);
 
 		// ## Pre-release Version
 		// Hyphen, followed by one or more dot-separated pre-release version
@@ -10001,6 +10105,7 @@ var hasRequiredParseOptions;
 function requireParseOptions () {
 	if (hasRequiredParseOptions) return parseOptions_1;
 	hasRequiredParseOptions = 1;
+
 	// parse out just the options we care about
 	const looseOption = Object.freeze({ loose: true });
 	const emptyOpts = Object.freeze({ });
@@ -10025,8 +10130,13 @@ var hasRequiredIdentifiers;
 function requireIdentifiers () {
 	if (hasRequiredIdentifiers) return identifiers;
 	hasRequiredIdentifiers = 1;
+
 	const numeric = /^[0-9]+$/;
 	const compareIdentifiers = (a, b) => {
+	  if (typeof a === 'number' && typeof b === 'number') {
+	    return a === b ? 0 : a < b ? -1 : 1
+	  }
+
 	  const anum = numeric.test(a);
 	  const bnum = numeric.test(b);
 
@@ -10057,9 +10167,10 @@ var hasRequiredSemver;
 function requireSemver () {
 	if (hasRequiredSemver) return semver;
 	hasRequiredSemver = 1;
+
 	const debug = requireDebug();
 	const { MAX_LENGTH, MAX_SAFE_INTEGER } = requireConstants();
-	const { safeRe: re, safeSrc: src, t } = requireRe();
+	const { safeRe: re, t } = requireRe();
 
 	const parseOptions = requireParseOptions();
 	const { compareIdentifiers } = requireIdentifiers();
@@ -10168,11 +10279,25 @@ function requireSemver () {
 	      other = new SemVer(other, this.options);
 	    }
 
-	    return (
-	      compareIdentifiers(this.major, other.major) ||
-	      compareIdentifiers(this.minor, other.minor) ||
-	      compareIdentifiers(this.patch, other.patch)
-	    )
+	    if (this.major < other.major) {
+	      return -1
+	    }
+	    if (this.major > other.major) {
+	      return 1
+	    }
+	    if (this.minor < other.minor) {
+	      return -1
+	    }
+	    if (this.minor > other.minor) {
+	      return 1
+	    }
+	    if (this.patch < other.patch) {
+	      return -1
+	    }
+	    if (this.patch > other.patch) {
+	      return 1
+	    }
+	    return 0
 	  }
 
 	  comparePre (other) {
@@ -10241,8 +10366,7 @@ function requireSemver () {
 	      }
 	      // Avoid an invalid semver results
 	      if (identifier) {
-	        const r = new RegExp(`^${this.options.loose ? src[t.PRERELEASELOOSE] : src[t.PRERELEASE]}$`);
-	        const match = `-${identifier}`.match(r);
+	        const match = `-${identifier}`.match(this.options.loose ? re[t.PRERELEASELOOSE] : re[t.PRERELEASE]);
 	        if (!match || match[1] !== identifier) {
 	          throw new Error(`invalid identifier: ${identifier}`)
 	        }
@@ -10384,6 +10508,7 @@ var hasRequiredCompare$1;
 function requireCompare$1 () {
 	if (hasRequiredCompare$1) return compare_1;
 	hasRequiredCompare$1 = 1;
+
 	const SemVer = requireSemver();
 	const compare = (a, b, loose) =>
 	  new SemVer(a, loose).compare(new SemVer(b, loose));
@@ -10398,6 +10523,7 @@ var hasRequiredGte;
 function requireGte () {
 	if (hasRequiredGte) return gte_1;
 	hasRequiredGte = 1;
+
 	const compare = requireCompare$1();
 	const gte = (a, b, loose) => compare(a, b, loose) >= 0;
 	gte_1 = gte;
@@ -12108,19 +12234,19 @@ function requireConvertSourceMap () {
 	if (hasRequiredConvertSourceMap) return convertSourceMap;
 	hasRequiredConvertSourceMap = 1;
 	(function (exports) {
-		var fs = require$$0$1;
-		var path = require$$0$2;
 
 		Object.defineProperty(exports, 'commentRegex', {
 		  get: function getCommentRegex () {
-		    return /^\s*\/(?:\/|\*)[@#]\s+sourceMappingURL=data:(?:application|text)\/json;(?:charset[:=]\S+?;)?base64,(?:.*)$/mg;
+		    // Groups: 1: media type, 2: MIME type, 3: charset, 4: encoding, 5: data.
+		    return /^\s*?\/[\/\*][@#]\s+?sourceMappingURL=data:(((?:application|text)\/json)(?:;charset=([^;,]+?)?)?)?(?:;(base64))?,(.*?)$/mg;
 		  }
 		});
+
 
 		Object.defineProperty(exports, 'mapFileCommentRegex', {
 		  get: function getMapFileCommentRegex () {
 		    // Matches sourceMappingURL in either // or /* comment styles.
-		    return /(?:\/\/[@#][ \t]+sourceMappingURL=([^\s'"`]+?)[ \t]*$)|(?:\/\*[@#][ \t]+sourceMappingURL=([^\*]+?)[ \t]*(?:\*\/){1}[ \t]*$)/mg;
+		    return /(?:\/\/[@#][ \t]+?sourceMappingURL=([^\s'"`]+?)[ \t]*?$)|(?:\/\*[@#][ \t]+sourceMappingURL=([^*]+?)[ \t]*?(?:\*\/){1}[ \t]*?$)/mg;
 		  }
 		});
 
@@ -12154,29 +12280,43 @@ function requireConvertSourceMap () {
 		  return sm.split(',').pop();
 		}
 
-		function readFromFileMap(sm, dir) {
-		  // NOTE: this will only work on the server since it attempts to read the map file
-
+		function readFromFileMap(sm, read) {
 		  var r = exports.mapFileCommentRegex.exec(sm);
-
 		  // for some odd reason //# .. captures in 1 and /* .. */ in 2
 		  var filename = r[1] || r[2];
-		  var filepath = path.resolve(dir, filename);
 
 		  try {
-		    return fs.readFileSync(filepath, 'utf8');
+		    var sm = read(filename);
+		    if (sm != null && typeof sm.catch === 'function') {
+		      return sm.catch(throwError);
+		    } else {
+		      return sm;
+		    }
 		  } catch (e) {
-		    throw new Error('An error occurred while trying to read the map file at ' + filepath + '\n' + e);
+		    throwError(e);
+		  }
+
+		  function throwError(e) {
+		    throw new Error('An error occurred while trying to read the map file at ' + filename + '\n' + e.stack);
 		  }
 		}
 
 		function Converter (sm, opts) {
 		  opts = opts || {};
 
-		  if (opts.isFileComment) sm = readFromFileMap(sm, opts.commentFileDir);
-		  if (opts.hasComment) sm = stripComment(sm);
-		  if (opts.isEncoded) sm = decodeBase64(sm);
-		  if (opts.isJSON || opts.isEncoded) sm = JSON.parse(sm);
+		  if (opts.hasComment) {
+		    sm = stripComment(sm);
+		  }
+
+		  if (opts.encoding === 'base64') {
+		    sm = decodeBase64(sm);
+		  } else if (opts.encoding === 'uri') {
+		    sm = decodeURIComponent(sm);
+		  }
+
+		  if (opts.isJSON || opts.encoding) {
+		    sm = JSON.parse(sm);
+		  }
 
 		  this.sourcemap = sm;
 		}
@@ -12213,10 +12353,22 @@ function requireConvertSourceMap () {
 		  return btoa(unescape(encodeURIComponent(json)));
 		}
 
+		Converter.prototype.toURI = function () {
+		  var json = this.toJSON();
+		  return encodeURIComponent(json);
+		};
+
 		Converter.prototype.toComment = function (options) {
-		  var base64 = this.toBase64();
-		  var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-		  return options && options.multiline ? '/*# ' + data + ' */' : '//# ' + data;
+		  var encoding, content, data;
+		  if (options != null && options.encoding === 'uri') {
+		    encoding = '';
+		    content = this.toURI();
+		  } else {
+		    encoding = ';base64';
+		    content = this.toBase64();
+		  }
+		  data = 'sourceMappingURL=data:application/json;charset=utf-8' + encoding + ',' + content;
+		  return options != null && options.multiline ? '/*# ' + data + ' */' : '//# ' + data;
 		};
 
 		// returns copy instead of original
@@ -12246,20 +12398,42 @@ function requireConvertSourceMap () {
 		  return new Converter(json, { isJSON: true });
 		};
 
+		exports.fromURI = function (uri) {
+		  return new Converter(uri, { encoding: 'uri' });
+		};
+
 		exports.fromBase64 = function (base64) {
-		  return new Converter(base64, { isEncoded: true });
+		  return new Converter(base64, { encoding: 'base64' });
 		};
 
 		exports.fromComment = function (comment) {
+		  var m, encoding;
 		  comment = comment
 		    .replace(/^\/\*/g, '//')
 		    .replace(/\*\/$/g, '');
-
-		  return new Converter(comment, { isEncoded: true, hasComment: true });
+		  m = exports.commentRegex.exec(comment);
+		  encoding = m && m[4] || 'uri';
+		  return new Converter(comment, { encoding: encoding, hasComment: true });
 		};
 
-		exports.fromMapFileComment = function (comment, dir) {
-		  return new Converter(comment, { commentFileDir: dir, isFileComment: true, isJSON: true });
+		function makeConverter(sm) {
+		  return new Converter(sm, { isJSON: true });
+		}
+
+		exports.fromMapFileComment = function (comment, read) {
+		  if (typeof read === 'string') {
+		    throw new Error(
+		      'String directory paths are no longer supported with `fromMapFileComment`\n' +
+		      'Please review the Upgrading documentation at https://github.com/thlorenz/convert-source-map#upgrading'
+		    )
+		  }
+
+		  var sm = readFromFileMap(comment, read);
+		  if (sm != null && typeof sm.then === 'function') {
+		    return sm.then(makeConverter);
+		  } else {
+		    return makeConverter(sm);
+		  }
 		};
 
 		// Finds last sourcemap comment in file or returns null if none was found
@@ -12269,9 +12443,15 @@ function requireConvertSourceMap () {
 		};
 
 		// Finds last sourcemap comment in file or returns null if none was found
-		exports.fromMapFileSource = function (content, dir) {
+		exports.fromMapFileSource = function (content, read) {
+		  if (typeof read === 'string') {
+		    throw new Error(
+		      'String directory paths are no longer supported with `fromMapFileSource`\n' +
+		      'Please review the Upgrading documentation at https://github.com/thlorenz/convert-source-map#upgrading'
+		    )
+		  }
 		  var m = content.match(exports.mapFileCommentRegex);
-		  return m ? exports.fromMapFileComment(m.pop(), dir) : null;
+		  return m ? exports.fromMapFileComment(m.pop(), read) : null;
 		};
 
 		exports.removeComments = function (src) {
@@ -12357,7 +12537,7 @@ function require_function () {
 	    return {
 	      name: this.name,
 	      decl: loc,
-	      loc: loc,
+	      loc,
 	      line: this.startLine
 	    }
 	  }
@@ -12456,192 +12636,6 @@ function requireRange () {
 
 var traceMapping_umd$1 = {exports: {}};
 
-var sourcemapCodec_umd$1 = {exports: {}};
-
-var sourcemapCodec_umd = sourcemapCodec_umd$1.exports;
-
-var hasRequiredSourcemapCodec_umd;
-
-function requireSourcemapCodec_umd () {
-	if (hasRequiredSourcemapCodec_umd) return sourcemapCodec_umd$1.exports;
-	hasRequiredSourcemapCodec_umd = 1;
-	(function (module, exports) {
-		(function (global, factory) {
-		    factory(exports) ;
-		})(sourcemapCodec_umd, (function (exports) {
-		    const comma = ','.charCodeAt(0);
-		    const semicolon = ';'.charCodeAt(0);
-		    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-		    const intToChar = new Uint8Array(64); // 64 possible chars.
-		    const charToInt = new Uint8Array(128); // z is 122 in ASCII
-		    for (let i = 0; i < chars.length; i++) {
-		        const c = chars.charCodeAt(i);
-		        intToChar[i] = c;
-		        charToInt[c] = i;
-		    }
-		    // Provide a fallback for older environments.
-		    const td = typeof TextDecoder !== 'undefined'
-		        ? /* #__PURE__ */ new TextDecoder()
-		        : typeof Buffer !== 'undefined'
-		            ? {
-		                decode(buf) {
-		                    const out = Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength);
-		                    return out.toString();
-		                },
-		            }
-		            : {
-		                decode(buf) {
-		                    let out = '';
-		                    for (let i = 0; i < buf.length; i++) {
-		                        out += String.fromCharCode(buf[i]);
-		                    }
-		                    return out;
-		                },
-		            };
-		    function decode(mappings) {
-		        const state = new Int32Array(5);
-		        const decoded = [];
-		        let index = 0;
-		        do {
-		            const semi = indexOf(mappings, index);
-		            const line = [];
-		            let sorted = true;
-		            let lastCol = 0;
-		            state[0] = 0;
-		            for (let i = index; i < semi; i++) {
-		                let seg;
-		                i = decodeInteger(mappings, i, state, 0); // genColumn
-		                const col = state[0];
-		                if (col < lastCol)
-		                    sorted = false;
-		                lastCol = col;
-		                if (hasMoreVlq(mappings, i, semi)) {
-		                    i = decodeInteger(mappings, i, state, 1); // sourcesIndex
-		                    i = decodeInteger(mappings, i, state, 2); // sourceLine
-		                    i = decodeInteger(mappings, i, state, 3); // sourceColumn
-		                    if (hasMoreVlq(mappings, i, semi)) {
-		                        i = decodeInteger(mappings, i, state, 4); // namesIndex
-		                        seg = [col, state[1], state[2], state[3], state[4]];
-		                    }
-		                    else {
-		                        seg = [col, state[1], state[2], state[3]];
-		                    }
-		                }
-		                else {
-		                    seg = [col];
-		                }
-		                line.push(seg);
-		            }
-		            if (!sorted)
-		                sort(line);
-		            decoded.push(line);
-		            index = semi + 1;
-		        } while (index <= mappings.length);
-		        return decoded;
-		    }
-		    function indexOf(mappings, index) {
-		        const idx = mappings.indexOf(';', index);
-		        return idx === -1 ? mappings.length : idx;
-		    }
-		    function decodeInteger(mappings, pos, state, j) {
-		        let value = 0;
-		        let shift = 0;
-		        let integer = 0;
-		        do {
-		            const c = mappings.charCodeAt(pos++);
-		            integer = charToInt[c];
-		            value |= (integer & 31) << shift;
-		            shift += 5;
-		        } while (integer & 32);
-		        const shouldNegate = value & 1;
-		        value >>>= 1;
-		        if (shouldNegate) {
-		            value = -2147483648 | -value;
-		        }
-		        state[j] += value;
-		        return pos;
-		    }
-		    function hasMoreVlq(mappings, i, length) {
-		        if (i >= length)
-		            return false;
-		        return mappings.charCodeAt(i) !== comma;
-		    }
-		    function sort(line) {
-		        line.sort(sortComparator);
-		    }
-		    function sortComparator(a, b) {
-		        return a[0] - b[0];
-		    }
-		    function encode(decoded) {
-		        const state = new Int32Array(5);
-		        const bufLength = 1024 * 16;
-		        const subLength = bufLength - 36;
-		        const buf = new Uint8Array(bufLength);
-		        const sub = buf.subarray(0, subLength);
-		        let pos = 0;
-		        let out = '';
-		        for (let i = 0; i < decoded.length; i++) {
-		            const line = decoded[i];
-		            if (i > 0) {
-		                if (pos === bufLength) {
-		                    out += td.decode(buf);
-		                    pos = 0;
-		                }
-		                buf[pos++] = semicolon;
-		            }
-		            if (line.length === 0)
-		                continue;
-		            state[0] = 0;
-		            for (let j = 0; j < line.length; j++) {
-		                const segment = line[j];
-		                // We can push up to 5 ints, each int can take at most 7 chars, and we
-		                // may push a comma.
-		                if (pos > subLength) {
-		                    out += td.decode(sub);
-		                    buf.copyWithin(0, subLength, pos);
-		                    pos -= subLength;
-		                }
-		                if (j > 0)
-		                    buf[pos++] = comma;
-		                pos = encodeInteger(buf, pos, state, segment, 0); // genColumn
-		                if (segment.length === 1)
-		                    continue;
-		                pos = encodeInteger(buf, pos, state, segment, 1); // sourcesIndex
-		                pos = encodeInteger(buf, pos, state, segment, 2); // sourceLine
-		                pos = encodeInteger(buf, pos, state, segment, 3); // sourceColumn
-		                if (segment.length === 4)
-		                    continue;
-		                pos = encodeInteger(buf, pos, state, segment, 4); // namesIndex
-		            }
-		        }
-		        return out + td.decode(buf.subarray(0, pos));
-		    }
-		    function encodeInteger(buf, pos, state, segment, j) {
-		        const next = segment[j];
-		        let num = next - state[j];
-		        state[j] = next;
-		        num = num < 0 ? (-num << 1) | 1 : num << 1;
-		        do {
-		            let clamped = num & 0b011111;
-		            num >>>= 5;
-		            if (num > 0)
-		                clamped |= 0b100000;
-		            buf[pos++] = intToChar[clamped];
-		        } while (num > 0);
-		        return pos;
-		    }
-
-		    exports.decode = decode;
-		    exports.encode = encode;
-
-		    Object.defineProperty(exports, '__esModule', { value: true });
-
-		}));
-		
-	} (sourcemapCodec_umd$1, sourcemapCodec_umd$1.exports));
-	return sourcemapCodec_umd$1.exports;
-}
-
 var resolveUri_umd$1 = {exports: {}};
 
 var resolveUri_umd = resolveUri_umd$1.exports;
@@ -12678,16 +12672,6 @@ function requireResolveUri_umd () {
 		     * 4. Hash, including "#", optional.
 		     */
 		    const fileRegex = /^file:(?:\/\/((?![a-z]:)[^/#?]*)?)?(\/?[^#?]*)(\?[^#]*)?(#.*)?/i;
-		    var UrlType;
-		    (function (UrlType) {
-		        UrlType[UrlType["Empty"] = 1] = "Empty";
-		        UrlType[UrlType["Hash"] = 2] = "Hash";
-		        UrlType[UrlType["Query"] = 3] = "Query";
-		        UrlType[UrlType["RelativePath"] = 4] = "RelativePath";
-		        UrlType[UrlType["AbsolutePath"] = 5] = "AbsolutePath";
-		        UrlType[UrlType["SchemeRelative"] = 6] = "SchemeRelative";
-		        UrlType[UrlType["Absolute"] = 7] = "Absolute";
-		    })(UrlType || (UrlType = {}));
 		    function isAbsoluteUrl(input) {
 		        return schemeRegex.test(input);
 		    }
@@ -12721,21 +12705,21 @@ function requireResolveUri_umd () {
 		            path,
 		            query,
 		            hash,
-		            type: UrlType.Absolute,
+		            type: 7 /* Absolute */,
 		        };
 		    }
 		    function parseUrl(input) {
 		        if (isSchemeRelativeUrl(input)) {
 		            const url = parseAbsoluteUrl('http:' + input);
 		            url.scheme = '';
-		            url.type = UrlType.SchemeRelative;
+		            url.type = 6 /* SchemeRelative */;
 		            return url;
 		        }
 		        if (isAbsolutePath(input)) {
 		            const url = parseAbsoluteUrl('http://foo.com' + input);
 		            url.scheme = '';
 		            url.host = '';
-		            url.type = UrlType.AbsolutePath;
+		            url.type = 5 /* AbsolutePath */;
 		            return url;
 		        }
 		        if (isFileUrl(input))
@@ -12747,11 +12731,11 @@ function requireResolveUri_umd () {
 		        url.host = '';
 		        url.type = input
 		            ? input.startsWith('?')
-		                ? UrlType.Query
+		                ? 3 /* Query */
 		                : input.startsWith('#')
-		                    ? UrlType.Hash
-		                    : UrlType.RelativePath
-		            : UrlType.Empty;
+		                    ? 2 /* Hash */
+		                    : 4 /* RelativePath */
+		            : 1 /* Empty */;
 		        return url;
 		    }
 		    function stripPathFilename(path) {
@@ -12779,7 +12763,7 @@ function requireResolveUri_umd () {
 		     * "foo/.". We need to normalize to a standard representation.
 		     */
 		    function normalizePath(url, type) {
-		        const rel = type <= UrlType.RelativePath;
+		        const rel = type <= 4 /* RelativePath */;
 		        const pieces = url.path.split('/');
 		        // We need to preserve the first piece always, so that we output a leading slash. The item at
 		        // pieces[0] is an empty string.
@@ -12840,27 +12824,27 @@ function requireResolveUri_umd () {
 		            return '';
 		        const url = parseUrl(input);
 		        let inputType = url.type;
-		        if (base && inputType !== UrlType.Absolute) {
+		        if (base && inputType !== 7 /* Absolute */) {
 		            const baseUrl = parseUrl(base);
 		            const baseType = baseUrl.type;
 		            switch (inputType) {
-		                case UrlType.Empty:
+		                case 1 /* Empty */:
 		                    url.hash = baseUrl.hash;
 		                // fall through
-		                case UrlType.Hash:
+		                case 2 /* Hash */:
 		                    url.query = baseUrl.query;
 		                // fall through
-		                case UrlType.Query:
-		                case UrlType.RelativePath:
+		                case 3 /* Query */:
+		                case 4 /* RelativePath */:
 		                    mergePaths(url, baseUrl);
 		                // fall through
-		                case UrlType.AbsolutePath:
+		                case 5 /* AbsolutePath */:
 		                    // The host, user, and port are joined, you can't copy one without the others.
 		                    url.user = baseUrl.user;
 		                    url.host = baseUrl.host;
 		                    url.port = baseUrl.port;
 		                // fall through
-		                case UrlType.SchemeRelative:
+		                case 6 /* SchemeRelative */:
 		                    // The input doesn't have a schema at least, so we need to copy at least that over.
 		                    url.scheme = baseUrl.scheme;
 		            }
@@ -12872,10 +12856,10 @@ function requireResolveUri_umd () {
 		        switch (inputType) {
 		            // This is impossible, because of the empty checks at the start of the function.
 		            // case UrlType.Empty:
-		            case UrlType.Hash:
-		            case UrlType.Query:
+		            case 2 /* Hash */:
+		            case 3 /* Query */:
 		                return queryHash;
-		            case UrlType.RelativePath: {
+		            case 4 /* RelativePath */: {
 		                // The first char is always a "/", and we need it to be relative.
 		                const path = url.path.slice(1);
 		                if (!path)
@@ -12888,7 +12872,7 @@ function requireResolveUri_umd () {
 		                }
 		                return path + queryHash;
 		            }
-		            case UrlType.AbsolutePath:
+		            case 5 /* AbsolutePath */:
 		                return url.path + queryHash;
 		            default:
 		                return url.scheme + '//' + url.user + url.host + url.port + url.path + queryHash;
@@ -12903,6 +12887,473 @@ function requireResolveUri_umd () {
 	return resolveUri_umd$1.exports;
 }
 
+var sourcemapCodec_umd$1 = {exports: {}};
+
+var sourcemapCodec_umd = sourcemapCodec_umd$1.exports;
+
+var hasRequiredSourcemapCodec_umd;
+
+function requireSourcemapCodec_umd () {
+	if (hasRequiredSourcemapCodec_umd) return sourcemapCodec_umd$1.exports;
+	hasRequiredSourcemapCodec_umd = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  {
+		    factory(module);
+		    module.exports = def(module);
+		  }
+		  function def(m) { return 'default' in m.exports ? m.exports.default : m.exports; }
+		})(sourcemapCodec_umd, (function (module) {
+		var __defProp = Object.defineProperty;
+		var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+		var __getOwnPropNames = Object.getOwnPropertyNames;
+		var __hasOwnProp = Object.prototype.hasOwnProperty;
+		var __export = (target, all) => {
+		  for (var name in all)
+		    __defProp(target, name, { get: all[name], enumerable: true });
+		};
+		var __copyProps = (to, from, except, desc) => {
+		  if (from && typeof from === "object" || typeof from === "function") {
+		    for (let key of __getOwnPropNames(from))
+		      if (!__hasOwnProp.call(to, key) && key !== except)
+		        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+		  }
+		  return to;
+		};
+		var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+		// src/sourcemap-codec.ts
+		var sourcemap_codec_exports = {};
+		__export(sourcemap_codec_exports, {
+		  decode: () => decode,
+		  decodeGeneratedRanges: () => decodeGeneratedRanges,
+		  decodeOriginalScopes: () => decodeOriginalScopes,
+		  encode: () => encode,
+		  encodeGeneratedRanges: () => encodeGeneratedRanges,
+		  encodeOriginalScopes: () => encodeOriginalScopes
+		});
+		module.exports = __toCommonJS(sourcemap_codec_exports);
+
+		// src/vlq.ts
+		var comma = ",".charCodeAt(0);
+		var semicolon = ";".charCodeAt(0);
+		var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		var intToChar = new Uint8Array(64);
+		var charToInt = new Uint8Array(128);
+		for (let i = 0; i < chars.length; i++) {
+		  const c = chars.charCodeAt(i);
+		  intToChar[i] = c;
+		  charToInt[c] = i;
+		}
+		function decodeInteger(reader, relative) {
+		  let value = 0;
+		  let shift = 0;
+		  let integer = 0;
+		  do {
+		    const c = reader.next();
+		    integer = charToInt[c];
+		    value |= (integer & 31) << shift;
+		    shift += 5;
+		  } while (integer & 32);
+		  const shouldNegate = value & 1;
+		  value >>>= 1;
+		  if (shouldNegate) {
+		    value = -2147483648 | -value;
+		  }
+		  return relative + value;
+		}
+		function encodeInteger(builder, num, relative) {
+		  let delta = num - relative;
+		  delta = delta < 0 ? -delta << 1 | 1 : delta << 1;
+		  do {
+		    let clamped = delta & 31;
+		    delta >>>= 5;
+		    if (delta > 0) clamped |= 32;
+		    builder.write(intToChar[clamped]);
+		  } while (delta > 0);
+		  return num;
+		}
+		function hasMoreVlq(reader, max) {
+		  if (reader.pos >= max) return false;
+		  return reader.peek() !== comma;
+		}
+
+		// src/strings.ts
+		var bufLength = 1024 * 16;
+		var td = typeof TextDecoder !== "undefined" ? /* @__PURE__ */ new TextDecoder() : typeof Buffer !== "undefined" ? {
+		  decode(buf) {
+		    const out = Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength);
+		    return out.toString();
+		  }
+		} : {
+		  decode(buf) {
+		    let out = "";
+		    for (let i = 0; i < buf.length; i++) {
+		      out += String.fromCharCode(buf[i]);
+		    }
+		    return out;
+		  }
+		};
+		var StringWriter = class {
+		  constructor() {
+		    this.pos = 0;
+		    this.out = "";
+		    this.buffer = new Uint8Array(bufLength);
+		  }
+		  write(v) {
+		    const { buffer } = this;
+		    buffer[this.pos++] = v;
+		    if (this.pos === bufLength) {
+		      this.out += td.decode(buffer);
+		      this.pos = 0;
+		    }
+		  }
+		  flush() {
+		    const { buffer, out, pos } = this;
+		    return pos > 0 ? out + td.decode(buffer.subarray(0, pos)) : out;
+		  }
+		};
+		var StringReader = class {
+		  constructor(buffer) {
+		    this.pos = 0;
+		    this.buffer = buffer;
+		  }
+		  next() {
+		    return this.buffer.charCodeAt(this.pos++);
+		  }
+		  peek() {
+		    return this.buffer.charCodeAt(this.pos);
+		  }
+		  indexOf(char) {
+		    const { buffer, pos } = this;
+		    const idx = buffer.indexOf(char, pos);
+		    return idx === -1 ? buffer.length : idx;
+		  }
+		};
+
+		// src/scopes.ts
+		var EMPTY = [];
+		function decodeOriginalScopes(input) {
+		  const { length } = input;
+		  const reader = new StringReader(input);
+		  const scopes = [];
+		  const stack = [];
+		  let line = 0;
+		  for (; reader.pos < length; reader.pos++) {
+		    line = decodeInteger(reader, line);
+		    const column = decodeInteger(reader, 0);
+		    if (!hasMoreVlq(reader, length)) {
+		      const last = stack.pop();
+		      last[2] = line;
+		      last[3] = column;
+		      continue;
+		    }
+		    const kind = decodeInteger(reader, 0);
+		    const fields = decodeInteger(reader, 0);
+		    const hasName = fields & 1;
+		    const scope = hasName ? [line, column, 0, 0, kind, decodeInteger(reader, 0)] : [line, column, 0, 0, kind];
+		    let vars = EMPTY;
+		    if (hasMoreVlq(reader, length)) {
+		      vars = [];
+		      do {
+		        const varsIndex = decodeInteger(reader, 0);
+		        vars.push(varsIndex);
+		      } while (hasMoreVlq(reader, length));
+		    }
+		    scope.vars = vars;
+		    scopes.push(scope);
+		    stack.push(scope);
+		  }
+		  return scopes;
+		}
+		function encodeOriginalScopes(scopes) {
+		  const writer = new StringWriter();
+		  for (let i = 0; i < scopes.length; ) {
+		    i = _encodeOriginalScopes(scopes, i, writer, [0]);
+		  }
+		  return writer.flush();
+		}
+		function _encodeOriginalScopes(scopes, index, writer, state) {
+		  const scope = scopes[index];
+		  const { 0: startLine, 1: startColumn, 2: endLine, 3: endColumn, 4: kind, vars } = scope;
+		  if (index > 0) writer.write(comma);
+		  state[0] = encodeInteger(writer, startLine, state[0]);
+		  encodeInteger(writer, startColumn, 0);
+		  encodeInteger(writer, kind, 0);
+		  const fields = scope.length === 6 ? 1 : 0;
+		  encodeInteger(writer, fields, 0);
+		  if (scope.length === 6) encodeInteger(writer, scope[5], 0);
+		  for (const v of vars) {
+		    encodeInteger(writer, v, 0);
+		  }
+		  for (index++; index < scopes.length; ) {
+		    const next = scopes[index];
+		    const { 0: l, 1: c } = next;
+		    if (l > endLine || l === endLine && c >= endColumn) {
+		      break;
+		    }
+		    index = _encodeOriginalScopes(scopes, index, writer, state);
+		  }
+		  writer.write(comma);
+		  state[0] = encodeInteger(writer, endLine, state[0]);
+		  encodeInteger(writer, endColumn, 0);
+		  return index;
+		}
+		function decodeGeneratedRanges(input) {
+		  const { length } = input;
+		  const reader = new StringReader(input);
+		  const ranges = [];
+		  const stack = [];
+		  let genLine = 0;
+		  let definitionSourcesIndex = 0;
+		  let definitionScopeIndex = 0;
+		  let callsiteSourcesIndex = 0;
+		  let callsiteLine = 0;
+		  let callsiteColumn = 0;
+		  let bindingLine = 0;
+		  let bindingColumn = 0;
+		  do {
+		    const semi = reader.indexOf(";");
+		    let genColumn = 0;
+		    for (; reader.pos < semi; reader.pos++) {
+		      genColumn = decodeInteger(reader, genColumn);
+		      if (!hasMoreVlq(reader, semi)) {
+		        const last = stack.pop();
+		        last[2] = genLine;
+		        last[3] = genColumn;
+		        continue;
+		      }
+		      const fields = decodeInteger(reader, 0);
+		      const hasDefinition = fields & 1;
+		      const hasCallsite = fields & 2;
+		      const hasScope = fields & 4;
+		      let callsite = null;
+		      let bindings = EMPTY;
+		      let range;
+		      if (hasDefinition) {
+		        const defSourcesIndex = decodeInteger(reader, definitionSourcesIndex);
+		        definitionScopeIndex = decodeInteger(
+		          reader,
+		          definitionSourcesIndex === defSourcesIndex ? definitionScopeIndex : 0
+		        );
+		        definitionSourcesIndex = defSourcesIndex;
+		        range = [genLine, genColumn, 0, 0, defSourcesIndex, definitionScopeIndex];
+		      } else {
+		        range = [genLine, genColumn, 0, 0];
+		      }
+		      range.isScope = !!hasScope;
+		      if (hasCallsite) {
+		        const prevCsi = callsiteSourcesIndex;
+		        const prevLine = callsiteLine;
+		        callsiteSourcesIndex = decodeInteger(reader, callsiteSourcesIndex);
+		        const sameSource = prevCsi === callsiteSourcesIndex;
+		        callsiteLine = decodeInteger(reader, sameSource ? callsiteLine : 0);
+		        callsiteColumn = decodeInteger(
+		          reader,
+		          sameSource && prevLine === callsiteLine ? callsiteColumn : 0
+		        );
+		        callsite = [callsiteSourcesIndex, callsiteLine, callsiteColumn];
+		      }
+		      range.callsite = callsite;
+		      if (hasMoreVlq(reader, semi)) {
+		        bindings = [];
+		        do {
+		          bindingLine = genLine;
+		          bindingColumn = genColumn;
+		          const expressionsCount = decodeInteger(reader, 0);
+		          let expressionRanges;
+		          if (expressionsCount < -1) {
+		            expressionRanges = [[decodeInteger(reader, 0)]];
+		            for (let i = -1; i > expressionsCount; i--) {
+		              const prevBl = bindingLine;
+		              bindingLine = decodeInteger(reader, bindingLine);
+		              bindingColumn = decodeInteger(reader, bindingLine === prevBl ? bindingColumn : 0);
+		              const expression = decodeInteger(reader, 0);
+		              expressionRanges.push([expression, bindingLine, bindingColumn]);
+		            }
+		          } else {
+		            expressionRanges = [[expressionsCount]];
+		          }
+		          bindings.push(expressionRanges);
+		        } while (hasMoreVlq(reader, semi));
+		      }
+		      range.bindings = bindings;
+		      ranges.push(range);
+		      stack.push(range);
+		    }
+		    genLine++;
+		    reader.pos = semi + 1;
+		  } while (reader.pos < length);
+		  return ranges;
+		}
+		function encodeGeneratedRanges(ranges) {
+		  if (ranges.length === 0) return "";
+		  const writer = new StringWriter();
+		  for (let i = 0; i < ranges.length; ) {
+		    i = _encodeGeneratedRanges(ranges, i, writer, [0, 0, 0, 0, 0, 0, 0]);
+		  }
+		  return writer.flush();
+		}
+		function _encodeGeneratedRanges(ranges, index, writer, state) {
+		  const range = ranges[index];
+		  const {
+		    0: startLine,
+		    1: startColumn,
+		    2: endLine,
+		    3: endColumn,
+		    isScope,
+		    callsite,
+		    bindings
+		  } = range;
+		  if (state[0] < startLine) {
+		    catchupLine(writer, state[0], startLine);
+		    state[0] = startLine;
+		    state[1] = 0;
+		  } else if (index > 0) {
+		    writer.write(comma);
+		  }
+		  state[1] = encodeInteger(writer, range[1], state[1]);
+		  const fields = (range.length === 6 ? 1 : 0) | (callsite ? 2 : 0) | (isScope ? 4 : 0);
+		  encodeInteger(writer, fields, 0);
+		  if (range.length === 6) {
+		    const { 4: sourcesIndex, 5: scopesIndex } = range;
+		    if (sourcesIndex !== state[2]) {
+		      state[3] = 0;
+		    }
+		    state[2] = encodeInteger(writer, sourcesIndex, state[2]);
+		    state[3] = encodeInteger(writer, scopesIndex, state[3]);
+		  }
+		  if (callsite) {
+		    const { 0: sourcesIndex, 1: callLine, 2: callColumn } = range.callsite;
+		    if (sourcesIndex !== state[4]) {
+		      state[5] = 0;
+		      state[6] = 0;
+		    } else if (callLine !== state[5]) {
+		      state[6] = 0;
+		    }
+		    state[4] = encodeInteger(writer, sourcesIndex, state[4]);
+		    state[5] = encodeInteger(writer, callLine, state[5]);
+		    state[6] = encodeInteger(writer, callColumn, state[6]);
+		  }
+		  if (bindings) {
+		    for (const binding of bindings) {
+		      if (binding.length > 1) encodeInteger(writer, -binding.length, 0);
+		      const expression = binding[0][0];
+		      encodeInteger(writer, expression, 0);
+		      let bindingStartLine = startLine;
+		      let bindingStartColumn = startColumn;
+		      for (let i = 1; i < binding.length; i++) {
+		        const expRange = binding[i];
+		        bindingStartLine = encodeInteger(writer, expRange[1], bindingStartLine);
+		        bindingStartColumn = encodeInteger(writer, expRange[2], bindingStartColumn);
+		        encodeInteger(writer, expRange[0], 0);
+		      }
+		    }
+		  }
+		  for (index++; index < ranges.length; ) {
+		    const next = ranges[index];
+		    const { 0: l, 1: c } = next;
+		    if (l > endLine || l === endLine && c >= endColumn) {
+		      break;
+		    }
+		    index = _encodeGeneratedRanges(ranges, index, writer, state);
+		  }
+		  if (state[0] < endLine) {
+		    catchupLine(writer, state[0], endLine);
+		    state[0] = endLine;
+		    state[1] = 0;
+		  } else {
+		    writer.write(comma);
+		  }
+		  state[1] = encodeInteger(writer, endColumn, state[1]);
+		  return index;
+		}
+		function catchupLine(writer, lastLine, line) {
+		  do {
+		    writer.write(semicolon);
+		  } while (++lastLine < line);
+		}
+
+		// src/sourcemap-codec.ts
+		function decode(mappings) {
+		  const { length } = mappings;
+		  const reader = new StringReader(mappings);
+		  const decoded = [];
+		  let genColumn = 0;
+		  let sourcesIndex = 0;
+		  let sourceLine = 0;
+		  let sourceColumn = 0;
+		  let namesIndex = 0;
+		  do {
+		    const semi = reader.indexOf(";");
+		    const line = [];
+		    let sorted = true;
+		    let lastCol = 0;
+		    genColumn = 0;
+		    while (reader.pos < semi) {
+		      let seg;
+		      genColumn = decodeInteger(reader, genColumn);
+		      if (genColumn < lastCol) sorted = false;
+		      lastCol = genColumn;
+		      if (hasMoreVlq(reader, semi)) {
+		        sourcesIndex = decodeInteger(reader, sourcesIndex);
+		        sourceLine = decodeInteger(reader, sourceLine);
+		        sourceColumn = decodeInteger(reader, sourceColumn);
+		        if (hasMoreVlq(reader, semi)) {
+		          namesIndex = decodeInteger(reader, namesIndex);
+		          seg = [genColumn, sourcesIndex, sourceLine, sourceColumn, namesIndex];
+		        } else {
+		          seg = [genColumn, sourcesIndex, sourceLine, sourceColumn];
+		        }
+		      } else {
+		        seg = [genColumn];
+		      }
+		      line.push(seg);
+		      reader.pos++;
+		    }
+		    if (!sorted) sort(line);
+		    decoded.push(line);
+		    reader.pos = semi + 1;
+		  } while (reader.pos <= length);
+		  return decoded;
+		}
+		function sort(line) {
+		  line.sort(sortComparator);
+		}
+		function sortComparator(a, b) {
+		  return a[0] - b[0];
+		}
+		function encode(decoded) {
+		  const writer = new StringWriter();
+		  let sourcesIndex = 0;
+		  let sourceLine = 0;
+		  let sourceColumn = 0;
+		  let namesIndex = 0;
+		  for (let i = 0; i < decoded.length; i++) {
+		    const line = decoded[i];
+		    if (i > 0) writer.write(semicolon);
+		    if (line.length === 0) continue;
+		    let genColumn = 0;
+		    for (let j = 0; j < line.length; j++) {
+		      const segment = line[j];
+		      if (j > 0) writer.write(comma);
+		      genColumn = encodeInteger(writer, segment[0], genColumn);
+		      if (segment.length === 1) continue;
+		      sourcesIndex = encodeInteger(writer, segment[1], sourcesIndex);
+		      sourceLine = encodeInteger(writer, segment[2], sourceLine);
+		      sourceColumn = encodeInteger(writer, segment[3], sourceColumn);
+		      if (segment.length === 4) continue;
+		      namesIndex = encodeInteger(writer, segment[4], namesIndex);
+		    }
+		  }
+		  return writer.flush();
+		}
+		}));
+		
+	} (sourcemapCodec_umd$1));
+	return sourcemapCodec_umd$1.exports;
+}
+
 var traceMapping_umd = traceMapping_umd$1.exports;
 
 var hasRequiredTraceMapping_umd;
@@ -12912,569 +13363,554 @@ function requireTraceMapping_umd () {
 	hasRequiredTraceMapping_umd = 1;
 	(function (module, exports) {
 		(function (global, factory) {
-		    factory(exports, requireSourcemapCodec_umd(), requireResolveUri_umd()) ;
-		})(traceMapping_umd, (function (exports, sourcemapCodec, resolveUri) {
-		    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+		  {
+		    factory(module, requireResolveUri_umd(), requireSourcemapCodec_umd());
+		    module.exports = def(module);
+		  }
+		  function def(m) { return 'default' in m.exports ? m.exports.default : m.exports; }
+		})(traceMapping_umd, (function (module, require_resolveURI, require_sourcemapCodec) {
+		var __create = Object.create;
+		var __defProp = Object.defineProperty;
+		var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+		var __getOwnPropNames = Object.getOwnPropertyNames;
+		var __getProtoOf = Object.getPrototypeOf;
+		var __hasOwnProp = Object.prototype.hasOwnProperty;
+		var __commonJS = (cb, mod) => function __require() {
+		  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+		};
+		var __export = (target, all) => {
+		  for (var name in all)
+		    __defProp(target, name, { get: all[name], enumerable: true });
+		};
+		var __copyProps = (to, from, except, desc) => {
+		  if (from && typeof from === "object" || typeof from === "function") {
+		    for (let key of __getOwnPropNames(from))
+		      if (!__hasOwnProp.call(to, key) && key !== except)
+		        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+		  }
+		  return to;
+		};
+		var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+		  // If the importer is in node compatibility mode or this is not an ESM
+		  // file that has been converted to a CommonJS file using a Babel-
+		  // compatible transform (i.e. "__esModule" has not been set), then set
+		  // "default" to the CommonJS "module.exports" for node compatibility.
+		  !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+		  mod
+		));
+		var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-		    var resolveUri__default = /*#__PURE__*/_interopDefaultLegacy(resolveUri);
+		// umd:@jridgewell/sourcemap-codec
+		var require_sourcemap_codec = __commonJS({
+		  "umd:@jridgewell/sourcemap-codec"(exports, module2) {
+		    module2.exports = require_sourcemapCodec;
+		  }
+		});
 
-		    function resolve(input, base) {
-		        // The base is always treated as a directory, if it's not empty.
-		        // https://github.com/mozilla/source-map/blob/8cb3ee57/lib/util.js#L327
-		        // https://github.com/chromium/chromium/blob/da4adbb3/third_party/blink/renderer/devtools/front_end/sdk/SourceMap.js#L400-L401
-		        if (base && !base.endsWith('/'))
-		            base += '/';
-		        return resolveUri__default["default"](input, base);
-		    }
+		// umd:@jridgewell/resolve-uri
+		var require_resolve_uri = __commonJS({
+		  "umd:@jridgewell/resolve-uri"(exports, module2) {
+		    module2.exports = require_resolveURI;
+		  }
+		});
 
-		    /**
-		     * Removes everything after the last "/", but leaves the slash.
-		     */
-		    function stripFilename(path) {
-		        if (!path)
-		            return '';
-		        const index = path.lastIndexOf('/');
-		        return path.slice(0, index + 1);
-		    }
+		// src/trace-mapping.ts
+		var trace_mapping_exports = {};
+		__export(trace_mapping_exports, {
+		  AnyMap: () => FlattenMap,
+		  FlattenMap: () => FlattenMap,
+		  GREATEST_LOWER_BOUND: () => GREATEST_LOWER_BOUND,
+		  LEAST_UPPER_BOUND: () => LEAST_UPPER_BOUND,
+		  TraceMap: () => TraceMap,
+		  allGeneratedPositionsFor: () => allGeneratedPositionsFor,
+		  decodedMap: () => decodedMap,
+		  decodedMappings: () => decodedMappings,
+		  eachMapping: () => eachMapping,
+		  encodedMap: () => encodedMap,
+		  encodedMappings: () => encodedMappings,
+		  generatedPositionFor: () => generatedPositionFor,
+		  isIgnored: () => isIgnored,
+		  originalPositionFor: () => originalPositionFor,
+		  presortedDecodedMap: () => presortedDecodedMap,
+		  sourceContentFor: () => sourceContentFor,
+		  traceSegment: () => traceSegment
+		});
+		module.exports = __toCommonJS(trace_mapping_exports);
+		var import_sourcemap_codec = __toESM(require_sourcemap_codec());
 
-		    const COLUMN = 0;
-		    const SOURCES_INDEX = 1;
-		    const SOURCE_LINE = 2;
-		    const SOURCE_COLUMN = 3;
-		    const NAMES_INDEX = 4;
-		    const REV_GENERATED_LINE = 1;
-		    const REV_GENERATED_COLUMN = 2;
+		// src/resolve.ts
+		var import_resolve_uri = __toESM(require_resolve_uri());
 
-		    function maybeSort(mappings, owned) {
-		        const unsortedIndex = nextUnsortedSegmentLine(mappings, 0);
-		        if (unsortedIndex === mappings.length)
-		            return mappings;
-		        // If we own the array (meaning we parsed it from JSON), then we're free to directly mutate it. If
-		        // not, we do not want to modify the consumer's input array.
-		        if (!owned)
-		            mappings = mappings.slice();
-		        for (let i = unsortedIndex; i < mappings.length; i = nextUnsortedSegmentLine(mappings, i + 1)) {
-		            mappings[i] = sortSegments(mappings[i], owned);
-		        }
-		        return mappings;
-		    }
-		    function nextUnsortedSegmentLine(mappings, start) {
-		        for (let i = start; i < mappings.length; i++) {
-		            if (!isSorted(mappings[i]))
-		                return i;
-		        }
-		        return mappings.length;
-		    }
-		    function isSorted(line) {
-		        for (let j = 1; j < line.length; j++) {
-		            if (line[j][COLUMN] < line[j - 1][COLUMN]) {
-		                return false;
-		            }
-		        }
-		        return true;
-		    }
-		    function sortSegments(line, owned) {
-		        if (!owned)
-		            line = line.slice();
-		        return line.sort(sortComparator);
-		    }
-		    function sortComparator(a, b) {
-		        return a[COLUMN] - b[COLUMN];
-		    }
+		// src/strip-filename.ts
+		function stripFilename(path) {
+		  if (!path) return "";
+		  const index = path.lastIndexOf("/");
+		  return path.slice(0, index + 1);
+		}
 
-		    let found = false;
-		    /**
-		     * A binary search implementation that returns the index if a match is found.
-		     * If no match is found, then the left-index (the index associated with the item that comes just
-		     * before the desired index) is returned. To maintain proper sort order, a splice would happen at
-		     * the next index:
-		     *
-		     * ```js
-		     * const array = [1, 3];
-		     * const needle = 2;
-		     * const index = binarySearch(array, needle, (item, needle) => item - needle);
-		     *
-		     * assert.equal(index, 0);
-		     * array.splice(index + 1, 0, needle);
-		     * assert.deepEqual(array, [1, 2, 3]);
-		     * ```
-		     */
-		    function binarySearch(haystack, needle, low, high) {
-		        while (low <= high) {
-		            const mid = low + ((high - low) >> 1);
-		            const cmp = haystack[mid][COLUMN] - needle;
-		            if (cmp === 0) {
-		                found = true;
-		                return mid;
-		            }
-		            if (cmp < 0) {
-		                low = mid + 1;
-		            }
-		            else {
-		                high = mid - 1;
-		            }
-		        }
-		        found = false;
-		        return low - 1;
-		    }
-		    function upperBound(haystack, needle, index) {
-		        for (let i = index + 1; i < haystack.length; index = i++) {
-		            if (haystack[i][COLUMN] !== needle)
-		                break;
-		        }
-		        return index;
-		    }
-		    function lowerBound(haystack, needle, index) {
-		        for (let i = index - 1; i >= 0; index = i--) {
-		            if (haystack[i][COLUMN] !== needle)
-		                break;
-		        }
-		        return index;
-		    }
-		    function memoizedState() {
-		        return {
-		            lastKey: -1,
-		            lastNeedle: -1,
-		            lastIndex: -1,
-		        };
-		    }
-		    /**
-		     * This overly complicated beast is just to record the last tested line/column and the resulting
-		     * index, allowing us to skip a few tests if mappings are monotonically increasing.
-		     */
-		    function memoizedBinarySearch(haystack, needle, state, key) {
-		        const { lastKey, lastNeedle, lastIndex } = state;
-		        let low = 0;
-		        let high = haystack.length - 1;
-		        if (key === lastKey) {
-		            if (needle === lastNeedle) {
-		                found = lastIndex !== -1 && haystack[lastIndex][COLUMN] === needle;
-		                return lastIndex;
-		            }
-		            if (needle >= lastNeedle) {
-		                // lastIndex may be -1 if the previous needle was not found.
-		                low = lastIndex === -1 ? 0 : lastIndex;
-		            }
-		            else {
-		                high = lastIndex;
-		            }
-		        }
-		        state.lastKey = key;
-		        state.lastNeedle = needle;
-		        return (state.lastIndex = binarySearch(haystack, needle, low, high));
-		    }
+		// src/resolve.ts
+		function resolver(mapUrl, sourceRoot) {
+		  const from = stripFilename(mapUrl);
+		  const prefix = sourceRoot ? sourceRoot + "/" : "";
+		  return (source) => (0, import_resolve_uri.default)(prefix + (source || ""), from);
+		}
 
-		    // Rebuilds the original source files, with mappings that are ordered by source line/column instead
-		    // of generated line/column.
-		    function buildBySources(decoded, memos) {
-		        const sources = memos.map(buildNullArray);
-		        for (let i = 0; i < decoded.length; i++) {
-		            const line = decoded[i];
-		            for (let j = 0; j < line.length; j++) {
-		                const seg = line[j];
-		                if (seg.length === 1)
-		                    continue;
-		                const sourceIndex = seg[SOURCES_INDEX];
-		                const sourceLine = seg[SOURCE_LINE];
-		                const sourceColumn = seg[SOURCE_COLUMN];
-		                const originalSource = sources[sourceIndex];
-		                const originalLine = (originalSource[sourceLine] || (originalSource[sourceLine] = []));
-		                const memo = memos[sourceIndex];
-		                // The binary search either found a match, or it found the left-index just before where the
-		                // segment should go. Either way, we want to insert after that. And there may be multiple
-		                // generated segments associated with an original location, so there may need to move several
-		                // indexes before we find where we need to insert.
-		                const index = upperBound(originalLine, sourceColumn, memoizedBinarySearch(originalLine, sourceColumn, memo, sourceLine));
-		                insert(originalLine, (memo.lastIndex = index + 1), [sourceColumn, i, seg[COLUMN]]);
-		            }
-		        }
-		        return sources;
-		    }
-		    function insert(array, index, value) {
-		        for (let i = array.length; i > index; i--) {
-		            array[i] = array[i - 1];
-		        }
-		        array[index] = value;
-		    }
-		    // Null arrays allow us to use ordered index keys without actually allocating contiguous memory like
-		    // a real array. We use a null-prototype object to avoid prototype pollution and deoptimizations.
-		    // Numeric properties on objects are magically sorted in ascending order by the engine regardless of
-		    // the insertion order. So, by setting any numeric keys, even out of order, we'll get ascending
-		    // order when iterating with for-in.
-		    function buildNullArray() {
-		        return { __proto__: null };
-		    }
+		// src/sourcemap-segment.ts
+		var COLUMN = 0;
+		var SOURCES_INDEX = 1;
+		var SOURCE_LINE = 2;
+		var SOURCE_COLUMN = 3;
+		var NAMES_INDEX = 4;
+		var REV_GENERATED_LINE = 1;
+		var REV_GENERATED_COLUMN = 2;
 
-		    const AnyMap = function (map, mapUrl) {
-		        const parsed = typeof map === 'string' ? JSON.parse(map) : map;
-		        if (!('sections' in parsed))
-		            return new TraceMap(parsed, mapUrl);
-		        const mappings = [];
-		        const sources = [];
-		        const sourcesContent = [];
-		        const names = [];
-		        recurse(parsed, mapUrl, mappings, sources, sourcesContent, names, 0, 0, Infinity, Infinity);
-		        const joined = {
-		            version: 3,
-		            file: parsed.file,
-		            names,
-		            sources,
-		            sourcesContent,
-		            mappings,
-		        };
-		        return exports.presortedDecodedMap(joined);
-		    };
-		    function recurse(input, mapUrl, mappings, sources, sourcesContent, names, lineOffset, columnOffset, stopLine, stopColumn) {
-		        const { sections } = input;
-		        for (let i = 0; i < sections.length; i++) {
-		            const { map, offset } = sections[i];
-		            let sl = stopLine;
-		            let sc = stopColumn;
-		            if (i + 1 < sections.length) {
-		                const nextOffset = sections[i + 1].offset;
-		                sl = Math.min(stopLine, lineOffset + nextOffset.line);
-		                if (sl === stopLine) {
-		                    sc = Math.min(stopColumn, columnOffset + nextOffset.column);
-		                }
-		                else if (sl < stopLine) {
-		                    sc = columnOffset + nextOffset.column;
-		                }
-		            }
-		            addSection(map, mapUrl, mappings, sources, sourcesContent, names, lineOffset + offset.line, columnOffset + offset.column, sl, sc);
-		        }
+		// src/sort.ts
+		function maybeSort(mappings, owned) {
+		  const unsortedIndex = nextUnsortedSegmentLine(mappings, 0);
+		  if (unsortedIndex === mappings.length) return mappings;
+		  if (!owned) mappings = mappings.slice();
+		  for (let i = unsortedIndex; i < mappings.length; i = nextUnsortedSegmentLine(mappings, i + 1)) {
+		    mappings[i] = sortSegments(mappings[i], owned);
+		  }
+		  return mappings;
+		}
+		function nextUnsortedSegmentLine(mappings, start) {
+		  for (let i = start; i < mappings.length; i++) {
+		    if (!isSorted(mappings[i])) return i;
+		  }
+		  return mappings.length;
+		}
+		function isSorted(line) {
+		  for (let j = 1; j < line.length; j++) {
+		    if (line[j][COLUMN] < line[j - 1][COLUMN]) {
+		      return false;
 		    }
-		    function addSection(input, mapUrl, mappings, sources, sourcesContent, names, lineOffset, columnOffset, stopLine, stopColumn) {
-		        if ('sections' in input)
-		            return recurse(...arguments);
-		        const map = new TraceMap(input, mapUrl);
-		        const sourcesOffset = sources.length;
-		        const namesOffset = names.length;
-		        const decoded = exports.decodedMappings(map);
-		        const { resolvedSources, sourcesContent: contents } = map;
-		        append(sources, resolvedSources);
-		        append(names, map.names);
-		        if (contents)
-		            append(sourcesContent, contents);
-		        else
-		            for (let i = 0; i < resolvedSources.length; i++)
-		                sourcesContent.push(null);
-		        for (let i = 0; i < decoded.length; i++) {
-		            const lineI = lineOffset + i;
-		            // We can only add so many lines before we step into the range that the next section's map
-		            // controls. When we get to the last line, then we'll start checking the segments to see if
-		            // they've crossed into the column range. But it may not have any columns that overstep, so we
-		            // still need to check that we don't overstep lines, too.
-		            if (lineI > stopLine)
-		                return;
-		            // The out line may already exist in mappings (if we're continuing the line started by a
-		            // previous section). Or, we may have jumped ahead several lines to start this section.
-		            const out = getLine(mappings, lineI);
-		            // On the 0th loop, the section's column offset shifts us forward. On all other lines (since the
-		            // map can be multiple lines), it doesn't.
-		            const cOffset = i === 0 ? columnOffset : 0;
-		            const line = decoded[i];
-		            for (let j = 0; j < line.length; j++) {
-		                const seg = line[j];
-		                const column = cOffset + seg[COLUMN];
-		                // If this segment steps into the column range that the next section's map controls, we need
-		                // to stop early.
-		                if (lineI === stopLine && column >= stopColumn)
-		                    return;
-		                if (seg.length === 1) {
-		                    out.push([column]);
-		                    continue;
-		                }
-		                const sourcesIndex = sourcesOffset + seg[SOURCES_INDEX];
-		                const sourceLine = seg[SOURCE_LINE];
-		                const sourceColumn = seg[SOURCE_COLUMN];
-		                out.push(seg.length === 4
-		                    ? [column, sourcesIndex, sourceLine, sourceColumn]
-		                    : [column, sourcesIndex, sourceLine, sourceColumn, namesOffset + seg[NAMES_INDEX]]);
-		            }
-		        }
-		    }
-		    function append(arr, other) {
-		        for (let i = 0; i < other.length; i++)
-		            arr.push(other[i]);
-		    }
-		    function getLine(arr, index) {
-		        for (let i = arr.length; i <= index; i++)
-		            arr[i] = [];
-		        return arr[index];
-		    }
+		  }
+		  return true;
+		}
+		function sortSegments(line, owned) {
+		  if (!owned) line = line.slice();
+		  return line.sort(sortComparator);
+		}
+		function sortComparator(a, b) {
+		  return a[COLUMN] - b[COLUMN];
+		}
 
-		    const LINE_GTR_ZERO = '`line` must be greater than 0 (lines start at line 1)';
-		    const COL_GTR_EQ_ZERO = '`column` must be greater than or equal to 0 (columns start at column 0)';
-		    const LEAST_UPPER_BOUND = -1;
-		    const GREATEST_LOWER_BOUND = 1;
-		    /**
-		     * Returns the encoded (VLQ string) form of the SourceMap's mappings field.
-		     */
-		    exports.encodedMappings = void 0;
-		    /**
-		     * Returns the decoded (array of lines of segments) form of the SourceMap's mappings field.
-		     */
-		    exports.decodedMappings = void 0;
-		    /**
-		     * A low-level API to find the segment associated with a generated line/column (think, from a
-		     * stack trace). Line and column here are 0-based, unlike `originalPositionFor`.
-		     */
-		    exports.traceSegment = void 0;
-		    /**
-		     * A higher-level API to find the source/line/column associated with a generated line/column
-		     * (think, from a stack trace). Line is 1-based, but column is 0-based, due to legacy behavior in
-		     * `source-map` library.
-		     */
-		    exports.originalPositionFor = void 0;
-		    /**
-		     * Finds the generated line/column position of the provided source/line/column source position.
-		     */
-		    exports.generatedPositionFor = void 0;
-		    /**
-		     * Finds all generated line/column positions of the provided source/line/column source position.
-		     */
-		    exports.allGeneratedPositionsFor = void 0;
-		    /**
-		     * Iterates each mapping in generated position order.
-		     */
-		    exports.eachMapping = void 0;
-		    /**
-		     * Retrieves the source content for a particular source, if its found. Returns null if not.
-		     */
-		    exports.sourceContentFor = void 0;
-		    /**
-		     * A helper that skips sorting of the input map's mappings array, which can be expensive for larger
-		     * maps.
-		     */
-		    exports.presortedDecodedMap = void 0;
-		    /**
-		     * Returns a sourcemap object (with decoded mappings) suitable for passing to a library that expects
-		     * a sourcemap, or to JSON.stringify.
-		     */
-		    exports.decodedMap = void 0;
-		    /**
-		     * Returns a sourcemap object (with encoded mappings) suitable for passing to a library that expects
-		     * a sourcemap, or to JSON.stringify.
-		     */
-		    exports.encodedMap = void 0;
-		    class TraceMap {
-		        constructor(map, mapUrl) {
-		            const isString = typeof map === 'string';
-		            if (!isString && map._decodedMemo)
-		                return map;
-		            const parsed = (isString ? JSON.parse(map) : map);
-		            const { version, file, names, sourceRoot, sources, sourcesContent } = parsed;
-		            this.version = version;
-		            this.file = file;
-		            this.names = names;
-		            this.sourceRoot = sourceRoot;
-		            this.sources = sources;
-		            this.sourcesContent = sourcesContent;
-		            const from = resolve(sourceRoot || '', stripFilename(mapUrl));
-		            this.resolvedSources = sources.map((s) => resolve(s || '', from));
-		            const { mappings } = parsed;
-		            if (typeof mappings === 'string') {
-		                this._encoded = mappings;
-		                this._decoded = undefined;
-		            }
-		            else {
-		                this._encoded = undefined;
-		                this._decoded = maybeSort(mappings, isString);
-		            }
-		            this._decodedMemo = memoizedState();
-		            this._bySources = undefined;
-		            this._bySourceMemos = undefined;
-		        }
+		// src/by-source.ts
+		function buildBySources(decoded, memos) {
+		  const sources = memos.map(() => []);
+		  for (let i = 0; i < decoded.length; i++) {
+		    const line = decoded[i];
+		    for (let j = 0; j < line.length; j++) {
+		      const seg = line[j];
+		      if (seg.length === 1) continue;
+		      const sourceIndex2 = seg[SOURCES_INDEX];
+		      const sourceLine = seg[SOURCE_LINE];
+		      const sourceColumn = seg[SOURCE_COLUMN];
+		      const source = sources[sourceIndex2];
+		      const segs = source[sourceLine] || (source[sourceLine] = []);
+		      segs.push([sourceColumn, i, seg[COLUMN]]);
 		    }
-		    (() => {
-		        exports.encodedMappings = (map) => {
-		            var _a;
-		            return ((_a = map._encoded) !== null && _a !== void 0 ? _a : (map._encoded = sourcemapCodec.encode(map._decoded)));
-		        };
-		        exports.decodedMappings = (map) => {
-		            return (map._decoded || (map._decoded = sourcemapCodec.decode(map._encoded)));
-		        };
-		        exports.traceSegment = (map, line, column) => {
-		            const decoded = exports.decodedMappings(map);
-		            // It's common for parent source maps to have pointers to lines that have no
-		            // mapping (like a "//# sourceMappingURL=") at the end of the child file.
-		            if (line >= decoded.length)
-		                return null;
-		            const segments = decoded[line];
-		            const index = traceSegmentInternal(segments, map._decodedMemo, line, column, GREATEST_LOWER_BOUND);
-		            return index === -1 ? null : segments[index];
-		        };
-		        exports.originalPositionFor = (map, { line, column, bias }) => {
-		            line--;
-		            if (line < 0)
-		                throw new Error(LINE_GTR_ZERO);
-		            if (column < 0)
-		                throw new Error(COL_GTR_EQ_ZERO);
-		            const decoded = exports.decodedMappings(map);
-		            // It's common for parent source maps to have pointers to lines that have no
-		            // mapping (like a "//# sourceMappingURL=") at the end of the child file.
-		            if (line >= decoded.length)
-		                return OMapping(null, null, null, null);
-		            const segments = decoded[line];
-		            const index = traceSegmentInternal(segments, map._decodedMemo, line, column, bias || GREATEST_LOWER_BOUND);
-		            if (index === -1)
-		                return OMapping(null, null, null, null);
-		            const segment = segments[index];
-		            if (segment.length === 1)
-		                return OMapping(null, null, null, null);
-		            const { names, resolvedSources } = map;
-		            return OMapping(resolvedSources[segment[SOURCES_INDEX]], segment[SOURCE_LINE] + 1, segment[SOURCE_COLUMN], segment.length === 5 ? names[segment[NAMES_INDEX]] : null);
-		        };
-		        exports.allGeneratedPositionsFor = (map, { source, line, column, bias }) => {
-		            // SourceMapConsumer uses LEAST_UPPER_BOUND for some reason, so we follow suit.
-		            return generatedPosition(map, source, line, column, bias || LEAST_UPPER_BOUND, true);
-		        };
-		        exports.generatedPositionFor = (map, { source, line, column, bias }) => {
-		            return generatedPosition(map, source, line, column, bias || GREATEST_LOWER_BOUND, false);
-		        };
-		        exports.eachMapping = (map, cb) => {
-		            const decoded = exports.decodedMappings(map);
-		            const { names, resolvedSources } = map;
-		            for (let i = 0; i < decoded.length; i++) {
-		                const line = decoded[i];
-		                for (let j = 0; j < line.length; j++) {
-		                    const seg = line[j];
-		                    const generatedLine = i + 1;
-		                    const generatedColumn = seg[0];
-		                    let source = null;
-		                    let originalLine = null;
-		                    let originalColumn = null;
-		                    let name = null;
-		                    if (seg.length !== 1) {
-		                        source = resolvedSources[seg[1]];
-		                        originalLine = seg[2] + 1;
-		                        originalColumn = seg[3];
-		                    }
-		                    if (seg.length === 5)
-		                        name = names[seg[4]];
-		                    cb({
-		                        generatedLine,
-		                        generatedColumn,
-		                        source,
-		                        originalLine,
-		                        originalColumn,
-		                        name,
-		                    });
-		                }
-		            }
-		        };
-		        exports.sourceContentFor = (map, source) => {
-		            const { sources, resolvedSources, sourcesContent } = map;
-		            if (sourcesContent == null)
-		                return null;
-		            let index = sources.indexOf(source);
-		            if (index === -1)
-		                index = resolvedSources.indexOf(source);
-		            return index === -1 ? null : sourcesContent[index];
-		        };
-		        exports.presortedDecodedMap = (map, mapUrl) => {
-		            const tracer = new TraceMap(clone(map, []), mapUrl);
-		            tracer._decoded = map.mappings;
-		            return tracer;
-		        };
-		        exports.decodedMap = (map) => {
-		            return clone(map, exports.decodedMappings(map));
-		        };
-		        exports.encodedMap = (map) => {
-		            return clone(map, exports.encodedMappings(map));
-		        };
-		        function generatedPosition(map, source, line, column, bias, all) {
-		            line--;
-		            if (line < 0)
-		                throw new Error(LINE_GTR_ZERO);
-		            if (column < 0)
-		                throw new Error(COL_GTR_EQ_ZERO);
-		            const { sources, resolvedSources } = map;
-		            let sourceIndex = sources.indexOf(source);
-		            if (sourceIndex === -1)
-		                sourceIndex = resolvedSources.indexOf(source);
-		            if (sourceIndex === -1)
-		                return all ? [] : GMapping(null, null);
-		            const generated = (map._bySources || (map._bySources = buildBySources(exports.decodedMappings(map), (map._bySourceMemos = sources.map(memoizedState)))));
-		            const segments = generated[sourceIndex][line];
-		            if (segments == null)
-		                return all ? [] : GMapping(null, null);
-		            const memo = map._bySourceMemos[sourceIndex];
-		            if (all)
-		                return sliceGeneratedPositions(segments, memo, line, column, bias);
-		            const index = traceSegmentInternal(segments, memo, line, column, bias);
-		            if (index === -1)
-		                return GMapping(null, null);
-		            const segment = segments[index];
-		            return GMapping(segment[REV_GENERATED_LINE] + 1, segment[REV_GENERATED_COLUMN]);
-		        }
-		    })();
-		    function clone(map, mappings) {
-		        return {
-		            version: map.version,
-		            file: map.file,
-		            names: map.names,
-		            sourceRoot: map.sourceRoot,
-		            sources: map.sources,
-		            sourcesContent: map.sourcesContent,
-		            mappings,
-		        };
+		  }
+		  for (let i = 0; i < sources.length; i++) {
+		    const source = sources[i];
+		    for (let j = 0; j < source.length; j++) {
+		      const line = source[j];
+		      if (line) line.sort(sortComparator);
 		    }
-		    function OMapping(source, line, column, name) {
-		        return { source, line, column, name };
-		    }
-		    function GMapping(line, column) {
-		        return { line, column };
-		    }
-		    function traceSegmentInternal(segments, memo, line, column, bias) {
-		        let index = memoizedBinarySearch(segments, column, memo, line);
-		        if (found) {
-		            index = (bias === LEAST_UPPER_BOUND ? upperBound : lowerBound)(segments, column, index);
-		        }
-		        else if (bias === LEAST_UPPER_BOUND)
-		            index++;
-		        if (index === -1 || index === segments.length)
-		            return -1;
-		        return index;
-		    }
-		    function sliceGeneratedPositions(segments, memo, line, column, bias) {
-		        let min = traceSegmentInternal(segments, memo, line, column, GREATEST_LOWER_BOUND);
-		        // We ignored the bias when tracing the segment so that we're guarnateed to find the first (in
-		        // insertion order) segment that matched. Even if we did respect the bias when tracing, we would
-		        // still need to call `lowerBound()` to find the first segment, which is slower than just looking
-		        // for the GREATEST_LOWER_BOUND to begin with. The only difference that matters for us is when the
-		        // binary search didn't match, in which case GREATEST_LOWER_BOUND just needs to increment to
-		        // match LEAST_UPPER_BOUND.
-		        if (!found && bias === LEAST_UPPER_BOUND)
-		            min++;
-		        if (min === -1 || min === segments.length)
-		            return [];
-		        // We may have found the segment that started at an earlier column. If this is the case, then we
-		        // need to slice all generated segments that match _that_ column, because all such segments span
-		        // to our desired column.
-		        const matchedColumn = found ? column : segments[min][COLUMN];
-		        // The binary search is not guaranteed to find the lower bound when a match wasn't found.
-		        if (!found)
-		            min = lowerBound(segments, matchedColumn, min);
-		        const max = upperBound(segments, matchedColumn, min);
-		        const result = [];
-		        for (; min <= max; min++) {
-		            const segment = segments[min];
-		            result.push(GMapping(segment[REV_GENERATED_LINE] + 1, segment[REV_GENERATED_COLUMN]));
-		        }
-		        return result;
-		    }
+		  }
+		  return sources;
+		}
 
-		    exports.AnyMap = AnyMap;
-		    exports.GREATEST_LOWER_BOUND = GREATEST_LOWER_BOUND;
-		    exports.LEAST_UPPER_BOUND = LEAST_UPPER_BOUND;
-		    exports.TraceMap = TraceMap;
+		// src/binary-search.ts
+		var found = false;
+		function binarySearch(haystack, needle, low, high) {
+		  while (low <= high) {
+		    const mid = low + (high - low >> 1);
+		    const cmp = haystack[mid][COLUMN] - needle;
+		    if (cmp === 0) {
+		      found = true;
+		      return mid;
+		    }
+		    if (cmp < 0) {
+		      low = mid + 1;
+		    } else {
+		      high = mid - 1;
+		    }
+		  }
+		  found = false;
+		  return low - 1;
+		}
+		function upperBound(haystack, needle, index) {
+		  for (let i = index + 1; i < haystack.length; index = i++) {
+		    if (haystack[i][COLUMN] !== needle) break;
+		  }
+		  return index;
+		}
+		function lowerBound(haystack, needle, index) {
+		  for (let i = index - 1; i >= 0; index = i--) {
+		    if (haystack[i][COLUMN] !== needle) break;
+		  }
+		  return index;
+		}
+		function memoizedState() {
+		  return {
+		    lastKey: -1,
+		    lastNeedle: -1,
+		    lastIndex: -1
+		  };
+		}
+		function memoizedBinarySearch(haystack, needle, state, key) {
+		  const { lastKey, lastNeedle, lastIndex } = state;
+		  let low = 0;
+		  let high = haystack.length - 1;
+		  if (key === lastKey) {
+		    if (needle === lastNeedle) {
+		      found = lastIndex !== -1 && haystack[lastIndex][COLUMN] === needle;
+		      return lastIndex;
+		    }
+		    if (needle >= lastNeedle) {
+		      low = lastIndex === -1 ? 0 : lastIndex;
+		    } else {
+		      high = lastIndex;
+		    }
+		  }
+		  state.lastKey = key;
+		  state.lastNeedle = needle;
+		  return state.lastIndex = binarySearch(haystack, needle, low, high);
+		}
 
-		    Object.defineProperty(exports, '__esModule', { value: true });
+		// src/types.ts
+		function parse(map) {
+		  return typeof map === "string" ? JSON.parse(map) : map;
+		}
 
+		// src/flatten-map.ts
+		var FlattenMap = function(map, mapUrl) {
+		  const parsed = parse(map);
+		  if (!("sections" in parsed)) {
+		    return new TraceMap(parsed, mapUrl);
+		  }
+		  const mappings = [];
+		  const sources = [];
+		  const sourcesContent = [];
+		  const names = [];
+		  const ignoreList = [];
+		  recurse(
+		    parsed,
+		    mapUrl,
+		    mappings,
+		    sources,
+		    sourcesContent,
+		    names,
+		    ignoreList,
+		    0,
+		    0,
+		    Infinity,
+		    Infinity
+		  );
+		  const joined = {
+		    version: 3,
+		    file: parsed.file,
+		    names,
+		    sources,
+		    sourcesContent,
+		    mappings,
+		    ignoreList
+		  };
+		  return presortedDecodedMap(joined);
+		};
+		function recurse(input, mapUrl, mappings, sources, sourcesContent, names, ignoreList, lineOffset, columnOffset, stopLine, stopColumn) {
+		  const { sections } = input;
+		  for (let i = 0; i < sections.length; i++) {
+		    const { map, offset } = sections[i];
+		    let sl = stopLine;
+		    let sc = stopColumn;
+		    if (i + 1 < sections.length) {
+		      const nextOffset = sections[i + 1].offset;
+		      sl = Math.min(stopLine, lineOffset + nextOffset.line);
+		      if (sl === stopLine) {
+		        sc = Math.min(stopColumn, columnOffset + nextOffset.column);
+		      } else if (sl < stopLine) {
+		        sc = columnOffset + nextOffset.column;
+		      }
+		    }
+		    addSection(
+		      map,
+		      mapUrl,
+		      mappings,
+		      sources,
+		      sourcesContent,
+		      names,
+		      ignoreList,
+		      lineOffset + offset.line,
+		      columnOffset + offset.column,
+		      sl,
+		      sc
+		    );
+		  }
+		}
+		function addSection(input, mapUrl, mappings, sources, sourcesContent, names, ignoreList, lineOffset, columnOffset, stopLine, stopColumn) {
+		  const parsed = parse(input);
+		  if ("sections" in parsed) return recurse(...arguments);
+		  const map = new TraceMap(parsed, mapUrl);
+		  const sourcesOffset = sources.length;
+		  const namesOffset = names.length;
+		  const decoded = decodedMappings(map);
+		  const { resolvedSources, sourcesContent: contents, ignoreList: ignores } = map;
+		  append(sources, resolvedSources);
+		  append(names, map.names);
+		  if (contents) append(sourcesContent, contents);
+		  else for (let i = 0; i < resolvedSources.length; i++) sourcesContent.push(null);
+		  if (ignores) for (let i = 0; i < ignores.length; i++) ignoreList.push(ignores[i] + sourcesOffset);
+		  for (let i = 0; i < decoded.length; i++) {
+		    const lineI = lineOffset + i;
+		    if (lineI > stopLine) return;
+		    const out = getLine(mappings, lineI);
+		    const cOffset = i === 0 ? columnOffset : 0;
+		    const line = decoded[i];
+		    for (let j = 0; j < line.length; j++) {
+		      const seg = line[j];
+		      const column = cOffset + seg[COLUMN];
+		      if (lineI === stopLine && column >= stopColumn) return;
+		      if (seg.length === 1) {
+		        out.push([column]);
+		        continue;
+		      }
+		      const sourcesIndex = sourcesOffset + seg[SOURCES_INDEX];
+		      const sourceLine = seg[SOURCE_LINE];
+		      const sourceColumn = seg[SOURCE_COLUMN];
+		      out.push(
+		        seg.length === 4 ? [column, sourcesIndex, sourceLine, sourceColumn] : [column, sourcesIndex, sourceLine, sourceColumn, namesOffset + seg[NAMES_INDEX]]
+		      );
+		    }
+		  }
+		}
+		function append(arr, other) {
+		  for (let i = 0; i < other.length; i++) arr.push(other[i]);
+		}
+		function getLine(arr, index) {
+		  for (let i = arr.length; i <= index; i++) arr[i] = [];
+		  return arr[index];
+		}
+
+		// src/trace-mapping.ts
+		var LINE_GTR_ZERO = "`line` must be greater than 0 (lines start at line 1)";
+		var COL_GTR_EQ_ZERO = "`column` must be greater than or equal to 0 (columns start at column 0)";
+		var LEAST_UPPER_BOUND = -1;
+		var GREATEST_LOWER_BOUND = 1;
+		var TraceMap = class {
+		  constructor(map, mapUrl) {
+		    const isString = typeof map === "string";
+		    if (!isString && map._decodedMemo) return map;
+		    const parsed = parse(map);
+		    const { version, file, names, sourceRoot, sources, sourcesContent } = parsed;
+		    this.version = version;
+		    this.file = file;
+		    this.names = names || [];
+		    this.sourceRoot = sourceRoot;
+		    this.sources = sources;
+		    this.sourcesContent = sourcesContent;
+		    this.ignoreList = parsed.ignoreList || parsed.x_google_ignoreList || void 0;
+		    const resolve = resolver(mapUrl, sourceRoot);
+		    this.resolvedSources = sources.map(resolve);
+		    const { mappings } = parsed;
+		    if (typeof mappings === "string") {
+		      this._encoded = mappings;
+		      this._decoded = void 0;
+		    } else if (Array.isArray(mappings)) {
+		      this._encoded = void 0;
+		      this._decoded = maybeSort(mappings, isString);
+		    } else if (parsed.sections) {
+		      throw new Error(`TraceMap passed sectioned source map, please use FlattenMap export instead`);
+		    } else {
+		      throw new Error(`invalid source map: ${JSON.stringify(parsed)}`);
+		    }
+		    this._decodedMemo = memoizedState();
+		    this._bySources = void 0;
+		    this._bySourceMemos = void 0;
+		  }
+		};
+		function cast(map) {
+		  return map;
+		}
+		function encodedMappings(map) {
+		  var _a, _b;
+		  return (_b = (_a = cast(map))._encoded) != null ? _b : _a._encoded = (0, import_sourcemap_codec.encode)(cast(map)._decoded);
+		}
+		function decodedMappings(map) {
+		  var _a;
+		  return (_a = cast(map))._decoded || (_a._decoded = (0, import_sourcemap_codec.decode)(cast(map)._encoded));
+		}
+		function traceSegment(map, line, column) {
+		  const decoded = decodedMappings(map);
+		  if (line >= decoded.length) return null;
+		  const segments = decoded[line];
+		  const index = traceSegmentInternal(
+		    segments,
+		    cast(map)._decodedMemo,
+		    line,
+		    column,
+		    GREATEST_LOWER_BOUND
+		  );
+		  return index === -1 ? null : segments[index];
+		}
+		function originalPositionFor(map, needle) {
+		  let { line, column, bias } = needle;
+		  line--;
+		  if (line < 0) throw new Error(LINE_GTR_ZERO);
+		  if (column < 0) throw new Error(COL_GTR_EQ_ZERO);
+		  const decoded = decodedMappings(map);
+		  if (line >= decoded.length) return OMapping(null, null, null, null);
+		  const segments = decoded[line];
+		  const index = traceSegmentInternal(
+		    segments,
+		    cast(map)._decodedMemo,
+		    line,
+		    column,
+		    bias || GREATEST_LOWER_BOUND
+		  );
+		  if (index === -1) return OMapping(null, null, null, null);
+		  const segment = segments[index];
+		  if (segment.length === 1) return OMapping(null, null, null, null);
+		  const { names, resolvedSources } = map;
+		  return OMapping(
+		    resolvedSources[segment[SOURCES_INDEX]],
+		    segment[SOURCE_LINE] + 1,
+		    segment[SOURCE_COLUMN],
+		    segment.length === 5 ? names[segment[NAMES_INDEX]] : null
+		  );
+		}
+		function generatedPositionFor(map, needle) {
+		  const { source, line, column, bias } = needle;
+		  return generatedPosition(map, source, line, column, bias || GREATEST_LOWER_BOUND, false);
+		}
+		function allGeneratedPositionsFor(map, needle) {
+		  const { source, line, column, bias } = needle;
+		  return generatedPosition(map, source, line, column, bias || LEAST_UPPER_BOUND, true);
+		}
+		function eachMapping(map, cb) {
+		  const decoded = decodedMappings(map);
+		  const { names, resolvedSources } = map;
+		  for (let i = 0; i < decoded.length; i++) {
+		    const line = decoded[i];
+		    for (let j = 0; j < line.length; j++) {
+		      const seg = line[j];
+		      const generatedLine = i + 1;
+		      const generatedColumn = seg[0];
+		      let source = null;
+		      let originalLine = null;
+		      let originalColumn = null;
+		      let name = null;
+		      if (seg.length !== 1) {
+		        source = resolvedSources[seg[1]];
+		        originalLine = seg[2] + 1;
+		        originalColumn = seg[3];
+		      }
+		      if (seg.length === 5) name = names[seg[4]];
+		      cb({
+		        generatedLine,
+		        generatedColumn,
+		        source,
+		        originalLine,
+		        originalColumn,
+		        name
+		      });
+		    }
+		  }
+		}
+		function sourceIndex(map, source) {
+		  const { sources, resolvedSources } = map;
+		  let index = sources.indexOf(source);
+		  if (index === -1) index = resolvedSources.indexOf(source);
+		  return index;
+		}
+		function sourceContentFor(map, source) {
+		  const { sourcesContent } = map;
+		  if (sourcesContent == null) return null;
+		  const index = sourceIndex(map, source);
+		  return index === -1 ? null : sourcesContent[index];
+		}
+		function isIgnored(map, source) {
+		  const { ignoreList } = map;
+		  if (ignoreList == null) return false;
+		  const index = sourceIndex(map, source);
+		  return index === -1 ? false : ignoreList.includes(index);
+		}
+		function presortedDecodedMap(map, mapUrl) {
+		  const tracer = new TraceMap(clone(map, []), mapUrl);
+		  cast(tracer)._decoded = map.mappings;
+		  return tracer;
+		}
+		function decodedMap(map) {
+		  return clone(map, decodedMappings(map));
+		}
+		function encodedMap(map) {
+		  return clone(map, encodedMappings(map));
+		}
+		function clone(map, mappings) {
+		  return {
+		    version: map.version,
+		    file: map.file,
+		    names: map.names,
+		    sourceRoot: map.sourceRoot,
+		    sources: map.sources,
+		    sourcesContent: map.sourcesContent,
+		    mappings,
+		    ignoreList: map.ignoreList || map.x_google_ignoreList
+		  };
+		}
+		function OMapping(source, line, column, name) {
+		  return { source, line, column, name };
+		}
+		function GMapping(line, column) {
+		  return { line, column };
+		}
+		function traceSegmentInternal(segments, memo, line, column, bias) {
+		  let index = memoizedBinarySearch(segments, column, memo, line);
+		  if (found) {
+		    index = (bias === LEAST_UPPER_BOUND ? upperBound : lowerBound)(segments, column, index);
+		  } else if (bias === LEAST_UPPER_BOUND) index++;
+		  if (index === -1 || index === segments.length) return -1;
+		  return index;
+		}
+		function sliceGeneratedPositions(segments, memo, line, column, bias) {
+		  let min = traceSegmentInternal(segments, memo, line, column, GREATEST_LOWER_BOUND);
+		  if (!found && bias === LEAST_UPPER_BOUND) min++;
+		  if (min === -1 || min === segments.length) return [];
+		  const matchedColumn = found ? column : segments[min][COLUMN];
+		  if (!found) min = lowerBound(segments, matchedColumn, min);
+		  const max = upperBound(segments, matchedColumn, min);
+		  const result = [];
+		  for (; min <= max; min++) {
+		    const segment = segments[min];
+		    result.push(GMapping(segment[REV_GENERATED_LINE] + 1, segment[REV_GENERATED_COLUMN]));
+		  }
+		  return result;
+		}
+		function generatedPosition(map, source, line, column, bias, all) {
+		  var _a, _b;
+		  line--;
+		  if (line < 0) throw new Error(LINE_GTR_ZERO);
+		  if (column < 0) throw new Error(COL_GTR_EQ_ZERO);
+		  const { sources, resolvedSources } = map;
+		  let sourceIndex2 = sources.indexOf(source);
+		  if (sourceIndex2 === -1) sourceIndex2 = resolvedSources.indexOf(source);
+		  if (sourceIndex2 === -1) return all ? [] : GMapping(null, null);
+		  const bySourceMemos = (_a = cast(map))._bySourceMemos || (_a._bySourceMemos = sources.map(memoizedState));
+		  const generated = (_b = cast(map))._bySources || (_b._bySources = buildBySources(decodedMappings(map), bySourceMemos));
+		  const segments = generated[sourceIndex2][line];
+		  if (segments == null) return all ? [] : GMapping(null, null);
+		  const memo = bySourceMemos[sourceIndex2];
+		  if (all) return sliceGeneratedPositions(segments, memo, line, column, bias);
+		  const index = traceSegmentInternal(segments, memo, line, column, bias);
+		  if (index === -1) return GMapping(null, null);
+		  const segment = segments[index];
+		  return GMapping(segment[REV_GENERATED_LINE] + 1, segment[REV_GENERATED_COLUMN]);
+		}
 		}));
 		
-	} (traceMapping_umd$1, traceMapping_umd$1.exports));
+	} (traceMapping_umd$1));
 	return traceMapping_umd$1.exports;
 }
 
@@ -13533,29 +13969,36 @@ function requireSource () {
 	   *    c8 ignore next 3
 	   *    c8 ignore start
 	   *    c8 ignore stop
+	   * And equivalent ones for v8, e.g. v8 ignore next.
 	   * @param {string} lineStr
 	   * @return {{count?: number, start?: boolean, stop?: boolean}|undefined}
 	   */
 	  _parseIgnore (lineStr) {
-	    const testIgnoreNextLines = lineStr.match(/^\W*\/\* c8 ignore next (?<count>[0-9]+)/);
+	    const testIgnoreNextLines = lineStr.match(/^\W*\/\* (?:[cv]8|node:coverage) ignore next (?<count>[0-9]+)/);
 	    if (testIgnoreNextLines) {
 	      return { count: Number(testIgnoreNextLines.groups.count) }
 	    }
 
 	    // Check if comment is on its own line.
-	    if (lineStr.match(/^\W*\/\* c8 ignore next/)) {
+	    if (lineStr.match(/^\W*\/\* (?:[cv]8|node:coverage) ignore next/)) {
 	      return { count: 1 }
 	    }
 
-	    if (lineStr.match(/\/\* c8 ignore next/)) {
+	    if (lineStr.match(/\/\* ([cv]8|node:coverage) ignore next/)) {
 	      // Won't ignore successive lines, but the current line will be ignored.
 	      return { count: 0 }
 	    }
 
-	    const testIgnoreStartStop = lineStr.match(/\/\* c8 ignore (?<mode>start|stop)/);
+	    const testIgnoreStartStop = lineStr.match(/\/\* [c|v]8 ignore (?<mode>start|stop)/);
 	    if (testIgnoreStartStop) {
 	      if (testIgnoreStartStop.groups.mode === 'start') return { start: true }
 	      if (testIgnoreStartStop.groups.mode === 'stop') return { stop: true }
+	    }
+
+	    const testNodeIgnoreStartStop = lineStr.match(/\/\* node:coverage (?<mode>enable|disable)/);
+	    if (testNodeIgnoreStartStop) {
+	      if (testNodeIgnoreStartStop.groups.mode === 'disable') return { start: true }
+	      if (testNodeIgnoreStartStop.groups.mode === 'enable') return { stop: true }
 	    }
 	  }
 
@@ -13720,12 +14163,14 @@ function requireSource () {
 	// Not required since Node 12, see: https://github.com/nodejs/node/pull/27375
 	const isPreNode12 = /^v1[0-1]\./u.test(process.version);
 	function getShebangLength (source) {
+	  /* c8 ignore start - platform-specific */
 	  if (isPreNode12 && source.indexOf('#!') === 0) {
 	    const match = source.match(/(?<shebang>#!.*)/);
 	    if (match) {
 	      return match.groups.shebang.length
 	    }
 	  } else {
+	  /* c8 ignore stop - platform-specific */
 	    return 0
 	  }
 	}
@@ -13755,6 +14200,7 @@ function requireV8ToIstanbul$1 () {
 	const CovSource = requireSource();
 	const { sliceRange } = requireRange();
 	const compatError = Error(`requires Node.js ${require$$9.engines.node}`);
+	const { readFileSync } = require$$0$1;
 	let readFile = () => { throw compatError };
 	try {
 	  readFile = require('fs').promises.readFile;
@@ -13795,7 +14241,7 @@ function requireV8ToIstanbul$1 () {
 	      // if we find a source-map (either inline, or a .map file) we load
 	      // both the transpiled and original source, both of which are used during
 	      // the backflips we perform to remap absolute to relative positions.
-	      convertSourceMap.fromSource(rawSource) || convertSourceMap.fromMapFileSource(rawSource, dirname(this.path));
+	      convertSourceMap.fromSource(rawSource) || convertSourceMap.fromMapFileSource(rawSource, this._readFileFromDir.bind(this));
 
 	    if (this.rawSourceMap) {
 	      if (this.rawSourceMap.sourcemap.sources.length > 1) {
@@ -13835,6 +14281,10 @@ function requireV8ToIstanbul$1 () {
 	    }
 	  }
 
+	  _readFileFromDir (filename) {
+	    return readFileSync(resolve(dirname(this.path), filename), 'utf-8')
+	  }
+
 	  async sourcesContentFromSources () {
 	    const fileList = this.sourceMap.sources.map(relativePath => {
 	      const realPath = this._resolveSource(this.rawSourceMap, relativePath);
@@ -13869,12 +14319,13 @@ function requireV8ToIstanbul$1 () {
 	  applyCoverage (blocks) {
 	    blocks.forEach(block => {
 	      block.ranges.forEach((range, i) => {
-	        const { startCol, endCol, path, covSource } = this._maybeRemapStartColEndCol(range);
+	        const isEmptyCoverage = block.functionName === '(empty-report)';
+	        const { startCol, endCol, path, covSource } = this._maybeRemapStartColEndCol(range, isEmptyCoverage);
 	        if (this.excludePath(path)) {
 	          return
 	        }
 	        let lines;
-	        if (block.functionName === '(empty-report)') {
+	        if (isEmptyCoverage) {
 	          // (empty-report), this will result in a report that has all lines zeroed out.
 	          lines = covSource.lines.filter((line) => {
 	            line.count = 0;
@@ -13948,15 +14399,17 @@ function requireV8ToIstanbul$1 () {
 	    });
 	  }
 
-	  _maybeRemapStartColEndCol (range) {
+	  _maybeRemapStartColEndCol (range, isEmptyCoverage) {
 	    let covSource = this.covSources[0].source;
-	    let startCol = Math.max(0, range.startOffset - covSource.wrapperLength);
-	    let endCol = Math.min(covSource.eof, range.endOffset - covSource.wrapperLength);
+	    const covSourceWrapperLength = isEmptyCoverage ? 0 : covSource.wrapperLength;
+	    let startCol = Math.max(0, range.startOffset - covSourceWrapperLength);
+	    let endCol = Math.min(covSource.eof, range.endOffset - covSourceWrapperLength);
 	    let path = this.path;
 
 	    if (this.sourceMap) {
-	      startCol = Math.max(0, range.startOffset - this.sourceTranspiled.wrapperLength);
-	      endCol = Math.min(this.sourceTranspiled.eof, range.endOffset - this.sourceTranspiled.wrapperLength);
+	      const sourceTranspiledWrapperLength = isEmptyCoverage ? 0 : this.sourceTranspiled.wrapperLength;
+	      startCol = Math.max(0, range.startOffset - sourceTranspiledWrapperLength);
+	      endCol = Math.min(this.sourceTranspiled.eof, range.endOffset - sourceTranspiledWrapperLength);
 
 	      const { startLine, relStartCol, endLine, relEndCol, source } = this.sourceTranspiled.offsetToOriginalRelative(
 	        this.sourceMap,
@@ -14020,7 +14473,7 @@ function requireV8ToIstanbul$1 () {
 	    };
 	    source.lines.forEach((line, index) => {
 	      statements.statementMap[`${index}`] = line.toIstanbul();
-	      statements.s[`${index}`] = line.count;
+	      statements.s[`${index}`] = line.ignore ? 1 : line.count;
 	    });
 	    return statements
 	  }
