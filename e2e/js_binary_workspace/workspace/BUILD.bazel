@@ -1,7 +1,23 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
 js_binary(
     name = "bin",
     chdir = package_name(),
     entry_point = "index.js",
+    visibility = ["//visibility:public"],
+)
+
+js_run_binary(
+    name = "run_bin",
+    stdout = "out_workspace.txt",
+    tool = ":bin",
+    visibility = ["//visibility:public"],
+)
+
+build_test(
+    name = "test",
+    targets = [
+        ":run_bin",
+    ],
 )
