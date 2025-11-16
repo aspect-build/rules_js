@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
@@ -68,6 +69,11 @@ build_test(
         ":node_modules/@figma",
         ":node_modules/@kubernetes",
         ":node_modules/@plotly",
+
+        # Packages of the same name with alternate aliases/versions/protocols
+        ":node_modules/lodash",
+        ":node_modules/lodash-4.17.21",
+        ":node_modules/lodash-4.17.21-tar",
     ],
 )
 
@@ -88,4 +94,10 @@ sh_test(
         "@nodejs_linux_arm64//:node_files",
     ],
     toolchains = ["@rules_nodejs//nodejs:current_node_runtime"],
+)
+
+js_test(
+    name = "pkg_versions_test",
+    data = [":node_modules"],
+    entry_point = "versions.js",
 )

@@ -74,6 +74,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/alias-only-sizzle",
             ":node_modules/alias-project-a",
             ":node_modules/alias-types-node",
+            ":node_modules/alternate-versions",
             ":node_modules/is-odd",
             ":node_modules/is-odd-alias",
             ":node_modules/is-odd-v0",

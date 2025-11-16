@@ -59,11 +59,24 @@ def _package_store_name(pnpm_name, pnpm_version):
         name = pnpm_name
         version = pnpm_version
 
-    if version.startswith("@"):
+    # TODO(3.0): the version should already be the store name to remove this pnpm lockfile
+    # logic of knowing/guessing when a version is already a store name.
+
+    at_index = version.find("@")
+    proto_indx = version.find("://")
+    if at_index == 0:
         # Special case where the package name should _not_ be included in the package store name.
         # See https://github.com/aspect-build/rules_js/issues/423 for more context.
         return _escape_target_name(version)
+    elif at_index > 0 and (proto_indx == -1 or at_index < proto_indx):
+        # A package key containing an @ in the version is most likely already a full package store name
+        # such as 'name@version' or 'name@version(peer/patch-info)'.
+        # However there are odd edge cases such as `https://blah.com/@scope/name` where an @ may be in the
+        # version specifier, but if the underlying package name == 'name' the 'name@' prefix must
+        # still be prepended.
+        return _escape_target_name(version)
     else:
+        # Otherwise assume a simple name+value and the package store name is name@version
         return "%s@%s" % (_escape_target_name(name), _escape_target_name(version))
 
 def _make_symlink(ctx, symlink_path, target_path):
