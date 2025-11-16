@@ -199,7 +199,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 
     for i in imports:
         npm_import(
-            name = i.name,
+            name = i.repo_name,
             bins = i.bins,
             commit = i.commit,
             custom_postinstall = i.custom_postinstall,
