@@ -13,9 +13,9 @@ bzl_library(
     srcs = ["defs.bzl"],
     deps = [
         "//js:defs",
-        "@aspect_bazel_lib//lib:copy_file",
-        "@aspect_bazel_lib//lib:copy_to_directory",
-        "@aspect_bazel_lib//lib:directory_path",
+        "@bazel_lib//lib:copy_file",
+        "@bazel_lib//lib:copy_to_directory",
+        "@bazel_lib//lib:directory_path",
     ],
 )
 

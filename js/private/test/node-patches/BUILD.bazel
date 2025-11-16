@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@npm//:@babel/cli/package_json.bzl", babel_bin = "bin")
 load("//js:defs.bzl", "js_test")
 

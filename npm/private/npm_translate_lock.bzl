@@ -19,8 +19,8 @@ Advanced users may want to directly fetch a package from npm rather than start f
 [`npm_import`](./npm_import) does this.
 """
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
+load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_helpers.bzl", "helpers")

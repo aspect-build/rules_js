@@ -8,12 +8,12 @@ module(
 
 # Lower-bounds (minimum) versions for direct runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
-bazel_dep(name = "aspect_bazel_lib", version = "2.17.1")  # TODO(alexeagle): remove
 bazel_dep(name = "tar.bzl", version = "0.6.0")
 bazel_dep(name = "yq.bzl", version = "0.3.1")
 bazel_dep(name = "aspect_tools_telemetry", version = "0.2.8")
 bazel_dep(name = "bazel_features", version = "1.9.0")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
+bazel_dep(name = "jq.bzl", version = "0.4.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "0.0.5")
 bazel_dep(name = "rules_nodejs", version = "6.6.0")
@@ -36,7 +36,7 @@ pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(name = "pnpm")
 use_repo(pnpm, "pnpm", "pnpm__links")
 
-bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+bazel_lib_toolchains = use_extension("@bazel_lib//lib:extensions.bzl", "toolchains")
 use_repo(
     bazel_lib_toolchains,
     "coreutils_toolchains",
@@ -83,12 +83,12 @@ bazel_dep(name = "buildifier_prebuilt", version = "8.0.1", dev_dependency = True
 bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
 
 host = use_extension(
-    "@aspect_bazel_lib//lib:extensions.bzl",
+    "@bazel_lib//lib:extensions.bzl",
     "host",
     dev_dependency = True,
 )
 host.host()
-use_repo(host, "aspect_bazel_lib_host")
+use_repo(host, "bazel_lib_host")
 
 node_dev = use_extension(
     "@rules_nodejs//nodejs:extensions.bzl",

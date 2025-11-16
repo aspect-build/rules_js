@@ -1,6 +1,6 @@
 """pnpm extension logic (the extension itself is in npm/extensions.bzl)."""
 
-load("@aspect_bazel_lib//lib:lists.bzl", "unique")
+load("@bazel_lib//lib:lists.bzl", "unique")
 load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
 
 DEFAULT_PNPM_REPO_NAME = "pnpm"

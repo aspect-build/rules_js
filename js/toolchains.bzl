@@ -2,7 +2,7 @@
 """
 
 load(
-    "@aspect_bazel_lib//lib:repositories.bzl",
+    "@bazel_lib//lib:repositories.bzl",
     _register_copy_directory_toolchains = "register_copy_directory_toolchains",
     _register_copy_to_directory_toolchains = "register_copy_to_directory_toolchains",
     _register_coreutils_toolchains = "register_coreutils_toolchains",

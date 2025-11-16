@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@foo//:@aspect-test/a/package_json.bzl", "bin")
 load("@foo//:defs.bzl", "js_run_binary")
 
