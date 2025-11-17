@@ -254,7 +254,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     # Generate the store_bzl and associated links_* code for every npm package
     for (i, _import) in enumerate(npm_imports):
-        defs_bzl = "@%s%s//:defs.bzl" % (_import.name, utils.links_repo_suffix)
+        defs_bzl = "@%s%s//:defs.bzl" % (_import.repo_name, utils.links_repo_suffix)
         if _import.link_packages:
             defs_bzl_header.append(
                 """load("{defs_bzl}", link_{i} = "npm_link_imported_package_store_internal", store_{i} = "npm_imported_package_store_internal")""".format(
@@ -333,7 +333,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                             name = link_alias,
                             src = ":{}/{}".format(link_alias, _PACKAGE_JSON_BZL_FILENAME),
                             dep = "@{repo_name}//:{package_name}_bzl_library".format(
-                                repo_name = helpers.to_apparent_repo_name(_import.name),
+                                repo_name = helpers.to_apparent_repo_name(_import.repo_name),
                                 package_name = link_alias.split("/")[-1],
                             ),
                         ))
@@ -342,7 +342,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 for link_alias in link_aliases:
                     package_json_bzl_file_path = "{}/{}/{}".format(link_package, link_alias, _PACKAGE_JSON_BZL_FILENAME) if link_package else "{}/{}".format(link_alias, _PACKAGE_JSON_BZL_FILENAME)
                     repo_package_json_bzl = "@{repo_name}//:{package_json_bzl}".format(
-                        repo_name = _import.name,
+                        repo_name = _import.repo_name,
                         package_json_bzl = _PACKAGE_JSON_BZL_FILENAME,
                     )
                     rctx_files[package_json_bzl_file_path] = [_BIN_TMPL.format(
