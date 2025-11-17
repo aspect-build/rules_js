@@ -38,7 +38,7 @@ expected_packages = {
             "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw==",
         },
     },
-    "file:lodash-4.17.21.tgz": {
+    "lodash@file:lodash-4.17.21.tgz": {
         "name": "lodash",
         "dependencies": {},
         "optional_dependencies": {},
@@ -101,15 +101,9 @@ def _parse_lockfile_v9_test_impl(ctx):
 }
 """, False, False)
 
-    # NOTE: unknown properties in >=v9, convert to <v9 defaults for test assertions
-    v9_expected_packages = dict(expected_packages)
-    v9_expected_packages["@aspect-test/a@5.0.0"] = dict(v9_expected_packages["@aspect-test/a@5.0.0"])
-    v9_expected_packages["lodash@file:lodash-4.17.21.tgz"] = dict(v9_expected_packages["file:lodash-4.17.21.tgz"])
-    v9_expected_packages.pop("file:lodash-4.17.21.tgz")  # renamed with lodash@ in v9
-
     expected = (
         expected_importers,
-        v9_expected_packages,
+        expected_packages,
         {},
         None,
     )
