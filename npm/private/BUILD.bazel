@@ -40,10 +40,10 @@ bzl_library(
         "//js:libs",
         "//js:providers",
         "@aspect_bazel_lib//lib:copy_to_directory",
-        "@aspect_bazel_lib//lib:jq",
         "@aspect_bazel_lib//tools:version",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:versions",
+        "@jq.bzl//jq",
     ],
 )
 
