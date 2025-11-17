@@ -1,5 +1,0 @@
-bazel-bin
-bazel-out
-bazel-testlogs
-bazel-workspace
-external
