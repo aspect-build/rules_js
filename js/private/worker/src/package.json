@@ -1,6 +1,7 @@
 {
     "dependencies": {
-        "google-protobuf": "3.21.4"
+        "google-protobuf": "3.21.4",
+        "tslib": "2.8.1"
     },
     "devDependencies": {
         "rollup": "4.39.0",
@@ -10,8 +11,6 @@
         "@types/google-protobuf": "3.15.12",
         "@rollup/plugin-typescript": "12.1.2",
         "@types/node": "18.19.54",
-        "typescript": "^5.8.0",
-        "tslib": "2.8.1",
-        "abortcontroller-polyfill": "1.7.5"
+        "typescript": "^5.8.0"
     }
 }
