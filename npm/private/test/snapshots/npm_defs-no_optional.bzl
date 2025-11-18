@@ -593,7 +593,7 @@ load("@npm-no_optional__math-intrinsics__1.1.0__links//:defs.bzl", store_589 = "
 load("@npm-no_optional__math-log2__1.0.1__links//:defs.bzl", store_590 = "npm_imported_package_store_internal")
 load("@npm-no_optional__mathjs__11.4.0__links//:defs.bzl", link_591 = "npm_link_imported_package_store_internal", store_591 = "npm_imported_package_store_internal")
 load("@npm-no_optional__md5__2.3.0__links//:defs.bzl", store_592 = "npm_imported_package_store_internal")
-load("@npm-no_optional__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq__links//:defs.bzl", link_593 = "npm_link_imported_package_store_internal", store_593 = "npm_imported_package_store_internal")
+load("@npm-no_optional__meaning-of-life__1.0.0_1287509853__links//:defs.bzl", link_593 = "npm_link_imported_package_store_internal", store_593 = "npm_imported_package_store_internal")
 load("@npm-no_optional__media-query-parser__2.0.2__links//:defs.bzl", store_594 = "npm_imported_package_store_internal")
 load("@npm-no_optional__merge-stream__2.0.0__links//:defs.bzl", store_595 = "npm_imported_package_store_internal")
 load("@npm-no_optional__mime-db__1.52.0__links//:defs.bzl", store_596 = "npm_imported_package_store_internal")
