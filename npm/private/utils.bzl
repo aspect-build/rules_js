@@ -1,7 +1,7 @@
 "Utility functions for npm rules"
 
-load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@bazel_lib//lib:paths.bzl", "relative_file")
+load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"

@@ -1,5 +1,5 @@
-load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
 load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("@bazel_lib//lib:output_files.bzl", "output_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 

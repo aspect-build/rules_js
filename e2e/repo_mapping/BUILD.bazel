@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:output_files.bzl", "output_files")
+load("@bazel_lib//lib:output_files.bzl", "output_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm__uvu__0.5.6__links//:defs.bzl", npm_link_types_node = "npm_link_imported_package")

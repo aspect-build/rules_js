@@ -1,7 +1,7 @@
 """`js_library` helper functions.
 """
 
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
+load("@bazel_lib//lib:copy_to_bin.bzl", "copy_file_to_bin_action")
 load(":js_info.bzl", "JsInfo")
 
 def gather_transitive_sources(sources, targets):

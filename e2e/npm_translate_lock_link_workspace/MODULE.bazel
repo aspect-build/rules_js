@@ -6,7 +6,7 @@ local_path_override(
     path = "../..",
 )
 
-bazel_dep(name = "aspect_bazel_lib", version = "2.21.1")
+bazel_dep(name = "bazel_lib", version = "3.0.0", dev_dependency = True)
 
 npm = use_extension(
     "@aspect_rules_js//npm:extensions.bzl",

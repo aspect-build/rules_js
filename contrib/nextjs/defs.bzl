@@ -44,9 +44,9 @@ For [standalone applications](https://nextjs.org/docs/app/api-reference/config/n
   [standalone directory structure guidelines](https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files)
 """
 
-load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
-load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
-load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@bazel_lib//lib:directory_path.bzl", "directory_path")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_run_devserver")
 
 # The Next.js output directory which is not configurable

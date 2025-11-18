@@ -1,6 +1,6 @@
 """Starlark helpers for npm_translate_lock."""
 
-load("@aspect_bazel_lib//lib:base64.bzl", "base64")
+load("@bazel_lib//lib:base64.bzl", "base64")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")

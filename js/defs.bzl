@@ -31,7 +31,7 @@ load(
 def js_binary(**kwargs):
     _js_binary(
         enable_runfiles = select({
-            Label("@aspect_bazel_lib//lib:enable_runfiles"): True,
+            Label("@bazel_lib//lib:enable_runfiles"): True,
             "//conditions:default": False,
         }),
         **kwargs
@@ -41,7 +41,7 @@ def js_binary(**kwargs):
 def js_test(**kwargs):
     _js_test(
         enable_runfiles = select({
-            Label("@aspect_bazel_lib//lib:enable_runfiles"): True,
+            Label("@bazel_lib//lib:enable_runfiles"): True,
             "//conditions:default": False,
         }),
         **kwargs
