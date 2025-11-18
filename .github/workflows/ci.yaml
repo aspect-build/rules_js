@@ -143,13 +143,13 @@ jobs:
                       config: local
                     - bazel-version:
                           major: 7
-                          version: 7.4.0
+                          version: 7.7.1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
                     - bazel-version:
                           major: 7
-                          version: 7.4.0
+                          version: 7.7.1
                       os: macos
                       config: local
                       folder: e2e/bzlmod
