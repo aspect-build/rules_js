@@ -33,8 +33,11 @@ def pnpm_repository(name, pnpm_version = DEFAULT_PNPM_VERSION):
         else:
             fail("pnpm_version should be string or tuple, got " + type(pnpm_version))
 
+        key = "{}@{}".format("pnpm", pnpm_version)
+
         _npm_import_rule(
             name = name,
+            key = key,
             integrity = integrity,
             package = "pnpm",
             root_package = "",
@@ -48,6 +51,7 @@ def pnpm_repository(name, pnpm_version = DEFAULT_PNPM_VERSION):
 
         _npm_import_links_rule(
             name = "{}{}".format(name, utils.links_repo_suffix),
+            key = key,
             package = "pnpm",
             root_package = "",
             version = pnpm_version,

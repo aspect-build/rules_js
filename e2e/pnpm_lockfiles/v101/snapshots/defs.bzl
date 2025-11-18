@@ -14,7 +14,7 @@ load("@lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.1__links
 load("@lock-<LOCKVERSION>__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2__links//:defs.bzl", store_11 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_aspect-test_e__1.0.0__links//:defs.bzl", link_12 = "npm_link_imported_package_store_internal", store_12 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_aspect-test_h__1.0.0__links//:defs.bzl", link_13 = "npm_link_imported_package_store_internal", store_13 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_14 = "npm_link_imported_package_store_internal", store_14 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0__foo-jsonify-0.0.0.tgz__links//:defs.bzl", link_14 = "npm_link_imported_package_store_internal", store_14 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_isaacs_cliui__8.0.2__links//:defs.bzl", link_15 = "npm_link_imported_package_store_internal", store_15 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_rollup_plugin-typescript__8.2.1_626159424__links//:defs.bzl", link_16 = "npm_link_imported_package_store_internal", store_16 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_rollup_pluginutils__3.1.0_rollup_2.14.0__links//:defs.bzl", store_17 = "npm_imported_package_store_internal")
@@ -175,7 +175,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package_store_name = "@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
             src = "//projects/c:pkg",
             package = "@scoped/c",
-            version = "file:../projects/c_at_scoped_b_projects+b",
+            version = "file:../projects/c(@scoped/b@projects+b)",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",

@@ -145,7 +145,7 @@ load("@npm__at_esbuild_win32-x64__0.21.5__links//:defs.bzl", store_141 = "npm_im
 load("@npm__at_esbuild_win32-x64__0.24.0__links//:defs.bzl", store_142 = "npm_imported_package_store_internal")
 load("@npm__at_fastify_send__3.3.0__links//:defs.bzl", link_143 = "npm_link_imported_package_store_internal", store_143 = "npm_imported_package_store_internal")
 load("@npm__at_figma_nodegit__0.28.0-figma.3__links//:defs.bzl", link_144 = "npm_link_imported_package_store_internal", store_144 = "npm_imported_package_store_internal")
-load("@npm__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", store_145 = "npm_imported_package_store_internal")
+load("@npm__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0__foo-jsonify-0.0.0.tgz__links//:defs.bzl", store_145 = "npm_imported_package_store_internal")
 load("@npm__at_gar_promisify__1.1.3__links//:defs.bzl", store_146 = "npm_imported_package_store_internal")
 load("@npm__at_gregmagolan_test-a__0.0.1__links//:defs.bzl", store_147 = "npm_imported_package_store_internal")
 load("@npm__at_gregmagolan_test-b__0.0.2__links//:defs.bzl", link_148 = "npm_link_imported_package_store_internal", store_148 = "npm_imported_package_store_internal")

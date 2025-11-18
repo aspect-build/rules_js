@@ -6,36 +6,34 @@ load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:utils.bzl", "utils", "utils_test")
 
 # buildifier: disable=function-docstring
-def test_bazel_name(ctx):
+def test_repo_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "at_scope_pkg_21.1.0_rollup_2.70.2_at_scope_y_1.1.1",
-        utils.bazel_name("@scope/pkg@21.1.0_rollup@2.70.2_@scope/y@1.1.1"),
+        "x__at_scope_pkg__21.1.0_rollup_2.70.2_at_scope_y_1.1.1",
+        utils.package_repo_name("x", "@scope/pkg@21.1.0(rollup@2.70.2)(@scope/y@1.1.1)"),
     )
     asserts.equals(
         env,
-        "at_scope_pkg_21.1.0",
-        utils.bazel_name("@scope/pkg@21.1.0"),
+        "x__at_scope_pkg__21.1.0",
+        utils.package_repo_name("x", "@scope/pkg@21.1.0"),
     )
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
 def test_pnpm_name(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "@scope/y@1.1.1", utils.package_key("@scope/y", "1.1.1"))
-    asserts.equals(env, "@scope+y@1.1.1", utils.package_store_name("@scope/y", "1.1.1"))
-    asserts.equals(env, "@scope+real@1.1.1", utils.package_store_name("@scope/y", "@scope/real@1.1.1"))
+    asserts.equals(env, "registry+@scope+y_1.1.1", utils.package_store_name("registry/@scope/y@1.1.1"))
+    asserts.equals(env, "@scope+y@1.1.1", utils.package_store_name("@scope/y@1.1.1"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
 def test_link_version(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "link:foo"))
-    asserts.equals(env, "@scope+y@file+bar", utils.package_store_name("@scope/y", "file:bar"))
-    asserts.equals(env, "@scope+y@file+..+foo+bar", utils.package_store_name("@scope/y", "file:../foo/bar"))
-
-    # asserts.equals(env, "@scope+y@file+@foo+bar", utils.package_store_name("@scope/y", "file:@foo/bar"))
+    asserts.equals(env, "@scope+y@link+foo", utils.package_store_name("@scope/y@link:foo"))
+    asserts.equals(env, "@scope+y@file+bar", utils.package_store_name("@scope/y@file:bar"))
+    asserts.equals(env, "@scope+y@file+_foo+bar", utils.package_store_name("@scope/y@file:@foo/bar"))
+    asserts.equals(env, "@scope+y@file+..+foo+bar", utils.package_store_name("@scope/y@file:../foo/bar"))
     return unittest.end(env)
 
 def test_friendly_name(ctx):
@@ -45,7 +43,7 @@ def test_friendly_name(ctx):
 
 def test_package_store_name(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "@scope+y@2.1.1", utils.package_store_name("@scope/y", "2.1.1"))
+    asserts.equals(env, "@scope+y@2.1.1", utils.package_store_name("@scope/y@2.1.1"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -127,7 +125,7 @@ def test_npm_registry_download_url(ctx):
     )
     return unittest.end(env)
 
-t1_test = unittest.make(test_bazel_name)
+t1_test = unittest.make(test_repo_name)
 t2_test = unittest.make(test_pnpm_name)
 t3_test = unittest.make(test_friendly_name)
 t4_test = unittest.make(test_package_store_name)

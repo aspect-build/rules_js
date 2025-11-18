@@ -87,31 +87,31 @@ js_binary(name = "sync", entry_point = "noop.js")
 
     # Collect first-party file: links in packages
     fp_links = {}
-    for package_info in packages.values():
+    for package_key, package_info in packages.items():
         name = package_info["name"]
         version = package_info["version"]
         deps = package_info["dependencies"]
         resolution = package_info["resolution"]
         if resolution.get("type", None) == "directory":
             dep_path = helpers.link_package(root_package, resolution["directory"])
-            dep_key = "{}+{}".format(name, version)
             transitive_deps = {}
-            for raw_package, raw_version in deps.items():
-                package_store_name = utils.package_store_name(raw_package, raw_version)
+            for dep_name, dep_key in deps.items():
+                package_store_name = utils.package_store_name(dep_key)
                 dep_store_target = '"//{root_package}:{package_store_root}/node_modules/{package_store_name}"'.format(
                     root_package = root_package,
                     package_store_name = package_store_name,
                     package_store_root = utils.package_store_root,
                 )
                 if dep_store_target not in transitive_deps:
-                    transitive_deps[dep_store_target] = [raw_package]
+                    transitive_deps[dep_store_target] = [dep_name]
                 else:
-                    transitive_deps[dep_store_target].append(raw_package)
+                    transitive_deps[dep_store_target].append(dep_name)
 
-            # collapse link aliases lists into to acomma separated strings
+            # collapse alias lists to comma separated strings for each store target
             for dep_store_target in transitive_deps.keys():
                 transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
-            fp_links[dep_key] = {
+            fp_links[package_key] = {
+                "key": package_key,
                 "package": name,
                 "version": version,
                 "path": dep_path,
@@ -124,57 +124,51 @@ js_binary(name = "sync", entry_point = "noop.js")
         importer = importers[import_path]
         prod_deps = importer["dependencies"] | importer["optional_dependencies"]
         all_deps = prod_deps | importer["dev_dependencies"]
-        for dep_package, dep_version in all_deps.items():
-            is_dev = dep_package not in prod_deps
-            if dep_version.startswith("file:"):
-                dep_key = "{}+{}".format(dep_package, dep_version)
+        for dep_name, dep_key in all_deps.items():
+            is_dev = dep_name not in prod_deps
+            if dep_key.find("@file:") != -1:
                 if not dep_key in fp_links.keys():
                     # Ignore file: dependencies on packages such as file: tarballs
-                    # TODO(3.0): remove with pnpm <v9
-                    if dep_version in packages:
-                        continue
-
-                    # pnpm >=v9 where packages always have name@version
-                    if "{}@{}".format(dep_package, dep_version) in packages:
+                    if dep_key in packages:
                         continue
 
                     msg = "Expected to file: referenced package {} in first-party links {}".format(dep_key, fp_links.keys())
                     fail(msg)
                 if link_package not in fp_links[dep_key]["link_packages"]:
                     fp_links[dep_key]["link_packages"][link_package] = {}
-                fp_links[dep_key]["link_packages"][link_package][dep_package] = is_dev
-            elif dep_version.startswith("link:"):
-                dep_link = dep_version[len("link:"):]
+                fp_links[dep_key]["link_packages"][link_package][dep_name] = is_dev
+            elif dep_key.startswith("link:"):
+                dep_link = utils.link_to_importer(dep_key)
                 dep_path = helpers.link_package(root_package, dep_link)
-                dep_key = "link:{}".format(dep_path)
-                if not fp_links.get(dep_key, False):
+                if not fp_links.get(dep_path, False):
                     transitive_deps = {}
                     raw_deps = {}
                     if importers.get(dep_link, False):
                         raw_deps = importers[dep_link]["dependencies"] | importers[dep_link]["optional_dependencies"]
-                    for raw_package, raw_version in raw_deps.items():
-                        package_store_name = utils.package_store_name(raw_package, raw_version)
+                    for raw_dep_name, raw_dep_key in raw_deps.items():
+                        package_store_name = utils.package_store_name(raw_dep_key)
                         dep_store_target = '"//{root_package}:{package_store_root}/node_modules/{package_store_name}"'.format(
                             root_package = root_package,
                             package_store_name = package_store_name,
                             package_store_root = utils.package_store_root,
                         )
                         if dep_store_target not in transitive_deps:
-                            transitive_deps[dep_store_target] = [raw_package]
+                            transitive_deps[dep_store_target] = [raw_dep_name]
                         else:
-                            transitive_deps[dep_store_target].append(raw_package)
+                            transitive_deps[dep_store_target].append(raw_dep_name)
 
                     for dep_store_target in transitive_deps.keys():
                         transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
 
                     # note this is the (first) name used to reference this package and not
-                    # necessarily the proper self-declared packge name
-                    package = dep_package
+                    # necessarily the proper self-declared package name
+                    package = dep_name
 
                     # rules_js using 0.0.0 to indicate local first-party packages
                     version = "0.0.0"
 
-                    fp_links[dep_key] = {
+                    fp_links[dep_path] = {
+                        "key": "{}@{}".format(package, version),
                         "package": package,
                         "version": version,
                         "path": dep_path,
@@ -182,9 +176,9 @@ js_binary(name = "sync", entry_point = "noop.js")
                         "deps": transitive_deps,
                     }
 
-                if link_package not in fp_links[dep_key]["link_packages"]:
-                    fp_links[dep_key]["link_packages"][link_package] = {}
-                fp_links[dep_key]["link_packages"][link_package][dep_package] = is_dev
+                if link_package not in fp_links[dep_path]["link_packages"]:
+                    fp_links[dep_path]["link_packages"][link_package] = {}
+                fp_links[dep_path]["link_packages"][link_package][dep_name] = is_dev
 
     npm_link_packages_const = """_IMPORTER_PACKAGES = {pkgs}""".format(
         pkgs = str(package_to_importer.keys()),
@@ -351,6 +345,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     # Generate the first-party package stores and linking of first-party packages
     for i, fp_link in enumerate(fp_links.values()):
+        fp_key = fp_link["key"]
         fp_package = fp_link["package"]
         fp_version = fp_link["version"]
         fp_path = fp_link["path"]
@@ -359,7 +354,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             fp_path,
             attr.npm_package_target_name.replace("{dirname}", paths.basename(fp_path)),
         )
-        fp_package_store_name = utils.package_store_name(fp_package, fp_version)
+        fp_package_store_name = utils.package_store_name(fp_key)
 
         # Add first-party package links to npm_link_targets for each package that uses it
         for fp_link_package, aliases in fp_link["link_packages"].items():

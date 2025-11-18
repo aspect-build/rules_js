@@ -12,12 +12,14 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "@aspect-test/a"
 VERSION = "5.0.2"
 _ROOT_PACKAGE = "<LOCKVERSION>"
+_KEY = "@aspect-test/a@5.0.2"
 _PACKAGE_STORE_NAME = "@aspect-test+a@5.0.2"
 
 # Generated npm_imported_package_store_internal() wrapper target for npm package @aspect-test/a@5.0.2
 # buildifier: disable=function-docstring
 def npm_imported_package_store_internal():
     _npm_imported_package_store_internal(
+        key = _KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,

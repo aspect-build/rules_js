@@ -3,6 +3,7 @@
 load(":npm_package_store.bzl", _npm_package_store_lib = "npm_package_store_lib")
 
 _INTERNAL_ATTRS_STORE = _npm_package_store_lib.attrs | {
+    "key": attr.string(mandatory = True),
     "src": attr.label(
         doc = """A target providing a `NpmPackageInfo` or `JsInfo` containing the package sources.
 

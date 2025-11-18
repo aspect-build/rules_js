@@ -12,12 +12,14 @@ load("@aspect_rules_js//npm/private:npm_import.bzl",
 PACKAGE = "unused"
 VERSION = "0.2.2"
 _ROOT_PACKAGE = ""
+_KEY = "unused@0.2.2"
 _PACKAGE_STORE_NAME = "unused@0.2.2"
 
 # Generated npm_imported_package_store_internal() wrapper target for npm package unused@0.2.2
 # buildifier: disable=function-docstring
 def npm_imported_package_store_internal():
     _npm_imported_package_store_internal(
+        key = _KEY,
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,

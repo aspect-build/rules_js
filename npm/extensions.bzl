@@ -200,6 +200,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     for i in imports:
         npm_import(
             name = i.repo_name,
+            key = i.package_key,
             bins = i.bins,
             commit = i.commit,
             custom_postinstall = i.custom_postinstall,
@@ -235,8 +236,12 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     return imports
 
 def _npm_import_bzlmod(i):
+    # Assume package+version is a unique key for any package store this import is placed in
+    package_key = "{}@{}".format(i.package, i.version)
+
     npm_import(
         name = i.name,
+        key = package_key,
         generate_package_json_bzl = True,  # Always generate package_json.bzl explicitly declared imports
         generate_bzl_library_targets = None,
         extract_full_archive = None,

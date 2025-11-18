@@ -74,7 +74,7 @@ load("@npm-no_optional__at_discoveryjs_json-ext__0.5.7__links//:defs.bzl", store
 load("@npm-no_optional__at_emotion_hash__0.9.2__links//:defs.bzl", store_71 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_fastify_send__3.3.0__links//:defs.bzl", link_72 = "npm_link_imported_package_store_internal", store_72 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_figma_nodegit__0.28.0-figma.3__links//:defs.bzl", link_73 = "npm_link_imported_package_store_internal", store_73 = "npm_imported_package_store_internal")
-load("@npm-no_optional__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz__links//:defs.bzl", store_74 = "npm_imported_package_store_internal")
+load("@npm-no_optional__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0__foo-jsonify-0.0.0.tgz__links//:defs.bzl", store_74 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_gar_promisify__1.1.3__links//:defs.bzl", store_75 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_gregmagolan_test-a__0.0.1__links//:defs.bzl", store_76 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_gregmagolan_test-b__0.0.2__links//:defs.bzl", link_77 = "npm_link_imported_package_store_internal", store_77 = "npm_imported_package_store_internal")

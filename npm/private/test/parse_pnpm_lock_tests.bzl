@@ -18,8 +18,8 @@ def _parse_empty_lock_test_impl(ctx):
 expected_importers = {
     ".": {
         "dependencies": {
-            "@aspect-test/a": "5.0.0",
-            "lodash": "file:lodash-4.17.21.tgz",
+            "@aspect-test/a": "@aspect-test/a@5.0.0",
+            "lodash": "lodash@file:lodash-4.17.21.tgz",
         },
         "dev_dependencies": {},
         "optional_dependencies": {},

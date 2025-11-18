@@ -10,74 +10,127 @@ DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
+# Maximum length of peer dependency string before hashing to prevent long paths
+_MAX_PEER_DEP_LENGTH = 32
+
+# A unique separator for link: dependencies to separate the link name vs path
+_LINK_SEPARATOR = "|"
+
 def _sorted_map(m):
     # TODO(zbarsky): maybe faster as `dict(sorted(m.items()))`?
     return {k: m[k] for k in sorted(m.keys())}
 
-def _sanitize_rule_name(string):
+def _importer_to_link(package, path):
+    # Convert a pnpm-workspace relative path to a link: key
+    return "link:{}{}{}".format(package, _LINK_SEPARATOR, path)
+
+def _link_to_importer(link):
+    # Convert a link: key to a pnpm-workspace relative path
+    p_idx = link.find(_LINK_SEPARATOR)
+    if p_idx == -1 or not link.startswith("link:"):
+        msg = "invalid link dependency key '{}'".format(link)
+        fail(msg)
+    return link[p_idx + 1:]
+
+def _link_to_alias(link):
+    # Convert a link: key to the link alias (package name)
+    p_idx = link.find(_LINK_SEPARATOR)
+    if p_idx == -1 or not link.startswith("link:"):
+        msg = "invalid link dependency key '{}'".format(link)
+        fail(msg)
+    return link[5:p_idx]
+
+def _package_store_name(s):
+    # Target names may contain only A-Z, a-z, 0-9, '-', '_', '.', '+', '@' and probably more.
+    # Package target names handle '/' and other characters unique to better represent npm packages.
+
+    # TODO(3.0): simplify and stop trying to be backwards compatible with 2.x
+
+    # Convert link: to {name}@0.0.0 for naming of local workspace packages
+    if s.startswith("link:"):
+        s = _link_to_alias(s) + "@0.0.0"
+
+    version_index = s.find("@", 1)
+    peers_index = s.find("(", version_index)
+    if peers_index != -1:
+        # TODO(3.0): "patch_hash=" removal to align hashes with pnpm <v9
+        s = s.replace("(patch_hash=", "(")
+
+        if len(s) - peers_index > _MAX_PEER_DEP_LENGTH:
+            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
+            # peer deps so we must hash here to prevent extremely long file paths that lead to
+            # "File name too long" build failures.
+            s = s[:peers_index] + "_" + _hash(s[peers_index:]).lstrip("-")
+
+    r = ""
+    for i, c in enumerate(s.elems()):
+        if (c == "/" or c == ":") and (peers_index == -1 or i <= peers_index):
+            # use "+" for package name or version / (such as @scoped/pkg or file:path separators)
+            if r and r[-1] != "+":
+                r += "+"
+        elif c == "@" and i > version_index:
+            if r and r[-1] != "_":
+                # use "_" for version @ in peers
+                r += "_"
+            if s[i - 1] == "(":
+                # use "at" for scope @ in peers
+                r += "at_"
+        elif not c.isalnum() and c != "-" and c != "_" and c != "." and c != "+" and c != "@":
+            r += "_"
+        else:
+            r += c
+
+    r = r.rstrip("_-.")
+
+    return r
+
+def _package_repo_name(prefix, s):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
-    result = ""
-    for c in string.elems():
-        if c == "@" and (not result or result[-1] == "_"):
-            result += "at"
-        if not c.isalnum() and c != "-" and c != "_" and c != ".":
-            c = "_"
-        result += c
-    return result.strip("_-")
+    # Package repo names handle '/' and other characters unique to better represent npm packages.
 
-def _bazel_name(name, version = None):
-    "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
-    escaped_name = _sanitize_rule_name(name)
-    if not version:
-        return escaped_name
+    # TODO(3.0): simplify and stop trying to be backwards compatible with 2.x
 
-    # Separate name + version with extra _
-    return "%s__%s" % (escaped_name, _sanitize_rule_name(version))
+    version_index = s.find("@", 1)
+    peers_index = s.find("(", version_index)
 
-def _package_key(name, version):
-    "Make a name/version pnpm-style name for a package name and version"
-    return "%s@%s" % (name, version)
+    peer_suffix = ""
+    if peers_index != -1:
+        peer_dep = s[peers_index:]
+        s = s[:peers_index]
+
+        # TODO(3.0): "patch_hash=" removal to align hashes with pnpm <v9
+        peer_dep = peer_dep.replace("(patch_hash=", "(")
+
+        if len(peer_dep) > _MAX_PEER_DEP_LENGTH:
+            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
+            # peer deps so we must hash here to prevent extremely long file paths that lead to
+            # "File name too long" build failures.
+            peer_suffix = "_" + _hash(peer_dep).lstrip("-")
+        else:
+            peer_suffix = peer_dep.replace("(@", "(at_").replace(")(", "_").replace("@", "_").replace("/", "_").replace("(", "_").replace(")", "_")
+
+    r = prefix + "__"
+    for i, c in enumerate(s.elems()):
+        if i == version_index:
+            # Separate package name and version with double underscore
+            r += "__"
+        elif c == "@" and (i == 0 or s[i - 1] == "("):
+            # Replace scope and peer/patch separator with 'at_'
+            if r and r[-1] != "_":
+                r += "_"
+            r += "at_"
+        elif not c.isalnum() and c != "-" and c != "_" and c != ".":
+            r += "_"
+        else:
+            r += c
+
+    r += peer_suffix
+
+    return r.rstrip("_-.")
 
 def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
-
-def _escape_target_name(name):
-    return name.replace("://", "/").replace("/", "+").replace(":", "+")
-
-def _package_store_name(pnpm_name, pnpm_version):
-    "Make a package store name for a given package and version"
-
-    if pnpm_version.startswith("link:"):
-        # Distinguish local links a 0.0.0 version. This is unlike pnpm which symlinks
-        # local links into the source tree instead of storing them in the package store.
-        name = pnpm_name
-        version = "0.0.0"
-    elif pnpm_version.startswith("npm:"):
-        name, version = pnpm_version[4:].rsplit("@", 1)
-    else:
-        name = pnpm_name
-        version = pnpm_version
-
-    # TODO(3.0): the version should already be the store name to remove this pnpm lockfile
-    # logic of knowing/guessing when a version is already a store name.
-
-    at_index = version.find("@")
-    proto_indx = version.find("://")
-    if at_index == 0:
-        # Special case where the package name should _not_ be included in the package store name.
-        # See https://github.com/aspect-build/rules_js/issues/423 for more context.
-        return _escape_target_name(version)
-    elif at_index > 0 and (proto_indx == -1 or at_index < proto_indx):
-        # A package key containing an @ in the version is most likely already a full package store name
-        # such as 'name@version' or 'name@version(peer/patch-info)'.
-        # However there are odd edge cases such as `https://blah.com/@scope/name` where an @ may be in the
-        # version specifier, but if the underlying package name == 'name' the 'name@' prefix must
-        # still be prepended.
-        return _escape_target_name(version)
-    else:
-        # Otherwise assume a simple name+value and the package store name is name@version
-        return "%s@%s" % (_escape_target_name(name), _escape_target_name(version))
 
 def _make_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
@@ -110,8 +163,7 @@ def _npm_registry_download_url(package, version, registries, default_registry):
         registry.removesuffix("/"),
         package,
         package_name_no_scope,
-        # Strip the rules_js peer/patch metadata off the version. See pnpm.bzl
-        version[:version.find("_")] if version.find("_") != -1 else version,
+        version,
     )
 
 def _is_git_repository_url(url):
@@ -254,10 +306,11 @@ def _is_tarball_extension(ext):
     return ext in tarball_extensions
 
 utils = struct(
-    bazel_name = _bazel_name,
     sorted_map = _sorted_map,
-    package_key = _package_key,
     friendly_name = _friendly_name,
+    link_to_importer = _link_to_importer,
+    importer_to_link = _importer_to_link,
+    package_repo_name = _package_repo_name,
     package_store_name = _package_store_name,
     make_symlink = _make_symlink,
     # Symlinked node_modules structure package store path under node_modules

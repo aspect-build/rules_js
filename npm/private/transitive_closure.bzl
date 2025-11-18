@@ -15,12 +15,12 @@ def gather_transitive_closure(packages, package, cache = {}):
         cache: a dictionary of results from previous invocations
 
     Returns:
-        A dictionary of transitive dependencies, mapping package names to dependent versions.
+        A dictionary of transitive dependencies, mapping package keys to package names/aliases
     """
     root_package = packages[package]
 
     transitive_closure = {}
-    transitive_closure[root_package["name"]] = [root_package["version"]]
+    transitive_closure[package] = [root_package["name"]]
 
     stack = [_get_package_info_deps(root_package)]
     iteration_max = 999999
@@ -31,37 +31,29 @@ def gather_transitive_closure(packages, package, cache = {}):
             msg = "gather_transitive_closure exhausted the iteration limit of {} - please report this issue".format(iteration_max)
             fail(msg)
         deps = stack.pop()
-        for name in deps.keys():
-            version = deps[name]
-            if version.startswith("npm:"):
-                # an aliased dependency
-                package_key = version[4:]
-                name, version = package_key.rsplit("@", 1)
-            elif version not in packages:
-                package_key = utils.package_key(name, version)
-            else:
-                package_key = version
-            transitive_closure[name] = transitive_closure.get(name, [])
-            if version in transitive_closure[name]:
+        for name, dep_key in deps.items():
+            transitive_closure[dep_key] = transitive_closure.get(dep_key, [])
+            if name in transitive_closure[dep_key]:
                 continue
-            transitive_closure[name].append(version)
-            if version.startswith("link:"):
+            transitive_closure[dep_key].append(name)
+
+            if dep_key.startswith("link:"):
                 # we don't need to drill down through first-party links for the transitive closure since there are no cycles
                 # allowed in first-party links
                 continue
 
-            if package_key in cache:
+            if dep_key in cache:
                 # Already computed for this dep, merge the cached results
-                for transitive_name in cache[package_key].keys():
+                for transitive_name in cache[dep_key].keys():
                     transitive_closure[transitive_name] = transitive_closure.get(transitive_name, [])
-                    for transitive_version in cache[package_key][transitive_name]:
+                    for transitive_version in cache[dep_key][transitive_name]:
                         if transitive_version not in transitive_closure[transitive_name]:
                             transitive_closure[transitive_name].append(transitive_version)
-            elif package_key in packages:
+            elif dep_key in packages:
                 # Recurse into the next level of dependencies
-                stack.append(_get_package_info_deps(packages[package_key]))
+                stack.append(_get_package_info_deps(packages[dep_key]))
             else:
-                msg = "Unknown package key: {} ({} @ {}) in {}".format(package_key, name, version, packages.keys())
+                msg = "Unknown package key: {} in {}".format(dep_key, packages.keys())
                 fail(msg)
 
     return utils.sorted_map(transitive_closure)
