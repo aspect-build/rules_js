@@ -130,10 +130,6 @@ jobs:
                     # Don't run tests with Bazel 8 by default
                     - bazel-version:
                           major: 8
-                    # TODO: js_image_oci with bazel 7.6.1 and non-bzlmod fails
-                    - bazel-version:
-                          major: 7
-                      folder: e2e/js_image_oci
                 include:
                     # Include unit tests with bazel8
                     - bazel-version:
