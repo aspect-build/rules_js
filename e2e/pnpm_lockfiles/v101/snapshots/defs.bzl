@@ -51,7 +51,7 @@ load("@lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", link_47 = "npm_link
 load("@lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_48 = "npm_link_imported_package_store_internal", store_48 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_49 = "npm_link_imported_package_store_internal", store_49 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_50 = "npm_link_imported_package_store_internal", store_50 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__meaning-of-life__1.0.0_1541309197__links//:defs.bzl", link_51 = "npm_link_imported_package_store_internal", store_51 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__meaning-of-life__1.0.0_124257499__links//:defs.bzl", link_51 = "npm_link_imported_package_store_internal", store_51 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_52 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_53 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_54 = "npm_imported_package_store_internal")
@@ -172,7 +172,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_69()
         store_70()
         _npm_local_package_store(
-            package_store_name = "@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
+            package_store_name = "@scoped+c@file+..+projects+c_@scoped+b@projects+b",
             src = "//projects/c:pkg",
             package = "@scoped/c",
             version = "file:../projects/c(@scoped/b@projects+b)",
@@ -245,7 +245,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             version = "0.0.0",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+c@2.0.0": "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.0": "@aspect-test/d",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0": "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -257,7 +257,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             version = "0.0.0",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+c@2.0.1": "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.1": "@aspect-test/d",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.1": "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -660,7 +660,7 @@ def _fp_link_0(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/c" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package

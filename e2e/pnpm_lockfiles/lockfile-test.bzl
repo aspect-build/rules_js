@@ -137,7 +137,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/scoped/bad",
             ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_at_scoped_b_projects%sb" % ("_" if lock_version == "v54" else "+"),  # is declared as a file: instead of link:
+            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
 
             # file: 4.17.21.tgz tarbal
@@ -201,14 +201,14 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc",
 
             # Patched dependencies
-            ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_%s" % ("1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
-            "@%s__meaning-of-life__1.0.0_%s//:pkg" % (lock_repo, "1541309197" if lock_version == "v101" else "o3deharooos255qt5xdujc3cuq"),
+            ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_%s" % ("1287509853" if lock_version == "v90" else "124257499"),
+            "@%s__meaning-of-life__1.0.0_%s//:pkg" % (lock_repo, "1287509853" if lock_version == "v90" else "124257499"),
 
             # Direct deps from custom registry
             ":.aspect_rules_js/node_modules/@types+node@18.19.54",
 
             # Direct deps with peers
-            ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2",
+            ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0",
             "@%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2//:pkg" % lock_repo,
         ],
     )

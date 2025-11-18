@@ -67,7 +67,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
-            package_store_name = "vendored-b@file+vendored+b_at_lib_b_lib+b",
+            package_store_name = "vendored-b@file+vendored+b_@lib+b@lib+b",
             src = "//vendored/b:pkg",
             package = "vendored-b",
             version = "file:vendored/b(@lib/b@lib+b)",
@@ -86,7 +86,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "//:.aspect_rules_js/node_modules/@aspect-test+e@1.0.0": "@aspect-test/e",
                 "//:.aspect_rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
                 "//:.aspect_rules_js/node_modules/vendored-a@file+vendored+a": "vendored-a",
-                "//:.aspect_rules_js/node_modules/vendored-b@file+vendored+b_at_lib_b_lib+b": "vendored-b",
+                "//:.aspect_rules_js/node_modules/vendored-b@file+vendored+b_@lib+b@lib+b": "vendored-b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -120,7 +120,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@lib/d",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_at_aspect-test_c_2.0.2": "@aspect-test/d",
+                "//:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2": "@aspect-test/d",
                 "//:.aspect_rules_js/node_modules/@types+node@18.19.54": "alias-2",
             },
             visibility = ["//visibility:public"],
@@ -370,7 +370,7 @@ def _fp_link_1(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/vendored-b" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/vendored-b@file+vendored+b_at_lib_b_lib+b",
+        src = "//:.aspect_rules_js/node_modules/vendored-b@file+vendored+b_@lib+b@lib+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/a" package

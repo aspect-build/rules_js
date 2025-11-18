@@ -40,43 +40,37 @@ def _link_to_alias(link):
         fail(msg)
     return link[5:p_idx]
 
+def _package_shorten_peers(s):
+    version_index = s.find("@", 1)
+    peers_index = s.find("(", version_index)
+    if peers_index != -1:
+        if len(s) - peers_index > _MAX_PEER_DEP_LENGTH:
+            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
+            # peer deps so we must hash here to prevent extremely long file paths that lead to
+            # "File name too long" build failures in bazel
+            s = s[:peers_index] + "_" + _hash(s[peers_index:]).lstrip("-")
+    return s
+
 def _package_store_name(s):
     # Target names may contain only A-Z, a-z, 0-9, '-', '_', '.', '+', '@' and probably more.
-    # Package target names handle '/' and other characters unique to better represent npm packages.
-
-    # TODO(3.0): simplify and stop trying to be backwards compatible with 2.x
+    # Package store target names try to align with pnpm v9+ store naming conventions.
+    # Compare with the pnpm v9+ virtual store before modifying.
 
     # Convert link: to {name}@0.0.0 for naming of local workspace packages
     if s.startswith("link:"):
         s = _link_to_alias(s) + "@0.0.0"
-
-    version_index = s.find("@", 1)
-    peers_index = s.find("(", version_index)
-    if peers_index != -1:
-        # TODO(3.0): "patch_hash=" removal to align hashes with pnpm <v9
-        s = s.replace("(patch_hash=", "(")
-
-        if len(s) - peers_index > _MAX_PEER_DEP_LENGTH:
-            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
-            # peer deps so we must hash here to prevent extremely long file paths that lead to
-            # "File name too long" build failures.
-            s = s[:peers_index] + "_" + _hash(s[peers_index:]).lstrip("-")
+    else:
+        s = _package_shorten_peers(s)
 
     r = ""
-    for i, c in enumerate(s.elems()):
-        if (c == "/" or c == ":") and (peers_index == -1 or i <= peers_index):
-            # use "+" for package name or version / (such as @scoped/pkg or file:path separators)
-            if r and r[-1] != "+":
-                r += "+"
-        elif c == "@" and i > version_index:
-            if r and r[-1] != "_":
-                # use "_" for version @ in peers
-                r += "_"
-            if s[i - 1] == "(":
-                # use "at" for scope @ in peers
-                r += "at_"
+    for c in s.elems():
+        if (c == "/" or c == ":"):
+            # use "+" path/protocol symbols like pnpm
+            r += "+"
         elif not c.isalnum() and c != "-" and c != "_" and c != "." and c != "+" and c != "@":
-            r += "_"
+            # use "_" for all other other characters not friendly with target names
+            if r and r[-1] != "_":
+                r += "_"
         else:
             r += c
 
@@ -88,26 +82,12 @@ def _package_repo_name(prefix, s):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
     # Package repo names handle '/' and other characters unique to better represent npm packages.
 
-    # TODO(3.0): simplify and stop trying to be backwards compatible with 2.x
+    # link: packages are not supported
+    if s.startswith("link:"):
+        fail("link: packages should not be repositories")
 
+    s = _package_shorten_peers(s)
     version_index = s.find("@", 1)
-    peers_index = s.find("(", version_index)
-
-    peer_suffix = ""
-    if peers_index != -1:
-        peer_dep = s[peers_index:]
-        s = s[:peers_index]
-
-        # TODO(3.0): "patch_hash=" removal to align hashes with pnpm <v9
-        peer_dep = peer_dep.replace("(patch_hash=", "(")
-
-        if len(peer_dep) > _MAX_PEER_DEP_LENGTH:
-            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
-            # peer deps so we must hash here to prevent extremely long file paths that lead to
-            # "File name too long" build failures.
-            peer_suffix = "_" + _hash(peer_dep).lstrip("-")
-        else:
-            peer_suffix = peer_dep.replace("(@", "(at_").replace(")(", "_").replace("@", "_").replace("/", "_").replace("(", "_").replace(")", "_")
 
     r = prefix + "__"
     for i, c in enumerate(s.elems()):
@@ -119,12 +99,12 @@ def _package_repo_name(prefix, s):
             if r and r[-1] != "_":
                 r += "_"
             r += "at_"
+        elif c == ")":
+            pass  # skip closing peer/patch parentheses
         elif not c.isalnum() and c != "-" and c != "_" and c != ".":
             r += "_"
         else:
             r += c
-
-    r += peer_suffix
 
     return r.rstrip("_-.")
 

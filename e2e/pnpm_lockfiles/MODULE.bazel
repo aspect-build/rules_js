@@ -88,7 +88,7 @@ npm = use_extension(
         # Dep with patch
         "lock-%s__meaning-of-life__1.0.0_%s" % (
             version,
-            "1541309197" if version == "v101" else "o3deharooos255qt5xdujc3cuq",
+            "1287509853" if version == "v90" else "124257499",
         ),
 
         # Vendored tarball
