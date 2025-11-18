@@ -41,7 +41,6 @@ jobs:
                     .
                     e2e/bzlmod
                     e2e/gyp_no_install_script
-                    e2e/js_image_docker
                     e2e/js_image_oci
                     e2e/js_run_devserver
                     e2e/npm_link_package
@@ -131,12 +130,6 @@ jobs:
                     # Don't run tests with Bazel 8 by default
                     - bazel-version:
                           major: 8
-                    # rules_docker is not compatible with Bazel 7
-                    - bazel-version:
-                          major: 7
-                      folder: e2e/js_image_docker
-                    # TODO: un-exclude the following bzlmod tests once they work
-                    - folder: e2e/js_image_docker
                     # TODO: js_image_oci with bazel 7.6.1 and non-bzlmod fails
                     - bazel-version:
                           major: 7
