@@ -2,8 +2,6 @@
 
 The `js_image_layer` rule returns `tar` artifacts, suitable to include in the `tars` attribute of the `oci_image` rule from rules_oci.
 
-For an example using rules_docker rather than rules_oci, see the js_image_docker folder next to this one.
-
 ## Fine-grained layering
 
 `js_image_layer` is a macro that yields two tar files `app.tar` and `node_modules.tar`. While `app.tar` contains first-party sources, `node_modules.tar` contains all third-party dependencies.
