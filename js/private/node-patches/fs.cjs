@@ -268,9 +268,13 @@ function patcher(roots, useInternalLstatPatch = false) {
                             // The escape from the root is not mappable back into the root; throw EINVAL
                             return cb(enoent('readlink', args[0]));
                         }
-                        else {
+                        else if (!useInternalLstatPatch) {
                             // The escape from the root is not mappable back into the root; throw EINVAL
                             return cb(einval('readlink', args[0]));
+                        }
+                        else {
+                            // TODO: why does this only apply when useInternalLstatPatch is true?
+                            return cb(null, str);
                         }
                     }
                     const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
