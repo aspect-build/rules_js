@@ -611,23 +611,27 @@ def _verify_lifecycle_hooks_specified(_, state):
         return
 
     if state.only_built_dependencies() == None:
-        fail("""\
-ERROR: pnpm.onlyBuiltDependencies required in pnpm workspace root package.json when using pnpm v9 or later
+        msg = """\
+ERROR: pnpm 'onlyBuiltDependencies' configuration required when using pnpm v9 or later.
 
-The root package.json must be alongside the pnpm-lock.yaml file and contain a pnpm.onlyBuiltDependencies and
-will be automatically detected even if not explicitly added to data attribute.
+Packages that rules_js should generate lifecycle hook actions for must be declared in
+'onlyBuiltDependencies'.
 
-As of pnpm v9, the lockfile no longer specifies if packages have lifecycle hooks.
+As of pnpm v10 'onlyBuiltDependencies' should be configured in the pnpm-workspace.yaml file
+alongside other pnpm configuration. See https://pnpm.io/10.x/settings#onlybuiltdependencies
+for more information.
 
-Packages that rules_js should generate lifecycle hook actions for must now be declared in
-pnpm.onlyBuiltDependencies in the pnpm workspace root package.json. See
-https://pnpm.io/package_json#pnpmonlybuiltdependencies for more information.
+In pnpm v9 and earlier 'onlyBuiltDependencies' is configured in the root package.json
+pnpm.onlyBuiltDependencies. The root package.json must be alongside the pnpm-lock.yaml file
+and will be automatically detected even if not explicitly added to data attribute.
+See https://pnpm.io/9.x/package_json#pnpmonlybuiltdependencies for more information.
 
 Prior to pnpm v9, rules_js keyed off of the requiresBuild attribute in the pnpm lock
 file to determine if a lifecycle hook action should be generated for an npm package.
 See [pnpm #7707](https://github.com/pnpm/pnpm/issues/7707) for the reasons that pnpm
 removed the requiresBuild attribute from the lockfile in v9.
-""")
+"""
+        fail(msg)
 
 ################################################################################
 def _verify_patches(rctx, state):
