@@ -641,9 +641,31 @@ def _assert_lockfile_version(version, testonly = False):
         fail(msg)
     return msg
 
+def _parse_pnpm_workspace_json(content):
+    """Parse the content of a pnpm-workspace.yaml file.
+
+    Args:
+        content: pnpm-workspace.yaml file content as json
+
+    Returns:
+        A tuple of (packages list, error string)
+    """
+    if not content:
+        return {}, None
+
+    parsed = json.decode(content)
+    if not parsed:
+        return {}, None
+
+    if not types.is_dict(parsed):
+        return None, "pnpm-workspace should be a starlark dict"
+
+    return parsed, None
+
 pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
+    parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
 )
 
 # Exported only to be tested
