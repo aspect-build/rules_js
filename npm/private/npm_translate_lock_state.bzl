@@ -56,7 +56,8 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         _init_patched_dependencies_labels(priv, rctx, attr, label_store)
 
     # May depend on lockfile state
-    _init_root_package(priv, rctx, attr, label_store)
+    _init_root_package(priv, attr, label_store)
+    _init_workspace(priv, rctx, attr, label_store, is_windows)
 
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
@@ -191,7 +192,7 @@ def _init_external_repository_action_cache(priv, attr):
     priv["external_repository_action_cache"] = attr.external_repository_action_cache if attr.external_repository_action_cache else utils.default_external_repository_action_cache()
 
 ################################################################################
-def _init_root_package(priv, rctx, attr, label_store):
+def _init_root_package(priv, attr, label_store):
     pnpm_lock_label = label_store.label("pnpm_lock")
 
     # use the directory of the pnpm_lock file as the root_package unless overridden by the root_package attribute
@@ -208,19 +209,51 @@ def _init_root_package(priv, rctx, attr, label_store):
             fail("root_package cannot be overridden if there are pnpm workspace packages specified")
         priv["root_package"] = attr.root_package
 
-    # Load a declared root package.json
+def _init_workspace(priv, rctx, attr, label_store, is_windows):
+    root_package_json = {}
+
+    # Load pnpm settings from root package.json for pnpm <= v9.
     if label_store.has("package_json_root"):
+        # Load a declared root package.json
         root_package_json_path = label_store.path("package_json_root")
-        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
+        root_package_json = json.decode(rctx.read(root_package_json_path))
     elif "." in priv["importers"].keys():
         # Load an undeclared package.json derived from the root importer in the lockfile
         label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
         root_package_json_path = label_store.path("package_json_root")
-        priv["root_package_json"] = json.decode(rctx.read(root_package_json_path))
-    else:
-        # if there is no root importer that means there is no root package.json to read; pnpm allows
-        # you to just have a pnpm-workspaces.yaml at the root and no package.json at that location
-        priv["root_package_json"] = {}
+        root_package_json = json.decode(rctx.read(root_package_json_path))
+
+    priv["pnpm_settings"] = root_package_json.get("pnpm", {})
+
+    # Read settings from pnpm-workspace.yaml for pnpm v10+ (NOTE: pnpm 9-10+ has lockfile version 9).
+    # Support scenario where pnpm-lock.yaml was never parsed and "lock_version" is not set.
+    if priv.get("lock_version", 0) >= 9.0 and label_store.has("pnpm_workspace"):
+        pnpm_workspace_path = label_store.path("pnpm_workspace")
+        if is_windows or utils.exists(rctx, pnpm_workspace_path):
+            pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, attr, str(pnpm_workspace_path), is_windows)
+
+            if workspace_parse_err == None:
+                pnpm_workspace_settings, workspace_parse_err = pnpm.parse_pnpm_workspace_json(pnpm_workspace_json)
+
+                if pnpm_workspace_settings:
+                    priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
+
+            if workspace_parse_err != None:
+                should_update = _should_update_pnpm_lock(priv)
+                msg = """
+        {type}: pnpm-workspace.yaml parse error {error}`.
+        """.format(type = "WARNING" if should_update else "ERROR", error = workspace_parse_err)
+
+                if should_update:
+                    # buildifier: disable=print
+                    print(msg)
+                else:
+                    fail(msg)
+
+    # Default to empty settings if none found such as no pnpm-workspace.yaml or no package.json alongside the lockfile
+    # TODO(3.0): pnpm-workspace should always be available
+    if priv["pnpm_settings"] == None:
+        priv["pnpm_settings"] = {}
 
 ################################################################################
 def _init_npmrc(priv, rctx, attr, label_store, is_windows):
@@ -473,6 +506,23 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         _load_npmrc(priv, rctx, home_npmrc_path)
 
 ################################################################################
+def _yaml_to_json(rctx, attr, yaml_path, is_windows):
+    host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(rctx), ".exe" if is_windows else ""))
+    yq_args = [
+        str(rctx.path(host_yq)),
+        str(yaml_path),
+        "-o=json",
+    ]
+    result = rctx.execute(yq_args)
+    if result.return_code:
+        return None, "failed to parse {} with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), yaml_path, result.return_code, result.stdout, result.stderr)
+
+    # NB: yq will return the string "null" if the yaml file is empty
+    if result.stdout != "null":
+        return result.stdout, None
+
+    return None, None
+
 def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     importers = {}
     packages = {}
@@ -480,17 +530,9 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     lock_version = None
     lock_parse_err = None
 
-    host_yq = Label("@{}_{}//:yq{}".format(attr.yq_toolchain_prefix, repo_utils.platform(rctx), ".exe" if is_windows else ""))
-    yq_args = [
-        str(rctx.path(host_yq)),
-        str(pnpm_lock_path),
-        "-o=json",
-    ]
-    result = rctx.execute(yq_args)
-    if result.return_code:
-        lock_parse_err = "failed to parse pnpm lock file with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), result.return_code, result.stdout, result.stderr)
-    else:
-        importers, packages, patched_dependencies, lock_version, lock_parse_err = pnpm.parse_pnpm_lock_json(result.stdout if result.stdout != "null" else None)  # NB: yq will return the string "null" if the yaml file is empty
+    lockfile_content, lock_parse_err = _yaml_to_json(rctx, attr, str(pnpm_lock_path), is_windows)
+    if lock_parse_err == None:
+        importers, packages, patched_dependencies, lock_version, lock_parse_err = pnpm.parse_pnpm_lock_json(lockfile_content)
 
     priv["lock_version"] = lock_version
     priv["importers"] = importers
@@ -538,7 +580,7 @@ def _patched_dependencies(priv):
     return priv["patched_dependencies"]
 
 def _only_built_dependencies(priv):
-    return _root_package_json(priv).get("pnpm", {}).get("onlyBuiltDependencies", None)
+    return _pnpm_settings(priv).get("onlyBuiltDependencies", None)
 
 def _num_patches(priv):
     return priv["num_patches"]
@@ -552,8 +594,8 @@ def _npm_auth(priv):
 def _root_package(priv):
     return priv["root_package"]
 
-def _root_package_json(priv):
-    return priv["root_package_json"]
+def _pnpm_settings(priv):
+    return priv["pnpm_settings"]
 
 ################################################################################
 def _new(rctx_name, rctx, attr, bzlmod):
@@ -576,7 +618,7 @@ def _new(rctx_name, rctx, attr, bzlmod):
         "npm_registries": {},
         "packages": {},
         "root_package": attr.root_package,
-        "root_package_json": {},
+        "pnpm_settings": {},
         "patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
     }

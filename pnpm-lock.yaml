@@ -9,11 +9,11 @@ overrides:
   semver-max: file:./npm/private/test/vendored/semver-max
   is-odd: file:./npm/private/test/vendored/is-odd
 
-packageExtensionsChecksum: 317d4b6ce1de48c4819a6fafc025ffb3
+packageExtensionsChecksum: sha256-wjVw+jaxrnffsda5QzoSE1Cv0vO+BjrFnGucmF47zPg=
 
 patchedDependencies:
   meaning-of-life@1.0.0:
-    hash: o3deharooos255qt5xdujc3cuq
+    hash: 33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0
     path: examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch
 
 importers:
@@ -184,7 +184,7 @@ importers:
         version: 3.2.7
       meaning-of-life:
         specifier: 1.0.0
-        version: 1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)
+        version: 1.0.0(patch_hash=33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0)
       mobx:
         specifier: 6.3.0
         version: 6.3.0
@@ -8231,7 +8231,7 @@ snapshots:
       crypt: 0.0.2
       is-buffer: 1.1.6
 
-  meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq): {}
+  meaning-of-life@1.0.0(patch_hash=33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0): {}
 
   media-query-parser@2.0.2:
     dependencies:
