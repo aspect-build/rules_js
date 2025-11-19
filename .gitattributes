@@ -6,4 +6,5 @@ js/private/coverage/coverage.js linguist-generated=true
 js/private/devserver/js_run_devserver.mjs linguist-generated=true
 js/private/watch/aspect_watch_protocol.mjs linguist-generated=true
 js/private/watch/aspect_watch_protocol.d.mts linguist-generated=true
+js/private/node-patches/fs.cjs linguist-generated=true
 js/private/js_image_layer.mjs linguist-generated=true
