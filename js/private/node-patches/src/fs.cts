@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import type { PathLike, Stats, BigIntStats } from 'fs'
+import type { PathLike, Stats, StatSyncOptions, BigIntStats } from 'fs'
 import type * as FsType from 'fs'
 import type * as UrlType from 'url'
 import * as path from 'path'
@@ -677,6 +677,10 @@ export function patcher(roots: string[]): () => void {
         })
     }
 
+    const symlinkNoThrow: StatSyncOptions = Object.freeze({
+        throwIfNoEntry: false,
+    })
+
     const hopLinkCache = Object.create(null) as { [f: string]: HopResults }
     function readHopLinkSync(p: string): HopResults {
         if (hopLinkCache[p]) {
@@ -685,26 +689,20 @@ export function patcher(roots: string[]): () => void {
 
         let link: HopResults
 
-        try {
-            if (origLstatSync(p).isSymbolicLink()) {
-                link = origReadlinkSync(p) as string
-                if (link) {
-                    if (!path.isAbsolute(link)) {
-                        link = path.resolve(path.dirname(p), link)
-                    }
-                } else {
-                    link = HOP_NON_LINK
+        const pStats = origLstatSync(p, symlinkNoThrow)
+        if (!pStats) {
+            link = HOP_NOT_FOUND
+        } else if (pStats.isSymbolicLink()) {
+            link = origReadlinkSync(p) as string
+            if (link) {
+                if (!path.isAbsolute(link)) {
+                    link = path.resolve(path.dirname(p), link)
                 }
             } else {
                 link = HOP_NON_LINK
             }
-        } catch (err: any) {
-            if (err.code === 'ENOENT') {
-                // file does not exist
-                link = HOP_NOT_FOUND
-            } else {
-                link = HOP_NON_LINK
-            }
+        } else {
+            link = HOP_NON_LINK
         }
 
         hopLinkCache[p] = link
