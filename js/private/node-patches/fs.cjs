@@ -84,7 +84,7 @@ function patcher(roots) {
         if (process.env.VERBOSE_LOGS) {
             console.error('fs patcher called without any valid root paths ' + __filename);
         }
-        return;
+        return function () { };
     }
     const origLstat = fs.lstat.bind(fs);
     const origLstatSync = fs.lstatSync.bind(fs);
@@ -242,11 +242,11 @@ function patcher(roots) {
             return origReadlink(...args);
         }
         const cb = once(args[args.length - 1]);
-        args[args.length - 1] = function readlinkCb(err, str) {
+        args[args.length - 1] = function readlinkCb(err, p) {
             if (err)
                 return cb(err);
             const resolved = resolvePathLike(args[0]);
-            str = path.resolve(path.dirname(resolved), str);
+            const str = path.resolve(path.dirname(resolved), p);
             const escapedRoot = isEscape(resolved, str);
             if (escapedRoot) {
                 return nextHop(str, readlinkNextHopCb);
@@ -261,10 +261,10 @@ function patcher(roots) {
                             return cb(einval('readlink', args[0]));
                         }
                     }
-                    next = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
-                    if (next != resolved &&
-                        !isEscape(resolved, next, [escapedRoot])) {
-                        return cb(null, next);
+                    const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
+                    if (r != resolved &&
+                        !isEscape(resolved, r, [escapedRoot])) {
+                        return cb(null, r);
                     }
                     // The escape from the root is not mappable back into the root; throw EINVAL
                     return cb(einval('readlink', args[0]));
@@ -281,7 +281,7 @@ function patcher(roots) {
         const str = path.resolve(path.dirname(resolved), origReadlinkSync(...args));
         const escapedRoot = isEscape(resolved, str);
         if (escapedRoot) {
-            let next = nextHopSync(str);
+            const next = nextHopSync(str);
             if (!next) {
                 if (next == undefined) {
                     // The escape from the root is not mappable back into the root; throw EINVAL
@@ -292,9 +292,9 @@ function patcher(roots) {
                     throw einval('readlink', args[0]);
                 }
             }
-            next = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
-            if (next != resolved && !isEscape(resolved, next, [escapedRoot])) {
-                return next;
+            const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
+            if (r != resolved && !isEscape(resolved, r, [escapedRoot])) {
+                return r;
             }
             // The escape from the root is not mappable back into the root; throw EINVAL
             throw einval('readlink', args[0]);
@@ -452,24 +452,32 @@ function patcher(roots) {
             });
         };
         const origRead = dir.read.bind(dir);
-        dir.read = async function handleDirRead(cb) {
-            if (typeof cb === 'function') {
-                origRead(function handleDirReadCb(err, entry) {
-                    if (err)
-                        return cb(err, null);
-                    handleDirent(p, entry).then(() => {
-                        cb(null, entry);
-                    }, (err) => cb(err, null));
-                });
+        dir.read = function readWrapper() {
+            if (typeof arguments[0] === 'function') {
+                return handleDirReadCallback(arguments[0]);
             }
             else {
-                const entry = await origRead();
-                if (entry) {
-                    await handleDirent(p, entry);
-                }
-                return entry;
+                return handleDirReadPromise();
             }
         };
+        // read(cb: (err: NodeJS.ErrnoException | null, dirEnt: Dirent | null) => void): void;
+        function handleDirReadCallback(cb) {
+            origRead(function handleDirReadCb(err, entry) {
+                if (err)
+                    return cb(err, null);
+                handleDirent(p, entry).then(() => {
+                    cb(null, entry);
+                }, (err) => cb(err, null));
+            });
+        }
+        // read(): Promise<Dirent | null>;
+        async function handleDirReadPromise() {
+            const entry = await origRead();
+            if (entry) {
+                await handleDirent(p, entry);
+            }
+            return entry;
+        }
         const origReadSync = dir.readSync.bind(dir);
         dir.readSync = function handleDirReadSync() {
             return handleDirentSync(p, origReadSync());
@@ -619,7 +627,7 @@ function patcher(roots) {
         for (;;) {
             let link = readHopLinkSync(maybe);
             if (link === HOP_NOT_FOUND) {
-                return undefined;
+                return false;
             }
             if (link !== HOP_NON_LINK) {
                 if (nested) {
@@ -644,9 +652,8 @@ function patcher(roots) {
             maybe = dirname;
         }
     }
-    function guardedReadLink(start, cb) {
-        let loc = start;
-        return nextHop(loc, guardedReadLinkHopCb);
+    function guardedReadLink(loc, cb) {
+        nextHop(loc, guardedReadLinkHopCb);
         function guardedReadLinkHopCb(next) {
             if (!next) {
                 // we're no longer hopping but we haven't escaped;
@@ -660,9 +667,8 @@ function patcher(roots) {
             return cb(next);
         }
     }
-    function guardedReadLinkSync(start) {
-        let loc = start;
-        let next = nextHopSync(loc);
+    function guardedReadLinkSync(loc) {
+        const next = nextHopSync(loc);
         if (!next) {
             // we're no longer hopping but we haven't escaped;
             // something funky happened in the filesystem
@@ -675,12 +681,13 @@ function patcher(roots) {
         return next;
     }
     function unguardedRealPath(start, cb) {
-        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpath)
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
+        oneHop(stringifyPathLike(start), cb);
         function oneHop(loc, cb) {
             nextHop(loc, function oneHopeNextCb(next) {
                 if (next == undefined) {
                     // file does not exist (broken link)
-                    return cb(enoent('realpath', start));
+                    return cb(enoent('realpath', start), undefined);
                 }
                 else if (!next) {
                     // we've hit a real file
@@ -689,10 +696,10 @@ function patcher(roots) {
                 oneHop(next, cb);
             });
         }
-        oneHop(start, cb);
     }
-    function guardedRealPath(start, cb, escapedRoot = undefined) {
-        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpath)
+    function guardedRealPath(start, cb, escapedRoot) {
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
+        oneHop(stringifyPathLike(start), cb);
         function oneHop(loc, cb) {
             nextHop(loc, function guardedRealPathHopCb(next) {
                 if (!next) {
@@ -704,7 +711,7 @@ function patcher(roots) {
                         }
                         else {
                             // something funky happened in the filesystem
-                            return cb(enoent('realpath', start));
+                            return cb(enoent('realpath', start), undefined);
                         }
                     });
                 }
@@ -717,11 +724,10 @@ function patcher(roots) {
                 oneHop(next, cb);
             });
         }
-        oneHop(start, cb);
     }
     function unguardedRealPathSync(start) {
-        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = start, next;; loc = next) {
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
+        for (let loc = stringifyPathLike(start), next;; loc = next) {
             next = nextHopSync(loc);
             if (next == undefined) {
                 // file does not exist (broken link)
@@ -733,9 +739,9 @@ function patcher(roots) {
             }
         }
     }
-    function guardedRealPathSync(start, escapedRoot = undefined) {
-        start = stringifyPathLike(start); // handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = start, next;; loc = next) {
+    function guardedRealPathSync(start, escapedRoot) {
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
+        for (let loc = stringifyPathLike(start), next;; loc = next) {
             next = nextHopSync(loc);
             if (!next) {
                 // we're no longer hopping but we haven't escaped

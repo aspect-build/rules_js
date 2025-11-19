@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import type { PathLike, Stats } from 'fs'
+import type { PathLike, Stats, BigIntStats } from 'fs'
 import type * as FsType from 'fs'
 import type * as UrlType from 'url'
 import * as path from 'path'
@@ -36,6 +36,8 @@ const HOP_NON_LINK = Symbol.for('HOP NON LINK')
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
 
 type HopResults = string | typeof HOP_NON_LINK | typeof HOP_NOT_FOUND
+
+type ErrPathCallback = (err: Error | null, path: string | undefined) => void
 
 const PATCHED_FS_METHODS: ReadonlyArray<keyof typeof FsType> = [
     'lstat',
@@ -63,10 +65,13 @@ export function patcher(roots: string[]): () => void {
     // protects against sandbox escaping that occurs through module resolution
     // in the Go binary. See
     // https://github.com/aspect-build/rules_esbuild/issues/58.
-    fs._unpatched = PATCHED_FS_METHODS.reduce((obj, method) => {
-        obj[method] = fs[method]
-        return obj
-    }, {})
+    fs._unpatched = PATCHED_FS_METHODS.reduce(
+        (obj, method) => {
+            obj[method] = fs[method]
+            return obj
+        },
+        {} as { [key in (typeof PATCHED_FS_METHODS)[number]]: any }
+    )
 
     roots = roots || []
     roots = roots.filter((root) => fs.existsSync(root))
@@ -76,7 +81,7 @@ export function patcher(roots: string[]): () => void {
                 'fs patcher called without any valid root paths ' + __filename
             )
         }
-        return
+        return function () {}
     }
 
     const origLstat = fs.lstat.bind(fs) as typeof FsType.lstat
@@ -114,7 +119,10 @@ export function patcher(roots: string[]): () => void {
         const cb = once(args[args.length - 1] as Function)
 
         // override the callback
-        args[args.length - 1] = function lstatCb(err: Error, stats: Stats) {
+        args[args.length - 1] = function lstatCb(
+            err: Error | null,
+            stats: Stats | BigIntStats
+        ) {
             if (err) return cb(err)
 
             if (!stats.isSymbolicLink()) {
@@ -142,7 +150,7 @@ export function patcher(roots: string[]): () => void {
                 // which can result in an infinite loop
                 return unguardedRealPath(args[0], unguardedRealPathCb)
 
-                function unguardedRealPathCb(err: Error, str: string) {
+                function unguardedRealPathCb(err: Error | null, str?: string) {
                     if (err) {
                         if ((err as any).code === 'ENOENT') {
                             // broken link so there is nothing more to do
@@ -150,7 +158,7 @@ export function patcher(roots: string[]): () => void {
                         }
                         return cb(err)
                     }
-                    return origLstat(str, cb)
+                    return origLstat(str!, cb)
                 }
             }
         }
@@ -188,7 +196,7 @@ export function patcher(roots: string[]): () => void {
             // we can't use origRealPathSync here since that function calls lstat internally
             // which can result in an infinite loop
             return origLstatSync(...args)
-        } catch (err) {
+        } catch (err: any) {
             if (err.code === 'ENOENT') {
                 // broken link so there is nothing more to do
                 return stats
@@ -209,9 +217,12 @@ export function patcher(roots: string[]): () => void {
 
         const cb = once(args[args.length - 1] as Function)
 
-        args[args.length - 1] = function realpathCb(err: Error, str: string) {
+        args[args.length - 1] = function realpathCb(
+            err: Error | null,
+            str?: string
+        ) {
             if (err) return cb(err)
-            const escapedRoot: string | false = isEscape(args[0], str)
+            const escapedRoot: string | false = isEscape(args[0], str!)
             if (escapedRoot) {
                 return guardedRealPath(args[0], cb, escapedRoot)
             } else {
@@ -232,9 +243,12 @@ export function patcher(roots: string[]): () => void {
 
         const cb = once(args[args.length - 1] as Function)
 
-        args[args.length - 1] = function nativeCb(err: Error, str: string) {
+        args[args.length - 1] = function nativeCb(
+            err: Error | null,
+            str?: string
+        ) {
             if (err) return cb(err)
-            const escapedRoot: string | false = isEscape(args[0], str)
+            const escapedRoot: string | false = isEscape(args[0], str!)
             if (escapedRoot) {
                 return guardedRealPath(args[0], cb, escapedRoot)
             } else {
@@ -279,15 +293,18 @@ export function patcher(roots: string[]): () => void {
 
         const cb = once(args[args.length - 1] as Function)
 
-        args[args.length - 1] = function readlinkCb(err: Error, str: string) {
+        args[args.length - 1] = function readlinkCb(
+            err: Error | null,
+            p?: string
+        ) {
             if (err) return cb(err)
             const resolved = resolvePathLike(args[0])
-            str = path.resolve(path.dirname(resolved), str)
+            const str = path.resolve(path.dirname(resolved), p!)
             const escapedRoot: string | false = isEscape(resolved, str)
             if (escapedRoot) {
                 return nextHop(str, readlinkNextHopCb)
 
-                function readlinkNextHopCb(next: string | false) {
+                function readlinkNextHopCb(next: string | undefined | false) {
                     if (!next) {
                         if (next == undefined) {
                             // The escape from the root is not mappable back into the root; throw EINVAL
@@ -297,15 +314,15 @@ export function patcher(roots: string[]): () => void {
                             return cb(einval('readlink', args[0]))
                         }
                     }
-                    next = path.resolve(
+                    const r = path.resolve(
                         path.dirname(resolved),
                         path.relative(path.dirname(str), next)
                     )
                     if (
-                        next != resolved &&
-                        !isEscape(resolved, next, [escapedRoot as string])
+                        r != resolved &&
+                        !isEscape(resolved, r, [escapedRoot as string])
                     ) {
-                        return cb(null, next)
+                        return cb(null, r)
                     }
                     // The escape from the root is not mappable back into the root; throw EINVAL
                     return cb(einval('readlink', args[0]))
@@ -330,7 +347,7 @@ export function patcher(roots: string[]): () => void {
 
         const escapedRoot: string | false = isEscape(resolved, str)
         if (escapedRoot) {
-            let next: string | false = nextHopSync(str)
+            const next = nextHopSync(str)
             if (!next) {
                 if (next == undefined) {
                     // The escape from the root is not mappable back into the root; throw EINVAL
@@ -340,12 +357,12 @@ export function patcher(roots: string[]): () => void {
                     throw einval('readlink', args[0])
                 }
             }
-            next = path.resolve(
+            const r = path.resolve(
                 path.dirname(resolved),
                 path.relative(path.dirname(str), next)
             )
-            if (next != resolved && !isEscape(resolved, next, [escapedRoot])) {
-                return next
+            if (r != resolved && !isEscape(resolved, r, [escapedRoot])) {
+                return r
             }
             // The escape from the root is not mappable back into the root; throw EINVAL
             throw einval('readlink', args[0])
@@ -367,12 +384,12 @@ export function patcher(roots: string[]): () => void {
         const p = resolvePathLike(args[0])
 
         args[args.length - 1] = function readdirCb(
-            err: Error,
+            err: Error | null,
             result: Dirent[]
         ) {
             if (err) return cb(err)
             // user requested withFileTypes
-            if (result[0] && result[0].isSymbolicLink) {
+            if (result[0] && (result[0] as any).isSymbolicLink) {
                 Promise.all(result.map((v: Dirent) => handleDirent(p, v)))
                     .then(() => {
                         cb(null, result)
@@ -412,7 +429,7 @@ export function patcher(roots: string[]): () => void {
             if (typeof args[args.length - 1] === 'function') {
                 const cb = once(args[args.length - 1] as Function)
                 args[args.length - 1] = async function opendirCb(
-                    err: Error,
+                    err: Error | null,
                     dir: Dir
                 ) {
                     try {
@@ -522,27 +539,41 @@ export function patcher(roots: string[]): () => void {
         }
 
         const origRead = dir.read.bind(dir)
-        dir.read = async function handleDirRead(
-            cb?: Parameters<typeof dir.read>[0]
-        ) {
-            if (typeof cb === 'function') {
-                origRead(function handleDirReadCb(err: Error, entry: Dirent) {
-                    if (err) return cb(err, null)
-                    handleDirent(p, entry).then(
-                        () => {
-                            cb(null, entry)
-                        },
-                        (err) => cb(err, null)
-                    )
-                })
+        dir.read = function readWrapper() {
+            if (typeof arguments[0] === 'function') {
+                return handleDirReadCallback(arguments[0])
             } else {
-                const entry = await origRead()
-                if (entry) {
-                    await handleDirent(p, entry)
-                }
-                return entry
+                return handleDirReadPromise()
             }
+        } as any
+
+        // read(cb: (err: NodeJS.ErrnoException | null, dirEnt: Dirent | null) => void): void;
+        function handleDirReadCallback(
+            cb: (err: Error | null, entry: Dirent | null) => void
+        ): void {
+            origRead(function handleDirReadCb(
+                err: Error | null,
+                entry: Dirent | null
+            ) {
+                if (err) return cb(err, null)
+                handleDirent(p, entry!).then(
+                    () => {
+                        cb(null, entry!)
+                    },
+                    (err) => cb(err, null)
+                )
+            })
         }
+
+        // read(): Promise<Dirent | null>;
+        async function handleDirReadPromise(): Promise<Dirent | null> {
+            const entry = await origRead()
+            if (entry) {
+                await handleDirent(p, entry)
+            }
+            return entry
+        }
+
         const origReadSync = dir.readSync.bind(dir)
         dir.readSync = function handleDirReadSync() {
             return handleDirentSync(p, origReadSync())
@@ -571,13 +602,19 @@ export function patcher(roots: string[]): () => void {
                     if (err) {
                         return reject(err)
                     }
-                    fs.stat(str, function handleDirentStatCb(err, stat) {
-                        if (err) {
-                            return reject(err)
+                    fs.stat(
+                        str,
+                        function handleDirentStatCb(
+                            err: Error | null,
+                            stat: Stats | undefined
+                        ) {
+                            if (err) {
+                                return reject(err)
+                            }
+                            patchDirent(v, stat)
+                            resolve(v)
                         }
-                        patchDirent(v, stat)
-                        resolve(v)
-                    })
+                    )
                 })
             }
         })
@@ -598,7 +635,10 @@ export function patcher(roots: string[]): () => void {
         return v
     }
 
-    function nextHop(loc: string, cb: (next: string | false) => void): void {
+    function nextHop(
+        loc: string,
+        cb: (next: string | undefined | false) => void
+    ): void {
         let nested = ''
         let maybe = loc
         let escapedHop: string | false = false
@@ -658,7 +698,7 @@ export function patcher(roots: string[]): () => void {
             } else {
                 link = HOP_NON_LINK
             }
-        } catch (err) {
+        } catch (err: any) {
             if (err.code === 'ENOENT') {
                 // file does not exist
                 link = HOP_NOT_FOUND
@@ -676,33 +716,36 @@ export function patcher(roots: string[]): () => void {
             return cb(hopLinkCache[p])
         }
 
-        origReadlink(p, function readHopLinkCb(err: Error, link: string) {
-            if (err) {
-                let result: HopResults
+        origReadlink(
+            p,
+            function readHopLinkCb(err: Error | null, link: string) {
+                if (err) {
+                    let result: HopResults
 
-                if ((err as any).code === 'ENOENT') {
-                    // file does not exist
-                    result = HOP_NOT_FOUND
-                } else {
-                    result = HOP_NON_LINK
+                    if ((err as any).code === 'ENOENT') {
+                        // file does not exist
+                        result = HOP_NOT_FOUND
+                    } else {
+                        result = HOP_NON_LINK
+                    }
+
+                    hopLinkCache[p] = result
+                    return cb(result)
                 }
 
-                hopLinkCache[p] = result
-                return cb(result)
-            }
+                if (link === undefined) {
+                    hopLinkCache[p] = HOP_NON_LINK
+                    return cb(HOP_NON_LINK)
+                }
 
-            if (link === undefined) {
-                hopLinkCache[p] = HOP_NON_LINK
-                return cb(HOP_NON_LINK)
-            }
+                if (!path.isAbsolute(link)) {
+                    link = path.resolve(path.dirname(p), link)
+                }
 
-            if (!path.isAbsolute(link)) {
-                link = path.resolve(path.dirname(p), link)
+                hopLinkCache[p] = link
+                cb(link)
             }
-
-            hopLinkCache[p] = link
-            cb(link)
-        })
+        )
     }
 
     function nextHopSync(loc: string): string | false {
@@ -714,7 +757,7 @@ export function patcher(roots: string[]): () => void {
             let link = readHopLinkSync(maybe)
 
             if (link === HOP_NOT_FOUND) {
-                return undefined
+                return false
             }
 
             if (link !== HOP_NON_LINK) {
@@ -746,10 +789,9 @@ export function patcher(roots: string[]): () => void {
         }
     }
 
-    function guardedReadLink(start: string, cb: (str: string) => void): void {
-        let loc = start
-        return nextHop(loc, guardedReadLinkHopCb)
-        function guardedReadLinkHopCb(next: string | false) {
+    function guardedReadLink(loc: string, cb: (str: string) => void): void {
+        nextHop(loc, guardedReadLinkHopCb)
+        function guardedReadLinkHopCb(next: string | undefined | false) {
             if (!next) {
                 // we're no longer hopping but we haven't escaped;
                 // something funky happened in the filesystem
@@ -763,9 +805,8 @@ export function patcher(roots: string[]): () => void {
         }
     }
 
-    function guardedReadLinkSync(start: string): string {
-        let loc = start
-        let next: string | false = nextHopSync(loc)
+    function guardedReadLinkSync(loc: string): string {
+        const next = nextHopSync(loc)
         if (!next) {
             // we're no longer hopping but we haven't escaped;
             // something funky happened in the filesystem
@@ -778,16 +819,15 @@ export function patcher(roots: string[]): () => void {
         return next
     }
 
-    function unguardedRealPath(
-        start: string,
-        cb: (err: Error, str?: string) => void
-    ): void {
-        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpath)
-        function oneHop(loc, cb) {
+    function unguardedRealPath(start: PathLike, cb: ErrPathCallback): void {
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
+        oneHop(stringifyPathLike(start), cb)
+
+        function oneHop(loc: string, cb: ErrPathCallback) {
             nextHop(loc, function oneHopeNextCb(next) {
                 if (next == undefined) {
                     // file does not exist (broken link)
-                    return cb(enoent('realpath', start))
+                    return cb(enoent('realpath', start), undefined)
                 } else if (!next) {
                     // we've hit a real file
                     return cb(null, loc)
@@ -795,28 +835,32 @@ export function patcher(roots: string[]): () => void {
                 oneHop(next, cb)
             })
         }
-        oneHop(start, cb)
     }
 
     function guardedRealPath(
         start: PathLike,
-        cb: (err: Error, str?: string) => void,
-        escapedRoot: string = undefined
+        cb: ErrPathCallback,
+        escapedRoot?: string
     ): void {
-        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpath)
-        function oneHop(loc: string, cb: (err: Error, str?: string) => void) {
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
+        oneHop(stringifyPathLike(start), cb)
+
+        function oneHop(loc: string, cb: ErrPathCallback) {
             nextHop(loc, function guardedRealPathHopCb(next) {
                 if (!next) {
                     // we're no longer hopping but we haven't escaped
-                    return fs.exists(loc, function guardedRealPathExistsCb(e) {
-                        if (e) {
-                            // we hit a real file within the guard and can go no further
-                            return cb(null, loc)
-                        } else {
-                            // something funky happened in the filesystem
-                            return cb(enoent('realpath', start))
+                    return fs.exists(
+                        loc,
+                        function guardedRealPathExistsCb(e: boolean) {
+                            if (e) {
+                                // we hit a real file within the guard and can go no further
+                                return cb(null, loc)
+                            } else {
+                                // something funky happened in the filesystem
+                                return cb(enoent('realpath', start), undefined)
+                            }
                         }
-                    })
+                    )
                 }
                 if (
                     escapedRoot
@@ -829,12 +873,11 @@ export function patcher(roots: string[]): () => void {
                 oneHop(next, cb)
             })
         }
-        oneHop(start, cb)
     }
 
-    function unguardedRealPathSync(start: string): string {
-        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = start, next; ; loc = next) {
+    function unguardedRealPathSync(start: PathLike): string {
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
+        for (let loc = stringifyPathLike(start), next; ; loc = next) {
             next = nextHopSync(loc)
             if (next == undefined) {
                 // file does not exist (broken link)
@@ -848,10 +891,14 @@ export function patcher(roots: string[]): () => void {
 
     function guardedRealPathSync(
         start: PathLike,
-        escapedRoot: string = undefined
+        escapedRoot?: string
     ): string {
-        start = stringifyPathLike(start) // handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = start, next: string | false; ; loc = next as string) {
+        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
+        for (
+            let loc = stringifyPathLike(start), next: string | false;
+            ;
+            loc = next as string
+        ) {
             next = nextHopSync(loc)
             if (!next) {
                 // we're no longer hopping but we haven't escaped
@@ -986,7 +1033,7 @@ function once(fn: Function) {
         let err: Error | false = false
         try {
             fn(...args)
-        } catch (_e) {
+        } catch (_e: any) {
             err = _e
         }
 
