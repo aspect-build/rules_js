@@ -352,6 +352,124 @@ describe('testing realpath', async () => {
         )
     })
 
+    await it('can resolve a symlink to a non-existing path', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: {},
+                otherroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                const revertPatches = patcher([
+                    path.join(fixturesDir, 'sandbox'),
+                ])
+
+                let brokenLinkPath = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'broken-link'
+                )
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'doesnt-exist'),
+                    brokenLinkPath
+                )
+
+                assert.throws(
+                    () => fs.realpathSync(brokenLinkPath),
+                    'should throw because link is broken'
+                )
+
+                let thrown
+                try {
+                    await util.promisify(fs.realpath.native)(brokenLinkPath)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown)
+                        assert.fail('should throw if empty string is passed')
+                }
+
+                try {
+                    await fs.promises.realpath(brokenLinkPath)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown)
+                        assert.fail('should throw if empty string is passed')
+                }
+
+                revertPatches()
+            }
+        )
+    })
+
+    await it('can resolve a symlink to a non-existing path after escaping', async () => {
+        await withFixtures(
+            {
+                sandbox: {},
+                execroot: {},
+                otherroot: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+
+                const nonSandboxedBrokenLink = path.join(
+                    fixturesDir,
+                    'broken-link'
+                )
+
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'doesnt-exist'),
+                    nonSandboxedBrokenLink
+                )
+
+                const revertPatches = patcher([
+                    path.join(fixturesDir, 'sandbox'),
+                ])
+
+                let sandboxedLinkToBrokenLink = path.join(
+                    fixturesDir,
+                    'sandbox',
+                    'indirect-link'
+                )
+                fs.symlinkSync(
+                    nonSandboxedBrokenLink,
+                    sandboxedLinkToBrokenLink
+                )
+
+                assert.throws(
+                    () => fs.realpathSync(sandboxedLinkToBrokenLink),
+                    'should throw because link is broken'
+                )
+
+                let thrown
+                try {
+                    await util.promisify(fs.realpath.native)(
+                        sandboxedLinkToBrokenLink
+                    )
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown)
+                        assert.fail('should throw if empty string is passed')
+                }
+
+                try {
+                    await fs.promises.realpath(sandboxedLinkToBrokenLink)
+                } catch (e) {
+                    thrown = e
+                } finally {
+                    if (!thrown)
+                        assert.fail('should throw if empty string is passed')
+                }
+
+                revertPatches()
+            }
+        )
+    })
+
     await it('can resolve symlink to a symlink in the sandbox if there is no corresponding location in the sandbox but is a realpath outside', async () => {
         await withFixtures(
             {
