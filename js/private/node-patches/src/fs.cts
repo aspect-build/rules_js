@@ -848,19 +848,7 @@ export function patcher(roots: string[]): () => void {
         function oneHop(loc: string, cb: ErrPathCallback) {
             nextHop(loc, function guardedRealPathHopCb(next) {
                 if (!next) {
-                    // we're no longer hopping but we haven't escaped
-                    return fs.exists(
-                        loc,
-                        function guardedRealPathExistsCb(e: boolean) {
-                            if (e) {
-                                // we hit a real file within the guard and can go no further
-                                return cb(null, loc)
-                            } else {
-                                // something funky happened in the filesystem
-                                return cb(enoent('realpath', start), undefined)
-                            }
-                        }
-                    )
+                    return cb(enoent('realpath', start), undefined)
                 }
                 if (
                     escapedRoot
