@@ -558,36 +558,32 @@ function patcher(roots) {
             readHopLink(maybe, readNextHop);
         });
     }
+    const symlinkNoThrow = Object.freeze({
+        throwIfNoEntry: false,
+    });
     const hopLinkCache = Object.create(null);
     function readHopLinkSync(p) {
         if (hopLinkCache[p]) {
             return hopLinkCache[p];
         }
         let link;
-        try {
-            if (origLstatSync(p).isSymbolicLink()) {
-                link = origReadlinkSync(p);
-                if (link) {
-                    if (!path.isAbsolute(link)) {
-                        link = path.resolve(path.dirname(p), link);
-                    }
-                }
-                else {
-                    link = HOP_NON_LINK;
+        const pStats = origLstatSync(p, symlinkNoThrow);
+        if (!pStats) {
+            link = HOP_NOT_FOUND;
+        }
+        else if (pStats.isSymbolicLink()) {
+            link = origReadlinkSync(p);
+            if (link) {
+                if (!path.isAbsolute(link)) {
+                    link = path.resolve(path.dirname(p), link);
                 }
             }
             else {
                 link = HOP_NON_LINK;
             }
         }
-        catch (err) {
-            if (err.code === 'ENOENT') {
-                // file does not exist
-                link = HOP_NOT_FOUND;
-            }
-            else {
-                link = HOP_NON_LINK;
-            }
+        else {
+            link = HOP_NON_LINK;
         }
         hopLinkCache[p] = link;
         return link;
