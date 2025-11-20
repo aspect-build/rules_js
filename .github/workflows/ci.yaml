@@ -42,6 +42,7 @@ jobs:
                     .
                     e2e/bzlmod
                     e2e/gyp_no_install_script
+                    e2e/js_binary_workspace
                     e2e/js_image_docker
                     e2e/js_image_oci
                     e2e/js_run_devserver
