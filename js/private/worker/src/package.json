@@ -12,6 +12,6 @@
         "@types/node": "18.19.54",
         "typescript": "^5.8.0",
         "tslib": "2.8.1",
-        "abortcontroller-polyfill": "1.7.5"
+        "abortcontroller-polyfill": "1.7.8"
     }
 }
