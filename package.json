@@ -9,57 +9,5 @@
         "inline-fixtures": "1.1.0",
         "jsonpath-plus": "7.2.0",
         "typescript": "^5.8.0"
-    },
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "@aspect-test/c",
-            "@figma/nodegit",
-            "@kubernetes/client-node",
-            "bufferutil",
-            "esbuild",
-            "fsevents",
-            "segfault-handler",
-            "puppeteer",
-            "protoc-gen-grpc-ts"
-        ],
-        "packageExtensions": {
-            "mocha": {
-                "peerDependencies": {
-                    "mocha-multi-reporters": "*"
-                }
-            },
-            "mocha-multi-reporters": {
-                "peerDependencies": {
-                    "mocha-junit-reporter": "*"
-                }
-            },
-            "segfault-handler": {
-                "dependencies": {
-                    "node-gyp": "*"
-                }
-            },
-            "unix-dgram": {
-                "dependencies": {
-                    "node-gyp": "*"
-                }
-            },
-            "@kubernetes/client-node": {
-                "//1": "these deps are from devDependencies of @kubernetes/client-node and needed for 'prepare' lifecycle hook",
-                "//2": "https://github.com/kubernetes-client/javascript/blob/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9/package.json#L28",
-                "//3": "A very specific @types/node version is required for the tsc compilation within @kubernetes/client-node",
-                "dependencies": {
-                    "@types/node": "22.7.4",
-                    "typescript": "~5.6.2"
-                }
-            }
-        },
-        "overrides": {
-            "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
-            "semver-max": "file:./npm/private/test/vendored/semver-max",
-            "is-odd": "file:./npm/private/test/vendored/is-odd"
-        },
-        "patchedDependencies": {
-            "meaning-of-life@1.0.0": "examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch"
-        }
     }
 }
