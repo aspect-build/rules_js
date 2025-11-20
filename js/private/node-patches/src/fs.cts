@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import type { PathLike, Stats, BigIntStats } from 'fs'
+import type { PathLike, Stats, StatSyncOptions, BigIntStats } from 'fs'
 import type * as FsType from 'fs'
 import type * as UrlType from 'url'
 import * as path from 'path'
@@ -55,7 +55,10 @@ const PATCHED_FS_METHODS: ReadonlyArray<keyof typeof FsType> = [
  * Function that patches the `fs` module to not escape the given roots.
  * @returns a function to undo the patches.
  */
-export function patcher(roots: string[]): () => void {
+export function patcher(
+    roots: string[],
+    useInternalLstatPatch: boolean = false
+): () => void {
     if (fs._unpatched) {
         throw new Error('FS is already patched.')
     }
@@ -107,101 +110,125 @@ export function patcher(roots: string[]): () => void {
     const { canEscape, isEscape } = escapeFunction(roots)
 
     // =========================================================================
+    // fsInternal.lstat (to patch ESM resolve's `realpathSync`!)
+    // =========================================================================
+    let unpatchEsm: Function | undefined
+    if (useInternalLstatPatch) {
+        const lstatEsmPatcher =
+            new (require('./fs_stat.cjs').FsInternalStatPatcher)(
+                { canEscape, isEscape },
+                guardedReadLink,
+                guardedReadLinkSync,
+                unguardedRealPath,
+                unguardedRealPathSync
+            )
+
+        lstatEsmPatcher.patch()
+
+        unpatchEsm = lstatEsmPatcher.revert.bind(lstatEsmPatcher)
+    }
+
+    // =========================================================================
     // fs.lstat
     // =========================================================================
 
-    fs.lstat = function lstat(...args: Parameters<typeof FsType.lstat>) {
-        // preserve error when calling function without required callback
-        if (typeof args[args.length - 1] !== 'function') {
-            return origLstat(...args)
+    if (!useInternalLstatPatch) {
+        fs.lstat = function lstat(...args: Parameters<typeof FsType.lstat>) {
+            // preserve error when calling function without required callback
+            if (typeof args[args.length - 1] !== 'function') {
+                return origLstat(...args)
+            }
+
+            const cb = once(args[args.length - 1] as Function)
+
+            // override the callback
+            args[args.length - 1] = function lstatCb(
+                err: Error | null,
+                stats: Stats | BigIntStats
+            ) {
+                if (err) return cb(err)
+
+                if (!stats.isSymbolicLink()) {
+                    // the file is not a symbolic link so there is nothing more to do
+                    return cb(null, stats)
+                }
+
+                args[0] = resolvePathLike(args[0])
+
+                if (!canEscape(args[0])) {
+                    // the file can not escaped the sandbox so there is nothing more to do
+                    return cb(null, stats)
+                }
+
+                return guardedReadLink(args[0], guardedReadLinkCb)
+
+                function guardedReadLinkCb(str: string) {
+                    if (str != args[0]) {
+                        // there are one or more hops within the guards so there is nothing more to do
+                        return cb(null, stats)
+                    }
+
+                    // there are no hops so lets report the stats of the real file;
+                    // we can't use origRealPath here since that function calls lstat internally
+                    // which can result in an infinite loop
+                    return unguardedRealPath(args[0], unguardedRealPathCb)
+
+                    function unguardedRealPathCb(
+                        err: Error | null,
+                        str?: string
+                    ) {
+                        if (err) {
+                            if ((err as any).code === 'ENOENT') {
+                                // broken link so there is nothing more to do
+                                return cb(null, stats)
+                            }
+                            return cb(err)
+                        }
+                        return origLstat(str!, cb)
+                    }
+                }
+            }
+
+            origLstat(...args)
         }
 
-        const cb = once(args[args.length - 1] as Function)
-
-        // override the callback
-        args[args.length - 1] = function lstatCb(
-            err: Error | null,
-            stats: Stats | BigIntStats
+        fs.lstatSync = function lstatSync(
+            ...args: Parameters<typeof FsType.lstatSync>
         ) {
-            if (err) return cb(err)
+            const stats = origLstatSync(...args)
 
-            if (!stats.isSymbolicLink()) {
+            if (!stats?.isSymbolicLink()) {
                 // the file is not a symbolic link so there is nothing more to do
-                return cb(null, stats)
+                return stats
             }
 
             args[0] = resolvePathLike(args[0])
 
             if (!canEscape(args[0])) {
                 // the file can not escaped the sandbox so there is nothing more to do
-                return cb(null, stats)
-            }
-
-            return guardedReadLink(args[0], guardedReadLinkCb)
-
-            function guardedReadLinkCb(str: string) {
-                if (str != args[0]) {
-                    // there are one or more hops within the guards so there is nothing more to do
-                    return cb(null, stats)
-                }
-
-                // there are no hops so lets report the stats of the real file;
-                // we can't use origRealPath here since that function calls lstat internally
-                // which can result in an infinite loop
-                return unguardedRealPath(args[0], unguardedRealPathCb)
-
-                function unguardedRealPathCb(err: Error | null, str?: string) {
-                    if (err) {
-                        if ((err as any).code === 'ENOENT') {
-                            // broken link so there is nothing more to do
-                            return cb(null, stats)
-                        }
-                        return cb(err)
-                    }
-                    return origLstat(str!, cb)
-                }
-            }
-        }
-
-        origLstat(...args)
-    }
-
-    fs.lstatSync = function lstatSync(
-        ...args: Parameters<typeof FsType.lstatSync>
-    ) {
-        const stats = origLstatSync(...args)
-
-        if (!stats?.isSymbolicLink()) {
-            // the file is not a symbolic link so there is nothing more to do
-            return stats
-        }
-
-        args[0] = resolvePathLike(args[0])
-
-        if (!canEscape(args[0])) {
-            // the file can not escaped the sandbox so there is nothing more to do
-            return stats
-        }
-
-        const guardedReadLink: string = guardedReadLinkSync(args[0])
-        if (guardedReadLink != args[0]) {
-            // there are one or more hops within the guards so there is nothing more to do
-            return stats
-        }
-
-        try {
-            args[0] = unguardedRealPathSync(args[0])
-
-            // there are no hops so lets report the stats of the real file;
-            // we can't use origRealPathSync here since that function calls lstat internally
-            // which can result in an infinite loop
-            return origLstatSync(...args)
-        } catch (err: any) {
-            if (err.code === 'ENOENT') {
-                // broken link so there is nothing more to do
                 return stats
             }
-            throw err
+
+            const guardedReadLink: string = guardedReadLinkSync(args[0])
+            if (guardedReadLink != args[0]) {
+                // there are one or more hops within the guards so there is nothing more to do
+                return stats
+            }
+
+            try {
+                args[0] = unguardedRealPathSync(args[0])
+
+                // there are no hops so lets report the stats of the real file;
+                // we can't use origRealPathSync here since that function calls lstat internally
+                // which can result in an infinite loop
+                return origLstatSync(...args)
+            } catch (err: any) {
+                if (err.code === 'ENOENT') {
+                    // broken link so there is nothing more to do
+                    return stats
+                }
+                throw err
+            }
         }
     }
 
@@ -309,9 +336,12 @@ export function patcher(roots: string[]): () => void {
                         if (next == undefined) {
                             // The escape from the root is not mappable back into the root; throw EINVAL
                             return cb(enoent('readlink', args[0]))
-                        } else {
+                        } else if (!useInternalLstatPatch) {
                             // The escape from the root is not mappable back into the root; throw EINVAL
                             return cb(einval('readlink', args[0]))
+                        } else {
+                            // TODO: why does this only apply when useInternalLstatPatch is true?
+                            return cb(null, str)
                         }
                     }
                     const r = path.resolve(
@@ -478,7 +508,9 @@ export function patcher(roots: string[]): () => void {
 
     if (promisePropertyDescriptor) {
         const promises: typeof fs.promises = {}
-        promises.lstat = util.promisify(fs.lstat)
+        if (!useInternalLstatPatch) {
+            promises.lstat = util.promisify(fs.lstat)
+        }
         // NOTE: node core uses the newer realpath function fs.promises.native instead of fs.realPath
         promises.realpath = util.promisify(fs.realpath.native)
         promises.readlink = util.promisify(fs.readlink)
@@ -677,6 +709,10 @@ export function patcher(roots: string[]): () => void {
         })
     }
 
+    const symlinkNoThrow: StatSyncOptions = Object.freeze({
+        throwIfNoEntry: false,
+    })
+
     const hopLinkCache = Object.create(null) as { [f: string]: HopResults }
     function readHopLinkSync(p: string): HopResults {
         if (hopLinkCache[p]) {
@@ -685,26 +721,20 @@ export function patcher(roots: string[]): () => void {
 
         let link: HopResults
 
-        try {
-            if (origLstatSync(p).isSymbolicLink()) {
-                link = origReadlinkSync(p) as string
-                if (link) {
-                    if (!path.isAbsolute(link)) {
-                        link = path.resolve(path.dirname(p), link)
-                    }
-                } else {
-                    link = HOP_NON_LINK
+        const pStats = origLstatSync(p, symlinkNoThrow)
+        if (!pStats) {
+            link = HOP_NOT_FOUND
+        } else if (pStats.isSymbolicLink()) {
+            link = origReadlinkSync(p) as string
+            if (link) {
+                if (!path.isAbsolute(link)) {
+                    link = path.resolve(path.dirname(p), link)
                 }
             } else {
                 link = HOP_NON_LINK
             }
-        } catch (err: any) {
-            if (err.code === 'ENOENT') {
-                // file does not exist
-                link = HOP_NOT_FOUND
-            } else {
-                link = HOP_NON_LINK
-            }
+        } else {
+            link = HOP_NON_LINK
         }
 
         hopLinkCache[p] = link
@@ -921,6 +951,10 @@ export function patcher(roots: string[]): () => void {
             unpatchPromises()
         }
 
+        if (unpatchEsm) {
+            unpatchEsm()
+        }
+
         // Re-sync the esm modules to revert to the unpatched module.
         esmModule.syncBuiltinESMExports()
     }
@@ -945,7 +979,7 @@ function stringifyPathLike(p: PathLike): string {
     }
 }
 
-function resolvePathLike(p: PathLike): string {
+export function resolvePathLike(p: PathLike): string {
     return path.resolve(stringifyPathLike(p))
 }
 

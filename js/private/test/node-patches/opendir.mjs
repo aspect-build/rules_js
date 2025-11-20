@@ -22,6 +22,8 @@ import * as util from 'node:util'
 
 import { patcher } from '../../node-patches/src/fs.cjs'
 
+const useEsmPatch = process.env.NODE_PATCHES_TEST_ESM_LOADER === '1'
+
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {
     await fn()
@@ -45,7 +47,7 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const revertPatches = patcher([fixturesDir])
+                const revertPatches = patcher([fixturesDir], useEsmPatch)
 
                 let dir
                 dir = await util.promisify(fs.opendir)(
@@ -114,7 +116,10 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const revertPatches = patcher([path.join(fixturesDir, 'a')])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir, 'a')],
+                    useEsmPatch
+                )
 
                 let dir
                 dir = await util.promisify(fs.opendir)(
@@ -178,7 +183,10 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const revertPatches = patcher([path.join(fixturesDir)])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir)],
+                    useEsmPatch
+                )
 
                 const dir = await util.promisify(fs.opendir)(
                     path.join(fixturesDir, 'a')
@@ -214,7 +222,10 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const revertPatches = patcher([path.join(fixturesDir, 'a')])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir, 'a')],
+                    useEsmPatch
+                )
 
                 const dir = await util.promisify(fs.opendir)(
                     path.join(fixturesDir, 'a')
@@ -271,9 +282,10 @@ describe('testing opendir', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const revertPatches = patcher([
-                    path.join(fixturesDir, 'sandbox'),
-                ])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir, 'sandbox')],
+                    useEsmPatch
+                )
 
                 let dir
                 dir = await util.promisify(fs.opendir)(
