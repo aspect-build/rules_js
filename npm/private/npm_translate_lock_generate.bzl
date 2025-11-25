@@ -216,8 +216,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     bazel_package = native.package_name()
     root_package = "{root_package}"
     is_root = bazel_package == root_package
-    link = bazel_package in _IMPORTER_PACKAGES
-    if not is_root and not link:
+    is_importer = bazel_package in _IMPORTER_PACKAGES
+    if not is_root and not is_importer:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
 {validation_call}
@@ -419,7 +419,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     # Invoke and collect link targets based on package
     if links_pkg_bzl:
-        npm_link_all_packages_bzl.append("""    if link:""")
+        npm_link_all_packages_bzl.append("""    if is_importer:""")
         first_link = True
         for link_package, bzl in links_pkg_bzl.items():
             npm_link_all_packages_bzl.append("""        {els}if bazel_package == "{pkg}":""".format(
@@ -456,23 +456,23 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 """)
 
     # Generate catch all & scoped js_library targets
-    # TODO(3.0): don't generate empty js_library targets?
     npm_link_all_packages_bzl.append("""
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
             _js_library(
-                name = "{}/{}".format(name, scope),
+                name = "node_modules/{}".format(scope),
                 srcs = scoped_targets,
                 tags = ["manual"],
                 visibility = ["//visibility:public"],
             )
 
-    _js_library(
-        name = name,
-        srcs = link_targets if link_targets else [],
-        tags = ["manual"],
-        visibility = ["//visibility:public"],
-    )""")
+    if is_importer:
+        _js_library(
+            name = "node_modules",
+            srcs = link_targets if link_targets else [],
+            tags = ["manual"],
+            visibility = ["//visibility:public"],
+        )""")
 
     npm_link_targets_bzl = _generate_npm_link_targets(links_targets)
 
