@@ -17,8 +17,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
-    link = bazel_package in _IMPORTER_PACKAGES
-    if not is_root and not link:
+    is_importer = bazel_package in _IMPORTER_PACKAGES
+    if not is_root and not is_importer:
         msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
 
@@ -29,7 +29,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     link_targets = None
     scope_targets = None
 
-    if link:
+    if is_importer:
         if bazel_package == "":
             link_0()
             link_targets = [":node_modules/@aspect-test/c"]
@@ -53,18 +53,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
             _js_library(
-                name = "{}/{}".format(name, scope),
+                name = "node_modules/{}".format(scope),
                 srcs = scoped_targets,
                 tags = ["manual"],
                 visibility = ["//visibility:public"],
             )
 
-    _js_library(
-        name = name,
-        srcs = link_targets if link_targets else [],
-        tags = ["manual"],
-        visibility = ["//visibility:public"],
-    )
+    if is_importer:
+        _js_library(
+            name = "node_modules",
+            srcs = link_targets if link_targets else [],
+            tags = ["manual"],
+            visibility = ["//visibility:public"],
+        )
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
