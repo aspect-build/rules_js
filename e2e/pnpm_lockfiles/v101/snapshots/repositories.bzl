@@ -714,23 +714,6 @@ def npm_repositories():
     )
 
     npm_import(
-        name = "lock-<LOCKVERSION>__hello__https___gitpkg.vercel.app_EqualMa_gitpkg-hello_packages_hello",
-        root_package = "<LOCKVERSION>",
-        link_workspace = "",
-        link_packages = {
-            "<LOCKVERSION>": ["hello"],
-            "projects/peer-types": ["hello"],
-        },
-        package = "hello",
-        version = "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
-        url = "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
-        package_visibility = ["//visibility:public"],
-        transitive_closure = {
-            "hello": ["https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello"],
-        },
-    )
-
-    npm_import(
         name = "lock-<LOCKVERSION>__is-core-module__2.16.1",
         root_package = "<LOCKVERSION>",
         link_workspace = "",

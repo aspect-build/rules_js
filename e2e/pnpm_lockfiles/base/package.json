@@ -10,7 +10,6 @@
         "@aspect-test-custom-scope/a": "npm:@aspect-test/a",
         "@isaacs/cliui": "8.0.2",
         "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
-        "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
         "jquery-git-ssh-e61fccb": "git+ssh://git@github.com/jquery/jquery.git#e61fccb9d736235b4b011f89cba6866bc0b8997d",
         "jquery-git-ssh-399b201": "git+ssh://git@github.com:jquery/jquery#399b201bb3143a3952894cf3489b4848fc003967",
