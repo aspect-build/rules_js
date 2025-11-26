@@ -113,7 +113,7 @@ jobs:
             os: ${{ steps.os.outputs.res }}
 
     test:
-        runs-on: ${{ matrix.os }}-latest
+        runs-on: ${{ matrix.os == 'macos' && 'macos-latest' || matrix.os == 'windows' && 'windows-latest' || 'ubuntu-22.04-4core' }}
         needs:
             - matrix-prep
         defaults:
