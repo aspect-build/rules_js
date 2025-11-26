@@ -39,7 +39,6 @@ importers:
       aspect-test-a-no-scope: npm:@aspect-test/a
       aspect-test-a/no-at: npm:@aspect-test/a
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
-      hello: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
       is-odd: npm:is-odd@3.0.1
       is-odd-alias: npm:is-odd
       is-odd-v0: npm:is-odd@0.1.0
@@ -75,7 +74,6 @@ importers:
       aspect-test-a-no-scope: /@aspect-test/a/5.0.2
       aspect-test-a/no-at: /@aspect-test/a/5.0.2
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
-      hello: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
       is-odd: 3.0.1
       is-odd-alias: /is-odd/3.0.1
       is-odd-v0: /is-odd/0.1.0
@@ -159,13 +157,11 @@ importers:
       '@scoped/a': workspace:*
       '@scoped/b': link:../b
       '@scoped/c': file:../c
-      hello: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
       jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
     devDependencies:
       '@scoped/a': link:../a
       '@scoped/b': link:../b
       '@scoped/c': file:../projects/c_@scoped+b@projects+b
-      hello: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
       jsonify: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
 
   ../projects/peers-combo-1:
@@ -575,11 +571,6 @@ packages:
     version: 5.2.0
     engines: {node: '>=0.3.1'}
     dev: false
-
-  '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello':
-    resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
-    name: hello
-    version: 1.0.0
 
   file:../projects/a-types:
     resolution: {directory: ../projects/a-types, type: directory}

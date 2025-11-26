@@ -61,9 +61,6 @@ importers:
       debug:
         specifier: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
         version: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
-      hello:
-        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
-        version: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
       is-odd:
         specifier: npm:is-odd@3.0.1
         version: 3.0.1
@@ -220,9 +217,6 @@ importers:
       '@scoped/c':
         specifier: file:../c
         version: file:../projects/c(@scoped/b@projects+b)
-      hello:
-        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
-        version: '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello'
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -640,11 +634,6 @@ packages:
     version: 5.2.0
     engines: {node: '>=0.3.1'}
     dev: false
-
-  '@gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello':
-    resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
-    name: hello
-    version: 1.0.0
 
   file:../projects/a-types:
     resolution: {directory: ../projects/a-types, type: directory}

@@ -62,9 +62,6 @@ importers:
       debug:
         specifier: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
         version: https://codeload.github.com/ngokevin/debug/tar.gz/9742c5f383a6f8046241920156236ade8ec30d53
-      hello:
-        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
-        version: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
       is-odd:
         specifier: npm:is-odd@3.0.1
         version: 3.0.1
@@ -221,9 +218,6 @@ importers:
       '@scoped/c':
         specifier: file:../c
         version: file:../projects/c(@scoped/b@projects+b)
-      hello:
-        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
-        version: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -393,10 +387,6 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
-
-  hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello:
-    resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
-    version: 1.0.0
 
   is-core-module@2.16.1:
     resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==}
@@ -661,8 +651,6 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
-
-  hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello: {}
 
   is-core-module@2.16.1:
     dependencies:
