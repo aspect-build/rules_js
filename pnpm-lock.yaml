@@ -389,9 +389,6 @@ importers:
       handlebars-helpers/helper-date:
         specifier: github:coda/helper-date#a2cb4284148cbba7d36173dff4c7c60ce59eae55
         version: helper-date@https://codeload.github.com/coda/helper-date/tar.gz/a2cb4284148cbba7d36173dff4c7c60ce59eae55
-      hello:
-        specifier: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
-        version: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello
       hot-shots:
         specifier: 10.0.0
         version: 10.0.0
@@ -3007,10 +3004,6 @@ packages:
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
-
-  hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello:
-    resolution: {tarball: https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello}
-    version: 1.0.0
 
   helper-date@https://codeload.github.com/coda/helper-date/tar.gz/a2cb4284148cbba7d36173dff4c7c60ce59eae55:
     resolution: {tarball: https://codeload.github.com/coda/helper-date/tar.gz/a2cb4284148cbba7d36173dff4c7c60ce59eae55}
@@ -7689,8 +7682,6 @@ snapshots:
       function-bind: 1.1.2
 
   he@1.2.0: {}
-
-  hello@https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello: {}
 
   helper-date@https://codeload.github.com/coda/helper-date/tar.gz/a2cb4284148cbba7d36173dff4c7c60ce59eae55:
     dependencies:
