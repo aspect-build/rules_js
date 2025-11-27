@@ -264,7 +264,6 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     RUNFILES="$PWD/$RUNFILES"
 fi
 
-export RUNFILES
 JS_BINARY__RUNFILES="$RUNFILES"
 export JS_BINARY__RUNFILES
 
