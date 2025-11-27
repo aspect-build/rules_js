@@ -206,7 +206,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             custom_postinstall = i.custom_postinstall,
             deps = i.deps,
             integrity = i.integrity,
-            generate_package_json_bzl = True,  # TODO(3.0): only if it's a direct dep?
+            generate_package_json_bzl = i.is_direct_dep,
             extract_full_archive = None,
             dev = False,
             extra_build_content = "",

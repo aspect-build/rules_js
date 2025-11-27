@@ -255,6 +255,9 @@ def _select_npm_auth(url, npm_auth):
 def _get_npm_imports(importers, packages, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
+    # Direct dependencies of 'importers' which will have public targets
+    direct_deps = {}
+
     # make a lookup table of package to link name for each importer
     importer_links = {}
     for import_path, importer in importers.items():
@@ -264,6 +267,8 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         }
         linked_packages = {}
         for dep_package, dep_package_key in dependencies.items():
+            direct_deps[dep_package_key] = True
+
             if dep_package_key.startswith("link:"):
                 continue
             if dep_package_key not in linked_packages:
@@ -440,6 +445,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             integrity = integrity,
             link_packages = link_packages,
             repo_name = repo_name,
+            is_direct_dep = package_key in direct_deps,
             package_key = package_key,
             package = name,
             package_visibility = package_visibility,
