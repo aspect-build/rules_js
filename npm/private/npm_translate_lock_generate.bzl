@@ -613,9 +613,6 @@ def _generate_npm_package_locations(fp_links, npm_imports):
                     if alias not in location_to_packages[link_package]:
                         location_to_packages[link_package].append(alias)
 
-    # TODO(zbarsky): `sorted_map` could just return the dict's items which is what `to_dict_attr` wants anyway.
-    location_to_packages = utils.sorted_map(location_to_packages)
-
     return "_NPM_PACKAGE_LOCATIONS = {}".format(
         starlark_codegen_utils.to_dict_attr(location_to_packages, 0, quote_value = False),
     )

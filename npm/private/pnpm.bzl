@@ -255,9 +255,6 @@ def _parse_lockfile(parsed, no_dev, no_optional, err):
     importers = _convert_v9_importers(importers, snapshots, no_dev, no_optional)
     packages = _convert_v9_packages(packages, snapshots, no_optional)
 
-    importers = utils.sorted_map(importers)
-    packages = utils.sorted_map(packages)
-
     _validate_lockfile_data(importers, packages)
 
     return importers, packages, patched_dependencies, None
