@@ -279,7 +279,7 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         importer_links[import_path] = links
 
     patches_used = []
-    result = {}
+    result = []
     for package_key, package_info in packages.items():
         name = package_info["name"]
         version = package_info["version"]
@@ -471,13 +471,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             replace_package = replace_package,
         )
 
-        if repo_name in result:
-            msg = "ERROR: duplicate package name: {}\n\t1: {}\n\t2: {}".format(repo_name, result[repo_name], result_pkg)
-            fail(msg)
-
-        result[repo_name] = result_pkg
-
-    result = utils.sorted_map(result).values()
+        result.append(result_pkg)
 
     # Check that all patches files specified were used; this is a defense-in-depth since it is too
     # easy to make a type in the patches keys or for a dep to change both of with could result
