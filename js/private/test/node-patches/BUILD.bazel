@@ -21,8 +21,10 @@ CJS_TESTS = [
 
 # Multiple node toolchains for testing across versions
 TOOLCHAINS_NAMES = [
-    "node16",
-    "node18",
+    # default name+version
+    "nodejs",
+
+    # custom versions for tests
     "node20",
     "node22",
     "node24",
