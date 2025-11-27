@@ -1,8 +1,8 @@
 // Register source-map-support for source maps to be applied on stack traces.
 require('source-map-support/register')
 
-let basePath = process.env.RUNFILES
-    ? `${process.env.RUNFILES}/${process.env.JS_BINARY__WORKSPACE}`
+let basePath = process.env.JS_BINARY__RUNFILES
+    ? `${process.env.JS_BINARY__RUNFILES}/${process.env.JS_BINARY__WORKSPACE}`
     : process.cwd()
 
 if (!basePath.endsWith('/')) {

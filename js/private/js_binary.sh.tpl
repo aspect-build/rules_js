@@ -147,7 +147,6 @@ trap _exit EXIT
 # Initialize RUNFILES environment variable
 # ==============================================================================
 {{initialize_runfiles}}
-export RUNFILES
 JS_BINARY__RUNFILES="$RUNFILES"
 export JS_BINARY__RUNFILES
 

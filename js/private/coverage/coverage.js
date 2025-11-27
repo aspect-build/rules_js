@@ -16087,7 +16087,10 @@ const include = require$$0$1
 
 // TODO: can or should we instrument files from other repositories as well?
 // if so then the path.join call below will yield invalid paths since files will have external/wksp as their prefix.
-const pwd = require$$0$2.join(process.env.RUNFILES, process.env.TEST_WORKSPACE);
+const pwd = require$$0$2.join(
+    process.env.JS_COVERAGE__RUNFILES,
+    process.env.TEST_WORKSPACE
+);
 process.chdir(pwd);
 
 new c8Exports.Report({
