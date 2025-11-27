@@ -62,9 +62,6 @@ js_test(
         ":node_modules/@rollup/plugin-commonjs",
         ":node_modules/mobx-react",
         ":node_modules/react",
-        # TODO: fix this test so we test a peer dependency without requiring it as a direct
-        # dependency https://github.com/aspect-build/rules_js/issues/92
-        ":node_modules/rollup",
     ],
     entry_point = "peer_test.js",
 )
