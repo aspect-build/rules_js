@@ -61,12 +61,12 @@ if [ "${TEST_SRCDIR:-}" ]; then
 elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
     RUNFILES=$(_normalize_path "$RUNFILES_MANIFEST_FILE")
     if [[ "${RUNFILES}" == *.runfiles_manifest ]]; then
-        # Newer versions of Bazel put the manifest besides the runfiles with the suffix .runfiles_manifest.
+        # Bazel puts the manifest besides the runfiles with the suffix .runfiles_manifest.
         # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
         # runfiles directory and named my_binary.runfiles_manifest
         RUNFILES=${RUNFILES%_manifest}
     elif [[ "${RUNFILES}" == */MANIFEST ]]; then
-        # Older versions of Bazel put the manifest file named MANIFEST in the runfiles directory
+        # Bazel for windows puts the manifest file named MANIFEST in the runfiles directory
         RUNFILES=${RUNFILES%/MANIFEST}
     else
         logf_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
