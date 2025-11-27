@@ -4,7 +4,7 @@
     "// devDependencies2": "See also: root package.json pnpm.onlyBuiltDependencies+packageExtensions",
     "devDependencies": {
         "@fastify/send": "3.3.0",
-        "@figma/nodegit": "^0.28.0-figma.3",
+        "@figma/nodegit": "^0.28.0-figma.6",
         "@kubernetes/client-node": "https://github.com/kubernetes-client/javascript#cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9",
         "@plotly/regl": "2.1.2",
         "bufferutil": "4.0.8",
