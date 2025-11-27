@@ -30,16 +30,3 @@ bzl_library(
         "@npm//:typescript_bzl_library",
     ],
 )
-
-# TODO(derek): stardoc doesn't work under bzlmod with these
-# targets when working against an overridden version of bazel-lib.
-# Remove comments of the released version of bazel-lib succeeds.
-#
-# stardoc_with_diff_test(
-#     name = "tsc-docs",
-#     bzl_library_target = ":tsc",
-# )
-#
-# update_docs(
-#     name = "docs",
-# )
