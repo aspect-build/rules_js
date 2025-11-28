@@ -255,6 +255,396 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_aix-ppc64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/aix-ppc64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-KuZrd2hRjz01y5JK9mEBSD3Vj3mbCvemhT466rSuJYeE/hjuBrHfjjcjMdTm/sz7au+++sdbJZJmuBwQLuw68A==",
+        transitive_closure = {
+            "@esbuild/aix-ppc64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_android-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/android-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-CC3vt4+1xZrs97/PKDkl0yN7w8edvU2vZvAFGD16n9F0Cvniy5qvzRXjfO1l94efczkkQE6g1x0i73Qf5uthOQ==",
+        transitive_closure = {
+            "@esbuild/android-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_android-arm__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/android-arm",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-j67aezrPNYWJEOHUNLPj9maeJte7uSMM6gMoxfPC9hOg8N02JuQi/T7ewumf4tNvJadFkvLZMlAq73b9uwdMyQ==",
+        transitive_closure = {
+            "@esbuild/android-arm": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_android-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/android-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-wurMkF1nmQajBO1+0CJmcN17U4BP6GqNSROP8t0X/Jiw2ltYGLHpEksp9MpoBqkrFR3kv2/te6Sha26k3+yZ9Q==",
+        transitive_closure = {
+            "@esbuild/android-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_darwin-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/darwin-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-uJOQKYCcHhg07DL7i8MzjvS2LaP7W7Pn/7uA0B5S1EnqAirJtbyw4yC5jQ5qcFjHK9l6o/MX9QisBg12kNkdHg==",
+        transitive_closure = {
+            "@esbuild/darwin-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_darwin-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/darwin-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-8mG6arH3yB/4ZXiEnXof5MK72dE6zM9cDvUcPtxhUZsDjESl9JipZYW60C3JGreKCEP+p8P/72r69m4AZGJd5g==",
+        transitive_closure = {
+            "@esbuild/darwin-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_freebsd-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/freebsd-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-9FHtyO988CwNMMOE3YIeci+UV+x5Zy8fI2qHNpsEtSF83YPBmE8UWmfYAQg6Ux7Gsmd4FejZqnEUZCMGaNQHQw==",
+        transitive_closure = {
+            "@esbuild/freebsd-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_freebsd-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/freebsd-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-zCMeMXI4HS/tXvJz8vWGexpZj2YVtRAihHLk1imZj4efx1BQzN76YFeKqlDr3bUWI26wHwLWPd3rwh6pe4EV7g==",
+        transitive_closure = {
+            "@esbuild/freebsd-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-AS18v0V+vZiLJyi/4LphvBE+OIX682Pu7ZYNsdUHyUKSoRwdnOsMf6FDekwoAFKej14WAkOef3zAORJgAtXnlQ==",
+        transitive_closure = {
+            "@esbuild/linux-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-arm__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-arm",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-t76XLQDpxgmq2cNXKTVEB7O7YMb42atj2Re2Haf45HkaUpjM2J0UuJZDuaGbPbamzZ7bawyGFUkodL+zcE+jvQ==",
+        transitive_closure = {
+            "@esbuild/linux-arm": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-ia32__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-ia32",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-Mz1jxqm/kfgKkc/KLHC5qIujMvnnarD9ra1cEcrs7qshTUSksPihGrWHVG5+osAIQ68577Zpww7SGapmzSt4Nw==",
+        transitive_closure = {
+            "@esbuild/linux-ia32": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-loong64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-loong64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-QbEREjdJeIreIAbdG2hLU1yXm1uu+LTdzoq1KCo4G4pFOLlvIspBm36QrQOar9LFduavoWX2msNFAAAY9j4BDg==",
+        transitive_closure = {
+            "@esbuild/linux-loong64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-mips64el__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-mips64el",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-sJz3zRNe4tO2wxvDpH/HYJilb6+2YJxo/ZNbVdtFiKDufzWq4JmKAiHy9iGoLjAV7r/W32VgaHGkk35cUXlNOg==",
+        transitive_closure = {
+            "@esbuild/linux-mips64el": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-ppc64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-ppc64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-z9N10FBD0DCS2dmSABDBb5TLAyF1/ydVb+N4pi88T45efQ/w4ohr/F/QYCkxDPnkhkp6AIpIcQKQ8F0ANoA2JA==",
+        transitive_closure = {
+            "@esbuild/linux-ppc64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-riscv64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-riscv64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-pQdyAIZ0BWIC5GyvVFn5awDiO14TkT/19FTmFcPdDec94KJ1uZcmFs21Fo8auMXzD4Tt+diXu1LW1gHus9fhFQ==",
+        transitive_closure = {
+            "@esbuild/linux-riscv64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-s390x__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-s390x",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-hPlRWR4eIDDEci953RI1BLZitgi5uqcsjKMxwYfmi4LcwyWo2IcRP+lThVnKjNtk90pLS8nKdroXYOqW+QQH+w==",
+        transitive_closure = {
+            "@esbuild/linux-s390x": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_linux-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/linux-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-1hBWx4OUJE2cab++aVZ7pObD6s+DK4mPGpemtnAORBvb5l/g5xFGk0vc0PjSkrDs0XaXj9yyob3d14XqvnQ4gw==",
+        transitive_closure = {
+            "@esbuild/linux-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_netbsd-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/netbsd-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-6m0sfQfxfQfy1qRuecMkJlf1cIzTOgyaeXaiVaaki8/v+WB+U4hc6ik15ZW6TAllRlg/WuQXxWj1jx6C+dfy3w==",
+        transitive_closure = {
+            "@esbuild/netbsd-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_netbsd-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/netbsd-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-xbbOdfn06FtcJ9d0ShxxvSn2iUsGd/lgPIO2V3VZIPDbEaIj1/3nBBe1AwuEZKXVXkMmpr6LUAgMkLD/4D2PPA==",
+        transitive_closure = {
+            "@esbuild/netbsd-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_openbsd-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/openbsd-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-fWgqR8uNbCQ/GGv0yhzttj6sU/9Z5/Sv/VGU3F5OuXK6J6SlriONKrQ7tNlwBrJZXRYk5jUhuWvF7GYzGguBZQ==",
+        transitive_closure = {
+            "@esbuild/openbsd-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_openbsd-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/openbsd-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-aCwlRdSNMNxkGGqQajMUza6uXzR/U0dIl1QmLjPtRbLOx3Gy3otfFu/VjATy4yQzo9yFDGTxYDo1FfAD9oRD2A==",
+        transitive_closure = {
+            "@esbuild/openbsd-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_openharmony-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/openharmony-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-nyvsBccxNAsNYz2jVFYwEGuRRomqZ149A39SHWk4hV0jWxKM0hjBPm3AmdxcbHiFLbBSwG6SbpIcUbXjgyECfA==",
+        transitive_closure = {
+            "@esbuild/openharmony-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_sunos-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/sunos-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-Q1KY1iJafM+UX6CFEL+F4HRTgygmEW568YMqDA5UV97AuZSm21b7SXIrRJDwXWPzr8MGr75fUZPV67FdtMHlHA==",
+        transitive_closure = {
+            "@esbuild/sunos-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_win32-arm64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/win32-arm64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-W1eyGNi6d+8kOmZIwi/EDjrL9nxQIQ0MiGqe/AWc6+IaHloxHSGoeRgDRKHFISThLmsewZ5nHFvGFWdBYlgKPg==",
+        transitive_closure = {
+            "@esbuild/win32-arm64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_win32-ia32__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/win32-ia32",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-30z1aKL9h22kQhilnYkORFYt+3wp7yZsHWus+wSKAJR8JtdfI76LJ4SBdMsCopTR3z/ORqVu5L1vtnHZWVj4cQ==",
+        transitive_closure = {
+            "@esbuild/win32-ia32": ["0.27.0"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__at_esbuild_win32-x64__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {},
+        package = "@esbuild/win32-x64",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-aIitBcjQeyOhMTImhLZmtxfdOcuNRpwlPNmlFKPcHQYPhEssw75Cl1TSXJXpMkzaua9FUetx/4OQKq7eJul5Cg==",
+        transitive_closure = {
+            "@esbuild/win32-x64": ["0.27.0"],
+        },
+    )
+
+    npm_import(
         name = "lock-<LOCKVERSION>__at_foo_jsonify__at_github.com_aspect-build_test-packages_releases_download_0.0.0_at_foo-jsonify-0.0.0.tgz",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
@@ -633,6 +1023,77 @@ def npm_repositories():
         integrity = "sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==",
         transitive_closure = {
             "emoji-regex": ["9.2.2"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__esbuild__0.27.0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["esbuild"],
+        },
+        package = "esbuild",
+        version = "0.27.0",
+        url = "https://registry.npmjs.org/esbuild/-/esbuild-0.27.0.tgz",
+        package_visibility = ["//visibility:public"],
+        integrity = "sha512-jd0f4NHbD6cALCyGElNpGAOtWxSq46l9X/sWB0Nzd5er4Kz2YTm+Vl0qKFT9KUJvD8+fiO8AvoHhFvEatfVixA==",
+        deps = {
+            "@esbuild/aix-ppc64": "0.27.0",
+            "@esbuild/android-arm": "0.27.0",
+            "@esbuild/android-arm64": "0.27.0",
+            "@esbuild/android-x64": "0.27.0",
+            "@esbuild/darwin-arm64": "0.27.0",
+            "@esbuild/darwin-x64": "0.27.0",
+            "@esbuild/freebsd-arm64": "0.27.0",
+            "@esbuild/freebsd-x64": "0.27.0",
+            "@esbuild/linux-arm": "0.27.0",
+            "@esbuild/linux-arm64": "0.27.0",
+            "@esbuild/linux-ia32": "0.27.0",
+            "@esbuild/linux-loong64": "0.27.0",
+            "@esbuild/linux-mips64el": "0.27.0",
+            "@esbuild/linux-ppc64": "0.27.0",
+            "@esbuild/linux-riscv64": "0.27.0",
+            "@esbuild/linux-s390x": "0.27.0",
+            "@esbuild/linux-x64": "0.27.0",
+            "@esbuild/netbsd-arm64": "0.27.0",
+            "@esbuild/netbsd-x64": "0.27.0",
+            "@esbuild/openbsd-arm64": "0.27.0",
+            "@esbuild/openbsd-x64": "0.27.0",
+            "@esbuild/openharmony-arm64": "0.27.0",
+            "@esbuild/sunos-x64": "0.27.0",
+            "@esbuild/win32-arm64": "0.27.0",
+            "@esbuild/win32-ia32": "0.27.0",
+            "@esbuild/win32-x64": "0.27.0",
+        },
+        transitive_closure = {
+            "@esbuild/aix-ppc64": ["0.27.0"],
+            "@esbuild/android-arm": ["0.27.0"],
+            "@esbuild/android-arm64": ["0.27.0"],
+            "@esbuild/android-x64": ["0.27.0"],
+            "@esbuild/darwin-arm64": ["0.27.0"],
+            "@esbuild/darwin-x64": ["0.27.0"],
+            "@esbuild/freebsd-arm64": ["0.27.0"],
+            "@esbuild/freebsd-x64": ["0.27.0"],
+            "@esbuild/linux-arm": ["0.27.0"],
+            "@esbuild/linux-arm64": ["0.27.0"],
+            "@esbuild/linux-ia32": ["0.27.0"],
+            "@esbuild/linux-loong64": ["0.27.0"],
+            "@esbuild/linux-mips64el": ["0.27.0"],
+            "@esbuild/linux-ppc64": ["0.27.0"],
+            "@esbuild/linux-riscv64": ["0.27.0"],
+            "@esbuild/linux-s390x": ["0.27.0"],
+            "@esbuild/linux-x64": ["0.27.0"],
+            "@esbuild/netbsd-arm64": ["0.27.0"],
+            "@esbuild/netbsd-x64": ["0.27.0"],
+            "@esbuild/openbsd-arm64": ["0.27.0"],
+            "@esbuild/openbsd-x64": ["0.27.0"],
+            "@esbuild/openharmony-arm64": ["0.27.0"],
+            "@esbuild/sunos-x64": ["0.27.0"],
+            "@esbuild/win32-arm64": ["0.27.0"],
+            "@esbuild/win32-ia32": ["0.27.0"],
+            "@esbuild/win32-x64": ["0.27.0"],
+            "esbuild": ["0.27.0"],
         },
     )
 
