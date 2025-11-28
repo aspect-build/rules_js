@@ -102,6 +102,9 @@ npm = use_extension(
         # Vendored tarball
         "lock-%s__lodash__file_.._vendored_lodash-4.17.21.tgz" % version,
         "lock-%s__lodash__file_.._vendored_lodash-4.17.21.tgz__links" % version,
+
+        # optional deps, os/cpu conditions
+        "lock-%s__esbuild__0.27.0__links" % version,
     )
     for version in PNPM_LOCK_VERSIONS
 ]
