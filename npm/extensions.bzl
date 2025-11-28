@@ -71,9 +71,7 @@ def _npm_extension_impl(module_ctx):
         for attr in mod.tags.npm_translate_lock:
             state = parse_and_verify_lock(module_ctx, attr.name, attr)
 
-            npm_imports = _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
-
-            _npm_translate_lock_bzlmod(module_ctx, attr, state, npm_imports)
+            _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -126,22 +124,9 @@ _hub_repo = repository_rule(
     },
 )
 
-def _npm_translate_lock_bzlmod(mctx, attr, state, npm_imports):
-    mctx.report_progress("Generating starlark for npm dependencies")
+def _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages):
+    module_ctx.report_progress("Generating starlark for npm dependencies")
 
-    files = generate_repository_files(
-        attr.name,
-        attr,
-        state,
-        npm_imports,
-    )
-
-    _hub_repo(
-        name = attr.name,
-        contents = files,
-    )
-
-def _npm_lock_imports_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages):
     registries = {}
     npm_auth = {}
     if attr.npmrc:
@@ -225,7 +210,18 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             url = i.url,
             version = i.version,
         )
-    return imports
+
+    files = generate_repository_files(
+        attr.name,
+        attr,
+        state,
+        imports,
+    )
+
+    _hub_repo(
+        name = attr.name,
+        contents = files,
+    )
 
 def _npm_import_bzlmod(i):
     # Assume package+version is a unique key for any package store this import is placed in
