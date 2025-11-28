@@ -28,6 +28,9 @@ BZLMOD_FILES = {
     # file: tarball packages
     "lodash_resolved.json": "@REPO_NAME//VERSION:lodash/resolved.json",
     "lodash-4.17.21_tgz_defs.bzl": "@REPO_NAME__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl",
+
+    # optional deps, os/cpu conditions
+    "esbuild_links_defs.bzl": "@REPO_NAME__esbuild__0.27.0__links//:defs.bzl",
 }
 
 def lockfile_test(npm_link_all_packages, name = None):
