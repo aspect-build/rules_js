@@ -64,7 +64,7 @@ def rules_js_dependencies():
 
     http_archive(
         name = "aspect_tools_telemetry_report",
-        sha256 = "fea3bc2f9b7896ab222756c27147b1f1b8f489df8114e03d252ffff475f8bce6",
-        strip_prefix = "tools_telemetry-0.2.8",
-        url = "https://github.com/aspect-build/tools_telemetry/releases/download/v0.2.8/tools_telemetry-v0.2.8.tar.gz",
+        sha256 = "f5699225a941148e1dbcc48066ac2f23c7f0658856690e38b016ebe5486da48f",
+        strip_prefix = "tools_telemetry-0.3.1",
+        url = "https://github.com/aspect-build/tools_telemetry/releases/download/v0.3.1/tools_telemetry-v0.3.1.tar.gz",
     )
