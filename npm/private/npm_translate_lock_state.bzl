@@ -34,7 +34,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_external_repository_action_cache(priv, attr)
 
-    _init_common_labels(priv, attr, label_store)
+    _init_common_labels(priv, rctx, attr, label_store)
 
     _init_patches_labels(priv, rctx, attr, label_store)
 
@@ -47,6 +47,8 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     pnpm_lock_path = label_store.path("pnpm_lock")
     pnpm_lock_exists = is_windows or utils.exists(rctx, pnpm_lock_path)
     if pnpm_lock_exists:
+        rctx.report_progress("Translating {}".format(label_store.relative_path("pnpm_lock")))
+
         _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows)
         _init_patched_dependencies_labels(priv, rctx, attr, label_store)
 
@@ -75,7 +77,7 @@ def _validate_attrs(attr, is_windows):
         fail("only one of npm_package_lock or yarn_lock may be set")
 
 ################################################################################
-def _init_common_labels(priv, attr, label_store):
+def _init_common_labels(priv, rctx, attr, label_store):
     # data files
     # only initialize if update_pnpm_lock is set since data files are unused otherwise
     if _should_update_pnpm_lock(priv):
@@ -84,6 +86,8 @@ def _init_common_labels(priv, attr, label_store):
 
     # lock files
     if attr.pnpm_lock:
+        rctx.watch(attr.pnpm_lock)
+
         label_store.add("pnpm_lock", attr.pnpm_lock, seed_root = True)
         label_store.add("lock", attr.pnpm_lock)
 

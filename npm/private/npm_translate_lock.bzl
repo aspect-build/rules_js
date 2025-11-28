@@ -394,9 +394,6 @@ def parse_and_verify_lock(rctx, rctx_name, attr):
     if not attr.pnpm_lock:
         _bootstrap_import(rctx, rctx_name, attr, state)
 
-    if attr.pnpm_lock:
-        rctx.watch(attr.pnpm_lock)
-
     if state.should_update_pnpm_lock():
         # Run `pnpm install --lockfile-only` or `pnpm import` if its inputs have changed since last update
         if state.action_cache_miss():
@@ -415,8 +412,6 @@ See https://github.com/aspect-build/rules_js/issues/1445
     helpers.verify_patches(rctx, attr, state)
 
     helpers.verify_lifecycle_hooks_specified(rctx, state)
-
-    rctx.report_progress("Translating {}".format(state.label_store.relative_path("pnpm_lock")))
 
     return state
 
