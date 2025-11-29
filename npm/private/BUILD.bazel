@@ -228,6 +228,9 @@ bzl_library(
     name = "pnpm",
     srcs = ["pnpm.bzl"],
     visibility = ["//npm:__subpackages__"],
+    deps = [
+        "//platforms/pnpm:index_bzl",
+    ],
 )
 
 bzl_library(

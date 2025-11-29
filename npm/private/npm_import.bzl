@@ -707,6 +707,10 @@ def _npm_import_links_rule_impl(rctx):
     lc_deps = {}
     deps = {}
 
+    # Dependency constraints map from target name to constraints.
+    # NOTE: will include the main target, /ref and /pkg all in one map for simplicity.
+    deps_constraints = {}
+
     # Convert the name:package_key deps map into the package_store_target:aliases map
     for (dep_name, dep_key) in rctx.attr.deps.items():
         dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/ref"'.format(
@@ -716,6 +720,10 @@ def _npm_import_links_rule_impl(rctx):
         if not dep_store_target in ref_deps:
             ref_deps[dep_store_target] = []
         ref_deps[dep_store_target].append(dep_name)
+
+        dep_constraints = rctx.attr.deps_constraints.get(dep_key, None)
+        if dep_constraints != None:
+            deps_constraints[dep_store_target] = dep_constraints
 
     transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
     if transitive_closure_pattern:
@@ -744,6 +752,8 @@ def _npm_import_links_rule_impl(rctx):
                 package_store_root = utils.package_store_root,
             )
 
+            dep_constraints = rctx.attr.deps_constraints.get(dep_key, None)
+
             for dep_name in dep_names:
                 if lc_dep_store_target not in lc_deps:
                     lc_deps[lc_dep_store_target] = []
@@ -752,6 +762,9 @@ def _npm_import_links_rule_impl(rctx):
                 if dep_store_target not in deps:
                     deps[dep_store_target] = []
                 deps[dep_store_target].append(dep_name)
+
+                if dep_constraints != None:
+                    deps_constraints[dep_store_target] = dep_constraints
     else:
         for (dep_name, dep_key) in rctx.attr.deps.items():
             dep_store_target = '":{package_store_root}/node_modules/{package_store_name}"'.format(
@@ -766,6 +779,10 @@ def _npm_import_links_rule_impl(rctx):
             if dep_store_target not in deps:
                 deps[dep_store_target] = []
             deps[dep_store_target].append(dep_name)
+
+            dep_constraints = rctx.attr.deps_constraints.get(dep_key, None)
+            if dep_constraints != None:
+                deps_constraints[dep_store_target] = dep_constraints
 
     package_store_name = utils.package_store_name(rctx.attr.key)
 
@@ -805,9 +822,9 @@ def _npm_import_links_rule_impl(rctx):
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
     npm_link_pkg_bzl_vars = dict(
-        deps = starlark_codegen_utils.to_dict_attr(deps, 2, quote_key = False),
+        deps = _to_deps_attr(deps, deps_constraints),
         npm_package_target = npm_package_target,
-        lc_deps = starlark_codegen_utils.to_dict_attr(lc_deps, 2, quote_key = False),
+        lc_deps = _to_deps_attr(lc_deps, deps_constraints),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
@@ -815,7 +832,7 @@ def _npm_import_links_rule_impl(rctx):
         public_visibility = str(public_visibility),
         package_key = rctx.attr.key,
         package = rctx.attr.package,
-        ref_deps = starlark_codegen_utils.to_dict_attr(ref_deps, 2, quote_key = False),
+        ref_deps = _to_deps_attr(ref_deps, deps_constraints),
         root_package = rctx.attr.root_package,
         transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
@@ -847,6 +864,14 @@ def _npm_import_links_rule_impl(rctx):
         return None
 
     return rctx.repo_metadata(reproducible = True)
+
+def _to_deps_attr(deps, deps_constraints):
+    return starlark_codegen_utils.to_conditional_dict_attr(
+        deps,
+        deps_constraints,
+        quote_key = False,
+        indent_count = 2,
+    )
 
 _COMMON_ATTRS = {
     "package": attr.string(mandatory = True),
@@ -1181,7 +1206,9 @@ npm_import_lib = struct(
 
 npm_import_links_rule = repository_rule(
     implementation = _npm_import_links_rule_impl,
-    attrs = _ATTRS_LINKS | _INTERNAL_COMMON_ATTRS,
+    attrs = _ATTRS_LINKS | _INTERNAL_COMMON_ATTRS | {
+        "deps_constraints": attr.string_list_dict(),
+    },
 )
 
 npm_import_rule = repository_rule(
@@ -1198,6 +1225,7 @@ def npm_import(
         package,
         version,
         deps,
+        deps_constraints,
         extra_build_content,
         transitive_closure,
         root_package,
@@ -1266,6 +1294,7 @@ def npm_import(
         dev = dev,
         root_package = root_package,
         deps = deps,
+        deps_constraints = deps_constraints,
         transitive_closure = transitive_closure,
         lifecycle_build_target = has_lifecycle_hooks or has_custom_postinstall,
         lifecycle_hooks_env = lifecycle_hooks_env,

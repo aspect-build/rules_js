@@ -41,8 +41,87 @@ def _to_dict_list_attr(dict, indent_count = 0, indent_size = 4, quote_key = True
     result += "\n%s}" % indent
     return result
 
+def _to_conditional_dict_attr(
+        dict,
+        constraints,
+        indent_count = 0,
+        indent_size = 4,
+        quote_key = True,
+        quote_value = True):
+    """Generate a conditional dictionary using select() statements.
+
+    Args:
+        dict: all items in the dictionary
+        constraints: select() constraints to be applied to items in the dict
+        indent_count: Base indentation level
+        indent_size: Spaces per indent level
+        quote_key: Whether to quote dictionary keys
+        quote_value: Whether to quote dictionary values
+
+    Returns:
+        String representation of conditional dict with select() or plain dict
+
+    Example output:
+        {
+            "key_a": "value_a",
+        } | select({
+            ":constraint_of_key_b": {
+                "key_b": "value_b",
+            },
+            "//conditions:default": {}
+        })
+    """
+    tab = " " * indent_size
+    indent = tab * indent_count
+
+    parts = []
+
+    # Add unconstrained first (if any)
+    unconstrained_dict = {}
+    constrained = {}
+
+    for k, v in dict.items():
+        # dict entries with no constraints go into the unconstrained dict
+        if k not in constraints:
+            unconstrained_dict[k] = v
+            continue
+
+        # dict entries with constraints must be mapped into the constrained dict
+        for condition in constraints[k]:
+            if condition not in constrained:
+                constrained[condition] = {}
+            constrained[condition][k] = v
+
+    if unconstrained_dict:
+        parts.append(
+            _to_dict_attr(unconstrained_dict, indent_count, indent_size, quote_key, quote_value),
+        )
+
+    # Add select() for constrainted entries
+    if constrained:
+        select_parts = []
+        for condition, cond_dict in constrained.items():
+            condition_dict = _to_dict_attr(cond_dict, indent_count + 1, indent_size, quote_key, quote_value)
+            select_parts.append('%s"%s": %s' % (tab * (indent_count + 1), condition, condition_dict))
+
+        # Add default case with no values for incompatible platforms
+        select_parts.append('%s"//conditions:default": {}' % (tab * (indent_count + 1)))
+
+        select_block = "select({\n%s\n%s})" % (",\n".join(select_parts), indent)
+        parts.append(select_block)
+
+    if not parts:
+        # empty
+        return "{}"
+    elif len(parts) == 1:
+        # Combine with | operator if needed
+        return parts[0]
+    else:
+        return " | ".join(parts)
+
 starlark_codegen_utils = struct(
     to_list_attr = _to_list_attr,
     to_dict_attr = _to_dict_attr,
     to_dict_list_attr = _to_dict_list_attr,
+    to_conditional_dict_attr = _to_conditional_dict_attr,
 )

@@ -2,6 +2,7 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
+load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_PLATFORMS")
 load(":utils.bzl", "utils")
 
 # Metadata about a pnpm "project" (importer).
@@ -34,7 +35,10 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathoptional
 #
 #   resolution: the lockfile resolution field
-def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution):
+#   cpu: list of allowed cpu architectures or None
+#   os: list of allowed operating systems or None
+
+def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os):
     return {
         "name": name,
         "dependencies": dependencies,
@@ -44,7 +48,34 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "version": version,
         "friendly_version": friendly_version,
         "resolution": resolution,
+        "cpu": cpu,
+        "os": os,
     }
+
+def _to_bazel_os_cpu_constraint(os, cpu):
+    if os not in PNPM_PLATFORMS:
+        fail("os '{}' not recognized".format(os))
+    if cpu not in PNPM_ARCHS:
+        fail("cpu '{}' not recognized".format(cpu))
+
+    if not PNPM_ARCHS[cpu] or not PNPM_PLATFORMS[os]:
+        return None
+
+    return "@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu)
+
+def _to_bazel_os_constraint(os):
+    if os not in PNPM_PLATFORMS:
+        fail("os '{}' not recognized".format(os))
+    if not PNPM_PLATFORMS[os]:
+        return None
+    return "@aspect_rules_js//platforms/pnpm:{}".format(os)
+
+def _to_bazel_cpu_constraint(cpu):
+    if cpu not in PNPM_ARCHS:
+        fail("cpu '{}' not recognized".format(cpu))
+    if not PNPM_ARCHS[cpu]:
+        return None
+    return "@aspect_rules_js//platforms/pnpm:{}".format(cpu)
 
 ######################### Lockfile v9 #########################
 
@@ -198,6 +229,8 @@ def _convert_v9_packages(packages, snapshots, no_optional):
             has_bin = package_data.get("hasBin", False),
             optional = optional,
             resolution = package_data["resolution"],
+            cpu = package_data.get("cpu", None),
+            os = package_data.get("os", None),
         )
 
     return result
@@ -344,4 +377,7 @@ pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
+    to_bazel_os_cpu_constraint = _to_bazel_os_cpu_constraint,
+    to_bazel_os_constraint = _to_bazel_os_constraint,
+    to_bazel_cpu_constraint = _to_bazel_cpu_constraint,
 )
