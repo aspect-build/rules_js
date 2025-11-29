@@ -34,7 +34,10 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathoptional
 #
 #   resolution: the lockfile resolution field
-def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution):
+#   cpu: list of allowed cpu architectures or None
+#   os: list of allowed operating systems or None
+
+def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os):
     return {
         "name": name,
         "dependencies": dependencies,
@@ -44,7 +47,18 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "version": version,
         "friendly_version": friendly_version,
         "resolution": resolution,
+        "cpu": cpu,
+        "os": os,
     }
+
+def _pnpm_to_bazel_os_cpu(os, cpu):
+    return "@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu)
+
+def _pnpm_to_bazel_os(os):
+    return "@aspect_rules_js//platforms/pnpm:{}".format(os)
+
+def _pnpm_to_bazel_cpu(cpu):
+    return "@aspect_rules_js//platforms/pnpm:{}".format(cpu)
 
 ######################### Lockfile v9 #########################
 
@@ -198,6 +212,8 @@ def _convert_v9_packages(packages, snapshots, no_optional):
             has_bin = package_data.get("hasBin", False),
             optional = optional,
             resolution = package_data["resolution"],
+            cpu = package_data.get("cpu", None),
+            os = package_data.get("os", None),
         )
 
     return result
@@ -344,4 +360,7 @@ pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
+    pnpm_to_bazel_os_cpu = _pnpm_to_bazel_os_cpu,
+    pnpm_to_bazel_os = _pnpm_to_bazel_os,
+    pnpm_to_bazel_cpu = _pnpm_to_bazel_cpu,
 )

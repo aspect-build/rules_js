@@ -24,16 +24,27 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
             ":.aspect_rules_js/node_modules/rollup@2.14.0/pkg": "rollup",
-        },
-        ref_deps = {
-            ":.aspect_rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
-        },
+        } | select({
+            "@aspect_rules_js//platforms/pnpm:darwin": {
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
+            },
+            "//conditions:default": {}
+        }),
+        ref_deps = select({
+            "@aspect_rules_js//platforms/pnpm:darwin": {
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
+            },
+            "//conditions:default": {}
+        }),
         lc_deps = {
-            ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
             ":.aspect_rules_js/node_modules/rollup@2.14.0/pkg_pre_lc_lite": "rollup",
-        },
+        } | select({
+            "@aspect_rules_js//platforms/pnpm:darwin": {
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
+            },
+            "//conditions:default": {}
+        }),
         has_lifecycle_build_target = False,
         transitive_closure_pattern = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0//:pkg",

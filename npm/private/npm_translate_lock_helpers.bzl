@@ -3,6 +3,7 @@
 load("@bazel_lib//lib:base64.bzl", "base64")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load(":pnpm.bzl", "pnpm")
 load(":utils.bzl", "utils")
 
 ################################################################################
@@ -439,9 +440,12 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
+        deps_constraints = _dep_constraints(packages, package_info)
+
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
             deps = optional_deps | deps,
+            deps_constraints = deps_constraints,
             integrity = integrity,
             link_packages = link_packages,
             repo_name = repo_name,
@@ -494,6 +498,27 @@ Either remove this patch file if it is no longer needed or change its key to mat
     _check_for_conflicting_public_links(result, attr.public_hoist_packages)
 
     return result
+
+################################################################################
+def _dep_constraints(packages, package_info):
+    constraints = {}
+
+    for name, key in package_info["optional_dependencies"].items():
+        # Only set constraints on optional deps
+        if name in package_info["dependencies"]:
+            continue
+
+        if packages[key]["os"] and packages[key]["cpu"]:
+            constraints[key] = []
+            for os in packages[key]["os"]:
+                for cpu in packages[key]["cpu"]:
+                    constraints[key].append(pnpm.pnpm_to_bazel_os_cpu(os, cpu))
+        elif packages[key]["cpu"]:
+            constraints[key] = [pnpm.pnpm_to_bazel_cpu(cpu) for cpu in packages[key]["cpu"]]
+        elif packages[key]["os"]:
+            constraints[key] = [pnpm.pnpm_to_bazel_os(os) for os in packages[key]["os"]]
+
+    return constraints
 
 ################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
