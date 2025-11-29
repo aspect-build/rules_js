@@ -34,7 +34,10 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathoptional
 #
 #   resolution: the lockfile resolution field
-def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution):
+#   cpu: list of allowed cpu architectures or None
+#   os: list of allowed operating systems or None
+
+def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os):
     return {
         "name": name,
         "dependencies": dependencies,
@@ -44,7 +47,47 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "version": version,
         "friendly_version": friendly_version,
         "resolution": resolution,
+        "cpu": cpu,
+        "os": os,
     }
+
+# Known PNPM v9+ OS and CPU constraints to Bazel @platform labels
+_PNPM_OS_TO_PLATFORM = {
+    "aix": "@platforms//os:linux",
+    "android": "@platforms//os:android",
+    "darwin": "@platforms//os:macos",
+    "freebsd": "@platforms//os:freebsd",
+    "linux": "@platforms//os:linux",
+    "netbsd": "@platforms//os:netbsd",
+    "openbsd": "@platforms//os:openbsd",
+    "openharmony": "@platforms//os:linux",  # TODO: confirm
+    "sunos": "@platforms//os:linux",  # TODO: confirm
+    "win32": "@platforms//os:windows",
+}
+_PNPM_CPU_TO_PLATFORM = {
+    "arm64": "@platforms//cpu:arm64",
+    "arm": "@platforms//cpu:arm",
+    "ia32": "@platforms//cpu:i386",
+    "loong64": "@platforms//cpu:riscv64",  # TODO: confirm
+    "mips64el": "@platforms//cpu:mips64",  # TODO: confirm
+    "ppc64": "@platforms//cpu:ppc64le",
+    "riscv64": "@platforms//cpu:riscv64",
+    "s390x": "@platforms//cpu:s390x",
+    "wasm32": "@platforms//cpu:wasm32",
+    "x64": "@platforms//cpu:x86_64",
+}
+
+def _pnpm_to_bazel_os(os):
+    if os not in _PNPM_OS_TO_PLATFORM:
+        msg = "Unsupported OS constraint '{}'".format(os)
+        fail(msg)
+    return _PNPM_OS_TO_PLATFORM[os]
+
+def _pnpm_to_bazel_cpu(cpu):
+    if cpu not in _PNPM_CPU_TO_PLATFORM:
+        msg = "Unsupported CPU constraint '{}'".format(cpu)
+        fail(msg)
+    return _PNPM_CPU_TO_PLATFORM[cpu]
 
 ######################### Lockfile v9 #########################
 
@@ -198,6 +241,8 @@ def _convert_v9_packages(packages, snapshots, no_optional):
             has_bin = package_data.get("hasBin", False),
             optional = optional,
             resolution = package_data["resolution"],
+            cpu = package_data.get("cpu", None),
+            os = package_data.get("os", None),
         )
 
     return result
@@ -344,4 +389,6 @@ pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
+    pnpm_to_bazel_os = _pnpm_to_bazel_os,
+    pnpm_to_bazel_cpu = _pnpm_to_bazel_cpu,
 )
