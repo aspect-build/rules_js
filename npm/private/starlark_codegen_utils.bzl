@@ -115,43 +115,9 @@ def _to_conditional_dict_attr(
     else:
         return " | ".join(parts)
 
-def _to_conditional_dict2_attr(
-        dict,
-        constraints1,
-        constraints2,
-        indent_count = 0,
-        indent_size = 4,
-        quote_key = True,
-        quote_value = True):
-    """Generate a conditional dictionary using select() statements across 2 constraints.
-
-    NOTE: currently just does one of them based on size
-
-    Args:
-        dict: all items in the dictionary
-        constraints1: depth1 select() constraints to be applied to items in the dict
-        constraints2: depth2 select() constraints to be applied to items in the dict
-        indent_count: Base indentation level
-        indent_size: Spaces per indent level
-        quote_key: Whether to quote dictionary keys
-        quote_value: Whether to quote dictionary values
-
-    Returns:
-        String representation of conditional dict with select() or plain dict
-    """
-    return _to_conditional_dict_attr(
-        dict,
-        constraints1 if len(constraints1) >= len(constraints2) else constraints2,
-        indent_count,
-        indent_size,
-        quote_key,
-        quote_value,
-    )
-
 starlark_codegen_utils = struct(
     to_list_attr = _to_list_attr,
     to_dict_attr = _to_dict_attr,
     to_dict_list_attr = _to_dict_list_attr,
     to_conditional_dict_attr = _to_conditional_dict_attr,
-    to_conditional_dict2_attr = _to_conditional_dict2_attr,
 )

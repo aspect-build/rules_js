@@ -51,43 +51,14 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "os": os,
     }
 
-# Known PNPM v9+ OS and CPU constraints to Bazel @platform labels
-_PNPM_OS_TO_PLATFORM = {
-    "aix": "@platforms//os:linux",
-    "android": "@platforms//os:android",
-    "darwin": "@platforms//os:macos",
-    "freebsd": "@platforms//os:freebsd",
-    "linux": "@platforms//os:linux",
-    "netbsd": "@platforms//os:netbsd",
-    "openbsd": "@platforms//os:openbsd",
-    "openharmony": "@platforms//os:linux",  # TODO: confirm
-    "sunos": "@platforms//os:linux",  # TODO: confirm
-    "win32": "@platforms//os:windows",
-}
-_PNPM_CPU_TO_PLATFORM = {
-    "arm64": "@platforms//cpu:arm64",
-    "arm": "@platforms//cpu:arm",
-    "ia32": "@platforms//cpu:i386",
-    "loong64": "@platforms//cpu:riscv64",  # TODO: confirm
-    "mips64el": "@platforms//cpu:mips64",  # TODO: confirm
-    "ppc64": "@platforms//cpu:ppc64le",
-    "riscv64": "@platforms//cpu:riscv64",
-    "s390x": "@platforms//cpu:s390x",
-    "wasm32": "@platforms//cpu:wasm32",
-    "x64": "@platforms//cpu:x86_64",
-}
+def _pnpm_to_bazel_os_cpu(os, cpu):
+    return "@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu)
 
 def _pnpm_to_bazel_os(os):
-    if os not in _PNPM_OS_TO_PLATFORM:
-        msg = "Unsupported OS constraint '{}'".format(os)
-        fail(msg)
-    return _PNPM_OS_TO_PLATFORM[os]
+    return "@aspect_rules_js//platforms/pnpm:{}".format(os)
 
 def _pnpm_to_bazel_cpu(cpu):
-    if cpu not in _PNPM_CPU_TO_PLATFORM:
-        msg = "Unsupported CPU constraint '{}'".format(cpu)
-        fail(msg)
-    return _PNPM_CPU_TO_PLATFORM[cpu]
+    return "@aspect_rules_js//platforms/pnpm:{}".format(cpu)
 
 ######################### Lockfile v9 #########################
 
@@ -389,6 +360,7 @@ pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
+    pnpm_to_bazel_os_cpu = _pnpm_to_bazel_os_cpu,
     pnpm_to_bazel_os = _pnpm_to_bazel_os,
     pnpm_to_bazel_cpu = _pnpm_to_bazel_cpu,
 )

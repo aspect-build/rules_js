@@ -26,13 +26,13 @@ def npm_imported_package_store_internal():
         deps = {
             ":.aspect_rules_js/node_modules/rollup@2.14.0/pkg": "rollup",
         } | select({
-            "@platforms//os:macos": {
+            "@aspect_rules_js//platforms/pnpm:darwin": {
                 ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
             },
             "//conditions:default": {}
         }),
         ref_deps = select({
-            "@platforms//os:macos": {
+            "@aspect_rules_js//platforms/pnpm:darwin": {
                 ":.aspect_rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
             },
             "//conditions:default": {}
@@ -40,7 +40,7 @@ def npm_imported_package_store_internal():
         lc_deps = {
             ":.aspect_rules_js/node_modules/rollup@2.14.0/pkg_pre_lc_lite": "rollup",
         } | select({
-            "@platforms//os:macos": {
+            "@aspect_rules_js//platforms/pnpm:darwin": {
                 ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
             },
             "//conditions:default": {}
