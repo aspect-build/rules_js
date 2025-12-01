@@ -251,7 +251,7 @@ def _maybe_npmrc(priv, rctx, attr, label_store, key):
 WARNING: Implicitly using .npmrc file `{npmrc}`.
         Set the `npmrc` attribute of `npm_translate_lock(name = "{rctx_name}")` to `{npmrc}` suppress this warning.
 """.format(npmrc = npmrc_label, rctx_name = priv["rctx_name"]))
-        _copy_input_file(priv, rctx, attr, label_store, key)
+        _copy_input_file_legacy(priv, rctx, attr, label_store, key)
         label_store.add("npmrc", npmrc_label)
 
 ################################################################################
@@ -262,7 +262,7 @@ def _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists):
         keys.append("pnpm_lock")
     for k in keys:
         if label_store.has(k):
-            _copy_input_file(priv, rctx, attr, label_store, k)
+            _copy_input_file_legacy(priv, rctx, attr, label_store, k)
 
 ################################################################################
 # pnpm workspace file and data files are needed incase we run `pnpm install --lockfile-only` or `pnpm import` if updating lock file.
@@ -277,11 +277,13 @@ def _copy_update_input_files(priv, rctx, attr, label_store):
         keys.append("data_{}".format(i))
     for k in keys:
         if label_store.has(k):
-            _copy_input_file(priv, rctx, attr, label_store, k)
+            _copy_input_file_legacy(priv, rctx, attr, label_store, k)
 
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
 def _copy_unspecified_input_files(priv, rctx, attr, label_store):
+    repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
+
     pnpm_lock_label = attr.pnpm_lock
 
     # pnpm-workspace.yaml
@@ -303,29 +305,24 @@ WARNING: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the 
                 pnpm_lock = pnpm_lock_label,
             )
             fail(msg)
-        _copy_input_file(priv, rctx, attr, label_store, pnpm_workspace_key)
+        _copy_input_file_legacy(priv, rctx, attr, label_store, pnpm_workspace_key)
+
+    pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else repo_root
+    rel_dir = pnpm_lock_dir.removeprefix(repo_root)
 
     # package.json files
-    for i, _ in enumerate(priv["importers"].keys()):
-        package_json_key = "package_json_{}".format(i)
-        if not _has_input_hash(priv, label_store.relative_path(package_json_key)):
-            # there is a workspace package here so there must be a package.json file
-            # buildifier: disable=print
-            print("""
-WARNING: Implicitly using package.json file `{package_json}` since the `{pnpm_lock}` file contains this workspace package.
-    Add '{package_json}' to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
-""".format(
-                pnpm_lock = pnpm_lock_label,
-                package_json = label_store.label(package_json_key),
-                rctx_name = priv["rctx_name"],
-            ))
-            if not utils.exists(rctx, label_store.path(package_json_key)):
+    for package_json in priv["importers"].keys():
+        rel_path = paths.normalize(paths.join(rel_dir, package_json, "package.json"))
+        workspace_path = paths.join(repo_root, rel_path)
+
+        if not _has_input_hash(priv, rel_path):
+            if not rctx.path(workspace_path).exists:
                 msg = "ERROR: expected {path} to exist since the `{pnpm_lock}` file contains this workspace package".format(
-                    path = label_store.path(package_json_key),
+                    path = workspace_path,
                     pnpm_lock = pnpm_lock_label,
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, label_store, package_json_key)
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)), repo_root)
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
     pnpm_patches = []
@@ -353,7 +350,7 @@ WARNING: Implicitly using patch file `{patch}` since the `{package_json}` file c
                     package_json = label_store.label("package_json_root"),
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, label_store, patch_key)
+            _copy_input_file_legacy(priv, rctx, attr, label_store, patch_key)
 
 ################################################################################
 def _has_input_hash(priv, path):
@@ -405,17 +402,28 @@ def _write_action_cache(priv, rctx, label_store):
     )
 
 ################################################################################
-def _copy_input_file(priv, rctx, attr, label_store, key):
+# This is legacy and should be removed all usages, we don't like label store
+def _copy_input_file_legacy(priv, rctx, attr, label_store, key):
     if not label_store.has(key):
         fail("key not found '{}'".format(key))
 
+    return _copy_input_file(
+        priv,
+        rctx,
+        attr,
+        label_store.path(key),
+        label_store.repository_path(key),
+        str(rctx.path(Label("@@//:all"))).removesuffix("all"),
+    )
+
+def _copy_input_file(priv, rctx, attr, path, repository_path, repo_root):
     if _should_update_pnpm_lock(priv):
         # NB: rctx.read will convert binary files to text but that is acceptable for
         # the purposes of calculating a hash of the file
         _set_input_hash(
             priv,
-            label_store.relative_path(key),
-            utils.hash(rctx.read(label_store.path(key))),
+            path.removeprefix(repo_root),
+            utils.hash(rctx.read(path)),
         )
 
     # Copy the file using cp (linux/macos) or xcopy (windows). Don't use the rctx.template
@@ -423,7 +431,7 @@ def _copy_input_file(priv, rctx, attr, label_store, key):
     # use the rctx.download with `file:` url trick since that messes with the
     # experimental_remote_downloader option. rctx.read follows by rctx.file also does not
     # work since it can't handle binary files.
-    _copy_input_file_action(rctx, attr, label_store.path(key), label_store.repository_path(key))
+    _copy_input_file_action(rctx, attr, path, repository_path)
 
 def _copy_input_file_action(rctx, attr, src, dst):
     is_windows = repo_utils.is_windows(rctx)
