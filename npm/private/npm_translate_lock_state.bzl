@@ -316,32 +316,19 @@ WARNING: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the 
             _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)), repo_root)
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
-    pnpm_patches = []
     for patch_info in priv["patched_dependencies"].values():
-        pnpm_patches.append(patch_info.get("path"))
+        patch = patch_info.get("path")
+        rel_path = paths.normalize(paths.join(rel_dir, patch))
+        workspace_path = paths.join(repo_root, rel_path)
 
-    num_patches = priv["num_patches"]
-
-    for i, _ in enumerate(pnpm_patches):
-        # The key for pnpm.patchesDependencies patches are indexed after patches in the `patches` attr
-        patch_key = "patches_{}".format(i + num_patches - len(pnpm_patches))
-        if not _has_input_hash(priv, label_store.relative_path(patch_key)):
-            # buildifier: disable=print
-            print("""
-WARNING: Implicitly using patch file `{patch}` since the `{package_json}` file contains this patch in `pnpm.patchedDependencies`.
-    Add '{patch}' to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
-""".format(
-                package_json = label_store.label("package_json_root"),
-                patch = label_store.label(patch_key),
-                rctx_name = priv["rctx_name"],
-            ))
-            if not utils.exists(rctx, label_store.path(patch_key)):
+        if not _has_input_hash(priv, rel_path):
+            if not rctx.path(workspace_path).exists:
                 msg = "ERROR: expected {path} to exist since the `{package_json}` file contains this patch in `pnpm.patchedDependencies`.".format(
-                    path = label_store.path(patch_key),
+                    path = workspace_path,
                     package_json = label_store.label("package_json_root"),
                 )
                 fail(msg)
-            _copy_input_file_legacy(priv, rctx, attr, label_store, patch_key)
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)), repo_root)
 
 ################################################################################
 def _has_input_hash(priv, path):
