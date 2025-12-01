@@ -49,7 +49,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         rctx.report_progress("Translating {}".format(label_store.relative_path("pnpm_lock")))
 
         _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows)
-        _init_patched_dependencies_labels(priv, rctx, attr, label_store)
 
     # May depend on lockfile state
     _init_root_package(priv, label_store)
@@ -146,19 +145,6 @@ def _init_patches_labels(priv, _, attr, label_store):
         label_store.add("patches_{}".format(i), d)
 
     priv["num_patches"] = len(patches)
-
-################################################################################
-def _init_patched_dependencies_labels(priv, _, attr, label_store):
-    # Read patches from pnpm-lock.yaml `patchedDependencies`
-    patches = [
-        attr.pnpm_lock.same_package_label(patch_info["path"])
-        for patch_info in priv["patched_dependencies"].values()
-    ]
-
-    for i, d in enumerate(patches):
-        label_store.add("patches_{}".format(i + priv["num_patches"]), d)
-
-    priv["num_patches"] += len(patches)
 
 ################################################################################
 def _init_importer_labels(priv, label_store):
