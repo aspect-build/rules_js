@@ -42,6 +42,7 @@ write_source_files(
         "snapshots/npm_defs-no_dev.bzl": "@npm-no_dev//:defs.bzl",
         "snapshots/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
         "snapshots/fsevents_links_defs.bzl": "@npm__fsevents__2.3.3__links//:defs.bzl",
+        "snapshots/next_links_defs.bzl": "@npm__next__15.2.4_1790925128__links//:defs.bzl",
         "snapshots/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
         "snapshots/package_json.bzl": "@npm__rollup__2.70.2//:package_json.bzl",
         "snapshots/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8//:package_json.bzl",
