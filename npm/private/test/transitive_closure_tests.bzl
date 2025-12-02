@@ -42,7 +42,7 @@ def test_walk_deps(ctx):
     env = unittest.begin(ctx)
 
     # Walk the example tree above
-    closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a@5.0.0")
+    is_circular, closure = gather_transitive_closure(TEST_PACKAGES, "@aspect-test/a@5.0.0")
     expected = {
         "@aspect-test/a@5.0.0": ["@aspect-test/a"],
         "@aspect-test/b@5.0.0": ["@aspect-test/b"],
@@ -50,6 +50,7 @@ def test_walk_deps(ctx):
         "@aspect-test/c@2.0.0": ["@aspect-test/c"],
         "@aspect-test/d@2.0.0(@aspect-test/c@1.0.0)": ["@aspect-test/d"],
     }
+    asserts.equals(env, False, is_circular)
     asserts.equals(env, expected, closure)
 
     return unittest.end(env)
