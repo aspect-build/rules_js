@@ -285,7 +285,7 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         name = package_info["name"]
         version = package_info["version"]
         friendly_version = package_info["friendly_version"]
-        transitive_closure = package_info.get("transitive_closure", None)
+        transitive_closure = package_info.get("transitive_closure", {}) | package_info.get("transitive_optional_closure", {})
         resolution = package_info["resolution"]
 
         resolution_type = resolution.get("type", None)
@@ -438,11 +438,11 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
-        deps, deps_constraints = _collect_deps(packages, package_info)
+        deps_constraints = _collect_dep_constraints(packages, package_info)
 
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
-            deps = deps,
+            deps = package_info["dependencies"] | package_info["optional_dependencies"],
             deps_constraints = deps_constraints,
             integrity = integrity,
             link_packages = link_packages,
@@ -463,7 +463,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             npm_auth_basic = npm_auth_basic,
             npm_auth_username = npm_auth_username,
             npm_auth_password = npm_auth_password,
-            transitive_closure = transitive_closure,
+            transitive_closure = transitive_closure if len(transitive_closure) else None,
             url = url,
             commit = commit,
             version = version,
@@ -497,23 +497,16 @@ Either remove this patch file if it is no longer needed or change its key to mat
     return result
 
 ################################################################################
-def _collect_deps(packages, package_info):
+def _collect_dep_constraints(packages, package_info):
     # Quick-exit for packages with no optional dependencies
-    if not package_info["optional_dependencies"]:
-        return package_info["dependencies"], None
+    if not package_info["optional_dependencies"] and not package_info.get("transitive_optional_closure", None):
+        return None
 
     constraints = {}
-    odeps = {}
 
-    for dep_name, dep_key in package_info["optional_dependencies"].items():
-        if dep_name in package_info["dependencies"]:
-            # Only process optional deps that don't have a direct dependency already
-            continue
-
+    optional_keys = package_info["optional_dependencies"].values() + package_info.get("transitive_optional_closure", {}).keys()
+    for dep_key in optional_keys:
         dep = packages[dep_key]
-
-        # Add the optional dep to the list before computing (potential) constraints
-        odeps[dep_name] = dep_key
 
         c = None
         if dep["os"] and dep["cpu"]:
@@ -530,7 +523,7 @@ def _collect_deps(packages, package_info):
             # Record the constraints for this optional dependency
             constraints[dep_key] = [v for v in c if v != None]
 
-    return odeps | package_info["dependencies"], constraints
+    return constraints
 
 ################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
