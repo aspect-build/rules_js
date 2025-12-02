@@ -338,7 +338,7 @@ load("@npm-no_optional__es-errors__1.3.0__links//:defs.bzl", store_334 = "npm_im
 load("@npm-no_optional__es-module-lexer__0.9.3__links//:defs.bzl", store_335 = "npm_imported_package_store_internal")
 load("@npm-no_optional__es-object-atoms__1.1.1__links//:defs.bzl", store_336 = "npm_imported_package_store_internal")
 load("@npm-no_optional__es-set-tostringtag__2.1.0__links//:defs.bzl", store_337 = "npm_imported_package_store_internal")
-load("@npm-no_optional__es5-ext__0.10.64__links//:defs.bzl", store_338 = "npm_imported_package_store_internal")
+load("@npm-no_optional__es5-ext__0.10.64__links//:defs.bzl", link_338 = "npm_link_imported_package_store_internal", store_338 = "npm_imported_package_store_internal")
 load("@npm-no_optional__es6-iterator__2.0.3__links//:defs.bzl", store_339 = "npm_imported_package_store_internal")
 load("@npm-no_optional__es6-symbol__3.1.4__links//:defs.bzl", store_340 = "npm_imported_package_store_internal")
 load("@npm-no_optional__es6-weak-map__2.0.3__links//:defs.bzl", store_341 = "npm_imported_package_store_internal")
@@ -2063,6 +2063,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_24(dev=True)
             link_110(dev=True)
             link_215(dev=True)
+            link_338("circles", dev=True)
             link_470(dev=True)
             link_529(dev=True)
             link_855(dev=True)
@@ -2072,6 +2073,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/@babel/plugin-transform-modules-commonjs",
                 ":node_modules/@types/node",
                 ":node_modules/chalk",
+                ":node_modules/circles",
                 ":node_modules/inline-fixtures",
                 ":node_modules/jsonpath-plus",
                 ":node_modules/typescript",
@@ -2466,6 +2468,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@babel/plugin-transform-modules-commonjs",
                 ":node_modules/@types/node",
                 ":node_modules/chalk",
+                ":node_modules/circles",
                 ":node_modules/inline-fixtures",
                 ":node_modules/jsonpath-plus",
                 ":node_modules/typescript",

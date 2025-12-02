@@ -282,6 +282,7 @@ use_repo(
     "npm",
     "npm-no_dev",
     "npm-no_optional",
+    "npm__es5-ext__0.10.64__links",
     "npm__fsevents__2.3.3__links",
     "npm__next__15.2.4_1790925128__links",
     "npm__rollup__2.70.2",
