@@ -6,6 +6,7 @@
         "@babel/plugin-transform-modules-commonjs": "^7.27.1",
         "@types/node": "18.19.54",
         "chalk": "5.1.1",
+        "circles": "npm:es5-ext@0.10.64",
         "inline-fixtures": "1.1.0",
         "jsonpath-plus": "7.2.0",
         "typescript": "^5.8.0"

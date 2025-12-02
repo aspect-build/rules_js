@@ -35,6 +35,9 @@ importers:
       chalk:
         specifier: 5.1.1
         version: 5.1.1
+      circles:
+        specifier: npm:es5-ext@0.10.64
+        version: es5-ext@0.10.64
       inline-fixtures:
         specifier: 1.1.0
         version: 1.1.0

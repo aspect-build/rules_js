@@ -480,7 +480,7 @@ load("@npm__es-errors__1.3.0__links//:defs.bzl", store_476 = "npm_imported_packa
 load("@npm__es-module-lexer__0.9.3__links//:defs.bzl", store_477 = "npm_imported_package_store_internal")
 load("@npm__es-object-atoms__1.1.1__links//:defs.bzl", store_478 = "npm_imported_package_store_internal")
 load("@npm__es-set-tostringtag__2.1.0__links//:defs.bzl", store_479 = "npm_imported_package_store_internal")
-load("@npm__es5-ext__0.10.64__links//:defs.bzl", store_480 = "npm_imported_package_store_internal")
+load("@npm__es5-ext__0.10.64__links//:defs.bzl", link_480 = "npm_link_imported_package_store_internal", store_480 = "npm_imported_package_store_internal")
 load("@npm__es6-iterator__2.0.3__links//:defs.bzl", store_481 = "npm_imported_package_store_internal")
 load("@npm__es6-symbol__3.1.4__links//:defs.bzl", store_482 = "npm_imported_package_store_internal")
 load("@npm__es6-weak-map__2.0.3__links//:defs.bzl", store_483 = "npm_imported_package_store_internal")
@@ -1120,7 +1120,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "lodash-4.17.21", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
     "examples/linked_lib": ["@aspect-test/e", "alias-e", "@aspect-test/e-dev", "@aspect-test/f", "@types/node"],
     "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/e-dev", "@aspect-test/f", "@types/node"],
-    "": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "@types/node", "chalk", "inline-fixtures", "jsonpath-plus", "typescript"],
+    "": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "@types/node", "chalk", "circles", "inline-fixtures", "jsonpath-plus", "typescript"],
     "examples/runfiles": ["@bazel/runfiles"],
     "js/private/coverage/bundle": ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "c8", "rollup"],
     "js/private/worker/src": ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
@@ -2448,6 +2448,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_24(dev=True)
             link_241(dev=True)
             link_353(dev=True)
+            link_480("circles", dev=True)
             link_614(dev=True)
             link_674(dev=True)
             link_1024(dev=True)
@@ -2457,6 +2458,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/@babel/plugin-transform-modules-commonjs",
                 ":node_modules/@types/node",
                 ":node_modules/chalk",
+                ":node_modules/circles",
                 ":node_modules/inline-fixtures",
                 ":node_modules/jsonpath-plus",
                 ":node_modules/typescript",
@@ -2851,6 +2853,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@babel/plugin-transform-modules-commonjs",
                 ":node_modules/@types/node",
                 ":node_modules/chalk",
+                ":node_modules/circles",
                 ":node_modules/inline-fixtures",
                 ":node_modules/jsonpath-plus",
                 ":node_modules/typescript",
