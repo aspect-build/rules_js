@@ -891,7 +891,6 @@ _ATTRS_LINKS = _COMMON_ATTRS | {
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(default = ["no-sandbox"]),
     "lifecycle_hooks_use_default_shell_env": attr.bool(),
-    "transitive_closure": attr.string_list_dict(doc = "Mapping of package store entry labels to a list of names to reference that package as"),
     "package_visibility": attr.string_list(default = ["//visibility:public"]),
     "replace_package": attr.string(),
     "exclude_package_contents": attr.string_list(default = []),
@@ -1034,9 +1033,6 @@ Args:
     version: Version of the npm package, such as `8.4.0`
 
     deps: A dict other npm packages this one depends on where the key is the package name and value is the version
-
-    transitive_closure: A dict all npm packages this one depends on directly or transitively where the key is the
-        package name and value is a list of version(s) depended on in the closure.
 
     root_package: The root package where the node_modules package store is linked to.
         Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
@@ -1208,6 +1204,7 @@ npm_import_links_rule = repository_rule(
     implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS | _INTERNAL_COMMON_ATTRS | {
         "deps_constraints": attr.string_list_dict(),
+        "transitive_closure": attr.string_list_dict(doc = "Mapping of package store entry labels to a list of names to reference that package as"),
     },
 )
 
