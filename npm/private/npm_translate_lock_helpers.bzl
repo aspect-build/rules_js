@@ -3,6 +3,7 @@
 load("@bazel_lib//lib:base64.bzl", "base64")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load(":pnpm.bzl", "pnpm")
 load(":utils.bzl", "utils")
 
 ################################################################################
@@ -284,8 +285,6 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         name = package_info["name"]
         version = package_info["version"]
         friendly_version = package_info["friendly_version"]
-        deps = package_info["dependencies"]
-        optional_deps = package_info["optional_dependencies"]
         transitive_closure = package_info["transitive_closure"]
         resolution = package_info["resolution"]
 
@@ -439,9 +438,12 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
+        deps, deps_constraints = _collect_deps(packages, package_info)
+
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
-            deps = optional_deps | deps,
+            deps = deps,
+            deps_constraints = deps_constraints,
             integrity = integrity,
             link_packages = link_packages,
             repo_name = repo_name,
@@ -494,6 +496,42 @@ Either remove this patch file if it is no longer needed or change its key to mat
     _check_for_conflicting_public_links(result, attr.public_hoist_packages)
 
     return result
+
+################################################################################
+def _collect_deps(packages, package_info):
+    # Quick-exit for packages with no optional dependencies
+    if not package_info["optional_dependencies"]:
+        return package_info["dependencies"], None
+
+    constraints = {}
+    odeps = {}
+
+    for dep_name, dep_key in package_info["optional_dependencies"].items():
+        if dep_name in package_info["dependencies"]:
+            # Only process optional deps that don't have a direct dependency already
+            continue
+
+        dep = packages[dep_key]
+
+        # Add the optional dep to the list before computing (potential) constraints
+        odeps[dep_name] = dep_key
+
+        c = None
+        if dep["os"] and dep["cpu"]:
+            c = []
+            for os in dep["os"]:
+                for cpu in dep["cpu"]:
+                    c.append(pnpm.to_bazel_os_cpu_constraint(os, cpu))
+        elif dep["cpu"]:
+            c = [pnpm.to_bazel_cpu_constraint(cpu) for cpu in dep["cpu"]]
+        elif dep["os"]:
+            c = [pnpm.to_bazel_os_constraint(os) for os in dep["os"]]
+
+        if c != None:
+            # Record the constraints for this optional dependency
+            constraints[dep_key] = [v for v in c if v != None]
+
+    return odeps | package_info["dependencies"], constraints
 
 ################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
