@@ -259,7 +259,7 @@ def _npm_import_bzlmod(i):
         exclude_package_contents = i.exclude_package_contents,
         replace_package = i.replace_package,
         root_package = i.root_package,
-        transitive_closure = i.transitive_closure,
+        transitive_closure = None,
         url = i.url,
         version = i.version,
     )
