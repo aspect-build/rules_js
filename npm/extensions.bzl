@@ -193,8 +193,6 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             lifecycle_hooks_env = i.lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements,
             lifecycle_hooks_use_default_shell_env = i.lifecycle_hooks_use_default_shell_env,
-            # attr.pnpm_lock.repo_name is a canonical repository name, so it needs to be qualified with an extra '@'.
-            link_workspace = attr.link_workspace if attr.link_workspace else "@" + attr.pnpm_lock.repo_name,
             npm_auth = i.npm_auth,
             npm_auth_basic = i.npm_auth_basic,
             npm_auth_password = i.npm_auth_password,
@@ -246,7 +244,6 @@ def _npm_import_bzlmod(i):
         lifecycle_hooks_env = i.lifecycle_hooks_env,
         lifecycle_hooks_execution_requirements = i.lifecycle_hooks_execution_requirements,
         lifecycle_hooks_use_default_shell_env = i.lifecycle_hooks_use_default_shell_env,
-        link_workspace = i.link_workspace,
         npm_auth = i.npm_auth,
         npm_auth_basic = i.npm_auth_basic,
         npm_auth_username = i.npm_auth_username,

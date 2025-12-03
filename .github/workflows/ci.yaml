@@ -65,7 +65,6 @@ jobs:
                     e2e/pnpm_workspace_rerooted
                     e2e/pnpm_version
                     e2e/runfiles
-                    e2e/npm_translate_lock_link_workspace
                     e2e/stamped_package_json
                     e2e/update_pnpm_lock
                     e2e/update_pnpm_lock_with_import

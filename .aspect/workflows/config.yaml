@@ -102,9 +102,6 @@ workspaces:
     e2e/repo_mapping:
         icon: js
         tasks: *e2e_tasks
-    e2e/npm_translate_lock_link_workspace:
-        icon: js
-        tasks: *e2e_tasks
     e2e/runfiles:
         icon: js
         tasks: *e2e_tasks
