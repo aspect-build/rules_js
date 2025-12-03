@@ -32,6 +32,8 @@ load(
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+load(":npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
+load(":npmrc.bzl", "parse_npmrc")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -513,47 +515,104 @@ def _fetch_git_repository(rctx):
     if not rctx.delete(git_metadata_folder):
         fail("Failed to delete .git folder in %s" % str(git_repo.directory))
 
+def _get_auth_from_url(url, npm_auth_dict):
+    for registry, auth_info in npm_auth_dict.items():
+        if registry in url:
+            if "bearer" in auth_info:
+                return {
+                    url: {
+                        "type": "pattern",
+                        "pattern": "Bearer <password>",
+                        "password": auth_info["bearer"],
+                    },
+                }
+            elif "basic" in auth_info:
+                return {
+                    url: {
+                        "type": "pattern",
+                        "pattern": "Basic <password>",
+                        "password": auth_info["basic"],
+                    },
+                }
+            elif "username" in auth_info and "password" in auth_info:
+                return {
+                    url: {
+                        "type": "basic",
+                        "login": auth_info["username"],
+                        "password": auth_info["password"],
+                    },
+                }
+    return {}
+
+def _read_npmrc_auth(rctx):
+    npm_auth = {}
+
+    if rctx.attr.npmrc:
+        npmrc = parse_npmrc(rctx.read(rctx.attr.npmrc))
+        (_, repo_auth) = npm_translate_lock_helpers.get_npm_auth(
+            npmrc,
+            str(rctx.path(rctx.attr.npmrc)),
+            rctx.os.environ,
+        )
+        npm_auth.update(repo_auth)
+
+    if rctx.attr.use_home_npmrc:
+        home_directory = repo_utils.get_home_directory(rctx)
+        if home_directory:
+            home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
+            home_npmrc = parse_npmrc(rctx.read(home_npmrc_path))
+            (_, home_auth) = npm_translate_lock_helpers.get_npm_auth(
+                home_npmrc,
+                home_npmrc_path,
+                rctx.os.environ,
+            )
+            npm_auth.update(home_auth)
+
+    return npm_auth
+
 def _download_and_extract_archive(rctx, package_json_only):
     download_url = rctx.attr.url if rctx.attr.url else utils.npm_registry_download_url(rctx.attr.package, rctx.attr.version, {}, utils.default_registry())
 
-    auth = {}
+    npm_auth_dict = _read_npmrc_auth(rctx)
+    auth = _get_auth_from_url(download_url, npm_auth_dict)
 
-    if rctx.attr.npm_auth_username or rctx.attr.npm_auth_password:
-        if not rctx.attr.npm_auth_username:
-            fail("'npm_auth_password' was provided without 'npm_auth_username'")
-        if not rctx.attr.npm_auth_password:
-            fail("'npm_auth_username' was provided without 'npm_auth_password'")
+    if not auth:
+        if rctx.attr.npm_auth_username or rctx.attr.npm_auth_password:
+            if not rctx.attr.npm_auth_username:
+                fail("'npm_auth_password' was provided without 'npm_auth_username'")
+            if not rctx.attr.npm_auth_password:
+                fail("'npm_auth_username' was provided without 'npm_auth_password'")
 
-    auth_count = 0
-    if rctx.attr.npm_auth:
-        auth = {
-            download_url: {
-                "type": "pattern",
-                "pattern": "Bearer <password>",
-                "password": rctx.attr.npm_auth,
-            },
-        }
-        auth_count += 1
-    if rctx.attr.npm_auth_basic:
-        auth = {
-            download_url: {
-                "type": "pattern",
-                "pattern": "Basic <password>",
-                "password": rctx.attr.npm_auth_basic,
-            },
-        }
-        auth_count += 1
-    if rctx.attr.npm_auth_username and rctx.attr.npm_auth_password:
-        auth = {
-            download_url: {
-                "type": "basic",
-                "login": rctx.attr.npm_auth_username,
-                "password": rctx.attr.npm_auth_password,
-            },
-        }
-        auth_count += 1
-    if auth_count > 1:
-        fail("expected only one of 'npm_auth', `npm_auth_basic` or 'npm_auth_username' and 'npm_auth_password' to be set")
+        auth_count = 0
+        if rctx.attr.npm_auth:
+            auth = {
+                download_url: {
+                    "type": "pattern",
+                    "pattern": "Bearer <password>",
+                    "password": rctx.attr.npm_auth,
+                },
+            }
+            auth_count += 1
+        if rctx.attr.npm_auth_basic:
+            auth = {
+                download_url: {
+                    "type": "pattern",
+                    "pattern": "Basic <password>",
+                    "password": rctx.attr.npm_auth_basic,
+                },
+            }
+            auth_count += 1
+        if rctx.attr.npm_auth_username and rctx.attr.npm_auth_password:
+            auth = {
+                download_url: {
+                    "type": "basic",
+                    "login": rctx.attr.npm_auth_username,
+                    "password": rctx.attr.npm_auth_password,
+                },
+            }
+            auth_count += 1
+        if auth_count > 1:
+            fail("expected only one of 'npm_auth', `npm_auth_basic` or 'npm_auth_username' and 'npm_auth_password' to be set")
 
     rctx.download(
         output = _TARBALL_FILENAME,
@@ -955,6 +1014,8 @@ _ATTRS = _COMMON_ATTRS | {
     "npm_auth_basic": attr.string(),
     "npm_auth_password": attr.string(),
     "npm_auth_username": attr.string(),
+    "npmrc": attr.label(),
+    "use_home_npmrc": attr.bool(),
     "patch_tool": attr.label(),
     "patch_args": attr.string_list(),
     "patches": attr.label_list(),

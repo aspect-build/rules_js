@@ -1,0 +1,7 @@
+{
+  "name": "npm-translate-lock-dynamic-auth-test",
+  "version": "0.0.0",
+  "dependencies": {
+    "@aspect-test/a": "5.0.0"
+  }
+}
