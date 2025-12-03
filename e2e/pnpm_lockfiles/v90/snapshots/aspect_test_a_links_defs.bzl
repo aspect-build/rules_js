@@ -34,12 +34,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/ref": "@aspect-test/c",
             ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2/ref": "@aspect-test/d",
         },
-        lc_deps = {
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/pkg_pre_lc_lite": "@aspect-test/a",
-            ":.aspect_rules_js/node_modules/@aspect-test+b@5.0.2/pkg": "@aspect-test/b",
-            ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg": "@aspect-test/c",
-            ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2/pkg": "@aspect-test/d",
-        },
+        lc_deps = {},
         has_lifecycle_build_target = False,
         has_transitive_closure = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_a__5.0.2//:pkg",
