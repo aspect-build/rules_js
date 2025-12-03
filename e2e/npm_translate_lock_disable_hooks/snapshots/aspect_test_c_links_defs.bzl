@@ -31,7 +31,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.0/pkg_pre_lc_lite": "@aspect-test/c",
         },
         has_lifecycle_build_target = False,
-        transitive_closure_pattern = True,
+        has_transitive_closure = True,
         npm_package_target = "@@aspect_rules_js~~npm~npm__at_aspect-test_c__2.0.0//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},

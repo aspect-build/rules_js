@@ -57,7 +57,7 @@ def npm_imported_package_store_internal():
         ref_deps = {ref_deps},
         lc_deps = {lc_deps},
         has_lifecycle_build_target = {has_lifecycle_build_target},
-        transitive_closure_pattern = {transitive_closure_pattern},
+        has_transitive_closure = {has_transitive_closure},
         npm_package_target = "{npm_package_target}",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {lifecycle_hooks_env},
@@ -79,7 +79,7 @@ def npm_imported_package_store_internal(
         ref_deps,
         lc_deps,
         has_lifecycle_build_target,
-        transitive_closure_pattern,
+        has_transitive_closure,
         npm_package_target,
         package_store_name,
         lifecycle_hooks_env,
@@ -123,7 +123,7 @@ def npm_imported_package_store_internal(
     # package store target with transitive closure of all npm package dependencies
     _npm_package_store(
         name = store_target_name,
-        src = None if transitive_closure_pattern else npm_package_target,
+        src = None if has_transitive_closure else npm_package_target,
         key = key,
         package = package,
         version = version,
@@ -725,8 +725,8 @@ def _npm_import_links_rule_impl(rctx):
         if dep_constraints != None:
             deps_constraints[dep_store_target] = dep_constraints
 
-    transitive_closure_pattern = len(rctx.attr.transitive_closure) > 0
-    if transitive_closure_pattern:
+    has_transitive_closure = len(rctx.attr.transitive_closure) > 0
+    if has_transitive_closure:
         # transitive closure deps pattern is used for breaking circular deps;
         # this pattern is used to break circular dependencies between 3rd
         # party npm deps; it is not used for 1st party deps
@@ -826,6 +826,7 @@ def _npm_import_links_rule_impl(rctx):
         npm_package_target = npm_package_target,
         lc_deps = _to_deps_attr(lc_deps, deps_constraints),
         has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
+        has_transitive_closure = str(has_transitive_closure),
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
         link_visibility = rctx.attr.package_visibility,
@@ -834,7 +835,6 @@ def _npm_import_links_rule_impl(rctx):
         package = rctx.attr.package,
         ref_deps = _to_deps_attr(ref_deps, deps_constraints),
         root_package = rctx.attr.root_package,
-        transitive_closure_pattern = str(transitive_closure_pattern),
         version = rctx.attr.version,
         package_store_name = package_store_name,
         bins = bins,

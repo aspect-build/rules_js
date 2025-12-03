@@ -52,7 +52,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/type@2.7.3/pkg": "type",
         },
         has_lifecycle_build_target = False,
-        transitive_closure_pattern = True,
+        has_transitive_closure = True,
         npm_package_target = "@@_main~npm~npm__es5-ext__0.10.64//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},

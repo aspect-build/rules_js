@@ -215,7 +215,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/yallist@5.0.0/pkg": "yallist",
         },
         has_lifecycle_build_target = True,
-        transitive_closure_pattern = True,
+        has_transitive_closure = True,
         npm_package_target = "@@aspect_rules_js~~npm~npm__segfault-handler__1.3.0//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},

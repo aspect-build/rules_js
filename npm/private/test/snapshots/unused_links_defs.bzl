@@ -42,7 +42,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/wordwrap@0.0.3/pkg": "wordwrap",
         },
         has_lifecycle_build_target = False,
-        transitive_closure_pattern = True,
+        has_transitive_closure = True,
         npm_package_target = "@@_main~npm~npm__unused__0.2.2//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},

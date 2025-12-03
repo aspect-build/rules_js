@@ -41,7 +41,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2/pkg": "@aspect-test/d",
         },
         has_lifecycle_build_target = False,
-        transitive_closure_pattern = True,
+        has_transitive_closure = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__at_aspect-test_b__5.0.2//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},

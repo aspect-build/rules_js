@@ -31,7 +31,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/pkg_pre_lc_lite": "lodash",
         },
         has_lifecycle_build_target = False,
-        transitive_closure_pattern = True,
+        has_transitive_closure = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},

@@ -235,7 +235,7 @@ def npm_imported_package_store_internal():
             "//conditions:default": {}
         }),
         has_lifecycle_build_target = False,
-        transitive_closure_pattern = True,
+        has_transitive_closure = True,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__esbuild__0.27.0//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},
