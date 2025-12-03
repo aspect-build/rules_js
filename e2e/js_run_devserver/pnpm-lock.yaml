@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@bazel/ibazel':
-        specifier: 0.16.2
-        version: 0.16.2
+        specifier: 0.27.0
+        version: 0.27.0
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -20,8 +20,8 @@ importers:
 
 packages:
 
-  '@bazel/ibazel@0.16.2':
-    resolution: {integrity: sha512-KgqAWMH0emL6f3xH6nqyTryoBMqlJ627LBIe9PT1PRRQPz2FtHib3FIHJPukp1slzF3hJYZvdiVwgPnHbaSOOA==}
+  '@bazel/ibazel@0.27.0':
+    resolution: {integrity: sha512-nIQPXoBMKMTD9DzQqBZMuYPRrxiu8Iouw7lAc+gR0WIJOG/NX7qyemPECDEAbVP3mAJKmzyCIQbhYFFx4DjOOg==}
     hasBin: true
 
   ansi-styles@4.3.0:
@@ -207,7 +207,7 @@ packages:
 
 snapshots:
 
-  '@bazel/ibazel@0.16.2': {}
+  '@bazel/ibazel@0.27.0': {}
 
   ansi-styles@4.3.0:
     dependencies:
