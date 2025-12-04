@@ -31,10 +31,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/esprima@1.0.0/ref": "esprima",
             ":.aspect_rules_js/node_modules/optimist@0.6.0/ref": "optimist",
         },
-        lc_deps = {
-            ":.aspect_rules_js/node_modules/esprima@1.0.0": "esprima",
-            ":.aspect_rules_js/node_modules/optimist@0.6.0": "optimist",
-        },
+        lc_deps = {},
         has_lifecycle_build_target = False,
         has_transitive_closure = False,
         npm_package_target = "@@_main~npm~npm__unused__0.2.2//:pkg",

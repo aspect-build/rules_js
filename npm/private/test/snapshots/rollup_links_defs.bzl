@@ -35,12 +35,7 @@ def npm_imported_package_store_internal():
             },
             "//conditions:default": {}
         }),
-        lc_deps = select({
-            "@aspect_rules_js//platforms/pnpm:darwin": {
-                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
-            },
-            "//conditions:default": {}
-        }),
+        lc_deps = {},
         has_lifecycle_build_target = False,
         has_transitive_closure = False,
         npm_package_target = "@@_main~npm~npm__rollup__2.70.2//:pkg",
