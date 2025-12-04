@@ -236,14 +236,14 @@ if [ ! -f $1 ]; then exit 42; fi
     else:
         fail(INTERNAL_ERROR_MSG)
 
-def _replace_npmrc_token_envvar(token, npmrc_path, environ):
+def _replace_npmrc_token_envvar(token, npmrc_path, rctx):
     # A token can be a reference to an environment variable
     if token.startswith("$"):
         # ${NPM_TOKEN} -> NPM_TOKEN
         # $NPM_TOKEN -> NPM_TOKEN
         token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-        if environ.get(token, False):
-            token = environ[token]
+        if rctx.getenv(token) != None:
+            token = rctx.getenv(token)
         else:
             # buildifier: disable=print
             print("""
