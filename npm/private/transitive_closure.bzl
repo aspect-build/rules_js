@@ -19,6 +19,7 @@ def gather_transitive_closure(packages, package, cache = {}):
     """
     root_package = packages[package]
 
+    is_circular = False
     transitive_closure = {}
     transitive_closure[package] = [root_package["name"]]
 
@@ -32,6 +33,10 @@ def gather_transitive_closure(packages, package, cache = {}):
             fail(msg)
         deps = stack.pop()
         for name, dep_key in deps.items():
+            if dep_key == package:
+                is_circular = True
+                continue
+
             transitive_closure[dep_key] = transitive_closure.get(dep_key, [])
             if name in transitive_closure[dep_key]:
                 continue
@@ -43,10 +48,14 @@ def gather_transitive_closure(packages, package, cache = {}):
                 continue
 
             if dep_key in cache:
+                dep_is_circular, dep_transitive_closure = cache[dep_key]
+                if dep_is_circular:
+                    is_circular = True
+
                 # Already computed for this dep, merge the cached results
-                for transitive_name in cache[dep_key].keys():
+                for transitive_name in dep_transitive_closure.keys():
                     transitive_closure[transitive_name] = transitive_closure.get(transitive_name, [])
-                    for transitive_version in cache[dep_key][transitive_name]:
+                    for transitive_version in dep_transitive_closure[transitive_name]:
                         if transitive_version not in transitive_closure[transitive_name]:
                             transitive_closure[transitive_name].append(transitive_version)
             elif dep_key in packages:
@@ -56,7 +65,7 @@ def gather_transitive_closure(packages, package, cache = {}):
                 msg = "Unknown package key: {} in {}".format(dep_key, packages.keys())
                 fail(msg)
 
-    return utils.sorted_map(transitive_closure)
+    return is_circular, utils.sorted_map(transitive_closure)
 
 def _get_package_info_deps(package_info):
     return package_info["dependencies"] | package_info["optional_dependencies"]
@@ -71,11 +80,12 @@ def calculate_transitive_closures(packages):
     # Collect transitive dependencies for each package
     cache = {}
     for package in packages.keys():
-        transitive_closure = gather_transitive_closure(
+        is_circular, transitive_closure = gather_transitive_closure(
             packages,
             package,
             cache,
         )
 
+        packages[package]["is_circular"] = is_circular
         packages[package]["transitive_closure"] = transitive_closure
-        cache[package] = transitive_closure
+        cache[package] = (is_circular, transitive_closure)

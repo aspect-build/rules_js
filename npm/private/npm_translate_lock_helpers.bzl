@@ -464,7 +464,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             npm_auth_basic = npm_auth_basic,
             npm_auth_username = npm_auth_username,
             npm_auth_password = npm_auth_password,
-            transitive_closure = transitive_closure,
+            transitive_closure = transitive_closure if custom_postinstall or lifecycle_hooks or package_info["is_circular"] else None,
             url = url,
             commit = commit,
             version = version,

@@ -23,11 +23,9 @@ def npm_imported_package_store_internal():
         package = PACKAGE,
         version = VERSION,
         root_package = _ROOT_PACKAGE,
-        deps = {
-            ":.aspect_rules_js/node_modules/rollup@2.14.0/pkg": "rollup",
-        } | select({
+        deps = select({
             "@aspect_rules_js//platforms/pnpm:darwin": {
-                ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
             },
             "//conditions:default": {}
         }),
@@ -37,16 +35,14 @@ def npm_imported_package_store_internal():
             },
             "//conditions:default": {}
         }),
-        lc_deps = {
-            ":.aspect_rules_js/node_modules/rollup@2.14.0/pkg_pre_lc_lite": "rollup",
-        } | select({
+        lc_deps = select({
             "@aspect_rules_js//platforms/pnpm:darwin": {
-                ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
             },
             "//conditions:default": {}
         }),
         has_lifecycle_build_target = False,
-        has_transitive_closure = True,
+        has_transitive_closure = False,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},
