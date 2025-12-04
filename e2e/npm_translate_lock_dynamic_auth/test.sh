@@ -41,7 +41,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo -e "${BLUE}Test 1: Fetch with valid token${NC}"
-cat > ~/.npmrc << EOF
+cat >~/.npmrc <<EOF
 _authToken=${ASPECT_NPM_AUTH_TOKEN}
 EOF
 touch ~/.npmrc.test
@@ -57,7 +57,7 @@ fi
 echo ""
 
 echo -e "${BLUE}Test 2: Fetch with broken token (empty repository cache)${NC}"
-cat > ~/.npmrc << EOF
+cat >~/.npmrc <<EOF
 _authToken=BROKEN_TOKEN_SHOULD_CAUSE_401
 EOF
 
@@ -80,7 +80,7 @@ fi
 echo ""
 
 echo -e "${BLUE}Test 3: Fetch with restored valid token${NC}"
-cat > ~/.npmrc << EOF
+cat >~/.npmrc <<EOF
 _authToken=${ASPECT_NPM_AUTH_TOKEN}
 EOF
 

@@ -1083,6 +1083,8 @@ def npm_import(
         npm_auth_basic = "",
         npm_auth_username = "",
         npm_auth_password = "",
+        npmrc = None,
+        use_home_npmrc = None,
         bins = {},
         dev = False,
         exclude_package_contents = [],
@@ -1321,6 +1323,10 @@ def npm_import(
 
         npm_auth_password: Auth password to authenticate with npm. When using Basic authentication.
 
+        npmrc: Label to an .npmrc file for authentication. Supports environment variable expansion.
+
+        use_home_npmrc: Use ~/.npmrc for authentication.
+
         extra_build_content: Additional content to append on the generated BUILD file at the root of
             the created repository, either as a string or a list of lines similar to
             <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
@@ -1389,6 +1395,8 @@ def npm_import(
         npm_auth_basic = npm_auth_basic,
         npm_auth_username = npm_auth_username,
         npm_auth_password = npm_auth_password,
+        npmrc = npmrc,
+        use_home_npmrc = use_home_npmrc,
         lifecycle_hooks = lifecycle_hooks,
         extra_build_content = (
             extra_build_content if type(extra_build_content) == "string" else "\n".join(extra_build_content)
