@@ -131,7 +131,7 @@ def _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents
     npm_auth = {}
     if attr.npmrc:
         npmrc = parse_npmrc(module_ctx.read(attr.npmrc))
-        (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx.os.environ)
+        (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx)
 
     if attr.use_home_npmrc:
         home_directory = repo_utils.get_home_directory(module_ctx)
@@ -139,7 +139,7 @@ def _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents
             home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
             home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
 
-            (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx.os.environ)
+            (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx)
             registries.update(registries2)
             npm_auth.update(npm_auth2)
         else:

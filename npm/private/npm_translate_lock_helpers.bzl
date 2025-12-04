@@ -88,7 +88,7 @@ def _gather_values_from_matching_names(additive, keyed_lists, *names):
     return (result, keys)
 
 ################################################################################
-def _get_npm_auth(npmrc, npmrc_path, environ):
+def _get_npm_auth(npmrc, npmrc_path, rctx):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
     - creates a token by registry dict: {registry: token}
@@ -135,7 +135,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
     Args:
         npmrc: The `.npmrc` file.
         npmrc_path: The file path to `.npmrc`.
-        environ: A map of environment variables with their values.
+        rctx: the repository_ctx or module_ctx to fetch environment vars from
 
     Returns:
         A tuple (registries, auth).
@@ -160,7 +160,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
 
             # envvar replacement is supported for `_authToken`
             # https://pnpm.io/npmrc#url_authtoken
-            token = utils.replace_npmrc_token_envvar(v, npmrc_path, environ)
+            token = utils.replace_npmrc_token_envvar(v, npmrc_path, rctx)
 
             if registry not in auth:
                 auth[registry] = {}
@@ -183,7 +183,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
             registry = k.removeprefix("//").removesuffix(_NPM_AUTH).removesuffix(":").removesuffix("/")
 
             # envvar replacement is supported for `_auth` as well
-            token = utils.replace_npmrc_token_envvar(v, npmrc_path, environ)
+            token = utils.replace_npmrc_token_envvar(v, npmrc_path, rctx)
 
             if registry not in auth:
                 auth[registry] = {}

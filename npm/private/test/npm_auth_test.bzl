@@ -173,6 +173,11 @@ def _plain_username_password_test_impl(ctx):
 def _env_var_token_test_impl(ctx):
     env = unittest.begin(ctx)
 
+    renv = {}
+    rctx = struct(
+        getenv = renv.get,
+    )
+
     asserts.equals(
         env,
         (
@@ -188,10 +193,11 @@ def _env_var_token_test_impl(ctx):
                 "//registry1/:_authToken": "$TOKEN1",
             },
             "",
-            {},
+            rctx,
         ),
     )
 
+    renv["TOKEN1"] = "1234"
     asserts.equals(
         env,
         (
@@ -207,9 +213,7 @@ def _env_var_token_test_impl(ctx):
                 "//registry1/:_authToken": "$TOKEN1",
             },
             "",
-            {
-                "TOKEN1": "1234",
-            },
+            rctx,
         ),
     )
 
@@ -228,12 +232,11 @@ def _env_var_token_test_impl(ctx):
                 "//registry1/:_authToken": "${%s}" % "TOKEN1",
             },
             "",
-            {
-                "TOKEN1": "1234",
-            },
+            rctx,
         ),
     )
 
+    renv["TOKEN2"] = "5678"
     asserts.equals(
         env,
         (
@@ -253,16 +256,16 @@ def _env_var_token_test_impl(ctx):
                 "//registry2/:_authToken": "${%s}" % "TOKEN2",
             },
             "",
-            {
-                "TOKEN1": "1234",
-                "TOKEN2": "5678",
-            },
+            rctx,
         ),
     )
     return unittest.end(env)
 
 def _mixed_token_test_impl(ctx):
     env = unittest.begin(ctx)
+    rctx = struct(
+        getenv = lambda key: ("5678" if key == "TOKEN2" else None),
+    )
 
     asserts.equals(
         env,
@@ -293,9 +296,7 @@ def _mixed_token_test_impl(ctx):
                 "//registry4/:_auth": "c29tZW9uZTpwYXNzd29yZA==",
             },
             "",
-            {
-                "TOKEN2": "5678",
-            },
+            rctx,
         ),
     )
 

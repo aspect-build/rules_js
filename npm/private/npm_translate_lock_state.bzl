@@ -464,7 +464,7 @@ def _load_npmrc(priv, rctx, npmrc_path):
     if "registry" in contents:
         priv["default_registry"] = utils.to_registry_url(contents["registry"])
 
-    (registries, auth) = helpers.get_npm_auth(contents, npmrc_path, rctx.os.environ)
+    (registries, auth) = helpers.get_npm_auth(contents, npmrc_path, rctx)
     priv["npm_registries"].update(registries)
     priv["npm_auth"].update(auth)
 
