@@ -24,10 +24,10 @@ Here is what the final image looks like when `platform = "linux/arm64"`:
 app
 |-- main
 |-- main.runfiles
-|   |-- __main__
+|   |-- _main
 |   |   |-- main.sh
 |   |   |-- node_modules
-|   |   |   `-- chalk -> /app/main.sh.runfiles/__main__/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk
+|   |   |   `-- chalk -> /app/main.sh.runfiles/_main/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk
 |   |   `-- src
 |   |       |-- ascii.art
 |   |       `-- main.js
