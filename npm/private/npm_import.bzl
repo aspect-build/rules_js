@@ -821,12 +821,14 @@ def _npm_import_links_rule_impl(rctx):
 
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
+    has_lifecycle_build_target = bool(rctx.attr.lifecycle_build_target)
+
     npm_link_pkg_bzl_vars = dict(
         deps = _to_deps_attr(deps, deps_constraints),
         npm_package_target = npm_package_target,
-        lc_deps = _to_deps_attr(lc_deps, deps_constraints),
-        has_lifecycle_build_target = str(rctx.attr.lifecycle_build_target),
-        has_transitive_closure = str(has_transitive_closure),
+        lc_deps = _to_deps_attr(lc_deps, deps_constraints) if has_lifecycle_build_target else "{}",
+        has_lifecycle_build_target = has_lifecycle_build_target,
+        has_transitive_closure = has_transitive_closure,
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
         link_visibility = rctx.attr.package_visibility,

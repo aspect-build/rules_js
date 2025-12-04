@@ -161,75 +161,7 @@ def npm_imported_package_store_internal():
             },
             "//conditions:default": {}
         }),
-        lc_deps = select({
-            "@aspect_rules_js//platforms/pnpm:aix_ppc64": {
-                ":.aspect_rules_js/node_modules/@esbuild+aix-ppc64@0.27.0": "@esbuild/aix-ppc64",
-            },
-            "@aspect_rules_js//platforms/pnpm:android_arm": {
-                ":.aspect_rules_js/node_modules/@esbuild+android-arm@0.27.0": "@esbuild/android-arm",
-            },
-            "@aspect_rules_js//platforms/pnpm:android_arm64": {
-                ":.aspect_rules_js/node_modules/@esbuild+android-arm64@0.27.0": "@esbuild/android-arm64",
-            },
-            "@aspect_rules_js//platforms/pnpm:android_x64": {
-                ":.aspect_rules_js/node_modules/@esbuild+android-x64@0.27.0": "@esbuild/android-x64",
-            },
-            "@aspect_rules_js//platforms/pnpm:darwin_arm64": {
-                ":.aspect_rules_js/node_modules/@esbuild+darwin-arm64@0.27.0": "@esbuild/darwin-arm64",
-            },
-            "@aspect_rules_js//platforms/pnpm:darwin_x64": {
-                ":.aspect_rules_js/node_modules/@esbuild+darwin-x64@0.27.0": "@esbuild/darwin-x64",
-            },
-            "@aspect_rules_js//platforms/pnpm:freebsd_arm64": {
-                ":.aspect_rules_js/node_modules/@esbuild+freebsd-arm64@0.27.0": "@esbuild/freebsd-arm64",
-            },
-            "@aspect_rules_js//platforms/pnpm:freebsd_x64": {
-                ":.aspect_rules_js/node_modules/@esbuild+freebsd-x64@0.27.0": "@esbuild/freebsd-x64",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_arm": {
-                ":.aspect_rules_js/node_modules/@esbuild+linux-arm@0.27.0": "@esbuild/linux-arm",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_arm64": {
-                ":.aspect_rules_js/node_modules/@esbuild+linux-arm64@0.27.0": "@esbuild/linux-arm64",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_ia32": {
-                ":.aspect_rules_js/node_modules/@esbuild+linux-ia32@0.27.0": "@esbuild/linux-ia32",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_ppc64": {
-                ":.aspect_rules_js/node_modules/@esbuild+linux-ppc64@0.27.0": "@esbuild/linux-ppc64",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_riscv64": {
-                ":.aspect_rules_js/node_modules/@esbuild+linux-riscv64@0.27.0": "@esbuild/linux-riscv64",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_s390x": {
-                ":.aspect_rules_js/node_modules/@esbuild+linux-s390x@0.27.0": "@esbuild/linux-s390x",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_x64": {
-                ":.aspect_rules_js/node_modules/@esbuild+linux-x64@0.27.0": "@esbuild/linux-x64",
-            },
-            "@aspect_rules_js//platforms/pnpm:netbsd_arm64": {
-                ":.aspect_rules_js/node_modules/@esbuild+netbsd-arm64@0.27.0": "@esbuild/netbsd-arm64",
-            },
-            "@aspect_rules_js//platforms/pnpm:netbsd_x64": {
-                ":.aspect_rules_js/node_modules/@esbuild+netbsd-x64@0.27.0": "@esbuild/netbsd-x64",
-            },
-            "@aspect_rules_js//platforms/pnpm:openbsd_arm64": {
-                ":.aspect_rules_js/node_modules/@esbuild+openbsd-arm64@0.27.0": "@esbuild/openbsd-arm64",
-            },
-            "@aspect_rules_js//platforms/pnpm:openbsd_x64": {
-                ":.aspect_rules_js/node_modules/@esbuild+openbsd-x64@0.27.0": "@esbuild/openbsd-x64",
-            },
-            "@aspect_rules_js//platforms/pnpm:win32_arm64": {
-                ":.aspect_rules_js/node_modules/@esbuild+win32-arm64@0.27.0": "@esbuild/win32-arm64",
-            },
-            "@aspect_rules_js//platforms/pnpm:win32_ia32": {
-                ":.aspect_rules_js/node_modules/@esbuild+win32-ia32@0.27.0": "@esbuild/win32-ia32",
-            },
-            "@aspect_rules_js//platforms/pnpm:win32_x64": {
-                ":.aspect_rules_js/node_modules/@esbuild+win32-x64@0.27.0": "@esbuild/win32-x64",
-            },
-            "//conditions:default": {}
-        }),
+        lc_deps = {},
         has_lifecycle_build_target = False,
         has_transitive_closure = False,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__esbuild__0.27.0//:pkg",
