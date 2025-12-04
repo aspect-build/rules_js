@@ -9,19 +9,16 @@ npm_link_package(
     name = "node_modules/@e2e/lib",
     src = "//root/lib:lib_pkg",
     package = "@e2e/lib",
-    root_package = "root",
 )
 
 npm_link_package(
     name = "node_modules/@e2e/pkg",
     src = "//root/pkg:lib_pkg",
-    root_package = "root",
 )
 
 npm_link_package(
     name = "node_modules/@e2e/wrapper-lib",
     src = "//root/wrapper-lib:wrapper-lib_pkg",
-    root_package = "root",
 )
 
 output_files(
