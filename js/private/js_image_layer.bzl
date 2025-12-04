@@ -35,8 +35,7 @@ A proper `cmd` usually looks like /`[ js_image_layer 'root' ]`/`[ package name o
 unless you have a custom launcher script that invokes the entry_point of the `js_binary` in a different path.
 
 On the other hand, `workdir` has to be set to the "runfiles tree root" which would be exactly `cmd` **but with `.runfiles/[ name of the workspace ]` suffix**.
-If using bzlmod then name of the local workspace is always `_main`. If bzlmod is not enabled then the name of the local workspace, if not otherwise specified
-in the `WORKSPACE` file, is `__main__`. If `workdir` is not set correctly, some attributes such as `chdir` might not work properly.
+When using bzlmod then name of the local workspace is always `_main`. If `workdir` is not set correctly, some attributes such as `chdir` might not work properly.
 
 js_image_layer creates up to 5 layers depending on what files are included in the runfiles of the provided
 `binary` target.
@@ -108,10 +107,7 @@ oci_image(
     tars = [
         ":layers"
     ],
-    workdir = select({
-        "@bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
-        "//conditions:default": "/app/bin.runfiles/__main__",
-    }),
+    workdir = "/app/bin.runfiles/_main",
 )
 ```
 
@@ -149,10 +145,7 @@ js_binary(
         tars = [
             ":{}_layers".format(arch)
         ],
-        workdir = select({
-            "@bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
-            "//conditions:default": "/app/bin.runfiles/__main__",
-        }),
+        workdir = "/app/bin.runfiles/_main",
     )
 
     for arch in ["amd64", "arm64"]

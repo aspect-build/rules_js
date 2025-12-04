@@ -2,6 +2,8 @@ import %workspace%/tools/preset.bazelrc
 
 ### YOUR PROJECT SPECIFIC OPTIONS GO HERE ###
 
+common --noenable_workspace
+
 # We have some empty globs in rules_js
 common --noincompatible_disallow_empty_glob
 
