@@ -1,2 +1,5 @@
 import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
 
+# TODO: fully migrate to bzlmod
+common --enable_workspace

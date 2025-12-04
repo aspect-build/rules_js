@@ -1,4 +1,5 @@
 import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
 
 ### YOUR PROJECT SPECIFIC OPTIONS GO HERE ###
 
