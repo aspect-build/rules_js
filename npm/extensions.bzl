@@ -12,7 +12,6 @@ load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_an
 load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
-load("//npm/private:npm_translate_lock_state.bzl", _DEFAULT_ROOT_PACKAGE = "DEFAULT_ROOT_PACKAGE")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 
@@ -69,9 +68,7 @@ def _npm_extension_impl(module_ctx):
     # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            state = parse_and_verify_lock(module_ctx, attr.name, attr)
-
-            _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages)
+            _npm_translate_lock_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -124,7 +121,9 @@ _hub_repo = repository_rule(
     },
 )
 
-def _npm_translate_lock_bzlmod(module_ctx, attr, state, exclude_package_contents_config, replace_packages):
+def _npm_translate_lock_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
+    state = parse_and_verify_lock(module_ctx, attr.name, attr)
+
     module_ctx.report_progress("Generating starlark for npm dependencies")
 
     registries = {}
@@ -162,7 +161,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         replace_packages = replace_packages,
         patched_dependencies = state.patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
-        root_package = attr.pnpm_lock.package if attr.root_package == _DEFAULT_ROOT_PACKAGE else attr.root_package,
+        root_package = state.root_package(),
         rctx_name = attr.name,
         attr = attr,
         all_lifecycle_hooks = lifecycle_hooks,
@@ -204,7 +203,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             patches = i.patches,
             exclude_package_contents = i.exclude_package_contents,
             replace_package = i.replace_package,
-            root_package = i.root_package,
+            root_package = state.root_package(),
             transitive_closure = i.transitive_closure,
             url = i.url,
             version = i.version,

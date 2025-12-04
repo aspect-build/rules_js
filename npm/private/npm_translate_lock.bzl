@@ -24,7 +24,7 @@ load("@bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":list_sources.bzl", "list_sources")
 load(":npm_translate_lock_helpers.bzl", "helpers")
-load(":npm_translate_lock_state.bzl", "DEFAULT_ROOT_PACKAGE", "npm_translate_lock_state")
+load(":npm_translate_lock_state.bzl", "npm_translate_lock_state")
 load(":utils.bzl", "utils")
 
 RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
@@ -60,7 +60,6 @@ _ATTRS = {
     "preupdate": attr.label_list(),
     "public_hoist_packages": attr.string_list_dict(),
     "quiet": attr.bool(default = True),
-    "root_package": attr.string(default = DEFAULT_ROOT_PACKAGE),
     "run_lifecycle_hooks": attr.bool(default = True),
     "update_pnpm_lock": attr.bool(),
     "use_home_npmrc": attr.bool(),
