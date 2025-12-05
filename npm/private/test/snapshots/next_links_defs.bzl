@@ -3,10 +3,12 @@
 # buildifier: disable=bzl-visibility
 load(
     "@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
 )
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_package_store_internal = "npm_imported_package_store_internal")
 
 PACKAGE = "next"
 VERSION = "15.2.4(@babel/core@7.28.5)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)"
@@ -21,7 +23,6 @@ def npm_imported_package_store_internal():
         key = _KEY,
         package = PACKAGE,
         version = VERSION,
-        root_package = _ROOT_PACKAGE,
         deps = {
             ":.aspect_rules_js/node_modules/next@15.2.4_1790925128/pkg": "next",
             ":.aspect_rules_js/node_modules/@babel+code-frame@7.27.1/pkg": "@babel/code-frame",
