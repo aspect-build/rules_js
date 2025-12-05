@@ -65,7 +65,7 @@ def gather_transitive_closure(packages, package, cache = {}):
                 msg = "Unknown package key: {} in {}".format(dep_key, packages.keys())
                 fail(msg)
 
-    return is_circular, utils.sorted_map(transitive_closure)
+    return is_circular, transitive_closure
 
 def _get_package_info_deps(package_info):
     return package_info["dependencies"] | package_info["optional_dependencies"]
@@ -86,6 +86,7 @@ def calculate_transitive_closures(packages):
             cache,
         )
 
-        packages[package]["is_circular"] = is_circular
-        packages[package]["transitive_closure"] = transitive_closure
+        if is_circular:
+            packages[package]["transitive_closure"] = utils.sorted_map(transitive_closure)
+
         cache[package] = (is_circular, transitive_closure)

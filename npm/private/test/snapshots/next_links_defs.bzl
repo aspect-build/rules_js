@@ -24,6 +24,7 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
+            ":.aspect_rules_js/node_modules/next@15.2.4_1790925128/pkg": "next",
             ":.aspect_rules_js/node_modules/@babel+code-frame@7.27.1/pkg": "@babel/code-frame",
             ":.aspect_rules_js/node_modules/@babel+compat-data@7.28.5/pkg": "@babel/compat-data",
             ":.aspect_rules_js/node_modules/@babel+core@7.28.5/pkg": "@babel/core",
@@ -90,7 +91,6 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/lru-cache@5.1.1/pkg": "lru-cache",
             ":.aspect_rules_js/node_modules/ms@2.1.3/pkg": "ms",
             ":.aspect_rules_js/node_modules/nanoid@3.3.11/pkg": "nanoid",
-            ":.aspect_rules_js/node_modules/next@15.2.4_1790925128/pkg": "next",
             ":.aspect_rules_js/node_modules/node-releases@2.0.27/pkg": "node-releases",
             ":.aspect_rules_js/node_modules/picocolors@1.1.1/pkg": "picocolors",
             ":.aspect_rules_js/node_modules/postcss@8.4.31/pkg": "postcss",
