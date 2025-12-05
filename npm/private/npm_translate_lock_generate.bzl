@@ -516,22 +516,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     rctx_files[_DEFS_BZL_FILENAME] = defs_bzl_contents
 
-    for filename, contents in attr.additional_file_contents.items():
-        if not rctx_files.get(filename, False):
-            rctx_files[filename] = contents
-        elif filename.endswith(".bzl"):
-            # bzl files are special cased since all load statements must go at the top
-            load_statements = []
-            other_statements = []
-            for content in contents:
-                if content.startswith("load("):
-                    load_statements.append(content)
-                else:
-                    other_statements.append(content)
-            rctx_files[filename] = load_statements + rctx_files[filename] + other_statements
-        else:
-            rctx_files[filename].extend(contents)
-
     return final_rctx_files | {
         filename: generated_by_prefix + "\n" + "\n".join(contents).rstrip() + "\n"
         for filename, contents in rctx_files.items()

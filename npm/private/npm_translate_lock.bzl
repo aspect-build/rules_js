@@ -32,7 +32,6 @@ RULES_JS_FROZEN_PNPM_LOCK_ENV = "ASPECT_RULES_JS_FROZEN_PNPM_LOCK"
 ################################################################################
 
 _ATTRS = {
-    "additional_file_contents": attr.string_list_dict(),
     "bins": attr.string_list_dict(),
     "custom_postinstalls": attr.string_dict(),
     "data": attr.label_list(),
