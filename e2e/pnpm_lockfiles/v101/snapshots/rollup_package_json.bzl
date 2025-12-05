@@ -2,13 +2,13 @@
 
 load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")
 
-_link_workspace_and_package = "@@//<LOCKVERSION>"
+_root_package = "<LOCKVERSION>"
 _package_store_name = "rollup@2.14.0"
 
 def rollup(name, **kwargs):
     bin_internal(
         name,
-        link_workspace_and_package = _link_workspace_and_package,
+        root_package = _root_package,
         package_store_name = _package_store_name,
         bin_path = "./dist/bin/rollup",
         bin_mnemonic = "Rollup",
@@ -18,7 +18,7 @@ def rollup(name, **kwargs):
 def rollup_test(name, **kwargs):
     bin_test_internal(
         name,
-        link_workspace_and_package = _link_workspace_and_package,
+        root_package = _root_package,
         package_store_name = _package_store_name,
         bin_path = "./dist/bin/rollup",
         **kwargs,
@@ -28,7 +28,7 @@ def rollup_test(name, **kwargs):
 def rollup_binary(name, **kwargs):
     bin_binary_internal(
         name,
-        link_workspace_and_package = _link_workspace_and_package,
+        root_package = _root_package,
         package_store_name = _package_store_name,
         bin_path = "./dist/bin/rollup",
         **kwargs,

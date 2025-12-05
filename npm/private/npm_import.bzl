@@ -331,8 +331,8 @@ def npm_link_imported_package(
     )
 """
 
-def bin_internal(name, link_workspace_and_package, package_store_name, bin_path, bin_mnemonic, **kwargs):
-    target = "%s:%s/node_modules/%s" % (link_workspace_and_package, utils.package_store_root, package_store_name)
+def bin_internal(name, root_package, package_store_name, bin_path, bin_mnemonic, **kwargs):
+    target = "//%s:%s/node_modules/%s" % (root_package, utils.package_store_root, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -353,8 +353,8 @@ def bin_internal(name, link_workspace_and_package, package_store_name, bin_path,
         **kwargs
     )
 
-def bin_test_internal(name, link_workspace_and_package, package_store_name, bin_path, **kwargs):
-    target = "%s:%s/node_modules/%s" % (link_workspace_and_package, utils.package_store_root, package_store_name)
+def bin_test_internal(name, root_package, package_store_name, bin_path, **kwargs):
+    target = "//%s:%s/node_modules/%s" % (root_package, utils.package_store_root, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -368,8 +368,8 @@ def bin_test_internal(name, link_workspace_and_package, package_store_name, bin_
         **kwargs
     )
 
-def bin_binary_internal(name, link_workspace_and_package, package_store_name, bin_path, **kwargs):
-    target = "%s:%s/node_modules/%s" % (link_workspace_and_package, utils.package_store_root, package_store_name)
+def bin_binary_internal(name, root_package, package_store_name, bin_path, **kwargs):
+    target = "//%s:%s/node_modules/%s" % (root_package, utils.package_store_root, package_store_name)
     _directory_path(
         name = "%s__entry_point" % name,
         directory = target + "/dir",
@@ -387,7 +387,7 @@ _BIN_MACRO_TMPL = """
 def {bin_name}(name, **kwargs):
     bin_internal(
         name,
-        link_workspace_and_package = _link_workspace_and_package,
+        root_package = _root_package,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
         bin_mnemonic = "{bin_mnemonic}",
@@ -397,7 +397,7 @@ def {bin_name}(name, **kwargs):
 def {bin_name}_test(name, **kwargs):
     bin_test_internal(
         name,
-        link_workspace_and_package = _link_workspace_and_package,
+        root_package = _root_package,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
         **kwargs,
@@ -407,7 +407,7 @@ def {bin_name}_test(name, **kwargs):
 def {bin_name}_binary(name, **kwargs):
     bin_binary_internal(
         name,
-        link_workspace_and_package = _link_workspace_and_package,
+        root_package = _root_package,
         package_store_name = _package_store_name,
         bin_path = "{bin_path}",
         **kwargs,
@@ -625,7 +625,7 @@ def _npm_import_rule_impl(rctx):
                 generated_by_prefix,
                 """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
                 "",
-                '_link_workspace_and_package = "@%s//%s"' % (rctx.attr.link_workspace, rctx.attr.root_package),
+                '_root_package = "%s"' % rctx.attr.root_package,
                 '_package_store_name = "%s"' % package_store_name,
             ]
             for name in bins:
@@ -908,7 +908,6 @@ _ATTRS = _COMMON_ATTRS | {
     "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
-    "link_workspace": attr.string(),
     "npm_auth": attr.string(),
     "npm_auth_basic": attr.string(),
     "npm_auth_password": attr.string(),
@@ -1038,13 +1037,6 @@ Args:
 
     root_package: The root package where the node_modules package store is linked to.
         Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
-
-    link_workspace: The workspace name where links will be created for this package.
-
-        This is typically set in rule sets and libraries that are to be consumed as external repositories so
-        links are created in the external repository and not the user workspace.
-
-        Can be left unspecified if the link workspace is the user workspace.
 
     lifecycle_hooks: List of lifecycle hook `package.json` scripts to run for this package if they exist.
 
@@ -1228,7 +1220,6 @@ def npm_import(
         extra_build_content,
         transitive_closure,
         root_package,
-        link_workspace,
         lifecycle_hooks,
         lifecycle_hooks_execution_requirements,
         lifecycle_hooks_env,
@@ -1260,7 +1251,6 @@ def npm_import(
         package = package,
         version = version,
         root_package = root_package,
-        link_workspace = link_workspace,
         integrity = integrity,
         url = url,
         commit = commit,
