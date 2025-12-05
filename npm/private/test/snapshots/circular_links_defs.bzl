@@ -24,8 +24,8 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/node_modules/d@1.0.2/pkg": "d",
             ":.aspect_rules_js/node_modules/es5-ext@0.10.64/pkg": "es5-ext",
+            ":.aspect_rules_js/node_modules/d@1.0.2/pkg": "d",
             ":.aspect_rules_js/node_modules/es6-iterator@2.0.3/pkg": "es6-iterator",
             ":.aspect_rules_js/node_modules/es6-symbol@3.1.4/pkg": "es6-symbol",
             ":.aspect_rules_js/node_modules/esniff@2.0.1/pkg": "esniff",

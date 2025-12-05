@@ -285,7 +285,7 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
         name = package_info["name"]
         version = package_info["version"]
         friendly_version = package_info["friendly_version"]
-        transitive_closure = package_info["transitive_closure"]
+        transitive_closure = package_info.get("transitive_closure", None)
         resolution = package_info["resolution"]
 
         resolution_type = resolution.get("type", None)
@@ -463,7 +463,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             npm_auth_basic = npm_auth_basic,
             npm_auth_username = npm_auth_username,
             npm_auth_password = npm_auth_password,
-            transitive_closure = transitive_closure if custom_postinstall or lifecycle_hooks or package_info["is_circular"] else None,
+            transitive_closure = transitive_closure,
             url = url,
             commit = commit,
             version = version,
