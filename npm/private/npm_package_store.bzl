@@ -155,6 +155,8 @@ If set, takes precendance over the package version in the `NpmPackageInfo` src.
     ),
 }
 
+_PACKAGE_STORE_PREFIX_LEN = len("node_modules/" + utils.package_store_root)
+
 def _npm_package_store_impl(ctx):
     if ctx.attr.src:
         if NpmPackageInfo in ctx.attr.src:
@@ -181,6 +183,10 @@ def _npm_package_store_impl(ctx):
         fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
+
+    package_store_prefix_len = _PACKAGE_STORE_PREFIX_LEN
+    if ctx.label.package:
+        package_store_prefix_len += len(ctx.label.package) + 1
 
     package_key = "{}@{}".format(package, version)
     package_store_name = utils.package_store_name(package_key)
@@ -368,10 +374,20 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 actual_dep = deps_map[dep_ref_dep_key]
                 dep_ref_def_package_store_directory = actual_dep[NpmPackageStoreInfo].package_store_directory
                 if dep_ref_def_package_store_directory:
+                    target = dep_ref_def_package_store_directory.short_path[package_store_prefix_len:]
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
                         # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                        dep_ref_dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, dep_package_store_name, dep_ref_dep_alias)
-                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory.path))
+                        dep_ref_dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(
+                            utils.package_store_root,
+                            dep_package_store_name,
+                            dep_ref_dep_alias,
+                        )
+                        symlink = ctx.actions.declare_symlink(dep_ref_dep_symlink_path)
+                        ctx.actions.symlink(
+                            output = symlink,
+                            target_path = ("../../.." if "/" in dep_ref_dep_alias else "../..") + target,
+                        )
+                        files.append(symlink)
     else:
         # We should _never_ get here
         fail("Internal error")
