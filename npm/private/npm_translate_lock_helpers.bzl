@@ -455,7 +455,6 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             patch_args = patch_args,
             patches = patches,
             exclude_package_contents = exclude_package_contents,
-            root_package = root_package,
             lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,

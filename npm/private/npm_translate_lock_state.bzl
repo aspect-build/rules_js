@@ -16,7 +16,6 @@ PACKAGE_JSON_FILENAME = "package.json"
 PNPM_LOCK_FILENAME = "pnpm-lock.yaml"
 PNPM_WORKSPACE_FILENAME = "pnpm-workspace.yaml"
 PNPM_LOCK_ACTION_CACHE_PREFIX = "npm_translate_lock_"
-DEFAULT_ROOT_PACKAGE = "."
 RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV = "ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK"
 
 ################################################################################
@@ -53,7 +52,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         _init_patched_dependencies_labels(priv, rctx, attr, label_store)
 
     # May depend on lockfile state
-    _init_root_package(priv, attr, label_store)
+    _init_root_package(priv, label_store)
     _init_workspace(priv, rctx, label_store, is_windows)
 
     if _should_update_pnpm_lock(priv):
@@ -172,22 +171,14 @@ def _init_external_repository_action_cache(priv, attr):
     priv["external_repository_action_cache"] = attr.external_repository_action_cache if attr.external_repository_action_cache else utils.default_external_repository_action_cache()
 
 ################################################################################
-def _init_root_package(priv, attr, label_store):
+def _init_root_package(priv, label_store):
     pnpm_lock_label = label_store.label("pnpm_lock")
 
-    # use the directory of the pnpm_lock file as the root_package unless overridden by the root_package attribute
-    if attr.root_package == DEFAULT_ROOT_PACKAGE:
-        # Don't allow a pnpm lock file that isn't in the root directory of a bazel package
-        if paths.dirname(pnpm_lock_label.name):
-            msg = "expected pnpm lock file {} to be at the root of a bazel package".format(pnpm_lock_label)
-            fail(msg)
-        priv["root_package"] = pnpm_lock_label.package
-    else:
-        # Don't allow root_package override if there are workspace importers; this is not supported as
-        # paths to workspace packages will not work in this case
-        if _has_workspaces(priv):
-            fail("root_package cannot be overridden if there are pnpm workspace packages specified")
-        priv["root_package"] = attr.root_package
+    # Don't allow a pnpm lock file that isn't in the root directory of a bazel package
+    if paths.dirname(pnpm_lock_label.name):
+        msg = "expected pnpm lock file {} to be at the root of a bazel package".format(pnpm_lock_label)
+        fail(msg)
+    priv["root_package"] = pnpm_lock_label.package
 
 def _init_workspace(priv, rctx, label_store, is_windows):
     root_package_json = {}
@@ -591,7 +582,7 @@ def _new(rctx_name, rctx, attr):
         "npm_auth": {},
         "npm_registries": {},
         "packages": {},
-        "root_package": attr.root_package,
+        "root_package": attr.pnpm_lock.package if attr.pnpm_lock else "",
         "pnpm_settings": {},
         "patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
