@@ -295,9 +295,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             if dep_package_store_directory:
                 linked_package_store_directories.append(dep_package_store_directory)
                 for dep_alias in dep_aliases:
-                    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                    dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_alias)
-                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
+                    target = dep_package_store_directory.short_path[package_store_prefix_len:]
+                    files.append(_symlink_package_store(ctx, package_store_name, target, dep_alias))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm dependency will create the dep symlinks for this dep;
@@ -311,9 +310,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
             # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
             if dep_package_store_directory not in linked_package_store_directories:
-                # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_info.package)
-                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
+                target = dep_package_store_directory.short_path[package_store_prefix_len:]
+                files.append(_symlink_package_store(ctx, package_store_name, target, dep_info.package))
 
                 # Include the store info of all linked dependencies
                 npm_package_store_infos.append(dep_info)
@@ -376,18 +374,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 if dep_ref_def_package_store_directory:
                     target = dep_ref_def_package_store_directory.short_path[package_store_prefix_len:]
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
-                        # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                        dep_ref_dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(
-                            utils.package_store_root,
-                            dep_package_store_name,
-                            dep_ref_dep_alias,
-                        )
-                        symlink = ctx.actions.declare_symlink(dep_ref_dep_symlink_path)
-                        ctx.actions.symlink(
-                            output = symlink,
-                            target_path = ("../../.." if "/" in dep_ref_dep_alias else "../..") + target,
-                        )
-                        files.append(symlink)
+                        files.append(_symlink_package_store(ctx, dep_package_store_name, target, dep_ref_dep_alias))
     else:
         # We should _never_ get here
         fail("Internal error")
@@ -502,3 +489,19 @@ def npm_local_package_store_internal(package_store_name, package, version, src, 
         actual = store_target_name,
         visibility = visibility,
     )
+
+# Util for creating the symlink for a package store dependency referencing
+# another package store entry.
+def _symlink_package_store(ctx, package_store_name, target, name):
+    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+    store_symlink_path = "node_modules/{}/{}/node_modules/{}".format(
+        utils.package_store_root,
+        package_store_name,
+        name,
+    )
+    symlink = ctx.actions.declare_symlink(store_symlink_path)
+    ctx.actions.symlink(
+        output = symlink,
+        target_path = ("../../.." if "/" in name else "../..") + target,
+    )
+    return symlink
