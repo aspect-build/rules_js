@@ -3,8 +3,6 @@
 # NOTE:
 #  - an entry existing in the PNPM_{ARCHS,PLATFORMS} means it is known to rules_js
 #  - an entry mapping to None means it is unsupported within rules_js/bazel
-#  - currently this map is 1-1 with select() cases - if pnpm arch/platforms start mapping
-#    to the same bazel @platforms this will need to be updated to be refactored
 
 # Node/PNPM architectures and correspending @platforms labels
 # See https://nodejs.org/api/process.html#processarch
@@ -24,6 +22,10 @@ PNPM_ARCHS = {
     "mipsel": None,
     "mips64el": None,
     "s390": None,
+
+    # Additional platforms found in pnpm [cpu] fields not on Node.js docs
+    "x32": "@platforms//cpu:x86_32",
+    "x86": "@platforms//cpu:x86_32",
 }
 
 # Node/PNPM platforms and correspending @platforms labels
