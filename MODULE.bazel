@@ -284,6 +284,7 @@ use_repo(
     "npm-no_optional",
     "npm__es5-ext__0.10.64__links",
     "npm__fsevents__2.3.3__links",
+    "npm__google-closure-compiler__20251111.0.0__links",
     "npm__next__15.2.4_1790925128__links",
     "npm__rollup__2.70.2",
     "npm__rollup__2.70.2__links",
