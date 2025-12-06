@@ -23,19 +23,18 @@ load(
 )
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
-load(":npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
+load(":npm_package_store_internal.bzl", "npm_package_store_internal")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store_internal.bzl", _npm_package_store = "npm_package_store_internal")
-
-# buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_import.bzl",
+load(
+    "@aspect_rules_js//npm/private:npm_import.bzl",
     _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
-    _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal")
+    _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
+)
 """
 
 _LINK_JS_PACKAGE_TMPL = """\
@@ -99,7 +98,7 @@ def npm_imported_package_store_internal(
     store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
 
     # reference target used when referenced by a package with cycles
-    _npm_package_store(
+    npm_package_store_internal(
         name = "{}/ref".format(store_target_name),
         key = key,
         package = package,
@@ -109,7 +108,7 @@ def npm_imported_package_store_internal(
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
-    _npm_package_store(
+    npm_package_store_internal(
         name = "{}/pkg".format(store_target_name),
         src = "{}/pkg_lc".format(store_target_name) if has_lifecycle_build_target else npm_package_target,
         key = key,
@@ -121,7 +120,7 @@ def npm_imported_package_store_internal(
     )
 
     # package store target with transitive closure of all npm package dependencies
-    _npm_package_store(
+    npm_package_store_internal(
         name = store_target_name,
         src = None if has_transitive_closure or has_lifecycle_build_target else npm_package_target,
         key = key,
@@ -145,7 +144,7 @@ def npm_imported_package_store_internal(
 
     if has_lifecycle_build_target:
         # pre-lifecycle target with reference deps for use terminal pre-lifecycle target
-        _npm_package_store(
+        npm_package_store_internal(
             name = "{}/pkg_pre_lc_lite".format(store_target_name),
             key = key,
             package = package,
@@ -156,7 +155,7 @@ def npm_imported_package_store_internal(
         )
 
         # terminal pre-lifecycle target for use in lifecycle build target below
-        _npm_package_store(
+        npm_package_store_internal(
             name = "{}/pkg_pre_lc".format(store_target_name),
             key = key,
             package = package,
