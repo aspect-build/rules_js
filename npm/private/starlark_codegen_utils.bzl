@@ -105,7 +105,7 @@ def _to_conditional_dict_attr(
             select_parts.append('%s"%s": %s' % (tab * (indent_count + 1), condition, condition_dict))
 
         # Add default case with no values for incompatible platforms
-        select_parts.append('%s"//conditions:default": {}' % (tab * (indent_count + 1)))
+        select_parts.append('%s"//conditions:default": {},' % (tab * (indent_count + 1)))
 
         select_block = "select({\n%s\n%s})" % (",\n".join(select_parts), indent)
         parts.append(select_block)
