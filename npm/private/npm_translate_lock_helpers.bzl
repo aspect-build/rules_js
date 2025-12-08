@@ -259,25 +259,26 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
     # Direct dependencies of 'importers' which will have public targets
     direct_deps = {}
 
-    # make a lookup table of package to link name for each importer
-    importer_links = {}
-    for import_path, importer in importers.items():
+    # A map of which importers depend on which packages (and by which name) to
+    # quickly map package => dependents.
+    package_importers = {}
+    for importer_path, importer in importers.items():
         dependencies = importer["dependencies"] | importer["optional_dependencies"] | importer["dev_dependencies"]
-        links = {
-            "link_package": _link_package(root_package, import_path),
-        }
-        linked_packages = {}
+
+        link_package = _link_package(root_package, importer_path)
+
         for dep_package, dep_package_key in dependencies.items():
             direct_deps[dep_package_key] = True
 
             if dep_package_key.startswith("link:"):
                 continue
-            if dep_package_key not in linked_packages:
-                linked_packages[dep_package_key] = [dep_package]
-            else:
-                linked_packages[dep_package_key].append(dep_package)
-        links["packages"] = linked_packages
-        importer_links[import_path] = links
+
+            if dep_package_key not in package_importers:
+                package_importers[dep_package_key] = {link_package: [dep_package]}
+            elif link_package not in package_importers[dep_package_key]:
+                package_importers[dep_package_key][link_package] = [dep_package]
+            elif dep_package not in package_importers[dep_package_key][link_package]:
+                package_importers[dep_package_key][link_package].append(dep_package)
 
     patches_used = []
     result = []
@@ -375,13 +376,8 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         if len(package_visibility) == 0:
             package_visibility = ["//visibility:public"]
 
-        # gather all of the importers (workspace packages) that this npm package should be linked at which names
-        link_packages = {}
-        for links in importer_links.values():
-            linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key)
-            if link_names:
-                link_packages[links["link_package"]] = link_names
+        # Bazel package which this pnpm package should be linked at which names
+        link_packages = package_importers.get(package_key, {})
 
         # check if this package should be hoisted via public_hoist_packages
         public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
