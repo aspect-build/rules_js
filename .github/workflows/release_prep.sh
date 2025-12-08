@@ -65,5 +65,3 @@ pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 use_repo(pnpm, "pnpm")
 \`\`\`
 EOF
-
-echo "\`\`\`"
