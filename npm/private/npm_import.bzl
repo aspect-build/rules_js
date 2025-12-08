@@ -925,26 +925,15 @@ You can create these manually if you want to have exact control.
 Bazel will only fetch the given package from an external registry if the package is
 required for the user-requested targets to be build/tested.
 
-This is a repository rule, which should be called from your `WORKSPACE` file
-or some `.bzl` file loaded from it. For example, with this code in `WORKSPACE`:
-
-```starlark
-npm_import(
-    name = "npm__at_types_node__15.12.2",
-    package = "@types/node",
-    version = "15.12.2",
-    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
-)
-```
-
-In `MODULE.bazel` the same would look like so:
+This is a repository rule, which should be called from your `WORKSPACE` file.
+For example, in `MODULE.bazel`:
 
 ```starlark
 npm.npm_import(
     name = "npm__at_types_node__15.12.2",
     package = "@types/node",
     version = "15.12.2",
-    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",v
+    integrity = "sha512-zjQ69G564OCIWIOHSXyQEEDpdpGl+G348RAKY0XXy9Z5kU9Vzv1GMNnkar/ZJ8dzXB3COzD9Mo9NtRZ4xfgUww==",
 )
 use_repo(npm, "npm__at_types_node__15.12.2")
 use_repo(npm, "npm__at_types_node__15.12.2__links")
