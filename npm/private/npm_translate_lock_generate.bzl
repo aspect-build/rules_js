@@ -94,7 +94,7 @@ js_binary(name = "sync", entry_point = "noop.js")
         resolution = package_info["resolution"]
         if resolution.get("type", None) == "directory":
             dep_path = helpers.link_package(root_package, resolution["directory"])
-            transitive_deps = {}
+            package_deps = {}
             for dep_name, dep_key in deps.items():
                 package_store_name = utils.package_store_name(dep_key)
                 dep_store_target = '"//{root_package}:{package_store_root}/node_modules/{package_store_name}"'.format(
@@ -102,21 +102,21 @@ js_binary(name = "sync", entry_point = "noop.js")
                     package_store_name = package_store_name,
                     package_store_root = utils.package_store_root,
                 )
-                if dep_store_target not in transitive_deps:
-                    transitive_deps[dep_store_target] = [dep_name]
+                if dep_store_target not in package_deps:
+                    package_deps[dep_store_target] = [dep_name]
                 else:
-                    transitive_deps[dep_store_target].append(dep_name)
+                    package_deps[dep_store_target].append(dep_name)
 
             # collapse alias lists to comma separated strings for each store target
-            for dep_store_target in transitive_deps.keys():
-                transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
+            for dep_store_target in package_deps.keys():
+                package_deps[dep_store_target] = ",".join(package_deps[dep_store_target])
             fp_links[package_key] = {
                 "key": package_key,
                 "package": name,
                 "version": version,
                 "path": dep_path,
                 "link_packages": {},
-                "deps": transitive_deps,
+                "deps": package_deps,
             }
 
     # Collect first-party links in importers
@@ -141,7 +141,7 @@ js_binary(name = "sync", entry_point = "noop.js")
                 dep_link = utils.link_to_importer(dep_key)
                 dep_path = helpers.link_package(root_package, dep_link)
                 if not fp_links.get(dep_path, False):
-                    transitive_deps = {}
+                    package_deps = {}
                     raw_deps = {}
                     if importers.get(dep_link, False):
                         raw_deps = importers[dep_link]["dependencies"] | importers[dep_link]["optional_dependencies"]
@@ -152,13 +152,13 @@ js_binary(name = "sync", entry_point = "noop.js")
                             package_store_name = package_store_name,
                             package_store_root = utils.package_store_root,
                         )
-                        if dep_store_target not in transitive_deps:
-                            transitive_deps[dep_store_target] = [raw_dep_name]
+                        if dep_store_target not in package_deps:
+                            package_deps[dep_store_target] = [raw_dep_name]
                         else:
-                            transitive_deps[dep_store_target].append(raw_dep_name)
+                            package_deps[dep_store_target].append(raw_dep_name)
 
-                    for dep_store_target in transitive_deps.keys():
-                        transitive_deps[dep_store_target] = ",".join(transitive_deps[dep_store_target])
+                    for dep_store_target in package_deps.keys():
+                        package_deps[dep_store_target] = ",".join(package_deps[dep_store_target])
 
                     # note this is the (first) name used to reference this package and not
                     # necessarily the proper self-declared package name
@@ -173,7 +173,7 @@ js_binary(name = "sync", entry_point = "noop.js")
                         "version": version,
                         "path": dep_path,
                         "link_packages": {},
-                        "deps": transitive_deps,
+                        "deps": package_deps,
                     }
 
                 if link_package not in fp_links[dep_path]["link_packages"]:
