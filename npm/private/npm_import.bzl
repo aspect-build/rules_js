@@ -266,6 +266,7 @@ def npm_link_imported_package_store_internal(link_name = PACKAGE, dev = False):
 # Invoked by generated npm_link_imported_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_link_imported_package_internal(
+        name,
         package,
         version,
         dev,
@@ -278,6 +279,8 @@ def npm_link_imported_package_internal(
 
     is_root = bazel_package == root_package
 
+    if name != "node_modules":
+        fail("npm_link_imported_package: customizing 'name' is not supported")
     if not is_root and not link:
         msg = "Nothing to link in bazel package '{bazel_package}' for npm package npm package {package}@{version}. This is neither the root package nor a link package of this package.".format(
             bazel_package = bazel_package,
@@ -316,9 +319,8 @@ def npm_link_imported_package(
         name = "node_modules",
         dev = False,
         link = True):
-    if name != "node_modules":
-        fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package_internal(
+        name,
         package = PACKAGE,
         version = VERSION,
         dev = dev,
