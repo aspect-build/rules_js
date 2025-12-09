@@ -36,7 +36,6 @@ bzl_library(
     deps = [
         ":bash",
         ":js_helpers",
-        "@aspect_bazel_lib//lib:directory_path",
         "@bazel_lib//lib:copy_to_bin",
         "@bazel_lib//lib:directory_path",
         "@bazel_lib//lib:expand_make_vars",

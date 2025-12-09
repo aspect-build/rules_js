@@ -15,7 +15,6 @@ js_binary(
 ```
 """
 
-load("@aspect_bazel_lib//lib:directory_path.bzl", _LegacyDirectoryPathInfo = "DirectoryPathInfo")
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
@@ -492,12 +491,11 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     else:
         nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:runtime_toolchain_type"].nodeinfo
 
-    directory_path_provider = DirectoryPathInfo if DirectoryPathInfo in ctx.attr.entry_point else _LegacyDirectoryPathInfo
-    if directory_path_provider in ctx.attr.entry_point:
-        entry_point = ctx.attr.entry_point[directory_path_provider].directory
+    if DirectoryPathInfo in ctx.attr.entry_point:
+        entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
         entry_point_path = "/".join([
-            ctx.attr.entry_point[directory_path_provider].directory.short_path,
-            ctx.attr.entry_point[directory_path_provider].path,
+            ctx.attr.entry_point[DirectoryPathInfo].directory.short_path,
+            ctx.attr.entry_point[DirectoryPathInfo].path,
         ])
     else:
         if len(ctx.files.entry_point) != 1:
