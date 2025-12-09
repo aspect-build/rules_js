@@ -8,7 +8,6 @@ module(
 
 # Lower-bounds (minimum) versions for direct runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
-bazel_dep(name = "aspect_bazel_lib", version = "2.17.1")  # TODO(alexeagle): remove
 bazel_dep(name = "tar.bzl", version = "0.6.0")
 bazel_dep(name = "yq.bzl", version = "0.3.2")
 bazel_dep(name = "jq.bzl", version = "0.4.0")
@@ -18,6 +17,10 @@ bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "0.0.5")
 bazel_dep(name = "rules_nodejs", version = "6.6.2")
+
+# Ensure any version of aspect_bazel_lib used is at least 2.22.0 to include
+# https://github.com/bazel-contrib/bazel-lib/commit/371362199e5e5bde58aeb15b54ea6cfb164af337
+bazel_dep(name = "aspect_bazel_lib", version = "2.22.0", repo_name = None)
 
 tel = use_extension("@aspect_tools_telemetry//:extension.bzl", "telemetry")
 use_repo(tel, "aspect_tools_telemetry_report")
