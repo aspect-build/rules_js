@@ -236,32 +236,25 @@ def _npm_package_store_impl(ctx):
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
                 bsdtar = ctx.toolchains[tar_lib.toolchain_type]
 
-                tar_exclude_package_contents = []
-                if ctx.attr.exclude_package_contents:
-                    for pattern in ctx.attr.exclude_package_contents:
-                        if pattern == "":
-                            continue
-                        tar_exclude_package_contents.append("--exclude")
-                        tar_exclude_package_contents.append(pattern)
+                args = ctx.actions.args()
+                args.add("--extract")
+                args.add("--no-same-owner")
+                args.add("--no-same-permissions")
+                args.add("--strip-components", "1")
+                args.add("--file", src)
+                args.add_all("--directory", [package_store_directory], expand_directories = False)
+                args.add_all(ctx.attr.exclude_package_contents, before_each = "--exclude")
 
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
-                    inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
+                    inputs = [src],
                     outputs = [package_store_directory],
-                    arguments = [
-                        "--extract",
-                    ] + tar_exclude_package_contents + [
-                        "--no-same-owner",
-                        "--no-same-permissions",
-                        "--strip-components",
-                        "1",
-                        "--file",
-                        src.path,
-                        "--directory",
-                        package_store_directory.path,
-                    ],
+                    arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
+                    execution_requirements = {
+                        "supports-path-mapping": "1",
+                    },
 
                     # Always override the locale to give better hermeticity.
                     # See https://github.com/aspect-build/rules_js/issues/2039
