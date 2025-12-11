@@ -8,7 +8,7 @@ echo >>.git/info/attributes "js/private/test/image/non_ascii export-ignore"
 # But **do** include e2e/bzlmod since the BCR wants to run presubmit test
 # and it only sees our release artifact.
 # shellcheck disable=2010
-ls e2e | grep -v bzlmod | grep -v "e2e/e2e.bazelrc" | awk 'NF{print "e2e/" $0 " export-ignore"}' >>.git/info/attributes
+ls e2e | grep -v bzlmod | grep -v "e2e.bazelrc" | awk 'NF{print "e2e/" $0 " export-ignore"}' >>.git/info/attributes
 
 # Argument provided by reusable workflow caller, see
 # https://github.com/bazel-contrib/.github/blob/d197a6427c5435ac22e56e33340dff912bc9334e/.github/workflows/release_ruleset.yaml#L72
