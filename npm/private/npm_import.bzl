@@ -904,8 +904,6 @@ _ATTRS = _COMMON_ATTRS | {
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
     "exclude_package_contents": attr.string_list(default = []),
-    "generate_package_json_bzl": attr.bool(),
-    "generate_bzl_library_targets": attr.bool(),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
     "npm_auth": attr.string(),
@@ -1193,7 +1191,10 @@ npm_import_links_rule = repository_rule(
 
 npm_import_rule = repository_rule(
     implementation = _npm_import_rule_impl,
-    attrs = _ATTRS | _INTERNAL_COMMON_ATTRS,
+    attrs = _ATTRS | _INTERNAL_COMMON_ATTRS | {
+        "generate_package_json_bzl": attr.bool(),
+        "generate_bzl_library_targets": attr.bool(),
+    },
 )
 
 # Private API for importing + linking a single npm package
