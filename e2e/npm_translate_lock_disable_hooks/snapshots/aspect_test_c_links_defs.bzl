@@ -53,9 +53,8 @@ def npm_link_imported_package(
         name = "node_modules",
         dev = False,
         link = True):
-    if name != "node_modules":
-        fail("npm_link_imported_package: customizing 'name' is not supported")
     return _npm_link_imported_package_internal(
+        name,
         package = PACKAGE,
         version = VERSION,
         dev = dev,
