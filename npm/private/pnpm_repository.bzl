@@ -44,9 +44,8 @@ def pnpm_repository(name, pnpm_version = DEFAULT_PNPM_VERSION):
             version = pnpm_version,
             extra_build_content = "\n".join([
                 """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
-                """js_binary(name = "pnpm", data = glob(["package/**"]), entry_point = "package/dist/pnpm.cjs", visibility = ["//visibility:public"])""",
+                """js_binary(name = "pnpm", data = glob(["**"]), entry_point = "dist/pnpm.cjs", visibility = ["//visibility:public"])""",
             ]),
-            extract_full_archive = True,
         )
 
         _npm_import_links_rule(
