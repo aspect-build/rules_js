@@ -229,8 +229,8 @@ def _npm_import_bzlmod(i):
         name = i.name,
         key = package_key,
         generate_package_json_bzl = True,  # Always generate package_json.bzl explicitly declared imports
-        generate_bzl_library_targets = None,
-        extract_full_archive = None,
+        generate_bzl_library_targets = None,  # Not supported via bzlmod
+        extract_full_archive = i.extract_full_archive,
         bins = i.bins,
         commit = i.commit,
         custom_postinstall = i.custom_postinstall,
