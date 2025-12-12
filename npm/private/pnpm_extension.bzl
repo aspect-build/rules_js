@@ -18,7 +18,7 @@ def resolve_pnpm_repositories(mctx):
 
     Returns:
       A struct with the following fields:
-      - `repositories`: dict (name -> pnpm_version) to invoke `pnpm_repository` with.
+      - `repositories`: dict (name -> {version, include_npm, integrity}) to invoke `pnpm_repository` with.
       - `notes`: list of notes to print to the user.
     """
 
@@ -38,7 +38,7 @@ def resolve_pnpm_repositories(mctx):
                 This prevents conflicting registrations in the global namespace of external repos.
                 """)
             if not registrations.get(attr.name, False):
-                registrations[attr.name] = []
+                registrations[attr.name] = {}
 
             if attr.pnpm_version_from and attr.pnpm_version and attr.pnpm_version != DEFAULT_PNPM_VERSION:
                 fail("Cannot specify both pnpm_version = {} and pnpm_version_from = {}".format(attr.pnpm_version, attr.pnpm_version_from))
@@ -68,12 +68,14 @@ def resolve_pnpm_repositories(mctx):
             # Avoid inserting the default version from a non-root module
             # (likely rules_js itself) if the root module already has a version.
             if mod.is_root or len(registrations[attr.name]) == 0:
-                registrations[attr.name].append(v)
+                if v not in registrations[attr.name]:
+                    registrations[attr.name][v] = []
+                registrations[attr.name][v].append(attr.include_npm)
             if attr.pnpm_version_integrity:
                 integrity[attr.pnpm_version] = attr.pnpm_version_integrity
-    for name, version_list in registrations.items():
-        # Disregard repeated version numbers
-        versions = unique(version_list)
+    for name, versions_map in registrations.items():
+        # Disregard repeated version numbers and convert {version:include_npm} to version[]
+        versions = unique(versions_map.keys())
 
         # Use "Minimal Version Selection" like bzlmod does for resolving module conflicts
         # Note, the 'sorted(list)' function in starlark doesn't allow us to provide a custom comparator
@@ -89,6 +91,12 @@ def resolve_pnpm_repositories(mctx):
         else:
             selected = versions[0]
 
-        result.repositories[name] = (selected, integrity[selected]) if selected in integrity.keys() else selected
+        selected = {
+            "version": selected,
+            "include_npm": 0 < len([i for i in versions_map[selected] if i]),
+            "integrity": integrity.get(selected, None),
+        }
+
+        result.repositories[name] = selected
 
     return result
