@@ -5,7 +5,6 @@ See https://bazel.build/docs/bzlmod#extension-definition
 load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
-load("//npm:repositories.bzl", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
@@ -14,6 +13,7 @@ load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers 
 load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
+load("//npm/private:pnpm_repository.bzl", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 
 DEFAULT_PNPM_VERSION = _DEFAULT_PNPM_VERSION
 LATEST_PNPM_VERSION = _LATEST_PNPM_VERSION
@@ -229,8 +229,8 @@ def _npm_import_bzlmod(i):
         name = i.name,
         key = package_key,
         generate_package_json_bzl = True,  # Always generate package_json.bzl explicitly declared imports
-        generate_bzl_library_targets = None,  # Not supported via bzlmod
-        extract_full_archive = i.extract_full_archive,
+        generate_bzl_library_targets = None,
+        extract_full_archive = None,
         bins = i.bins,
         commit = i.commit,
         custom_postinstall = i.custom_postinstall,
@@ -358,10 +358,11 @@ def _pnpm_extension_impl(module_ctx):
         # buildifier: disable=print
         print(note)
 
-    for name, pnpm_version in resolved.repositories.items():
+    for name, pnpm in resolved.repositories.items():
         pnpm_repository(
             name = name,
-            pnpm_version = pnpm_version,
+            pnpm_version = pnpm["version"],
+            include_npm = pnpm["include_npm"],
         )
 
 pnpm = module_extension(
@@ -373,6 +374,10 @@ pnpm = module_extension(
                     doc = """Name of the generated repository, allowing more than one pnpm version to be registered.
                         Overriding the default is only permitted in the root module.""",
                     default = DEFAULT_PNPM_REPO_NAME,
+                ),
+                "include_npm": attr.bool(
+                    doc = "If true, include the npm package along with the pnpm binary.",
+                    default = False,
                 ),
                 "pnpm_version": attr.string(
                     doc = "pnpm version to use. The string `latest` will be resolved to LATEST_PNPM_VERSION.",

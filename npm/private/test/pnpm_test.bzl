@@ -4,12 +4,13 @@ load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:pnpm_repository.bzl", "LATEST_PNPM_VERSION")
 
-def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None):
+def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None, include_npm = False):
     return struct(
         name = name,
         pnpm_version = version,
         pnpm_version_from = pnpm_version_from,
         pnpm_version_integrity = integrity,
+        include_npm = include_npm,
     )
 
 def _fake_mod(is_root, *pnpm_tags):
@@ -37,7 +38,7 @@ def _basic(ctx):
     # - rules_js sets a default.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": ("8.6.7", "8.6.7-integrity")},
+        repositories = {"pnpm": {"version": "8.6.7", "integrity": "8.6.7-integrity", "include_npm": False}},
         modules = [
             _fake_mod(True),
             _fake_mod(
@@ -50,7 +51,7 @@ def _basic(ctx):
 def _from_package_json_simple(ctx):
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": "1.2.3"},
+        repositories = {"pnpm": {"version": "1.2.3", "integrity": None, "include_npm": False}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
         ],
@@ -60,7 +61,7 @@ def _from_package_json_simple(ctx):
 def _from_package_json_with_hash(ctx):
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": "1.2.3"},
+        repositories = {"pnpm": {"version": "1.2.3", "integrity": None, "include_npm": False}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
         ],
@@ -71,7 +72,7 @@ def _override(ctx):
     # What happens when the root overrides the pnpm version.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": "9.1.0"},
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": None, "include_npm": False}},
         notes = [],
         modules = [
             _fake_mod(
@@ -98,9 +99,23 @@ def _latest(ctx):
     # - Accept a brittle test.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": LATEST_PNPM_VERSION},
+        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": None, "include_npm": False}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "latest")),
+        ],
+    )
+
+def _include_npm(ctx):
+    return _resolve_test(
+        ctx,
+        repositories = {
+            "pnpm": {"version": "9.1.0", "integrity": None, "include_npm": True},
+            "wnpm": {"version": "9.2.0", "integrity": None, "include_npm": True},
+        },
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(version = "9.1.0", include_npm = True)),
+            _fake_mod(True, _fake_pnpm_tag(name = "wnpm", version = "9.2.0", include_npm = False)),
+            _fake_mod(True, _fake_pnpm_tag(name = "wnpm", version = "9.2.0", include_npm = True)),
         ],
     )
 
@@ -108,8 +123,8 @@ def _custom_name(ctx):
     return _resolve_test(
         ctx,
         repositories = {
-            "my-pnpm": "9.1.0",
-            "pnpm": ("8.6.7", "8.6.7-integrity"),
+            "my-pnpm": {"version": "9.1.0", "integrity": None, "include_npm": False},
+            "pnpm": {"version": "8.6.7", "integrity": "8.6.7-integrity", "include_npm": False},
         },
         modules = [
             _fake_mod(
@@ -129,7 +144,7 @@ def _integrity_conflict(ctx):
     return _resolve_test(
         ctx,
         repositories = {
-            "pnpm": ("8.6.7", "dep-integrity"),
+            "pnpm": {"version": "8.6.7", "integrity": "dep-integrity", "include_npm": False},
         },
         # Modules are *BFS* from root:
         # https://bazel.build/rules/lib/builtins/module_ctx#modules
@@ -149,6 +164,7 @@ basic_test = unittest.make(_basic)
 override_test = unittest.make(_override)
 latest_test = unittest.make(_latest)
 custom_name_test = unittest.make(_custom_name)
+include_npm_test = unittest.make(_include_npm)
 integrity_conflict_test = unittest.make(_integrity_conflict)
 from_package_json_simple_test = unittest.make(_from_package_json_simple)
 from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
@@ -160,6 +176,7 @@ def pnpm_tests(name):
         override_test,
         latest_test,
         custom_name_test,
+        include_npm_test,
         integrity_conflict_test,
         from_package_json_simple_test,
         from_package_json_with_hash_test,
