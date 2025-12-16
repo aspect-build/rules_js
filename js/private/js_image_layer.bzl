@@ -568,7 +568,7 @@ def _js_image_layer_impl(ctx):
     output_groups = dict()
     compress = "" if ctx.attr.compression == "none" else ctx.attr.compression
     for typ, mtree, unused_inputs in layer_groups_gen:
-        ext = tar_lib.common.compression_to_extension[compress] if compress else ""
+        ext = tar_lib.common.compression_to_extension[compress] if compress else ".tar"
         output = ctx.actions.declare_file("%s_%s%s" % (ctx.label.name, typ, ext))
 
         # add the layer group to outputgroupinfo and defaultinfo
