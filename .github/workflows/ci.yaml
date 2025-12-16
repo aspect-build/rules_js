@@ -41,6 +41,7 @@ jobs:
                   a=(
                     .
                     e2e/bzlmod
+                    e2e/git_dep_no_tar
                     e2e/gyp_no_install_script
                     e2e/js_image_docker
                     e2e/js_image_oci
