@@ -243,9 +243,6 @@ _ATTRS = {
         See https://github.com/aspect-build/rules_js/issues/362 for more information. Once #362 is resolved,
         the default for this attribute can be set to False.
 
-        This flag was added in Node.js v10.2.0 (released 2018-05-23). If your node toolchain is configured to use a
-        Node.js version older than this you'll need to set this attribute to False.
-
         See https://nodejs.org/api/cli.html#--preserve-symlinks-main for more information.
         """,
         default = True,
