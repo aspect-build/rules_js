@@ -444,6 +444,10 @@ _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _fetch_git_repository(rctx):
+    remote_url = str(rctx.attr.url)
+    if remote_url.startswith("git+"):
+        remote_url = remote_url[4:]
+
     # Adapted from git_repo helper function used by git_repository in @bazel_tools//tools/build_defs/repo:git_worker.bzl:
     # https://github.com/bazelbuild/bazel/blob/5bdd2b2ff8d6be4ecbffe82d975983129d459782/tools/build_defs/repo/git_worker.bzl#L34
     git_repo = struct(
@@ -451,11 +455,11 @@ def _fetch_git_repository(rctx):
         shallow = "--depth=1",
         reset_ref = rctx.attr.commit,
         fetch_ref = rctx.attr.commit,
-        remote = rctx.attr.url,
+        remote = remote_url,
     )
     rctx.report_progress("Cloning %s of %s" % (git_repo.reset_ref, git_repo.remote))
     _git_init(rctx, git_repo)
-    _git_add_origin(rctx, git_repo, rctx.attr.url)
+    _git_add_origin(rctx, git_repo, remote_url)
     _git_fetch(rctx, git_repo)
     _git_reset(rctx, git_repo)
     _git_clean(rctx, git_repo)
