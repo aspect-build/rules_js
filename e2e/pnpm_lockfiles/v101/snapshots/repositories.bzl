@@ -1175,6 +1175,23 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "lock-<LOCKVERSION>__highlight.js__git_https___gitea.osmocom.org_vyanitskiy_highlight.js.git_58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["highlightjs-git-https-notar"],
+        },
+        package = "highlight.js",
+        version = "git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f",
+        url = "https://gitea.osmocom.org/vyanitskiy/highlight.js.git",
+        package_visibility = ["//visibility:public"],
+        commit = "58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f",
+        transitive_closure = {
+            "highlight.js": ["git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f"],
+        },
+    )
+
+    npm_import(
         name = "lock-<LOCKVERSION>__is-core-module__2.16.1",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
@@ -1331,6 +1348,38 @@ def npm_repositories():
     )
 
     npm_import(
+        name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_763ade6dda092709b36d97491951bcae415d91d1",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["jquery-git-https-763ade6"],
+        },
+        package = "jquery",
+        version = "https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1",
+        url = "https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1",
+        package_visibility = ["//visibility:public"],
+        transitive_closure = {
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_c28c26aef0b3238f578690d73703382951cb355d",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["jquery-github"],
+        },
+        package = "jquery",
+        version = "https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d",
+        url = "https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d",
+        package_visibility = ["//visibility:public"],
+        transitive_closure = {
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d"],
+        },
+    )
+
+    npm_import(
         name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d",
         root_package = "<LOCKVERSION>",
         link_workspace = "",
@@ -1343,6 +1392,22 @@ def npm_repositories():
         package_visibility = ["//visibility:public"],
         transitive_closure = {
             "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d"],
+        },
+    )
+
+    npm_import(
+        name = "lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_f85d521cdeeb3c6d3f4563a06dba8be793e26ef0",
+        root_package = "<LOCKVERSION>",
+        link_workspace = "",
+        link_packages = {
+            "<LOCKVERSION>": ["jquery-http-git-f85d521"],
+        },
+        package = "jquery",
+        version = "https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0",
+        url = "https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0",
+        package_visibility = ["//visibility:public"],
+        transitive_closure = {
+            "jquery": ["https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0"],
         },
     )
 
