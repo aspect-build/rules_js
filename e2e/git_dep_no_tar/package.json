@@ -1,0 +1,9 @@
+{
+    "name": "image",
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
+    "dependencies": {
+        "highlightjs-ttcn3": "https://gitea.osmocom.org/ttcn3/highlightjs-ttcn3.git#6daccff309fca1e7561a43984d42fa4f829ce06d"
+    }
+}
