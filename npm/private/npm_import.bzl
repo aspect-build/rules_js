@@ -602,7 +602,7 @@ def _download_and_extract_archive(rctx, package_json_only):
     if not package_json_only:
         result = rctx.execute(tar_args)
         if result.return_code:
-            msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(tar_args), result.return_code, result.stdout, result.stderr)
+            msg = "Failed to extract package tarball. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(tar_args, result.return_code, result.stdout, result.stderr)
             fail(msg)
 
     if not is_windows:
