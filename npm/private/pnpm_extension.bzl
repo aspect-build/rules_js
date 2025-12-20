@@ -56,9 +56,14 @@ def resolve_pnpm_repositories(mctx):
                 if not package_manager.startswith("pnpm@"):
                     fail("packageManager field must specify pnpm, got: " + package_manager)
 
-                # Extract version from "pnpm@8.15.9" format
+                # Extract version and optional integrity from "pnpm@8.15.9+sha512.<hash>" format
                 v = package_manager[5:]  # Remove "pnpm@" prefix
-                v = v.rsplit("+sha512.")[0]  # Remove optional "+sha512.<hash>" suffix
+                if "+sha512." in v:
+                    parts = v.rsplit("+sha512.", 1)
+                    v = parts[0]
+
+                    # Store the integrity hash (prepend "sha512-" as that's the expected format)
+                    integrity[v] = "sha512-" + parts[1]
 
             elif attr.pnpm_version == "latest":
                 v = LATEST_PNPM_VERSION
