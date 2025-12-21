@@ -49,6 +49,8 @@ def _basic(ctx):
     )
 
 def _from_package_json_simple(ctx):
+    # Test reading pnpm version from package.json without integrity hash.
+    # packageManager: "pnpm@1.2.3" -> version only, no integrity tuple
     return _resolve_test(
         ctx,
         repositories = {"pnpm": {"version": "1.2.3", "integrity": None, "include_npm": False}},
@@ -59,9 +61,11 @@ def _from_package_json_simple(ctx):
     )
 
 def _from_package_json_with_hash(ctx):
+    # Test reading pnpm version from package.json with integrity hash.
+    # packageManager: "pnpm@1.2.3+sha512.xxx" -> (version, integrity) tuple
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": "1.2.3", "integrity": None, "include_npm": False}},
+        repositories = {"pnpm": {"version": "1.2.3", "integrity": "sha512-97462997561378b6f52ac5c614f3a3b923a652ad5ac987100286e4aa2d84a6a0642e9e45f3d01d30c46b12b20beb0f86aeb790bf9a82bc59db42b67fe69d1a25", "include_npm": False}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
         ],
