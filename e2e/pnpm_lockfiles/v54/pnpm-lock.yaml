@@ -40,14 +40,18 @@ importers:
       aspect-test-a/no-at: npm:@aspect-test/a
       debug: ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.27.0
+      highlightjs-git-https-notar: git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f
       is-odd: npm:is-odd@3.0.1
       is-odd-alias: npm:is-odd
       is-odd-v0: npm:is-odd@0.1.0
       is-odd-v1: npm:is-odd@1.0.0
       is-odd-v2: npm:is-odd@2.0.0
       is-odd-v3: npm:is-odd@3.0.0
+      jquery-git-https-763ade6: git+https://git@github.com:jquery/jquery#763ade6dda092709b36d97491951bcae415d91d1
       jquery-git-ssh-399b201: git+ssh://git@github.com:jquery/jquery#399b201bb3143a3952894cf3489b4848fc003967
       jquery-git-ssh-e61fccb: git+ssh://git@github.com/jquery/jquery.git#e61fccb9d736235b4b011f89cba6866bc0b8997d
+      jquery-github: github:jquery/jquery
+      jquery-http-git-f85d521: https://github.com/jquery/jquery.git#f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
       jsonify: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
       lodash: file:../vendored/lodash-4.17.21.tgz
       meaning-of-life: 1.0.0
@@ -76,14 +80,18 @@ importers:
       aspect-test-a/no-at: /@aspect-test/a/5.0.2
       debug: github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
       esbuild: 0.27.0
+      highlightjs-git-https-notar: gitea.osmocom.org/vyanitskiy/highlight.js/58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f
       is-odd: 3.0.1
       is-odd-alias: /is-odd/3.0.1
       is-odd-v0: /is-odd/0.1.0
       is-odd-v1: /is-odd/1.0.0
       is-odd-v2: /is-odd/2.0.0
       is-odd-v3: /is-odd/3.0.0
+      jquery-git-https-763ade6: github.com/jquery/jquery/763ade6dda092709b36d97491951bcae415d91d1
       jquery-git-ssh-399b201: github.com/jquery/jquery/399b201bb3143a3952894cf3489b4848fc003967
       jquery-git-ssh-e61fccb: github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d
+      jquery-github: github.com/jquery/jquery/c28c26aef0b3238f578690d73703382951cb355d
+      jquery-http-git-f85d521: github.com/jquery/jquery/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
       jsonify: '@github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
       lodash: file:../vendored/lodash-4.17.21.tgz
       meaning-of-life: 1.0.0_o3deharooos255qt5xdujc3cuq
@@ -844,16 +852,41 @@ packages:
     version: 4.17.21
     dev: false
 
+  gitea.osmocom.org/vyanitskiy/highlight.js/58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f:
+    resolution: {commit: 58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f, repo: https://gitea.osmocom.org/vyanitskiy/highlight.js.git, type: git}
+    name: highlight.js
+    version: 11.8.0
+    engines: {node: '>=12.0.0'}
+    dev: false
+
   github.com/jquery/jquery/399b201bb3143a3952894cf3489b4848fc003967:
     resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967}
     name: jquery
     version: 3.7.1-pre
     dev: false
 
+  github.com/jquery/jquery/763ade6dda092709b36d97491951bcae415d91d1:
+    resolution: {commit: 763ade6dda092709b36d97491951bcae415d91d1, repo: https://git@github.com/jquery/jquery.git, type: git}
+    name: jquery
+    version: 3.7.1-pre
+    dev: false
+
+  github.com/jquery/jquery/c28c26aef0b3238f578690d73703382951cb355d:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d}
+    name: jquery
+    version: 4.0.0-rc.1
+    dev: false
+
   github.com/jquery/jquery/e61fccb9d736235b4b011f89cba6866bc0b8997d:
     resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d}
     name: jquery
     version: 3.0.0-pre
+    dev: false
+
+  github.com/jquery/jquery/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0}
+    name: jquery
+    version: 3.7.1-pre
     dev: false
 
   github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53:

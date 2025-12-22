@@ -63,40 +63,44 @@ load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__estree-walker__1.0.1__links//:d
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_60 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__function-bind__1.1.2__links//:defs.bzl", store_61 = "npm_imported_package_store")
 load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__hasown__2.0.2__links//:defs.bzl", store_62 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_63 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_64 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_65 = "npm_link_imported_package_store", store_65 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_66 = "npm_link_imported_package_store", store_66 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_67 = "npm_link_imported_package_store", store_67 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_68 = "npm_link_imported_package_store", store_68 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_69 = "npm_link_imported_package_store", store_69 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_70 = "npm_link_imported_package_store", store_70 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_71 = "npm_link_imported_package_store", store_71 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_72 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", store_73 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_74 = "npm_link_imported_package_store", store_74 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_75 = "npm_link_imported_package_store", store_75 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_76 = "npm_link_imported_package_store", store_76 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq__links//:defs.bzl", link_77 = "npm_link_imported_package_store", store_77 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_78 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_79 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_80 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_81 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__resolve__1.22.11__links//:defs.bzl", store_82 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0__links//:defs.bzl", link_83 = "npm_link_imported_package_store", store_83 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.29.4__links//:defs.bzl", link_84 = "npm_link_imported_package_store", store_84 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_85 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__4.2.3__links//:defs.bzl", store_86 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__5.1.2__links//:defs.bzl", store_87 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__6.0.1__links//:defs.bzl", store_88 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__7.1.2__links//:defs.bzl", store_89 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_90 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_91 = "npm_link_imported_package_store", store_91 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_92 = "npm_link_imported_package_store", store_92 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__undici-types__5.26.5__links//:defs.bzl", store_93 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_94 = "npm_link_imported_package_store", store_94 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_95 = "npm_imported_package_store")
-load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_96 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__highlight.js__git_https___gitea.osmocom.org_vyanitskiy_highlight.js.git_58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f__links//:defs.bzl", link_63 = "npm_link_imported_package_store", store_63 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_64 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_65 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_66 = "npm_link_imported_package_store", store_66 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_67 = "npm_link_imported_package_store", store_67 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_68 = "npm_link_imported_package_store", store_68 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_69 = "npm_link_imported_package_store", store_69 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_70 = "npm_link_imported_package_store", store_70 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_71 = "npm_link_imported_package_store", store_71 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_763ade6dda092709b36d97491951bcae415d91d1__links//:defs.bzl", link_72 = "npm_link_imported_package_store", store_72 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_c28c26aef0b3238f578690d73703382951cb355d__links//:defs.bzl", link_73 = "npm_link_imported_package_store", store_73 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_74 = "npm_link_imported_package_store", store_74 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_f85d521cdeeb3c6d3f4563a06dba8be793e26ef0__links//:defs.bzl", link_75 = "npm_link_imported_package_store", store_75 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_76 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", store_77 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_78 = "npm_link_imported_package_store", store_78 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_79 = "npm_link_imported_package_store", store_79 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_80 = "npm_link_imported_package_store", store_80 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__meaning-of-life__1.0.0_o3deharooos255qt5xdujc3cuq__links//:defs.bzl", link_81 = "npm_link_imported_package_store", store_81 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_82 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_83 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_84 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_85 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__resolve__1.22.11__links//:defs.bzl", store_86 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__2.14.0__links//:defs.bzl", link_87 = "npm_link_imported_package_store", store_87 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__rollup__3.29.4__links//:defs.bzl", link_88 = "npm_link_imported_package_store", store_88 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_89 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__4.2.3__links//:defs.bzl", store_90 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__string-width__5.1.2__links//:defs.bzl", store_91 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__6.0.1__links//:defs.bzl", store_92 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__strip-ansi__7.1.2__links//:defs.bzl", store_93 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_94 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_95 = "npm_link_imported_package_store", store_95 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_96 = "npm_link_imported_package_store", store_96 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__undici-types__5.26.5__links//:defs.bzl", store_97 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_98 = "npm_link_imported_package_store", store_98 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_99 = "npm_imported_package_store")
+load("@@aspect_rules_js~~npm~lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_100 = "npm_imported_package_store")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
@@ -221,6 +225,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_94(name)
         store_95(name)
         store_96(name)
+        store_97(name)
+        store_98(name)
+        store_99(name)
+        store_100(name)
         _npm_local_package_store(
             link_root_name = name,
             package_store_name = "@scoped+c@file+..+projects+c_at_scoped_b_projects+b",
@@ -374,21 +382,25 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_49("{}/alias-only-sizzle".format(name), True, name, "alias-only-sizzle")
             link_52("{}/debug".format(name), False, name, "debug")
             link_58("{}/esbuild".format(name), False, name, "esbuild")
-            link_65("{}/is-odd-v0".format(name), False, name, "is-odd-v0")
-            link_66("{}/is-odd-v1".format(name), False, name, "is-odd-v1")
-            link_67("{}/is-odd-v2".format(name), False, name, "is-odd-v2")
-            link_68("{}/is-odd-v3".format(name), False, name, "is-odd-v3")
-            link_69("{}/is-odd".format(name), False, name, "is-odd")
-            link_69("{}/is-odd-alias".format(name), False, name, "is-odd-alias")
-            link_70("{}/jquery-git-ssh-399b201".format(name), False, name, "jquery-git-ssh-399b201")
-            link_71("{}/jquery-git-ssh-e61fccb".format(name), False, name, "jquery-git-ssh-e61fccb")
-            link_76("{}/lodash".format(name), False, name, "lodash")
-            link_77("{}/meaning-of-life".format(name), False, name, "meaning-of-life")
-            link_83("{}/rollup".format(name), False, name, "rollup")
-            link_84("{}/rollup3".format(name), False, name, "rollup3")
-            link_91("{}/tslib".format(name), False, name, "tslib")
-            link_92("{}/typescript".format(name), False, name, "typescript")
-            link_94("{}/uvu".format(name), False, name, "uvu")
+            link_63("{}/highlightjs-git-https-notar".format(name), False, name, "highlightjs-git-https-notar")
+            link_66("{}/is-odd-v0".format(name), False, name, "is-odd-v0")
+            link_67("{}/is-odd-v1".format(name), False, name, "is-odd-v1")
+            link_68("{}/is-odd-v2".format(name), False, name, "is-odd-v2")
+            link_69("{}/is-odd-v3".format(name), False, name, "is-odd-v3")
+            link_70("{}/is-odd".format(name), False, name, "is-odd")
+            link_70("{}/is-odd-alias".format(name), False, name, "is-odd-alias")
+            link_71("{}/jquery-git-ssh-399b201".format(name), False, name, "jquery-git-ssh-399b201")
+            link_72("{}/jquery-git-https-763ade6".format(name), False, name, "jquery-git-https-763ade6")
+            link_73("{}/jquery-github".format(name), False, name, "jquery-github")
+            link_74("{}/jquery-git-ssh-e61fccb".format(name), False, name, "jquery-git-ssh-e61fccb")
+            link_75("{}/jquery-http-git-f85d521".format(name), False, name, "jquery-http-git-f85d521")
+            link_80("{}/lodash".format(name), False, name, "lodash")
+            link_81("{}/meaning-of-life".format(name), False, name, "meaning-of-life")
+            link_87("{}/rollup".format(name), False, name, "rollup")
+            link_88("{}/rollup3".format(name), False, name, "rollup3")
+            link_95("{}/tslib".format(name), False, name, "tslib")
+            link_96("{}/typescript".format(name), False, name, "typescript")
+            link_98("{}/uvu".format(name), False, name, "uvu")
             _fp_link_0(name)
             _fp_link_2(name)
             _fp_link_3(name)
@@ -413,6 +425,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/rollup-plugin-with-peers".format(name),
                 ":{}/debug".format(name),
                 ":{}/esbuild".format(name),
+                ":{}/highlightjs-git-https-notar".format(name),
                 ":{}/is-odd-v0".format(name),
                 ":{}/is-odd-v1".format(name),
                 ":{}/is-odd-v2".format(name),
@@ -420,7 +433,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":{}/is-odd".format(name),
                 ":{}/is-odd-alias".format(name),
                 ":{}/jquery-git-ssh-399b201".format(name),
+                ":{}/jquery-git-https-763ade6".format(name),
+                ":{}/jquery-github".format(name),
                 ":{}/jquery-git-ssh-e61fccb".format(name),
+                ":{}/jquery-http-git-f85d521".format(name),
                 ":{}/lodash".format(name),
                 ":{}/meaning-of-life".format(name),
                 ":{}/rollup".format(name),
@@ -530,10 +546,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@scoped": [":{}/@scoped/a".format(name)],
             }
         elif bazel_package == "projects/alts":
-            link_74("{}/lodash-4.17.20".format(name), False, name, "lodash-4.17.20")
-            link_75("{}/lodash-4.17.21".format(name), False, name, "lodash-4.17.21")
-            link_76("{}/lodash".format(name), False, name, "lodash")
-            link_76("{}/lodash-4.17.21-file".format(name), False, name, "lodash-4.17.21-file")
+            link_78("{}/lodash-4.17.20".format(name), False, name, "lodash-4.17.20")
+            link_79("{}/lodash-4.17.21".format(name), False, name, "lodash-4.17.21")
+            link_80("{}/lodash".format(name), False, name, "lodash")
+            link_80("{}/lodash-4.17.21-file".format(name), False, name, "lodash-4.17.21-file")
             link_targets = [
                 ":{}/lodash-4.17.20".format(name),
                 ":{}/lodash-4.17.21".format(name),
@@ -624,6 +640,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/rollup-plugin-with-peers".format(name),
                 ":{}/debug".format(name),
                 ":{}/esbuild".format(name),
+                ":{}/highlightjs-git-https-notar".format(name),
                 ":{}/is-odd-v0".format(name),
                 ":{}/is-odd-v1".format(name),
                 ":{}/is-odd-v2".format(name),
@@ -631,7 +648,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/is-odd".format(name),
                 ":{}/is-odd-alias".format(name),
                 ":{}/jquery-git-ssh-399b201".format(name),
+                ":{}/jquery-git-https-763ade6".format(name),
+                ":{}/jquery-github".format(name),
                 ":{}/jquery-git-ssh-e61fccb".format(name),
+                ":{}/jquery-http-git-f85d521".format(name),
                 ":{}/lodash".format(name),
                 ":{}/meaning-of-life".format(name),
                 ":{}/rollup".format(name),

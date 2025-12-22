@@ -490,9 +490,6 @@ _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _fetch_git_repository(rctx):
-    if not rctx.attr.commit:
-        fail("commit required if url is a git repository")
-
     remote_url = str(rctx.attr.url)
     if remote_url.startswith("git+"):
         remote_url = remote_url[4:]
@@ -621,10 +618,10 @@ def _npm_import_rule_impl(rctx):
 
     reproducible = False
     package_src = _EXTRACT_TO_DIRNAME
-    if utils.is_git_repository_url(rctx.attr.url):
+
+    if rctx.attr.commit:
         _fetch_git_repository(rctx)
-        if rctx.attr.commit:
-            reproducible = True
+        reproducible = True
     elif rctx.attr.extract_full_archive or has_patches or has_lifecycle_hooks:
         _download_and_extract_archive(rctx, package_json_only = False)
         if rctx.attr.integrity:

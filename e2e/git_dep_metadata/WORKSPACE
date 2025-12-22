@@ -36,6 +36,6 @@ npm_import(
     commit = "c245af8ea73ce3345d92bbda6c684092a841e262",
     package = "syncpack",
     root_package = "",
-    url = "https://codeload.github.com/JamieMason/syncpack/tar.gz/c245af8ea73ce3345d92bbda6c684092a841e262",
-    version = "github.com/JamieMason/syncpack/c245af8ea73ce3345d92bbda6c684092a841e262",
+    url = "https://git@github.com/JamieMason/syncpack.git",
+    version = "c245af8ea73ce3345d92bbda6c684092a841e262",
 )

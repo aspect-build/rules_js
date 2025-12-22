@@ -165,8 +165,12 @@ def lockfile_test(npm_link_all_packages, name = None):
             # Odd git/http versions
             ":node_modules/debug",
             ":node_modules/jsonify",
+            ":node_modules/highlightjs-git-https-notar",
+            ":node_modules/jquery-github",
             ":node_modules/jquery-git-ssh-e61fccb",
             ":node_modules/jquery-git-ssh-399b201",
+            ":node_modules/jquery-http-git-f85d521",
+            ":node_modules/jquery-git-https-763ade6",
 
             # npm: alias
             ":node_modules/@aspect-test/a2",
