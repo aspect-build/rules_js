@@ -146,9 +146,6 @@ def _npm_registry_download_url(package, version, registries, default_registry):
         version,
     )
 
-def _is_git_repository_url(url):
-    return url.startswith("git+ssh://") or url.startswith("git+https://") or url.startswith("git@")
-
 def _to_registry_url(url):
     return "{}://{}".format(DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
 
@@ -301,7 +298,6 @@ utils = struct(
     package_directory_output_group = "package_directory",
     npm_registry_url = _npm_registry_url,
     npm_registry_download_url = _npm_registry_download_url,
-    is_git_repository_url = _is_git_repository_url,
     to_registry_url = _to_registry_url,
     default_external_repository_action_cache = _default_external_repository_action_cache,
     default_registry = _default_registry_url,

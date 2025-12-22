@@ -63,40 +63,44 @@ load("@lock-<LOCKVERSION>__estree-walker__1.0.1__links//:defs.bzl", store_59 = "
 load("@lock-<LOCKVERSION>__fsevents__2.3.3__links//:defs.bzl", store_60 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__function-bind__1.1.2__links//:defs.bzl", store_61 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__hasown__2.0.2__links//:defs.bzl", store_62 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_63 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_64 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_65 = "npm_link_imported_package_store_internal", store_65 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_66 = "npm_link_imported_package_store_internal", store_66 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_67 = "npm_link_imported_package_store_internal", store_67 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_68 = "npm_link_imported_package_store_internal", store_68 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_69 = "npm_link_imported_package_store_internal", store_69 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_70 = "npm_link_imported_package_store_internal", store_70 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_71 = "npm_link_imported_package_store_internal", store_71 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_72 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", link_73 = "npm_link_imported_package_store_internal", store_73 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_74 = "npm_link_imported_package_store_internal", store_74 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_75 = "npm_link_imported_package_store_internal", store_75 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_76 = "npm_link_imported_package_store_internal", store_76 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__meaning-of-life__1.0.0_124257499__links//:defs.bzl", link_77 = "npm_link_imported_package_store_internal", store_77 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_78 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_79 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_80 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_81 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__resolve__1.22.11__links//:defs.bzl", store_82 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__rollup__2.14.0__links//:defs.bzl", link_83 = "npm_link_imported_package_store_internal", store_83 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__rollup__3.29.4__links//:defs.bzl", link_84 = "npm_link_imported_package_store_internal", store_84 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_85 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__string-width__4.2.3__links//:defs.bzl", store_86 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__string-width__5.1.2__links//:defs.bzl", store_87 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__strip-ansi__6.0.1__links//:defs.bzl", store_88 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__strip-ansi__7.1.2__links//:defs.bzl", store_89 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_90 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_91 = "npm_link_imported_package_store_internal", store_91 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_92 = "npm_link_imported_package_store_internal", store_92 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__undici-types__5.26.5__links//:defs.bzl", store_93 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_94 = "npm_link_imported_package_store_internal", store_94 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_95 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_96 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__highlight.js__git_https___gitea.osmocom.org_vyanitskiy_highlight.js.git_58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f__links//:defs.bzl", link_63 = "npm_link_imported_package_store_internal", store_63 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__is-core-module__2.16.1__links//:defs.bzl", store_64 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__is-fullwidth-code-point__3.0.0__links//:defs.bzl", store_65 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__is-odd__0.1.0__links//:defs.bzl", link_66 = "npm_link_imported_package_store_internal", store_66 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_67 = "npm_link_imported_package_store_internal", store_67 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_68 = "npm_link_imported_package_store_internal", store_68 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_69 = "npm_link_imported_package_store_internal", store_69 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_70 = "npm_link_imported_package_store_internal", store_70 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_71 = "npm_link_imported_package_store_internal", store_71 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_763ade6dda092709b36d97491951bcae415d91d1__links//:defs.bzl", link_72 = "npm_link_imported_package_store_internal", store_72 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_c28c26aef0b3238f578690d73703382951cb355d__links//:defs.bzl", link_73 = "npm_link_imported_package_store_internal", store_73 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_74 = "npm_link_imported_package_store_internal", store_74 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_f85d521cdeeb3c6d3f4563a06dba8be793e26ef0__links//:defs.bzl", link_75 = "npm_link_imported_package_store_internal", store_75 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_76 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", link_77 = "npm_link_imported_package_store_internal", store_77 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_78 = "npm_link_imported_package_store_internal", store_78 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_79 = "npm_link_imported_package_store_internal", store_79 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_80 = "npm_link_imported_package_store_internal", store_80 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__meaning-of-life__1.0.0_124257499__links//:defs.bzl", link_81 = "npm_link_imported_package_store_internal", store_81 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_82 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_83 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__path-parse__1.0.7__links//:defs.bzl", store_84 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__picomatch__2.3.1__links//:defs.bzl", store_85 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__resolve__1.22.11__links//:defs.bzl", store_86 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__rollup__2.14.0__links//:defs.bzl", link_87 = "npm_link_imported_package_store_internal", store_87 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__rollup__3.29.4__links//:defs.bzl", link_88 = "npm_link_imported_package_store_internal", store_88 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__sade__1.8.1__links//:defs.bzl", store_89 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__string-width__4.2.3__links//:defs.bzl", store_90 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__string-width__5.1.2__links//:defs.bzl", store_91 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__strip-ansi__6.0.1__links//:defs.bzl", store_92 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__strip-ansi__7.1.2__links//:defs.bzl", store_93 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_94 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_95 = "npm_link_imported_package_store_internal", store_95 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_96 = "npm_link_imported_package_store_internal", store_96 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__undici-types__5.26.5__links//:defs.bzl", store_97 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_98 = "npm_link_imported_package_store_internal", store_98 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_99 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_100 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
@@ -223,6 +227,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_94()
         store_95()
         store_96()
+        store_97()
+        store_98()
+        store_99()
+        store_100()
         _npm_local_package_store(
             package_store_name = "@scoped+c@file+..+projects+c_@scoped+b@projects+b",
             src = "//projects/c:pkg",
@@ -359,21 +367,25 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_45("alias-only-sizzle", dev=True)
             link_52()
             link_58()
-            link_65("is-odd-v0")
-            link_66("is-odd-v1")
-            link_67("is-odd-v2")
-            link_68("is-odd-v3")
-            link_69()
-            link_69("is-odd-alias")
-            link_70("jquery-git-ssh-399b201")
-            link_71("jquery-git-ssh-e61fccb")
-            link_76()
-            link_77()
-            link_83()
-            link_84("rollup3")
-            link_91()
-            link_92()
-            link_94()
+            link_63("highlightjs-git-https-notar")
+            link_66("is-odd-v0")
+            link_67("is-odd-v1")
+            link_68("is-odd-v2")
+            link_69("is-odd-v3")
+            link_70()
+            link_70("is-odd-alias")
+            link_71("jquery-git-ssh-399b201")
+            link_72("jquery-git-https-763ade6")
+            link_73("jquery-github")
+            link_74("jquery-git-ssh-e61fccb")
+            link_75("jquery-http-git-f85d521")
+            link_80()
+            link_81()
+            link_87()
+            link_88("rollup3")
+            link_95()
+            link_96()
+            link_98()
             _fp_link_0()
             _fp_link_2()
             _fp_link_2("alias-project-a")
@@ -399,6 +411,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/rollup-plugin-with-peers",
                 ":node_modules/debug",
                 ":node_modules/esbuild",
+                ":node_modules/highlightjs-git-https-notar",
                 ":node_modules/is-odd-v0",
                 ":node_modules/is-odd-v1",
                 ":node_modules/is-odd-v2",
@@ -406,7 +419,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/is-odd",
                 ":node_modules/is-odd-alias",
                 ":node_modules/jquery-git-ssh-399b201",
+                ":node_modules/jquery-git-https-763ade6",
+                ":node_modules/jquery-github",
                 ":node_modules/jquery-git-ssh-e61fccb",
+                ":node_modules/jquery-http-git-f85d521",
                 ":node_modules/lodash",
                 ":node_modules/meaning-of-life",
                 ":node_modules/rollup",
@@ -517,10 +533,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 "@scoped": [":node_modules/@scoped/a"],
             }
         elif bazel_package == "projects/alts":
-            link_73()
-            link_74("lodash-4.17.20")
-            link_75("lodash-4.17.21")
-            link_76("lodash-4.17.21-file")
+            link_77()
+            link_78("lodash-4.17.20")
+            link_79("lodash-4.17.21")
+            link_80("lodash-4.17.21-file")
             link_targets = [
                 ":node_modules/lodash",
                 ":node_modules/lodash-4.17.20",
@@ -614,6 +630,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/rollup-plugin-with-peers",
                 ":node_modules/debug",
                 ":node_modules/esbuild",
+                ":node_modules/highlightjs-git-https-notar",
                 ":node_modules/is-odd-v0",
                 ":node_modules/is-odd-v1",
                 ":node_modules/is-odd-v2",
@@ -621,7 +638,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/is-odd",
                 ":node_modules/is-odd-alias",
                 ":node_modules/jquery-git-ssh-399b201",
+                ":node_modules/jquery-git-https-763ade6",
+                ":node_modules/jquery-github",
                 ":node_modules/jquery-git-ssh-e61fccb",
+                ":node_modules/jquery-http-git-f85d521",
                 ":node_modules/lodash",
                 ":node_modules/meaning-of-life",
                 ":node_modules/rollup",

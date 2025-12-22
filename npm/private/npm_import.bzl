@@ -444,9 +444,6 @@ _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
 def _fetch_git_repository(rctx):
-    if not rctx.attr.commit:
-        fail("commit required if url is a git repository")
-
     # Adapted from git_repo helper function used by git_repository in @bazel_tools//tools/build_defs/repo:git_worker.bzl:
     # https://github.com/bazelbuild/bazel/blob/5bdd2b2ff8d6be4ecbffe82d975983129d459782/tools/build_defs/repo/git_worker.bzl#L34
     git_repo = struct(
@@ -571,10 +568,10 @@ def _npm_import_rule_impl(rctx):
 
     reproducible = False
     package_src = _EXTRACT_TO_DIRNAME
-    if utils.is_git_repository_url(rctx.attr.url):
+
+    if rctx.attr.commit:
         _fetch_git_repository(rctx)
-        if rctx.attr.commit:
-            reproducible = True
+        reproducible = True
     elif rctx.attr.extract_full_archive or has_patches or has_lifecycle_hooks:
         _download_and_extract_archive(rctx, package_json_only = False)
         if rctx.attr.integrity:

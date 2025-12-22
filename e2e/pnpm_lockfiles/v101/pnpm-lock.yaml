@@ -68,6 +68,9 @@ importers:
       esbuild:
         specifier: 0.27.0
         version: 0.27.0
+      highlightjs-git-https-notar:
+        specifier: git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f
+        version: highlight.js@git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f
       is-odd:
         specifier: npm:is-odd@3.0.1
         version: 3.0.1
@@ -86,12 +89,21 @@ importers:
       is-odd-v3:
         specifier: npm:is-odd@3.0.0
         version: is-odd@3.0.0
+      jquery-git-https-763ade6:
+        specifier: git+https://git@github.com:jquery/jquery#763ade6dda092709b36d97491951bcae415d91d1
+        version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1
       jquery-git-ssh-399b201:
         specifier: git+ssh://git@github.com:jquery/jquery#399b201bb3143a3952894cf3489b4848fc003967
         version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967
       jquery-git-ssh-e61fccb:
         specifier: git+ssh://git@github.com/jquery/jquery.git#e61fccb9d736235b4b011f89cba6866bc0b8997d
         version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d
+      jquery-github:
+        specifier: github:jquery/jquery
+        version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d
+      jquery-http-git-f85d521:
+        specifier: https://github.com/jquery/jquery.git#f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
+        version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -555,6 +567,11 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
+  highlight.js@git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f:
+    resolution: {commit: 58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f, repo: https://gitea.osmocom.org/vyanitskiy/highlight.js.git, type: git}
+    version: 11.8.0
+    engines: {node: '>=12.0.0'}
+
   is-core-module@2.16.1:
     resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==}
     engines: {node: '>= 0.4'}
@@ -590,9 +607,21 @@ packages:
     resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967}
     version: 3.7.1-pre
 
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1}
+    version: 3.7.1-pre
+
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d}
+    version: 4.0.0-rc.1
+
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d:
     resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d}
     version: 3.0.0-pre
+
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0}
+    version: 3.7.1-pre
 
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
@@ -926,6 +955,8 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
+  highlight.js@git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f: {}
+
   is-core-module@2.16.1:
     dependencies:
       hasown: 2.0.2
@@ -956,7 +987,13 @@ snapshots:
 
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967: {}
 
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1: {}
+
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d: {}
+
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d: {}
+
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0: {}
 
   kleur@4.1.5: {}
 
