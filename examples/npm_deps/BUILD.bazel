@@ -265,8 +265,11 @@ js_test(
 
 write_file(
     name = "write9",
-    out = "case9.js",
-    content = ["require('@mycorp/pkg-d')"],
+    out = "case9.mjs",
+    content = [
+        "import { sandboxAssert } from '@mycorp/pkg-d'",
+        "sandboxAssert()",
+    ],
 )
 
 js_test(
@@ -274,7 +277,7 @@ js_test(
     data = [
         ":node_modules/@mycorp/pkg-d",
     ],
-    entry_point = "case9.js",
+    entry_point = "case9.mjs",
 )
 
 #######################################
@@ -282,8 +285,11 @@ js_test(
 
 write_file(
     name = "write10",
-    out = "case10.js",
-    content = ["require('@mycorp/pkg-e')"],
+    out = "case10.mjs",
+    content = [
+        "import { sandboxAssert } from '@mycorp/pkg-e'",
+        "sandboxAssert()",
+    ],
 )
 
 js_test(
@@ -291,5 +297,5 @@ js_test(
     data = [
         ":node_modules/@mycorp/pkg-e",
     ],
-    entry_point = "case10.js",
+    entry_point = "case10.mjs",
 )
