@@ -803,7 +803,7 @@ load("@npm-no_dev__negotiator__0.6.4__links//:defs.bzl", store_799 = "npm_import
 load("@npm-no_dev__negotiator__1.0.0__links//:defs.bzl", store_800 = "npm_imported_package_store_internal")
 load("@npm-no_dev__neo-async__2.6.2__links//:defs.bzl", store_801 = "npm_imported_package_store_internal")
 load("@npm-no_dev__next-tick__1.1.0__links//:defs.bzl", store_802 = "npm_imported_package_store_internal")
-load("@npm-no_dev__next__15.2.6_1790925128__links//:defs.bzl", link_803 = "npm_link_imported_package_store_internal", store_803 = "npm_imported_package_store_internal")
+load("@npm-no_dev__next__15.2.6_1315089095__links//:defs.bzl", link_803 = "npm_link_imported_package_store_internal", store_803 = "npm_imported_package_store_internal")
 load("@npm-no_dev__node-fetch__2.6.7_encoding_0.1.13__links//:defs.bzl", store_804 = "npm_imported_package_store_internal")
 load("@npm-no_dev__node-fetch__2.7.0_encoding_0.1.13__links//:defs.bzl", store_805 = "npm_imported_package_store_internal")
 load("@npm-no_dev__node-gyp-build__4.8.4__links//:defs.bzl", store_806 = "npm_imported_package_store_internal")
@@ -987,7 +987,7 @@ load("@npm-no_dev__strip-ansi__7.1.2__links//:defs.bzl", store_983 = "npm_import
 load("@npm-no_dev__strip-bom__4.0.0__links//:defs.bzl", store_984 = "npm_imported_package_store_internal")
 load("@npm-no_dev__strip-json-comments__3.1.1__links//:defs.bzl", store_985 = "npm_imported_package_store_internal")
 load("@npm-no_dev__strongly-connected-components__1.0.1__links//:defs.bzl", store_986 = "npm_imported_package_store_internal")
-load("@npm-no_dev__styled-jsx__5.1.6_324456147__links//:defs.bzl", store_987 = "npm_imported_package_store_internal")
+load("@npm-no_dev__styled-jsx__5.1.6_react_19.2.0__links//:defs.bzl", store_987 = "npm_imported_package_store_internal")
 load("@npm-no_dev__supercluster__7.1.5__links//:defs.bzl", store_988 = "npm_imported_package_store_internal")
 load("@npm-no_dev__superscript-text__1.0.0__links//:defs.bzl", store_989 = "npm_imported_package_store_internal")
 load("@npm-no_dev__supports-color__7.2.0__links//:defs.bzl", store_990 = "npm_imported_package_store_internal")
@@ -1111,7 +1111,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
-_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):

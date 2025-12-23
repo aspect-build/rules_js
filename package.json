@@ -1,14 +1,10 @@
 {
     "private": true,
     "devDependencies": {
-        "@babel/cli": "^7.28.3",
-        "@babel/core": "^7.28.4",
-        "@babel/plugin-transform-modules-commonjs": "^7.27.1",
         "google-closure-compiler": "^20251111.0.0",
         "@types/node": "18.19.54",
         "chalk": "5.1.1",
         "circles": "npm:es5-ext@0.10.64",
-        "inline-fixtures": "1.1.0",
         "jsonpath-plus": "7.2.0",
         "typescript": "^5.8.0"
     }

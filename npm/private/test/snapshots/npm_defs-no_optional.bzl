@@ -632,7 +632,7 @@ load("@npm-no_optional__negotiator__0.6.4__links//:defs.bzl", store_628 = "npm_i
 load("@npm-no_optional__negotiator__1.0.0__links//:defs.bzl", store_629 = "npm_imported_package_store_internal")
 load("@npm-no_optional__neo-async__2.6.2__links//:defs.bzl", store_630 = "npm_imported_package_store_internal")
 load("@npm-no_optional__next-tick__1.1.0__links//:defs.bzl", store_631 = "npm_imported_package_store_internal")
-load("@npm-no_optional__next__15.2.6_1790925128__links//:defs.bzl", link_632 = "npm_link_imported_package_store_internal", store_632 = "npm_imported_package_store_internal")
+load("@npm-no_optional__next__15.2.6_1315089095__links//:defs.bzl", link_632 = "npm_link_imported_package_store_internal", store_632 = "npm_imported_package_store_internal")
 load("@npm-no_optional__node-fetch__2.6.7_encoding_0.1.13__links//:defs.bzl", store_633 = "npm_imported_package_store_internal")
 load("@npm-no_optional__node-fetch__2.7.0_encoding_0.1.13__links//:defs.bzl", store_634 = "npm_imported_package_store_internal")
 load("@npm-no_optional__node-gyp-build__4.8.4__links//:defs.bzl", store_635 = "npm_imported_package_store_internal")
@@ -814,7 +814,7 @@ load("@npm-no_optional__strip-ansi__7.1.2__links//:defs.bzl", store_810 = "npm_i
 load("@npm-no_optional__strip-bom__4.0.0__links//:defs.bzl", store_811 = "npm_imported_package_store_internal")
 load("@npm-no_optional__strip-json-comments__3.1.1__links//:defs.bzl", store_812 = "npm_imported_package_store_internal")
 load("@npm-no_optional__strongly-connected-components__1.0.1__links//:defs.bzl", store_813 = "npm_imported_package_store_internal")
-load("@npm-no_optional__styled-jsx__5.1.6_324456147__links//:defs.bzl", store_814 = "npm_imported_package_store_internal")
+load("@npm-no_optional__styled-jsx__5.1.6_react_19.2.0__links//:defs.bzl", store_814 = "npm_imported_package_store_internal")
 load("@npm-no_optional__supercluster__7.1.5__links//:defs.bzl", store_815 = "npm_imported_package_store_internal")
 load("@npm-no_optional__superscript-text__1.0.0__links//:defs.bzl", store_816 = "npm_imported_package_store_internal")
 load("@npm-no_optional__supports-color__7.2.0__links//:defs.bzl", store_817 = "npm_imported_package_store_internal")
@@ -936,7 +936,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
-_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
@@ -2075,28 +2075,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
                 "@types": [":node_modules/@types/node"],
             }
-        elif bazel_package == "":
+        elif bazel_package == "js/private/test/node-patches":
             link_8(dev=True)
             link_11(dev=True)
             link_24(dev=True)
-            link_110(dev=True)
-            link_215(dev=True)
-            link_339("circles", dev=True)
-            link_434(dev=True)
             link_473(dev=True)
-            link_532(dev=True)
-            link_862(dev=True)
             link_targets = [
                 ":node_modules/@babel/cli",
                 ":node_modules/@babel/core",
                 ":node_modules/@babel/plugin-transform-modules-commonjs",
-                ":node_modules/@types/node",
-                ":node_modules/chalk",
-                ":node_modules/circles",
-                ":node_modules/google-closure-compiler",
                 ":node_modules/inline-fixtures",
-                ":node_modules/jsonpath-plus",
-                ":node_modules/typescript",
             ]
             scope_targets = {
                 "@babel": [
@@ -2104,7 +2092,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":node_modules/@babel/core",
                     ":node_modules/@babel/plugin-transform-modules-commonjs",
                 ],
-                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/runfiles":
             link_29()
@@ -2258,6 +2245,24 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             ]
             scope_targets = {
                 "@tailwindcss": [":node_modules/@tailwindcss/postcss"],
+            }
+        elif bazel_package == "":
+            link_110(dev=True)
+            link_215(dev=True)
+            link_339("circles", dev=True)
+            link_434(dev=True)
+            link_532(dev=True)
+            link_862(dev=True)
+            link_targets = [
+                ":node_modules/@types/node",
+                ":node_modules/chalk",
+                ":node_modules/circles",
+                ":node_modules/google-closure-compiler",
+                ":node_modules/jsonpath-plus",
+                ":node_modules/typescript",
+            ]
+            scope_targets = {
+                "@types": [":node_modules/@types/node"],
             }
         elif bazel_package == "examples/js_lib_pkg/a":
             link_110(dev=True)
@@ -2480,19 +2485,13 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@aspect-test/f",
                 ":node_modules/@types/node",
             ])
-    elif bazel_package == "":
+    elif bazel_package == "js/private/test/node-patches":
         if dev:
             link_targets.extend([
                 ":node_modules/@babel/cli",
                 ":node_modules/@babel/core",
                 ":node_modules/@babel/plugin-transform-modules-commonjs",
-                ":node_modules/@types/node",
-                ":node_modules/chalk",
-                ":node_modules/circles",
-                ":node_modules/google-closure-compiler",
                 ":node_modules/inline-fixtures",
-                ":node_modules/jsonpath-plus",
-                ":node_modules/typescript",
             ])
     elif bazel_package == "examples/runfiles":
         if prod:
@@ -2573,6 +2572,16 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             link_targets.extend([
                 ":node_modules/@tailwindcss/postcss",
                 ":node_modules/tailwindcss",
+            ])
+    elif bazel_package == "":
+        if dev:
+            link_targets.extend([
+                ":node_modules/@types/node",
+                ":node_modules/chalk",
+                ":node_modules/circles",
+                ":node_modules/google-closure-compiler",
+                ":node_modules/jsonpath-plus",
+                ":node_modules/typescript",
             ])
     elif bazel_package == "examples/js_lib_pkg/a":
         if dev:

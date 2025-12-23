@@ -1,6 +1,7 @@
 load("@bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@npm//:@babel/cli/package_json.bzl", babel_bin = "bin")
-load("//js:defs.bzl", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//js/private/test/node-patches:@babel/cli/package_json.bzl", babel_bin = "bin")
+load("//js:defs.bzl", "js_library", "js_test")
 
 TESTS = [
     "escape.js",
@@ -39,6 +40,8 @@ TOOLCHAINS_VERSIONS = [
     for n in TOOLCHAINS_NAMES
 ]
 
+npm_link_all_packages()
+
 # We need to copy the entry points to the bin so that the tests below don't follow the execroot
 # symlink back to the source tree since the fs patches are not on for the tests as they are the code
 # under test
@@ -50,12 +53,17 @@ TOOLCHAINS_VERSIONS = [
     for t in TESTS + MJS_TESTS
 ]
 
+js_library(
+    name = "babel_config",
+    srcs = ["babel.config.js"],
+    deps = [
+        ":node_modules/@babel/plugin-transform-modules-commonjs",
+    ],
+)
+
 babel_bin.babel(
     name = "babel_mjs2js",
-    srcs = MJS_TESTS + [
-        "babel.config.js",
-        "//:node_modules/@babel/plugin-transform-modules-commonjs",
-    ],
+    srcs = MJS_TESTS + [":babel_config"],
     outs = [t.replace(".mjs", ".cjs") for t in MJS_TESTS],
     args = [
         "--extensions",
@@ -79,7 +87,7 @@ babel_bin.babel(
                     toolchain_name,
                 ),
                 data = [
-                    "//:node_modules/inline-fixtures",
+                    ":node_modules/inline-fixtures",
                     "//js/private/node-patches/src:compile",
                 ],
                 entry_point = "copy_entry_{}".format(t),
@@ -100,7 +108,7 @@ babel_bin.babel(
                     toolchain_name,
                 ),
                 data = [
-                    "//:node_modules/inline-fixtures",
+                    ":node_modules/inline-fixtures",
                     "//js/private/node-patches/src:compile",
                 ],
                 entry_point = t,
