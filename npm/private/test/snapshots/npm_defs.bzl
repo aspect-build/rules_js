@@ -796,7 +796,7 @@ load("@@_main~npm~npm__negotiator__0.6.4__links//:defs.bzl", store_792 = "npm_im
 load("@@_main~npm~npm__negotiator__1.0.0__links//:defs.bzl", store_793 = "npm_imported_package_store")
 load("@@_main~npm~npm__neo-async__2.6.2__links//:defs.bzl", store_794 = "npm_imported_package_store")
 load("@@_main~npm~npm__next-tick__1.1.0__links//:defs.bzl", store_795 = "npm_imported_package_store")
-load("@@_main~npm~npm__next__15.2.6_1790925128__links//:defs.bzl", link_796 = "npm_link_imported_package_store", store_796 = "npm_imported_package_store")
+load("@@_main~npm~npm__next__15.2.6_1315089095__links//:defs.bzl", link_796 = "npm_link_imported_package_store", store_796 = "npm_imported_package_store")
 load("@@_main~npm~npm__node-fetch__2.6.7_encoding_0.1.13__links//:defs.bzl", store_797 = "npm_imported_package_store")
 load("@@_main~npm~npm__node-fetch__2.7.0_encoding_0.1.13__links//:defs.bzl", store_798 = "npm_imported_package_store")
 load("@@_main~npm~npm__node-gyp-build__4.8.4__links//:defs.bzl", store_799 = "npm_imported_package_store")
@@ -977,7 +977,7 @@ load("@@_main~npm~npm__strip-ansi__7.1.2__links//:defs.bzl", store_973 = "npm_im
 load("@@_main~npm~npm__strip-bom__4.0.0__links//:defs.bzl", store_974 = "npm_imported_package_store")
 load("@@_main~npm~npm__strip-json-comments__3.1.1__links//:defs.bzl", store_975 = "npm_imported_package_store")
 load("@@_main~npm~npm__strongly-connected-components__1.0.1__links//:defs.bzl", store_976 = "npm_imported_package_store")
-load("@@_main~npm~npm__styled-jsx__5.1.6_324456147__links//:defs.bzl", store_977 = "npm_imported_package_store")
+load("@@_main~npm~npm__styled-jsx__5.1.6_react_19.2.0__links//:defs.bzl", store_977 = "npm_imported_package_store")
 load("@@_main~npm~npm__supercluster__7.1.5__links//:defs.bzl", store_978 = "npm_imported_package_store")
 load("@@_main~npm~npm__superscript-text__1.0.0__links//:defs.bzl", store_979 = "npm_imported_package_store")
 load("@@_main~npm~npm__supports-color__7.2.0__links//:defs.bzl", store_980 = "npm_imported_package_store")
@@ -1101,7 +1101,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
 
-_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
 _NPM_PACKAGE_VISIBILITY = {
     "unused": ["//npm/private/test:__subpackages__"],
@@ -1111,7 +1111,7 @@ _NPM_PACKAGE_VISIBILITY = {
 }
 
 _NPM_PACKAGE_LOCATIONS = {
-    "": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "@types/node", "chalk", "inline-fixtures", "jsonpath-plus", "typescript"],
+    "": ["@types/node", "chalk", "jsonpath-plus", "typescript"],
     "examples/js_binary": ["@mycorp/pkg-a"],
     "examples/js_lib_pkg/a": ["@types/node"],
     "examples/js_lib_pkg/b": ["js_lib_pkg_a", "js_lib_pkg_a-alias_1", "js_lib_pkg_a-alias_2", "@types/node"],
@@ -1133,6 +1133,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "js/private/devserver/src": ["@rollup/plugin-node-resolve", "@types/node", "rollup"],
     "js/private/test/image": ["@mycorp/pkg-a", "@mycorp/pkg-d", "acorn"],
     "js/private/test/js_run_devserver": ["@types/node", "jasmine"],
+    "js/private/test/node-patches": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "inline-fixtures"],
     "js/private/worker/src": ["abortcontroller-polyfill", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
     "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "bufferutil", "debug", "esbuild", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
     "npm/private/test/npm_package": ["chalk", "chalk-alt"],
@@ -2542,24 +2543,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ],
                 "@types": [":{}/@types/node".format(name)],
             }
-        elif bazel_package == "":
+        elif bazel_package == "js/private/test/node-patches":
             link_45("{}/@babel/cli".format(name), True, name, "@babel/cli")
             link_48("{}/@babel/core".format(name), True, name, "@babel/core")
             link_61("{}/@babel/plugin-transform-modules-commonjs".format(name), True, name, "@babel/plugin-transform-modules-commonjs")
-            link_278("{}/@types/node".format(name), True, name, "@types/node")
-            link_354("{}/chalk".format(name), True, name, "chalk")
             link_615("{}/inline-fixtures".format(name), True, name, "inline-fixtures")
-            link_675("{}/jsonpath-plus".format(name), True, name, "jsonpath-plus")
-            link_1024("{}/typescript".format(name), True, name, "typescript")
             link_targets = [
                 ":{}/@babel/cli".format(name),
                 ":{}/@babel/core".format(name),
                 ":{}/@babel/plugin-transform-modules-commonjs".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/chalk".format(name),
                 ":{}/inline-fixtures".format(name),
-                ":{}/jsonpath-plus".format(name),
-                ":{}/typescript".format(name),
             ]
             scope_targets = {
                 "@babel": [
@@ -2567,7 +2560,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@babel/core".format(name),
                     ":{}/@babel/plugin-transform-modules-commonjs".format(name),
                 ],
-                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "examples/runfiles":
             link_66("{}/@bazel/runfiles".format(name), False, name, "@bazel/runfiles")
@@ -2681,6 +2673,20 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             ]
             scope_targets = {
                 "@tailwindcss": [":{}/@tailwindcss/postcss".format(name)],
+            }
+        elif bazel_package == "":
+            link_278("{}/@types/node".format(name), True, name, "@types/node")
+            link_354("{}/chalk".format(name), True, name, "chalk")
+            link_675("{}/jsonpath-plus".format(name), True, name, "jsonpath-plus")
+            link_1024("{}/typescript".format(name), True, name, "typescript")
+            link_targets = [
+                ":{}/@types/node".format(name),
+                ":{}/chalk".format(name),
+                ":{}/jsonpath-plus".format(name),
+                ":{}/typescript".format(name),
+            ]
+            scope_targets = {
+                "@types": [":{}/@types/node".format(name)],
             }
         elif bazel_package == "examples/js_lib_pkg/a":
             link_278("{}/@types/node".format(name), True, name, "@types/node")
@@ -2906,17 +2912,13 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/@aspect-test/f".format(name),
                 ":{}/@types/node".format(name),
             ])
-    elif bazel_package == "":
+    elif bazel_package == "js/private/test/node-patches":
         if dev:
             link_targets.extend([
                 ":{}/@babel/cli".format(name),
                 ":{}/@babel/core".format(name),
                 ":{}/@babel/plugin-transform-modules-commonjs".format(name),
-                ":{}/@types/node".format(name),
-                ":{}/chalk".format(name),
                 ":{}/inline-fixtures".format(name),
-                ":{}/jsonpath-plus".format(name),
-                ":{}/typescript".format(name),
             ])
     elif bazel_package == "examples/runfiles":
         if prod:
@@ -2977,6 +2979,14 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             link_targets.extend([
                 ":{}/@tailwindcss/postcss".format(name),
                 ":{}/tailwindcss".format(name),
+            ])
+    elif bazel_package == "":
+        if dev:
+            link_targets.extend([
+                ":{}/@types/node".format(name),
+                ":{}/chalk".format(name),
+                ":{}/jsonpath-plus".format(name),
+                ":{}/typescript".format(name),
             ])
     elif bazel_package == "examples/js_lib_pkg/a":
         if dev:
