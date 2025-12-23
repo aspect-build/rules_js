@@ -1,6 +1,7 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("@npm//:@babel/cli/package_json.bzl", babel_bin = "bin")
-load("//js:defs.bzl", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//js/private/test/node-patches:@babel/cli/package_json.bzl", babel_bin = "bin")
+load("//js:defs.bzl", "js_library", "js_test")
 
 TESTS = [
     "escape.js",
@@ -37,6 +38,8 @@ TOOLCHAINS_VERSIONS = [
     for n in TOOLCHAINS_NAMES
 ]
 
+npm_link_all_packages()
+
 # We need to copy the entry points to the bin so that the tests below don't follow the execroot
 # symlink back to the source tree since the fs patches are not on for the tests as they are the code
 # under test
@@ -48,12 +51,17 @@ TOOLCHAINS_VERSIONS = [
     for t in TESTS + MJS_TESTS
 ]
 
+js_library(
+    name = "babel_config",
+    srcs = ["babel.config.js"],
+    deps = [
+        ":node_modules/@babel/plugin-transform-modules-commonjs",
+    ],
+)
+
 babel_bin.babel(
     name = "babel_mjs2js",
-    srcs = MJS_TESTS + [
-        "babel.config.js",
-        "//:node_modules/@babel/plugin-transform-modules-commonjs",
-    ],
+    srcs = MJS_TESTS + [":babel_config"],
     outs = [t.replace(".mjs", ".cjs") for t in MJS_TESTS],
     args = [
         "--extensions",
@@ -69,52 +77,70 @@ babel_bin.babel(
 # Basic tests
 [
     [
-        # The primary tests, both .js and .mjs
         [
-            js_test(
-                name = "{}_{}_test".format(
-                    t.replace(".mjs", "").replace(".js", ""),
-                    toolchain_name,
-                ),
-                data = [
-                    "//:node_modules/inline-fixtures",
-                    "//js/private/node-patches/src:compile",
-                ],
-                entry_point = "copy_entry_{}".format(t),
-                node_toolchain = toolchain,
-                patch_node_fs = False,
-                # Without node patches on for these tests, the program is going to escape the sandbox if it
-                # is on since the fs patches are not on for the tests as they are the code under test
-                tags = ["no-sandbox"],
-            )
-            for t in TESTS + MJS_TESTS
-        ],
+            # The primary tests, both .js and .mjs
+            [
+                js_test(
+                    name = "{}_{}{}_test".format(
+                        t.replace(".mjs", "").replace(".js", ""),
+                        toolchain_name,
+                        "_esmloader" if useEsmLoader else "",
+                    ),
+                    data = [
+                        ":node_modules/inline-fixtures",
+                        "//js/private/node-patches/src:compile",
+                    ],
+                    entry_point = "copy_entry_{}".format(t),
+                    env = {
+                        "NODE_PATCHES_TEST_ESM_LOADER": "1" if useEsmLoader else "",
+                    },
+                    node_options = ["--expose-internals"] if useEsmLoader else [],
+                    node_toolchain = toolchain,
+                    patch_node_esm_loader = False,
+                    patch_node_fs = False,
+                    # Without node patches on for these tests, the program is going to escape the sandbox if it
+                    # is on since the fs patches are not on for the tests as they are the code under test
+                    tags = ["no-sandbox"],
+                )
+                for t in TESTS + MJS_TESTS
+            ],
 
-        # The .cjs tests converted from .mjs
-        [
-            js_test(
-                name = "{}_{}_cjs_test".format(
-                    t.replace(".cjs", ""),
-                    toolchain_name,
-                ),
-                data = [
-                    "//:node_modules/inline-fixtures",
-                    "//js/private/node-patches/src:compile",
-                ],
-                entry_point = t,
-                node_toolchain = toolchain,
-                patch_node_fs = False,
-                # Without node patches on for these tests, the program is going to escape the sandbox if it
-                # is on since the fs patches are not on for the tests as they are the code under test
-                tags = ["no-sandbox"],
-            )
-            for t in CJS_TESTS
-        ],
+            # The .cjs tests converted from .mjs
+            [
+                js_test(
+                    name = "{}_{}{}_cjs_test".format(
+                        t.replace(".cjs", ""),
+                        toolchain_name,
+                        "_esmloader" if useEsmLoader else "",
+                    ),
+                    data = [
+                        ":node_modules/inline-fixtures",
+                        "//js/private/node-patches/src:compile",
+                    ],
+                    entry_point = "copy_entry_{}".format(t) if (t in TESTS) else t,
+                    env = {
+                        "NODE_PATCHES_TEST_ESM_LOADER": "1" if useEsmLoader else "",
+                    },
+                    node_options = ["--expose-internals"] if useEsmLoader else [],
+                    node_toolchain = toolchain,
+                    patch_node_esm_loader = False,
+                    patch_node_fs = False,
+                    # Without node patches on for these tests, the program is going to escape the sandbox if it
+                    # is on since the fs patches are not on for the tests as they are the code under test
+                    tags = ["no-sandbox"],
+                )
+                for t in CJS_TESTS
+            ],
+        ]
+        for toolchain_name, toolchain in zip(
+            TOOLCHAINS_NAMES,
+            TOOLCHAINS_VERSIONS,
+        )
     ]
-    for toolchain_name, toolchain in zip(
-        TOOLCHAINS_NAMES,
-        TOOLCHAINS_VERSIONS,
-    )
+    for useEsmLoader in [
+        False,
+        True,
+    ]
 ]
 
 # Node process spawning tests
@@ -142,3 +168,30 @@ babel_bin.babel(
         TOOLCHAINS_VERSIONS,
     )
 ]
+
+# TODO: this doesn't fail with patch_node_esm_loader=False, need failing test!!
+[
+    js_test(
+        name = "esm_test_%s" % toolchain_name,
+        data = [":lib"],
+        entry_point = "esm.mjs",
+        node_toolchain = toolchain,
+        patch_node_esm_loader = True,
+        patch_node_fs = True,
+        preserve_symlinks_main = False,  # TODO: test both?
+    )
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
+    )
+    if toolchain_name != "node16"  # ESM json loading not supported on Node 16
+]
+
+# A basic library with esm imports, esm json data etc
+js_library(
+    name = "lib",
+    srcs = [
+        "data.json",
+        "lib.mjs",
+    ],
+)
