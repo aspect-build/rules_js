@@ -22,5 +22,7 @@ def mocha_test(name, srcs, args = [], data = [], env = {}, **kwargs):
             # to the location Bazel expects.
             "MOCHA_FILE": "$$XML_OUTPUT_FILE",
         }),
+        preserve_symlinks_main = False,
+        copy_data_to_bin = False,
         **kwargs
     )

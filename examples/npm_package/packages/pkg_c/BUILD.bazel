@@ -9,7 +9,7 @@ npm_package(
     srcs = [
         "data1/package.json",
         "data1/pkg-c.json",
-        "src/index.js",
+        "src/index.mjs",
     ],
     package = "@mycorp/pkg-c1",
     root_paths = [
@@ -25,7 +25,7 @@ npm_package(
     srcs = [
         "data2/package.json",
         "data2/pkg-c.json",
-        "src/index.js",
+        "src/index.mjs",
     ],
     package = "@mycorp/pkg-c2",
     root_paths = [
