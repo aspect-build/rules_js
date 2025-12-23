@@ -67,6 +67,12 @@ build_test(
         ":node_modules/@figma",
         ":node_modules/@kubernetes",
         ":node_modules/@plotly",
+
+        # odd URL/protocol versions
+        ":node_modules/@kubernetes/client-node",
+        ":node_modules/inline-fixtures",
+        ":node_modules/protoc-gen-grpc",
+        ":node_modules/syncpack",
     ],
 )
 

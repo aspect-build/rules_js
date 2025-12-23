@@ -26,6 +26,7 @@ js/private/coverage/bundle/node_modules
 js/private/devserver/src/node_modules/
 js/private/test/image/node_modules
 js/private/test/js_run_devserver/node_modules
+js/private/test/node-patches/node_modules
 js/private/worker/src/node_modules
 node_modules/
 npm/private/test/node_modules/
