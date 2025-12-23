@@ -164,7 +164,7 @@ jobs:
                   ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
 
             - name: Mount bazel caches
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   # Cache the --dist_cache and --repository_cache directories (see ci.bazelrc)
                   # and the default bazel output (https://bazel.build/remote/output-directories#layout)
