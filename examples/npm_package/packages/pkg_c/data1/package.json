@@ -1,5 +1,9 @@
 {
     "name": "@mycorp/pkg-c1",
+    "type": "module",
+    "exports": {
+        ".": "./index.mjs"
+    },
     "private": true,
     "dependencies": {}
 }

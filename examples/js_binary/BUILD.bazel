@@ -25,7 +25,14 @@ js_binary(
     name = "bin",
     # Reference the location where the acorn npm module was linked in the root Bazel package
     data = ["//:node_modules/acorn"],
-    entry_point = "require_acorn.js",
+    entry_point = "require_acorn.mjs",
+)
+
+js_binary(
+    name = "bin_cjs",
+    # Reference the location where the acorn npm module was linked in the root Bazel package
+    data = ["//:node_modules/acorn"],
+    entry_point = "require_acorn.cjs",
 )
 
 ####################################################
@@ -46,6 +53,22 @@ diff_test(
     name = "test_js_binary_under_genrule",
     file1 = "//examples:expected_one_ast.json",
     file2 = "out1",
+)
+
+genrule(
+    name = "run1_cjs",
+    srcs = [],
+    outs = ["out1_cjs"],
+    # All js_binary rules need a BAZEL_BINDIR environment variable set so they can
+    # run from that directory as the working directory.
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(location :bin_cjs) {}/out1_cjs".format(package_name()),
+    tools = [":bin_cjs"],
+)
+
+diff_test(
+    name = "test_js_binary_under_genrule_cjs",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = "out1_cjs",
 )
 
 ####################################################
@@ -71,6 +94,26 @@ diff_test(
     name = "test_js_binary_under_js_run_binary",
     file1 = "//examples:expected_one_ast.json",
     file2 = "out2",
+)
+
+js_run_binary(
+    name = "run2_cjs",
+    srcs = [],
+    outs = ["out2_cjs"],
+    args = ["out2_cjs"],
+    chdir = package_name(),
+    # Request that the rules_js launcher prints extra information
+    log_level = "debug",
+    tool = ":bin_cjs",
+    # Uncomment the setting below to see debug output even on a
+    # successful run of the build action.
+    # silent_on_success = False,
+)
+
+diff_test(
+    name = "test_js_binary_under_js_run_binary_cjs",
+    file1 = "//examples:expected_one_ast.json",
+    file2 = "out2_cjs",
 )
 
 # Also test with local (no sandbox) execution by setting execution_requirements "local" to "1".
@@ -101,8 +144,8 @@ diff_test(
 
 # Also test with copy_data_to_bin disabled
 copy_to_bin(
-    name = "require_acorn_js",
-    srcs = ["require_acorn.js"],
+    name = "require_acorn_mjs",
+    srcs = ["require_acorn.mjs"],
 )
 
 js_binary(
@@ -110,7 +153,7 @@ js_binary(
     copy_data_to_bin = False,
     # Reference the location where the acorn npm module was linked in the root Bazel package
     data = ["//:node_modules/acorn"],
-    entry_point = ":require_acorn_js",
+    entry_point = ":require_acorn_mjs",
 )
 
 js_run_binary(
@@ -142,7 +185,7 @@ diff_test(
 js_test(
     name = "test_test",
     data = ["//:node_modules/@types/node"],
-    entry_point = "test.js",
+    entry_point = "test.mjs",
 )
 
 ###############################
@@ -152,11 +195,12 @@ js_test(
 
 write_file(
     name = "write4",
-    out = "case4.js",
+    out = "case4.mjs",
     content = [
-        """require('fs').writeFileSync(
+        "import { writeFileSync } from 'fs'",
+        """writeFileSync(
             process.argv[2],
-            require(process.argv[3]).toAst("1")
+            (await import(process.argv[3])).toAst("1")
         )""",
     ],
 )
@@ -167,7 +211,7 @@ js_binary(
         ":node_modules/@mycorp/pkg-a",
         "//:node_modules/@mycorp/pkg-b",
     ],
-    entry_point = "case4.js",
+    entry_point = "case4.mjs",
 )
 
 js_run_binary(
@@ -228,12 +272,13 @@ diff_test(
 
 write_file(
     name = "write5",
-    out = "case5.js",
-    content = ["""\
-require('fs').writeFileSync(
-    process.argv[2],
-    JSON.stringify(require(require('path').join(process.cwd(), "data.json")))
-)"""],
+    out = "case5.mjs",
+    content = [
+        "import { writeFileSync } from 'fs';",
+        "import { join } from 'path';",
+        "const jsonData = await import(join(process.cwd(), 'data.json'), { with: { type: 'json' } });",
+        "writeFileSync(process.argv[2], JSON.stringify(jsonData.default))",
+    ],
 )
 
 write_file(
@@ -244,7 +289,7 @@ write_file(
 
 js_binary(
     name = "bin5",
-    entry_point = "case5.js",
+    entry_point = "case5.mjs",
 )
 
 js_run_binary(
@@ -557,11 +602,13 @@ js_test(
 
 write_file(
     name = "write13",
-    out = "case13.js",
+    out = "case13.mjs",
     content = [
-        """require('fs').writeFileSync(
+        "import { writeFileSync } from 'fs';",
+        """
+           writeFileSync(
             process.argv[2],
-            JSON.stringify(require(process.argv[3]))
+            JSON.stringify((await import(process.argv[3])).default)
         )""",
     ],
 )
@@ -572,7 +619,7 @@ js_binary(
         "//:node_modules/@mycorp/pkg-c1",
         "//:node_modules/@mycorp/pkg-c2",
     ],
-    entry_point = "case13.js",
+    entry_point = "case13.mjs",
 )
 
 write_file(

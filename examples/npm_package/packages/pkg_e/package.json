@@ -1,6 +1,12 @@
 {
     "name": "@mycorp/pkg-e",
+    "type": "module",
     "private": true,
+    "exports": {
+        ".": {
+            "import": "./index.mjs"
+        }
+    },
     "dependencies": {
         "@mycorp/pkg-d": "workspace:*"
     }
