@@ -1,0 +1,20 @@
+# WORKSPACE mode setup for Bazel 7 when bzlmod is disabled.
+
+local_repository(
+    name = "aspect_rules_js",
+    path = "../..",
+)
+
+local_repository(
+    name = "workspace",
+    path = "workspace",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
+
+load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
+
+# Use default Node toolchain registration suitable for CI.
+rules_js_register_toolchains()
