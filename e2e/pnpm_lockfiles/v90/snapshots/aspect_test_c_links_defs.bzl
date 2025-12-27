@@ -3,10 +3,12 @@
 # buildifier: disable=bzl-visibility
 load(
     "@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
 )
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_package_store_internal = "npm_imported_package_store_internal")
 
 PACKAGE = "@aspect-test/c"
 VERSION = "2.0.0"
@@ -21,7 +23,6 @@ def npm_imported_package_store_internal():
         key = _KEY,
         package = PACKAGE,
         version = VERSION,
-        root_package = _ROOT_PACKAGE,
         deps = {
             ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.0/pkg": "@aspect-test/c",
         },
