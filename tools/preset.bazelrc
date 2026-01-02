@@ -67,6 +67,11 @@ common --experimental_fetch_all_coverage_outputs
 common --experimental_remote_cache_eviction_retries=5
 # Docs: https://registry.build/flag/bazel?filter=experimental_remote_cache_eviction_retries
 
+# Discard Merkle trees for remote actions reducing memory usage significantly.
+# Requires Bazel to recompute them upon remote cache misses and retries.
+common --experimental_remote_discard_merkle_trees
+# Docs: https://registry.build/flag/bazel?filter=experimental_remote_discard_merkle_trees
+
 # This flag was added in Bazel 5.0.0 with a default of zero:
 # https://github.com/bazelbuild/bazel/commit/a1137ec1338d9549fd34a9a74502ffa58c286a8e
 # For Bazel 8.0.0 the default was changed to 5:
@@ -122,6 +127,10 @@ common --incompatible_default_to_explicit_init_py
 common --incompatible_disallow_empty_glob
 # Docs: https://registry.build/flag/bazel?filter=incompatible_disallow_empty_glob
 
+# Accept multiple --modify_execution_info flags, rather than the last flag overwriting earlier ones.
+common --incompatible_modify_execution_info_additive
+# Docs: https://registry.build/flag/bazel?filter=incompatible_modify_execution_info_additive
+
 # Make builds more reproducible by using a static value for PATH and not inheriting LD_LIBRARY_PATH.
 # Use `--action_env=ENV_VARIABLE` if you want to inherit specific variables from the environment where Bazel runs.
 # Note that doing so can prevent cross-user caching if a shared cache is used.
@@ -134,6 +143,11 @@ common --incompatible_strict_action_env
 # This flag was flipped for Bazel 8.
 common --nolegacy_external_runfiles
 # Docs: https://registry.build/flag/bazel?filter=legacy_external_runfiles
+
+# Fail the build if the MODULE.bazel.lock file is out of date.
+# Using this mode in ci prevents the lockfile from being out of date.
+common:ci --lockfile_mode="error"
+# Docs: https://registry.build/flag/bazel?filter=lockfile_mode
 
 # On CI, don't download remote outputs to the local machine.
 # Most CI pipelines don't need to access the files and they can remain at rest on the remote cache.
