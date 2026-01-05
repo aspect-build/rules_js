@@ -39,6 +39,7 @@ var __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _ar
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.patcher = patcher;
 exports.isSubPath = isSubPath;
+exports.resolvePathLike = resolvePathLike;
 exports.escapeFunction = escapeFunction;
 const path = require("path");
 const util = require("util");
@@ -63,9 +64,21 @@ const PATCHED_FS_METHODS = [
 ];
 /**
  * Function that patches the `fs` module to not escape the given roots.
+ *
+ * NOTE: internally Node may call back to `fs.*` methods for example
+ *      realpath: https://github.com/nodejs/node/blob/v24.12.0/lib/fs.js#L2927
+ *                https://github.com/nodejs/node/blob/v24.12.0/lib/fs.js#L2951-L2957
+ *
+ *      writeFile: https://github.com/nodejs/node/blob/v24.12.0/lib/fs.js#L2372
+ *
+ *      ... many other places.
+ *
+ * However in other scenarios such as ESM module resolution it uses internal invocations
+ * that can not be patched via `fs.*` methods.
+ *
  * @returns a function to undo the patches.
  */
-function patcher(roots) {
+function patcher(roots, useInternalLstatPatch = false) {
     if (fs._unpatched) {
         throw new Error('FS is already patched.');
     }
@@ -99,6 +112,15 @@ function patcher(roots) {
     const origRealpathSyncNative = fs.realpathSync
         .native;
     const { canEscape, isEscape } = escapeFunction(roots);
+    // =========================================================================
+    // fsInternal.lstat (to patch ESM resolve's `realpathSync`!)
+    // =========================================================================
+    let unpatchEsm;
+    if (useInternalLstatPatch) {
+        const lstatEsmPatcher = new (require('./fs_stat.cjs').FsInternalStatPatcher)({ canEscape, isEscape }, guardedReadLink, guardedReadLinkSync, unguardedRealPath, unguardedRealPathSync);
+        lstatEsmPatcher.patch();
+        unpatchEsm = lstatEsmPatcher.revert.bind(lstatEsmPatcher);
+    }
     // =========================================================================
     // fs.lstat
     // =========================================================================
@@ -756,6 +778,9 @@ function patcher(roots) {
         delete fs._unpatched;
         if (unpatchPromises) {
             unpatchPromises();
+        }
+        if (unpatchEsm) {
+            unpatchEsm();
         }
         // Re-sync the esm modules to revert to the unpatched module.
         esmModule.syncBuiltinESMExports();

@@ -6,6 +6,7 @@ examples/**/*-docs.md
 js/private/coverage/coverage.js
 js/private/devserver/js_run_devserver.mjs
 js/private/node-patches/fs.cjs
+js/private/node-patches/fs_stat.cjs
 js/private/watch/aspect_watch_protocol.mjs
 js/private/watch/aspect_watch_protocol.d.mts
 min/

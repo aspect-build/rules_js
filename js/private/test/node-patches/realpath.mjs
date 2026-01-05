@@ -22,6 +22,8 @@ import * as util from 'node:util'
 
 import { patcher } from '../../node-patches/src/fs.cjs'
 
+const useEsmPatch = process.env.NODE_PATCHES_TEST_ESM_LOADER === '1'
+
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {
     await fn()
@@ -32,7 +34,7 @@ async function it(_, fn) {
 
 describe('testing realpath', async () => {
     await it('can handle empty, dot, undefined & null values', async () => {
-        const revertPatches = patcher([process.cwd()])
+        const revertPatches = patcher([process.cwd()], useEsmPatch)
 
         // ---------------------------------------------------------------------
         // empty string
@@ -166,7 +168,10 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const revertPatches = patcher([path.join(fixturesDir)])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir)],
+                    useEsmPatch
+                )
                 const linkPath = path.join(
                     fs.realpathSync(fixturesDir),
                     'a',
@@ -217,7 +222,10 @@ describe('testing realpath', async () => {
                 // on mac, inside of bazel, the fixtures dir returned here is not realpath-ed.
                 fixturesDir = fs.realpathSync(fixturesDir)
 
-                const revertPatches = patcher([path.join(fixturesDir)])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir)],
+                    useEsmPatch
+                )
                 const filePath = path.join(
                     fs.realpathSync(fixturesDir),
                     'a',
@@ -310,7 +318,10 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'a', 'link')
                 )
 
-                const revertPatches = patcher([path.join(fixturesDir, 'a')])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir, 'a')],
+                    useEsmPatch
+                )
                 const linkPath = path.join(
                     fs.realpathSync(fixturesDir),
                     'a',
@@ -492,9 +503,10 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const revertPatches = patcher([
-                    path.join(fixturesDir, 'sandbox'),
-                ])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir, 'sandbox')],
+                    useEsmPatch
+                )
                 const linkPath = path.join(fixturesDir, 'sandbox', 'link')
 
                 assert.deepStrictEqual(
@@ -571,9 +583,10 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'sandbox', 'link')
                 )
 
-                const revertPatches = patcher([
-                    path.join(fixturesDir, 'sandbox'),
-                ])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir, 'sandbox')],
+                    useEsmPatch
+                )
                 const linkPath = path.join(fixturesDir, 'sandbox', 'link')
 
                 assert.throws(() => {
@@ -663,9 +676,10 @@ describe('testing realpath', async () => {
                     path.join(fixturesDir, 'sandbox', 'node_modules', 'pkg')
                 )
 
-                const revertPatches = patcher([
-                    path.join(fixturesDir, 'sandbox'),
-                ])
+                const revertPatches = patcher(
+                    [path.join(fixturesDir, 'sandbox')],
+                    useEsmPatch
+                )
                 const linkPath = path.join(
                     fixturesDir,
                     'sandbox',
