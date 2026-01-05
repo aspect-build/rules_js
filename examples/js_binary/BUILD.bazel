@@ -22,87 +22,114 @@ npm_link_all_packages(name = "node_modules")
 
 # A simple program that runs the Acorn JS parser to produce an AST
 js_binary(
-    name = "bin",
+    name = "bin_mjs",
     # Reference the location where the acorn npm module was linked in the root Bazel package
     data = ["//:node_modules/acorn"],
-    entry_point = "require_acorn.js",
+    entry_point = "require_acorn.mjs",
+)
+
+js_binary(
+    name = "bin_cjs",
+    # Reference the location where the acorn npm module was linked in the root Bazel package
+    data = ["//:node_modules/acorn"],
+    entry_point = "require_acorn.cjs",
 )
 
 ####################################################
 # Use case 1
 # js_binary can be used with genrule
 # because everything it needs to run is in the runfiles
-genrule(
-    name = "run1",
-    srcs = [],
-    outs = ["out1"],
-    # All js_binary rules need a BAZEL_BINDIR environment variable set so they can
-    # run from that directory as the working directory.
-    cmd = "BAZEL_BINDIR=$(BINDIR) $(location :bin) {}/out1".format(package_name()),
-    tools = [":bin"],
-)
-
-diff_test(
-    name = "test_js_binary_under_genrule",
-    file1 = "//examples:expected_one_ast.json",
-    file2 = "out1",
-)
+[
+    [
+        genrule(
+            name = "run1_%s" % t,
+            srcs = [],
+            outs = ["out1-%s" % t],
+            # All js_binary rules need a BAZEL_BINDIR environment variable set so they can
+            # run from that directory as the working directory.
+            cmd = "BAZEL_BINDIR=$(BINDIR) $(location :bin_%s) {}/out1-%s".format(package_name()) % (t, t),
+            tools = [":bin_%s" % t],
+        ),
+        diff_test(
+            name = "test_js_binary_under_genrule_%s" % t,
+            file1 = "//examples:expected_one_ast.json",
+            file2 = "out1-%s" % t,
+        ),
+    ]
+    for t in [
+        "mjs",
+        "cjs",
+    ]
+]
 
 ####################################################
 # Use case 2
 # Using js_run_binary has some nice syntax sugar vs.
 # a genrule() or the run_binary rule from bazel-skylib.
-
-js_run_binary(
-    name = "run2",
-    srcs = [],
-    outs = ["out2"],
-    args = ["out2"],
-    chdir = package_name(),
-    # Request that the rules_js launcher prints extra information
-    log_level = "debug",
-    tool = ":bin",
-    # Uncomment the setting below to see debug output even on a
-    # successful run of the build action.
-    # silent_on_success = False,
-)
-
-diff_test(
-    name = "test_js_binary_under_js_run_binary",
-    file1 = "//examples:expected_one_ast.json",
-    file2 = "out2",
-)
+[
+    [
+        js_run_binary(
+            name = "run2_%s" % t,
+            srcs = [],
+            outs = ["out2_%s" % t],
+            args = ["out2_%s" % t],
+            chdir = package_name(),
+            # Request that the rules_js launcher prints extra information
+            log_level = "debug",
+            tool = ":bin_%s" % t,
+            # Uncomment the setting below to see debug output even on a
+            # successful run of the build action.
+            # silent_on_success = False,
+        ),
+        diff_test(
+            name = "test_js_binary_under_js_run_binary_%s" % t,
+            file1 = "//examples:expected_one_ast.json",
+            file2 = "out2_%s" % t,
+        ),
+    ]
+    for t in [
+        "mjs",
+        "cjs",
+    ]
+]
 
 # Also test with local (no sandbox) execution by setting execution_requirements "local" to "1".
 # Bazel sets different environment variables in this case such as RUNFILES_MANIFEST_FILE.
 # This case tests for regression of the fix in https://github.com/aspect-build/rules_js/pull/323.
-js_run_binary(
-    name = "run2_local",
-    srcs = [],
-    outs = ["out2_local"],
-    args = ["out2_local"],
-    chdir = package_name(),
-    execution_requirements = {
-        "local": "1",
-    },
-    # Request that the rules_js launcher prints extra information
-    log_level = "debug",
-    tool = ":bin",
-    # Uncomment the setting below to see debug output even on a
-    # successful run of the build action.
-    # silent_on_success = False,
-)
-
-diff_test(
-    name = "test_js_binary_under_js_run_binary_local",
-    file1 = "//examples:expected_one_ast.json",
-    file2 = "out2_local",
-)
+[
+    [
+        js_run_binary(
+            name = "run2_local_%s" % t,
+            srcs = [],
+            outs = ["out2_local_%s" % t],
+            args = ["out2_local_%s" % t],
+            chdir = package_name(),
+            execution_requirements = {
+                "local": "1",
+            },
+            # Request that the rules_js launcher prints extra information
+            log_level = "debug",
+            tool = ":bin_%s" % t,
+            # Uncomment the setting below to see debug output even on a
+            # successful run of the build action.
+            # silent_on_success = False,
+        ),
+        diff_test(
+            name = "test_js_binary_under_js_run_binary_local_%s" % t,
+            file1 = "//examples:expected_one_ast.json",
+            file2 = "out2_local_%s" % t,
+        ),
+    ]
+    for t in [
+        "mjs",
+        "cjs",
+    ]
+]
 
 # Also test with copy_data_to_bin disabled
 copy_to_bin(
-    name = "require_acorn_js",
-    srcs = ["require_acorn.js"],
+    name = "require_acorn_mjs",
+    srcs = ["require_acorn.mjs"],
 )
 
 js_binary(
@@ -110,7 +137,7 @@ js_binary(
     copy_data_to_bin = False,
     # Reference the location where the acorn npm module was linked in the root Bazel package
     data = ["//:node_modules/acorn"],
-    entry_point = ":require_acorn_js",
+    entry_point = ":require_acorn_mjs",
 )
 
 js_run_binary(
@@ -140,7 +167,13 @@ diff_test(
 # Bazel will check the exit code: a zero means the test passes, anything else means it fails.
 
 js_test(
-    name = "test_test",
+    name = "test_mjs",
+    data = ["//:node_modules/@types/node"],
+    entry_point = "test.mjs",
+)
+
+js_test(
+    name = "test_cjs",
     data = ["//:node_modules/@types/node"],
     entry_point = "test.js",
 )
@@ -151,8 +184,8 @@ js_test(
 # This relies on @mycorp/pkg-a and @mycorp/pkg-b which are packages within this monorepo.
 
 write_file(
-    name = "write4",
-    out = "case4.js",
+    name = "write4_cjs",
+    out = "case4.cjs",
     content = [
         """require('fs').writeFileSync(
             process.argv[2],
@@ -161,74 +194,100 @@ write_file(
     ],
 )
 
-js_binary(
-    name = "bin4",
-    data = [
-        ":node_modules/@mycorp/pkg-a",
-        "//:node_modules/@mycorp/pkg-b",
+write_file(
+    name = "write4_mjs",
+    out = "case4.mjs",
+    content = [
+        "import { writeFileSync } from 'fs'",
+        """writeFileSync(
+            process.argv[2],
+            (await import(process.argv[3])).toAst("1")
+        )""",
     ],
-    entry_point = "case4.js",
 )
 
-js_run_binary(
-    name = "run4-a",
-    args = [
-        "out4-dist/out4-a",
-        "@mycorp/pkg-a",
-    ],
-    chdir = package_name(),
-    # This specifically tests that a `select` can be used when setting `env`.
-    env = select({
-        "//conditions:default": {
-            "NODE_ENV": "production",
-        },
-    }),
-    out_dirs = ["out4-dist"],
-    tool = ":bin4",
-)
-
-directory_path(
-    name = "out4-a",
-    directory = ":run4-a",
-    path = "out4-a",
-)
-
-diff_test(
-    name = "test4-a",
-    file1 = "//examples:expected_one_ast.json",
-    file2 = ":out4-a",
-)
-
-js_run_binary(
-    name = "run4-b",
-    outs = ["out4-b"],
-    args = [
-        "out4-b",
-        "@mycorp/pkg-b",
-    ],
-    chdir = package_name(),
-    # This specifically tests that a `select` and `|` operator can be used when setting `env`.
-    env = {} | select({
-        "//conditions:default": {
-            "NODE_ENV": "production",
-        },
-    }),
-    tool = ":bin4",
-)
-
-diff_test(
-    name = "test4-b",
-    file1 = "//examples:expected_one_ast.json",
-    file2 = ":out4-b",
-)
+[
+    [
+        js_binary(
+            name = "bin4_%s" % t,
+            data = [
+                ":node_modules/@mycorp/pkg-a",
+                "//:node_modules/@mycorp/pkg-b",
+            ],
+            entry_point = "case4.%s" % t,
+        ),
+        js_run_binary(
+            name = "run4-a_%s" % t,
+            args = [
+                "out4-%s-dist/out4-a" % t,
+                "@mycorp/pkg-a",
+            ],
+            chdir = package_name(),
+            # This specifically tests that a `select` can be used when setting `env`.
+            env = select({
+                "//conditions:default": {
+                    "NODE_ENV": "production",
+                },
+            }),
+            out_dirs = ["out4-%s-dist" % t],
+            tool = ":bin4_%s" % t,
+        ),
+        directory_path(
+            name = "out4-a-%s" % t,
+            directory = ":run4-a_%s" % t,
+            path = "out4-a",
+        ),
+        diff_test(
+            name = "test4-%s-a" % t,
+            file1 = "//examples:expected_one_ast.json",
+            file2 = ":out4-a-%s" % t,
+        ),
+        js_run_binary(
+            name = "run4-b_%s" % t,
+            outs = ["out4-b_%s" % t],
+            args = [
+                "out4-b_%s" % t,
+                "@mycorp/pkg-b",
+            ],
+            chdir = package_name(),
+            # This specifically tests that a `select` and `|` operator can be used when setting `env`.
+            env = {} | select({
+                "//conditions:default": {
+                    "NODE_ENV": "production",
+                },
+            }),
+            tool = ":bin4_%s" % t,
+        ),
+        diff_test(
+            name = "test4-b_%s" % t,
+            file1 = "//examples:expected_one_ast.json",
+            file2 = ":out4-b_%s" % t,
+        ),
+    ]
+    for t in [
+        "mjs",
+        "cjs",
+    ]
+]
 
 #######################################
 # Use case 5
 # js_run_binary that reads a data file at runtime.
 
 write_file(
-    name = "write5",
-    out = "case5.js",
+    name = "write5_mjs",
+    out = "case5.mjs",
+    content = [
+        "import { writeFileSync } from 'node:fs';",
+        "import { join } from 'node:path';",
+        "const jsonData = await import(join(process.cwd(), 'data.json'), { with: { type: 'json' } });",
+        "writeFileSync(process.argv[2], JSON.stringify(jsonData.default))",
+    ],
+)
+
+write_file(
+    name = "write5_cjs",
+    out = "case5.cjs",
     content = ["""\
 require('fs').writeFileSync(
     process.argv[2],
@@ -242,25 +301,31 @@ write_file(
     content = ["{\"answer\":42}"],
 )
 
-js_binary(
-    name = "bin5",
-    entry_point = "case5.js",
-)
-
-js_run_binary(
-    name = "run5",
-    srcs = ["data.json"],
-    outs = ["out5"],
-    args = ["out5"],
-    chdir = package_name(),
-    tool = ":bin5",
-)
-
-diff_test(
-    name = "test5",
-    file1 = "expected5",
-    file2 = "out5",
-)
+[
+    [
+        js_binary(
+            name = "bin5_%s" % t,
+            entry_point = "case5.%s" % t,
+        ),
+        js_run_binary(
+            name = "run5_%s" % t,
+            srcs = ["data.json"],
+            outs = ["out5_%s" % t],
+            args = ["out5_%s" % t],
+            chdir = package_name(),
+            tool = ":bin5_%s" % t,
+        ),
+        diff_test(
+            name = "test5_%s" % t,
+            file1 = "expected5",
+            file2 = "out5_%s" % t,
+        ),
+    ]
+    for t in [
+        "mjs",
+        "cjs",
+    ]
+]
 
 #######################################
 # Use case 6
@@ -514,7 +579,7 @@ genrule(
 # because everything it needs to run is in the runfiles
 custom_rule(
     name = "run11",
-    tool = ":bin",
+    tool = ":bin_mjs",
 )
 
 diff_test(
@@ -531,7 +596,7 @@ custom_rule(
     execution_requirements = {
         "local": "1",
     },
-    tool = ":bin",
+    tool = ":bin_mjs",
 )
 
 diff_test(
@@ -556,8 +621,8 @@ js_test(
 # https://github.com/aspect-build/rules_js/issues/471
 
 write_file(
-    name = "write13",
-    out = "case13.js",
+    name = "write13_cjs",
+    out = "case13.cjs",
     content = [
         """require('fs').writeFileSync(
             process.argv[2],
@@ -566,13 +631,17 @@ write_file(
     ],
 )
 
-js_binary(
-    name = "bin13",
-    data = [
-        "//:node_modules/@mycorp/pkg-c1",
-        "//:node_modules/@mycorp/pkg-c2",
+write_file(
+    name = "write13_mjs",
+    out = "case13.mjs",
+    content = [
+        "import { writeFileSync } from 'fs';",
+        """
+           writeFileSync(
+            process.argv[2],
+            JSON.stringify((await import(process.argv[3])).default)
+        )""",
     ],
-    entry_point = "case13.js",
 )
 
 write_file(
@@ -584,29 +653,6 @@ write_file(
     visibility = ["//visibility:private"],
 )
 
-js_run_binary(
-    name = "run13-1",
-    args = [
-        "out13-dist-1/out13-1",
-        "@mycorp/pkg-c1",
-    ],
-    chdir = package_name(),
-    out_dirs = ["out13-dist-1"],
-    tool = ":bin13",
-)
-
-directory_path(
-    name = "out13-1",
-    directory = ":run13-1",
-    path = "out13-1",
-)
-
-diff_test(
-    name = "test13-1",
-    file1 = ":expected13-1-out.json",
-    file2 = ":out13-1",
-)
-
 write_file(
     name = "expected13-2-out",
     out = "expected13-2-out.json",
@@ -616,25 +662,59 @@ write_file(
     visibility = ["//visibility:private"],
 )
 
-js_run_binary(
-    name = "run13-2",
-    args = [
-        "out13-dist-2/out13-2",
-        "@mycorp/pkg-c2",
-    ],
-    chdir = package_name(),
-    out_dirs = ["out13-dist-2"],
-    tool = ":bin13",
-)
-
-directory_path(
-    name = "out13-2",
-    directory = ":run13-2",
-    path = "out13-2",
-)
-
-diff_test(
-    name = "test13-2",
-    file1 = ":expected13-2-out.json",
-    file2 = ":out13-2",
-)
+[
+    [
+        js_binary(
+            name = "bin13_%s" % t,
+            data = [
+                "//:node_modules/@mycorp/pkg-c1",
+                "//:node_modules/@mycorp/pkg-c2",
+            ],
+            entry_point = "case13.%s" % t,
+        ),
+        js_run_binary(
+            name = "run13-1_%s" % t,
+            args = [
+                "out13-dist-1_%s/out13-1" % t,
+                "@mycorp/pkg-c1",
+            ],
+            chdir = package_name(),
+            out_dirs = ["out13-dist-1_%s" % t],
+            tool = ":bin13_%s" % t,
+        ),
+        directory_path(
+            name = "out13-1_%s" % t,
+            directory = ":run13-1_%s" % t,
+            path = "out13-1",
+        ),
+        diff_test(
+            name = "test13-1_%s" % t,
+            file1 = ":expected13-1-out.json",
+            file2 = ":out13-1_%s" % t,
+        ),
+        js_run_binary(
+            name = "run13-2_%s" % t,
+            args = [
+                "out13-dist-2_%s/out13-2" % t,
+                "@mycorp/pkg-c2",
+            ],
+            chdir = package_name(),
+            out_dirs = ["out13-dist-2_%s" % t],
+            tool = ":bin13_%s" % t,
+        ),
+        directory_path(
+            name = "out13-2_%s" % t,
+            directory = ":run13-2_%s" % t,
+            path = "out13-2",
+        ),
+        diff_test(
+            name = "test13-2_%s" % t,
+            file1 = ":expected13-2-out.json",
+            file2 = ":out13-2_%s" % t,
+        ),
+    ]
+    for t in [
+        "mjs",
+        "cjs",
+    ]
+]
