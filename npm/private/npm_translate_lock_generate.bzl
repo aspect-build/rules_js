@@ -39,7 +39,7 @@ _FP_STORE_TMPL = \
         )"""
 
 _FP_DIRECT_TMPL = \
-    """
+    """\
 # Generated npm_link_package_store for linking of first-party "{pkg}" package
 # buildifier: disable=function-docstring
 def _fp_link_{i}(name):
@@ -228,8 +228,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from {defs_bzl_file} and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '{root_package}', pnpm workspace projects: %s" % (bazel_package, {link_packages_comma_separated})
         fail(msg)
-{validation_call}
-""".format(
+{validation_call}""".format(
             defs_bzl_file = "@{}//:{}".format(rctx.name, rctx.attr.defs_bzl_filename),
             link_packages_comma_separated = "\"'\" + \"', '\".join(_IMPORTER_PACKAGES) + \"'\"" if package_to_importer else "\"\"",
             root_package = root_package,
@@ -448,7 +447,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             first_link = False
 
     # Invoke and collect link targets from the `imported_links` param
-    npm_link_all_packages_bzl.append("""    
+    npm_link_all_packages_bzl.append("""\
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -459,8 +458,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 scope_targets = {}
             if _scope not in scope_targets:
                 scope_targets[_scope] = []
-            scope_targets[_scope].extend(_targets)
-""")
+            scope_targets[_scope].extend(_targets)""")
 
     # Generate catch all & scoped js_library targets
     # TODO(3.0): don't generate empty js_library targets?
@@ -487,19 +485,18 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     defs_bzl_header.append("# buildifier: disable=bzl-visibility")
     defs_bzl_header.append("""load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")""")
 
-    # Only add visibility load if package visibility is configured
-    if has_package_visibility:
-        defs_bzl_header.append("")
-        defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
-
     if fp_links:
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
         defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")""")
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")""")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")""")
+
+    if has_package_visibility:
+        defs_bzl_header.append("")
+        defs_bzl_header.append("# buildifier: disable=bzl-visibility")
+        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
 
     # Build the defs.bzl file contents
     defs_bzl_contents = [
@@ -518,7 +515,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         "",
         "\n".join(npm_link_targets_bzl),
         "",
-        "\n".join(link_factories_bzl),
+        "\n\n".join(link_factories_bzl),
     ])
 
     rctx_files[rctx.attr.defs_bzl_filename] = defs_bzl_contents

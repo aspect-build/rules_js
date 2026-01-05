@@ -21,7 +21,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
 
 _IMPORTER_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d"]
 
@@ -37,7 +37,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not link:
         msg = "The npm_link_all_packages() macro loaded from @aspect_rules_js~~npm~npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
-
 
     if is_root:
         store_0(name)
@@ -268,7 +267,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":{}/@lib/b_alias".format(name),
                 ],
             }
-    
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -280,7 +278,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             if _scope not in scope_targets:
                 scope_targets[_scope] = []
             scope_targets[_scope].extend(_targets)
-
 
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
@@ -368,7 +365,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":{}/@lib/b_alias".format(name),
             ])
     return link_targets
-
 
 # Generated npm_link_package_store for linking of first-party "vendored-a" package
 # buildifier: disable=function-docstring

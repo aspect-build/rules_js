@@ -1093,13 +1093,13 @@ load("@@_main~npm~npm__zod__3.21.4__links//:defs.bzl", store_1087 = "npm_importe
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
-
-# buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
 
 _IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
 
@@ -1154,7 +1154,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
     # Validate package visibility before creating any targets
     _npm_validate_package_visibility(bazel_package, _NPM_PACKAGE_LOCATIONS, _NPM_PACKAGE_VISIBILITY)
-
 
     if is_root:
         store_0(name)
@@ -2788,7 +2787,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             scope_targets = {
                 "@mycorp": [":{}/@mycorp/pkg-d".format(name)],
             }
-    
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -2800,7 +2798,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             if _scope not in scope_targets:
                 scope_targets[_scope] = []
             scope_targets[_scope].extend(_targets)
-
 
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
@@ -3052,7 +3049,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         if prod:
             link_targets.extend([":{}/@mycorp/pkg-d".format(name)])
     return link_targets
-
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-a" package
 # buildifier: disable=function-docstring
