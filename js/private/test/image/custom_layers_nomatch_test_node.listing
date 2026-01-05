@@ -8,7 +8,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-patches/
--r-xr-xr-x  0 0      0       34317 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-patches/fs.cjs
+-r-xr-xr-x  0 0      0       34327 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-patches/fs.cjs
 -r-xr-xr-x  0 0      0        1460 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-patches/register.cjs
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/rules_nodejs~~node~nodejs_linux_amd64/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/
