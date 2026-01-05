@@ -15,22 +15,24 @@
  * limitations under the License.
  */
 
-import type { PathLike, Stats, StatSyncOptions, BigIntStats } from 'fs'
-import type * as FsType from 'fs'
-import type * as UrlType from 'url'
-import * as path from 'path'
-import * as util from 'util'
-
-// windows cant find the right types
-type Dir = FsType.Dir
-type Dirent = FsType.Dirent
+import type {
+    Dir,
+    Dirent,
+    PathLike,
+    Stats,
+    StatSyncOptions,
+    BigIntStats,
+} from 'node:fs'
+import type * as FsType from 'node:fs'
+import * as esmModule from 'node:module'
+import * as path from 'node:path'
+import * as url from 'node:url'
+import * as util from 'node:util'
 
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
 const fs = require('node:fs') as any
-const url = require('node:url') as typeof UrlType
-const esmModule = require('node:module')
 
 const HOP_NON_LINK = Symbol.for('HOP NON LINK')
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND')
