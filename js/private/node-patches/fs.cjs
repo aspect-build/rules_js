@@ -40,14 +40,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.patcher = patcher;
 exports.isSubPath = isSubPath;
 exports.escapeFunction = escapeFunction;
-const path = require("path");
-const util = require("util");
+const esmModule = require("node:module");
+const path = require("node:path");
+const url = require("node:url");
+const util = require("node:util");
 // using require here on purpose so we can override methods with any
 // also even though imports are mutable in typescript the cognitive dissonance is too high because
 // es modules
 const fs = require('node:fs');
-const url = require('node:url');
-const esmModule = require('node:module');
 const HOP_NON_LINK = Symbol.for('HOP NON LINK');
 const HOP_NOT_FOUND = Symbol.for('HOP NOT FOUND');
 const PATCHED_FS_METHODS = [
