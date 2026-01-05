@@ -9,8 +9,9 @@ drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/pkg_d/
--r-xr-xr-x  0 100    0         387 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/pkg_d/index.js
--r-xr-xr-x  0 100    0         164 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/pkg_d/package.json
+-r-xr-xr-x  0 100    0         810 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/pkg_d/index.cjs
+-r-xr-xr-x  0 100    0         841 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/pkg_d/index.mjs
+-r-xr-xr-x  0 100    0         336 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/pkg_d/package.json
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/

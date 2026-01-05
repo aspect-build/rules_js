@@ -6,9 +6,11 @@ npm_link_all_packages()
 js_library(
     name = "pkg",
     srcs = [
-        "index.js",
+        "index.cjs",
+        "index.mjs",
         "package.json",
     ],
+    copy_data_to_bin = False,
     visibility = ["//visibility:public"],
     # because we're linking this js_library, we must explictly add our npm dependendies to `deps` so
     # they are picked up my the linker. npm dependendies in `data` are not propogated through the

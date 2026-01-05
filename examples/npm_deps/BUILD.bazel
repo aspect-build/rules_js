@@ -237,18 +237,55 @@ js_test(
 # Case 7: use a first-party npm package within our Bazel monorepo workspace from an npm_package target
 
 write_file(
-    name = "write7",
-    out = "case7.js",
+    name = "write7_a",
+    out = "case7_a.js",
     content = ["require('@mycorp/pkg-a')"],
 )
 
 js_test(
-    name = "test7",
+    name = "test7_a",
     data = [
         ":node_modules/@mycorp/pkg-a",
     ],
-    entry_point = "case7.js",
+    entry_point = "case7_a.js",
 )
+
+write_file(
+    name = "write7_b_mjs",
+    out = "case7_b.mjs",
+    content = [
+        "import { sandboxAssert, getAcornVersion } from '@mycorp/pkg-b'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssert();",
+        "(await import('@mycorp/pkg-b')).sandboxAssert();",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+write_file(
+    name = "write7_b_cjs",
+    out = "case7_b.cjs",
+    content = [
+        "const { sandboxAssert, getAcornVersion } = require('@mycorp/pkg-b')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssert()",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+[
+    js_test(
+        name = "test7_b_%s" % t,
+        data = [
+            "//:node_modules/@mycorp/pkg-b",
+        ],
+        entry_point = "case7_b.%s" % t,
+    )
+    for t in [
+        "cjs",
+        "mjs",
+    ]
+]
 
 #######################################
 # Case 8: patch applied via `pnpm.patchesDependencies` then by `patches`
@@ -264,32 +301,82 @@ js_test(
 # Case 9: use a first-party npm package within our Bazel monorepo workspace from a js_library target
 
 write_file(
-    name = "write9",
-    out = "case9.js",
-    content = ["require('@mycorp/pkg-d')"],
+    name = "write9_cjs",
+    out = "case9.cjs",
+    content = [
+        "const { sandboxAssert, getAcornVersion } = require('@mycorp/pkg-d')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssert()",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+write_file(
+    name = "write9_mjs",
+    out = "case9.mjs",
+    content = [
+        "import { sandboxAssert, getAcornVersion } from '@mycorp/pkg-d'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssert();",
+        "(await import('@mycorp/pkg-d')).sandboxAssert();",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
 )
 
 js_test(
-    name = "test9",
+    name = "test9_cjs",
     data = [
         ":node_modules/@mycorp/pkg-d",
     ],
-    entry_point = "case9.js",
+    entry_point = "case9.cjs",
+)
+
+js_test(
+    name = "test9_mjs",
+    data = [
+        ":node_modules/@mycorp/pkg-d",
+    ],
+    entry_point = "case9.mjs",
 )
 
 #######################################
 # Case 10: use a first-party npm package a transitive dependency on a monorepo workspace from a js_library target
 
 write_file(
-    name = "write10",
-    out = "case10.js",
-    content = ["require('@mycorp/pkg-e')"],
+    name = "write10_cjs",
+    out = "case10.cjs",
+    content = [
+        "const { sandboxAssert, getAcornVersion } = require('@mycorp/pkg-e')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssert()",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+write_file(
+    name = "write10_mjs",
+    out = "case10.mjs",
+    content = [
+        "import { sandboxAssert, getAcornVersion } from '@mycorp/pkg-e'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssert();",
+        "(await import('@mycorp/pkg-e')).sandboxAssert();",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
 )
 
 js_test(
-    name = "test10",
+    name = "test10_cjs",
     data = [
         ":node_modules/@mycorp/pkg-e",
     ],
-    entry_point = "case10.js",
+    entry_point = "case10.cjs",
+)
+
+js_test(
+    name = "test10_mjs",
+    data = [
+        ":node_modules/@mycorp/pkg-e",
+    ],
+    entry_point = "case10.mjs",
 )

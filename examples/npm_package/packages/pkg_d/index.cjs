@@ -3,7 +3,6 @@
  */
 const acorn = require('acorn')
 const { v4: uuid } = require('uuid')
-const { a } = require('./a')
 
 function toAst(program) {
     return JSON.stringify(acorn.parse(program, { ecmaVersion: 2020 })) + '\n'
@@ -18,18 +17,18 @@ function sandboxAssert() {
         throw new Error(`Not in sandbox: ${__filename}`)
     }
 
-    // Use of npm_package() copies files into the npm package store.
-    if (!__filename.includes('/node_modules/.aspect_rules_js/')) {
-        throw new Error(`Not in package store: ${__filename}`)
+    // Files are in the runfiles directory via js_library(srcs) instead
+    // of copies in the npm package store.
+    if (!__filename.startsWith(process.env.RUNFILES_DIR)) {
+        throw new Error(`Not runfiles: ${__filename}`)
     }
 }
-
-sandboxAssert()
 
 module.exports = {
     toAst,
     getAcornVersion,
     uuid,
-    a,
     sandboxAssert,
 }
+
+sandboxAssert()

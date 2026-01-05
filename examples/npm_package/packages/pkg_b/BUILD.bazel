@@ -8,7 +8,8 @@ npm_link_all_packages()
 npm_package(
     name = "pkg",
     srcs = [
-        "index.js",
+        "index.cjs",
+        "index.mjs",
         "package.json",
     ],
     data = [
