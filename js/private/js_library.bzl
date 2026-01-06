@@ -240,17 +240,11 @@ def _js_library_impl(ctx):
 
     runfiles = gather_runfiles(
         ctx = ctx,
-        sources = transitive_sources,
         data = ctx.attr.data,
         deps = srcs_types_deps,
         data_files = ctx.files.data,
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
-        include_sources = True,
-        include_types = False,
-        include_transitive_sources = True,
-        include_transitive_types = False,
-        include_npm_sources = True,
     )
 
     return [
