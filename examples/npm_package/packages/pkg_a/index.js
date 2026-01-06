@@ -48,6 +48,10 @@ function sandboxAssert() {
     }
 }
 
+global['pkg_a__js'] ??= 0
+if (++global['pkg_a__js'] > 1) {
+    throw new Error('pkg_a index.js loaded multiple times')
+}
 sandboxAssert()
 
 module.exports = {

@@ -24,4 +24,8 @@ export function sandboxAssert() {
     }
 }
 
+global['pkg_c__mjs'] ??= 0
+if (++global['pkg_c__mjs'] > 1) {
+    throw new Error('pkg_c index.mjs loaded multiple times')
+}
 sandboxAssert()

@@ -43,4 +43,8 @@ module.exports = {
     sandboxAssert,
 }
 
+global['pkg_d__cjs'] ??= 0
+if (++global['pkg_d__cjs'] > 1) {
+    throw new Error('pkg_d index.cjs loaded multiple times')
+}
 sandboxAssert()

@@ -39,4 +39,8 @@ export function getAcornVersion() {
     return acorn.version
 }
 
+global['pkg_d__mjs'] ??= 0
+if (++global['pkg_d__mjs'] > 1) {
+    throw new Error('pkg_d index.mjs loaded multiple times')
+}
 sandboxAssert()
