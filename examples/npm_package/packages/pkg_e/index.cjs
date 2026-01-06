@@ -18,6 +18,15 @@ function sandboxAssert() {
 
     dSandboxAssert()
     require('@mycorp/pkg-d').sandboxAssert()
+
+    // Resolve of pkg-d
+    const pkgDPath = require.resolve('@mycorp/pkg-d')
+    if (!/-sandbox\/\d+\/execroot\//.test(pkgDPath)) {
+        throw new Error(`pkg-d not in sandbox: ${pkgDPath}`)
+    }
+    if (!pkgDPath.startsWith(process.env.RUNFILES_DIR)) {
+        throw new Error(`pkg-d not in runfiles: ${pkgDPath}`)
+    }
 }
 
 sandboxAssert()
