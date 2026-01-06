@@ -226,7 +226,7 @@ export function patcher(roots: string[]): () => void {
             if (err) return cb(err)
             const escapedRoot: string | false = isEscape(args[0], str!)
             if (escapedRoot) {
-                return guardedRealPath(args[0], cb, escapedRoot)
+                return guardedRealPath(args[0], cb, [escapedRoot])
             } else {
                 return cb(null, str)
             }
@@ -252,7 +252,7 @@ export function patcher(roots: string[]): () => void {
             if (err) return cb(err)
             const escapedRoot: string | false = isEscape(args[0], str!)
             if (escapedRoot) {
-                return guardedRealPath(args[0], cb, escapedRoot)
+                return guardedRealPath(args[0], cb, [escapedRoot])
             } else {
                 return cb(null, str)
             }
@@ -267,7 +267,7 @@ export function patcher(roots: string[]): () => void {
         const str = origRealpathSync(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
-            return guardedRealPathSync(args[0], escapedRoot)
+            return guardedRealPathSync(args[0], [escapedRoot])
         }
         return str
     }
@@ -278,7 +278,7 @@ export function patcher(roots: string[]): () => void {
         const str = origRealpathSyncNative(...args)
         const escapedRoot: string | false = isEscape(args[0], str)
         if (escapedRoot) {
-            return guardedRealPathSync(args[0], escapedRoot)
+            return guardedRealPathSync(args[0], [escapedRoot])
         }
         return str
     }
@@ -304,6 +304,7 @@ export function patcher(roots: string[]): () => void {
             const str = path.resolve(path.dirname(resolved), p!)
             const escapedRoot: string | false = isEscape(resolved, str)
             if (escapedRoot) {
+                const escapedRoots = [escapedRoot]
                 return nextHop(str, readlinkNextHopCb)
 
                 function readlinkNextHopCb(next: string | undefined | false) {
@@ -320,10 +321,7 @@ export function patcher(roots: string[]): () => void {
                         path.dirname(resolved),
                         path.relative(path.dirname(str), next)
                     )
-                    if (
-                        r != resolved &&
-                        !isEscape(resolved, r, [escapedRoot as string])
-                    ) {
+                    if (r != resolved && !isEscape(resolved, r, escapedRoots)) {
                         return cb(null, r)
                     }
                     // The escape from the root is not mappable back into the root; throw EINVAL
@@ -840,7 +838,7 @@ export function patcher(roots: string[]): () => void {
     function guardedRealPath(
         start: PathLike,
         cb: ErrPathCallback,
-        escapedRoot?: string
+        escapedRoots: string[]
     ): void {
         // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
         oneHop(stringifyPathLike(start), cb)
@@ -850,11 +848,7 @@ export function patcher(roots: string[]): () => void {
                 if (!next) {
                     return cb(enoent('realpath', start), undefined)
                 }
-                if (
-                    escapedRoot
-                        ? isEscape(loc, next, [escapedRoot])
-                        : isEscape(loc, next)
-                ) {
+                if (isEscape(loc, next, escapedRoots)) {
                     // this hop takes us out of the guard
                     return cb(null, loc)
                 }
@@ -879,7 +873,7 @@ export function patcher(roots: string[]): () => void {
 
     function guardedRealPathSync(
         start: PathLike,
-        escapedRoot?: string
+        escapedRoots: string[]
     ): string {
         // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
         for (
@@ -898,11 +892,7 @@ export function patcher(roots: string[]): () => void {
                     throw enoent('realpath', start)
                 }
             }
-            if (
-                escapedRoot
-                    ? isEscape(loc, next, [escapedRoot])
-                    : isEscape(loc, next)
-            ) {
+            if (isEscape(loc, next, escapedRoots)) {
                 // this hop takes us out of the guard
                 return loc
             }

@@ -190,7 +190,7 @@ function patcher(roots) {
                 return cb(err);
             const escapedRoot = isEscape(args[0], str);
             if (escapedRoot) {
-                return guardedRealPath(args[0], cb, escapedRoot);
+                return guardedRealPath(args[0], cb, [escapedRoot]);
             }
             else {
                 return cb(null, str);
@@ -209,7 +209,7 @@ function patcher(roots) {
                 return cb(err);
             const escapedRoot = isEscape(args[0], str);
             if (escapedRoot) {
-                return guardedRealPath(args[0], cb, escapedRoot);
+                return guardedRealPath(args[0], cb, [escapedRoot]);
             }
             else {
                 return cb(null, str);
@@ -221,7 +221,7 @@ function patcher(roots) {
         const str = origRealpathSync(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
-            return guardedRealPathSync(args[0], escapedRoot);
+            return guardedRealPathSync(args[0], [escapedRoot]);
         }
         return str;
     };
@@ -229,7 +229,7 @@ function patcher(roots) {
         const str = origRealpathSyncNative(...args);
         const escapedRoot = isEscape(args[0], str);
         if (escapedRoot) {
-            return guardedRealPathSync(args[0], escapedRoot);
+            return guardedRealPathSync(args[0], [escapedRoot]);
         }
         return str;
     };
@@ -249,6 +249,7 @@ function patcher(roots) {
             const str = path.resolve(path.dirname(resolved), p);
             const escapedRoot = isEscape(resolved, str);
             if (escapedRoot) {
+                const escapedRoots = [escapedRoot];
                 return nextHop(str, readlinkNextHopCb);
                 function readlinkNextHopCb(next) {
                     if (!next) {
@@ -262,8 +263,7 @@ function patcher(roots) {
                         }
                     }
                     const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(str), next));
-                    if (r != resolved &&
-                        !isEscape(resolved, r, [escapedRoot])) {
+                    if (r != resolved && !isEscape(resolved, r, escapedRoots)) {
                         return cb(null, r);
                     }
                     // The escape from the root is not mappable back into the root; throw EINVAL
@@ -693,7 +693,7 @@ function patcher(roots) {
             });
         }
     }
-    function guardedRealPath(start, cb, escapedRoot) {
+    function guardedRealPath(start, cb, escapedRoots) {
         // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
         oneHop(stringifyPathLike(start), cb);
         function oneHop(loc, cb) {
@@ -701,9 +701,7 @@ function patcher(roots) {
                 if (!next) {
                     return cb(enoent('realpath', start), undefined);
                 }
-                if (escapedRoot
-                    ? isEscape(loc, next, [escapedRoot])
-                    : isEscape(loc, next)) {
+                if (isEscape(loc, next, escapedRoots)) {
                     // this hop takes us out of the guard
                     return cb(null, loc);
                 }
@@ -725,7 +723,7 @@ function patcher(roots) {
             }
         }
     }
-    function guardedRealPathSync(start, escapedRoot) {
+    function guardedRealPathSync(start, escapedRoots) {
         // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
         for (let loc = stringifyPathLike(start), next;; loc = next) {
             next = nextHopSync(loc);
@@ -740,9 +738,7 @@ function patcher(roots) {
                     throw enoent('realpath', start);
                 }
             }
-            if (escapedRoot
-                ? isEscape(loc, next, [escapedRoot])
-                : isEscape(loc, next)) {
+            if (isEscape(loc, next, escapedRoots)) {
                 // this hop takes us out of the guard
                 return loc;
             }
