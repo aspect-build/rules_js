@@ -26,6 +26,15 @@ export async function sandboxAssert() {
 
     // Dynamic import of pkg-d
     await import('@mycorp/pkg-d').then(({ sandboxAssert }) => sandboxAssert())
+
+    // Resolve of pkg-d
+    const pkgDPath = fileURLToPath(import.meta.resolve('@mycorp/pkg-d'))
+    if (!/-sandbox\/\d+\/execroot\//.test(pkgDPath)) {
+        throw new Error(`pkg-d not in sandbox: ${pkgDPath}`)
+    }
+    if (!pkgDPath.startsWith(process.env.RUNFILES_DIR)) {
+        throw new Error(`pkg-d not in runfiles: ${pkgDPath}`)
+    }
 }
 
 await sandboxAssert()
