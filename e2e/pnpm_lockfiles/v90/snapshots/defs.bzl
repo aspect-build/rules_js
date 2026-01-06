@@ -109,7 +109,7 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_package_store = "npm_package_store", _npm_local_package_store = "npm_local_package_store_internal")
+load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
 
 _IMPORTER_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/alts", "projects/b", "projects/c", "projects/d", "projects/peer-types", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
 
@@ -127,7 +127,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     if not is_root and not is_importer:
         msg = "The npm_link_all_packages() macro loaded from @lock-<LOCKVERSION>//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '<LOCKVERSION>', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
-
 
     if is_root:
         store_0()
@@ -571,7 +570,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":node_modules/@scoped/b",
                 ],
             }
-    
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -583,7 +581,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             if _scope not in scope_targets:
                 scope_targets[_scope] = []
             scope_targets[_scope].extend(_targets)
-
 
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
@@ -722,7 +719,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@scoped/b",
             ])
     return link_targets
-
 
 # Generated npm_link_package_store for linking of first-party "@scoped/c" package
 # buildifier: disable=function-docstring

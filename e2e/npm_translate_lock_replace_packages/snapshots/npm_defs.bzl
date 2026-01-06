@@ -23,7 +23,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         msg = "The npm_link_all_packages() macro loaded from @npm//:defs.bzl and called in bazel package '%s' may only be called in bazel packages that correspond to the pnpm root package or pnpm workspace projects. Projects are discovered from the pnpm-lock.yaml and may be missing if the lockfile is out of date. Root package: '', pnpm workspace projects: %s" % (bazel_package, "'" + "', '".join(_IMPORTER_PACKAGES) + "'")
         fail(msg)
 
-
     if is_root:
         store_0()
         store_1()
@@ -39,7 +38,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/chalk",
                 ":node_modules/lodash",
             ]
-    
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -51,7 +49,6 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             if _scope not in scope_targets:
                 scope_targets[_scope] = []
             scope_targets[_scope].extend(_targets)
-
 
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
