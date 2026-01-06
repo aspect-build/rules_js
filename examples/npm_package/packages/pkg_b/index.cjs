@@ -47,6 +47,10 @@ function sandboxAssert() {
     }
 }
 
+global['pkg_b__cjs'] ??= 0
+if (++global['pkg_b__cjs'] > 1) {
+    throw new Error('pkg_b index.cjs loaded multiple times')
+}
 sandboxAssert()
 
 module.exports = {

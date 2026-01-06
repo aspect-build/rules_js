@@ -9,6 +9,7 @@
         }
     },
     "dependencies": {
+        "@mycorp/pkg-b": "workspace:*",
         "@mycorp/pkg-d": "workspace:*"
     }
 }

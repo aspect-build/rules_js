@@ -19,6 +19,10 @@ function sandboxAssert() {
     }
 }
 
+global['pkg_c__cjs'] ??= 0
+if (++global['pkg_c__cjs'] > 1) {
+    throw new Error('pkg_c index.cjs loaded multiple times')
+}
 sandboxAssert()
 
 module.exports.name = pkgC.name
