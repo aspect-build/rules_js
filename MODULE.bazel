@@ -182,6 +182,8 @@ npm.npm_translate_lock(
         "//examples/npm_package/packages/pkg_e:package.json",
         "//examples/runfiles:package.json",
         "//examples/stack_traces:package.json",
+        "//examples/vite3:package.json",
+        "//examples/vite6:package.json",
         "//examples/webpack_cli:package.json",
         "//js/private/coverage/bundle:package.json",
         "//js/private/devserver/src:package.json",
