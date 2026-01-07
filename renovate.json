@@ -2,19 +2,18 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
     "extends": [
-        "config:base",
-        ":preserveSemverRanges",
-        ":rebaseStalePrs",
-        ":disableDigestUpdates",
-        "schedule:weekly",
-        "group:recommended",
+        ":dependencyDashboard",
+        ":enablePreCommit",
+        ":semanticPrefixFixDepsChoreOthers",
         "group:monorepos",
+        "group:recommended",
+        "replacements:all",
         "workarounds:all"
     ],
     "packageRules": [
         {
-          "matchFiles": ["MODULE.bazel"],
-          "enabled": false
+            "matchFiles": ["MODULE.bazel"],
+            "enabled": false
         }
     ],
 
@@ -24,55 +23,9 @@
 
     "ignorePaths": [
         "**/node_modules/**",
-        "**/bower_components/**",
         "e2e/**",
         "examples/**",
         "js/private/test/**",
         "npm/private/test/**"
-    ],
-
-    "timezone": "America/Los_Angeles",
-
-    "schedule": ["after 2am every weekday", "before 5am every weekday"],
-
-    "packageRules": [
-        {
-            "matchPackagePatterns": ["npm"],
-            "stabilityDays": 3
-        },
-        {
-            "groupName": "patch updates",
-            "matchPackagePatterns": ["*"],
-            "matchUpdateTypes": ["patch"]
-        },
-        {
-            "groupName": "Bazel",
-            "matchManagers": ["bazel"],
-            "matchUpdateTypes": ["patch", "minor"]
-        },
-        {
-            "groupName": "Aspect",
-            "matchSourceUrlPrefixes": ["https://github.com/aspect-build/"],
-            "matchUpdateTypes": ["patch", "minor"],
-            "schedule": null
-        },
-        {
-            "groupName": "@types",
-            "matchUpdateTypes": ["patch", "minor"],
-            "matchPackagePatterns": ["^@types/"],
-            "extends": ["schedule:monthly"]
-        },
-        {
-            "groupName": "rollup",
-            "matchUpdateTypes": ["patch", "minor"],
-            "matchPackagePatterns": ["rollup"],
-            "extends": ["schedule:monthly"]
-        },
-        {
-            "groupName": "Webpack",
-            "matchUpdateTypes": ["patch", "minor"],
-            "matchPackagePatterns": ["webpack"],
-            "extends": ["schedule:monthly"]
-        }
     ]
 }
