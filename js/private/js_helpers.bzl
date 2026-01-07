@@ -118,11 +118,11 @@ def gather_runfiles(
         data_files = [],
         copy_data_files_to_bin = False,
         no_copy_to_bin = [],
-        include_sources = True,
+        include_sources = False,
         include_types = False,
-        include_transitive_sources = True,
+        include_transitive_sources = False,
         include_transitive_types = False,
-        include_npm_sources = True):
+        include_npm_sources = False):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
     As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
@@ -134,9 +134,9 @@ def gather_runfiles(
     Args:
         ctx: the rule context
 
-        sources: depset which should be included in runfiles
+        sources: DEPRECATED depset which should be included in runfiles
 
-        deps: list of dependency targets; only transitive runfiles are gather from these targets
+        deps: DEPRECATED list of dependency targets; only transitive runfiles are gather from these targets
 
         data: list of data targets; default outputs and transitive runfiles are gather from these targets
 
@@ -158,15 +158,15 @@ def gather_runfiles(
             file such as a file in an external repository. In most cases, this option is not needed.
             See `copy_data_files_to_bin` docstring for more info.
 
-        include_sources: see js_info_files documentation
+        include_sources: DEPRECATED see js_info_files documentation
 
-        include_types: see js_info_files documentation
+        include_types: DEPRECATED see js_info_files documentation
 
-        include_transitive_sources: see js_info_files documentation
+        include_transitive_sources: DEPRECATED see js_info_files documentation
 
-        include_transitive_types: see js_info_files documentation
+        include_transitive_types: DEPRECATED see js_info_files documentation
 
-        include_npm_sources: see js_info_files documentation
+        include_npm_sources: DEPRECATED see js_info_files documentation
 
     Returns:
         A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
@@ -182,17 +182,16 @@ def gather_runfiles(
     for target in data:
         transitive_files_depsets.append(target[DefaultInfo].files)
 
-    data_deps = data + deps
-
     # Gather files from JsInfo providers of data & deps
-    transitive_files_depsets.append(gather_files_from_js_infos(
-        targets = data_deps,
-        include_sources = include_sources,
-        include_types = include_types,
-        include_transitive_sources = include_transitive_sources,
-        include_transitive_types = include_transitive_types,
-        include_npm_sources = include_npm_sources,
-    ))
+    if include_sources or include_types or include_transitive_sources or include_transitive_types or include_npm_sources:
+        transitive_files_depsets.append(gather_files_from_js_infos(
+            targets = data + deps,
+            include_sources = include_sources,
+            include_types = include_types,
+            include_transitive_sources = include_transitive_sources,
+            include_transitive_types = include_transitive_types,
+            include_npm_sources = include_npm_sources,
+        ))
 
     # Use `data_files` as-is if `copy_data_files_to_bin` is False
     if copy_data_files_to_bin:
@@ -211,7 +210,10 @@ def gather_runfiles(
         transitive_files = depset(transitive = transitive_files_depsets),
     ).merge_all([
         target[DefaultInfo].default_runfiles
-        for target in data_deps
+        for target in data
+    ]).merge_all([
+        target[DefaultInfo].default_runfiles
+        for target in deps
     ])
 
 LOG_LEVELS = {
