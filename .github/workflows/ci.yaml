@@ -23,6 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
+            - uses: lycheeverse/lychee-action@v2
             - id: bazel-version
               name: Prepare 'bazel-version' matrix axis
               run: |
