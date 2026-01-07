@@ -10,7 +10,7 @@ def mocha_test(name, srcs, args = [], data = [], env = {}, **kwargs):
             "mocha-multi-reporters",
             "--reporter-options",
             "configFile=$(rootpath //examples/macro:mocha_reporters.json)",
-            native.package_name() + "/*test.js",
+            native.package_name() + "/*test.*js",
         ] + args,
         data = data + srcs + [
             "//examples/macro:mocha_reporters.json",

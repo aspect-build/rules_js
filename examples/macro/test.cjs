@@ -1,7 +1,7 @@
 const assert = require('assert')
 const { dirname } = require('node:path')
 
-describe('mocha .js', () => {
+describe('mocha .cjs', () => {
     it('integrates with Bazel', () => {
         assert(true)
     })
@@ -13,15 +13,15 @@ describe('mocha .js', () => {
     it('is sandboxed', () => {
         assert.match(
             process.cwd(),
-            /examples\/macro\/test(_\w+)?_\/test(_\w+)?\.runfiles/
+            /examples\/macro\/test(_\w+)_\/test(_\w+)\.runfiles/
         )
         assert.match(
             __dirname,
-            /examples\/macro\/test(_\w+)?_\/test(_\w+)?\.runfiles/
+            /examples\/macro\/test(_\w+)_\/test(_\w+)\.runfiles/
         )
         assert.match(
             __filename,
-            /-sandbox\/\d+\/execroot\/_main\/bazel-out\/[^/]+\/bin\/examples\/macro\/test(_\w+)?_\/test(_\w+)?\.runfiles\/_main\/examples\/macro\/test\.js/
+            /-sandbox\/\d+\/execroot\/_main\/bazel-out\/[^/]+\/bin\/examples\/macro\/test(_\w+)_\/test(_\w+).runfiles\/_main\/examples\/macro\/test\.cjs/
         )
         assert.equal(__dirname, dirname(__filename))
     })
