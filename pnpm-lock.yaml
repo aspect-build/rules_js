@@ -308,8 +308,8 @@ importers:
         specifier: 6.1.0
         version: 6.1.0(rollup@4.39.0)
       '@rollup/plugin-node-resolve':
-        specifier: 16.0.1
-        version: 16.0.1(rollup@4.39.0)
+        specifier: 16.0.3
+        version: 16.0.3(rollup@4.39.0)
       rollup:
         specifier: 4.39.0
         version: 4.39.0
@@ -317,8 +317,8 @@ importers:
   js/private/devserver/src:
     devDependencies:
       '@rollup/plugin-node-resolve':
-        specifier: 16.0.1
-        version: 16.0.1(rollup@4.39.0)
+        specifier: 16.0.3
+        version: 16.0.3(rollup@4.39.0)
       '@types/node':
         specifier: 18.19.54
         version: 18.19.54
@@ -375,8 +375,8 @@ importers:
         specifier: 6.1.0
         version: 6.1.0(rollup@4.39.0)
       '@rollup/plugin-node-resolve':
-        specifier: 16.0.1
-        version: 16.0.1(rollup@4.39.0)
+        specifier: 16.0.3
+        version: 16.0.3(rollup@4.39.0)
       '@rollup/plugin-typescript':
         specifier: 12.1.2
         version: 12.1.2(rollup@4.39.0)(tslib@2.8.1)(typescript@5.8.2)
@@ -1602,8 +1602,8 @@ packages:
       rollup:
         optional: true
 
-  '@rollup/plugin-node-resolve@16.0.1':
-    resolution: {integrity: sha512-tk5YCxJWIG81umIvNkSod2qK5KyQW19qcBF/B78n1bjtOON6gzKoVeSzAE8yHCZEDmqkHKkxplExA8KzdJLJpA==}
+  '@rollup/plugin-node-resolve@16.0.3':
+    resolution: {integrity: sha512-lUYM3UBGuM93CnMPG1YocWu7X802BrNF3jW2zny5gQyLQgRFJhV1Sq0Zi74+dh/6NBx1DxFC4b4GXg9wUCG5Qg==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.78.0||^3.0.0||^4.0.0
@@ -4566,7 +4566,7 @@ packages:
 
   puppeteer@19.11.1:
     resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 24.15.0 is no longer supported
 
   quick-lru@5.1.1:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
@@ -6387,7 +6387,7 @@ snapshots:
     optionalDependencies:
       rollup: 4.39.0
 
-  '@rollup/plugin-node-resolve@16.0.1(rollup@4.39.0)':
+  '@rollup/plugin-node-resolve@16.0.3(rollup@4.39.0)':
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.39.0)
       '@types/resolve': 1.20.2
