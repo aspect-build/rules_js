@@ -195,28 +195,29 @@ def _init_workspace(priv, rctx, label_store, is_windows):
 
     # Read settings from pnpm-workspace.yaml for pnpm v10+ (NOTE: pnpm 9-10+ has lockfile version 9).
     # Support scenario where pnpm-lock.yaml was never parsed and "lock_version" is not set.
-    if label_store.has("pnpm_workspace"):
-        pnpm_workspace_path = label_store.path("pnpm_workspace")
-        if is_windows or utils.exists(rctx, pnpm_workspace_path):
-            pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, str(pnpm_workspace_path), is_windows)
+    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME)
+    pnpm_workspace_path = rctx.path(pnpm_workspace_label)
+    if pnpm_workspace_path.exists:
+        pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, str(pnpm_workspace_path), is_windows)
 
-            if workspace_parse_err == None:
-                pnpm_workspace_settings, workspace_parse_err = pnpm.parse_pnpm_workspace_json(pnpm_workspace_json)
+        if workspace_parse_err == None:
+            pnpm_workspace_settings, workspace_parse_err = pnpm.parse_pnpm_workspace_json(pnpm_workspace_json)
 
-                if pnpm_workspace_settings:
-                    priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
+            if pnpm_workspace_settings:
+                priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
 
-            if workspace_parse_err != None:
-                should_update = _should_update_pnpm_lock(priv)
-                msg = """
-        {type}: pnpm-workspace.yaml parse error {error}`.
-        """.format(type = "WARNING" if should_update else "ERROR", error = workspace_parse_err)
+        if workspace_parse_err != None:
+            should_update = _should_update_pnpm_lock(priv)
+            msg = """
+    {type}: pnpm-workspace.yaml parse error {error}`.
+    """.format(type = "WARNING" if should_update else "ERROR", error = workspace_parse_err)
 
-                if should_update:
-                    # buildifier: disable=print
-                    print(msg)
-                else:
-                    fail(msg)
+            if should_update:
+                # buildifier: disable=print
+                print(msg)
+            else:
+                fail(msg)
 
 ################################################################################
 def _init_npmrc(priv, rctx, attr, label_store):
