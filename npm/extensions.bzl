@@ -159,7 +159,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         importers = state.importers(),
         packages = state.packages(),
         replace_packages = replace_packages,
-        patched_dependencies = state.patched_dependencies(),
+        pnpm_patched_dependencies = state.pnpm_patched_dependencies(),
         only_built_dependencies = state.only_built_dependencies(),
         root_package = state.root_package(),
         rctx_name = attr.name,

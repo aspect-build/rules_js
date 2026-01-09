@@ -162,7 +162,6 @@ npm.npm_translate_lock(
         "pngjs": "chmod -R a+X *",  # fixes malformed tarball content file permissions in this package after extraction (see https://github.com/aspect-build/rules_js/issues/1637 for more details)
     },
     data = [
-        "//:examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch",
         "//:package.json",
         "//:pnpm-workspace.yaml",
         "//examples/js_binary:package.json",
@@ -175,6 +174,7 @@ npm.npm_translate_lock(
         "//examples/macro:package.json",
         "//examples/nextjs:package.json",
         "//examples/npm_deps:package.json",
+        "//examples/npm_deps/patches:meaning-of-life@1.0.0-pnpm.patch",
         "//examples/npm_package/libs/lib_a:package.json",
         "//examples/npm_package/packages/pkg_a:package.json",
         "//examples/npm_package/packages/pkg_b:package.json",

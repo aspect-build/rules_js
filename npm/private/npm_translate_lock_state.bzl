@@ -35,8 +35,6 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_common_labels(priv, rctx, attr, label_store)
 
-    _init_patches_labels(priv, rctx, attr, label_store)
-
     if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
         _init_update_labels(priv, rctx, attr, label_store)
@@ -129,22 +127,6 @@ def _init_update_labels(priv, _, attr, label_store):
         label_store.add("npm_package_lock", attr.npm_package_lock, seed_root = True)
     if attr.yarn_lock:
         label_store.add("yarn_lock", attr.yarn_lock, seed_root = True)
-
-################################################################################
-def _init_patches_labels(priv, _, attr, label_store):
-    if attr.verify_patches:
-        label_store.add("verify_patches", attr.verify_patches)
-
-    patches = []
-    for pkg_patches in attr.patches.values():
-        patches.extend(pkg_patches)
-
-    patches = [attr.pnpm_lock.relative(p) for p in patches]
-
-    for i, d in enumerate(patches):
-        label_store.add("patches_{}".format(i), d)
-
-    priv["num_patches"] = len(patches)
 
 ################################################################################
 def _init_importer_labels(priv, label_store):
@@ -302,7 +284,7 @@ WARNING: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the 
             _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)), repo_root)
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
-    for patch_info in priv["patched_dependencies"].values():
+    for patch_info in priv["pnpm_patched_dependencies"].values():
         patch = patch_info.get("path")
         rel_path = paths.normalize(paths.join(rel_dir, patch))
         workspace_path = paths.join(repo_root, rel_path)
@@ -468,12 +450,12 @@ def _yaml_to_json(rctx, yaml_path, is_windows):
 def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     importers = {}
     packages = {}
-    patched_dependencies = {}
+    pnpm_patched_dependencies = {}
     lock_parse_err = None
 
     lockfile_content, lock_parse_err = _yaml_to_json(rctx, str(pnpm_lock_path), is_windows)
     if lock_parse_err == None:
-        importers, packages, patched_dependencies, lock_parse_err = pnpm.parse_pnpm_lock_json(
+        importers, packages, pnpm_patched_dependencies, lock_parse_err = pnpm.parse_pnpm_lock_json(
             lockfile_content,
             attr.no_dev,
             attr.no_optional,
@@ -483,7 +465,7 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
 
     priv["importers"] = importers
     priv["packages"] = packages
-    priv["patched_dependencies"] = patched_dependencies
+    priv["pnpm_patched_dependencies"] = pnpm_patched_dependencies
 
     if lock_parse_err != None:
         should_update = _should_update_pnpm_lock(priv)
@@ -516,14 +498,11 @@ def _importers(priv):
 def _packages(priv):
     return priv["packages"]
 
-def _patched_dependencies(priv):
-    return priv["patched_dependencies"]
+def _pnpm_patched_dependencies(priv):
+    return priv["pnpm_patched_dependencies"]
 
 def _only_built_dependencies(priv):
     return _pnpm_settings(priv).get("onlyBuiltDependencies", None)
-
-def _num_patches(priv):
-    return priv["num_patches"]
 
 def _npm_registries(priv):
     return priv["npm_registries"]
@@ -557,7 +536,7 @@ def _new(rctx_name, rctx, attr):
         "packages": {},
         "root_package": attr.pnpm_lock.package if attr.pnpm_lock else "",
         "pnpm_settings": {},
-        "patched_dependencies": {},
+        "pnpm_patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
     }
 
@@ -569,11 +548,10 @@ def _new(rctx_name, rctx, attr):
         default_registry = lambda: _default_registry(priv),
         importers = lambda: _importers(priv),
         packages = lambda: _packages(priv),
-        patched_dependencies = lambda: _patched_dependencies(priv),
+        pnpm_patched_dependencies = lambda: _pnpm_patched_dependencies(priv),
         only_built_dependencies = lambda: _only_built_dependencies(priv),
         npm_registries = lambda: _npm_registries(priv),
         npm_auth = lambda: _npm_auth(priv),
-        num_patches = lambda: _num_patches(priv),
         root_package = lambda: _root_package(priv),
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
         action_cache_miss = lambda: _action_cache_miss(priv, rctx, label_store),
