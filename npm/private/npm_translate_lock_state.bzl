@@ -274,7 +274,7 @@ def _copy_unspecified_input_files(priv, rctx, attr, label_store):
     repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
 
     pnpm_lock_label = attr.pnpm_lock
-    pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME)
+    pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME) if pnpm_lock_label else Label("@@//:" + PNPM_WORKSPACE_FILENAME)
     pnpm_workspace_path = rctx.path(pnpm_workspace_label)
     pnpm_workspace_relpath = str(pnpm_workspace_path).removeprefix(repo_root)
 
