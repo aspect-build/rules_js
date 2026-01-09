@@ -21,7 +21,9 @@ bazel_dep(name = "rules_nodejs", version = "6.6.2")
 # Ensure any version of aspect_bazel_lib used includes:
 # https://github.com/bazel-contrib/bazel-lib/commit/371362199e5e5bde58aeb15b54ea6cfb164af337
 # https://github.com/bazel-contrib/bazel-lib/commit/ceaff54210291292f35d03bd4bbc0b6ceb40e77a
-bazel_dep(name = "aspect_bazel_lib", version = "2.22.2", repo_name = None)
+# https://github.com/bazel-contrib/bazel-lib/commit/27a9e7af51c0f806f823425a03283ae487d3a953
+# https://github.com/bazel-contrib/bazel-lib/commit/e56aa707b72364bb1cc6f92580cb12ff88dfc1b4
+bazel_dep(name = "aspect_bazel_lib", version = "2.22.4", repo_name = None)
 
 tel = use_extension("@aspect_tools_telemetry//:extension.bzl", "telemetry")
 use_repo(tel, "aspect_tools_telemetry_report")
