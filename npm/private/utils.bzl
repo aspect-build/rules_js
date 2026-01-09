@@ -10,6 +10,10 @@ DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
+# Maximum package store name length before hashing to prevent long paths
+# Similar to pnpm's limit: https://github.com/pnpm/pnpm/blob/9d4c16876f899146a45f21d93f041b42e3413011/packages/dependency-path/src/index.ts#L165
+_MAX_STORE_LENGTH = 120
+
 # Maximum length of peer dependency string before hashing to prevent long paths
 _MAX_PEER_DEP_LENGTH = 32
 
@@ -40,15 +44,30 @@ def _link_to_alias(link):
         fail(msg)
     return link[5:p_idx]
 
-def _package_shorten_peers(s):
+def _package_shorten_key(s):
+    # Prevent long paths similar to pnpm. The pnpm lockfile v6+ does not shorten long versions
+    # and instead relies on the lockfile processing to handle it depending on the platform.
+    #
+    # Long file paths can lead to "File name too long" build failures in bazel
+    #
+    # See:
+    #  https://github.com/pnpm/pnpm/blob/9d4c16876f899146a45f21d93f041b42e3413011/packages/dependency-path/src/index.ts#L165
+    #  https://github.com/pnpm/pnpm/blob/c5d4d81f56e53d824a8ed1a0f2b0e830ccaa9a0e/packages/dependency-path/src/index.ts#L169-L180
     version_index = s.find("@", 1)
     peers_index = s.find("(", version_index)
+
+    # Shorten long peer deps
     if peers_index != -1:
-        if len(s) - peers_index > _MAX_PEER_DEP_LENGTH:
-            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
-            # peer deps so we must hash here to prevent extremely long file paths that lead to
-            # "File name too long" build failures in bazel
-            s = s[:peers_index] + "_" + _hash(s[peers_index:]).lstrip("-")
+        if len(s) - peers_index > _MAX_PEER_DEP_LENGTH or len(s) > _MAX_STORE_LENGTH:
+            s = s[:peers_index] + "(" + _hash(s[peers_index:]).lstrip("-") + ")"
+    else:
+        peers_index = len(s)
+
+    # If the full key is still too long, shorten the version
+    if len(s) > _MAX_STORE_LENGTH:
+        # If hashing peers was not enough, hash the version too
+        s = s[:version_index] + "@" + _hash(s[version_index:peers_index]).lstrip("-") + s[peers_index:]
+
     return s
 
 def _package_store_name(s):
@@ -60,7 +79,7 @@ def _package_store_name(s):
     if s.startswith("link:"):
         s = _link_to_alias(s) + "@0.0.0"
     else:
-        s = _package_shorten_peers(s)
+        s = _package_shorten_key(s)
 
     r = ""
     for c in s.elems():
@@ -86,7 +105,7 @@ def _package_repo_name(prefix, s):
     if s.startswith("link:"):
         fail("link: packages should not be repositories")
 
-    s = _package_shorten_peers(s)
+    s = _package_shorten_key(s)
     version_index = s.find("@", 1)
 
     r = prefix + "__"

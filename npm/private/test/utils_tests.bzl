@@ -61,6 +61,10 @@ def test_package_store_and_target_name(ctx):
     asserts.equals(env, "@scoped+c@file+..+projects+c_@scoped+b@projects+b", utils.package_store_name("@scoped/c@file:../projects/c(@scoped/b@projects+b)"))
     asserts.equals(env, "x__at_scoped_c__file_.._projects_c_at_scoped_b_projects_b", utils.package_repo_name("x", "@scoped/c@file:../projects/c(@scoped/b@projects+b)"))
 
+    # file: .. (long peers)
+    asserts.equals(env, "@scoped+c@file+..+projects+c_401592697", utils.package_store_name("@scoped/c@file:../projects/c(@scoped/b@projects+b)(@scoped/d@projects+d)(@scoped/e@projects+e)"))
+    asserts.equals(env, "x__at_scoped_c__file_.._projects_c_401592697", utils.package_repo_name("x", "@scoped/c@file:../projects/c(@scoped/b@projects+b)(@scoped/d@projects+d)(@scoped/e@projects+e)"))
+
     # URL
     asserts.equals(env, "diff@https+++github.com+kpdecker+jsdiff+archive+refs+tags+v5.2.0.tar.gz", utils.package_store_name("diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
     asserts.equals(env, "x__diff__https___github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz", utils.package_repo_name("x", "diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
@@ -72,6 +76,16 @@ def test_package_store_and_target_name(ctx):
     # URLs with commit hashes
     asserts.equals(env, "jquery@https+++codeload.github.com+jquery+jquery+tar.gz+399b201bb3143a3952894cf3489b4848fc003967", utils.package_store_name("jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
     asserts.equals(env, "x__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967", utils.package_repo_name("x", "jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
+
+    # URL (long - see https://github.com/aspect-build/rules_js/issues/2628)
+    asserts.equals(env, "@tw+isomorphic--util@79283155", utils.package_store_name("@tw/isomorphic--util@https://artifactory.mycompany.com/artifactory/ifi-generic-local-dev/web/packages/web/isomorphic/util/8c6f424501e02117ed4b98e5f33c7a5204ebb6fb.tar.gz"))
+    asserts.equals(env, "x__at_tw_isomorphic--util__79283155", utils.package_repo_name("x", "@tw/isomorphic--util@https://artifactory.mycompany.com/artifactory/ifi-generic-local-dev/web/packages/web/isomorphic/util/8c6f424501e02117ed4b98e5f33c7a5204ebb6fb.tar.gz"))
+    asserts.equals(env, "inline-fixtures@1892187746", utils.package_store_name("inline-fixtures@https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662"))
+    asserts.equals(env, "x__inline-fixtures__1892187746", utils.package_repo_name("x", "inline-fixtures@https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662"))
+
+    # URL + peers (long - see https://github.com/aspect-build/rules_js/issues/2628)
+    asserts.equals(env, "@kubernetes+client-node@1838633845_1592917608", utils.package_store_name("@kubernetes/client-node@https://codeload.github.com/kubernetes-client/javascript/tar.gz/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9(bufferutil@4.0.8)(encoding@0.1.13)"))
+    asserts.equals(env, "x__at_kubernetes_client-node__1838633845_1592917608", utils.package_repo_name("x", "@kubernetes/client-node@https://codeload.github.com/kubernetes-client/javascript/tar.gz/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9(bufferutil@4.0.8)(encoding@0.1.13)"))
 
     return unittest.end(env)
 
