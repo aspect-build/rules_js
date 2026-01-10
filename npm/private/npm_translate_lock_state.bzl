@@ -111,9 +111,6 @@ def _init_common_labels(priv, rctx, attr, label_store):
         label_store.add("npmrc", attr.npmrc)
     label_store.add_sibling("lock", "sibling_npmrc", NPM_RC_FILENAME)
 
-    # pnpm-workspace.yaml file
-    label_store.add_sibling("lock", "pnpm_workspace", PNPM_WORKSPACE_FILENAME)
-
 ################################################################################
 def _init_update_labels(priv, _, attr, label_store):
     pnpm_lock_label = label_store.label("pnpm_lock")
@@ -198,28 +195,29 @@ def _init_workspace(priv, rctx, label_store, is_windows):
 
     # Read settings from pnpm-workspace.yaml for pnpm v10+ (NOTE: pnpm 9-10+ has lockfile version 9).
     # Support scenario where pnpm-lock.yaml was never parsed and "lock_version" is not set.
-    if label_store.has("pnpm_workspace"):
-        pnpm_workspace_path = label_store.path("pnpm_workspace")
-        if is_windows or utils.exists(rctx, pnpm_workspace_path):
-            pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, str(pnpm_workspace_path), is_windows)
+    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME)
+    pnpm_workspace_path = rctx.path(pnpm_workspace_label)
+    if pnpm_workspace_path.exists:
+        pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, str(pnpm_workspace_path), is_windows)
 
-            if workspace_parse_err == None:
-                pnpm_workspace_settings, workspace_parse_err = pnpm.parse_pnpm_workspace_json(pnpm_workspace_json)
+        if workspace_parse_err == None:
+            pnpm_workspace_settings, workspace_parse_err = pnpm.parse_pnpm_workspace_json(pnpm_workspace_json)
 
-                if pnpm_workspace_settings:
-                    priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
+            if pnpm_workspace_settings:
+                priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
 
-            if workspace_parse_err != None:
-                should_update = _should_update_pnpm_lock(priv)
-                msg = """
-        {type}: pnpm-workspace.yaml parse error {error}`.
-        """.format(type = "WARNING" if should_update else "ERROR", error = workspace_parse_err)
+        if workspace_parse_err != None:
+            should_update = _should_update_pnpm_lock(priv)
+            msg = """
+    {type}: pnpm-workspace.yaml parse error {error}`.
+    """.format(type = "WARNING" if should_update else "ERROR", error = workspace_parse_err)
 
-                if should_update:
-                    # buildifier: disable=print
-                    print(msg)
-                else:
-                    fail(msg)
+            if should_update:
+                # buildifier: disable=print
+                print(msg)
+            else:
+                fail(msg)
 
 ################################################################################
 def _init_npmrc(priv, rctx, attr, label_store):
@@ -276,10 +274,12 @@ def _copy_unspecified_input_files(priv, rctx, attr, label_store):
     repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
 
     pnpm_lock_label = attr.pnpm_lock
+    pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME) if pnpm_lock_label else Label("@@//:" + PNPM_WORKSPACE_FILENAME)
+    pnpm_workspace_path = rctx.path(pnpm_workspace_label)
+    pnpm_workspace_relpath = str(pnpm_workspace_path).removeprefix(repo_root)
 
     # pnpm-workspace.yaml
-    pnpm_workspace_key = "pnpm_workspace"
-    if _has_workspaces(priv) and not _has_input_hash(priv, label_store.relative_path(pnpm_workspace_key)):
+    if _has_workspaces(priv) and not _has_input_hash(priv, pnpm_workspace_relpath):
         # there are workspace packages so there must be a pnpm-workspace.yaml file
         # buildifier: disable=print
         print("""
@@ -287,16 +287,24 @@ WARNING: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the 
     Add `{pnpm_workspace}` to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
 """.format(
             pnpm_lock = pnpm_lock_label,
-            pnpm_workspace = label_store.label(pnpm_workspace_key),
+            pnpm_workspace = pnpm_workspace_label,
             rctx_name = priv["rctx_name"],
         ))
-        if not utils.exists(rctx, label_store.path(pnpm_workspace_key)):
+        if not pnpm_workspace_path.exists:
             msg = "ERROR: expected `{path}` to exist since the `{pnpm_lock}` file contains workspace packages".format(
-                path = label_store.path(pnpm_workspace_key),
+                path = pnpm_workspace_relpath,
                 pnpm_lock = pnpm_lock_label,
             )
             fail(msg)
-        _copy_input_file_legacy(priv, rctx, attr, label_store, pnpm_workspace_key)
+
+        if _should_update_pnpm_lock(priv):
+            # NB: rctx.read will convert binary files to text but that is acceptable for
+            # the purposes of calculating a hash of the file
+            _set_input_hash(
+                priv,
+                pnpm_workspace_relpath,
+                utils.hash(rctx.read(pnpm_workspace_path)),
+            )
 
     pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else repo_root
     rel_dir = pnpm_lock_dir.removeprefix(repo_root)
