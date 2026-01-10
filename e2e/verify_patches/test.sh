@@ -63,7 +63,7 @@ if bazel build //...; then
 fi
 
 print_step "Should pass the build after adding the new patch to 'patches'"
-_sedi 's#"//:patches/test-b.patch"#"//:patches/test-b.patch", "//:patches/foo.patch"#' MODULE.bazel
+_sedi 's#"//patches:test-b.patch"#"//patches:test-b.patch", "//patches:foo.patch"#' MODULE.bazel
 
 if ! bazel build //...; then
     echo "ERROR: expected 'bazel build //...' to pass"

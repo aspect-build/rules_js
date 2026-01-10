@@ -253,7 +253,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, replace_packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config):
+def _get_npm_imports(importers, packages, replace_packages, pnpm_patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     # Direct dependencies of 'importers' which will have public targets
@@ -320,7 +320,7 @@ def _get_npm_imports(importers, packages, replace_packages, patched_dependencies
 
         translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
 
-        pnpm_patch = patched_dependencies.get(friendly_name, patched_dependencies.get(name, None))
+        pnpm_patch = pnpm_patched_dependencies.get(friendly_name, pnpm_patched_dependencies.get(name, None))
         pnpm_patched = pnpm_patch != None
 
         if len(translate_patches) > 0 and pnpm_patched:
@@ -624,14 +624,20 @@ removed the requiresBuild attribute from the lockfile in v9.
 ################################################################################
 def _verify_patches(rctx, attr, state):
     if attr.verify_patches and attr.patches != None:
-        rctx.report_progress("Verifying patches in {}".format(state.label_store.relative_path("verify_patches")))
+        rctx.report_progress("Verifying patches in {}".format(attr.verify_patches))
 
         # Patches in the patch list verification file
-        verify_patches_content = rctx.read(state.label_store.label("verify_patches")).strip(" \t\n\r")
+        verify_patches_content = rctx.read(rctx.path(attr.verify_patches)).strip(" \t\n\r")
         verify_patches = sets.make(verify_patches_content.split("\n"))
 
         # Patches in `patches` or `pnpm.patchedDependencies`
-        declared_patches = sets.make([state.label_store.relative_path("patches_%d" % i) for i in range(state.num_patches())])
+        declared_patches = sets.make([patch["path"] for patch in state.pnpm_patched_dependencies().values()])
+
+        # Patches in `npm_translate_lock(patches)`
+        for patches in attr.patches.values():
+            for patch in patches:
+                patch_label = attr.pnpm_lock.relative(patch)
+                sets.insert(declared_patches, paths.join(patch_label.package, patch_label.name))
 
         if not sets.is_subset(verify_patches, declared_patches):
             missing_patches = sets.to_list(sets.difference(verify_patches, declared_patches))
@@ -646,7 +652,7 @@ The following patches were found in {patches_list} but were not listed in the
 
 To disable this check, remove the `verify_patches` attribute from `npm_translate_lock`.
 
-""".format(patches_list = state.label_store.relative_path("verify_patches"), missing_patches = missing_patches_formatted))
+""".format(patches_list = attr.verify_patches, missing_patches = missing_patches_formatted))
 
 helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,

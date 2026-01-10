@@ -30,9 +30,9 @@ npm.npm_translate_lock(
         "@gregmagolan/test-a": ["-p4"],
     },
     patches = {
-        "@gregmagolan/test-a": ["//:patches/test-a.patch"],
-        "@gregmagolan/test-a@0.0.1": ["//:patches/test-a@0.0.1.patch"],
-        "@gregmagolan/test-b": ["//:patches/test-b.patch"],
+        "@gregmagolan/test-a": ["//patches:test-a.patch"],
+        "@gregmagolan/test-a@0.0.1": ["//patches:test-a@0.0.1.patch"],
+        "@gregmagolan/test-b": ["//patches:test-b.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,
