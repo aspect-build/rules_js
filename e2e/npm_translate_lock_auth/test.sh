@@ -16,7 +16,6 @@ _sedi() {
 
 cp -f .npmrc ~/.npmrc
 rm .npmrc
-touch .npmrc
 
 # update .aspect/rules/external_repository_action_cache/npm_translate_lock_<HASH>
 unset ASPECT_RULES_JS_FROZEN_PNPM_LOCK
