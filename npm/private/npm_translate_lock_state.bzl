@@ -55,7 +55,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     if _should_update_pnpm_lock(priv):
         _init_importer_labels(priv, label_store)
 
-    _init_npmrc(priv, rctx, attr, label_store)
+    _init_npmrc(priv, rctx, attr)
 
     _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists)
 
@@ -102,11 +102,6 @@ def _init_common_labels(priv, rctx, attr, label_store):
         elif attr.yarn_lock:
             label_store.add("lock", attr.yarn_lock, seed_root = True)
         label_store.add_sibling("lock", "pnpm_lock", PNPM_LOCK_FILENAME)
-
-    # .npmrc files
-    if attr.npmrc:
-        label_store.add("npmrc", attr.npmrc)
-    label_store.add_sibling("lock", "sibling_npmrc", NPM_RC_FILENAME)
 
 ################################################################################
 def _init_update_labels(priv, _, attr, label_store):
@@ -188,25 +183,29 @@ def _init_workspace(priv, rctx, label_store, is_windows):
                 fail(msg)
 
 ################################################################################
-def _init_npmrc(priv, rctx, attr, label_store):
-    if label_store.has("npmrc"):
-        _load_npmrc(priv, rctx, label_store.path("npmrc"))
+def _init_npmrc(priv, rctx, attr):
+    if attr.npmrc:
+        _load_npmrc(priv, rctx, attr, rctx.path(attr.npmrc), attr.npmrc)
     else:
-        # check for a .npmrc next to the pnpm-lock.yaml file and fail if it exists to
-        # prevent unexpected behavior from an undeclared inputs
-        if rctx.path(label_store.label("sibling_npmrc")).exists:
-            fail("""
+        npmrc_label = attr.pnpm_lock or attr.npm_package_lock or attr.yarn_lock
+        if npmrc_label:
+            npmrc_label = npmrc_label.same_package_label(NPM_RC_FILENAME)
+
+            # check for a .npmrc next to the pnpm-lock.yaml file and fail if it exists to
+            # prevent unexpected behavior from an undeclared inputs
+            if rctx.path(npmrc_label).exists:
+                fail("""
 ERROR: Undeclared .npmrc file `{npmrc}`.
         Set the `npmrc` attribute of `npm_translate_lock(name = "{rctx_name}")` to `{npmrc}` or add it to .bazelignore.
-""".format(npmrc = label_store.label("sibling_npmrc"), rctx_name = priv["rctx_name"]))
+""".format(npmrc = npmrc_label, rctx_name = priv["rctx_name"]))
 
     if attr.use_home_npmrc:
-        _load_home_npmrc(priv, rctx)
+        _load_home_npmrc(priv, rctx, attr)
 
 ################################################################################
 # pnpm lock and npmrc files are needed so that the repository rule is re-run when those file change.
 def _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists):
-    keys = ["npmrc"]
+    keys = []
     if pnpm_lock_exists:
         keys.append("pnpm_lock")
     for k in keys:
@@ -390,7 +389,7 @@ def _copy_input_file_action(rctx, attr, src, dst):
         fail(msg)
 
 ################################################################################
-def _load_npmrc(priv, rctx, npmrc_path):
+def _load_npmrc(priv, rctx, attr, npmrc_path, npmrc_label):
     contents = parse_npmrc(rctx.read(npmrc_path))
     if "registry" in contents:
         priv["default_registry"] = utils.to_registry_url(contents["registry"])
@@ -399,8 +398,21 @@ def _load_npmrc(priv, rctx, npmrc_path):
     priv["npm_registries"].update(registries)
     priv["npm_auth"].update(auth)
 
+    if npmrc_label:
+        # If it is a label, copy it as an input file
+        repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
+
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(npmrc_path),
+            paths.join(npmrc_label.package, npmrc_label.name),
+            repo_root,
+        )
+
 ################################################################################
-def _load_home_npmrc(priv, rctx):
+def _load_home_npmrc(priv, rctx, attr):
     home_directory = repo_utils.get_home_directory(rctx)
     if not home_directory:
         # buildifier: disable=print
@@ -409,10 +421,10 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 """.format(rctx_name = priv["rctx_name"]))
         return
 
-    home_npmrc_path = "{}/{}".format(home_directory, NPM_RC_FILENAME)
+    home_npmrc_path = rctx.path("{}/{}".format(home_directory, NPM_RC_FILENAME))
 
-    if rctx.path(home_npmrc_path).exists:
-        _load_npmrc(priv, rctx, home_npmrc_path)
+    if home_npmrc_path.exists:
+        _load_npmrc(priv, rctx, attr, home_npmrc_path, None)
 
 ################################################################################
 def _yaml_to_json(rctx, yaml_path, is_windows):
