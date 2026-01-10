@@ -189,27 +189,19 @@ def _init_workspace(priv, rctx, label_store, is_windows):
 
 ################################################################################
 def _init_npmrc(priv, rctx, attr, label_store):
-    if not label_store.has("npmrc"):
-        # check for a .npmrc next to the pnpm-lock.yaml file
-        _maybe_npmrc(priv, rctx, attr, label_store, "sibling_npmrc")
-
     if label_store.has("npmrc"):
         _load_npmrc(priv, rctx, label_store.path("npmrc"))
+    else:
+        # check for a .npmrc next to the pnpm-lock.yaml file and fail if it exists to
+        # prevent unexpected behavior from an undeclared inputs
+        if rctx.path(label_store.label("sibling_npmrc")).exists:
+            fail("""
+ERROR: Undeclared .npmrc file `{npmrc}`.
+        Set the `npmrc` attribute of `npm_translate_lock(name = "{rctx_name}")` to `{npmrc}` or add it to .bazelignore.
+""".format(npmrc = label_store.label("sibling_npmrc"), rctx_name = priv["rctx_name"]))
 
     if attr.use_home_npmrc:
         _load_home_npmrc(priv, rctx)
-
-################################################################################
-def _maybe_npmrc(priv, rctx, attr, label_store, key):
-    npmrc_label = label_store.label(key)
-    if rctx.path(npmrc_label).exists:
-        # buildifier: disable=print
-        print("""
-WARNING: Implicitly using .npmrc file `{npmrc}`.
-        Set the `npmrc` attribute of `npm_translate_lock(name = "{rctx_name}")` to `{npmrc}` suppress this warning.
-""".format(npmrc = npmrc_label, rctx_name = priv["rctx_name"]))
-        _copy_input_file_legacy(priv, rctx, attr, label_store, key)
-        label_store.add("npmrc", npmrc_label)
 
 ################################################################################
 # pnpm lock and npmrc files are needed so that the repository rule is re-run when those file change.
@@ -250,29 +242,14 @@ def _copy_unspecified_input_files(priv, rctx, attr, label_store):
     if _has_workspaces(priv) and not _has_input_hash(priv, pnpm_workspace_relpath):
         # there are workspace packages so there must be a pnpm-workspace.yaml file
         # buildifier: disable=print
-        print("""
-WARNING: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{pnpm_lock}` file contains workspace packages.
-    Add `{pnpm_workspace}` to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")` to suppress this warning.
+        fail("""
+ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{pnpm_lock}` file contains workspace packages is unsupported.
+    Add `{pnpm_workspace}` to the 'data' attribute of `npm_translate_lock(name = "{rctx_name}")`.
 """.format(
             pnpm_lock = pnpm_lock_label,
             pnpm_workspace = pnpm_workspace_label,
             rctx_name = priv["rctx_name"],
         ))
-        if not pnpm_workspace_path.exists:
-            msg = "ERROR: expected `{path}` to exist since the `{pnpm_lock}` file contains workspace packages".format(
-                path = pnpm_workspace_relpath,
-                pnpm_lock = pnpm_lock_label,
-            )
-            fail(msg)
-
-        if _should_update_pnpm_lock(priv):
-            # NB: rctx.read will convert binary files to text but that is acceptable for
-            # the purposes of calculating a hash of the file
-            _set_input_hash(
-                priv,
-                pnpm_workspace_relpath,
-                utils.hash(rctx.read(pnpm_workspace_path)),
-            )
 
     pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else repo_root
     rel_dir = pnpm_lock_dir.removeprefix(repo_root)
