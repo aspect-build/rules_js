@@ -378,11 +378,6 @@ def parse_and_verify_lock(rctx, rctx_name, attr):
 
     state = npm_translate_lock_state.new(rctx_name, rctx, attr)
 
-    # If a pnpm lock file has not been specified then we need to bootstrap by running `pnpm
-    # import` in the user's repository
-    if not attr.pnpm_lock:
-        _bootstrap_import(rctx, rctx_name, attr, state)
-
     if state.should_update_pnpm_lock():
         # Run `pnpm install --lockfile-only` or `pnpm import` if its inputs have changed since last update
         if state.action_cache_miss():
@@ -447,73 +442,6 @@ def _host_node_path(rctx, attr):
     # TODO: Try to understand this better and see if we can go back to using
     #  Label("@nodejs_host//:bin/node")
     return rctx.path(Label("@{}_{}//:bin/node".format(attr.node_toolchain_prefix, repo_utils.platform(rctx))))
-
-def _bootstrap_import(rctx, rctx_name, attr, state):
-    pnpm_lock_label = state.label_store.label("pnpm_lock")
-    pnpm_lock_path = state.label_store.path("pnpm_lock")
-
-    # Check if the pnpm lock file already exists and copy it over if it does.
-    # When we do this, warn the user that we do.
-    if utils.exists(rctx, pnpm_lock_path):
-        # buildifier: disable=print
-        print("""
-WARNING: Implicitly using pnpm-lock.yaml file `{pnpm_lock}` that is expected to be the result of running `pnpm import` on the `{lock}` lock file.
-         Set the `pnpm_lock` attribute of `npm_translate_lock(name = "{rctx_name}")` to `{pnpm_lock}` suppress this warning.
-""".format(pnpm_lock = pnpm_lock_label, lock = state.label_store.label("lock"), rctx_name = rctx_name))
-        return
-
-    # No pnpm lock file exists and the user has specified a yarn or npm lock file. Bootstrap
-    # the pnpm lock file by running `pnpm import` in the source tree. We run in the source tree
-    # because at this point the user has likely not added all package.json and data files that
-    # pnpm import depends on to `npm_translate_lock`. In order to get a complete initial pnpm lock
-    # file with all workspace package imports listed we likely need to run in the source tree.
-    bootstrap_working_directory = paths.dirname(pnpm_lock_path)
-
-    if not attr.quiet:
-        # buildifier: disable=print
-        print("""
-INFO: Running initial `pnpm import` in `{wd}` to bootstrap the pnpm-lock.yaml file required by rules_js.
-      It is recommended that you check the generated pnpm-lock.yaml file into source control and add it to the pnpm_lock
-      attribute of `npm_translate_lock(name = "{rctx_name}")` so subsequent invocations of the repository
-      rule do not need to run `pnpm import` unless an input has changed.""".format(wd = bootstrap_working_directory, rctx_name = rctx_name))
-
-    rctx.report_progress("Bootstrapping pnpm-lock.yaml file with `pnpm import`")
-
-    result = rctx.execute(
-        [
-            _host_node_path(rctx, attr),
-            rctx.path(attr.use_pnpm),
-            "import",
-        ],
-        working_directory = bootstrap_working_directory,
-        quiet = attr.quiet,
-    )
-    if result.return_code:
-        msg = """ERROR: 'pnpm import' exited with status {status}:
-STDOUT:
-{stdout}
-STDERR:
-{stderr}
-""".format(status = result.return_code, stdout = result.stdout, stderr = result.stderr)
-        fail(msg)
-
-    if not utils.exists(rctx, pnpm_lock_path):
-        msg = """
-
-ERROR: Running `pnpm import` did not generate the {path} file.
-       Try installing pnpm (https://pnpm.io/installation) and running `pnpm import` manually
-       to generate the pnpm-lock.yaml file.""".format(path = pnpm_lock_path)
-        fail(msg)
-
-    msg = """
-
-INFO: Initial pnpm-lock.yaml file generated. Please add the generated pnpm-lock.yaml file into
-      source control and set the `pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}")` to `{pnpm_lock}`
-      and then run your build again.""".format(
-        rctx_name = rctx_name,
-        pnpm_lock = pnpm_lock_label,
-    )
-    fail(msg)
 
 ################################################################################
 def _execute_preupdate_scripts(rctx, attr, state):
