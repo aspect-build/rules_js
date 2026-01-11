@@ -104,7 +104,7 @@ def _init_common_labels(priv, rctx, attr, label_store):
         label_store.add_sibling("lock", "pnpm_lock", PNPM_LOCK_FILENAME)
 
 ################################################################################
-def _init_update_labels(priv, _, attr, label_store):
+def _init_update_labels(priv, rctx, attr, label_store):
     pnpm_lock_label = label_store.label("pnpm_lock")
     pnpm_lock_label_str = "//{}:{}".format(pnpm_lock_label.package, pnpm_lock_label.name)
     action_cache_path = paths.join(
@@ -116,9 +116,23 @@ def _init_update_labels(priv, _, attr, label_store):
         label_store.add("preupdate_{}".format(i), d)
 
     if attr.npm_package_lock:
-        label_store.add("npm_package_lock", attr.npm_package_lock, seed_root = True)
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(rctx.path(attr.npm_package_lock)),
+            paths.join(attr.npm_package_lock.package, attr.npm_package_lock.name),
+            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
+        )
     if attr.yarn_lock:
-        label_store.add("yarn_lock", attr.yarn_lock, seed_root = True)
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(rctx.path(attr.yarn_lock)),
+            paths.join(attr.yarn_lock.package, attr.yarn_lock.name),
+            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
+        )
 
 ################################################################################
 def _init_importer_labels(priv, label_store):
@@ -203,7 +217,6 @@ ERROR: Undeclared .npmrc file `{npmrc}`.
         _load_home_npmrc(priv, rctx, attr)
 
 ################################################################################
-# pnpm lock and npmrc files are needed so that the repository rule is re-run when those file change.
 def _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists):
     keys = []
     if pnpm_lock_exists:
@@ -213,12 +226,8 @@ def _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists):
             _copy_input_file_legacy(priv, rctx, attr, label_store, k)
 
 ################################################################################
-# pnpm workspace file and data files are needed incase we run `pnpm install --lockfile-only` or `pnpm import` if updating lock file.
 def _copy_update_input_files(priv, rctx, attr, label_store):
-    keys = [
-        "npm_package_lock",
-        "yarn_lock",
-    ]
+    keys = []
     for i in range(len(attr.preupdate)):
         keys.append("preupdate_{}".format(i))
     for i in range(len(attr.data)):
