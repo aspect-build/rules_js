@@ -3,10 +3,12 @@
 # buildifier: disable=bzl-visibility
 load(
     "@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
 )
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_simple_package_store_internal = "npm_imported_simple_package_store_internal")
 
 PACKAGE = "esbuild"
 VERSION = "0.27.0"
@@ -17,11 +19,10 @@ _PACKAGE_STORE_NAME = "esbuild@0.27.0"
 # Generated npm_imported_package_store_internal() wrapper target for npm package esbuild@0.27.0
 # buildifier: disable=function-docstring
 def npm_imported_package_store_internal():
-    _npm_imported_package_store_internal(
+    _npm_imported_simple_package_store_internal(
         key = _KEY,
         package = PACKAGE,
         version = VERSION,
-        root_package = _ROOT_PACKAGE,
         deps = select({
             "@aspect_rules_js//platforms/pnpm:aix_ppc64": {
                 ":.aspect_rules_js/node_modules/@esbuild+aix-ppc64@0.27.0": "@esbuild/aix-ppc64",
@@ -160,14 +161,8 @@ def npm_imported_package_store_internal():
             },
             "//conditions:default": {},
         }),
-        lc_deps = {},
-        has_lifecycle_build_target = False,
-        has_transitive_closure = False,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__esbuild__0.27.0//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
-        lifecycle_hooks_env = {},
-        lifecycle_hooks_execution_requirements = {},
-        use_default_shell_env = False,
         exclude_package_contents = [],
     )
 
