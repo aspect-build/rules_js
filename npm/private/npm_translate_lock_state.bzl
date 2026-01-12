@@ -7,7 +7,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npmrc.bzl", "parse_npmrc")
 load(":pnpm.bzl", "pnpm")
-load(":repository_label_store.bzl", "repository_label_store")
 load(":transitive_closure.bzl", "calculate_transitive_closures")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
 
@@ -19,7 +18,7 @@ PNPM_LOCK_ACTION_CACHE_PREFIX = "npm_translate_lock_"
 RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV = "ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK"
 
 ################################################################################
-def _init(priv, rctx, attr, label_store):
+def _init(priv, rctx, attr):
     is_windows = repo_utils.is_windows(rctx)
     if is_windows and _should_update_pnpm_lock(priv):
         # buildifier: disable=print
@@ -33,35 +32,27 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_external_repository_action_cache(priv, attr)
 
-    _init_common_labels(priv, rctx, attr, label_store)
+    _init_common_labels(priv, rctx, attr)
 
     if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
-        _init_update_labels(priv, rctx, attr, label_store)
+        _init_update_labels(priv, rctx, attr)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
-    # TODO(windows): utils.exists is not yet support on Windows
-    pnpm_lock_path = label_store.path("pnpm_lock")
-    pnpm_lock_exists = is_windows or utils.exists(rctx, pnpm_lock_path)
-    if pnpm_lock_exists:
-        rctx.report_progress("Translating {}".format(label_store.relative_path("pnpm_lock")))
+    if attr.pnpm_lock and rctx.path(attr.pnpm_lock).exists:
+        rctx.report_progress("Translating {}".format(attr.pnpm_lock))
 
-        _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows)
+        _load_lockfile(priv, rctx, attr, rctx.path(attr.pnpm_lock), is_windows)
 
     # May depend on lockfile state
-    _init_root_package(priv, label_store)
-    _init_workspace(priv, rctx, label_store, is_windows)
-
-    if _should_update_pnpm_lock(priv):
-        _init_importer_labels(priv, label_store)
+    _init_root_package(priv)
+    _init_workspace(priv, rctx, is_windows)
 
     _init_npmrc(priv, rctx, attr)
 
-    _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists)
-
     if _should_update_pnpm_lock(priv):
-        _copy_update_input_files(priv, rctx, attr, label_store)
-        _copy_unspecified_input_files(priv, rctx, attr, label_store)
+        _copy_update_input_files(priv, rctx, attr)
+        _copy_unspecified_input_files(priv, rctx, attr)
 
 ################################################################################
 def _validate_attrs(attr, is_windows):
@@ -73,48 +64,34 @@ def _validate_attrs(attr, is_windows):
         fail("only one of npm_package_lock or yarn_lock may be set")
 
 ################################################################################
-def _init_common_labels(priv, rctx, attr, label_store):
-    # data files
-    # only initialize if update_pnpm_lock is set since data files are unused otherwise
-    if _should_update_pnpm_lock(priv):
-        for i, d in enumerate(attr.data):
-            label_store.add("data_{}".format(i), d)
-
+def _init_common_labels(priv, rctx, attr):
     # lock files
     if attr.pnpm_lock:
         rctx.watch(attr.pnpm_lock)
+        priv["pnpm_lock_label"] = attr.pnpm_lock
+    elif attr.npm_package_lock or attr.yarn_lock:
+        priv["pnpm_lock_label"] = Label(str(attr.npm_package_lock or attr.yarn_lock).replace("package-lock.json", "pnpm-lock.yaml").replace("yarn.lock", "pnpm-lock.yaml"))
 
-        label_store.add("pnpm_lock", attr.pnpm_lock, seed_root = True)
-        label_store.add("lock", attr.pnpm_lock)
-
-        # root package.json file
-        # Because label syntax for repo rules can vary, check the paths of all `data` labels
-        # to see if one sits beside the pnpm lockfile
-        root_package_json_path = label_store.relative_path("pnpm_lock").replace(PNPM_LOCK_FILENAME, PACKAGE_JSON_FILENAME)
-        if _should_update_pnpm_lock(priv):
-            for i in range(len(attr.data)):
-                if label_store.relative_path("data_{}".format(i)) == root_package_json_path:
-                    label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
-
-    else:
-        if attr.npm_package_lock:
-            label_store.add("lock", attr.npm_package_lock, seed_root = True)
-        elif attr.yarn_lock:
-            label_store.add("lock", attr.yarn_lock, seed_root = True)
-        label_store.add_sibling("lock", "pnpm_lock", PNPM_LOCK_FILENAME)
+    priv["pnpm_root_package_json"] = priv["pnpm_lock_label"].same_package_label(PACKAGE_JSON_FILENAME)
 
 ################################################################################
-def _init_update_labels(priv, rctx, attr, label_store):
-    pnpm_lock_label = label_store.label("pnpm_lock")
+def _init_update_labels(priv, rctx, attr):
+    pnpm_lock_label = priv["pnpm_lock_label"]
     pnpm_lock_label_str = "//{}:{}".format(pnpm_lock_label.package, pnpm_lock_label.name)
     action_cache_path = paths.join(
         priv["external_repository_action_cache"],
         PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(priv["rctx_name"]) + pnpm_lock_label_str)),
     )
-    label_store.add_root("action_cache", action_cache_path)
-    for i, d in enumerate(attr.preupdate):
-        label_store.add("preupdate_{}".format(i), d)
+    priv["action_cache_label"] = Label("@@//:" + action_cache_path)
 
+    if attr.pnpm_lock:
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(rctx.path(attr.pnpm_lock)),
+            paths.join(attr.pnpm_lock.package, attr.pnpm_lock.name),
+        )
     if attr.npm_package_lock:
         _copy_input_file(
             priv,
@@ -122,7 +99,6 @@ def _init_update_labels(priv, rctx, attr, label_store):
             attr,
             str(rctx.path(attr.npm_package_lock)),
             paths.join(attr.npm_package_lock.package, attr.npm_package_lock.name),
-            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
         )
     if attr.yarn_lock:
         _copy_input_file(
@@ -131,13 +107,7 @@ def _init_update_labels(priv, rctx, attr, label_store):
             attr,
             str(rctx.path(attr.yarn_lock)),
             paths.join(attr.yarn_lock.package, attr.yarn_lock.name),
-            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
         )
-
-################################################################################
-def _init_importer_labels(priv, label_store):
-    for i, p in enumerate(priv["importers"].keys()):
-        label_store.add_sibling("lock", "package_json_{}".format(i), paths.join(p, PACKAGE_JSON_FILENAME))
 
 ################################################################################
 def _init_external_repository_action_cache(priv, attr):
@@ -145,8 +115,8 @@ def _init_external_repository_action_cache(priv, attr):
     priv["external_repository_action_cache"] = attr.external_repository_action_cache if attr.external_repository_action_cache else utils.default_external_repository_action_cache()
 
 ################################################################################
-def _init_root_package(priv, label_store):
-    pnpm_lock_label = label_store.label("pnpm_lock")
+def _init_root_package(priv):
+    pnpm_lock_label = priv["pnpm_lock_label"]
 
     # Don't allow a pnpm lock file that isn't in the root directory of a bazel package
     if paths.dirname(pnpm_lock_label.name):
@@ -154,25 +124,19 @@ def _init_root_package(priv, label_store):
         fail(msg)
     priv["root_package"] = pnpm_lock_label.package
 
-def _init_workspace(priv, rctx, label_store, is_windows):
+def _init_workspace(priv, rctx, is_windows):
     root_package_json = {}
 
-    # Load pnpm settings from root package.json for pnpm <= v9.
-    if label_store.has("package_json_root"):
-        # Load a declared root package.json
-        root_package_json_path = label_store.path("package_json_root")
-        root_package_json = json.decode(rctx.read(root_package_json_path))
-    elif "." in priv["importers"].keys():
-        # Load an undeclared package.json derived from the root importer in the lockfile
-        label_store.add_sibling("lock", "package_json_root", PACKAGE_JSON_FILENAME)
-        root_package_json_path = label_store.path("package_json_root")
+    root_package_json_path = rctx.path(priv["pnpm_root_package_json"])
+    if root_package_json_path.exists:
+        # Load pnpm settings from root package.json for pnpm <= v9.
         root_package_json = json.decode(rctx.read(root_package_json_path))
 
     priv["pnpm_settings"] = root_package_json.get("pnpm", {})
 
     # Read settings from pnpm-workspace.yaml for pnpm v10+ (NOTE: pnpm 9-10+ has lockfile version 9).
     # Support scenario where pnpm-lock.yaml was never parsed and "lock_version" is not set.
-    pnpm_lock_label = label_store.label("pnpm_lock")
+    pnpm_lock_label = priv["pnpm_lock_label"]
     pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME)
     pnpm_workspace_path = rctx.path(pnpm_workspace_label)
     if pnpm_workspace_path.exists:
@@ -217,34 +181,33 @@ ERROR: Undeclared .npmrc file `{npmrc}`.
         _load_home_npmrc(priv, rctx, attr)
 
 ################################################################################
-def _copy_common_input_files(priv, rctx, attr, label_store, pnpm_lock_exists):
-    keys = []
-    if pnpm_lock_exists:
-        keys.append("pnpm_lock")
-    for k in keys:
-        if label_store.has(k):
-            _copy_input_file_legacy(priv, rctx, attr, label_store, k)
-
-################################################################################
-def _copy_update_input_files(priv, rctx, attr, label_store):
-    keys = []
-    for i in range(len(attr.preupdate)):
-        keys.append("preupdate_{}".format(i))
-    for i in range(len(attr.data)):
-        keys.append("data_{}".format(i))
-    for k in keys:
-        if label_store.has(k):
-            _copy_input_file_legacy(priv, rctx, attr, label_store, k)
+def _copy_update_input_files(priv, rctx, attr):
+    for script_label in attr.preupdate:
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(rctx.path(script_label)),
+            paths.join(script_label.package, script_label.name),
+        )
+    for data_label in attr.data:
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(rctx.path(data_label)),
+            paths.join(data_label.package, data_label.name),
+        )
 
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
-def _copy_unspecified_input_files(priv, rctx, attr, label_store):
-    repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
+def _copy_unspecified_input_files(priv, rctx, attr):
+    src_root = priv["src_root"]
 
-    pnpm_lock_label = attr.pnpm_lock
+    pnpm_lock_label = priv["pnpm_lock_label"]
     pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME) if pnpm_lock_label else Label("@@//:" + PNPM_WORKSPACE_FILENAME)
     pnpm_workspace_path = rctx.path(pnpm_workspace_label)
-    pnpm_workspace_relpath = str(pnpm_workspace_path).removeprefix(repo_root)
+    pnpm_workspace_relpath = str(pnpm_workspace_path).removeprefix(src_root)
 
     # pnpm-workspace.yaml
     if _has_workspaces(priv) and not _has_input_hash(priv, pnpm_workspace_relpath):
@@ -259,13 +222,13 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
             rctx_name = priv["rctx_name"],
         ))
 
-    pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else repo_root
-    rel_dir = pnpm_lock_dir.removeprefix(repo_root)
+    pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else src_root
+    rel_dir = pnpm_lock_dir.removeprefix(src_root)
 
     # package.json files
     for package_json in priv["importers"].keys():
         rel_path = paths.normalize(paths.join(rel_dir, package_json, "package.json"))
-        workspace_path = paths.join(repo_root, rel_path)
+        workspace_path = paths.join(src_root, rel_path)
 
         if not _has_input_hash(priv, rel_path):
             if not rctx.path(workspace_path).exists:
@@ -274,22 +237,22 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                     pnpm_lock = pnpm_lock_label,
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)), repo_root)
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)))
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
     for patch_info in priv["pnpm_patched_dependencies"].values():
         patch = patch_info.get("path")
         rel_path = paths.normalize(paths.join(rel_dir, patch))
-        workspace_path = paths.join(repo_root, rel_path)
+        workspace_path = paths.join(src_root, rel_path)
 
         if not _has_input_hash(priv, rel_path):
             if not rctx.path(workspace_path).exists:
                 msg = "ERROR: expected {path} to exist since the `{package_json}` file contains this patch in `pnpm.patchedDependencies`.".format(
                     path = workspace_path,
-                    package_json = label_store.label("package_json_root"),
+                    package_json = priv["pnpm_root_package_json"],
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)), repo_root)
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)))
 
 ################################################################################
 def _has_input_hash(priv, path):
@@ -307,9 +270,9 @@ def _set_input_hash(priv, path, value):
     return True
 
 ################################################################################
-def _action_cache_miss(priv, rctx, label_store):
-    action_cache_path = label_store.path("action_cache")
-    if utils.exists(rctx, action_cache_path):
+def _action_cache_miss(priv, rctx):
+    action_cache_path = rctx.path(priv["action_cache_label"])
+    if action_cache_path.exists:
         input_hashes = parse_npmrc(rctx.read(action_cache_path))
         if utils.dicts_match(input_hashes, priv["input_hashes"]):
             # Calculated input hashes match saved input hashes; nothing to update
@@ -317,11 +280,11 @@ def _action_cache_miss(priv, rctx, label_store):
     return True
 
 ################################################################################
-def _write_action_cache(priv, rctx, label_store):
+def _write_action_cache(priv, rctx):
     header = """# @generated
 # Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").
 # This file should be checked into version control along with the pnpm-lock.yaml file.
-""".format(helpers.to_apparent_repo_name(priv["rctx_name"]), str(label_store.label("pnpm_lock")))
+""".format(helpers.to_apparent_repo_name(priv["rctx_name"]), str(priv["pnpm_lock_label"]))
 
     contents = []
     for key, value in priv["input_hashes"].items():
@@ -331,37 +294,24 @@ def _write_action_cache(priv, rctx, label_store):
     contents = sorted(contents)
 
     rctx.file(
-        label_store.repository_path("action_cache"),
+        paths.join(priv["action_cache_label"].package, priv["action_cache_label"].name),
         header + "\n".join(contents) + "\n",
     )
     utils.reverse_force_copy(
         rctx,
-        label_store.label("action_cache"),
-        label_store.path("action_cache"),
+        priv["action_cache_label"],
+        paths.join(priv["src_root"], priv["action_cache_label"].package, priv["action_cache_label"].name),
     )
 
 ################################################################################
-# This is legacy and should be removed all usages, we don't like label store
-def _copy_input_file_legacy(priv, rctx, attr, label_store, key):
-    if not label_store.has(key):
-        fail("key not found '{}'".format(key))
 
-    return _copy_input_file(
-        priv,
-        rctx,
-        attr,
-        label_store.path(key),
-        label_store.repository_path(key),
-        str(rctx.path(Label("@@//:all"))).removesuffix("all"),
-    )
-
-def _copy_input_file(priv, rctx, attr, path, repository_path, repo_root):
+def _copy_input_file(priv, rctx, attr, path, repository_path):
     if _should_update_pnpm_lock(priv):
         # NB: rctx.read will convert binary files to text but that is acceptable for
         # the purposes of calculating a hash of the file
         _set_input_hash(
             priv,
-            path.removeprefix(repo_root),
+            path.removeprefix(priv["src_root"]),
             utils.hash(rctx.read(path)),
         )
 
@@ -409,15 +359,12 @@ def _load_npmrc(priv, rctx, attr, npmrc_path, npmrc_label):
 
     if npmrc_label:
         # If it is a label, copy it as an input file
-        repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
-
         _copy_input_file(
             priv,
             rctx,
             attr,
             str(npmrc_path),
             paths.join(npmrc_label.package, npmrc_label.name),
-            repo_root,
         )
 
 ################################################################################
@@ -522,10 +469,14 @@ def _root_package(priv):
 def _pnpm_settings(priv):
     return priv["pnpm_settings"]
 
+def _action_cache_label(priv):
+    return priv["action_cache_label"]
+
+def _pnpm_lock_label(priv):
+    return priv["pnpm_lock_label"]
+
 ################################################################################
 def _new(rctx_name, rctx, attr):
-    label_store = repository_label_store.new(rctx.path)
-
     should_update_pnpm_lock = attr.update_pnpm_lock
     if rctx.getenv(RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV):
         # Force disabled update_pnpm_lock via environment variable. This is useful for some CI use cases.
@@ -533,6 +484,8 @@ def _new(rctx_name, rctx, attr):
 
     priv = {
         "rctx_name": rctx_name,
+        "repo_root": str(rctx.path("")),
+        "src_root": str(rctx.path(Label("@@//:all"))).removesuffix("all"),
         "default_registry": utils.default_registry(),
         "external_repository_action_cache": None,
         "importers": {},
@@ -546,10 +499,12 @@ def _new(rctx_name, rctx, attr):
         "should_update_pnpm_lock": should_update_pnpm_lock,
     }
 
-    _init(priv, rctx, attr, label_store)
+    _init(priv, rctx, attr)
 
     return struct(
-        label_store = label_store,  # pass-through access to the label store
+        repo_root = priv["repo_root"],
+        action_cache_label = lambda: _action_cache_label(priv),
+        pnpm_lock_label = lambda: _pnpm_lock_label(priv),
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
         importers = lambda: _importers(priv),
@@ -560,8 +515,8 @@ def _new(rctx_name, rctx, attr):
         npm_auth = lambda: _npm_auth(priv),
         root_package = lambda: _root_package(priv),
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
-        action_cache_miss = lambda: _action_cache_miss(priv, rctx, label_store),
-        write_action_cache = lambda: _write_action_cache(priv, rctx, label_store),
+        action_cache_miss = lambda: _action_cache_miss(priv, rctx),
+        write_action_cache = lambda: _write_action_cache(priv, rctx),
     )
 
 npm_translate_lock_state = struct(

@@ -206,33 +206,6 @@ STDERR:
         )
         fail(msg)
 
-# This uses `rctx.execute` to check if the file exists since `rctx.exists` does not exist.
-def _exists(rctx, p):
-    if type(p) == "Label":
-        fail("ERROR: dynamic labels not accepted since they should be converted paths at the top of the repository rule implementation to avoid restarts after rctx.execute() calls")
-    p = str(p)
-    if repo_utils.is_windows(rctx):
-        fail("Not yet implemented for Windows")
-        #         rctx.file("_exists.bat", content = """IF EXIST %1 (
-        #     EXIT /b 0
-        # ) ELSE (
-        #     EXIT /b 42
-        # )""", executable = True)
-        #         result = rctx.execute(["cmd.exe", "/C", "_exists.bat", str(p).replace("/", "\\")])
-
-    else:
-        rctx.file("_exists.sh", content = """#!/usr/bin/env bash
-set -o errexit -o nounset -o pipefail
-if [ ! -f $1 ]; then exit 42; fi
-""", executable = True)
-        result = rctx.execute(["./_exists.sh", str(p)])
-    if result.return_code == 0:  # file exists
-        return True
-    elif result.return_code == 42:  # file does not exist
-        return False
-    else:
-        fail(INTERNAL_ERROR_MSG)
-
 def _replace_npmrc_token_envvar(token, npmrc_path, rctx):
     # A token can be a reference to an environment variable
     if token.startswith("$"):
@@ -304,7 +277,6 @@ utils = struct(
     hash = _hash,
     dicts_match = _dicts_match,
     reverse_force_copy = _reverse_force_copy,
-    exists = _exists,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
 )

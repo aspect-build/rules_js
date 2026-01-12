@@ -388,7 +388,7 @@ def parse_and_verify_lock(rctx, rctx_name, attr):
 INFO: {} file updated. Please run your build again.
 
 See https://github.com/aspect-build/rules_js/issues/1445
-""".format(state.label_store.relative_path("pnpm_lock"))
+""".format(state.pnpm_lock_label())
                 fail(msg)
 
     helpers.verify_node_modules_ignored(rctx, attr, state.importers(), state.root_package())
@@ -445,20 +445,18 @@ def _host_node_path(rctx, attr):
 
 ################################################################################
 def _execute_preupdate_scripts(rctx, attr, state):
-    for i in range(len(attr.preupdate)):
-        script_key = "preupdate_{}".format(i)
-
+    for script_label in attr.preupdate:
         rctx.report_progress("Executing preupdate Node.js script `{script}`".format(
-            script = state.label_store.relative_path(script_key),
+            script = script_label,
         ))
 
         result = rctx.execute(
             [
                 _host_node_path(rctx, attr),
-                state.label_store.path(script_key),
+                rctx.path(script_label),
             ],
             # To keep things simple, run at the root of the external repository
-            working_directory = state.label_store.repo_root,
+            working_directory = state.repo_root,
             quiet = attr.quiet,
         )
         if result.return_code:
@@ -474,7 +472,7 @@ STDOUT:
 STDERR:
 {stderr}
 """.format(
-                script = state.label_store.relative_path(script_key),
+                script = script_label,
                 rctx_name = rctx.name,
                 status = result.return_code,
                 stderr = result.stderr,
@@ -486,11 +484,12 @@ STDERR:
 def _update_pnpm_lock(rctx, rctx_name, attr, state):
     _execute_preupdate_scripts(rctx, attr, state)
 
-    pnpm_lock_label = state.label_store.label("pnpm_lock")
-    pnpm_lock_relative_path = state.label_store.relative_path("pnpm_lock")
+    pnpm_lock_label = state.pnpm_lock_label()
+    pnpm_lock_relative_path = paths.join(pnpm_lock_label.package, pnpm_lock_label.name)
+    pnpm_lock_path = rctx.path(paths.join(state.repo_root, pnpm_lock_relative_path))
 
     update_cmd = ["import"] if attr.npm_package_lock or attr.yarn_lock else ["install", "--lockfile-only"]
-    update_working_directory = paths.dirname(state.label_store.repository_path("pnpm_lock"))
+    update_working_directory = paths.dirname(str(pnpm_lock_path))
 
     pnpm_cmd = " ".join(update_cmd)
 
@@ -547,8 +546,8 @@ STDERR:
 
     lockfile_changed = False
     if state.set_input_hash(
-        state.label_store.relative_path("pnpm_lock"),
-        utils.hash(rctx.read(state.label_store.repository_path("pnpm_lock"))),
+        pnpm_lock_relative_path,
+        utils.hash(rctx.read(pnpm_lock_path)),
     ):
         # The lock file has changed
         if not attr.quiet:
@@ -572,7 +571,7 @@ ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To 
            bazel run @@{rctx_name}//:sync
 
 """.format(
-            action_cache = state.label_store.relative_path("action_cache"),
-            pnpm_lock = state.label_store.relative_path("pnpm_lock"),
+            action_cache = state.action_cache_label(),
+            pnpm_lock = state.pnpm_lock_label(),
             rctx_name = rctx_name,
         ))
