@@ -58,11 +58,10 @@ def _gather_package_content_excludes(config, *names):
             value = config[name]
             excludes.extend(value)
 
-    if not found and "*" in config:
-        value = config["*"]
-        excludes.extend(value)
+    if not found:
+        return config["*"] if "*" in config else None
 
-    return None if len(excludes) == 0 else excludes
+    return excludes
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
@@ -351,12 +350,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         # that checked in repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
         patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
 
-        # gather exclude patterns
-        if exclude_package_contents_config != None:
-            # bzlmod mode: use provided configuration
-            exclude_package_contents = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
-        else:
-            exclude_package_contents = None
+        exclude_package_contents = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
 
         # gather replace packages
         replace_package, _ = _gather_values_from_matching_names(True, replace_packages, name, friendly_name, unfriendly_name)
