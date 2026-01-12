@@ -177,27 +177,25 @@ can effect performance and are sometimes worth explicitly excluding content.
 
 In these cases you can add such packages and the respective files/folders you want to exclude.
 
-**For WORKSPACE builds:**
-```starlark
-npm_translate_lock(
-    ...
-    exclude_package_contents = {
-        "resolve": ["**/test/*"],
-    },
-)
-```
-
-**For Bzlmod builds (MODULE.bazel):**
 ```starlark
 npm.npm_exclude_package_contents(
     package = "resolve",
     patterns = ["**/test/*"],
+    use_defaults = True,
 )
 ```
 
-These examples will remove the test folder from the "resolve" package.
+These examples will remove the `test` folder from the "resolve" package as well use excluding the some default patterns
+copied from [yarn autoclean](https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16).
 
-You can use this to remove whatever you find to be not needed for your project.
+The `package` can be dynamic, for example to opt-in to the default exclusions for all packages:
+
+```starlark
+npm.npm_exclude_package_contents(
+    package = "*",
+    use_defaults = True,
+)
+```
 
 #### Jest
 

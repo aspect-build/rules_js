@@ -523,12 +523,11 @@ def _download_and_extract_archive(rctx, package_json_only):
         fail(msg)
 
     exclude_pattern_args = []
-    if rctx.attr.exclude_package_contents:
-        for pattern in rctx.attr.exclude_package_contents:
-            if pattern == "":
-                continue
-            exclude_pattern_args.append("--exclude")
-            exclude_pattern_args.append(pattern)
+    for pattern in rctx.attr.exclude_package_contents:
+        if pattern == "":
+            continue
+        exclude_pattern_args.append("--exclude")
+        exclude_pattern_args.append(pattern)
 
     tar = Label("@bsd_tar_toolchains_{}//:tar{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
 
@@ -876,6 +875,7 @@ _COMMON_ATTRS = {
     "package": attr.string(mandatory = True),
     "root_package": attr.string(),
     "version": attr.string(mandatory = True),
+    "exclude_package_contents": attr.string_list(default = []),
 }
 
 _INTERNAL_COMMON_ATTRS = {
@@ -892,7 +892,6 @@ _ATTRS_LINKS = _COMMON_ATTRS | {
     "lifecycle_hooks_use_default_shell_env": attr.bool(),
     "package_visibility": attr.string_list(default = ["//visibility:public"]),
     "replace_package": attr.string(),
-    "exclude_package_contents": attr.string_list(default = []),
 }
 
 _ATTRS = _COMMON_ATTRS | {
@@ -900,7 +899,6 @@ _ATTRS = _COMMON_ATTRS | {
     "custom_postinstall": attr.string(),
     "extra_build_content": attr.string(),
     "extract_full_archive": attr.bool(),
-    "exclude_package_contents": attr.string_list(default = []),
     "integrity": attr.string(),
     "lifecycle_hooks": attr.string_list(),
     "npm_auth": attr.string(),
