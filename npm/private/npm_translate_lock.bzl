@@ -445,17 +445,15 @@ def _host_node_path(rctx, attr):
 
 ################################################################################
 def _execute_preupdate_scripts(rctx, attr, state):
-    for i in range(len(attr.preupdate)):
-        script_key = "preupdate_{}".format(i)
-
+    for script_label in attr.preupdate:
         rctx.report_progress("Executing preupdate Node.js script `{script}`".format(
-            script = state.label_store.relative_path(script_key),
+            script = script_label,
         ))
 
         result = rctx.execute(
             [
                 _host_node_path(rctx, attr),
-                state.label_store.path(script_key),
+                rctx.path(script_label),
             ],
             # To keep things simple, run at the root of the external repository
             working_directory = state.label_store.repo_root,
@@ -474,7 +472,7 @@ STDOUT:
 STDERR:
 {stderr}
 """.format(
-                script = state.label_store.relative_path(script_key),
+                script = script_label,
                 rctx_name = rctx.name,
                 status = result.return_code,
                 stderr = result.stderr,

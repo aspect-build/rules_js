@@ -55,7 +55,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
     _init_npmrc(priv, rctx, attr)
 
     if _should_update_pnpm_lock(priv):
-        _copy_update_input_files(priv, rctx, attr, label_store)
+        _copy_update_input_files(priv, rctx, attr)
         _copy_unspecified_input_files(priv, rctx, attr, label_store)
 
 ################################################################################
@@ -104,8 +104,6 @@ def _init_update_labels(priv, rctx, attr, label_store):
         PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(priv["rctx_name"]) + pnpm_lock_label_str)),
     )
     label_store.add_root("action_cache", action_cache_path)
-    for i, d in enumerate(attr.preupdate):
-        label_store.add("preupdate_{}".format(i), d)
 
     repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
     if attr.pnpm_lock:
@@ -219,15 +217,25 @@ ERROR: Undeclared .npmrc file `{npmrc}`.
         _load_home_npmrc(priv, rctx, attr)
 
 ################################################################################
-def _copy_update_input_files(priv, rctx, attr, label_store):
-    keys = []
-    for i in range(len(attr.preupdate)):
-        keys.append("preupdate_{}".format(i))
-    for i in range(len(attr.data)):
-        keys.append("data_{}".format(i))
-    for k in keys:
-        if label_store.has(k):
-            _copy_input_file_legacy(priv, rctx, attr, label_store, k)
+def _copy_update_input_files(priv, rctx, attr):
+    for script_label in attr.preupdate:
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(rctx.path(script_label)),
+            paths.join(script_label.package, script_label.name),
+            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
+        )
+    for data_label in attr.data:
+        _copy_input_file(
+            priv,
+            rctx,
+            attr,
+            str(rctx.path(data_label)),
+            paths.join(data_label.package, data_label.name),
+            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
+        )
 
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
@@ -334,19 +342,6 @@ def _write_action_cache(priv, rctx, label_store):
     )
 
 ################################################################################
-# This is legacy and should be removed all usages, we don't like label store
-def _copy_input_file_legacy(priv, rctx, attr, label_store, key):
-    if not label_store.has(key):
-        fail("key not found '{}'".format(key))
-
-    return _copy_input_file(
-        priv,
-        rctx,
-        attr,
-        label_store.path(key),
-        label_store.repository_path(key),
-        str(rctx.path(Label("@@//:all"))).removesuffix("all"),
-    )
 
 def _copy_input_file(priv, rctx, attr, path, repository_path, repo_root):
     if _should_update_pnpm_lock(priv):
