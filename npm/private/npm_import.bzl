@@ -31,19 +31,46 @@ _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
 load(
     "@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
 )
 """
 
-_LINK_JS_PACKAGE_TMPL = """\
+_LINK_JS_PACKAGE_INFO_TMPL = """\
 PACKAGE = "{package}"
 VERSION = "{version}"
 _ROOT_PACKAGE = "{root_package}"
 _KEY = "{package_key}"
 _PACKAGE_STORE_NAME = "{package_store_name}"
+"""
 
+_LINK_JS_SIMPLE_PACKAGE_LOADS_TMPL = """\
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_simple_package_store_internal = "npm_imported_simple_package_store_internal")
+"""
+
+_LINK_JS_SIMPLE_PACKAGE_TMPL = """\
+# Generated npm_imported_package_store_internal() wrapper target for npm package {package}@{version}
+# buildifier: disable=function-docstring
+def npm_imported_package_store_internal():
+    _npm_imported_simple_package_store_internal(
+        key = _KEY,
+        package = PACKAGE,
+        version = VERSION,
+        deps = {deps},
+        ref_deps = {ref_deps},
+        npm_package_target = "{npm_package_target}",
+        package_store_name = _PACKAGE_STORE_NAME,
+        exclude_package_contents = {exclude_package_contents},
+    )
+"""
+
+_LINK_JS_COMPLEX_PACKAGE_LOADS_TMPL = """\
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_package_store_internal = "npm_imported_package_store_internal")
+"""
+
+_LINK_JS_PACKAGE_TMPL = """\
 # Generated npm_imported_package_store_internal() wrapper target for npm package {package}@{version}
 # buildifier: disable=function-docstring
 def npm_imported_package_store_internal():
@@ -65,6 +92,65 @@ def npm_imported_package_store_internal():
         exclude_package_contents = {exclude_package_contents},
     )
 """
+
+# Invoked by generated npm_package_store targets for simple packages with no circles or hooks
+# buildifier: disable=function-docstring
+# buildifier: disable=unnamed-macro
+def npm_imported_simple_package_store_internal(
+        key,
+        package,
+        version,
+        deps,
+        ref_deps,
+        npm_package_target,
+        package_store_name,
+        exclude_package_contents):
+    store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
+
+    # primary package store target with the final package content and all npm package dependencies
+    npm_package_store_internal(
+        name = store_target_name,
+        src = npm_package_target,
+        key = key,
+        package = package,
+        version = version,
+        deps = deps,
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+        exclude_package_contents = exclude_package_contents,
+    )
+
+    # reference target used when referenced by a package with cycles
+    npm_package_store_internal(
+        name = "{}/ref".format(store_target_name),
+        key = key,
+        package = package,
+        version = version,
+        tags = ["manual"],
+        exclude_package_contents = exclude_package_contents,
+    )
+
+    # package target with package content reference deps for use in packages with cycles
+    npm_package_store_internal(
+        name = "{}/pkg".format(store_target_name),
+        src = npm_package_target,
+        key = key,
+        package = package,
+        version = version,
+        deps = ref_deps,
+        tags = ["manual"],
+        exclude_package_contents = exclude_package_contents,
+    )
+
+    # filegroup target that provides a single file which is
+    # package directory for use in $(execpath) and $(rootpath)
+    native.filegroup(
+        name = "{}/dir".format(store_target_name),
+        srcs = [":{}".format(store_target_name)],
+        output_group = utils.package_directory_output_group,
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )
 
 # Invoked by generated npm_package_store targets for npm package {package}@{version}
 # buildifier: disable=function-docstring
@@ -845,7 +931,9 @@ def _npm_import_links_rule_impl(rctx):
         tmpl.format(**npm_link_pkg_bzl_vars)
         for tmpl in [
             _LINK_JS_PACKAGE_LOADS_TMPL,
-            _LINK_JS_PACKAGE_TMPL,
+            _LINK_JS_COMPLEX_PACKAGE_LOADS_TMPL if has_lifecycle_build_target or has_transitive_closure else _LINK_JS_SIMPLE_PACKAGE_LOADS_TMPL,
+            _LINK_JS_PACKAGE_INFO_TMPL,
+            _LINK_JS_PACKAGE_TMPL if has_lifecycle_build_target or has_transitive_closure else _LINK_JS_SIMPLE_PACKAGE_TMPL,
             _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL,
             _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL,
         ]

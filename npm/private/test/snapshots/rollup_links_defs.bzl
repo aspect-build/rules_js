@@ -3,10 +3,12 @@
 # buildifier: disable=bzl-visibility
 load(
     "@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
 )
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_simple_package_store_internal = "npm_imported_simple_package_store_internal")
 
 PACKAGE = "rollup"
 VERSION = "2.70.2"
@@ -17,11 +19,10 @@ _PACKAGE_STORE_NAME = "rollup@2.70.2"
 # Generated npm_imported_package_store_internal() wrapper target for npm package rollup@2.70.2
 # buildifier: disable=function-docstring
 def npm_imported_package_store_internal():
-    _npm_imported_package_store_internal(
+    _npm_imported_simple_package_store_internal(
         key = _KEY,
         package = PACKAGE,
         version = VERSION,
-        root_package = _ROOT_PACKAGE,
         deps = select({
             "@aspect_rules_js//platforms/pnpm:darwin": {
                 ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
@@ -34,14 +35,8 @@ def npm_imported_package_store_internal():
             },
             "//conditions:default": {},
         }),
-        lc_deps = {},
-        has_lifecycle_build_target = False,
-        has_transitive_closure = False,
         npm_package_target = "@@_main~npm~npm__rollup__2.70.2//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
-        lifecycle_hooks_env = {},
-        lifecycle_hooks_execution_requirements = {},
-        use_default_shell_env = False,
         exclude_package_contents = [],
     )
 

@@ -3,10 +3,12 @@
 # buildifier: disable=bzl-visibility
 load(
     "@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
 )
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_package_store_internal = "npm_imported_package_store_internal")
 
 PACKAGE = "fsevents"
 VERSION = "2.3.3"

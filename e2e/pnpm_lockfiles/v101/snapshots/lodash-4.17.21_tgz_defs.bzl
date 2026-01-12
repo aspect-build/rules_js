@@ -3,10 +3,12 @@
 # buildifier: disable=bzl-visibility
 load(
     "@aspect_rules_js//npm/private:npm_import.bzl",
-    _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
 )
+
+# buildifier: disable=bzl-visibility
+load("@aspect_rules_js//npm/private:npm_import.bzl", _npm_imported_simple_package_store_internal = "npm_imported_simple_package_store_internal")
 
 PACKAGE = "lodash"
 VERSION = "file:../vendored/lodash-4.17.21.tgz"
@@ -17,21 +19,14 @@ _PACKAGE_STORE_NAME = "lodash@file+..+vendored+lodash-4.17.21.tgz"
 # Generated npm_imported_package_store_internal() wrapper target for npm package lodash@file:../vendored/lodash-4.17.21.tgz
 # buildifier: disable=function-docstring
 def npm_imported_package_store_internal():
-    _npm_imported_package_store_internal(
+    _npm_imported_simple_package_store_internal(
         key = _KEY,
         package = PACKAGE,
         version = VERSION,
-        root_package = _ROOT_PACKAGE,
         deps = {},
         ref_deps = {},
-        lc_deps = {},
-        has_lifecycle_build_target = False,
-        has_transitive_closure = False,
         npm_package_target = "@@aspect_rules_js~~npm~lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
-        lifecycle_hooks_env = {},
-        lifecycle_hooks_execution_requirements = {},
-        use_default_shell_env = False,
         exclude_package_contents = [],
     )
 
