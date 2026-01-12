@@ -885,7 +885,6 @@ _INTERNAL_COMMON_ATTRS = {
 _ATTRS_LINKS = _COMMON_ATTRS | {
     "bins": attr.string_dict(),
     "deps": attr.string_dict(doc = "Mapping of dependency link names to package store keys"),
-    "dev": attr.bool(),
     "lifecycle_build_target": attr.bool(),
     "lifecycle_hooks_env": attr.string_list(),
     "lifecycle_hooks_execution_requirements": attr.string_list(default = ["no-sandbox"]),
@@ -1140,13 +1139,6 @@ Args:
         from information in the pnpm lock file. That feature is currently blocked on
         https://github.com/pnpm/pnpm/issues/5131.
 
-    dev: Whether this npm package is a dev dependency
-
-        DEPRECATED: this field is deprecated and will be removed in a future release.
-
-        A package should be marked as a dev dependency as part of the dependency declaration,
-        not as part of the package definition or import.
-
     exclude_package_contents: List of glob patterns to exclude from the linked package.
 
         This is useful for excluding files that are not needed in the linked package.
@@ -1225,7 +1217,6 @@ def npm_import(
         npm_auth_username,
         npm_auth_password,
         bins,
-        dev,
         generate_bzl_library_targets,
         generate_package_json_bzl,
         extract_full_archive,
@@ -1267,7 +1258,6 @@ def npm_import(
         key = key,
         package = package,
         version = version,
-        dev = dev,
         root_package = root_package,
         deps = deps,
         deps_constraints = deps_constraints,

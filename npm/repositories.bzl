@@ -42,7 +42,6 @@ def npm_import(name, package, integrity, version, **kwargs):
         npm_auth_username = None,
         npm_auth_password = None,
         bins = None,
-        dev = None,
         generate_bzl_library_targets = None,
         generate_package_json_bzl = None,
         extract_full_archive = None,
