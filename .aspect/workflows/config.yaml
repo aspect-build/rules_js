@@ -22,6 +22,9 @@ workspaces:
     e2e/git_dep_metadata:
         icon: npm
         tasks: *e2e_tasks
+    e2e/git_dep_no_tar:
+        icon: npm
+        tasks: *e2e_tasks
     e2e/gyp_no_install_script:
         icon: npm
         tasks: *e2e_tasks
