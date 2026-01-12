@@ -48,7 +48,6 @@ def _new(rctx_path):
     repo_root = str(rctx_path(""))
 
     return struct(
-        repo_root = repo_root,
         add = lambda key, label: _add(priv, rctx_path, repo_root, key, label),
         has = lambda key: _has(priv, key),
         label = lambda key: _label(priv, key),

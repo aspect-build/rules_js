@@ -456,7 +456,7 @@ def _execute_preupdate_scripts(rctx, attr, state):
                 rctx.path(script_label),
             ],
             # To keep things simple, run at the root of the external repository
-            working_directory = state.label_store.repo_root,
+            working_directory = state.repo_root,
             quiet = attr.quiet,
         )
         if result.return_code:
@@ -486,7 +486,7 @@ def _update_pnpm_lock(rctx, rctx_name, attr, state):
 
     pnpm_lock_label = state.pnpm_lock_label()
     pnpm_lock_relative_path = paths.join(pnpm_lock_label.package, pnpm_lock_label.name)
-    pnpm_lock_path = rctx.path(paths.join(state.label_store.repo_root, pnpm_lock_relative_path))
+    pnpm_lock_path = rctx.path(paths.join(state.repo_root, pnpm_lock_relative_path))
 
     update_cmd = ["import"] if attr.npm_package_lock or attr.yarn_lock else ["install", "--lockfile-only"]
     update_working_directory = paths.dirname(str(pnpm_lock_path))

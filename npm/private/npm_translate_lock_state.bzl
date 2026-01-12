@@ -85,7 +85,6 @@ def _init_update_labels(priv, rctx, attr, label_store):
     )
     label_store.add("action_cache", Label("@@//:" + action_cache_path))
 
-    repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
     if attr.pnpm_lock:
         _copy_input_file(
             priv,
@@ -93,7 +92,6 @@ def _init_update_labels(priv, rctx, attr, label_store):
             attr,
             str(rctx.path(attr.pnpm_lock)),
             paths.join(attr.pnpm_lock.package, attr.pnpm_lock.name),
-            repo_root,
         )
     if attr.npm_package_lock:
         _copy_input_file(
@@ -102,7 +100,6 @@ def _init_update_labels(priv, rctx, attr, label_store):
             attr,
             str(rctx.path(attr.npm_package_lock)),
             paths.join(attr.npm_package_lock.package, attr.npm_package_lock.name),
-            repo_root,
         )
     if attr.yarn_lock:
         _copy_input_file(
@@ -111,7 +108,6 @@ def _init_update_labels(priv, rctx, attr, label_store):
             attr,
             str(rctx.path(attr.yarn_lock)),
             paths.join(attr.yarn_lock.package, attr.yarn_lock.name),
-            repo_root,
         )
 
 ################################################################################
@@ -194,7 +190,6 @@ def _copy_update_input_files(priv, rctx, attr):
             attr,
             str(rctx.path(script_label)),
             paths.join(script_label.package, script_label.name),
-            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
         )
     for data_label in attr.data:
         _copy_input_file(
@@ -203,18 +198,17 @@ def _copy_update_input_files(priv, rctx, attr):
             attr,
             str(rctx.path(data_label)),
             paths.join(data_label.package, data_label.name),
-            str(rctx.path(Label("@@//:all"))).removesuffix("all"),
         )
 
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
 def _copy_unspecified_input_files(priv, rctx, attr):
-    repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
+    src_root = priv["src_root"]
 
     pnpm_lock_label = priv["pnpm_lock_label"]
     pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME) if pnpm_lock_label else Label("@@//:" + PNPM_WORKSPACE_FILENAME)
     pnpm_workspace_path = rctx.path(pnpm_workspace_label)
-    pnpm_workspace_relpath = str(pnpm_workspace_path).removeprefix(repo_root)
+    pnpm_workspace_relpath = str(pnpm_workspace_path).removeprefix(src_root)
 
     # pnpm-workspace.yaml
     if _has_workspaces(priv) and not _has_input_hash(priv, pnpm_workspace_relpath):
@@ -229,13 +223,13 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
             rctx_name = priv["rctx_name"],
         ))
 
-    pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else repo_root
-    rel_dir = pnpm_lock_dir.removeprefix(repo_root)
+    pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else src_root
+    rel_dir = pnpm_lock_dir.removeprefix(src_root)
 
     # package.json files
     for package_json in priv["importers"].keys():
         rel_path = paths.normalize(paths.join(rel_dir, package_json, "package.json"))
-        workspace_path = paths.join(repo_root, rel_path)
+        workspace_path = paths.join(src_root, rel_path)
 
         if not _has_input_hash(priv, rel_path):
             if not rctx.path(workspace_path).exists:
@@ -244,13 +238,13 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                     pnpm_lock = pnpm_lock_label,
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)), repo_root)
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)))
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
     for patch_info in priv["pnpm_patched_dependencies"].values():
         patch = patch_info.get("path")
         rel_path = paths.normalize(paths.join(rel_dir, patch))
-        workspace_path = paths.join(repo_root, rel_path)
+        workspace_path = paths.join(src_root, rel_path)
 
         if not _has_input_hash(priv, rel_path):
             if not rctx.path(workspace_path).exists:
@@ -259,7 +253,7 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                     package_json = priv["pnpm_root_package_json"],
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)), repo_root)
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)))
 
 ################################################################################
 def _has_input_hash(priv, path):
@@ -312,13 +306,13 @@ def _write_action_cache(priv, rctx, label_store):
 
 ################################################################################
 
-def _copy_input_file(priv, rctx, attr, path, repository_path, repo_root):
+def _copy_input_file(priv, rctx, attr, path, repository_path):
     if _should_update_pnpm_lock(priv):
         # NB: rctx.read will convert binary files to text but that is acceptable for
         # the purposes of calculating a hash of the file
         _set_input_hash(
             priv,
-            path.removeprefix(repo_root),
+            path.removeprefix(priv["src_root"]),
             utils.hash(rctx.read(path)),
         )
 
@@ -366,15 +360,12 @@ def _load_npmrc(priv, rctx, attr, npmrc_path, npmrc_label):
 
     if npmrc_label:
         # If it is a label, copy it as an input file
-        repo_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
-
         _copy_input_file(
             priv,
             rctx,
             attr,
             str(npmrc_path),
             paths.join(npmrc_label.package, npmrc_label.name),
-            repo_root,
         )
 
 ################################################################################
@@ -493,6 +484,8 @@ def _new(rctx_name, rctx, attr):
 
     priv = {
         "rctx_name": rctx_name,
+        "repo_root": str(rctx.path("")),
+        "src_root": str(rctx.path(Label("@@//:all"))).removesuffix("all"),
         "default_registry": utils.default_registry(),
         "external_repository_action_cache": None,
         "importers": {},
@@ -510,6 +503,7 @@ def _new(rctx_name, rctx, attr):
 
     return struct(
         label_store = label_store,  # pass-through access to the label store
+        repo_root = priv["repo_root"],
         pnpm_lock_label = lambda: _pnpm_lock_label(priv),
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
