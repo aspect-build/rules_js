@@ -571,7 +571,7 @@ ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To 
            bazel run @@{rctx_name}//:sync
 
 """.format(
-            action_cache = state.label_store.relative_path("action_cache"),
+            action_cache = state.action_cache_label(),
             pnpm_lock = state.pnpm_lock_label(),
             rctx_name = rctx_name,
         ))

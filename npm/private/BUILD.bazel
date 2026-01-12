@@ -121,16 +121,6 @@ starlark_doc_extract(
 )
 
 bzl_library(
-    name = "repository_label_store",
-    srcs = ["repository_label_store.bzl"],
-    visibility = ["//npm:__subpackages__"],
-    deps = [
-        "@bazel_lib//lib:utils",
-        "@bazel_skylib//lib:paths",
-    ],
-)
-
-bzl_library(
     name = "npm_translate_lock_generate",
     srcs = ["npm_translate_lock_generate.bzl"],
     visibility = ["//npm:__subpackages__"],
@@ -169,7 +159,6 @@ bzl_library(
     deps = [
         ":npm_translate_lock_generate",
         ":npmrc",
-        ":repository_label_store",
         ":utils",
         "@bazel_lib//lib:base64",
         "@bazel_lib//lib:repo_utils",

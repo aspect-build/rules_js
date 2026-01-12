@@ -7,7 +7,6 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":npmrc.bzl", "parse_npmrc")
 load(":pnpm.bzl", "pnpm")
-load(":repository_label_store.bzl", "repository_label_store")
 load(":transitive_closure.bzl", "calculate_transitive_closures")
 load(":utils.bzl", "INTERNAL_ERROR_MSG", "utils")
 
@@ -19,7 +18,7 @@ PNPM_LOCK_ACTION_CACHE_PREFIX = "npm_translate_lock_"
 RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV = "ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK"
 
 ################################################################################
-def _init(priv, rctx, attr, label_store):
+def _init(priv, rctx, attr):
     is_windows = repo_utils.is_windows(rctx)
     if is_windows and _should_update_pnpm_lock(priv):
         # buildifier: disable=print
@@ -37,7 +36,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     if _should_update_pnpm_lock(priv):
         # labels only needed when updating the pnpm lock file
-        _init_update_labels(priv, rctx, attr, label_store)
+        _init_update_labels(priv, rctx, attr)
 
     # parse the pnpm lock file incase since we need the importers list for additional init
     if attr.pnpm_lock and rctx.path(attr.pnpm_lock).exists:
@@ -76,14 +75,14 @@ def _init_common_labels(priv, rctx, attr):
     priv["pnpm_root_package_json"] = priv["pnpm_lock_label"].same_package_label(PACKAGE_JSON_FILENAME)
 
 ################################################################################
-def _init_update_labels(priv, rctx, attr, label_store):
+def _init_update_labels(priv, rctx, attr):
     pnpm_lock_label = priv["pnpm_lock_label"]
     pnpm_lock_label_str = "//{}:{}".format(pnpm_lock_label.package, pnpm_lock_label.name)
     action_cache_path = paths.join(
         priv["external_repository_action_cache"],
         PNPM_LOCK_ACTION_CACHE_PREFIX + base64.encode(utils.hash(helpers.to_apparent_repo_name(priv["rctx_name"]) + pnpm_lock_label_str)),
     )
-    label_store.add("action_cache", Label("@@//:" + action_cache_path))
+    priv["action_cache_label"] = Label("@@//:" + action_cache_path)
 
     if attr.pnpm_lock:
         _copy_input_file(
@@ -271,9 +270,9 @@ def _set_input_hash(priv, path, value):
     return True
 
 ################################################################################
-def _action_cache_miss(priv, rctx, label_store):
-    action_cache_path = label_store.path("action_cache")
-    if utils.exists(rctx, action_cache_path):
+def _action_cache_miss(priv, rctx):
+    action_cache_path = rctx.path(priv["action_cache_label"])
+    if action_cache_path.exists:
         input_hashes = parse_npmrc(rctx.read(action_cache_path))
         if utils.dicts_match(input_hashes, priv["input_hashes"]):
             # Calculated input hashes match saved input hashes; nothing to update
@@ -281,7 +280,7 @@ def _action_cache_miss(priv, rctx, label_store):
     return True
 
 ################################################################################
-def _write_action_cache(priv, rctx, label_store):
+def _write_action_cache(priv, rctx):
     header = """# @generated
 # Input hashes for repository rule npm_translate_lock(name = \"{}\", pnpm_lock = \"{}\").
 # This file should be checked into version control along with the pnpm-lock.yaml file.
@@ -295,13 +294,13 @@ def _write_action_cache(priv, rctx, label_store):
     contents = sorted(contents)
 
     rctx.file(
-        label_store.repository_path("action_cache"),
+        paths.join(priv["action_cache_label"].package, priv["action_cache_label"].name),
         header + "\n".join(contents) + "\n",
     )
     utils.reverse_force_copy(
         rctx,
-        label_store.label("action_cache"),
-        label_store.path("action_cache"),
+        priv["action_cache_label"],
+        paths.join(priv["src_root"], priv["action_cache_label"].package, priv["action_cache_label"].name),
     )
 
 ################################################################################
@@ -470,13 +469,14 @@ def _root_package(priv):
 def _pnpm_settings(priv):
     return priv["pnpm_settings"]
 
+def _action_cache_label(priv):
+    return priv["action_cache_label"]
+
 def _pnpm_lock_label(priv):
     return priv["pnpm_lock_label"]
 
 ################################################################################
 def _new(rctx_name, rctx, attr):
-    label_store = repository_label_store.new(rctx.path)
-
     should_update_pnpm_lock = attr.update_pnpm_lock
     if rctx.getenv(RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV):
         # Force disabled update_pnpm_lock via environment variable. This is useful for some CI use cases.
@@ -499,11 +499,11 @@ def _new(rctx_name, rctx, attr):
         "should_update_pnpm_lock": should_update_pnpm_lock,
     }
 
-    _init(priv, rctx, attr, label_store)
+    _init(priv, rctx, attr)
 
     return struct(
-        label_store = label_store,  # pass-through access to the label store
         repo_root = priv["repo_root"],
+        action_cache_label = lambda: _action_cache_label(priv),
         pnpm_lock_label = lambda: _pnpm_lock_label(priv),
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
         default_registry = lambda: _default_registry(priv),
@@ -515,8 +515,8 @@ def _new(rctx_name, rctx, attr):
         npm_auth = lambda: _npm_auth(priv),
         root_package = lambda: _root_package(priv),
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
-        action_cache_miss = lambda: _action_cache_miss(priv, rctx, label_store),
-        write_action_cache = lambda: _write_action_cache(priv, rctx, label_store),
+        action_cache_miss = lambda: _action_cache_miss(priv, rctx),
+        write_action_cache = lambda: _write_action_cache(priv, rctx),
     )
 
 npm_translate_lock_state = struct(
