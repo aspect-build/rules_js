@@ -99,6 +99,10 @@ def _build_exclude_package_contents_config(module_ctx):
             # Add custom patterns
             exclusions[package].extend(exclude_tag.patterns)
 
+    if "*" not in exclusions:
+        # Always add default exclusions for all packages if not manually specified
+        exclusions["*"] = exclude_package_contents_default[:]
+
     return exclusions
 
 def _hub_repo_impl(rctx):
