@@ -192,23 +192,33 @@ def _dicts_match(a, b):
 def _reverse_force_copy(rctx, label, dst = None):
     if type(label) != "Label":
         fail(INTERNAL_ERROR_MSG)
-    dst = dst if dst else rctx.path(label)
-    src = rctx.path(paths.join(label.package, label.name))
-    if repo_utils.is_windows(rctx):
-        fail("Not yet implemented for Windows")
-        #         rctx.file("_reverse_force_copy.bat", content = """
-        # @REM needs a mkdir dirname(%2)
-        # xcopy /Y %1 %2
-        # """, executable = True)
-        #         result = rctx.execute(["cmd.exe", "/C", "_reverse_force_copy.bat", src.replace("/", "\\"), dst.replace("/", "\\")])
+    dst = dst if dst else str(rctx.path(label))
+    src = str(rctx.path(paths.join(label.package, label.name)))
+    is_windows = repo_utils.is_windows(rctx)
+    coreutils = rctx.path(Label("@coreutils_{}//:coreutils{}".format(repo_utils.platform(rctx), ".exe" if is_windows else "")))
 
-    else:
-        rctx.file("_reverse_force_copy.sh", content = """#!/usr/bin/env bash
-set -o errexit -o nounset -o pipefail
-mkdir -p $(dirname $2)
-cp -f $1 $2
-""", executable = True)
-        result = rctx.execute(["./_reverse_force_copy.sh", src, dst])
+    # ensure the destination directory exists
+    dst_dirname = paths.dirname(dst)
+    if dst_dirname:
+        mkdir_args = [coreutils, "mkdir", "-p", dst_dirname]
+        result = rctx.execute(mkdir_args)
+        if result.return_code != 0:
+            msg = """
+
+ERROR: failed to create directory {dst_dirname}:
+STDOUT:
+{stdout}
+STDERR:
+{stderr}
+""".format(
+                dst_dirname = dst_dirname,
+                stdout = result.stdout,
+                stderr = result.stderr,
+            )
+            fail(msg)
+
+    cp_args = [coreutils, "cp", src, dst]
+    result = rctx.execute(cp_args)
     if result.return_code != 0:
         msg = """
 

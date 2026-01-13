@@ -324,27 +324,28 @@ def _copy_input_file(priv, rctx, attr, path, repository_path):
 
 def _copy_input_file_action(rctx, attr, src, dst):
     is_windows = repo_utils.is_windows(rctx)
+    coreutils = rctx.path(Label("@coreutils_{}//:coreutils{}".format(repo_utils.platform(rctx), ".exe" if is_windows else "")))
 
     # ensure the destination directory exists
     dst_segments = dst.split("/")
     if len(dst_segments) > 1:
         dirname = "/".join(dst_segments[:-1])
-        mkdir_args = ["mkdir", "-p", dirname] if not is_windows else ["cmd", "/c", "if not exist {dir} (mkdir {dir})".format(dir = dirname.replace("/", "\\"))]
+        mkdir_args = [coreutils, "mkdir", "-p", dirname]
         result = rctx.execute(
             mkdir_args,
             quiet = attr.quiet,
         )
         if result.return_code:
-            msg = "Failed to create directory for copy. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
+            msg = "Failed to create directory for copy. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join([str(a) for a in mkdir_args]), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
-    cp_args = ["cp", "-f", src, dst] if not is_windows else ["xcopy", "/Y", str(src).replace("/", "\\"), "\\".join(dst_segments) + "*"]
+    cp_args = [coreutils, "cp", src, dst]
     result = rctx.execute(
         cp_args,
         quiet = attr.quiet,
     )
     if result.return_code:
-        msg = "Failed to copy file. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(cp_args), result.return_code, result.stdout, result.stderr)
+        msg = "Failed to copy file. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join([str(a) for a in cp_args]), result.return_code, result.stdout, result.stderr)
         fail(msg)
 
 ################################################################################

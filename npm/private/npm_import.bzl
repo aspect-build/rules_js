@@ -516,11 +516,12 @@ def _download_and_extract_archive(rctx, package_json_only):
 
     is_windows = repo_utils.is_windows(rctx)
 
-    mkdir_args = ["mkdir", "-p", _EXTRACT_TO_DIRNAME] if not is_windows else ["cmd", "/c", "if not exist {extract_to_dirname} (mkdir {extract_to_dirname})".format(extract_to_dirname = _EXTRACT_TO_DIRNAME.replace("/", "\\"))]
-    result = rctx.execute(mkdir_args)
-    if result.return_code:
-        msg = "Failed to create package directory. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
-        fail(msg)
+    coreutils = rctx.path(Label("@coreutils_{}//:coreutils{}".format(repo_utils.platform(rctx), ".exe" if is_windows else "")))
+
+    # Create the extract directory using rctx.file() which creates parent dirs automatically
+    _mkdir_marker = _EXTRACT_TO_DIRNAME + "/.aspect_rules_js_mkdir_marker"
+    rctx.file(_mkdir_marker, "")
+    rctx.delete(_mkdir_marker)
 
     exclude_pattern_args = []
     for pattern in rctx.attr.exclude_package_contents:
@@ -555,10 +556,10 @@ def _download_and_extract_archive(rctx, package_json_only):
         # Some packages have directory permissions missing executable which
         # make the directories not listable. Fix these cases in order to be able
         # to execute the copy action. https://stackoverflow.com/a/14634721
-        chmod_args = ["chmod", "-R", "a+X", _EXTRACT_TO_DIRNAME]
+        chmod_args = [coreutils, "chmod", "-R", "a+X", _EXTRACT_TO_DIRNAME]
         result = rctx.execute(chmod_args)
         if result.return_code:
-            msg = "Failed to set directory listing permissions. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(chmod_args), result.return_code, result.stdout, result.stderr)
+            msg = "Failed to set directory listing permissions. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join([str(a) for a in chmod_args]), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
 def _npm_import_rule_impl(rctx):
