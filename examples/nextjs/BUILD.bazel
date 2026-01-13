@@ -8,13 +8,6 @@ npm_link_all_packages()
 # The nextjs binary target to used by nextjs:defs.bzl
 next_bin.next_binary(
     name = "next_js_binary",
-
-    # Nextjs requires a modern node toolchain
-    node_toolchain = select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
-    }),
     visibility = ["//visibility:public"],
 )
 
@@ -52,11 +45,6 @@ js_library(
 #     ],
 #     config = "next.config.mjs",
 #     next_js_binary = ":next_js_binary",
-#     node_toolchain = select({
-#         "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
-#         "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
-#         "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
-#     }),
 # )
 
 # A standalone nextjs build
@@ -76,9 +64,4 @@ nextjs_standalone_build(
 nextjs_standalone_server(
     name = "server",
     app = ":standalone",
-    node_toolchain = select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
-    }),
 )
