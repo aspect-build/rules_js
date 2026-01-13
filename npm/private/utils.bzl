@@ -192,8 +192,8 @@ def _dicts_match(a, b):
 def _reverse_force_copy(rctx, label, dst = None):
     if type(label) != "Label":
         fail(INTERNAL_ERROR_MSG)
-    dst = dst if dst else str(rctx.path(label))
-    src = str(rctx.path(paths.join(label.package, label.name)))
+    dst = dst if dst else rctx.path(label)
+    src = rctx.path(paths.join(label.package, label.name))
     if repo_utils.is_windows(rctx):
         fail("Not yet implemented for Windows")
         #         rctx.file("_reverse_force_copy.bat", content = """
