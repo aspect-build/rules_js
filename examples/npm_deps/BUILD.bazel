@@ -92,7 +92,7 @@ js_test(
 
 #######################################
 # Use case 4: custom postinstall creates a file
-# See postinstall on @aspect-test/c in WORKSPACE
+# See lifecycle_hooks on @aspect-test/c in MODULE.bazel
 
 write_file(
     name = "write4",

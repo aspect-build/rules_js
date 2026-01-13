@@ -195,7 +195,7 @@ Args:
 
         ```
         public_hoist_packages = {
-            "@foo/bar": [""] # link to the root package in the WORKSPACE
+            "@foo/bar": [""] # link to the root package
             "fum@0.0.1": ["some/sub/package"]
         },
         ```

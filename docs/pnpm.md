@@ -33,8 +33,8 @@ For example:
 
 ```
 pnpm-lock.yaml
-WORKSPACE.bazel
-> npm_translate_lock()
+MODULE.bazel
+> npm.npm_translate_lock()
 BUILD.bazel
 > npm_link_all_packages()
 ├── A/
@@ -62,13 +62,13 @@ The `:node_modules/{package}` targets accessible to a package align with how Nod
 
 ## Using npm_translate_lock
 
-In `WORKSPACE`, call the repository rule pointing to your `pnpm-lock.yaml` file:
+In `MODULE.bazel`, use the `npm` extension pointing to your `pnpm-lock.yaml` file:
 
 ```starlark
-load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 
 # Uses the pnpm-lock.yaml file to automate creation of npm_import rules
-npm_translate_lock(
+npm.npm_translate_lock(
     # Creates a new repository named "@npm" - you could choose any name you like
     name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
@@ -78,23 +78,11 @@ npm_translate_lock(
     # in REPO.bazel
     verify_node_modules_ignored = "//:.bazelignore",
 )
+
+use_repo(npm, "npm")
 ```
 
-You can immediately load from the generated `repositories.bzl` file in `WORKSPACE`.
-This is similar to the
-[`pip_parse`](https://github.com/bazelbuild/rules_python/blob/main/docs/pip.md#pip_parse)
-rule in rules_python for example.
-It has the advantage of also creating aliases for simpler dependencies that don't require
-spelling out the version of the packages.
-
-```starlark
-# Following our example above, we named this "npm"
-load("@npm//:repositories.bzl", "npm_repositories")
-
-npm_repositories()
-```
-
-Note that you could call `npm_translate_lock` more than once, if you have more than one pnpm workspace in your Bazel workspace.
+Note that you could call `npm.npm_translate_lock` more than once, if you have more than one pnpm workspace in your repository.
 
 If you really don't want to rely on this being generated at runtime, we have experimental support
 to check in the result instead. See [checked-in repositories.bzl](#checked-in-repositoriesbzl) below.
@@ -389,4 +377,4 @@ write_source_files(
 )
 ```
 
-Then in `WORKSPACE`, load from that checked-in copy or instruct your users to do so.
+Then in `MODULE.bazel`, load from that checked-in copy or instruct your users to do so.

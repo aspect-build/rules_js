@@ -109,10 +109,10 @@ If the lockfile is in `some/subpkg/pnpm-lock.yaml` then `"some/subpkg"` should a
 
 For example:
 
-`WORKSPACE`
+`MODULE.bazel`
 
 ```starlark
-npm_translate_lock(
+npm.npm_translate_lock(
     ...
     public_hoist_packages = {
         "eslint-config-react-app": [""],
