@@ -47,7 +47,13 @@ use_repo(pnpm, "pnpm", "pnpm__links")
 bazel_lib_toolchains = use_extension("@bazel_lib//lib:extensions.bzl", "toolchains")
 use_repo(
     bazel_lib_toolchains,
+    "coreutils_darwin_amd64",
+    "coreutils_darwin_arm64",
+    "coreutils_linux_amd64",
+    "coreutils_linux_arm64",
     "coreutils_toolchains",
+    "coreutils_windows_amd64",
+    "coreutils_windows_arm64",
 )
 
 yq_toolchain = use_extension("@yq.bzl//yq:extensions.bzl", "yq")
