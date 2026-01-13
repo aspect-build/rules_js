@@ -44,7 +44,7 @@ def js_run_binary(
         stamp = 0,
         patch_node_fs = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
-        use_default_shell_env = None,
+        use_default_shell_env = False,
         **kwargs):
     """Wrapper around @bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
 
@@ -229,12 +229,10 @@ def js_run_binary(
 
             See `use_execroot_entry_point` doc for more info.
 
-        use_default_shell_env: If set, passed to the underlying run_binary.
+        use_default_shell_env: Passed to the underlying ctx.actions.run.
 
             May introduce non-determinism when True; use with care!
             See e.g. https://github.com/bazelbuild/bazel/issues/4912
-
-            Requires a minimum of bazel_lib v1.40.3 or v2.4.2.
 
             Refer to https://bazel.build/rules/lib/builtins/actions#run for more details.
 
@@ -371,11 +369,6 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     if allow_execroot_entry_point_with_no_copy_data_to_bin:
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
 
-    # Pass use_default_shell_env via kwargs and only if it is not None since older versions of
-    # bazel_lib run_binary don't support this attribute.
-    if use_default_shell_env != None:
-        kwargs["use_default_shell_env"] = use_default_shell_env
-
     _run_binary(
         name = name,
         tool = tool,
@@ -388,5 +381,6 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         progress_message = progress_message,
         execution_requirements = execution_requirements,
         stamp = stamp,
+        use_default_shell_env = use_default_shell_env,
         **kwargs
     )

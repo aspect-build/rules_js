@@ -330,7 +330,7 @@ In addition, Aspect's bazel-lib provides some helpers that make it easy to run s
 Continuing our example, where we wrote a macro in `tsc.bzl`, we'd write this to document it, in `BUILD`:
 
 ```starlark
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load("@bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 bzl_library(

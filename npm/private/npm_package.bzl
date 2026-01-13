@@ -10,20 +10,12 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@bazel_lib//tools:version.bzl", BAZEL_LIB_VERSION = "VERSION")
-load("@bazel_skylib//lib:versions.bzl", "versions")
 load("@jq.bzl//jq:jq.bzl", "jq")
 load("//js:defs.bzl", "js_binary")
 load("//js:libs.bzl", "js_lib_helpers")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
-# Pull in all copy_to_directory attributes except for exclude_prefixes
 copy_to_directory_lib_attrs = dict(copy_to_directory_lib.attrs)
-copy_to_directory_lib_attrs.pop(
-    "exclude_prefixes",
-    # It was removed in bazel-lib 2.0, so default to ignoring.
-    None,
-)
 
 _NPM_PACKAGE_ATTRS = copy_to_directory_lib_attrs | {
     "data": attr.label_list(),
@@ -501,11 +493,7 @@ def stamped_package_json(name, stamp_var, **kwargs):
             # This 'as' syntax results in $stamp being null in unstamped builds.
             "$ARGS.named.STAMP as $stamp",
             # Provide a default using the "alternative operator" in case $stamp is null.
-            ".version = ($stamp{}.{} // \"0.0.0\")".format(
-                # bazel-lib 1/2 require different syntax
-                "[0]" if versions.is_at_least("2.0.0", BAZEL_LIB_VERSION) else "",
-                stamp_var,
-            ),
+            ".version = ($stamp[0].{} // \"0.0.0\")".format(stamp_var),
         ]),
         **kwargs
     )
