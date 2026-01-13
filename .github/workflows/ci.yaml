@@ -122,10 +122,6 @@ jobs:
                 os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
                 folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
                 exclude:
-                    # Exclude Windows default, will opt-in to includes
-                    - os: windows
-                    # Exclude MacOS by default, will opt-in to includes
-                    - os: macos
                     # Don't run tests with Bazel 8 by default
                     - bazel-version:
                           major: 8
