@@ -344,11 +344,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # Resolve string patch labels relative to the root respository rather than relative to rules_js.
         # https://docs.google.com/document/d/1N81qfCa8oskCk5LqTW-LNthy6EBrDot7bdUsjz6JFC4/
-        patches = [str(attr.pnpm_lock.relative(patch)) for patch in patches]
-
-        # Prepend the optional '@' to patch labels in the root repository for earlier versions of Bazel so
-        # that checked in repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
-        patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
+        patches = [attr.pnpm_lock.relative(patch) for patch in patches]
 
         exclude_package_contents = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
 

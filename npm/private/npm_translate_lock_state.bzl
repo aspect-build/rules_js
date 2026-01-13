@@ -20,15 +20,8 @@ RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV = "ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOC
 ################################################################################
 def _init(priv, rctx, attr):
     is_windows = repo_utils.is_windows(rctx)
-    if is_windows and _should_update_pnpm_lock(priv):
-        # buildifier: disable=print
-        print("""
-WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}")` is not yet supported on Windows. This feature
-         will be disabled for this build.
-""".format(rctx_name = priv["rctx_name"]))
-        priv["should_update_pnpm_lock"] = False
 
-    _validate_attrs(attr, is_windows)
+    _validate_attrs(attr)
 
     _init_external_repository_action_cache(priv, attr)
 
@@ -55,9 +48,7 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         _copy_unspecified_input_files(priv, rctx, attr)
 
 ################################################################################
-def _validate_attrs(attr, is_windows):
-    if is_windows and not attr.pnpm_lock:
-        fail("pnpm_lock must be set on Windows")
+def _validate_attrs(attr):
     if not attr.pnpm_lock and not attr.npm_package_lock and not attr.yarn_lock:
         fail("at least one of pnpm_lock, npm_package_lock or yarn_lock must be set")
     if attr.npm_package_lock and attr.yarn_lock:
@@ -70,7 +61,7 @@ def _init_common_labels(priv, rctx, attr):
         rctx.watch(attr.pnpm_lock)
         priv["pnpm_lock_label"] = attr.pnpm_lock
     elif attr.npm_package_lock or attr.yarn_lock:
-        priv["pnpm_lock_label"] = Label(str(attr.npm_package_lock or attr.yarn_lock).replace("package-lock.json", "pnpm-lock.yaml").replace("yarn.lock", "pnpm-lock.yaml"))
+        priv["pnpm_lock_label"] = (attr.npm_package_lock or attr.yarn_lock).same_package_label("pnpm-lock.yaml")
 
     priv["pnpm_root_package_json"] = priv["pnpm_lock_label"].same_package_label(PACKAGE_JSON_FILENAME)
 
@@ -89,7 +80,7 @@ def _init_update_labels(priv, rctx, attr):
             priv,
             rctx,
             attr,
-            str(rctx.path(attr.pnpm_lock)),
+            rctx.path(attr.pnpm_lock),
             paths.join(attr.pnpm_lock.package, attr.pnpm_lock.name),
         )
     if attr.npm_package_lock:
@@ -97,7 +88,7 @@ def _init_update_labels(priv, rctx, attr):
             priv,
             rctx,
             attr,
-            str(rctx.path(attr.npm_package_lock)),
+            rctx.path(attr.npm_package_lock),
             paths.join(attr.npm_package_lock.package, attr.npm_package_lock.name),
         )
     if attr.yarn_lock:
@@ -105,7 +96,7 @@ def _init_update_labels(priv, rctx, attr):
             priv,
             rctx,
             attr,
-            str(rctx.path(attr.yarn_lock)),
+            rctx.path(attr.yarn_lock),
             paths.join(attr.yarn_lock.package, attr.yarn_lock.name),
         )
 
@@ -140,7 +131,7 @@ def _init_workspace(priv, rctx, is_windows):
     pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME)
     pnpm_workspace_path = rctx.path(pnpm_workspace_label)
     if pnpm_workspace_path.exists:
-        pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, str(pnpm_workspace_path), is_windows)
+        pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, pnpm_workspace_path, is_windows)
 
         if workspace_parse_err == None:
             pnpm_workspace_settings, workspace_parse_err = pnpm.parse_pnpm_workspace_json(pnpm_workspace_json)
@@ -187,7 +178,7 @@ def _copy_update_input_files(priv, rctx, attr):
             priv,
             rctx,
             attr,
-            str(rctx.path(script_label)),
+            rctx.path(script_label),
             paths.join(script_label.package, script_label.name),
         )
     for data_label in attr.data:
@@ -195,7 +186,7 @@ def _copy_update_input_files(priv, rctx, attr):
             priv,
             rctx,
             attr,
-            str(rctx.path(data_label)),
+            rctx.path(data_label),
             paths.join(data_label.package, data_label.name),
         )
 
@@ -311,7 +302,7 @@ def _copy_input_file(priv, rctx, attr, path, repository_path):
         # the purposes of calculating a hash of the file
         _set_input_hash(
             priv,
-            path.removeprefix(priv["src_root"]),
+            str(path).removeprefix(priv["src_root"]),
             utils.hash(rctx.read(path)),
         )
 
@@ -338,7 +329,7 @@ def _copy_input_file_action(rctx, attr, src, dst):
             msg = "Failed to create directory for copy. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(mkdir_args), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
-    cp_args = ["cp", "-f", src, dst] if not is_windows else ["xcopy", "/Y", src.replace("/", "\\"), "\\".join(dst_segments) + "*"]
+    cp_args = ["cp", "-f", src, dst] if not is_windows else ["xcopy", "/Y", str(src).replace("/", "\\"), "\\".join(dst_segments) + "*"]
     result = rctx.execute(
         cp_args,
         quiet = attr.quiet,
@@ -363,7 +354,7 @@ def _load_npmrc(priv, rctx, attr, npmrc_path, npmrc_label):
             priv,
             rctx,
             attr,
-            str(npmrc_path),
+            npmrc_path,
             paths.join(npmrc_label.package, npmrc_label.name),
         )
 
@@ -386,8 +377,8 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
 def _yaml_to_json(rctx, yaml_path, is_windows):
     host_yq = Label("@yq_{}//:yq{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
     yq_args = [
-        str(rctx.path(host_yq)),
-        str(yaml_path),
+        rctx.path(host_yq),
+        yaml_path,
         "-o=json",
     ]
     result = rctx.execute(yq_args)
@@ -406,7 +397,7 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
     pnpm_patched_dependencies = {}
     lock_parse_err = None
 
-    lockfile_content, lock_parse_err = _yaml_to_json(rctx, str(pnpm_lock_path), is_windows)
+    lockfile_content, lock_parse_err = _yaml_to_json(rctx, pnpm_lock_path, is_windows)
     if lock_parse_err == None:
         importers, packages, pnpm_patched_dependencies, lock_parse_err = pnpm.parse_pnpm_lock_json(
             lockfile_content,
