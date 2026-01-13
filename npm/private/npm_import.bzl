@@ -451,7 +451,7 @@ def _fetch_git_repository(rctx):
         shallow = "--depth=1",
         reset_ref = rctx.attr.commit,
         fetch_ref = rctx.attr.commit,
-        remote = str(rctx.attr.url),
+        remote = rctx.attr.url,
     )
     rctx.report_progress("Cloning %s of %s" % (git_repo.reset_ref, git_repo.remote))
     _git_init(rctx, git_repo)
