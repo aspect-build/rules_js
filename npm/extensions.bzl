@@ -4,7 +4,6 @@ See https://bazel.build/docs/bzlmod#extension-definition
 
 load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
@@ -47,10 +46,6 @@ def _fail_on_non_root_overrides(module, tag_class):
         ))
 
 def _npm_extension_impl(module_ctx):
-    if not bazel_lib_utils.is_bazel_7_or_greater():
-        # ctx.actions.declare_symlink was added in Bazel 6
-        fail("A minimum version of Bazel 7 required to use rules_js")
-
     # Collect all exclude_package_contents tags and build exclusion dictionary
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
 

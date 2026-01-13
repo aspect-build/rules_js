@@ -261,9 +261,6 @@ Args:
 
         See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
 
-        Note: [--incompatible_merge_fixed_and_default_shell_env](https://bazel.build/reference/command-line-reference#flag--incompatible_merge_fixed_and_default_shell_env)
-        is often required and not enabled by default in Bazel < 7.0.0.
-
         This defaults to False reduce the negative effects of `use_default_shell_env`.
 
         Read more: [lifecycles](/docs/pnpm.md#lifecycles)
