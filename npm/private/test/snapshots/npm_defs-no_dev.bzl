@@ -2433,6 +2433,18 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
         _npm_local_package_store(
+            package_store_name = "@mycorp+pkg-b@0.0.0",
+            src = "//examples/npm_package/packages/pkg_b:pkg",
+            package = "@mycorp/pkg-b",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/node_modules/acorn@8.7.1": "acorn",
+                "//:.aspect_rules_js/node_modules/uuid@8.3.2": "uuid",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
             package_store_name = "@mycorp+pkg-d@0.0.0",
             src = "//examples/npm_package/packages/pkg_d:pkg",
             package = "@mycorp/pkg-d",
@@ -2539,8 +2551,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "js/private/test/image":
             link_323()
-            _fp_link_5()
             _fp_link_6()
+            _fp_link_7()
             link_targets = [
                 ":node_modules/acorn",
                 ":node_modules/@mycorp/pkg-d",
@@ -2626,9 +2638,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "examples/npm_package/packages/pkg_e":
             _fp_link_5()
-            link_targets = [":node_modules/@mycorp/pkg-d"]
+            _fp_link_6()
+            link_targets = [
+                ":node_modules/@mycorp/pkg-b",
+                ":node_modules/@mycorp/pkg-d",
+            ]
             scope_targets = {
-                "@mycorp": [":node_modules/@mycorp/pkg-d"],
+                "@mycorp": [
+                    ":node_modules/@mycorp/pkg-b",
+                    ":node_modules/@mycorp/pkg-d",
+                ],
             }
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
@@ -2779,7 +2798,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "examples/npm_package/packages/pkg_e":
         if prod:
-            link_targets.extend([":node_modules/@mycorp/pkg-d"])
+            link_targets.extend([
+                ":node_modules/@mycorp/pkg-b",
+                ":node_modules/@mycorp/pkg-d",
+            ])
     return link_targets
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a" package
@@ -2809,9 +2831,18 @@ def _fp_link_4(alias = None):
         src = "//:.aspect_rules_js/node_modules/@lib+test2@0.0.0",
     )
 
-# Generated npm_link_package_store for linking of first-party "@mycorp/pkg-d" package
+# Generated npm_link_package_store for linking of first-party "@mycorp/pkg-b" package
 # buildifier: disable=function-docstring
 def _fp_link_5(alias = None):
+    _npm_local_link_package_store(
+        name = "node_modules/@mycorp/pkg-b" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
+        src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-b@0.0.0",
+    )
+
+# Generated npm_link_package_store for linking of first-party "@mycorp/pkg-d" package
+# buildifier: disable=function-docstring
+def _fp_link_6(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@mycorp/pkg-d" if alias == None else "node_modules/{}".format(alias),
         package = alias,
@@ -2820,7 +2851,7 @@ def _fp_link_5(alias = None):
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-a" package
 # buildifier: disable=function-docstring
-def _fp_link_6(alias = None):
+def _fp_link_7(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@mycorp/pkg-a" if alias == None else "node_modules/{}".format(alias),
         package = alias,

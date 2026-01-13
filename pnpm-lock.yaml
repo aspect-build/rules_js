@@ -230,6 +230,9 @@ importers:
 
   examples/npm_package/packages/pkg_e:
     dependencies:
+      '@mycorp/pkg-b':
+        specifier: workspace:*
+        version: link:../pkg_b
       '@mycorp/pkg-d':
         specifier: workspace:*
         version: link:../pkg_d

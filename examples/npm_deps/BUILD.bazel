@@ -380,3 +380,66 @@ js_test(
     ],
     entry_point = "case10.mjs",
 )
+
+#######################################
+# Case 11: use first-party packages directly and indirectly multiple times
+
+write_file(
+    name = "write11_cjs",
+    out = "case11.cjs",
+    content = [
+        "const { sandboxAssert: sandboxAssertB } = require('@mycorp/pkg-b')",
+        "const { sandboxAssert: sandboxAssertC1 } = require('@mycorp/pkg-c1')",
+        "const { sandboxAssert: sandboxAssertD, getAcornVersion: getAcornVersionD } = require('@mycorp/pkg-d')",
+        "const { sandboxAssert: sandboxAssertE, getAcornVersion: getAcornVersionE } = require('@mycorp/pkg-e')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssertB()",
+        "sandboxAssertC1()",
+        "sandboxAssertD()",
+        "sandboxAssertE()",
+        "deepEqual(getAcornVersionD(), getAcornVersionE())",
+    ],
+)
+
+write_file(
+    name = "write11_mjs",
+    out = "case11.mjs",
+    content = [
+        "import { sandboxAssert as sandboxAssertB } from '@mycorp/pkg-b'",
+        "import { sandboxAssert as sandboxAssertC1 } from '@mycorp/pkg-c1'",
+        "import { sandboxAssert as sandboxAssertD, getAcornVersion as getAcornVersionD } from '@mycorp/pkg-d'",
+        "import { sandboxAssert as sandboxAssertE, getAcornVersion as getAcornVersionE } from '@mycorp/pkg-e'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssertB()",
+        "sandboxAssertC1()",
+        "sandboxAssertD()",
+        "sandboxAssertE();",
+        "(await import('@mycorp/pkg-b')).sandboxAssert();",
+        "(await import('@mycorp/pkg-c1')).sandboxAssert();",
+        "(await import('@mycorp/pkg-d')).sandboxAssert();",
+        "(await import('@mycorp/pkg-e')).sandboxAssert();",
+        "deepEqual(getAcornVersionD(), getAcornVersionE())",
+    ],
+)
+
+js_test(
+    name = "test11_cjs",
+    data = [
+        ":node_modules/@mycorp/pkg-d",
+        ":node_modules/@mycorp/pkg-e",
+        "//:node_modules/@mycorp/pkg-b",
+        "//:node_modules/@mycorp/pkg-c1",
+    ],
+    entry_point = "case11.cjs",
+)
+
+js_test(
+    name = "test11_mjs",
+    data = [
+        ":node_modules/@mycorp/pkg-d",
+        ":node_modules/@mycorp/pkg-e",
+        "//:node_modules/@mycorp/pkg-b",
+        "//:node_modules/@mycorp/pkg-c1",
+    ],
+    entry_point = "case11.mjs",
+)
