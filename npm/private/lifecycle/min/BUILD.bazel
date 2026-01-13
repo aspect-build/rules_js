@@ -1,0 +1,34 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+# Copy the bundle into this isolated min/ directory
+write_source_files(
+    name = "write_min",
+    files = {
+        "index.min.js": "//npm/private/lifecycle/src:bundle",
+    },
+)
+
+# Generate a minimal package.json for the lifecycle hooks package
+# to ensure no parent package.json fields leak in.
+write_file(
+    name = "package_json",
+    out = "package.json",
+    content = ["""{"private": true}"""],
+    visibility = ["//visibility:private"],
+)
+
+js_binary(
+    name = "bin",
+    # NB: intentionally include package.json in the runfiles of this binary to prevent
+    # https://github.com/aspect-build/rules_js/issues/447
+    data = glob(["**"]) + [
+        ":package_json",
+    ],
+    entry_point = "index.min.js",
+    include_npm = True,
+    visibility = ["//visibility:public"],
+)
+
+exports_files(["index.min.js"])

@@ -200,6 +200,7 @@ npm.npm_translate_lock(
         "//js/private/test/js_run_devserver:package.json",
         "//js/private/test/node-patches:package.json",
         "//js/private/worker/src:package.json",
+        "//npm/private/lifecycle:package.json",
         "//npm/private/test:package.json",
         "//npm/private/test:vendored/lodash-4.17.21.tgz",
         "//npm/private/test/npm_package:package.json",

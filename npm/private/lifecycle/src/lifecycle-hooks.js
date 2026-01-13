@@ -131,15 +131,15 @@ async function runLifecycleHooks(opts, hooks) {
 
 // Remove the indeterministic Makefile from the resulting directory.
 // Can be removed when https://github.com/nodejs/gyp-next/pull/293
-// has sufficiently propagated and the vast majority of downloads on 
+// has sufficiently propagated and the vast majority of downloads on
 // npm are for packages that are >=node-gyp@11.3.0, where the fix is
-// first included 
-// 
+// first included
+//
 // https://www.npmjs.com/package/node-gyp?activeTab=versions
 async function cleanupNodeGypIndeterminism(root) {
     if (await useNodeGyp(root)) {
         try {
-            await fs.promises.rm(path.join(root,'build', 'Makefile'))
+            await fs.promises.rm(path.join(root, 'build', 'Makefile'))
         } catch (e) {
             // Best effort, ignore errors.
         }
