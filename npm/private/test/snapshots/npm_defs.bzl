@@ -1199,7 +1199,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "examples/npm_package/packages/pkg_a": ["acorn", "uuid"],
     "examples/npm_package/packages/pkg_b": ["acorn", "uuid"],
     "examples/npm_package/packages/pkg_d": ["acorn", "uuid"],
-    "examples/npm_package/packages/pkg_e": ["@mycorp/pkg-d"],
+    "examples/npm_package/packages/pkg_e": ["@mycorp/pkg-d", "@mycorp/pkg-b"],
     "examples/runfiles": ["@bazel/runfiles"],
     "examples/stack_traces": ["source-map-support"],
     "examples/vite3": ["@vitejs/plugin-react", "react-dom", "react", "vite"],
@@ -2506,7 +2506,21 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@mycorp/pkg-e",
             version = "0.0.0",
             deps = {
+                "//:.aspect_rules_js/{}/@mycorp+pkg-b@0.0.0".format(name): "@mycorp/pkg-b",
                 "//:.aspect_rules_js/{}/@mycorp+pkg-d@0.0.0".format(name): "@mycorp/pkg-d",
+            },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            link_root_name = name,
+            package_store_name = "@mycorp+pkg-b@0.0.0",
+            src = "//examples/npm_package/packages/pkg_b:pkg",
+            package = "@mycorp/pkg-b",
+            version = "0.0.0",
+            deps = {
+                "//:.aspect_rules_js/{}/acorn@8.7.1".format(name): "acorn",
+                "//:.aspect_rules_js/{}/uuid@8.3.2".format(name): "uuid",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -2741,7 +2755,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_1096("{}/typescript".format(name), True, name, "typescript")
             link_1110("{}/unused".format(name), True, name, "unused")
             link_1127("{}/webpack-bundle-analyzer".format(name), True, name, "webpack-bundle-analyzer")
-            _fp_link_10(name)
+            _fp_link_11(name)
             link_targets = [
                 ":{}/@fastify/send".format(name),
                 ":{}/@figma/nodegit".format(name),
@@ -2961,9 +2975,16 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "examples/npm_package/packages/pkg_e":
             _fp_link_8(name)
-            link_targets = [":{}/@mycorp/pkg-d".format(name)]
+            _fp_link_10(name)
+            link_targets = [
+                ":{}/@mycorp/pkg-d".format(name),
+                ":{}/@mycorp/pkg-b".format(name),
+            ]
             scope_targets = {
-                "@mycorp": [":{}/@mycorp/pkg-d".format(name)],
+                "@mycorp": [
+                    ":{}/@mycorp/pkg-d".format(name),
+                    ":{}/@mycorp/pkg-b".format(name),
+                ],
             }
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
@@ -3241,7 +3262,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             ])
     elif bazel_package == "examples/npm_package/packages/pkg_e":
         if prod:
-            link_targets.extend([":{}/@mycorp/pkg-d".format(name)])
+            link_targets.extend([
+                ":{}/@mycorp/pkg-d".format(name),
+                ":{}/@mycorp/pkg-b".format(name),
+            ])
     return link_targets
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-a" package
@@ -3311,9 +3335,17 @@ def _fp_link_9(name):
         link_visibility = ["//examples:__subpackages__"],
     )
 
-# Generated npm_link_package_store for linking of first-party "test-npm_package" package
+# Generated npm_link_package_store for linking of first-party "@mycorp/pkg-b" package
 # buildifier: disable=function-docstring
 def _fp_link_10(name):
+    _npm_local_link_package_store(
+        name = "{}/@mycorp/pkg-b".format(name),
+        src = "//:.aspect_rules_js/{}/@mycorp+pkg-b@0.0.0".format(name),
+    )
+
+# Generated npm_link_package_store for linking of first-party "test-npm_package" package
+# buildifier: disable=function-docstring
+def _fp_link_11(name):
     _npm_local_link_package_store(
         name = "{}/test-npm_package".format(name),
         src = "//:.aspect_rules_js/{}/test-npm_package@0.0.0".format(name),

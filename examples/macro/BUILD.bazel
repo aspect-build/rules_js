@@ -7,8 +7,23 @@ load("//examples/macro:mocha.bzl", "mocha_test")
 npm_link_all_packages(name = "node_modules")
 
 mocha_test(
-    name = "test",
+    name = "test_js",
     srcs = ["test.js"],
+)
+
+mocha_test(
+    name = "test_cjs",
+    srcs = ["test.cjs"],
+)
+
+mocha_test(
+    name = "test_esm",
+    srcs = ["test.mjs"],
+)
+
+mocha_test(
+    name = "test_all",
+    srcs = glob(["test.*js"]),
 )
 
 bzl_library(
