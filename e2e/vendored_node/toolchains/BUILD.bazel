@@ -10,36 +10,30 @@ build them from source, so there shouldn't be any fetches required.
 load("@rules_nodejs//nodejs:toolchain.bzl", "nodejs_toolchain")
 
 [
-    toolchain(
-        name = "node_vendored_%s_toolchain" % os,
-        exec_compatible_with = [
-            "@platforms//os:" + os,
-            "@platforms//cpu:x86_64",
-        ],
-        toolchain = ":node_" + os,
-        toolchain_type = "@rules_nodejs//nodejs:toolchain_type",
-    )
-    for os in [
-        "linux",
-        "macos",
-        "windows",
+    [
+        toolchain(
+            name = "node_vendored_%s_toolchain" % os,
+            exec_compatible_with = [
+                "@platforms//os:" + os,
+                "@platforms//cpu:" + (arch if arch else "x86_64"),
+            ],
+            toolchain = ":node_" + os,
+            toolchain_type = "@rules_nodejs//nodejs:toolchain_type",
+        ),
+        toolchain(
+            name = "node_vendored_%s_runtime" % os,
+            target_compatible_with = [
+                "@platforms//os:" + os,
+                "@platforms//cpu:" + (arch if arch else "x86_64"),
+            ],
+            toolchain = ":node_" + os,
+            toolchain_type = "@rules_nodejs//nodejs:runtime_toolchain_type",
+        ),
     ]
-]
-
-[
-    toolchain(
-        name = "node_vendored_%s_runtime" % os,
-        target_compatible_with = [
-            "@platforms//os:" + os,
-            "@platforms//cpu:x86_64",
-        ],
-        toolchain = ":node_" + os,
-        toolchain_type = "@rules_nodejs//nodejs:runtime_toolchain_type",
-    )
-    for os in [
-        "linux",
-        "macos",
-        "windows",
+    for (os, arch) in [
+        ("linux", None),
+        ("macos", "arm64"),
+        ("windows", None),
     ]
 ]
 
