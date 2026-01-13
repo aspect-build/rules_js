@@ -515,7 +515,7 @@ def _collect_dep_constraints(packages, package_info):
 def _link_package(root_package, import_path, rel_path = "."):
     link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
     if link_package.startswith("../"):
-        msg = "Invalid link_package outside of the WORKSPACE: {}".format(link_package)
+        msg = "Invalid link_package outside of the repository: {}".format(link_package)
         fail(msg)
     if link_package == ".":
         link_package = ""

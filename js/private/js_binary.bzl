@@ -24,8 +24,8 @@ load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
 
 _DOC = """Execute a program in the Node.js runtime.
 
-The version of Node.js is determined by Bazel's toolchain selection. In the WORKSPACE you used
-`nodejs_register_toolchains` to provide options to Bazel. Then Bazel selects from these options
+The version of Node.js is determined by Bazel's toolchain selection. Use the `node` extension
+from `rules_nodejs` to register Node.js toolchains. Then Bazel selects from these options
 based on the requested target platform. Use the
 [`--toolchain_resolution_debug`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--toolchain_resolution_debug)
 Bazel option to see more detail about the selection.
@@ -39,17 +39,17 @@ such as rules_go. See [PR #1690](https://github.com/aspect-build/rules_js/pull/1
 
 The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
 
-* JS_BINARY__BINDIR: the WORKSPACE-relative Bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_binary` target
+* JS_BINARY__BINDIR: the Bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_binary` target
 * JS_BINARY__COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_binary` target
 * JS_BINARY__TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_binary` target
 
 The following environment variables are made available to the Node.js runtime based on the rule context:
 
-* JS_BINARY__BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the Bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target's rule context
+* JS_BINARY__BUILD_FILE_PATH: the path to the BUILD file of the Bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target's rule context
 * JS_BINARY__PACKAGE: the package of the Bazel target being run; equivalent to `ctx.label.package` of the `js_binary` target's rule context
 * JS_BINARY__TARGET: the full label of the Bazel target being run; a stringified version of `ctx.label` of the `js_binary` target's rule context
 * JS_BINARY__TARGET_NAME: the name of the Bazel target being run; equivalent to `ctx.label.name` of the `js_binary` target's rule context
-* JS_BINARY__WORKSPACE: the Bazel workspace name; equivalent to `ctx.workspace_name` of the `js_binary` target's rule context
+* JS_BINARY__WORKSPACE: the Bazel repository name; equivalent to `ctx.workspace_name` of the `js_binary` target's rule context
 
 The following environment variables are made available to the Node.js runtime based the runtime environment:
 

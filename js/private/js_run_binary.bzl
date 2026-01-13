@@ -52,17 +52,17 @@ def js_run_binary(
 
     The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
 
-    * BAZEL_BINDIR: the WORKSPACE-relative bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
+    * BAZEL_BINDIR: the bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
     * BAZEL_COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
     * BAZEL_TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
 
     The following environment variables are made available to the Node.js runtime based on the rule context:
 
-    * BAZEL_BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
+    * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
     * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
     * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
     * BAZEL_TARGET: the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
-    * BAZEL_WORKSPACE: the bazel workspace name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
+    * BAZEL_WORKSPACE: the bazel repository name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
 
     Args:
         name: Target name
@@ -372,9 +372,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
 
     # Pass use_default_shell_env via kwargs and only if it is not None since older versions of
-    # bazel_lib run_binary don't support this attribute. We set the correct 1.x minimum for
-    # bzlmod but users could have a 2.x version < 2.4.2. For users using WORKSPACE, an older
-    # bazel_lib may sneak in since order matters for WORKSPACE deps.
+    # bazel_lib run_binary don't support this attribute.
     if use_default_shell_env != None:
         kwargs["use_default_shell_env"] = use_default_shell_env
 

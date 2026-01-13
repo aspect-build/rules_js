@@ -39,7 +39,7 @@ Other recommendations:
 
 rules_js depends on rules_nodejs version 6.1.0 or greater.
 
-Installation is included in the `MODULE` or `WORKSPACE` snippet you pasted from the Installation instructions above.
+Installation is included in the `MODULE.bazel` snippet you pasted from the Installation instructions above.
 
 **API docs:**
 
@@ -70,7 +70,7 @@ $ bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only
 ```
 
 Next, you'll typically use `npm_translate_lock` to translate the lock file to Starlark, which Bazel extensions understand.
-The `MODULE` or `WORKSPACE` snippet you pasted above already contains this code.
+The `MODULE.bazel` snippet you pasted above already contains this code.
 
 Technically, we run a port of pnpm rather than pnpm itself. Here are some design details:
 
@@ -232,7 +232,7 @@ This shows locations on disk where the npm packages can be loaded.
 
 > [!NOTE]
 > These queries only work when `generate_bzl_library_targets = True` is passed to `npm_translate_lock`.
-> If you get no results, check the settings in your `MODULE.bazel` or `WORKSPACE` file and try again.
+> If you get no results, check the settings in your `MODULE.bazel` file and try again.
 
 To see the definition of one of these targets, you can run another `bazel query`:
 

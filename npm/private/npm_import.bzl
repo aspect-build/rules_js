@@ -919,7 +919,6 @@ You can create these manually if you want to have exact control.
 Bazel will only fetch the given package from an external registry if the package is
 required for the user-requested targets to be build/tested.
 
-This is a repository rule, which should be called from your `WORKSPACE` file.
 For example, in `MODULE.bazel`:
 
 ```starlark
