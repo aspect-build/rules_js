@@ -72,11 +72,26 @@ npm.npm_translate_lock(
     # Creates a new repository named "@npm" - you could choose any name you like
     name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
-    # Bazel 7.x and earlier: this attribute checks the .bazelignore file covers all node_modules folders.
-    # Bazel 8.0 can use https://bazel.build/rules/lib/globals/repo#ignore_directories:
-    #   ignore_directories(["**/node_modules"])
-    # in REPO.bazel
-    verify_node_modules_ignored = "//:.bazelignore",
+)
+```
+
+### Ignoring node_modules
+
+Bazel must be configured to ignore `node_modules` directories created by pnpm.
+
+**Bazel 8+**: Add to `REPO.bazel`:
+
+```starlark
+ignore_directories(["**/node_modules"])
+```
+
+**Bazel 7.x (deprecated)**: Use the `verify_node_modules_ignored` attribute which checks that `.bazelignore` covers all node_modules folders:
+
+```starlark
+npm.npm_translate_lock(
+    name = "npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",  # Bazel 7.x only
 )
 
 use_repo(npm, "npm")

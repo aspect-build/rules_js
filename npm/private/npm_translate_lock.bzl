@@ -298,10 +298,12 @@ Args:
         }
         ```
 
-    verify_node_modules_ignored: node_modules folders in the source tree should be ignored by Bazel.
+    verify_node_modules_ignored: **Bazel 7.x only (deprecated)** - Verifies node_modules folders are ignored.
 
         This points to a `.bazelignore` file to verify that all nested node_modules directories
         pnpm will create are listed.
+
+        **Bazel 8+**: Use `ignore_directories(["**/node_modules"])` in REPO.bazel instead.
 
         See https://github.com/bazelbuild/bazel/issues/8106
 
