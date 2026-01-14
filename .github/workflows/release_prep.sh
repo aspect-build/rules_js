@@ -34,34 +34,30 @@ Many companies are successfully building with rules_js.
 If you're getting value from the project, please let us know!
 Just comment on our [Adoption Discussion](https://github.com/aspect-build/rules_js/discussions/1000).
 
-## Using Bzlmod:
-
 Add to your \`MODULE.bazel\` file:
 \`\`\`starlark
 bazel_dep(name = "aspect_rules_js", version = "${TAG:1}")
 
-####### Node.js version #########
-# By default you get the node version from DEFAULT_NODE_VERSION in @rules_nodejs//nodejs:repositories.bzl
-# Optionally you can pin a different node version:
-bazel_dep(name = "rules_nodejs", version = "6.6.0")
-node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
-node.toolchain(node_version = "18.14.2")
-#################################
-
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
-
+# Translate the pnpm-lock.yaml file to bazel targets
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
-
 use_repo(npm, "npm")
-
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 
 # Allows developers to use the matching pnpm version, for example:
 # bazel run -- @pnpm --dir $PWD install
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
 use_repo(pnpm, "pnpm")
+\`\`\`
+
+By default you get the node version from \`DEFAULT_NODE_VERSION\` in \`@rules_nodejs//nodejs:repositories.bzl\`
+Optionally you can pin a different version using \`rules_nodejs\`:
+\`\`\`starlark
+bazel_dep(name = "rules_nodejs", version = "6.7.3")
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(node_version = "24.13.0")
 \`\`\`
 EOF
