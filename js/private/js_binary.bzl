@@ -20,7 +20,7 @@ load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
-load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
+load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
 
 _DOC = """Execute a program in the Node.js runtime.
 
@@ -519,14 +519,18 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         data_files = [entry_point] + ctx.files.data,
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
-        include_sources = ctx.attr.include_sources,
-        include_types = ctx.attr.include_types,
-        include_transitive_sources = ctx.attr.include_transitive_sources,
-        include_transitive_types = ctx.attr.include_transitive_types,
-        include_npm_sources = ctx.attr.include_npm_sources,
     ).merge(ctx.runfiles(
         files = launcher_files,
         transitive_files = transitive_launcher_files,
+    )).merge(ctx.runfiles(
+        transitive_files = gather_files_from_js_infos(
+            targets = ctx.attr.data,
+            include_sources = ctx.attr.include_sources,
+            include_types = ctx.attr.include_types,
+            include_transitive_sources = ctx.attr.include_transitive_sources,
+            include_transitive_types = ctx.attr.include_transitive_types,
+            include_npm_sources = ctx.attr.include_npm_sources,
+        ),
     ))
 
     return struct(

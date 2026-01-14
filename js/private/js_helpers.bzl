@@ -117,12 +117,7 @@ def gather_runfiles(
         deps = [],
         data_files = [],
         copy_data_files_to_bin = False,
-        no_copy_to_bin = [],
-        include_sources = True,
-        include_types = False,
-        include_transitive_sources = True,
-        include_transitive_types = False,
-        include_npm_sources = True):
+        no_copy_to_bin = []):
     """Creates a runfiles object containing files in `sources`, default outputs from `data` and transitive runfiles from `data` & `deps`.
 
     As a defense in depth against `data` & `deps` targets not supplying all required runfiles, also
@@ -158,16 +153,6 @@ def gather_runfiles(
             file such as a file in an external repository. In most cases, this option is not needed.
             See `copy_data_files_to_bin` docstring for more info.
 
-        include_sources: see js_info_files documentation
-
-        include_types: see js_info_files documentation
-
-        include_transitive_sources: see js_info_files documentation
-
-        include_transitive_types: see js_info_files documentation
-
-        include_npm_sources: see js_info_files documentation
-
     Returns:
         A [runfiles](https://bazel.build/rules/lib/runfiles) object created with [ctx.runfiles](https://bazel.build/rules/lib/ctx#runfiles).
     """
@@ -181,18 +166,6 @@ def gather_runfiles(
     # Gather the default outputs of data targets
     for target in data:
         transitive_files_depsets.append(target[DefaultInfo].files)
-
-    data_deps = data + deps
-
-    # Gather files from JsInfo providers of data & deps
-    transitive_files_depsets.append(gather_files_from_js_infos(
-        targets = data_deps,
-        include_sources = include_sources,
-        include_types = include_types,
-        include_transitive_sources = include_transitive_sources,
-        include_transitive_types = include_transitive_types,
-        include_npm_sources = include_npm_sources,
-    ))
 
     # Use `data_files` as-is if `copy_data_files_to_bin` is False
     if copy_data_files_to_bin:
@@ -211,7 +184,10 @@ def gather_runfiles(
         transitive_files = depset(transitive = transitive_files_depsets),
     ).merge_all([
         target[DefaultInfo].default_runfiles
-        for target in data_deps
+        for target in data
+    ]).merge_all([
+        target[DefaultInfo].default_runfiles
+        for target in deps
     ])
 
 LOG_LEVELS = {
