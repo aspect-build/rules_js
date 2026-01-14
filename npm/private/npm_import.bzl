@@ -198,7 +198,7 @@ def npm_imported_package_store_internal(
                        "//conditions:default": [],
                    }),
             copy_srcs_to_bin = False,
-            tool = Label("@aspect_rules_js//npm/private/lifecycle:lifecycle-hooks"),
+            tool = Label("@aspect_rules_js//npm/private/lifecycle/min:bin"),
             out_dirs = [lifecycle_output_dir],
             tags = ["manual"],
             execution_requirements = lifecycle_hooks_execution_requirements,

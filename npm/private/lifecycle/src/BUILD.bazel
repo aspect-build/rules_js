@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
-set -o errexit -o nounset
-# Bundle our program with its two dependencies, because they're large:
+load("@npm//npm/private/lifecycle:rollup/package_json.bzl", rollup_bin = "bin")
+
+# Bundle our program with its dependencies, because they're large:
 # ┌─────────────────┬──────────────┬────────┐
 # │ name            │ children     │ size   │
 # ├─────────────────┼──────────────┼────────┤
@@ -12,9 +12,26 @@ set -o errexit -o nounset
 # └─────────────────┴──────────────┴────────┘
 # This avoids users having to fetch all those packages just to run the postinstall hooks.
 
-npm install
-npx -y rollup -c
-# ascii_only avoids bad unicode conversions, fixing
-# https://github.com/aspect-build/rules_js/issues/45
-npx -y terser@5.12.1 min/index.js -b ascii_only=true >min/index.min.js
-rm min/index.js
+rollup_bin.rollup(
+    name = "bundle",
+    srcs = [
+        "lifecycle-hooks.js",
+        "//npm/private/lifecycle:node_modules/@pnpm/lifecycle",
+        "//npm/private/lifecycle:node_modules/@pnpm/logger",
+        "//npm/private/lifecycle:node_modules/@pnpm/read-package-json",
+        "//npm/private/lifecycle:node_modules/path-exists",
+        "//npm/private/lifecycle:rollup_config",
+    ],
+    outs = ["index.min.js"],
+    args = [
+        "lifecycle-hooks.js",
+        "--config",
+        "../rollup.config.mjs",
+        "--format",
+        "cjs",
+        "--file",
+        "index.min.js",
+    ],
+    chdir = package_name(),
+    visibility = ["//npm/private/lifecycle:__subpackages__"],
+)

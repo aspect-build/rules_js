@@ -2,13 +2,17 @@
     "name": "lifecycle-deps",
     "private": true,
     "dependencies": {
+        "path-exists": "^4.0.0",
         "@pnpm/lifecycle": "14.1.7",
+        "@pnpm/read-package-json": "~7.0.0",
         "@pnpm/logger": "5.2.0"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^28.0.3",
-        "@rollup/plugin-json": "^6.1.0",
-        "@rollup/plugin-node-resolve": "^16.0.1",
-        "@rollup/plugin-replace": "^6.0.2"
+        "@rollup/plugin-commonjs": "28.0.3",
+        "@rollup/plugin-json": "6.1.0",
+        "@rollup/plugin-node-resolve": "16.0.1",
+        "@rollup/plugin-replace": "6.0.3",
+        "@rollup/plugin-terser": "0.4.4",
+        "rollup": "4.39.0"
     }
 }
