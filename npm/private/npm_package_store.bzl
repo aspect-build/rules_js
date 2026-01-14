@@ -14,7 +14,7 @@ _DOC = """Defines a npm package that is linked into a node_modules tree.
 The npm package is linked with a pnpm style symlinked node_modules output tree.
 
 The term "package" is defined at
-<https://nodejs.org/docs/latest-v16.x/api/packages.html>
+<https://nodejs.org/docs/latest-v22.x/api/packages.html>
 
 See https://pnpm.io/symlinked-node-modules-structure for more information on
 the symlinked node_modules structure.

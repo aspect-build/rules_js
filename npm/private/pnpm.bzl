@@ -329,11 +329,8 @@ def _assert_lockfile_version(version, testonly = False):
     if type(version) != type(1.0):
         fail("version should be passed as a float")
 
-    # Restrict the supported lock file versions to what this code has been tested with:
-    #   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
-    #   6.0 - pnpm v8.0.0 bumped the lockfile version to 6.0; this included breaking changes
-    #   6.1 - pnpm v8.6.0 bumped the lockfile version to 6.1
-    #   9.0 - pnpm v9.0.0 bumped the lockfile version to 9.0
+    # Restrict the supported lock file versions to what this code has been tested with.
+    # pnpm v9.0.0 bumped the lockfile version to 9.0
     min_lock_version = 9.0
     max_lock_version = 9.0
     msg = None
