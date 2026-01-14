@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url'
-import pkgC from './pkg-c.json' assert { type: 'json' }
+import pkgC from './pkg-c.json' with { type: 'json' }
 
 export default pkgC
 
