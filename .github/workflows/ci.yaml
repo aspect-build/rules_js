@@ -31,6 +31,7 @@ jobs:
                   a=(
                     "major:$m, version:\"$v\""
                     "major:8, version:\"8.1.1\""
+                    "major:9, version:\"9.0.0rc5\""
                   )
                   printf -v j '{%s},' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
@@ -129,6 +130,9 @@ jobs:
                     # Don't run tests with Bazel 8 by default
                     - bazel-version:
                           major: 8
+                    # Don't run tests with Bazel 9 by default
+                    - bazel-version:
+                          major: 9
                 include:
                     # Include unit tests with bazel8
                     - bazel-version:
@@ -136,12 +140,20 @@ jobs:
                       folder: .
                       os: ubuntu
                       config: local
+                    # Include unit tests with bazel9
+                    - bazel-version:
+                          major: 9
+                      folder: .
+                      os: ubuntu
+                      config: local
+                    # Include unit tests with bazel7 on windows
                     - bazel-version:
                           major: 7
                           version: 7.7.1
                       os: windows
                       config: local
                       folder: e2e/bzlmod
+                    # Include unit tests with bazel7 on macos
                     - bazel-version:
                           major: 7
                           version: 7.7.1
