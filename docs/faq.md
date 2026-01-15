@@ -2,20 +2,6 @@
 title: FAQ
 ---
 
-## Flaky build failure: Exec failed due to IOException
-
-Known issue: we sometimes see
-
-```
-(00:55:55) ERROR: /mnt/ephemeral/workdir/BUILD.bazel:46:22: Copying directory aspect_rules_js~1.37.0~npm~npm__picocolors__1.0.0/package failed: Exec failed due to IOException: /mnt/ephemeral/output/__main__/execroot/_main/external/aspect_rules_js~1.37.0~npm~npm__picocolors__1.0.0/package (No such file or directory)
-```
-
-This is most likely caused by https://github.com/bazelbuild/bazel/issues/22073. You can either update to Bazel 7.2.0rc1 or later or temporarily add this line to `.bazelrc`:
-
-```
-common --noexperimental_merged_skyframe_analysis_execution
-```
-
 ## Why does my program fail with "Module not found"?
 
 See the [Troubleshooting guide](./troubleshooting.md).

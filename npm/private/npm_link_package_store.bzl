@@ -10,7 +10,7 @@ This is used in conjunction with the npm_package_store rule that outputs an npm 
 node_modules/.aspect_rules_js package store in a pnpm style symlinked node_modules structure.
 
 The term "package" is defined at
-<https://nodejs.org/docs/latest-v16.x/api/packages.html>
+<https://nodejs.org/docs/latest-v22.x/api/packages.html>
 
 See https://pnpm.io/symlinked-node-modules-structure for more information on
 the symlinked node_modules structure.

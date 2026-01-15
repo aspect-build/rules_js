@@ -2,7 +2,6 @@
 See https://bazel.build/docs/bzlmod#extension-definition
 """
 
-load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
@@ -68,11 +67,7 @@ def _npm_extension_impl(module_ctx):
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
 
-    if bazel_features.external_deps.extension_metadata_has_reproducible:
-        return module_ctx.extension_metadata(
-            reproducible = True,
-        )
-    return module_ctx.extension_metadata()
+    return module_ctx.extension_metadata(reproducible = True)
 
 def _build_exclude_package_contents_config(module_ctx):
     """Build exclude_package_contents configuration from tags across all modules."""
