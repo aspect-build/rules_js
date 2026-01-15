@@ -13,4 +13,4 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/bin/
--r-xr-xr-x  0 0      0    97607264 Jan  1  1970 ./js/private/test/image/bin.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/bin/node
+-r-xr-xr-x  0 0      0   123405064 Jan  1  1970 ./js/private/test/image/bin.runfiles/rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/bin/node

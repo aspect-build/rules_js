@@ -65,14 +65,14 @@ write_file(
     out = "binary_version.js",
     content = ["""
 if (parseInt(process.version.slice(1)) !== parseInt(process.argv[2])) {
-    throw new Error(`Expected node version ${parseInt(process.version)}.* but got ${parseInt(process.argv[2])}`)
+    throw new Error(`Expected node version ~'${process.argv[2]}' but got ${process.version}`)
 }
 """],
 )
 
 js_test(
     name = "main_default_toolchain",
-    args = ["20"],
+    args = ["22"],
     entry_point = "binary_version.js",
 )
 

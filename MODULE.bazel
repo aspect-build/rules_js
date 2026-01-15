@@ -15,7 +15,7 @@ bazel_dep(name = "aspect_tools_telemetry", version = "0.3.3")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "0.0.5")
-bazel_dep(name = "rules_nodejs", version = "6.6.2")
+bazel_dep(name = "rules_nodejs", version = "6.7.3")
 
 # Ensure any version of aspect_bazel_lib used includes:
 # https://github.com/bazel-contrib/bazel-lib/commit/371362199e5e5bde58aeb15b54ea6cfb164af337
