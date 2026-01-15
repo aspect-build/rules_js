@@ -849,7 +849,6 @@ def _npm_import_links_rule_impl(rctx):
             _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL,
             _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL,
         ]
-        if tmpl
     ]
 
     generated_by_prefix = _make_generated_by_prefix(rctx.attr.key)
