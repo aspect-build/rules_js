@@ -289,10 +289,14 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
 )
 
-# Configure package exclusions using tag class
+# Configure default package exclusions for all packages, except nextjs
 npm.npm_exclude_package_contents(
-    package = "chalk",
-    patterns = ["**/README*"],
+    package = "*",
+    use_defaults = True,
+)
+npm.npm_exclude_package_contents(
+    package = "next",
+    patterns = [],
 )
 use_repo(
     npm,

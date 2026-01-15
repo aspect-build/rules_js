@@ -21,6 +21,7 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", "npm_package_store_internal")
@@ -876,7 +877,7 @@ _COMMON_ATTRS = {
     "package": attr.string(mandatory = True),
     "root_package": attr.string(),
     "version": attr.string(mandatory = True),
-    "exclude_package_contents": attr.string_list(default = []),
+    "exclude_package_contents": attr.string_list(default = exclude_package_contents_default),
 }
 
 _INTERNAL_COMMON_ATTRS = {

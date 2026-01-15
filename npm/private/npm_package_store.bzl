@@ -5,6 +5,7 @@ load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
+load(":exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
@@ -113,7 +114,7 @@ _ATTRS = {
 
         The exclude patterns are relative to the package store directory.
         """,
-        default = [],
+        default = exclude_package_contents_default,
     ),
     "package": attr.string(
         doc = """The package name to link to.
