@@ -39,6 +39,7 @@ def npm_imported_package_store_internal():
         },
         use_default_shell_env = False,
         exclude_package_contents = [],
+        exclude_package_contents_presets = ["basic"],
     )
 
 # Generated npm_link_imported_package_store_internal() for npm package fsevents@2.3.3

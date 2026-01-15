@@ -49,6 +49,7 @@ def npm_imported_package_store_internal():
         },
         use_default_shell_env = True,
         exclude_package_contents = [],
+        exclude_package_contents_presets = ["basic"],
     )
 
 # Generated npm_link_imported_package_store_internal() for npm package segfault-handler@1.3.0

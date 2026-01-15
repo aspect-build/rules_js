@@ -3,7 +3,6 @@ See https://bazel.build/docs/bzlmod#extension-definition
 """
 
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
-load("//npm/private:exclude_package_contents_default.bzl", "exclude_package_contents_default")
 load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
 load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
@@ -80,14 +79,12 @@ def _build_exclude_package_contents_config(module_ctx):
             if package in exclusions:
                 fail("Duplicate exclude_package_contents tag for package: {}".format(package))
 
-            exclusions[package] = []
-
-            # Add default exclusions if requested
-            if exclude_tag.use_defaults:
-                exclusions[package].extend(exclude_package_contents_default)
-
-            # Add custom patterns
-            exclusions[package].extend(exclude_tag.patterns)
+            # Store patterns and presets separately - don't expand here,
+            # they will be processed via npm_import attributes
+            exclusions[package] = struct(
+                patterns = exclude_tag.patterns,
+                presets = exclude_tag.presets,
+            )
 
     return exclusions
 
@@ -191,6 +188,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             patch_args = i.patch_args,
             patches = i.patches,
             exclude_package_contents = i.exclude_package_contents,
+            exclude_package_contents_presets = i.exclude_package_contents_presets,
             replace_package = i.replace_package,
             root_package = state.root_package(),
             transitive_closure = i.transitive_closure,
@@ -241,6 +239,7 @@ def _npm_import_bzlmod(i):
         patch_args = i.patch_args,
         patches = i.patches,
         exclude_package_contents = i.exclude_package_contents,
+        exclude_package_contents_presets = i.exclude_package_contents_presets,
         replace_package = i.replace_package,
         root_package = i.root_package,
         transitive_closure = None,
@@ -267,18 +266,24 @@ _EXCLUDE_PACKAGE_CONTENT_ATTRS = {
         doc = "List of glob patterns to exclude from the specified package.",
         default = [],
     ),
-    "use_defaults": attr.bool(
-        doc = "Whether to use default exclusion patterns for the specified package. Defaults are as to Yarn autoclean: https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16",
-        default = False,
+    "presets": attr.string_list(
+        doc = """\
+Which preset exclusion patterns to include. Multiple presets can be combined. Valid values:
+- "basic": basic exclusions such as README files, tests, and development files.
+- "yarn_autoclean": Yarn autoclean exclusions (see https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16)
+""",
+        default = ["basic"],
     ),
 }
 
 _EXCLUDE_PACKAGE_CONTENT_DOCS = """Configuration for excluding package contents from npm packages.
 
 This tag can be used multiple times to specify different exclusion patterns for different package specifiers.
-Multiple exclusion patterns for the same package are combined.
+More specific package matches override less specific ones (the wildcard "*" is only used if no specific
+package match is found).
 
-The `yarn autoclean` default exclusion patterns can be included by setting `use_defaults` to `True`.
+By default, `presets` is set to `["basic"]` which excludes common files such as `*.md` and development-related
+files. Multiple presets can be combined.
 
 Example:
 ```
@@ -288,7 +293,8 @@ npm.npm_exclude_package_contents(
 )
 npm.npm_exclude_package_contents(
     package = "my-package@1.2.3",
-    use_defaults = True,
+    # Overrides the "*" config for this specific package
+    presets = ["yarn_autoclean"],
 )
 ```
 """

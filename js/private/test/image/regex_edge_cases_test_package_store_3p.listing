@@ -10,9 +10,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/
--r-xr-xr-x  0 0      0       22267 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/CHANGELOG.md
 -r-xr-xr-x  0 0      0        1099 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/LICENSE
--r-xr-xr-x  0 0      0       10799 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/README.md
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/bin/
 -r-xr-xr-x  0 0      0          60 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/bin/acorn
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/dist/
@@ -25,9 +23,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/acorn/
--r-xr-xr-x  0 0      0       19126 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/acorn/CHANGELOG.md
 -r-xr-xr-x  0 0      0        1099 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/acorn/LICENSE
--r-xr-xr-x  0 0      0       10341 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/acorn/README.md
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/acorn/bin/
 -r-xr-xr-x  0 0      0          60 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/acorn/bin/acorn
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.7.1/node_modules/acorn/dist/
@@ -42,7 +38,6 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/
 -r-xr-xr-x  0 0      0        1117 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/license
 -r-xr-xr-x  0 0      0        1401 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/package.json
--r-xr-xr-x  0 0      0       11894 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/readme.md
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/source/
 -r-xr-xr-x  0 0      0        6204 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/source/index.d.ts
 -r-xr-xr-x  0 0      0        5581 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/source/index.js
@@ -59,10 +54,6 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/
--r-xr-xr-x  0 0      0       12680 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/CHANGELOG.md
--r-xr-xr-x  0 0      0         513 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/CONTRIBUTING.md
--r-xr-xr-x  0 0      0        1109 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/LICENSE.md
--r-xr-xr-x  0 0      0       16564 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/README.md
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/dist/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/dist/bin/
 -r-xr-xr-x  0 0      0          44 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/dist/bin/uuid

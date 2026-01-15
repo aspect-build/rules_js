@@ -42,6 +42,7 @@ def npm_imported_package_store_internal():
         lifecycle_hooks_execution_requirements = {},
         use_default_shell_env = False,
         exclude_package_contents = [],
+        exclude_package_contents_presets = ["basic"],
     )
 
 # Generated npm_link_imported_package_store_internal() for npm package @aspect-test/a@5.0.2

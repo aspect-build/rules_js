@@ -23,7 +23,7 @@ npm.npm_translate_lock(
 )
 npm.npm_exclude_package_contents(
     package = "*",
-    use_defaults = True,
+    presets = ["yarn_autoclean"],
 )
 npm.npm_exclude_package_contents(
     package = "is-odd@3.0.1",
@@ -31,6 +31,6 @@ npm.npm_exclude_package_contents(
         "**/README*",
         "**/LICENSE*",
     ],
-    use_defaults = True,
+    presets = ["yarn_autoclean"],
 )
 use_repo(npm, "npm")

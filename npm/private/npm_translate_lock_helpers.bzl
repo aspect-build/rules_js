@@ -49,19 +49,36 @@ Check the public_hoist_packages attribute for duplicates.
 
 ################################################################################
 def _gather_package_content_excludes(config, *names):
-    found = False
-    excludes = []
+    """Gather exclude patterns and presets for a package.
 
+    More specific package matches override less specific ones (first match wins).
+    The wildcard "*" config is only used if no specific package match is found.
+
+    Args:
+        config: Dict mapping package names to struct(patterns, presets)
+        *names: Package names to look up in order of precedence (e.g., name, friendly_name, unfriendly_name)
+
+    Returns:
+        A struct with patterns (list or None) and presets (list)
+    """
+
+    # Find the first matching config (most specific match wins, does not extend)
     for name in names:
         if name in config:
-            found = True
             value = config[name]
-            excludes.extend(value)
+            return struct(
+                patterns = value.patterns,
+                presets = value.presets,
+            )
 
-    if not found:
-        return config["*"] if "*" in config else None
+    # Fall back to wildcard if no specific match
+    if "*" in config:
+        wildcard = config["*"]
+        return struct(patterns = wildcard.patterns, presets = wildcard.presets)
 
-    return excludes
+    # Must repeat the default here since it is passed through to `npm_import()`
+    # and overrides the default exclude patterns defined by the rule.
+    return struct(patterns = None, presets = ["basic"])
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
@@ -346,7 +363,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         # https://docs.google.com/document/d/1N81qfCa8oskCk5LqTW-LNthy6EBrDot7bdUsjz6JFC4/
         patches = [attr.pnpm_lock.relative(patch) for patch in patches]
 
-        exclude_package_contents = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
+        exclude_package_contents_result = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
 
         # gather replace packages
         replace_package, _ = _gather_values_from_matching_names(True, replace_packages, name, friendly_name, unfriendly_name)
@@ -440,7 +457,8 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             patch_tool = attr.patch_tool,
             patch_args = patch_args,
             patches = patches,
-            exclude_package_contents = exclude_package_contents,
+            exclude_package_contents = exclude_package_contents_result.patterns,
+            exclude_package_contents_presets = exclude_package_contents_result.presets,
             lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
