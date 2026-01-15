@@ -20,8 +20,7 @@ def js_info(
         transitive_sources = None,
         transitive_types = None,
         npm_sources = None,
-        npm_package_store_infos = None,
-        **kwargs):
+        npm_package_store_infos = None):
     """Construct a JsInfo.
 
     Args:
@@ -32,16 +31,10 @@ def js_info(
         transitive_types: See JsInfo documentation
         npm_sources: See JsInfo documentation
         npm_package_store_infos: See JsInfo documentation
-        **kwargs: For backward compat support
 
     Returns:
         A JsInfo provider
     """
-
-    # Any addition non arguments should be considered invalid
-    if len(kwargs):
-        msg = "Invalid js_info parameter '{}'".format(kwargs.keys()[0])
-        fail(msg)
 
     # Default to depset()
 

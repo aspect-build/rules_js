@@ -563,8 +563,8 @@ def _download_and_extract_archive(rctx, package_json_only):
             fail(msg)
 
 def _npm_import_rule_impl(rctx):
-    has_lifecycle_hooks = not (not rctx.attr.lifecycle_hooks) or not (not rctx.attr.custom_postinstall)
-    has_patches = not (not rctx.attr.patches)
+    has_lifecycle_hooks = bool(rctx.attr.lifecycle_hooks) or bool(rctx.attr.custom_postinstall)
+    has_patches = bool(rctx.attr.patches)
 
     reproducible = False
     package_src = _EXTRACT_TO_DIRNAME
@@ -849,7 +849,6 @@ def _npm_import_links_rule_impl(rctx):
             _LINK_JS_PACKAGE_LINK_IMPORTED_STORE_TMPL,
             _LINK_JS_PACKAGE_LINK_IMPORTED_PKG_TMPL,
         ]
-        if tmpl
     ]
 
     generated_by_prefix = _make_generated_by_prefix(rctx.attr.key)
@@ -1243,8 +1242,8 @@ def npm_import(
         exclude_package_contents = exclude_package_contents,
     )
 
-    has_custom_postinstall = not (not custom_postinstall)
-    has_lifecycle_hooks = not (not lifecycle_hooks)
+    has_custom_postinstall = bool(custom_postinstall)
+    has_lifecycle_hooks = bool(lifecycle_hooks)
 
     # By convention, the `{name}{utils.links_repo_suffix}` repository contains the generated
     # code to link this npm package into one or more node_modules trees
