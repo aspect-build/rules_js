@@ -14,6 +14,24 @@ try {
     // in case file doesn't exist or some other error is thrown, just ignore it.
 } catch {}
 
+// When --experimental_split_coverage_postprocessing is enabled, Bazel runs
+// coverage post-processing as a separate action. The COVERAGE_DIR may have been
+// created by a previous action with restrictive permissions. Ensure we can write
+// to it by making the directory writable.
+try {
+    const coverageDir = process.env.COVERAGE_DIR
+    if (coverageDir) {
+        const stats = fs.statSync(coverageDir, { throwIfNoEntry: false })
+        // Check if directory exists and is not writable by owner
+        if (stats && (stats.mode & 0o200) === 0) {
+            fs.chmodSync(coverageDir, stats.mode | 0o200)
+        }
+    }
+} catch {
+    // Ignore errors - if we can't fix permissions, the write will fail with
+    // a more descriptive error message below
+}
+
 const include = fs
     .readFileSync(process.env.COVERAGE_MANIFEST)
     .toString('utf8')
