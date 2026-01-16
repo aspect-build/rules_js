@@ -142,3 +142,98 @@ assert_contains(
     actual = ":regexy-stdout",
     expected = "--arg2=/{%(.*?)%}/",
 )
+
+write_file(
+    name = "write_env_json",
+    out = "env_json.js",
+    content = ["""
+        console.log(process.env.JSON_ENV);
+        console.log(process.env.JSON_OBJ);
+        console.log(process.env.JSON_STR);
+        console.log(process.env.JSON_ENCODE);
+
+        if (JSON.parse(process.env.JSON_ENV)[0] !== 'twx') {
+            console.error('JSON_ENV value incorrect: ', process.env.JSON_ENV);
+            process.exit(1);
+        }
+        if (JSON.parse(process.env.JSON_OBJ).allow[0] !== 'twx') {
+            console.error('JSON_OBJ value incorrect: ', process.env.JSON_OBJ);
+            process.exit(1);
+        }
+        if (JSON.parse(process.env.JSON_STR).note !== 'he said "hi"') {
+            console.error('JSON_STR value incorrect: ', process.env.JSON_STR);
+            process.exit(1);
+        }
+        if (JSON.parse(process.env.JSON_ENCODE)[0] !== 'twx') {
+            console.error('JSON_ENCODE value incorrect: ', process.env.JSON_ENCODE);
+            process.exit(1);
+        }
+    """],
+)
+
+js_binary(
+    name = "env_json",
+    entry_point = "env_json.js",
+    env = {
+        "JSON_ENV": "[\"twx\"]",
+        "JSON_OBJ": "{\"allow\": [\"twx\"], \"deny\": []}",
+        "JSON_STR": "{\"note\": \"he said \\\"hi\\\"\"}",
+        "JSON_ENCODE": json.encode(["twx"]),
+    },
+)
+
+js_run_binary(
+    name = "_env_json",
+    log_level = "debug",
+    silent_on_success = False,
+    stdout = "env-json-stdout",
+    tool = ":env_json",
+)
+
+assert_contains(
+    name = "env_json_value",
+    actual = ":env-json-stdout",
+    expected = "[\"twx\"]",
+)
+
+assert_contains(
+    name = "env_json_launcher_escaped",
+    actual = ":env_json",
+    expected = "export JSON_ENV=\"[\\\"twx\\\"]\"",
+)
+
+assert_contains(
+    name = "env_json_obj_value",
+    actual = ":env-json-stdout",
+    expected = "{\"allow\": [\"twx\"], \"deny\": []}",
+)
+
+assert_contains(
+    name = "env_json_str_value",
+    actual = ":env-json-stdout",
+    expected = "{\"note\": \"he said \\\"hi\\\"\"}",
+)
+
+assert_contains(
+    name = "env_json_encode_value",
+    actual = ":env-json-stdout",
+    expected = "[\"twx\"]",
+)
+
+assert_contains(
+    name = "env_json_obj_launcher_escaped",
+    actual = ":env_json",
+    expected = """ export JSON_OBJ="{\\\"allow\\\": [\\\"twx\\\"], \\\"deny\\\": []}" """.strip(),
+)
+
+assert_contains(
+    name = "env_json_str_launcher_escaped",
+    actual = ":env_json",
+    expected = """ export JSON_STR="{\\\"note\\\": \\\"he said \\\\\\\"hi\\\\\\\"\\\"}" """.strip(),
+)
+
+assert_contains(
+    name = "env_json_encode_launcher_escaped",
+    actual = ":env_json",
+    expected = "export JSON_ENCODE=\"[\\\"twx\\\"]\"",
+)
