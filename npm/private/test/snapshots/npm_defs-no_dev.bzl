@@ -3004,7 +3004,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@mycorp/pkg-b",
                 ":node_modules/@mycorp/pkg-d",
             ])
-    return link_targets
+    return ["//%s%s" % (bazel_package, target) for target in link_targets]
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a" package
 # buildifier: disable=function-docstring

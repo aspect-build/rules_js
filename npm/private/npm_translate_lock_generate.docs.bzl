@@ -18,7 +18,7 @@ load("@npm//:defs.bzl", "npm_link_targets", "npm_link_all_packages")
 
 # buildifier: disable=unused-variable
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
-    """Generated list of target names that are linked by npm_link_all_packages()
+    """Generated list of target labels that are linked by npm_link_all_packages()
 
     Args:
         name: name of catch all target to generate for all packages linked
@@ -35,7 +35,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
             Default True includes development dependencies.
 
     Returns:
-        A list of target names that are linked by npm_link_all_packages()
+        A list of target labels (full package labels) that are linked by npm_link_all_packages()
     """
     pass
 
