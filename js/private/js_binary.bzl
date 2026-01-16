@@ -324,14 +324,17 @@ _ATTRS = {
     ),
 }
 
-_ENV_SET = """export {var}=\"{value}\""""
-_ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
+_ENV_SET = """export {var}={quoted_value}"""
+_ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
 _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 
 def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
+
+def _bash_quote(value):
+    return json.encode(value)
 
 def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
@@ -340,10 +343,10 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         fixed_env = dict(fixed_env, **{"JS_BINARY__PATCH_NODE_FS": "0"})
 
     envs = [
-        _ENV_SET.format(var = key, value = _expand_env_if_needed(ctx, value))
+        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
         for key, value in fixed_env.items()
     ] + [
-        _ENV_SET.format(var = key, value = _expand_env_if_needed(ctx, value))
+        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
         for key, value in ctx.attr.env.items()
     ]
 
@@ -356,7 +359,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     for (key, value) in makevars.items():
         envs.append(_ENV_SET.format(
             var = key,
-            value = ctx.expand_make_variables("env", value, {}),
+            quoted_value = _bash_quote(ctx.expand_make_variables("env", value, {})),
         ))
 
     # Add rule context variables to the environment
@@ -374,29 +377,35 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if is_windows and not ctx.attr.enable_runfiles:
         builtins["JS_BINARY__NO_RUNFILES"] = "1"
     for (key, value) in builtins.items():
-        envs.append(_ENV_SET.format(var = key, value = value))
+        envs.append(_ENV_SET.format(var = key, quoted_value = _bash_quote(value)))
 
     if ctx.attr.patch_node_fs:
         # Set patch node fs API env if not already set to allow js_run_binary to override
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__PATCH_NODE_FS", value = "1"))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(
+            var = "JS_BINARY__PATCH_NODE_FS",
+            quoted_value = _bash_quote("1"),
+        ))
 
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(
             var = "JS_BINARY__EXPECTED_EXIT_CODE",
-            value = str(ctx.attr.expected_exit_code),
+            quoted_value = _bash_quote(str(ctx.attr.expected_exit_code)),
         ))
 
     if ctx.attr.copy_data_to_bin:
         # Set an environment variable to flag that we have copied js_binary data to bin
-        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", value = "1"))
+        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _bash_quote("1")))
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", value = _expand_env_if_needed(ctx, ctx.attr.chdir)))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(
+            var = "JS_BINARY__CHDIR",
+            quoted_value = _bash_quote(_expand_env_if_needed(ctx, ctx.attr.chdir)),
+        ))
 
     # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, value = "1"))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, quoted_value = _bash_quote("1")))
 
     node_options = []
     for node_option in ctx.attr.node_options:
