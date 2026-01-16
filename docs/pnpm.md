@@ -99,9 +99,6 @@ use_repo(npm, "npm")
 
 Note that you could call `npm.npm_translate_lock` more than once, if you have more than one pnpm workspace in your repository.
 
-If you really don't want to rely on this being generated at runtime, we have experimental support
-to check in the result instead. See [checked-in repositories.bzl](#checked-in-repositoriesbzl) below.
-
 ## Hoisting
 
 The `node_modules` tree laid out by `rules_js` should be bug-for-bug compatible with the `node_modules` tree that
@@ -363,33 +360,3 @@ In this example:
     -   `PREBULT_BINARY=http://downloadurl`
 -   `fum` at version 0.0.1 has remote execution disabled. Like other packages aside from `@foo/bar`
     the action sandbox is disabled for performance.
-
-## Checked-in repositories.bzl
-
-This usage is experimental and difficult to get right! Read on with caution.
-
-You can check in the `repositories.bzl` file to version control, and load that instead.
-
-This makes it easier to ship a ruleset that has its own npm dependencies, as users don't
-have to install those dependencies. It also avoids eager-evaluation of `npm_translate_lock`
-for builds that don't need it.
-This is similar to the [`update-repos`](https://github.com/bazelbuild/bazel-gazelle#update-repos)
-approach from bazel-gazelle.
-
-The tradeoffs are similar to
-[this rules_python thread](https://github.com/bazelbuild/rules_python/issues/608).
-
-In a BUILD file, use a rule like
-[write_source_files](https://github.com/bazel-contrib/bazel-lib/blob/main/docs/write_source_files.md)
-to copy the generated file to the repo and test that it stays updated:
-
-```starlark
-write_source_files(
-    name = "update_repos",
-    files = {
-        "repositories.bzl": "@npm//:repositories.bzl",
-    },
-)
-```
-
-Then in `MODULE.bazel`, load from that checked-in copy or instruct your users to do so.

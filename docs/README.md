@@ -58,7 +58,7 @@ If your code works with pnpm, then you should expect it works under Bazel as wel
 This means that if your issue can be reproduced outside of Bazel, using a reproduction with only pnpm,
 then we ask that you fix the issue there, and will close such issues filed on rules_js.
 
-Supported pnpm versions are 7-9 (lockfile versions 5.4-6.1, 9).
+Supported pnpm versions are 9-10 (lockfile version 9).
 
 The typical usage is to import an entire `pnpm-lock.yaml` file.
 Create such a file if you don't have one. You could install pnpm on your machine, or use `npx` to run it.
