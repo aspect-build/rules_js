@@ -1,0 +1,2 @@
+# Stub WORKSPACE required for Bazel 6 when a module is referenced via a local_repository override.
+workspace(name = "workspace")

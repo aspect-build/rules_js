@@ -1,0 +1,7 @@
+module(name = "workspace")
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../../..",
+)

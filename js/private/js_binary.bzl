@@ -404,7 +404,23 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", value = _expand_env_if_needed(ctx, ctx.attr.chdir)))
+        chdir_value = _expand_env_if_needed(ctx, ctx.attr.chdir)
+
+        # Normalize workspace-relative chdir for external repositories to avoid requiring
+        # callers to manually prefix with "external/<repo>/".
+        if (
+            ctx.label.repo_name and
+            not (chdir_value.startswith("external/") or chdir_value.startswith("/")) and
+            not chdir_value.startswith("@")
+        ):
+            if chdir_value == ".":
+                normalized_chdir = "external/{}".format(ctx.label.repo_name)
+            else:
+                normalized_chdir = "external/{}/{}".format(ctx.label.repo_name, chdir_value)
+        else:
+            normalized_chdir = chdir_value
+
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", value = normalized_chdir))
 
     # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
