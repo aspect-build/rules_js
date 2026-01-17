@@ -316,9 +316,8 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
     let symlinkMeta = '';
     if (isNodeModulePath(file)) {
         let linkPath = await fs.promises.readlink(src);
-        if (path.isAbsolute(linkPath)) {
-            linkPath = path.relative(src, linkPath);
-        }
+        const linkAbs = path.resolve(path.dirname(src), linkPath);
+        linkPath = path.relative(src, linkAbs) || '.';
         // Special case for 1p node_modules symlinks
         const maybe1pSync = path.join(sandbox, file, linkPath);
         if (fs.existsSync(maybe1pSync)) {
