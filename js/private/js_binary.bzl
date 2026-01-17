@@ -469,6 +469,15 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
+        # If copy_data_to_bin is enabled and entry_point is a source file, check if a
+        # generated file with the same path is already provided via data. If so, use the
+        # generated file to avoid a conflicting copy action (see https://github.com/aspect-build/rules_js/issues/2190).
+        if ctx.attr.copy_data_to_bin and entry_point.is_source:
+            for d in ctx.files.data:
+                if not d.is_source and d.short_path == entry_point_path:
+                    entry_point = d
+                    break
+
     bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
