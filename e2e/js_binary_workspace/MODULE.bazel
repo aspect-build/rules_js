@@ -1,0 +1,16 @@
+module(name = "js_binary_workspace")
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+bazel_dep(name = "bazel_skylib", version = "1.8.1", dev_dependency = True)
+
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+# Add the subject module as a local repository so we can run it as an external dep
+bazel_dep(name = "workspace")
+local_path_override(
+    module_name = "workspace",
+    path = "workspace",
+)
