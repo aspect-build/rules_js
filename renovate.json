@@ -1,6 +1,5 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-
     "extends": [
         ":dependencyDashboard",
         ":enablePreCommit",
@@ -12,15 +11,12 @@
     ],
     "packageRules": [
         {
-            "matchFiles": ["MODULE.bazel"],
+            "matchFileNames": ["MODULE.bazel"],
             "enabled": false
         }
     ],
-
     "labels": ["deps"],
-
     "dependencyDashboard": true,
-
     "ignorePaths": [
         "**/node_modules/**",
         "e2e/**",
