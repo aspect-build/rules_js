@@ -3017,7 +3017,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@mycorp/pkg-d",
                 ":node_modules/@mycorp/pkg-b",
             ])
-    return link_targets
+    return ["//%s%s" % (bazel_package, target) for target in link_targets]
 
 # Generated npm_link_package_store for linking of first-party "@mycorp/pkg-a" package
 # buildifier: disable=function-docstring

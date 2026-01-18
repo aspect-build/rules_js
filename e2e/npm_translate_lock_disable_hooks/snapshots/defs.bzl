@@ -78,4 +78,4 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
     if bazel_package == "":
         if prod:
             link_targets.extend([":node_modules/@aspect-test/c"])
-    return link_targets
+    return ["//%s%s" % (bazel_package, target) for target in link_targets]

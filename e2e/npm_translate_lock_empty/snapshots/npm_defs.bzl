@@ -70,4 +70,4 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     link_targets = []
 
-    return link_targets
+    return ["//%s%s" % (bazel_package, target) for target in link_targets]

@@ -84,4 +84,4 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/chalk",
                 ":node_modules/lodash",
             ])
-    return link_targets
+    return ["//%s%s" % (bazel_package, target) for target in link_targets]

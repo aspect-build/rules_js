@@ -552,7 +552,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 targets = starlark_codegen_utils.to_list_attr(lists["dev"], 3, 4, quote_value = False),
             ))
         first_link = False
-    npm_link_targets_bzl.append("""    return link_targets""")
+    npm_link_targets_bzl.append("""    return ["//%s%s" % (bazel_package, target) for target in link_targets]""")
     return npm_link_targets_bzl
 
 def _generate_npm_visibility_config(package_visibility_attr):
