@@ -3,9 +3,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "com_grail_bazel_toolchain",
-    sha256 = "a9fc7cf01d0ea0a935bd9e3674dd3103766db77dfc6aafcb447a7ddd6ca24a78",
-    strip_prefix = "toolchains_llvm-c65ef7a45907016a754e5bf5bfabac76eb702fd3",
-    urls = ["https://github.com/bazel-contrib/toolchains_llvm/archive/c65ef7a45907016a754e5bf5bfabac76eb702fd3.tar.gz"],
+    sha256 = "5d2458dd379f05037259a5b0278905ca28aad70d5a0fb2683821ea4591db2ee2",
+    strip_prefix = "toolchains_llvm-80a885d35da3cd037d1625414d5527dd40603885",
+    urls = ["https://github.com/bazel-contrib/toolchains_llvm/archive/80a885d35da3cd037d1625414d5527dd40603885.tar.gz"],
 )
 
 _SYSROOT_LINUX_BUILD_FILE = """
