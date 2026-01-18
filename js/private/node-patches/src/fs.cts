@@ -301,11 +301,12 @@ export function patcher(roots: string[]): () => void {
         ) {
             if (err) return cb(err)
             const resolved = resolvePathLike(args[0])
-            const str = path.resolve(path.dirname(resolved), p!)
-            const escapedRoot: string | false = isEscape(resolved, str)
+            const linkTarget = p!
+            const targetAbs = path.resolve(path.dirname(resolved), linkTarget)
+            const escapedRoot: string | false = isEscape(resolved, targetAbs)
             if (escapedRoot) {
                 const escapedRoots = [escapedRoot]
-                return nextHop(str, readlinkNextHopCb)
+                return nextHop(targetAbs, readlinkNextHopCb)
 
                 function readlinkNextHopCb(next: string | undefined | false) {
                     if (!next) {
@@ -319,16 +320,20 @@ export function patcher(roots: string[]): () => void {
                     }
                     const r = path.resolve(
                         path.dirname(resolved),
-                        path.relative(path.dirname(str), next)
+                        path.relative(path.dirname(targetAbs), next)
                     )
                     if (r != resolved && !isEscape(resolved, r, escapedRoots)) {
-                        return cb(null, r)
+                        if (path.isAbsolute(linkTarget)) {
+                            return cb(null, r)
+                        }
+                        const rel = path.relative(path.dirname(resolved), r)
+                        return cb(null, rel || '.')
                     }
                     // The escape from the root is not mappable back into the root; throw EINVAL
                     return cb(einval('readlink', args[0]))
                 }
             } else {
-                return cb(null, str)
+                return cb(null, linkTarget)
             }
         }
 
@@ -339,15 +344,12 @@ export function patcher(roots: string[]): () => void {
         ...args: Parameters<typeof origReadlinkSync>
     ) {
         const resolved = resolvePathLike(args[0])
+        const linkTarget = origReadlinkSync(...args)
+        const targetAbs = path.resolve(path.dirname(resolved), linkTarget)
 
-        const str = path.resolve(
-            path.dirname(resolved),
-            origReadlinkSync(...args)
-        )
-
-        const escapedRoot: string | false = isEscape(resolved, str)
+        const escapedRoot: string | false = isEscape(resolved, targetAbs)
         if (escapedRoot) {
-            const next = nextHopSync(str)
+            const next = nextHopSync(targetAbs)
             if (!next) {
                 if (next == undefined) {
                     // The escape from the root is not mappable back into the root; throw EINVAL
@@ -359,15 +361,19 @@ export function patcher(roots: string[]): () => void {
             }
             const r = path.resolve(
                 path.dirname(resolved),
-                path.relative(path.dirname(str), next)
+                path.relative(path.dirname(targetAbs), next)
             )
             if (r != resolved && !isEscape(resolved, r, [escapedRoot])) {
-                return r
+                if (path.isAbsolute(linkTarget)) {
+                    return r
+                }
+                const rel = path.relative(path.dirname(resolved), r)
+                return rel || '.'
             }
             // The escape from the root is not mappable back into the root; throw EINVAL
             throw einval('readlink', args[0])
         }
-        return str
+        return linkTarget
     }
 
     // =========================================================================

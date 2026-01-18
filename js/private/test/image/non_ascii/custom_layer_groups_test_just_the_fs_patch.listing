@@ -9,4 +9,4 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/node-patches/
--r-xr-xr-x  0 0      0       34729 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/node-patches/fs.cjs
+-r-xr-xr-x  0 0      0       35271 Jan  1  1970 ./app/js/private/test/image/non_ascii/bin2.runfiles/_main/js/private/node-patches/fs.cjs

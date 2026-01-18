@@ -86,6 +86,44 @@ describe('testing readlink', async () => {
         )
     })
 
+    await it('preserves relative symlink targets in root', async () => {
+        await withFixtures(
+            {
+                a: {},
+                b: { file: 'contents' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+                const linkPath = path.join(fixturesDir, 'a', 'link')
+                const relativeTarget = path.join('..', 'b', 'file')
+
+                fs.symlinkSync(relativeTarget, linkPath)
+
+                const revertPatches = patcher([path.join(fixturesDir)])
+
+                assert.deepStrictEqual(
+                    fs.readlinkSync(linkPath),
+                    relativeTarget,
+                    'SYNC: should preserve relative symlink target'
+                )
+
+                assert.deepStrictEqual(
+                    await util.promisify(fs.readlink)(linkPath),
+                    relativeTarget,
+                    'CB: should preserve relative symlink target'
+                )
+
+                assert.deepStrictEqual(
+                    await fs.promises.readlink(linkPath),
+                    relativeTarget,
+                    'Promise: should preserve relative symlink target'
+                )
+
+                revertPatches()
+            }
+        )
+    })
+
     await it("doesn't resolve as symlink outside of root", async () => {
         await withFixtures(
             {
