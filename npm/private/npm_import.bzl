@@ -21,11 +21,24 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
+load(":exclude_package_contents_presets.bzl", "EXCLUDE_PACKAGE_CONTENTS_PRESETS")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", "npm_package_store_internal")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
+
+def _expand_exclude_package_contents_presets(patterns, presets):
+    """Expand preset names into patterns, validating that all presets exist."""
+    result = list(patterns)
+    for preset in presets:
+        if preset not in EXCLUDE_PACKAGE_CONTENTS_PRESETS:
+            fail("Unknown exclude_package_contents preset '{}'. Valid presets are: {}".format(
+                preset,
+                ", ".join(EXCLUDE_PACKAGE_CONTENTS_PRESETS.keys()),
+            ))
+        result = result + EXCLUDE_PACKAGE_CONTENTS_PRESETS[preset]
+    return result
 
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
@@ -63,6 +76,7 @@ def npm_imported_package_store_internal():
         lifecycle_hooks_execution_requirements = {lifecycle_hooks_execution_requirements},
         use_default_shell_env = {use_default_shell_env},
         exclude_package_contents = {exclude_package_contents},
+        exclude_package_contents_presets = {exclude_package_contents_presets},
     )
 """
 
@@ -84,7 +98,8 @@ def npm_imported_package_store_internal(
         lifecycle_hooks_env,
         lifecycle_hooks_execution_requirements,
         use_default_shell_env,
-        exclude_package_contents):
+        exclude_package_contents,
+        exclude_package_contents_presets):
     bazel_package = native.package_name()
     is_root = bazel_package == root_package
     if not is_root:
@@ -95,6 +110,12 @@ def npm_imported_package_store_internal(
         )
         fail(msg)
 
+    # Expand presets into patterns
+    expanded_exclude_patterns = _expand_exclude_package_contents_presets(
+        exclude_package_contents if exclude_package_contents else [],
+        exclude_package_contents_presets,
+    )
+
     store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
 
     # reference target used when referenced by a package with cycles
@@ -104,7 +125,7 @@ def npm_imported_package_store_internal(
         package = package,
         version = version,
         tags = ["manual"],
-        exclude_package_contents = exclude_package_contents,
+        exclude_package_contents = expanded_exclude_patterns,
     )
 
     # post-lifecycle target with reference deps for use in terminal target with transitive closure
@@ -116,7 +137,7 @@ def npm_imported_package_store_internal(
         version = version,
         deps = ref_deps,
         tags = ["manual"],
-        exclude_package_contents = exclude_package_contents,
+        exclude_package_contents = expanded_exclude_patterns,
     )
 
     # package store target with transitive closure of all npm package dependencies
@@ -129,7 +150,7 @@ def npm_imported_package_store_internal(
         deps = deps,
         visibility = ["//visibility:public"],
         tags = ["manual"],
-        exclude_package_contents = exclude_package_contents,
+        exclude_package_contents = expanded_exclude_patterns,
     )
 
     # filegroup target that provides a single file which is
@@ -151,7 +172,7 @@ def npm_imported_package_store_internal(
             version = version,
             deps = ref_deps,
             tags = ["manual"],
-            exclude_package_contents = exclude_package_contents,
+            exclude_package_contents = expanded_exclude_patterns,
         )
 
         # terminal pre-lifecycle target for use in lifecycle build target below
@@ -162,7 +183,7 @@ def npm_imported_package_store_internal(
             version = version,
             deps = lc_deps,
             tags = ["manual"],
-            exclude_package_contents = exclude_package_contents,
+            exclude_package_contents = expanded_exclude_patterns,
         )
 
         # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
@@ -523,8 +544,13 @@ def _download_and_extract_archive(rctx, package_json_only):
     rctx.file(_mkdir_marker, "")
     rctx.delete(_mkdir_marker)
 
+    exclude_patterns = _expand_exclude_package_contents_presets(
+        rctx.attr.exclude_package_contents,
+        rctx.attr.exclude_package_contents_presets,
+    )
+
     exclude_pattern_args = []
-    for pattern in rctx.attr.exclude_package_contents:
+    for pattern in exclude_patterns:
         if pattern == "":
             continue
         exclude_pattern_args.append("--exclude")
@@ -839,6 +865,7 @@ def _npm_import_links_rule_impl(rctx):
         bins = bins,
         use_default_shell_env = rctx.attr.lifecycle_hooks_use_default_shell_env,
         exclude_package_contents = starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents),
+        exclude_package_contents_presets = starlark_codegen_utils.to_list_attr(rctx.attr.exclude_package_contents_presets),
     )
 
     npm_link_package_bzl = [
@@ -876,6 +903,7 @@ _COMMON_ATTRS = {
     "root_package": attr.string(),
     "version": attr.string(mandatory = True),
     "exclude_package_contents": attr.string_list(default = []),
+    "exclude_package_contents_presets": attr.string_list(default = ["basic"]),
 }
 
 _INTERNAL_COMMON_ATTRS = {
@@ -1214,7 +1242,8 @@ def npm_import(
         generate_bzl_library_targets,
         generate_package_json_bzl,
         extract_full_archive,
-        exclude_package_contents):
+        exclude_package_contents,
+        exclude_package_contents_presets):
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
     npm_import_rule(
@@ -1240,6 +1269,7 @@ def npm_import(
         generate_bzl_library_targets = generate_bzl_library_targets,
         extract_full_archive = extract_full_archive,
         exclude_package_contents = exclude_package_contents,
+        exclude_package_contents_presets = exclude_package_contents_presets,
     )
 
     has_custom_postinstall = bool(custom_postinstall)
@@ -1264,4 +1294,5 @@ def npm_import(
         package_visibility = package_visibility,
         replace_package = replace_package,
         exclude_package_contents = exclude_package_contents,
+        exclude_package_contents_presets = exclude_package_contents_presets,
     )
