@@ -1,7 +1,7 @@
 {
     "private": true,
     "devDependencies": {
-        "@types/node": "18.19.54",
+        "@types/node": "18.19.130",
         "chalk": "5.1.1",
         "jsonpath-plus": "7.2.0",
         "typescript": "^5.8.0"

@@ -21,8 +21,8 @@ importers:
   .:
     devDependencies:
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 18.19.130
+        version: 18.19.130
       chalk:
         specifier: 5.1.1
         version: 5.1.1
@@ -323,8 +323,8 @@ importers:
         specifier: 16.0.1
         version: 16.0.1(rollup@4.39.0)
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 18.19.130
+        version: 18.19.130
       rollup:
         specifier: 4.39.0
         version: 4.39.0
@@ -387,8 +387,8 @@ importers:
         specifier: 3.15.12
         version: 3.15.12
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 18.19.130
+        version: 18.19.130
       abortcontroller-polyfill:
         specifier: 1.7.5
         version: 1.7.5
@@ -1908,14 +1908,14 @@ packages:
   '@types/node@18.13.0':
     resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==, tarball: https://registry.npmjs.org/@types/node/-/node-18.13.0.tgz}
 
+  '@types/node@18.19.130':
+    resolution: {integrity: sha512-GRaXQx6jGfL8sKfaIDD6OupbIHBr9jv7Jnaml9tB7l4v068PAOXqfcujMMo5PhbIs6ggR1XODELqahT2R8v0fg==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.130.tgz}
+
   '@types/node@18.19.54':
     resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
 
   '@types/node@22.18.13':
     resolution: {integrity: sha512-Bo45YKIjnmFtv6I1TuC8AaHBbqXtIo+Om5fE4QiU1Tj8QR/qt+8O3BAtOimG5IFmwaWiPmB3Mv3jtYzBA4Us2A==, tarball: https://registry.npmjs.org/@types/node/-/node-22.18.13.tgz}
-
-  '@types/node@22.7.4':
-    resolution: {integrity: sha512-y+NPi1rFzDs1NdQHHToqeiX2TIS79SWEAw9GYhkkx8bD0ChpfqC+n2j5OXOCpzfojBEBt6DnEnnG9MY0zk1XLg==, tarball: https://registry.npmjs.org/@types/node/-/node-22.7.4.tgz}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==, tarball: https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz}
@@ -4569,7 +4569,7 @@ packages:
 
   puppeteer@19.11.1:
     resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 24.15.0 is no longer supported
 
   quick-lru@5.1.1:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
@@ -5023,10 +5023,12 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   tar@7.5.2:
     resolution: {integrity: sha512-7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   terser-webpack-plugin@5.3.14:
     resolution: {integrity: sha512-vkZjpUjb6OMS7dhV+tILUW6BhpDR7P2L/aQSAv+Uwk+m8KATX9EccViHTJR2qDtACKPIYndLGCyl3FMo+r2LMw==}
@@ -5156,9 +5158,6 @@ packages:
 
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
-
-  undici-types@6.19.8:
-    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
@@ -6189,7 +6188,7 @@ snapshots:
   '@kubernetes/client-node@https://codeload.github.com/kubernetes-client/javascript/tar.gz/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9(bufferutil@4.0.8)(encoding@0.1.13)':
     dependencies:
       '@types/js-yaml': 4.0.9
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
       '@types/node-fetch': 2.6.13
       '@types/stream-buffers': 3.0.8
       '@types/tar': 6.1.13
@@ -6606,7 +6605,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 18.19.54
+      '@types/node': 18.19.130
       '@types/responselike': 1.0.3
 
   '@types/eslint-scope@3.7.7':
@@ -6639,14 +6638,18 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 18.19.130
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 18.19.130
       form-data: 4.0.4
 
   '@types/node@18.13.0': {}
+
+  '@types/node@18.19.130':
+    dependencies:
+      undici-types: 5.26.5
 
   '@types/node@18.19.54':
     dependencies:
@@ -6655,34 +6658,29 @@ snapshots:
   '@types/node@22.18.13':
     dependencies:
       undici-types: 6.21.0
-    optional: true
-
-  '@types/node@22.7.4':
-    dependencies:
-      undici-types: 6.19.8
 
   '@types/resolve@1.20.2': {}
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 18.19.130
 
   '@types/stream-buffers@3.0.8':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 18.19.130
 
   '@types/tar@6.1.13':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 18.19.130
       minipass: 4.2.8
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 18.19.130
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 18.19.130
     optional: true
 
   '@vanilla-extract/babel-plugin-debug-ids@1.2.2':
@@ -7904,7 +7902,7 @@ snapshots:
 
   eval@0.1.8:
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 18.19.130
       require-like: 0.1.2
 
   event-emitter@0.3.5:
@@ -8547,7 +8545,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 18.19.130
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -10200,10 +10198,7 @@ snapshots:
 
   undici-types@5.26.5: {}
 
-  undici-types@6.19.8: {}
-
-  undici-types@6.21.0:
-    optional: true
+  undici-types@6.21.0: {}
 
   unique-filename@2.0.1:
     dependencies:
