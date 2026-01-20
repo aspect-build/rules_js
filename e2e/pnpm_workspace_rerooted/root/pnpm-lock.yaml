@@ -109,8 +109,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(@aspect-test/c@2.0.2)
       alias-2:
-        specifier: npm:@types/node@18.19.54
-        version: '@types/node@18.19.54'
+        specifier: npm:@types/node@22.18.13
+        version: '@types/node@22.18.13'
 
 packages:
 
@@ -148,8 +148,8 @@ packages:
     resolution: {integrity: sha512-U1LStvh2QPmdQN7rlR0PTZZ1btTTcjiHxVmq5SvTxIRgIaJMCIsxcS5ghrd71H/JIwnJOmhI7BEQN3n6Hq9WSw==}
     hasBin: true
 
-  '@types/node@18.19.54':
-    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==}
+  '@types/node@22.18.13':
+    resolution: {integrity: sha512-Bo45YKIjnmFtv6I1TuC8AaHBbqXtIo+Om5fE4QiU1Tj8QR/qt+8O3BAtOimG5IFmwaWiPmB3Mv3jtYzBA4Us2A==}
 
   '@types/sizzle@2.3.8':
     resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
@@ -163,8 +163,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
   vendored-a@file:../vendored/a:
     resolution: {directory: ../vendored/a, type: directory}
@@ -202,9 +202,9 @@ snapshots:
 
   '@aspect-test/h@1.0.0': {}
 
-  '@types/node@18.19.54':
+  '@types/node@22.18.13':
     dependencies:
-      undici-types: 5.26.5
+      undici-types: 6.21.0
 
   '@types/sizzle@2.3.8': {}
 
@@ -212,7 +212,7 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  undici-types@5.26.5: {}
+  undici-types@6.21.0: {}
 
   vendored-a@file:../vendored/a:
     dependencies:

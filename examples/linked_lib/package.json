@@ -6,7 +6,7 @@
         "alias-e": "npm:@aspect-test/e"
     },
     "devDependencies": {
-        "@types/node": "18.13.0",
+        "@types/node": "22.18.13",
         "@aspect-test/e-dev": "npm:@aspect-test/e",
         "@aspect-test/f": "1.0.0"
     }

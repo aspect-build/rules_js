@@ -8,11 +8,11 @@ load("@npm__at_aspect-test_e__1.0.0__links//:defs.bzl", link_4 = "npm_link_impor
 load("@npm__at_aspect-test_f__1.0.0__links//:defs.bzl", link_5 = "npm_link_imported_package_store_internal", store_5 = "npm_imported_package_store_internal")
 load("@npm__at_aspect-test_g__1.0.0__links//:defs.bzl", link_6 = "npm_link_imported_package_store_internal", store_6 = "npm_imported_package_store_internal")
 load("@npm__at_aspect-test_h__1.0.0__links//:defs.bzl", link_7 = "npm_link_imported_package_store_internal", store_7 = "npm_imported_package_store_internal")
-load("@npm__at_types_node__18.19.54__links//:defs.bzl", link_8 = "npm_link_imported_package_store_internal", store_8 = "npm_imported_package_store_internal")
+load("@npm__at_types_node__22.18.13__links//:defs.bzl", link_8 = "npm_link_imported_package_store_internal", store_8 = "npm_imported_package_store_internal")
 load("@npm__at_types_sizzle__2.3.8__links//:defs.bzl", link_9 = "npm_link_imported_package_store_internal", store_9 = "npm_imported_package_store_internal")
 load("@npm__lodash__file_vendored_lodash-4.17.19.tgz__links//:defs.bzl", link_10 = "npm_link_imported_package_store_internal", store_10 = "npm_imported_package_store_internal")
 load("@npm__typescript__5.9.3__links//:defs.bzl", link_11 = "npm_link_imported_package_store_internal", store_11 = "npm_imported_package_store_internal")
-load("@npm__undici-types__5.26.5__links//:defs.bzl", store_12 = "npm_imported_package_store_internal")
+load("@npm__undici-types__6.21.0__links//:defs.bzl", store_12 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
@@ -120,7 +120,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             version = "0.0.0",
             deps = {
                 "//:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2": "@aspect-test/d",
-                "//:.aspect_rules_js/node_modules/@types+node@18.19.54": "alias-2",
+                "//:.aspect_rules_js/node_modules/@types+node@22.18.13": "alias-2",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],

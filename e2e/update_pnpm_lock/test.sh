@@ -23,7 +23,7 @@ if [ "$diff" ]; then
     exit 1
 fi
 
-_sedi 's#"@types/node": "18.11.18"#"@types/node": "16"#' package.json
+_sedi 's#"@types/node": "22.18.13"#"@types/node": "20"#' package.json
 
 export ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1
 
@@ -49,7 +49,7 @@ ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK=
 
 # Have to make another change to package.json to invalidate the repository rule
-_sedi 's#"@types/node": "16"#"@types/node": "14"#' package.json
+_sedi 's#"@types/node": "20"#"@types/node": "18"#' package.json
 
 # Trigger the update of the pnpm lockfile which should exit non-zero
 if bazel run @npm//:sync; then

@@ -33,7 +33,7 @@ if [ "$diff" ]; then
     exit 1
 fi
 
-_sedi 's#"@types/node": "18.11.18"#"@types/node": "16"#' package.json
+_sedi 's#"@types/node": "22.18.13"#"@types/node": "20"#' package.json
 
 export ASPECT_RULES_JS_FROZEN_PNPM_LOCK=1
 

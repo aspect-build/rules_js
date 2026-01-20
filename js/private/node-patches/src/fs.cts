@@ -391,12 +391,16 @@ export function patcher(roots: string[]): () => void {
 
         args[args.length - 1] = function readdirCb(
             err: Error | null,
-            result: Dirent[]
+            result: Array<Dirent<string | Buffer>>
         ) {
             if (err) return cb(err)
             // user requested withFileTypes
             if (result[0] && (result[0] as any).isSymbolicLink) {
-                Promise.all(result.map((v: Dirent) => handleDirent(p, v)))
+                Promise.all(
+                    result.map((v: Dirent<string | Buffer>) =>
+                        handleDirent(p, v)
+                    )
+                )
                     .then(() => {
                         cb(null, result)
                     })
@@ -588,12 +592,14 @@ export function patcher(roots: string[]): () => void {
         return dir
     }
 
-    async function handleDirent(p: string, v: Dirent) {
+    async function handleDirent(p: string, v: Dirent<string | Buffer>) {
         if (!v.isSymbolicLink()) {
             return v
         }
 
-        const f = path.resolve(p, v.name)
+        const entryName =
+            typeof v.name === 'string' ? v.name : v.name.toString()
+        const f = path.resolve(p, entryName)
 
         return new Promise(function handleDirentExecutor(resolve, reject) {
             return guardedReadLink(f, handleDirentReadLinkCb)

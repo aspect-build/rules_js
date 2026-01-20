@@ -100,7 +100,7 @@ importers:
         version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d
       jquery-github:
         specifier: github:jquery/jquery
-        version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d
+        version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/857b8150699ba783ada73efcb48706470f9f5a09
       jquery-http-git-f85d521:
         specifier: https://github.com/jquery/jquery.git#f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
         version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
@@ -158,22 +158,22 @@ importers:
         specifier: 5.3.1
         version: 5.3.1
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
       alias-only-sizzle:
         specifier: npm:@types/sizzle@~2.3.10
         version: '@types/sizzle@2.3.10'
       alias-types-node:
-        specifier: npm:@types/node@~18.19.54
-        version: '@types/node@18.19.54'
+        specifier: npm:@types/node@~22.18.13
+        version: '@types/node@22.18.13'
 
   ../projects/a: {}
 
   ../projects/a-types:
     dependencies:
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
 
   ../projects/alts:
     dependencies:
@@ -197,8 +197,8 @@ importers:
         version: link:../a
     devDependencies:
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
       a-types:
         specifier: workspace:*
         version: link:../a-types
@@ -491,8 +491,8 @@ packages:
   '@types/minimatch@5.1.2':
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==, tarball: https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz}
 
-  '@types/node@18.19.54':
-    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
+  '@types/node@22.18.13':
+    resolution: {integrity: sha512-Bo45YKIjnmFtv6I1TuC8AaHBbqXtIo+Om5fE4QiU1Tj8QR/qt+8O3BAtOimG5IFmwaWiPmB3Mv3jtYzBA4Us2A==, tarball: https://registry.npmjs.org/@types/node/-/node-22.18.13.tgz}
 
   '@types/sizzle@2.3.10':
     resolution: {integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==, tarball: https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.10.tgz}
@@ -611,9 +611,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1}
     version: 3.7.1-pre
 
-  jquery@https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d:
-    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d}
-    version: 4.0.0-rc.1
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/857b8150699ba783ada73efcb48706470f9f5a09:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/857b8150699ba783ada73efcb48706470f9f5a09}
+    version: 4.0.0
 
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d:
     resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d}
@@ -704,8 +704,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
   uvu@0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
@@ -875,13 +875,13 @@ snapshots:
   '@types/glob@8.1.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 18.19.54
+      '@types/node': 22.18.13
 
   '@types/minimatch@5.1.2': {}
 
-  '@types/node@18.19.54':
+  '@types/node@22.18.13':
     dependencies:
-      undici-types: 5.26.5
+      undici-types: 6.21.0
 
   '@types/sizzle@2.3.10': {}
 
@@ -989,7 +989,7 @@ snapshots:
 
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1: {}
 
-  jquery@https://codeload.github.com/jquery/jquery/tar.gz/c28c26aef0b3238f578690d73703382951cb355d: {}
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/857b8150699ba783ada73efcb48706470f9f5a09: {}
 
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d: {}
 
@@ -1059,7 +1059,7 @@ snapshots:
 
   typescript@5.5.2: {}
 
-  undici-types@5.26.5: {}
+  undici-types@6.21.0: {}
 
   uvu@0.5.6:
     dependencies:

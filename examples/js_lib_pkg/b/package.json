@@ -6,6 +6,6 @@
         "js_lib_pkg_a-alias_2": "link:../a"
     },
     "devDependencies": {
-        "@types/node": "18.19.54"
+        "@types/node": "22.18.13"
     }
 }

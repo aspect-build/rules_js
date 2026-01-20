@@ -10,7 +10,7 @@
         "@rollup/plugin-json": "6.1.0",
         "@types/google-protobuf": "3.15.12",
         "@rollup/plugin-typescript": "12.1.2",
-        "@types/node": "18.19.54",
+        "@types/node": "22.18.13",
         "typescript": "^5.8.0"
     }
 }

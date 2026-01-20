@@ -3,7 +3,7 @@
     "type": "module",
     "devDependencies": {
         "@rollup/plugin-node-resolve": "16.0.1",
-        "@types/node": "18.19.54",
+        "@types/node": "22.18.13",
         "rollup": "4.39.0"
     }
 }

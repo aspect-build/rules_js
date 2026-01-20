@@ -44,7 +44,7 @@ load("@lock-<LOCKVERSION>__at_types_archiver__5.3.1__links//:defs.bzl", link_40 
 load("@lock-<LOCKVERSION>__at_types_estree__0.0.39__links//:defs.bzl", store_41 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_types_glob__8.1.0__links//:defs.bzl", store_42 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_types_minimatch__5.1.2__links//:defs.bzl", store_43 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__at_types_node__18.19.54__links//:defs.bzl", link_44 = "npm_link_imported_package_store_internal", store_44 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__at_types_node__22.18.13__links//:defs.bzl", link_44 = "npm_link_imported_package_store_internal", store_44 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__at_types_sizzle__2.3.10__links//:defs.bzl", link_45 = "npm_link_imported_package_store_internal", store_45 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__ansi-regex__5.0.1__links//:defs.bzl", store_46 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__ansi-regex__6.2.2__links//:defs.bzl", store_47 = "npm_imported_package_store_internal")
@@ -73,7 +73,7 @@ load("@lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_69 = "npm_link
 load("@lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_70 = "npm_link_imported_package_store_internal", store_70 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_71 = "npm_link_imported_package_store_internal", store_71 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_763ade6dda092709b36d97491951bcae415d91d1__links//:defs.bzl", link_72 = "npm_link_imported_package_store_internal", store_72 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_c28c26aef0b3238f578690d73703382951cb355d__links//:defs.bzl", link_73 = "npm_link_imported_package_store_internal", store_73 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_857b8150699ba783ada73efcb48706470f9f5a09__links//:defs.bzl", link_73 = "npm_link_imported_package_store_internal", store_73 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_74 = "npm_link_imported_package_store_internal", store_74 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_f85d521cdeeb3c6d3f4563a06dba8be793e26ef0__links//:defs.bzl", link_75 = "npm_link_imported_package_store_internal", store_75 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_76 = "npm_imported_package_store_internal")
@@ -97,7 +97,7 @@ load("@lock-<LOCKVERSION>__strip-ansi__7.1.2__links//:defs.bzl", store_93 = "npm
 load("@lock-<LOCKVERSION>__supports-preserve-symlinks-flag__1.0.0__links//:defs.bzl", store_94 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__tslib__2.8.1__links//:defs.bzl", link_95 = "npm_link_imported_package_store_internal", store_95 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__typescript__5.5.2__links//:defs.bzl", link_96 = "npm_link_imported_package_store_internal", store_96 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__undici-types__5.26.5__links//:defs.bzl", store_97 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__undici-types__6.21.0__links//:defs.bzl", store_97 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__uvu__0.5.6__links//:defs.bzl", link_98 = "npm_link_imported_package_store_internal", store_98 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_99 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_100 = "npm_imported_package_store_internal")
@@ -336,7 +336,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "a-types",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@types+node@18.19.54": "@types/node",
+                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@types+node@22.18.13": "@types/node",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],

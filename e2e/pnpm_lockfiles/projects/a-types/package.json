@@ -3,6 +3,6 @@
     "version": "0.1.1",
     "private": true,
     "dependencies": {
-        "@types/node": "18.19.54"
+        "@types/node": "22.18.13"
     }
 }

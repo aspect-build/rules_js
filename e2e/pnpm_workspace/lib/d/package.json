@@ -3,6 +3,6 @@
     "private": true,
     "dependencies": {
         "@aspect-test/d": "^2.0.0",
-        "alias-2": "npm:@types/node@18.19.54"
+        "alias-2": "npm:@types/node@22.18.13"
     }
 }

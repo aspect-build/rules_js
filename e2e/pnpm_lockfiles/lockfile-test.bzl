@@ -211,7 +211,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             "@%s__meaning-of-life__1.0.0_%s//:pkg" % (lock_repo, "1287509853" if lock_version == "v90" else "124257499"),
 
             # Direct deps from custom registry
-            ":.aspect_rules_js/node_modules/@types+node@18.19.54",
+            ":.aspect_rules_js/node_modules/@types+node@22.18.13",
 
             # Direct deps with peers
             ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0",
