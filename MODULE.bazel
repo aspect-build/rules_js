@@ -296,8 +296,8 @@ use_repo(
     "npm__fsevents__2.3.3__links",
     "npm__google-closure-compiler__20251111.0.0__links",
     "npm__next__15.2.6_1315089095__links",
-    "npm__rollup__4.39.0",
-    "npm__rollup__4.39.0__links",
+    "npm__rollup__4.55.2",
+    "npm__rollup__4.55.2__links",
     "npm__unused__0.2.2__links",
     "npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8",
 )
