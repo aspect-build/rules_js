@@ -1012,7 +1012,7 @@ function requireAst () {
 	            return [s, (0, unescape_js_1.unescape)(this.toString()), false, false];
 	        }
 	        // XXX abstract out this map method
-	        let bodyDotAllowed = !repeated || allowDot || dot || false
+	        let bodyDotAllowed = !repeated || allowDot || dot || !startNoDot
 	            ? ''
 	            : this.#partsToRegExp(true);
 	        if (bodyDotAllowed === body) {
@@ -1157,12 +1157,12 @@ var hasRequiredCommonjs$4;
 function requireCommonjs$4 () {
 	if (hasRequiredCommonjs$4) return commonjs$3;
 	hasRequiredCommonjs$4 = 1;
-	(function (exports) {
+	(function (exports$1) {
 		var __importDefault = (commonjs$3 && commonjs$3.__importDefault) || function (mod) {
 		    return (mod && mod.__esModule) ? mod : { "default": mod };
 		};
-		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.unescape = exports.escape = exports.AST = exports.Minimatch = exports.match = exports.makeRe = exports.braceExpand = exports.defaults = exports.filter = exports.GLOBSTAR = exports.sep = exports.minimatch = void 0;
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.unescape = exports$1.escape = exports$1.AST = exports$1.Minimatch = exports$1.match = exports$1.makeRe = exports$1.braceExpand = exports$1.defaults = exports$1.filter = exports$1.GLOBSTAR = exports$1.sep = exports$1.minimatch = void 0;
 		const brace_expansion_1 = __importDefault(requireBraceExpansion());
 		const assert_valid_pattern_js_1 = requireAssertValidPattern();
 		const ast_js_1 = requireAst();
@@ -1176,7 +1176,7 @@ function requireCommonjs$4 () {
 		    }
 		    return new Minimatch(pattern, options).match(p);
 		};
-		exports.minimatch = minimatch;
+		exports$1.minimatch = minimatch;
 		// Optimized checking for the most common glob patterns.
 		const starDotExtRE = /^\*+([^+@!?\*\[\(]*)$/;
 		const starDotExtTest = (ext) => (f) => !f.startsWith('.') && f.endsWith(ext);
@@ -1240,10 +1240,10 @@ function requireCommonjs$4 () {
 		    posix: { sep: '/' },
 		};
 		/* c8 ignore stop */
-		exports.sep = defaultPlatform === 'win32' ? path.win32.sep : path.posix.sep;
-		exports.minimatch.sep = exports.sep;
-		exports.GLOBSTAR = Symbol('globstar **');
-		exports.minimatch.GLOBSTAR = exports.GLOBSTAR;
+		exports$1.sep = defaultPlatform === 'win32' ? path.win32.sep : path.posix.sep;
+		exports$1.minimatch.sep = exports$1.sep;
+		exports$1.GLOBSTAR = Symbol('globstar **');
+		exports$1.minimatch.GLOBSTAR = exports$1.GLOBSTAR;
 		// any single thing other than /
 		// don't need to escape / when using new RegExp()
 		const qmark = '[^/]';
@@ -1256,15 +1256,15 @@ function requireCommonjs$4 () {
 		// not a ^ or / followed by a dot,
 		// followed by anything, any number of times.
 		const twoStarNoDot = '(?:(?!(?:\\/|^)\\.).)*?';
-		const filter = (pattern, options = {}) => (p) => (0, exports.minimatch)(p, pattern, options);
-		exports.filter = filter;
-		exports.minimatch.filter = exports.filter;
+		const filter = (pattern, options = {}) => (p) => (0, exports$1.minimatch)(p, pattern, options);
+		exports$1.filter = filter;
+		exports$1.minimatch.filter = exports$1.filter;
 		const ext = (a, b = {}) => Object.assign({}, a, b);
 		const defaults = (def) => {
 		    if (!def || typeof def !== 'object' || !Object.keys(def).length) {
-		        return exports.minimatch;
+		        return exports$1.minimatch;
 		    }
-		    const orig = exports.minimatch;
+		    const orig = exports$1.minimatch;
 		    const m = (p, pattern, options = {}) => orig(p, pattern, ext(def, options));
 		    return Object.assign(m, {
 		        Minimatch: class Minimatch extends orig.Minimatch {
@@ -1293,11 +1293,11 @@ function requireCommonjs$4 () {
 		        braceExpand: (pattern, options = {}) => orig.braceExpand(pattern, ext(def, options)),
 		        match: (list, pattern, options = {}) => orig.match(list, pattern, ext(def, options)),
 		        sep: orig.sep,
-		        GLOBSTAR: exports.GLOBSTAR,
+		        GLOBSTAR: exports$1.GLOBSTAR,
 		    });
 		};
-		exports.defaults = defaults;
-		exports.minimatch.defaults = exports.defaults;
+		exports$1.defaults = defaults;
+		exports$1.minimatch.defaults = exports$1.defaults;
 		// Brace expansion:
 		// a{b,c}d -> abd acd
 		// a{b,}c -> abc ac
@@ -1318,8 +1318,8 @@ function requireCommonjs$4 () {
 		    }
 		    return (0, brace_expansion_1.default)(pattern);
 		};
-		exports.braceExpand = braceExpand;
-		exports.minimatch.braceExpand = exports.braceExpand;
+		exports$1.braceExpand = braceExpand;
+		exports$1.minimatch.braceExpand = exports$1.braceExpand;
 		// parse a component of the expanded set.
 		// At this point, no pattern may contain "/" in it
 		// so we're going to return a 2d array, where each entry is the full
@@ -1332,8 +1332,8 @@ function requireCommonjs$4 () {
 		// of * is equivalent to a single *.  Globstar behavior is enabled by
 		// default, and can be disabled by setting options.noglobstar.
 		const makeRe = (pattern, options = {}) => new Minimatch(pattern, options).makeRe();
-		exports.makeRe = makeRe;
-		exports.minimatch.makeRe = exports.makeRe;
+		exports$1.makeRe = makeRe;
+		exports$1.minimatch.makeRe = exports$1.makeRe;
 		const match = (list, pattern, options = {}) => {
 		    const mm = new Minimatch(pattern, options);
 		    list = list.filter(f => mm.match(f));
@@ -1342,8 +1342,8 @@ function requireCommonjs$4 () {
 		    }
 		    return list;
 		};
-		exports.match = match;
-		exports.minimatch.match = exports.match;
+		exports$1.match = match;
+		exports$1.minimatch.match = exports$1.match;
 		// replace stuff like \* with *
 		const globMagic = /[?*]|[+@!]\(.*?\)|\[|\]/;
 		const regExpEscape = (s) => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
@@ -1821,7 +1821,7 @@ function requireCommonjs$4 () {
 		                return false;
 		            }
 		            /* c8 ignore stop */
-		            if (p === exports.GLOBSTAR) {
+		            if (p === exports$1.GLOBSTAR) {
 		                this.debug('GLOBSTAR', [pattern, p, f]);
 		                // "**"
 		                // a/**/b/**/c would match the following:
@@ -1952,14 +1952,14 @@ function requireCommonjs$4 () {
 		        /* c8 ignore stop */
 		    }
 		    braceExpand() {
-		        return (0, exports.braceExpand)(this.pattern, this.options);
+		        return (0, exports$1.braceExpand)(this.pattern, this.options);
 		    }
 		    parse(pattern) {
 		        (0, assert_valid_pattern_js_1.assertValidPattern)(pattern);
 		        const options = this.options;
 		        // shortcuts
 		        if (pattern === '**')
-		            return exports.GLOBSTAR;
+		            return exports$1.GLOBSTAR;
 		        if (pattern === '')
 		            return '';
 		        // far and away, the most common glob pattern parts are
@@ -2036,18 +2036,18 @@ function requireCommonjs$4 () {
 		                }
 		                return typeof p === 'string'
 		                    ? regExpEscape(p)
-		                    : p === exports.GLOBSTAR
-		                        ? exports.GLOBSTAR
+		                    : p === exports$1.GLOBSTAR
+		                        ? exports$1.GLOBSTAR
 		                        : p._src;
 		            });
 		            pp.forEach((p, i) => {
 		                const next = pp[i + 1];
 		                const prev = pp[i - 1];
-		                if (p !== exports.GLOBSTAR || prev === exports.GLOBSTAR) {
+		                if (p !== exports$1.GLOBSTAR || prev === exports$1.GLOBSTAR) {
 		                    return;
 		                }
 		                if (prev === undefined) {
-		                    if (next !== undefined && next !== exports.GLOBSTAR) {
+		                    if (next !== undefined && next !== exports$1.GLOBSTAR) {
 		                        pp[i + 1] = '(?:\\/|' + twoStar + '\\/)?' + next;
 		                    }
 		                    else {
@@ -2057,12 +2057,12 @@ function requireCommonjs$4 () {
 		                else if (next === undefined) {
 		                    pp[i - 1] = prev + '(?:\\/|' + twoStar + ')?';
 		                }
-		                else if (next !== exports.GLOBSTAR) {
+		                else if (next !== exports$1.GLOBSTAR) {
 		                    pp[i - 1] = prev + '(?:\\/|\\/' + twoStar + '\\/)' + next;
-		                    pp[i + 1] = exports.GLOBSTAR;
+		                    pp[i + 1] = exports$1.GLOBSTAR;
 		                }
 		            });
-		            return pp.filter(p => p !== exports.GLOBSTAR).join('/');
+		            return pp.filter(p => p !== exports$1.GLOBSTAR).join('/');
 		        })
 		            .join('|');
 		        // need to wrap in parens if we had more than one thing with |,
@@ -2157,22 +2157,22 @@ function requireCommonjs$4 () {
 		        return this.negate;
 		    }
 		    static defaults(def) {
-		        return exports.minimatch.defaults(def).Minimatch;
+		        return exports$1.minimatch.defaults(def).Minimatch;
 		    }
 		}
-		exports.Minimatch = Minimatch;
+		exports$1.Minimatch = Minimatch;
 		/* c8 ignore start */
 		var ast_js_2 = requireAst();
-		Object.defineProperty(exports, "AST", { enumerable: true, get: function () { return ast_js_2.AST; } });
+		Object.defineProperty(exports$1, "AST", { enumerable: true, get: function () { return ast_js_2.AST; } });
 		var escape_js_2 = require_escape();
-		Object.defineProperty(exports, "escape", { enumerable: true, get: function () { return escape_js_2.escape; } });
+		Object.defineProperty(exports$1, "escape", { enumerable: true, get: function () { return escape_js_2.escape; } });
 		var unescape_js_2 = require_unescape();
-		Object.defineProperty(exports, "unescape", { enumerable: true, get: function () { return unescape_js_2.unescape; } });
+		Object.defineProperty(exports$1, "unescape", { enumerable: true, get: function () { return unescape_js_2.unescape; } });
 		/* c8 ignore stop */
-		exports.minimatch.AST = ast_js_1.AST;
-		exports.minimatch.Minimatch = Minimatch;
-		exports.minimatch.escape = escape_js_1.escape;
-		exports.minimatch.unescape = unescape_js_1.unescape;
+		exports$1.minimatch.AST = ast_js_1.AST;
+		exports$1.minimatch.Minimatch = Minimatch;
+		exports$1.minimatch.escape = escape_js_1.escape;
+		exports$1.minimatch.unescape = unescape_js_1.unescape;
 		
 	} (commonjs$3));
 	return commonjs$3;
@@ -3743,12 +3743,12 @@ var hasRequiredCommonjs$2;
 function requireCommonjs$2 () {
 	if (hasRequiredCommonjs$2) return commonjs;
 	hasRequiredCommonjs$2 = 1;
-	(function (exports) {
+	(function (exports$1) {
 		var __importDefault = (commonjs && commonjs.__importDefault) || function (mod) {
 		    return (mod && mod.__esModule) ? mod : { "default": mod };
 		};
-		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.Minipass = exports.isWritable = exports.isReadable = exports.isStream = void 0;
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.Minipass = exports$1.isWritable = exports$1.isReadable = exports$1.isStream = void 0;
 		const proc = typeof process === 'object' && process
 		    ? process
 		    : {
@@ -3766,9 +3766,9 @@ function requireCommonjs$2 () {
 		    typeof s === 'object' &&
 		    (s instanceof Minipass ||
 		        s instanceof node_stream_1.default ||
-		        (0, exports.isReadable)(s) ||
-		        (0, exports.isWritable)(s));
-		exports.isStream = isStream;
+		        (0, exports$1.isReadable)(s) ||
+		        (0, exports$1.isWritable)(s));
+		exports$1.isStream = isStream;
 		/**
 		 * Return true if the argument is a valid {@link Minipass.Readable}
 		 */
@@ -3778,7 +3778,7 @@ function requireCommonjs$2 () {
 		    typeof s.pipe === 'function' &&
 		    // node core Writable streams have a pipe() method, but it throws
 		    s.pipe !== node_stream_1.default.Writable.prototype.pipe;
-		exports.isReadable = isReadable;
+		exports$1.isReadable = isReadable;
 		/**
 		 * Return true if the argument is a valid {@link Minipass.Writable}
 		 */
@@ -3787,7 +3787,7 @@ function requireCommonjs$2 () {
 		    s instanceof node_events_1.EventEmitter &&
 		    typeof s.write === 'function' &&
 		    typeof s.end === 'function';
-		exports.isWritable = isWritable;
+		exports$1.isWritable = isWritable;
 		const EOF = Symbol('EOF');
 		const MAYBE_EMIT_END = Symbol('maybeEmitEnd');
 		const EMITTED_END = Symbol('emittedEnd');
@@ -4766,10 +4766,10 @@ function requireCommonjs$2 () {
 		     * @deprecated
 		     */
 		    static get isStream() {
-		        return exports.isStream;
+		        return exports$1.isStream;
 		    }
 		}
-		exports.Minipass = Minipass;
+		exports$1.Minipass = Minipass;
 		
 	} (commonjs));
 	return commonjs;
@@ -4854,7 +4854,7 @@ function requireCommonjs$1 () {
 	const IFSOCK = 0b1100;
 	const IFMT = 0b1111;
 	// mask to unset low 4 bits
-	const IFMT_UNKNOWN = -16;
+	const IFMT_UNKNOWN = ~IFMT;
 	// set after successfully calling readdir() and getting entries.
 	const READDIR_CALLED = 0b0000_0001_0000;
 	// set after a successful lstat()
@@ -5167,7 +5167,7 @@ function requireCommonjs$1 () {
 	        }
 	        const children = Object.assign([], { provisional: 0 });
 	        this.#children.set(this, children);
-	        this.#type &= -17;
+	        this.#type &= ~READDIR_CALLED;
 	        return children;
 	    }
 	    /**
@@ -8153,26 +8153,26 @@ var hasRequiredCommonjs;
 function requireCommonjs () {
 	if (hasRequiredCommonjs) return commonjs$4;
 	hasRequiredCommonjs = 1;
-	(function (exports) {
-		Object.defineProperty(exports, "__esModule", { value: true });
-		exports.glob = exports.sync = exports.iterate = exports.iterateSync = exports.stream = exports.streamSync = exports.Ignore = exports.hasMagic = exports.Glob = exports.unescape = exports.escape = void 0;
-		exports.globStreamSync = globStreamSync;
-		exports.globStream = globStream;
-		exports.globSync = globSync;
-		exports.globIterateSync = globIterateSync;
-		exports.globIterate = globIterate;
+	(function (exports$1) {
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.glob = exports$1.sync = exports$1.iterate = exports$1.iterateSync = exports$1.stream = exports$1.streamSync = exports$1.Ignore = exports$1.hasMagic = exports$1.Glob = exports$1.unescape = exports$1.escape = void 0;
+		exports$1.globStreamSync = globStreamSync;
+		exports$1.globStream = globStream;
+		exports$1.globSync = globSync;
+		exports$1.globIterateSync = globIterateSync;
+		exports$1.globIterate = globIterate;
 		const minimatch_1 = requireCommonjs$4();
 		const glob_js_1 = requireGlob();
 		const has_magic_js_1 = requireHasMagic();
 		var minimatch_2 = requireCommonjs$4();
-		Object.defineProperty(exports, "escape", { enumerable: true, get: function () { return minimatch_2.escape; } });
-		Object.defineProperty(exports, "unescape", { enumerable: true, get: function () { return minimatch_2.unescape; } });
+		Object.defineProperty(exports$1, "escape", { enumerable: true, get: function () { return minimatch_2.escape; } });
+		Object.defineProperty(exports$1, "unescape", { enumerable: true, get: function () { return minimatch_2.unescape; } });
 		var glob_js_2 = requireGlob();
-		Object.defineProperty(exports, "Glob", { enumerable: true, get: function () { return glob_js_2.Glob; } });
+		Object.defineProperty(exports$1, "Glob", { enumerable: true, get: function () { return glob_js_2.Glob; } });
 		var has_magic_js_2 = requireHasMagic();
-		Object.defineProperty(exports, "hasMagic", { enumerable: true, get: function () { return has_magic_js_2.hasMagic; } });
+		Object.defineProperty(exports$1, "hasMagic", { enumerable: true, get: function () { return has_magic_js_2.hasMagic; } });
 		var ignore_js_1 = requireIgnore();
-		Object.defineProperty(exports, "Ignore", { enumerable: true, get: function () { return ignore_js_1.Ignore; } });
+		Object.defineProperty(exports$1, "Ignore", { enumerable: true, get: function () { return ignore_js_1.Ignore; } });
 		function globStreamSync(pattern, options = {}) {
 		    return new glob_js_1.Glob(pattern, options).streamSync();
 		}
@@ -8192,34 +8192,34 @@ function requireCommonjs () {
 		    return new glob_js_1.Glob(pattern, options).iterate();
 		}
 		// aliases: glob.sync.stream() glob.stream.sync() glob.sync() etc
-		exports.streamSync = globStreamSync;
-		exports.stream = Object.assign(globStream, { sync: globStreamSync });
-		exports.iterateSync = globIterateSync;
-		exports.iterate = Object.assign(globIterate, {
+		exports$1.streamSync = globStreamSync;
+		exports$1.stream = Object.assign(globStream, { sync: globStreamSync });
+		exports$1.iterateSync = globIterateSync;
+		exports$1.iterate = Object.assign(globIterate, {
 		    sync: globIterateSync,
 		});
-		exports.sync = Object.assign(globSync, {
+		exports$1.sync = Object.assign(globSync, {
 		    stream: globStreamSync,
 		    iterate: globIterateSync,
 		});
-		exports.glob = Object.assign(glob_, {
+		exports$1.glob = Object.assign(glob_, {
 		    glob: glob_,
 		    globSync,
-		    sync: exports.sync,
+		    sync: exports$1.sync,
 		    globStream,
-		    stream: exports.stream,
+		    stream: exports$1.stream,
 		    globStreamSync,
-		    streamSync: exports.streamSync,
+		    streamSync: exports$1.streamSync,
 		    globIterate,
-		    iterate: exports.iterate,
+		    iterate: exports$1.iterate,
 		    globIterateSync,
-		    iterateSync: exports.iterateSync,
+		    iterateSync: exports$1.iterateSync,
 		    Glob: glob_js_1.Glob,
 		    hasMagic: has_magic_js_1.hasMagic,
 		    escape: minimatch_1.escape,
 		    unescape: minimatch_1.unescape,
 		});
-		exports.glob.glob = exports.glob;
+		exports$1.glob.glob = exports$1.glob;
 		
 	} (commonjs$4));
 	return commonjs$4;
@@ -9872,7 +9872,7 @@ var hasRequiredRe;
 function requireRe () {
 	if (hasRequiredRe) return re.exports;
 	hasRequiredRe = 1;
-	(function (module, exports) {
+	(function (module, exports$1) {
 
 		const {
 		  MAX_SAFE_COMPONENT_LENGTH,
@@ -9880,14 +9880,14 @@ function requireRe () {
 		  MAX_LENGTH,
 		} = requireConstants();
 		const debug = requireDebug();
-		exports = module.exports = {};
+		exports$1 = module.exports = {};
 
 		// The actual regexps go on exports.re
-		const re = exports.re = [];
-		const safeRe = exports.safeRe = [];
-		const src = exports.src = [];
-		const safeSrc = exports.safeSrc = [];
-		const t = exports.t = {};
+		const re = exports$1.re = [];
+		const safeRe = exports$1.safeRe = [];
+		const src = exports$1.src = [];
+		const safeSrc = exports$1.safeSrc = [];
+		const t = exports$1.t = {};
 		let R = 0;
 
 		const LETTERDASHNUMBER = '[a-zA-Z0-9-]';
@@ -10051,7 +10051,7 @@ function requireRe () {
 		createToken('LONETILDE', '(?:~>?)');
 
 		createToken('TILDETRIM', `(\\s*)${src[t.LONETILDE]}\\s+`, true);
-		exports.tildeTrimReplace = '$1~';
+		exports$1.tildeTrimReplace = '$1~';
 
 		createToken('TILDE', `^${src[t.LONETILDE]}${src[t.XRANGEPLAIN]}$`);
 		createToken('TILDELOOSE', `^${src[t.LONETILDE]}${src[t.XRANGEPLAINLOOSE]}$`);
@@ -10061,7 +10061,7 @@ function requireRe () {
 		createToken('LONECARET', '(?:\\^)');
 
 		createToken('CARETTRIM', `(\\s*)${src[t.LONECARET]}\\s+`, true);
-		exports.caretTrimReplace = '$1^';
+		exports$1.caretTrimReplace = '$1^';
 
 		createToken('CARET', `^${src[t.LONECARET]}${src[t.XRANGEPLAIN]}$`);
 		createToken('CARETLOOSE', `^${src[t.LONECARET]}${src[t.XRANGEPLAINLOOSE]}$`);
@@ -10074,7 +10074,7 @@ function requireRe () {
 		// it modifies, so that `> 1.2.3` ==> `>1.2.3`
 		createToken('COMPARATORTRIM', `(\\s*)${src[t.GTLT]
 		}\\s*(${src[t.LOOSEPLAIN]}|${src[t.XRANGEPLAIN]})`, true);
-		exports.comparatorTrimReplace = '$1$2$3';
+		exports$1.comparatorTrimReplace = '$1$2$3';
 
 		// Something like `1.2.3 - 1.2.4`
 		// Note that these all use the loose form, because they'll be
@@ -12233,9 +12233,9 @@ var hasRequiredConvertSourceMap;
 function requireConvertSourceMap () {
 	if (hasRequiredConvertSourceMap) return convertSourceMap;
 	hasRequiredConvertSourceMap = 1;
-	(function (exports) {
+	(function (exports$1) {
 
-		Object.defineProperty(exports, 'commentRegex', {
+		Object.defineProperty(exports$1, 'commentRegex', {
 		  get: function getCommentRegex () {
 		    // Groups: 1: media type, 2: MIME type, 3: charset, 4: encoding, 5: data.
 		    return /^\s*?\/[\/\*][@#]\s+?sourceMappingURL=data:(((?:application|text)\/json)(?:;charset=([^;,]+?)?)?)?(?:;(base64))?,(.*?)$/mg;
@@ -12243,7 +12243,7 @@ function requireConvertSourceMap () {
 		});
 
 
-		Object.defineProperty(exports, 'mapFileCommentRegex', {
+		Object.defineProperty(exports$1, 'mapFileCommentRegex', {
 		  get: function getMapFileCommentRegex () {
 		    // Matches sourceMappingURL in either // or /* comment styles.
 		    return /(?:\/\/[@#][ \t]+?sourceMappingURL=([^\s'"`]+?)[ \t]*?$)|(?:\/\*[@#][ \t]+sourceMappingURL=([^*]+?)[ \t]*?(?:\*\/){1}[ \t]*?$)/mg;
@@ -12281,7 +12281,7 @@ function requireConvertSourceMap () {
 		}
 
 		function readFromFileMap(sm, read) {
-		  var r = exports.mapFileCommentRegex.exec(sm);
+		  var r = exports$1.mapFileCommentRegex.exec(sm);
 		  // for some odd reason //# .. captures in 1 and /* .. */ in 2
 		  var filename = r[1] || r[2];
 
@@ -12390,28 +12390,28 @@ function requireConvertSourceMap () {
 		  return this.sourcemap[key];
 		};
 
-		exports.fromObject = function (obj) {
+		exports$1.fromObject = function (obj) {
 		  return new Converter(obj);
 		};
 
-		exports.fromJSON = function (json) {
+		exports$1.fromJSON = function (json) {
 		  return new Converter(json, { isJSON: true });
 		};
 
-		exports.fromURI = function (uri) {
+		exports$1.fromURI = function (uri) {
 		  return new Converter(uri, { encoding: 'uri' });
 		};
 
-		exports.fromBase64 = function (base64) {
+		exports$1.fromBase64 = function (base64) {
 		  return new Converter(base64, { encoding: 'base64' });
 		};
 
-		exports.fromComment = function (comment) {
+		exports$1.fromComment = function (comment) {
 		  var m, encoding;
 		  comment = comment
 		    .replace(/^\/\*/g, '//')
 		    .replace(/\*\/$/g, '');
-		  m = exports.commentRegex.exec(comment);
+		  m = exports$1.commentRegex.exec(comment);
 		  encoding = m && m[4] || 'uri';
 		  return new Converter(comment, { encoding: encoding, hasComment: true });
 		};
@@ -12420,7 +12420,7 @@ function requireConvertSourceMap () {
 		  return new Converter(sm, { isJSON: true });
 		}
 
-		exports.fromMapFileComment = function (comment, read) {
+		exports$1.fromMapFileComment = function (comment, read) {
 		  if (typeof read === 'string') {
 		    throw new Error(
 		      'String directory paths are no longer supported with `fromMapFileComment`\n' +
@@ -12437,32 +12437,32 @@ function requireConvertSourceMap () {
 		};
 
 		// Finds last sourcemap comment in file or returns null if none was found
-		exports.fromSource = function (content) {
-		  var m = content.match(exports.commentRegex);
-		  return m ? exports.fromComment(m.pop()) : null;
+		exports$1.fromSource = function (content) {
+		  var m = content.match(exports$1.commentRegex);
+		  return m ? exports$1.fromComment(m.pop()) : null;
 		};
 
 		// Finds last sourcemap comment in file or returns null if none was found
-		exports.fromMapFileSource = function (content, read) {
+		exports$1.fromMapFileSource = function (content, read) {
 		  if (typeof read === 'string') {
 		    throw new Error(
 		      'String directory paths are no longer supported with `fromMapFileSource`\n' +
 		      'Please review the Upgrading documentation at https://github.com/thlorenz/convert-source-map#upgrading'
 		    )
 		  }
-		  var m = content.match(exports.mapFileCommentRegex);
-		  return m ? exports.fromMapFileComment(m.pop(), read) : null;
+		  var m = content.match(exports$1.mapFileCommentRegex);
+		  return m ? exports$1.fromMapFileComment(m.pop(), read) : null;
 		};
 
-		exports.removeComments = function (src) {
-		  return src.replace(exports.commentRegex, '');
+		exports$1.removeComments = function (src) {
+		  return src.replace(exports$1.commentRegex, '');
 		};
 
-		exports.removeMapFileComments = function (src) {
-		  return src.replace(exports.mapFileCommentRegex, '');
+		exports$1.removeMapFileComments = function (src) {
+		  return src.replace(exports$1.mapFileCommentRegex, '');
 		};
 
-		exports.generateMapFileComment = function (file, options) {
+		exports$1.generateMapFileComment = function (file, options) {
 		  var data = 'sourceMappingURL=' + file;
 		  return options && options.multiline ? '/*# ' + data + ' */' : '//# ' + data;
 		}; 
@@ -12645,7 +12645,7 @@ var hasRequiredResolveUri_umd;
 function requireResolveUri_umd () {
 	if (hasRequiredResolveUri_umd) return resolveUri_umd$1.exports;
 	hasRequiredResolveUri_umd = 1;
-	(function (module, exports) {
+	(function (module, exports$1) {
 		(function (global, factory) {
 		    module.exports = factory() ;
 		})(resolveUri_umd, (function () {
@@ -12896,7 +12896,7 @@ var hasRequiredSourcemapCodec_umd;
 function requireSourcemapCodec_umd () {
 	if (hasRequiredSourcemapCodec_umd) return sourcemapCodec_umd$1.exports;
 	hasRequiredSourcemapCodec_umd = 1;
-	(function (module, exports) {
+	(function (module, exports$1) {
 		(function (global, factory) {
 		  {
 		    factory(module);
@@ -13361,7 +13361,7 @@ var hasRequiredTraceMapping_umd;
 function requireTraceMapping_umd () {
 	if (hasRequiredTraceMapping_umd) return traceMapping_umd$1.exports;
 	hasRequiredTraceMapping_umd = 1;
-	(function (module, exports) {
+	(function (module, exports$1) {
 		(function (global, factory) {
 		  {
 		    factory(module, requireResolveUri_umd(), requireSourcemapCodec_umd());
@@ -13402,14 +13402,14 @@ function requireTraceMapping_umd () {
 
 		// umd:@jridgewell/sourcemap-codec
 		var require_sourcemap_codec = __commonJS({
-		  "umd:@jridgewell/sourcemap-codec"(exports, module2) {
+		  "umd:@jridgewell/sourcemap-codec"(exports$1, module2) {
 		    module2.exports = require_sourcemapCodec;
 		  }
 		});
 
 		// umd:@jridgewell/resolve-uri
 		var require_resolve_uri = __commonJS({
-		  "umd:@jridgewell/resolve-uri"(exports, module2) {
+		  "umd:@jridgewell/resolve-uri"(exports$1, module2) {
 		    module2.exports = require_resolveURI;
 		  }
 		});

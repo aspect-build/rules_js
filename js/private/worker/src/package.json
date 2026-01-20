@@ -4,12 +4,12 @@
         "tslib": "2.8.1"
     },
     "devDependencies": {
-        "rollup": "4.39.0",
-        "@rollup/plugin-commonjs": "28.0.3",
-        "@rollup/plugin-node-resolve": "16.0.1",
-        "@rollup/plugin-json": "6.1.0",
+        "rollup": "^4.55.2",
+        "@rollup/plugin-commonjs": "^29.0.0",
+        "@rollup/plugin-json": "^6.1.0",
+        "@rollup/plugin-node-resolve": "^16.0.3",
+        "@rollup/plugin-typescript": "^12.3.0",
         "@types/google-protobuf": "3.15.12",
-        "@rollup/plugin-typescript": "12.1.2",
         "@types/node": "22.18.13",
         "typescript": "^5.8.0"
     }
