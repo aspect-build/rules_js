@@ -393,7 +393,7 @@ def _yaml_to_json(rctx, yaml_path, is_windows):
     ]
     result = rctx.execute(yq_args)
     if result.return_code:
-        return None, "failed to parse {} with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join(yq_args), yaml_path, result.return_code, result.stdout, result.stderr)
+        return None, "failed to parse {} with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(yq_args, yaml_path, result.return_code, result.stdout, result.stderr)
 
     # NB: yq will return the string "null" if the yaml file is empty
     if result.stdout != "null":
