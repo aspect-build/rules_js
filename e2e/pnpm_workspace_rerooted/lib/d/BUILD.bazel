@@ -21,6 +21,6 @@ build_test(
     name = "aliases",
     targets = [
         ":node_modules/alias-2",
-        "//root:.aspect_rules_js/node_modules/@types+node@18.19.54",
+        "//root:.aspect_rules_js/node_modules/@types+node@22.18.13",
     ],
 )

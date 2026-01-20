@@ -498,7 +498,8 @@ function patcher(roots) {
         if (!v.isSymbolicLink()) {
             return v;
         }
-        const f = path.resolve(p, v.name);
+        const entryName = typeof v.name === 'string' ? v.name : v.name.toString();
+        const f = path.resolve(p, entryName);
         return new Promise(function handleDirentExecutor(resolve, reject) {
             return guardedReadLink(f, handleDirentReadLinkCb);
             function handleDirentReadLinkCb(str) {

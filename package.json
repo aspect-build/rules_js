@@ -2,7 +2,7 @@
     "private": true,
     "devDependencies": {
         "google-closure-compiler": "^20251111.0.0",
-        "@types/node": "18.19.54",
+        "@types/node": "22.18.13",
         "chalk": "5.1.1",
         "circles": "npm:es5-ext@0.10.64",
         "jsonpath-plus": "7.2.0",

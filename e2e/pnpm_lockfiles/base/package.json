@@ -46,10 +46,10 @@
     "devDependencies": {
         "@aspect-test/b": "5.0.2",
         "@aspect-test/c": "^2.0.0",
-        "@types/node": "18.19.54",
+        "@types/node": "22.18.13",
         "@types/archiver": "5.3.1",
         "alias-only-sizzle": "npm:@types/sizzle@~2.3.10",
-        "alias-types-node": "npm:@types/node@~18.19.54"
+        "alias-types-node": "npm:@types/node@~22.18.13"
     },
     "optionalDependencies": {
         "@aspect-test/c": "2.0.0",

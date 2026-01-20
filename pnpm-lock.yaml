@@ -21,8 +21,8 @@ importers:
   .:
     devDependencies:
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
       chalk:
         specifier: 5.1.1
         version: 5.1.1
@@ -48,8 +48,8 @@ importers:
   examples/js_lib_pkg/a:
     devDependencies:
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
 
   examples/js_lib_pkg/b:
     dependencies:
@@ -64,8 +64,8 @@ importers:
         version: link:../a
     devDependencies:
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
 
   examples/linked_consumer:
     dependencies:
@@ -94,8 +94,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       '@types/node':
-        specifier: 18.13.0
-        version: 18.13.0
+        specifier: 22.18.13
+        version: 22.18.13
 
   examples/linked_pkg:
     dependencies:
@@ -113,8 +113,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       '@types/node':
-        specifier: 18.13.0
-        version: 18.13.0
+        specifier: 22.18.13
+        version: 22.18.13
 
   examples/macro:
     devDependencies:
@@ -329,8 +329,8 @@ importers:
         specifier: 16.0.1
         version: 16.0.1(rollup@4.39.0)
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
       rollup:
         specifier: 4.39.0
         version: 4.39.0
@@ -350,8 +350,8 @@ importers:
   js/private/test/js_run_devserver:
     dependencies:
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
       jasmine:
         specifier: 5.1.0
         version: 5.1.0
@@ -396,8 +396,8 @@ importers:
         specifier: 3.15.12
         version: 3.15.12
       '@types/node':
-        specifier: 18.19.54
-        version: 18.19.54
+        specifier: 22.18.13
+        version: 22.18.13
       rollup:
         specifier: 4.39.0
         version: 4.39.0
@@ -2081,12 +2081,6 @@ packages:
 
   '@types/node-fetch@2.6.13':
     resolution: {integrity: sha512-QGpRVpzSaUs30JBSGPjOg4Uveu384erbHBoT1zeONvyCfwQxIkUshLAOqN/k9EjGviPRmWTTe6aH2qySWKTVSw==, tarball: https://registry.npmjs.org/@types/node-fetch/-/node-fetch-2.6.13.tgz}
-
-  '@types/node@18.13.0':
-    resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==, tarball: https://registry.npmjs.org/@types/node/-/node-18.13.0.tgz}
-
-  '@types/node@18.19.54':
-    resolution: {integrity: sha512-+BRgt0G5gYjTvdLac9sIeE0iZcJxi4Jc4PV5EUzqi+88jmQLr+fRZdv2tCTV7IHKSGxM6SaLoOXQWWUiLUItMw==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.54.tgz}
 
   '@types/node@22.18.13':
     resolution: {integrity: sha512-Bo45YKIjnmFtv6I1TuC8AaHBbqXtIo+Om5fE4QiU1Tj8QR/qt+8O3BAtOimG5IFmwaWiPmB3Mv3jtYzBA4Us2A==, tarball: https://registry.npmjs.org/@types/node/-/node-22.18.13.tgz}
@@ -5569,9 +5563,6 @@ packages:
   unbzip2-stream@1.4.3:
     resolution: {integrity: sha512-mlExGW4w71ebDJviH16lQLtZS32VKqsSfk80GCfUlwT/4/hNRFsoscrF/c++9xinkMzECL1uL9DDwXqFWkruPg==}
 
-  undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
-
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
@@ -7234,7 +7225,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 18.19.54
+      '@types/node': 22.18.13
       '@types/responselike': 1.0.3
 
   '@types/eslint-scope@3.7.7':
@@ -7265,23 +7256,16 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 22.18.13
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
       form-data: 4.0.4
-
-  '@types/node@18.13.0': {}
-
-  '@types/node@18.19.54':
-    dependencies:
-      undici-types: 5.26.5
 
   '@types/node@22.18.13':
     dependencies:
       undici-types: 6.21.0
-    optional: true
 
   '@types/node@22.7.4':
     dependencies:
@@ -7291,28 +7275,28 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 22.18.13
 
   '@types/ssri@7.1.5':
     dependencies:
-      '@types/node': 18.19.54
+      '@types/node': 22.18.13
 
   '@types/stream-buffers@3.0.8':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
 
   '@types/tar@6.1.13':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
       minipass: 4.2.8
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
     optional: true
 
   '@vanilla-extract/babel-plugin-debug-ids@1.2.2':
@@ -8601,7 +8585,7 @@ snapshots:
 
   eval@0.1.8:
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
       require-like: 0.1.2
 
   event-emitter@0.3.5:
@@ -9310,7 +9294,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 22.18.13
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -11066,12 +11050,9 @@ snapshots:
       buffer: 5.7.1
       through: 2.3.8
 
-  undici-types@5.26.5: {}
-
   undici-types@6.19.8: {}
 
-  undici-types@6.21.0:
-    optional: true
+  undici-types@6.21.0: {}
 
   unique-filename@2.0.1:
     dependencies:
