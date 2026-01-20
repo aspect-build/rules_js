@@ -20,7 +20,7 @@ permissions:
     contents: write
 jobs:
     release:
-        uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.2.4
+        uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.3.0
         with:
             release_files: rules_js-*.tar.gz
             prerelease: false
