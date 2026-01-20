@@ -569,7 +569,7 @@ Possible fixes:
                 """.format(
                 fixes = "\n".join(missing_ignores),
                 bazelignore = attr.verify_node_modules_ignored,
-                repo = rctx.name,
+                repo = attr.name,
             )
             fail(msg)
 
