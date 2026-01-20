@@ -21,6 +21,7 @@ npm.npm_import(
 )
 use_repo(npm, "protoc-gen-grpc")
 use_repo(npm, "protoc-gen-grpc__links")
+
 npm.npm_import(
     name = "syncpack",
     commit = "c245af8ea73ce3345d92bbda6c684092a841e262",

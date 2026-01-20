@@ -18,6 +18,7 @@ npm.npm_translate_lock(
     verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "app1_npm")
+
 npm.npm_translate_lock(
     name = "app2_npm",
     npmrc = "//:.npmrc",
