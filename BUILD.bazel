@@ -87,7 +87,6 @@ buildifier(
         "**/snapshots/*",
     ],
     lint_mode = "fix",
-    lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "fix",
     tags = ["manual"],  # tag as manual so windows ci does not build it by default
 )
@@ -99,7 +98,6 @@ buildifier(
         "**/snapshots/*",
     ],
     lint_mode = "warn",
-    lint_warnings = ["-out-of-order-load"],  # TODO: enable out-of-order-load
     mode = "diff",
     tags = ["manual"],  # tag as manual so windows ci does not build it by default
 )
