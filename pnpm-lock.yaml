@@ -415,7 +415,7 @@ importers:
         version: 1001.0.1
       '@pnpm/read-package-json':
         specifier: ^1000.1.6
-        version: 1000.1.6
+        version: 1000.1.7
       path-exists:
         specifier: ^4.0.0
         version: 4.0.0
@@ -578,6 +578,10 @@ packages:
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/code-frame@7.28.6':
+    resolution: {integrity: sha512-JYgintcMjRiCvS8mMECzaEn+m3PfoQiyqukOMCCVQtoJGYJw8j/8LBJEiqkHLkfwCcs74E3pbAUFNg7d9VNJ+Q==}
     engines: {node: '>=6.9.0'}
 
   '@babel/compat-data@7.28.5':
@@ -1705,6 +1709,10 @@ packages:
     resolution: {integrity: sha512-qZM6S7GgbIu743OYJB1Me0nUMXDVLnEKkaJg1dVE/UrTDbSX2hiqjTVz0/Zvvmn9iF/nV9v7JsmciauspYfgxA==}
     engines: {node: '>=18.12'}
 
+  '@pnpm/read-package-json@1000.1.7':
+    resolution: {integrity: sha512-nzjqiyUMdkDoJup4KeJdGZ84xMEenwF9E6YqTursHVL/lznGgQ/5L8PNMMJkXDYzPyx3PuCxeGg/jJUcBUz6zQ==}
+    engines: {node: '>=18.12'}
+
   '@pnpm/read-project-manifest@1001.2.3':
     resolution: {integrity: sha512-46XPWpg3RYGLmlIRYjsG40ob6ZigMoyKXEqMDpmgF2YsejTCHrThnkm6QvLbc2fCCIfENrzhs0wVzvUt3miV8w==}
     engines: {node: '>=18.12'}
@@ -1725,6 +1733,10 @@ packages:
 
   '@pnpm/types@1001.2.0':
     resolution: {integrity: sha512-UIju+OadUVS0q5q/MbRAzMS5M9HZcZyT6evyrgPUH0DV9przkcW7/LH1Sj33Q2MpJO9Nzqw4b4w72x8mvtUAew==}
+    engines: {node: '>=18.12'}
+
+  '@pnpm/types@1001.3.0':
+    resolution: {integrity: sha512-NLTXheat/u7OEGg5M5vF6Z85zx8uKUZE0+whtX/sbFV2XL48RdnOWGPTKYuVVkv8M+launaLUTgGEXNs/ess2w==}
     engines: {node: '>=18.12'}
 
   '@pnpm/write-project-manifest@1000.0.15':
@@ -4914,7 +4926,7 @@ packages:
 
   puppeteer@19.11.1:
     resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 24.15.0 is no longer supported
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -5437,10 +5449,12 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   tar@7.5.2:
     resolution: {integrity: sha512-7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   teex@1.0.1:
     resolution: {integrity: sha512-eYE6iEI62Ni1H8oIa7KlDU6uQBtqr4Eajni3wX7rpfXD8ysFx8z0+dri+KWEPWpBsxXfxu58x/0jvTVT1ekOSg==}
@@ -6016,6 +6030,12 @@ snapshots:
       chokidar: 3.6.0
 
   '@babel/code-frame@7.27.1':
+    dependencies:
+      '@babel/helper-validator-identifier': 7.28.5
+      js-tokens: 4.0.0
+      picocolors: 1.1.1
+
+  '@babel/code-frame@7.28.6':
     dependencies:
       '@babel/helper-validator-identifier': 7.28.5
       js-tokens: 4.0.0
@@ -6936,6 +6956,13 @@ snapshots:
       load-json-file: 6.2.0
       normalize-package-data: 7.0.1
 
+  '@pnpm/read-package-json@1000.1.7':
+    dependencies:
+      '@pnpm/error': 1000.0.5
+      '@pnpm/types': 1001.3.0
+      load-json-file: 6.2.0
+      normalize-package-data: 7.0.1
+
   '@pnpm/read-project-manifest@1001.2.3(@pnpm/logger@1001.0.1)':
     dependencies:
       '@gwhitney/detect-indent': 7.0.1
@@ -6968,6 +6995,8 @@ snapshots:
       strip-comments-strings: 1.2.0
 
   '@pnpm/types@1001.2.0': {}
+
+  '@pnpm/types@1001.3.0': {}
 
   '@pnpm/write-project-manifest@1000.0.15':
     dependencies:
@@ -10116,7 +10145,7 @@ snapshots:
 
   parse-json@5.2.0:
     dependencies:
-      '@babel/code-frame': 7.27.1
+      '@babel/code-frame': 7.28.6
       error-ex: 1.3.4
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
