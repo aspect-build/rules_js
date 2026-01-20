@@ -45,8 +45,8 @@ write_source_files(
         "snapshots/circular_links_defs.bzl": "@npm__es5-ext__0.10.64__links//:defs.bzl",
         "snapshots/closure-compiler_links_defs.bzl": "@npm__google-closure-compiler__20251111.0.0__links//:defs.bzl",
         "snapshots/next_links_defs.bzl": "@npm__next__15.2.6_1315089095__links//:defs.bzl",
-        "snapshots/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
-        "snapshots/package_json.bzl": "@npm__rollup__2.70.2//:package_json.bzl",
+        "snapshots/rollup_links_defs.bzl": "@npm__rollup__4.39.0__links//:defs.bzl",
+        "snapshots/package_json.bzl": "@npm__rollup__4.39.0//:package_json.bzl",
         "snapshots/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8//:package_json.bzl",
     },
     tags = [

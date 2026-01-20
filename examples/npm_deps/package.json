@@ -7,14 +7,14 @@
         "@mycorp/pkg-a": "workspace:*",
         "@mycorp/pkg-d": "workspace:*",
         "@mycorp/pkg-e": "workspace:*",
-        "@rollup/plugin-commonjs": "21.1.0",
+        "@rollup/plugin-commonjs": "28.0.3",
         "acorn": "8.7.1",
         "debug": "3.2.7",
         "meaning-of-life": "1.0.0",
         "mobx-react": "7.3.0",
         "mobx": "6.3.0",
         "react": "17.0.2",
-        "rollup": "2.70.2",
+        "rollup": "4.39.0",
         "uvu": "0.5.3"
     }
 }

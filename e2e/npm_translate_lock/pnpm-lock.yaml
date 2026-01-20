@@ -10,55 +10,58 @@ importers:
     dependencies:
       debug:
         specifier: 4.3.4
-        version: https://registry.npmjs.org/debug/-/debug-4.3.4.tgz
+        version: 4.3.4
       is-odd:
         specifier: 3.0.1
-        version: https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz
+        version: 3.0.1
       semver:
         specifier: 7.5.1
-        version: https://registry.npmjs.org/semver/-/semver-7.5.1.tgz
+        version: 7.5.1
     devDependencies:
       '@rollup/plugin-commonjs':
-        specifier: 23.0.4
-        version: 23.0.4
+        specifier: 28.0.3
+        version: 28.0.3
       '@rollup/plugin-json':
-        specifier: 5.0.2
-        version: 5.0.2
+        specifier: 6.1.0
+        version: 6.1.0
       '@rollup/plugin-node-resolve':
-        specifier: 15.0.1
-        version: 15.0.1
+        specifier: 16.0.1
+        version: 16.0.1
       '@types/node':
         specifier: 18.11.18
-        version: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz
+        version: 18.11.18
       '@types/semver':
         specifier: 7.3.13
-        version: https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz
+        version: 7.3.13
 
 packages:
 
-  '@rollup/plugin-commonjs@23.0.4':
-    resolution: {integrity: sha512-bOPJeTZg56D2MCm+TT4psP8e8Jmf1Jsi7pFUMl8BN5kOADNzofNHe47+84WVCt7D095xPghC235/YKuNDEhczg==}
-    engines: {node: '>=14.0.0'}
+  '@jridgewell/sourcemap-codec@1.5.5':
+    resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==, tarball: https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.5.tgz}
+
+  '@rollup/plugin-commonjs@28.0.3':
+    resolution: {integrity: sha512-pyltgilam1QPdn+Zd9gaCfOLcnjMEJ9gV+bTw6/r73INdvzf1ah9zLIJBm+kW7R6IUFIQ1YO+VqZtYxZNWFPEQ==}
+    engines: {node: '>=16.0.0 || 14 >= 14.17'}
     peerDependencies:
-      rollup: ^2.68.0||^3.0.0
+      rollup: ^2.68.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
         optional: true
 
-  '@rollup/plugin-json@5.0.2':
-    resolution: {integrity: sha512-D1CoOT2wPvadWLhVcmpkDnesTzjhNIQRWLsc3fA49IFOP2Y84cFOOJ+nKGYedvXHKUsPeq07HR4hXpBBr+CHlA==}
+  '@rollup/plugin-json@6.1.0':
+    resolution: {integrity: sha512-EGI2te5ENk1coGeADSIwZ7G2Q8CJS2sF120T7jLw4xFw9n7wIOXHo+kIYRAoVpJAN+kmqZSoO3Fp4JtoNF4ReA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
         optional: true
 
-  '@rollup/plugin-node-resolve@15.0.1':
-    resolution: {integrity: sha512-ReY88T7JhJjeRVbfCyNj+NXAG3IIsVMsX9b5/9jC98dRP8/yxlZdz7mHZbHk5zHr24wZZICS5AcXsFZAXYUQEg==}
+  '@rollup/plugin-node-resolve@16.0.1':
+    resolution: {integrity: sha512-tk5YCxJWIG81umIvNkSod2qK5KyQW19qcBF/B78n1bjtOON6gzKoVeSzAE8yHCZEDmqkHKkxplExA8KzdJLJpA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      rollup: ^2.78.0||^3.0.0
+      rollup: ^2.78.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
         optional: true
@@ -72,51 +75,23 @@ packages:
       rollup:
         optional: true
 
-  '@types/estree@https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz':
-    resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz}
-    name: '@types/estree'
-    version: 1.0.8
+  '@types/estree@1.0.8':
+    resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==, tarball: https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz}
 
-  '@types/node@https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz':
-    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
-    name: '@types/node'
-    version: 18.11.18
+  '@types/node@18.11.18':
+    resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==, tarball: https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz}
 
-  '@types/resolve@https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz':
-    resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz}
-    name: '@types/resolve'
-    version: 1.20.2
+  '@types/resolve@1.20.2':
+    resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==, tarball: https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz}
 
-  '@types/semver@https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz':
-    resolution: {integrity: sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz}
-    name: '@types/semver'
-    version: 7.3.13
+  '@types/semver@7.3.13':
+    resolution: {integrity: sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==, tarball: https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz}
 
-  balanced-match@https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz:
-    resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz}
-    name: balanced-match
-    version: 1.0.2
+  commondir@1.0.1:
+    resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==, tarball: https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz}
 
-  brace-expansion@https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz:
-    resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz}
-    name: brace-expansion
-    version: 2.0.2
-
-  builtin-modules@https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz:
-    resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz}
-    name: builtin-modules
-    version: 3.3.0
-    engines: {node: '>=6'}
-
-  commondir@https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz:
-    resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz}
-    name: commondir
-    version: 1.0.1
-
-  debug@https://registry.npmjs.org/debug/-/debug-4.3.4.tgz:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/debug/-/debug-4.3.4.tgz}
-    name: debug
-    version: 4.3.4
+  debug@4.3.4:
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==, tarball: https://registry.npmjs.org/debug/-/debug-4.3.4.tgz}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -124,295 +99,181 @@ packages:
       supports-color:
         optional: true
 
-  deepmerge@https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz:
-    resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz}
-    name: deepmerge
-    version: 4.3.1
+  deepmerge@4.3.1:
+    resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==, tarball: https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz}
     engines: {node: '>=0.10.0'}
 
-  estree-walker@https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz:
-    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz}
-    name: estree-walker
-    version: 2.0.2
+  estree-walker@2.0.2:
+    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==, tarball: https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz}
 
-  fs.realpath@https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz:
-    resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz}
-    name: fs.realpath
-    version: 1.0.0
+  fdir@6.5.0:
+    resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==, tarball: https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      picomatch: ^3 || ^4
+    peerDependenciesMeta:
+      picomatch:
+        optional: true
 
-  function-bind@https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz:
-    resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz}
-    name: function-bind
-    version: 1.1.2
+  function-bind@1.1.2:
+    resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==, tarball: https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz}
 
-  glob@https://registry.npmjs.org/glob/-/glob-8.1.0.tgz:
-    resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/glob/-/glob-8.1.0.tgz}
-    name: glob
-    version: 8.1.0
-    engines: {node: '>=12'}
-    deprecated: Glob versions prior to v9 are no longer supported
-
-  hasown@https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz:
-    resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz}
-    name: hasown
-    version: 2.0.2
+  hasown@2.0.2:
+    resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==, tarball: https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz}
     engines: {node: '>= 0.4'}
 
-  inflight@https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz:
-    resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz}
-    name: inflight
-    version: 1.0.6
-    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-
-  inherits@https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz:
-    resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz}
-    name: inherits
-    version: 2.0.4
-
-  is-builtin-module@https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz:
-    resolution: {integrity: sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz}
-    name: is-builtin-module
-    version: 3.2.1
-    engines: {node: '>=6'}
-
-  is-core-module@https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz:
-    resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz}
-    name: is-core-module
-    version: 2.16.1
+  is-core-module@2.16.1:
+    resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==, tarball: https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz}
     engines: {node: '>= 0.4'}
 
-  is-module@https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz:
-    resolution: {integrity: sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz}
-    name: is-module
-    version: 1.0.0
+  is-module@1.0.0:
+    resolution: {integrity: sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==, tarball: https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz}
 
-  is-number@https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz:
-    resolution: {integrity: sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz}
-    name: is-number
-    version: 6.0.0
+  is-number@6.0.0:
+    resolution: {integrity: sha512-Wu1VHeILBK8KAWJUAiSZQX94GmOE45Rg6/538fKwiloUu21KncEkYGPqob2oSZ5mUT73vLGrHQjKw3KMPwfDzg==, tarball: https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz}
     engines: {node: '>=0.10.0'}
 
-  is-odd@https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz:
-    resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz}
-    name: is-odd
-    version: 3.0.1
+  is-odd@3.0.1:
+    resolution: {integrity: sha512-CQpnWPrDwmP1+SMHXZhtLtJv90yiyVfluGsX5iNCVkrhQtU3TQHsUWPG9wkdk9Lgd5yNpAg9jQEo90CBaXgWMA==, tarball: https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz}
     engines: {node: '>=4'}
 
-  is-reference@https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz:
-    resolution: {integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz}
-    name: is-reference
-    version: 1.2.1
+  is-reference@1.2.1:
+    resolution: {integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==, tarball: https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz}
 
-  lru-cache@https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz:
-    resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz}
-    name: lru-cache
-    version: 6.0.0
+  lru-cache@6.0.0:
+    resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==, tarball: https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz}
     engines: {node: '>=10'}
 
-  magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz:
-    resolution: {integrity: sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz}
-    name: magic-string
-    version: 0.26.7
+  magic-string@0.30.21:
+    resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==, tarball: https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz}
+
+  ms@2.1.2:
+    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==, tarball: https://registry.npmjs.org/ms/-/ms-2.1.2.tgz}
+
+  path-parse@1.0.7:
+    resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==, tarball: https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz}
+
+  picomatch@4.0.3:
+    resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==, tarball: https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz}
     engines: {node: '>=12'}
 
-  minimatch@https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz:
-    resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz}
-    name: minimatch
-    version: 5.1.6
-    engines: {node: '>=10'}
-
-  ms@https://registry.npmjs.org/ms/-/ms-2.1.2.tgz:
-    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/ms/-/ms-2.1.2.tgz}
-    name: ms
-    version: 2.1.2
-
-  once@https://registry.npmjs.org/once/-/once-1.4.0.tgz:
-    resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/once/-/once-1.4.0.tgz}
-    name: once
-    version: 1.4.0
-
-  path-parse@https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz:
-    resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz}
-    name: path-parse
-    version: 1.0.7
-
-  picomatch@https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz:
-    resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz}
-    name: picomatch
-    version: 4.0.3
-    engines: {node: '>=12'}
-
-  resolve@https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz:
-    resolution: {integrity: sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz}
-    name: resolve
-    version: 1.22.11
+  resolve@1.22.11:
+    resolution: {integrity: sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ==, tarball: https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz}
     engines: {node: '>= 0.4'}
     hasBin: true
 
-  semver@https://registry.npmjs.org/semver/-/semver-7.5.1.tgz:
-    resolution: {integrity: sha512-Wvss5ivl8TMRZXXESstBA4uR5iXgEN/VC5/sOcuXdVLzcdkz4HWetIoRfG5gb5X+ij/G9rw9YoGn3QoQ8OCSpw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/semver/-/semver-7.5.1.tgz}
-    name: semver
-    version: 7.5.1
+  semver@7.5.1:
+    resolution: {integrity: sha512-Wvss5ivl8TMRZXXESstBA4uR5iXgEN/VC5/sOcuXdVLzcdkz4HWetIoRfG5gb5X+ij/G9rw9YoGn3QoQ8OCSpw==, tarball: https://registry.npmjs.org/semver/-/semver-7.5.1.tgz}
     engines: {node: '>=10'}
     hasBin: true
 
-  sourcemap-codec@https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz:
-    resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz}
-    name: sourcemap-codec
-    version: 1.4.8
-    deprecated: Please use @jridgewell/sourcemap-codec instead
-
-  supports-preserve-symlinks-flag@https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz:
-    resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz}
-    name: supports-preserve-symlinks-flag
-    version: 1.0.0
+  supports-preserve-symlinks-flag@1.0.0:
+    resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==, tarball: https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz}
     engines: {node: '>= 0.4'}
 
-  wrappy@https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz:
-    resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz}
-    name: wrappy
-    version: 1.0.2
-
-  yallist@https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz:
-    resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz}
-    name: yallist
-    version: 4.0.0
+  yallist@4.0.0:
+    resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==, tarball: https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz}
 
 snapshots:
 
-  '@rollup/plugin-commonjs@23.0.4':
-    dependencies:
-      '@rollup/pluginutils': 5.3.0
-      commondir: https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz
-      estree-walker: https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz
-      glob: https://registry.npmjs.org/glob/-/glob-8.1.0.tgz
-      is-reference: https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz
-      magic-string: https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz
+  '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@rollup/plugin-json@5.0.2':
+  '@rollup/plugin-commonjs@28.0.3':
+    dependencies:
+      '@rollup/pluginutils': 5.3.0
+      commondir: 1.0.1
+      estree-walker: 2.0.2
+      fdir: 6.5.0(picomatch@4.0.3)
+      is-reference: 1.2.1
+      magic-string: 0.30.21
+      picomatch: 4.0.3
+
+  '@rollup/plugin-json@6.1.0':
     dependencies:
       '@rollup/pluginutils': 5.3.0
 
-  '@rollup/plugin-node-resolve@15.0.1':
+  '@rollup/plugin-node-resolve@16.0.1':
     dependencies:
       '@rollup/pluginutils': 5.3.0
-      '@types/resolve': https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz
-      deepmerge: https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz
-      is-builtin-module: https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz
-      is-module: https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz
-      resolve: https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz
+      '@types/resolve': 1.20.2
+      deepmerge: 4.3.1
+      is-module: 1.0.0
+      resolve: 1.22.11
 
   '@rollup/pluginutils@5.3.0':
     dependencies:
-      '@types/estree': https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz
-      estree-walker: https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz
-      picomatch: https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz
+      '@types/estree': 1.0.8
+      estree-walker: 2.0.2
+      picomatch: 4.0.3
 
-  '@types/estree@https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz': {}
+  '@types/estree@1.0.8': {}
 
-  '@types/node@https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz': {}
+  '@types/node@18.11.18': {}
 
-  '@types/resolve@https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz': {}
+  '@types/resolve@1.20.2': {}
 
-  '@types/semver@https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz': {}
+  '@types/semver@7.3.13': {}
 
-  balanced-match@https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz: {}
+  commondir@1.0.1: {}
 
-  brace-expansion@https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz:
+  debug@4.3.4:
     dependencies:
-      balanced-match: https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz
+      ms: 2.1.2
 
-  builtin-modules@https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz: {}
+  deepmerge@4.3.1: {}
 
-  commondir@https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz: {}
+  estree-walker@2.0.2: {}
 
-  debug@https://registry.npmjs.org/debug/-/debug-4.3.4.tgz:
+  fdir@6.5.0(picomatch@4.0.3):
+    optionalDependencies:
+      picomatch: 4.0.3
+
+  function-bind@1.1.2: {}
+
+  hasown@2.0.2:
     dependencies:
-      ms: https://registry.npmjs.org/ms/-/ms-2.1.2.tgz
+      function-bind: 1.1.2
 
-  deepmerge@https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz: {}
-
-  estree-walker@https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz: {}
-
-  fs.realpath@https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz: {}
-
-  function-bind@https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz: {}
-
-  glob@https://registry.npmjs.org/glob/-/glob-8.1.0.tgz:
+  is-core-module@2.16.1:
     dependencies:
-      fs.realpath: https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz
-      inflight: https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz
-      inherits: https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz
-      minimatch: https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz
-      once: https://registry.npmjs.org/once/-/once-1.4.0.tgz
+      hasown: 2.0.2
 
-  hasown@https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz:
+  is-module@1.0.0: {}
+
+  is-number@6.0.0: {}
+
+  is-odd@3.0.1:
     dependencies:
-      function-bind: https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz
+      is-number: 6.0.0
 
-  inflight@https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz:
+  is-reference@1.2.1:
     dependencies:
-      once: https://registry.npmjs.org/once/-/once-1.4.0.tgz
-      wrappy: https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz
+      '@types/estree': 1.0.8
 
-  inherits@https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz: {}
-
-  is-builtin-module@https://registry.npmjs.org/is-builtin-module/-/is-builtin-module-3.2.1.tgz:
+  lru-cache@6.0.0:
     dependencies:
-      builtin-modules: https://registry.npmjs.org/builtin-modules/-/builtin-modules-3.3.0.tgz
+      yallist: 4.0.0
 
-  is-core-module@https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz:
+  magic-string@0.30.21:
     dependencies:
-      hasown: https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz
+      '@jridgewell/sourcemap-codec': 1.5.5
 
-  is-module@https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz: {}
+  ms@2.1.2: {}
 
-  is-number@https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz: {}
+  path-parse@1.0.7: {}
 
-  is-odd@https://registry.npmjs.org/is-odd/-/is-odd-3.0.1.tgz:
+  picomatch@4.0.3: {}
+
+  resolve@1.22.11:
     dependencies:
-      is-number: https://registry.npmjs.org/is-number/-/is-number-6.0.0.tgz
+      is-core-module: 2.16.1
+      path-parse: 1.0.7
+      supports-preserve-symlinks-flag: 1.0.0
 
-  is-reference@https://registry.npmjs.org/is-reference/-/is-reference-1.2.1.tgz:
+  semver@7.5.1:
     dependencies:
-      '@types/estree': https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz
+      lru-cache: 6.0.0
 
-  lru-cache@https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz:
-    dependencies:
-      yallist: https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz
+  supports-preserve-symlinks-flag@1.0.0: {}
 
-  magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.26.7.tgz:
-    dependencies:
-      sourcemap-codec: https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz
-
-  minimatch@https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz:
-    dependencies:
-      brace-expansion: https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz
-
-  ms@https://registry.npmjs.org/ms/-/ms-2.1.2.tgz: {}
-
-  once@https://registry.npmjs.org/once/-/once-1.4.0.tgz:
-    dependencies:
-      wrappy: https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz
-
-  path-parse@https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz: {}
-
-  picomatch@https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz: {}
-
-  resolve@https://registry.npmjs.org/resolve/-/resolve-1.22.11.tgz:
-    dependencies:
-      is-core-module: https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz
-      path-parse: https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz
-      supports-preserve-symlinks-flag: https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz
-
-  semver@https://registry.npmjs.org/semver/-/semver-7.5.1.tgz:
-    dependencies:
-      lru-cache: https://registry.npmjs.org/lru-cache/-/lru-cache-6.0.0.tgz
-
-  sourcemap-codec@https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz: {}
-
-  supports-preserve-symlinks-flag@https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz: {}
-
-  wrappy@https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz: {}
-
-  yallist@https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz: {}
+  yallist@4.0.0: {}
