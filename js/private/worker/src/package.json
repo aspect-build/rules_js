@@ -10,7 +10,7 @@
         "@rollup/plugin-node-resolve": "^16.0.3",
         "@rollup/plugin-typescript": "^12.3.0",
         "@types/google-protobuf": "3.15.12",
-        "@types/node": "22.18.13",
+        "@types/node": "22.19.7",
         "typescript": "^5.8.0"
     }
 }
