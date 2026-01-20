@@ -13,7 +13,16 @@ list_patches = _list_patches
 pnpm_repository = _pnpm_repository
 
 # A trivial wrapper for fetching a single standalone package.
+# buildifier: disable=function-docstring
 def npm_import(name, package, integrity, version, **kwargs):
+    # rules_esbuild specifies empty hooks
+    lifecycle_hooks = kwargs.pop("lifecycle_hooks", None)
+    if len(lifecycle_hooks) != 0:
+        fail("Minimal repositories.bzl npm_import does not support lifecycle_hooks")
+
+    if len(kwargs) != 0:
+        fail("Minimal repositories.bzl npm_import received unexpected keyword arguments: %s" % ", ".join(kwargs.keys()))
+
     _npm_import(
         name = name,
         key = name,
@@ -25,7 +34,7 @@ def npm_import(name, package, integrity, version, **kwargs):
         extra_build_content = None,
         transitive_closure = None,
         root_package = "",
-        lifecycle_hooks = kwargs.pop("lifecycle_hooks", None),  # rules_esbuild specifies empty hooks
+        lifecycle_hooks = lifecycle_hooks,
         lifecycle_hooks_execution_requirements = None,
         lifecycle_hooks_env = None,
         lifecycle_hooks_use_default_shell_env = None,
@@ -46,7 +55,5 @@ def npm_import(name, package, integrity, version, **kwargs):
         generate_package_json_bzl = None,
         extract_full_archive = None,
         exclude_package_contents = None,
+        exclude_package_contents_presets = [],
     )
-
-    if len(kwargs) != 0:
-        fail("Minimal repositories.bzl npm_import received unexpected keyword arguments: %s" % ", ".join(kwargs.keys()))
