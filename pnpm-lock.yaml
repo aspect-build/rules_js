@@ -534,6 +534,15 @@ importers:
 
   npm/private/test/npm_package_publish: {}
 
+  npm/private/test/subs:
+    dependencies:
+      '@subs/a':
+        specifier: link:./a
+        version: link:a
+      '@subs/b':
+        specifier: link:./b
+        version: link:b
+
 packages:
 
   '@alloc/quick-lru@5.2.0':

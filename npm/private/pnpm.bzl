@@ -120,17 +120,13 @@ def _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, d
         result[name] = _convert_pnpm_v9_package_dependency_version(packages, snapshots, snapshot_key, name, version)
     return result
 
-def _convert_pnpm_v9_importer_dependency_map(importers, snapshots, import_path, deps):
+def _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, deps):
     result = {}
     for name, attributes in deps.items():
         version = attributes["version"]
 
         if version.startswith("link:"):
             workspace_rel_link = paths.normalize(paths.join(import_path, version[5:]))
-            if workspace_rel_link not in importers:
-                msg = "Import {} ({}) from project '{}' has invalid link path: {}".format(name, version, import_path, workspace_rel_link)
-                fail(msg)
-
             result[name] = utils.importer_to_link(name, workspace_rel_link)
             continue
 
@@ -153,9 +149,9 @@ def _convert_v9_importers(importers, snapshots, no_dev, no_optional):
     result = {}
     for import_path, importer in importers.items():
         result[import_path] = _new_import_info(
-            dependencies = _convert_pnpm_v9_importer_dependency_map(importers, snapshots, import_path, importer.get("dependencies", {})),
-            dev_dependencies = {} if no_dev else _convert_pnpm_v9_importer_dependency_map(importers, snapshots, import_path, importer.get("devDependencies", {})),
-            optional_dependencies = {} if no_optional else _convert_pnpm_v9_importer_dependency_map(importers, snapshots, import_path, importer.get("optionalDependencies", {})),
+            dependencies = _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, importer.get("dependencies", {})),
+            dev_dependencies = {} if no_dev else _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, importer.get("devDependencies", {})),
+            optional_dependencies = {} if no_optional else _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, importer.get("optionalDependencies", {})),
         )
     return result
 
@@ -294,33 +290,27 @@ def _parse_lockfile(parsed, no_dev, no_optional, err):
 
 def _validate_lockfile_data(importers, packages):
     for importer_path, importer in importers.items():
-        _validate_lockfile_deps(importers, packages, "importer", importer_path, importer["dependencies"])
-        _validate_lockfile_deps(importers, packages, "importer", importer_path, importer["dev_dependencies"])
-        _validate_lockfile_deps(importers, packages, "importer", importer_path, importer["optional_dependencies"])
+        _validate_lockfile_deps(packages, "importer", importer_path, importer["dependencies"])
+        _validate_lockfile_deps(packages, "importer", importer_path, importer["dev_dependencies"])
+        _validate_lockfile_deps(packages, "importer", importer_path, importer["optional_dependencies"])
 
     for package_key, info in packages.items():
-        _validate_lockfile_deps(importers, packages, "package", package_key, info["dependencies"])
-        _validate_lockfile_deps(importers, packages, "package", package_key, info["optional_dependencies"])
+        _validate_lockfile_deps(packages, "package", package_key, info["dependencies"])
+        _validate_lockfile_deps(packages, "package", package_key, info["optional_dependencies"])
 
-def _validate_lockfile_deps(importers, packages, importer_type, importer, deps):
-    for dep, version in deps.items():
-        if version.startswith("link:"):
-            link_imported = utils.link_to_importer(version)
-            if link_imported not in importers:
-                msg = "ERROR: {} '{}' depends on package '{}' at link path '{}' which is not in the importers: {}".format(
-                    importer_type,
-                    importer,
-                    dep,
-                    link_imported,
-                    importers.keys(),
-                )
-                fail(msg)
-        elif version not in packages:
+def _validate_lockfile_deps(packages, importer_type, importer, deps):
+    for dep_name, dep_key in deps.items():
+        # can link: to anything
+        if dep_key.startswith("link:"):
+            continue
+
+        # otherwise the dep must be a known package
+        if dep_key not in packages:
             msg = "ERROR: {} '{}' depends on package '{}' at version '{}' which is not in the packages: {}".format(
                 importer_type,
                 importer,
-                dep,
-                version,
+                dep_name,
+                dep_key,
                 packages.keys(),
             )
             fail(msg)

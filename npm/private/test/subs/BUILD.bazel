@@ -1,0 +1,22 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages()
+
+build_test(
+    name = "subs_test",
+    targets = [
+        ":node_modules",
+        ":node_modules/@subs/a",
+        ":node_modules/@subs/b",
+    ],
+)
+
+js_test(
+    name = "require_non-importers_test",
+    data = [
+        ":node_modules",
+    ],
+    entry_point = "test.js",
+)

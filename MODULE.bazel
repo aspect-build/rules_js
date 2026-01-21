@@ -204,6 +204,7 @@ npm.npm_translate_lock(
         "//npm/private/test:vendored/lodash-4.17.21.tgz",
         "//npm/private/test/npm_package:package.json",
         "//npm/private/test/npm_package_publish:package.json",
+        "//npm/private/test/subs:package.json",
         "//npm/private/test/vendored/is-odd:package.json",
         "//npm/private/test/vendored/semver-max:package.json",
     ],

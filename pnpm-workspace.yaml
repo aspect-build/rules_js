@@ -10,6 +10,7 @@ packages:
     - 'npm/private/lifecycle'
     - 'npm/private/test'
     - 'npm/private/test/*'
+    # NOTE: ensure npm/private/test/subs/* is NOT included
 
 onlyBuiltDependencies:
     - '@aspect-test/c'
