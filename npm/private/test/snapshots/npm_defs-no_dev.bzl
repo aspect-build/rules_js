@@ -1271,7 +1271,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
 
-_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/vite3", "examples/vite6", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/lifecycle", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish"]
+_IMPORTER_PACKAGES = ["", "examples/js_binary", "examples/js_lib_pkg/a", "examples/js_lib_pkg/b", "examples/linked_consumer", "examples/linked_empty_node_modules", "examples/linked_lib", "examples/linked_pkg", "examples/macro", "examples/nextjs", "examples/npm_deps", "examples/npm_package/libs/lib_a", "examples/npm_package/packages/pkg_a", "examples/npm_package/packages/pkg_b", "examples/npm_package/packages/pkg_d", "examples/npm_package/packages/pkg_e", "examples/runfiles", "examples/stack_traces", "examples/vite3", "examples/vite6", "examples/webpack_cli", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/lifecycle", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish", "npm/private/test/subs"]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
@@ -2640,6 +2640,24 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
+        _npm_local_package_store(
+            package_store_name = "@subs+a@0.0.0",
+            src = "//npm/private/test/subs/a:pkg",
+            package = "@subs/a",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            package_store_name = "@subs+b@0.0.0",
+            src = "//npm/private/test/subs/b:pkg",
+            package = "@subs/b",
+            version = "0.0.0",
+            deps = {},
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
 
     link_targets = None
     scope_targets = None
@@ -2839,6 +2857,19 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                     ":node_modules/@mycorp/pkg-d",
                 ],
             }
+        elif bazel_package == "npm/private/test/subs":
+            _fp_link_8()
+            _fp_link_9()
+            link_targets = [
+                ":node_modules/@subs/a",
+                ":node_modules/@subs/b",
+            ]
+            scope_targets = {
+                "@subs": [
+                    ":node_modules/@subs/a",
+                    ":node_modules/@subs/b",
+                ],
+            }
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -3000,6 +3031,12 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@mycorp/pkg-b",
                 ":node_modules/@mycorp/pkg-d",
             ])
+    elif bazel_package == "npm/private/test/subs":
+        if prod:
+            link_targets.extend([
+                ":node_modules/@subs/a",
+                ":node_modules/@subs/b",
+            ])
     return ["//%s%s" % (bazel_package, target) for target in link_targets]
 
 # Generated npm_link_package_store for linking of first-party "js_lib_pkg_a" package
@@ -3054,4 +3091,22 @@ def _fp_link_7(alias = None):
         name = "node_modules/@mycorp/pkg-a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
         src = "//:.aspect_rules_js/node_modules/@mycorp+pkg-a@0.0.0",
+    )
+
+# Generated npm_link_package_store for linking of first-party "@subs/a" package
+# buildifier: disable=function-docstring
+def _fp_link_8(alias = None):
+    _npm_local_link_package_store(
+        name = "node_modules/@subs/a" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
+        src = "//:.aspect_rules_js/node_modules/@subs+a@0.0.0",
+    )
+
+# Generated npm_link_package_store for linking of first-party "@subs/b" package
+# buildifier: disable=function-docstring
+def _fp_link_9(alias = None):
+    _npm_local_link_package_store(
+        name = "node_modules/@subs/b" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
+        src = "//:.aspect_rules_js/node_modules/@subs+b@0.0.0",
     )
