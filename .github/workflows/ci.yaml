@@ -31,7 +31,7 @@ jobs:
                   a=(
                     "major:$m, version:\"$v\""
                     "major:8, version:\"8.1.1\""
-                    "major:9, version:\"9.0.0rc5\""
+                    "major:9, version:\"9.0.0\""
                   )
                   printf -v j '{%s},' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
@@ -208,7 +208,6 @@ jobs:
                     test \
                     --config=local \
                     --config=ci \
-                    --incompatible_merge_fixed_and_default_shell_env \
                     --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     //...
@@ -247,7 +246,6 @@ jobs:
                     coverage \
                     --config=local \
                     --config=ci \
-                    --incompatible_merge_fixed_and_default_shell_env \
                     --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
                     --instrument_test_targets \
