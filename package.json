@@ -5,7 +5,7 @@
         "@types/node": "22.18.13",
         "chalk": "5.1.1",
         "circles": "npm:es5-ext@0.10.64",
-        "jsonpath-plus": "10.2.0",
+        "jsonpath-plus": "10.3.0",
         "typescript": "^5.8.0"
     }
 }

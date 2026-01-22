@@ -33,8 +33,8 @@ importers:
         specifier: ^20251111.0.0
         version: 20251111.0.0
       jsonpath-plus:
-        specifier: 10.2.0
-        version: 10.2.0
+        specifier: 10.3.0
+        version: 10.3.0
       typescript:
         specifier: ^5.8.0
         version: 5.8.2
@@ -1327,7 +1327,7 @@ packages:
     engines: {node: '>= 16'}
 
   '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz':
-    resolution: {integrity: sha512-jeEav4rwnUsUL4TVAhWp0FA9XN9HcwgFlL+RPh6w3R8NRK9u6yZDQK4a6/v1U8MyktIe+KG37BaSQdiOyYPi9g==, tarball: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz}
+    resolution: {tarball: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz}
     version: 0.0.0
 
   '@gar/promisify@1.1.3':
@@ -3787,7 +3787,7 @@ packages:
     engines: {node: '>= 8.0.0'}
 
   inline-fixtures@https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662:
-    resolution: {integrity: sha512-wIQ0SS5nncjuTXHEgNuvAj6l3kwvYv75YVcQecDRaoL1YHwynG/fxKxrDV0f45Eu6EsUPlomFKqFDR9DD6hxlQ==, tarball: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662}
+    resolution: {tarball: https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662}
     version: 1.1.0
     engines: {node: '>= 8.0.0'}
 
@@ -4010,11 +4010,6 @@ packages:
 
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
-
-  jsonpath-plus@10.2.0:
-    resolution: {integrity: sha512-T9V+8iNYKFL2n2rF+w02LBOT2JjDnTjioaNFrxRy0Bv1y/hNsqR/EBK7Ojy2ythRHwmz2cRIls+9JitQGZC/sw==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
 
   jsonpath-plus@10.3.0:
     resolution: {integrity: sha512-8TNmfeTCk2Le33A3vRRwtuworG/L5RrgMvdjhKZxvyShO+mBu2fP50OWUjRLNtvw344DdDarFh9buFAZs5ujeA==}
@@ -4936,7 +4931,7 @@ packages:
 
   puppeteer@19.11.1:
     resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
-    deprecated: < 24.15.0 is no longer supported
+    deprecated: < 22.8.2 is no longer supported
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -9406,12 +9401,6 @@ snapshots:
       universalify: 2.0.1
     optionalDependencies:
       graceful-fs: 4.2.11
-
-  jsonpath-plus@10.2.0:
-    dependencies:
-      '@jsep-plugin/assignment': 1.3.0(jsep@1.4.0)
-      '@jsep-plugin/regex': 1.0.4(jsep@1.4.0)
-      jsep: 1.4.0
 
   jsonpath-plus@10.3.0:
     dependencies:
