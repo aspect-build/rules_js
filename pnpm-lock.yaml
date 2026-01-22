@@ -24,8 +24,8 @@ importers:
         specifier: 22.18.13
         version: 22.18.13
       chalk:
-        specifier: 5.1.1
-        version: 5.1.1
+        specifier: 5.6.2
+        version: 5.6.2
       circles:
         specifier: npm:es5-ext@0.10.64
         version: es5-ext@0.10.64
@@ -2617,6 +2617,10 @@ packages:
     resolution: {integrity: sha512-OItMegkSDU3P7OJRWBbNRsQsL8SzgwlIGXSZRVfHCLBYrDgzYDuozwDMwvEDpiZdjr50tdOTbTzuubirtEozsg==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
+  chalk@5.6.2:
+    resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+
   charenc@0.0.2:
     resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
 
@@ -4935,7 +4939,7 @@ packages:
 
   puppeteer@19.11.1:
     resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 24.15.0 is no longer supported
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -7939,6 +7943,8 @@ snapshots:
 
   chalk@5.1.1: {}
 
+  chalk@5.6.2: {}
+
   charenc@0.0.2: {}
 
   chokidar@3.5.3:
@@ -9040,7 +9046,7 @@ snapshots:
 
   google-closure-compiler@20251111.0.0:
     dependencies:
-      chalk: 5.1.1
+      chalk: 5.6.2
       google-closure-compiler-java: 20251111.0.0
       minimist: 1.2.8
       vinyl: 3.0.1
