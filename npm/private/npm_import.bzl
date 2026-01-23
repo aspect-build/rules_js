@@ -25,6 +25,7 @@ load(":exclude_package_contents_presets.bzl", "EXCLUDE_PACKAGE_CONTENTS_PRESETS"
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
 load(":npm_package_store_internal.bzl", "npm_package_store_internal")
+load(":pnpm.bzl", "pnpm")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
 
@@ -733,7 +734,8 @@ def _npm_import_links_rule_impl(rctx):
 
     # Dependency constraints map from target name to constraints.
     # NOTE: will include the main target, /ref and /pkg all in one map for simplicity.
-    deps_constraints = {}
+    deps_oss = {}
+    deps_cpus = {}
 
     has_lifecycle_build_target = bool(rctx.attr.lifecycle_build_target)
     has_transitive_closure = len(rctx.attr.transitive_closure) > 0
@@ -748,9 +750,12 @@ def _npm_import_links_rule_impl(rctx):
             ref_deps[dep_store_target] = []
         ref_deps[dep_store_target].append(dep_name)
 
-        dep_constraints = rctx.attr.deps_constraints.get(dep_key, None)
-        if dep_constraints != None:
-            deps_constraints[dep_store_target] = dep_constraints
+        dep_oss = rctx.attr.deps_oss.get(dep_key, None)
+        if dep_oss:
+            deps_oss[dep_store_target] = dep_oss
+        dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
+        if dep_cpus:
+            deps_cpus[dep_store_target] = dep_cpus
 
     self_ref_names = None
 
@@ -767,11 +772,15 @@ def _npm_import_links_rule_impl(rctx):
                 package_store_name = utils.package_store_name(dep_key),
                 package_store_root = utils.package_store_root,
             )
-            dep_constraints = rctx.attr.deps_constraints.get(dep_key, None)
-            if dep_constraints != None:
-                deps_constraints[dep_store_target] = dep_constraints
 
             deps[dep_store_target] = dep_names
+
+            dep_oss = rctx.attr.deps_oss.get(dep_key, None)
+            if dep_oss:
+                deps_oss[dep_store_target] = dep_oss
+            dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
+            if dep_cpus:
+                deps_cpus[dep_store_target] = dep_cpus
     else:
         # regular deps pattern; reference each direct dependency's main store target
         for (dep_name, dep_key) in rctx.attr.deps.items():
@@ -784,9 +793,12 @@ def _npm_import_links_rule_impl(rctx):
                 deps[dep_store_target] = []
             deps[dep_store_target].append(dep_name)
 
-            dep_constraints = rctx.attr.deps_constraints.get(dep_key, None)
-            if dep_constraints != None:
-                deps_constraints[dep_store_target] = dep_constraints
+            dep_oss = rctx.attr.deps_oss.get(dep_key, None)
+            if dep_oss:
+                deps_oss[dep_store_target] = dep_oss
+            dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
+            if dep_cpus:
+                deps_cpus[dep_store_target] = dep_cpus
 
     if has_lifecycle_build_target:
         # Lifecycle hooks require a self-reference. Use the regular package name if not named via transitive_closure.
@@ -847,9 +859,9 @@ def _npm_import_links_rule_impl(rctx):
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
     npm_link_pkg_bzl_vars = dict(
-        deps = _to_deps_attr(deps, deps_constraints),
+        deps = _to_deps_attr(deps, deps_oss, deps_cpus),
         npm_package_target = npm_package_target,
-        lc_deps = _to_deps_attr(lc_deps, deps_constraints) if has_lifecycle_build_target else "{}",
+        lc_deps = _to_deps_attr(lc_deps, deps_oss, deps_cpus) if has_lifecycle_build_target else "{}",
         has_lifecycle_build_target = has_lifecycle_build_target,
         has_transitive_closure = has_transitive_closure,
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
@@ -858,7 +870,7 @@ def _npm_import_links_rule_impl(rctx):
         public_visibility = str(public_visibility),
         package_key = rctx.attr.key,
         package = rctx.attr.package,
-        ref_deps = _to_deps_attr(ref_deps, deps_constraints),
+        ref_deps = _to_deps_attr(ref_deps, deps_oss, deps_cpus),
         root_package = rctx.attr.root_package,
         version = rctx.attr.version,
         package_store_name = package_store_name,
@@ -890,10 +902,41 @@ def _npm_import_links_rule_impl(rctx):
 
     return rctx.repo_metadata(reproducible = True)
 
-def _to_deps_attr(deps, deps_constraints):
+def _to_deps_attr(deps, deps_oss, deps_cpus):
+    # Must split the deps into groups that share the same constraints based on
+    # cpu and os conditions.
+    # A bazel select() can only have one truthy condition so constraints such as:
+    #    ['windows', 'windows && x86_64']
+    # can not be expressed in a single select().
+    unconstrained = {}
+    constrained = {
+        "os": {},
+        "cpu": {},
+        "both": {},
+    }
+
+    for k, v in deps.items():
+        if k in deps_oss and k in deps_cpus:
+            for condition in pnpm.to_bazel_os_cpu_constraints(deps_oss[k], deps_cpus[k]):
+                if condition not in constrained["both"]:
+                    constrained["both"][condition] = {}
+                constrained["both"][condition][k] = v
+        elif k in deps_oss:
+            for condition in pnpm.to_bazel_os_constraints(deps_oss[k]):
+                if condition not in constrained["os"]:
+                    constrained["os"][condition] = {}
+                constrained["os"][condition][k] = v
+        elif k in deps_cpus:
+            for condition in pnpm.to_bazel_cpu_constraints(deps_cpus[k]):
+                if condition not in constrained["cpu"]:
+                    constrained["cpu"][condition] = {}
+                constrained["cpu"][condition][k] = v
+        else:
+            unconstrained[k] = v
+
     return starlark_codegen_utils.to_conditional_dict_attr(
-        deps,
-        deps_constraints,
+        unconstrained,
+        [v for v in constrained.values() if len(v) > 0],
         quote_key = False,
         indent_count = 2,
     )
@@ -1195,7 +1238,8 @@ npm_import_lib = struct(
 npm_import_links_rule = repository_rule(
     implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS | _INTERNAL_COMMON_ATTRS | {
-        "deps_constraints": attr.string_list_dict(),
+        "deps_oss": attr.string_list_dict(),
+        "deps_cpus": attr.string_list_dict(),
         "transitive_closure": attr.string_list_dict(doc = "Mapping of package store entry labels to a list of names to reference that package as"),
     },
 )
@@ -1217,7 +1261,8 @@ def npm_import(
         package,
         version,
         deps,
-        deps_constraints,
+        deps_oss,
+        deps_cpus,
         extra_build_content,
         transitive_closure,
         root_package,
@@ -1284,7 +1329,8 @@ def npm_import(
         version = version,
         root_package = root_package,
         deps = deps,
-        deps_constraints = deps_constraints,
+        deps_oss = deps_oss,
+        deps_cpus = deps_cpus,
         transitive_closure = transitive_closure,
         lifecycle_build_target = has_lifecycle_hooks or has_custom_postinstall,
         lifecycle_hooks_env = lifecycle_hooks_env,

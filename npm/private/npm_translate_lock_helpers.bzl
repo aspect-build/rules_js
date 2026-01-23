@@ -3,7 +3,6 @@
 load("@bazel_lib//lib:base64.bzl", "base64")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
-load(":pnpm.bzl", "pnpm")
 load(":utils.bzl", "utils")
 
 ################################################################################
@@ -441,12 +440,13 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
-        deps_constraints = _collect_dep_constraints(packages, package_info)
+        deps_oss, deps_cpus = _collect_dep_constraints(packages, package_info)
 
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
             deps = package_info["dependencies"] | package_info["optional_dependencies"],
-            deps_constraints = deps_constraints,
+            deps_oss = deps_oss,
+            deps_cpus = deps_cpus,
             integrity = integrity,
             link_packages = link_packages,
             repo_name = repo_name,
@@ -504,30 +504,20 @@ Either remove this patch file if it is no longer needed or change its key to mat
 def _collect_dep_constraints(packages, package_info):
     # Quick-exit for packages with no optional dependencies
     if not package_info["optional_dependencies"] and not package_info.get("transitive_optional_closure", None):
-        return None
+        return None, None
 
-    constraints = {}
+    constraints_os = {}
+    constraints_cpu = {}
 
     optional_keys = package_info["optional_dependencies"].values() + package_info.get("transitive_optional_closure", {}).keys()
     for dep_key in optional_keys:
         dep = packages[dep_key]
+        if dep["os"]:
+            constraints_os[dep_key] = dep["os"]
+        if dep["cpu"]:
+            constraints_cpu[dep_key] = dep["cpu"]
 
-        c = None
-        if dep["os"] and dep["cpu"]:
-            c = []
-            for os in dep["os"]:
-                for cpu in dep["cpu"]:
-                    c.append(pnpm.to_bazel_os_cpu_constraint(os, cpu))
-        elif dep["cpu"]:
-            c = [pnpm.to_bazel_cpu_constraint(cpu) for cpu in dep["cpu"]]
-        elif dep["os"]:
-            c = [pnpm.to_bazel_os_constraint(os) for os in dep["os"]]
-
-        if c != None:
-            # Record the constraints for this optional dependency
-            constraints[dep_key] = [v for v in c if v != None]
-
-    return constraints
+    return constraints_os, constraints_cpu
 
 ################################################################################
 def _link_package(root_package, import_path, rel_path = "."):

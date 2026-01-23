@@ -42,8 +42,8 @@ def _to_dict_list_attr(dict, indent_count = 0, indent_size = 4, quote_key = True
     return result
 
 def _to_conditional_dict_attr(
-        dict,
-        constraints,
+        basic,
+        groups,
         indent_count = 0,
         indent_size = 4,
         quote_key = True,
@@ -51,8 +51,8 @@ def _to_conditional_dict_attr(
     """Generate a conditional dictionary using select() statements.
 
     Args:
-        dict: all items in the dictionary
-        constraints: select() constraints to be applied to items in the dict
+        basic: the always-present dictionary entries
+        groups: list of select() constraints to be applied to items in the dict
         indent_count: Base indentation level
         indent_size: Spaces per indent level
         quote_key: Whether to quote dictionary keys
@@ -76,31 +76,15 @@ def _to_conditional_dict_attr(
 
     parts = []
 
-    # Add unconstrained first (if any)
-    unconstrained_dict = {}
-    constrained = {}
-
-    for k, v in dict.items():
-        # dict entries with no constraints go into the unconstrained dict
-        if k not in constraints:
-            unconstrained_dict[k] = v
-            continue
-
-        # dict entries with constraints must be mapped into the constrained dict
-        for condition in constraints[k]:
-            if condition not in constrained:
-                constrained[condition] = {}
-            constrained[condition][k] = v
-
-    if unconstrained_dict:
+    if basic:
         parts.append(
-            _to_dict_attr(unconstrained_dict, indent_count, indent_size, quote_key, quote_value),
+            _to_dict_attr(basic, indent_count, indent_size, quote_key, quote_value),
         )
 
     # Add select() for constrainted entries
-    if constrained:
+    for group in groups:
         select_parts = []
-        for condition, cond_dict in constrained.items():
+        for condition, cond_dict in group.items():
             condition_dict = _to_dict_attr(cond_dict, indent_count + 1, indent_size, quote_key, quote_value)
             select_parts.append('%s"%s": %s' % (tab * (indent_count + 1), condition, condition_dict))
 

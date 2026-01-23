@@ -1,6 +1,7 @@
 """Test for pnpm extension version resolution."""
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
+load("//npm/private:pnpm.bzl", "pnpm")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:pnpm_repository.bzl", "LATEST_PNPM_VERSION")
 
@@ -164,6 +165,35 @@ def _integrity_conflict(ctx):
         ],
     )
 
+def _cpu_constraints(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64"], pnpm.to_bazel_cpu_constraints(["arm64"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64", "@aspect_rules_js//platforms/pnpm:riscv64"], pnpm.to_bazel_cpu_constraints(["arm64", "riscv64"]))
+    asserts.equals(
+        env,
+        ["@aspect_rules_js//platforms/pnpm:ppc", "@aspect_rules_js//platforms/pnpm:ppc64", "@aspect_rules_js//platforms/pnpm:s390x", "@aspect_rules_js//platforms/pnpm:ia32", "@aspect_rules_js//platforms/pnpm:mips", "@aspect_rules_js//platforms/pnpm:wasm32"],
+        pnpm.to_bazel_cpu_constraints(["!arm", "!arm64", "!riscv64", "!x64"]),
+    )
+    return unittest.end(env)
+
+def _os_constraints(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["win32", "linux"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin", "sunos"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:android", "@aspect_rules_js//platforms/pnpm:netbsd"], pnpm.to_bazel_os_constraints(["!linux", "!darwin", "!freebsd", "!openbsd", "!aix"]))
+    return unittest.end(env)
+
+def _os_cpu_constraints(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin_arm64"], pnpm.to_bazel_os_cpu_constraints(["darwin"], ["arm64"]))
+    asserts.equals(
+        env,
+        ["@aspect_rules_js//platforms/pnpm:win32_x64", "@aspect_rules_js//platforms/pnpm:linux_x64"],
+        pnpm.to_bazel_os_cpu_constraints(["win32", "linux"], ["x64"]),
+    )
+    return unittest.end(env)
+
 basic_test = unittest.make(_basic)
 override_test = unittest.make(_override)
 latest_test = unittest.make(_latest)
@@ -172,6 +202,9 @@ include_npm_test = unittest.make(_include_npm)
 integrity_conflict_test = unittest.make(_integrity_conflict)
 from_package_json_simple_test = unittest.make(_from_package_json_simple)
 from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
+cpu_constraints_test = unittest.make(_cpu_constraints)
+os_constraints_test = unittest.make(_os_constraints)
+os_cpu_constraints_test = unittest.make(_os_cpu_constraints)
 
 def pnpm_tests(name):
     unittest.suite(
@@ -184,4 +217,7 @@ def pnpm_tests(name):
         integrity_conflict_test,
         from_package_json_simple_test,
         from_package_json_with_hash_test,
+        cpu_constraints_test,
+        os_constraints_test,
+        os_cpu_constraints_test,
     )

@@ -97,6 +97,7 @@ npm = use_extension(
 
         # optional deps, os/cpu conditions
         "lock-%s__esbuild__0.27.0__links" % version,
+        "lock-%s__sass-embedded__1.97.3__links" % version,
     )
     for version in PNPM_LOCK_VERSIONS
 ]

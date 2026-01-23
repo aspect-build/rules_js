@@ -9,23 +9,29 @@
 PNPM_ARCHS = {
     "arm64": "@platforms//cpu:arm64",
     "arm": "@platforms//cpu:arm",
+    "ppc": "@platforms//cpu:ppc",  # NOTE: removed in node24
     "ppc64": "@platforms//cpu:ppc64le",
     "riscv64": "@platforms//cpu:riscv64",
     "s390x": "@platforms//cpu:s390x",
-    "wasm32": "@platforms//cpu:wasm32",
     "ia32": "@platforms//cpu:x86_32",
     "x64": "@platforms//cpu:x86_64",
     "mips": "@platforms//cpu:mips64",  # TODO: confirm
 
-    # TODO: must map to unique platforms
-    "loong64": None,
-    "mipsel": None,
-    "mips64el": None,
-    "s390": None,
-
     # Additional platforms found in pnpm [cpu] fields not on Node.js docs
-    "x32": "@platforms//cpu:x86_32",
-    "x86": "@platforms//cpu:x86_32",
+    "wasm32": "@platforms//cpu:wasm32",
+}
+
+PNPM_ARCH_ALIASES = {
+    # Platforms that map to the same bazel constraint as other platforms
+    # TODO: confirm mappings
+    "mipsel": "mips",
+    "loong64": None,
+    "s390": "s390x",
+
+    # Additional platform aliases found in pnpm [cpu] fields not on Node.js docs
+    "mips64el": "mips",
+    "x32": "ia32",
+    "x86": "ia32",
 }
 
 # Node/PNPM platforms and correspending @platforms labels
@@ -37,10 +43,10 @@ PNPM_PLATFORMS = {
     "linux": "@platforms//os:linux",
     "openbsd": "@platforms//os:openbsd",
     "win32": "@platforms//os:windows",
-    "sunos": None,  # TODO: confirm
+    "sunos": None,  # TODO: confirm no bazel support
 
     # Additional platforms found in pnpm [os] fields not on Node.js docs
     "android": "@platforms//os:android",
     "netbsd": "@platforms//os:netbsd",
-    "openharmony": None,  # TODO: confirm
+    "openharmony": None,  # TODO: confirm no bazel support
 }
