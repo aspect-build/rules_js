@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
-load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_PLATFORMS")
+load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_ARCH_ALIASES", "PNPM_PLATFORMS")
 load(":utils.bzl", "utils")
 
 # Metadata about a pnpm "project" (importer).
@@ -52,30 +52,50 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "os": os,
     }
 
-def _to_bazel_os_cpu_constraint(os, cpu):
-    if os not in PNPM_PLATFORMS:
-        fail("os '{}' not recognized".format(os))
-    if cpu not in PNPM_ARCHS:
-        fail("cpu '{}' not recognized".format(cpu))
+def _to_bazel_os_cpu_constraints(oss, cpus):
+    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
+    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
+    r = []
+    for cpu in cpus:
+        for os in oss:
+            r.append("@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu))
+    return r
 
-    if not PNPM_ARCHS[cpu] or not PNPM_PLATFORMS[os]:
-        return None
+def _to_bazel_os_constraints(oss):
+    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
+    return ["@aspect_rules_js//platforms/pnpm:{}".format(os) for os in oss]
 
-    return "@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu)
+def _to_bazel_cpu_constraints(cpus):
+    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
+    return ["@aspect_rules_js//platforms/pnpm:{}".format(cpu) for cpu in cpus]
 
-def _to_bazel_os_constraint(os):
-    if os not in PNPM_PLATFORMS:
-        fail("os '{}' not recognized".format(os))
-    if not PNPM_PLATFORMS[os]:
-        return None
-    return "@aspect_rules_js//platforms/pnpm:{}".format(os)
+def _resolve_pnpm_constraint_values(values, known_map, aliases_map, kind):
+    if not values:
+        return []
 
-def _to_bazel_cpu_constraint(cpu):
-    if cpu not in PNPM_ARCHS:
-        fail("cpu '{}' not recognized".format(cpu))
-    if not PNPM_ARCHS[cpu]:
-        return None
-    return "@aspect_rules_js//platforms/pnpm:{}".format(cpu)
+    is_negated = values[0].startswith("!")
+
+    normalized = {}
+    for value in values:
+        key = value[1:] if is_negated else value
+
+        # Validate all values are either negated or not negated
+        if value.startswith("!") != is_negated:
+            fail("Unsupported mixing {} negations: {}".format(kind, values))
+
+        # Validate the key is known
+        if key not in known_map and key not in aliases_map:
+            fail("Unknown pnpm {}: {}".format(kind, value))
+
+        # Convert aliases to the aliased
+        if key in aliases_map:
+            key = aliases_map[key]
+        if key:
+            normalized[key] = True
+
+    if is_negated:
+        return [x for x in known_map.keys() if x not in normalized and known_map[x]]
+    return [x for x in normalized.keys() if known_map[x]]
 
 ######################### Lockfile v9 #########################
 
@@ -364,7 +384,7 @@ pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
-    to_bazel_os_cpu_constraint = _to_bazel_os_cpu_constraint,
-    to_bazel_os_constraint = _to_bazel_os_constraint,
-    to_bazel_cpu_constraint = _to_bazel_cpu_constraint,
+    to_bazel_os_cpu_constraints = _to_bazel_os_cpu_constraints,
+    to_bazel_os_constraints = _to_bazel_os_constraints,
+    to_bazel_cpu_constraints = _to_bazel_cpu_constraints,
 )

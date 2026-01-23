@@ -25,6 +25,11 @@ def npm_imported_package_store_internal():
         deps = {
             ":.aspect_rules_js/node_modules/@types+estree@1.0.8": "@types/estree",
         } | select({
+            "@aspect_rules_js//platforms/pnpm:darwin": {
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
+            },
+            "//conditions:default": {},
+        }) | select({
             "@aspect_rules_js//platforms/pnpm:android_arm": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm-eabi@4.55.2": "@rollup/rollup-android-arm-eabi",
             },
@@ -79,14 +84,16 @@ def npm_imported_package_store_internal():
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2": "@rollup/rollup-win32-x64-gnu",
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2": "@rollup/rollup-win32-x64-msvc",
             },
-            "@aspect_rules_js//platforms/pnpm:darwin": {
-                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
-            },
             "//conditions:default": {},
         }),
         ref_deps = {
             ":.aspect_rules_js/node_modules/@types+estree@1.0.8/ref": "@types/estree",
         } | select({
+            "@aspect_rules_js//platforms/pnpm:darwin": {
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
+            },
+            "//conditions:default": {},
+        }) | select({
             "@aspect_rules_js//platforms/pnpm:android_arm": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm-eabi@4.55.2/ref": "@rollup/rollup-android-arm-eabi",
             },
@@ -140,9 +147,6 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:win32_x64": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2/ref": "@rollup/rollup-win32-x64-gnu",
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2/ref": "@rollup/rollup-win32-x64-msvc",
-            },
-            "@aspect_rules_js//platforms/pnpm:darwin": {
-                ":.aspect_rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
             },
             "//conditions:default": {},
         }),

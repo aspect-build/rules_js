@@ -56,6 +56,9 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:linux_ia32": {
                 ":.aspect_rules_js/node_modules/@esbuild+linux-ia32@0.27.0": "@esbuild/linux-ia32",
             },
+            "@aspect_rules_js//platforms/pnpm:linux_mips": {
+                ":.aspect_rules_js/node_modules/@esbuild+linux-mips64el@0.27.0": "@esbuild/linux-mips64el",
+            },
             "@aspect_rules_js//platforms/pnpm:linux_ppc64": {
                 ":.aspect_rules_js/node_modules/@esbuild+linux-ppc64@0.27.0": "@esbuild/linux-ppc64",
             },
@@ -124,6 +127,9 @@ def npm_imported_package_store_internal():
             },
             "@aspect_rules_js//platforms/pnpm:linux_ia32": {
                 ":.aspect_rules_js/node_modules/@esbuild+linux-ia32@0.27.0/ref": "@esbuild/linux-ia32",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_mips": {
+                ":.aspect_rules_js/node_modules/@esbuild+linux-mips64el@0.27.0/ref": "@esbuild/linux-mips64el",
             },
             "@aspect_rules_js//platforms/pnpm:linux_ppc64": {
                 ":.aspect_rules_js/node_modules/@esbuild+linux-ppc64@0.27.0/ref": "@esbuild/linux-ppc64",

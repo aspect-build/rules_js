@@ -102,6 +102,7 @@ bzl_library(
         ":npm_link_package_store",
         ":npm_package_internal",
         ":npm_package_store_internal",
+        ":pnpm",
         ":starlark_codegen_utils",
         ":utils",
         "@aspect_rules_js//js:defs",

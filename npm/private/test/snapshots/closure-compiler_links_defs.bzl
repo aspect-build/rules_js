@@ -29,7 +29,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/vinyl@3.0.1": "vinyl",
             ":.aspect_rules_js/node_modules/vinyl-sourcemaps-apply@0.2.1": "vinyl-sourcemaps-apply",
         } | select({
-            "@aspect_rules_js//platforms/pnpm:linux_x32": {
+            "@aspect_rules_js//platforms/pnpm:linux_ia32": {
                 ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0": "google-closure-compiler-linux",
             },
             "@aspect_rules_js//platforms/pnpm:linux_x64": {
@@ -41,7 +41,7 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:darwin_arm64": {
                 ":.aspect_rules_js/node_modules/google-closure-compiler-macos@20251111.0.0": "google-closure-compiler-macos",
             },
-            "@aspect_rules_js//platforms/pnpm:win32_x32": {
+            "@aspect_rules_js//platforms/pnpm:win32_ia32": {
                 ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
             },
             "@aspect_rules_js//platforms/pnpm:win32_x64": {
@@ -56,7 +56,7 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/vinyl@3.0.1/ref": "vinyl",
             ":.aspect_rules_js/node_modules/vinyl-sourcemaps-apply@0.2.1/ref": "vinyl-sourcemaps-apply",
         } | select({
-            "@aspect_rules_js//platforms/pnpm:linux_x32": {
+            "@aspect_rules_js//platforms/pnpm:linux_ia32": {
                 ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0/ref": "google-closure-compiler-linux",
             },
             "@aspect_rules_js//platforms/pnpm:linux_x64": {
@@ -68,7 +68,7 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:darwin_arm64": {
                 ":.aspect_rules_js/node_modules/google-closure-compiler-macos@20251111.0.0/ref": "google-closure-compiler-macos",
             },
-            "@aspect_rules_js//platforms/pnpm:win32_x32": {
+            "@aspect_rules_js//platforms/pnpm:win32_ia32": {
                 ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0/ref": "google-closure-compiler-windows",
             },
             "@aspect_rules_js//platforms/pnpm:win32_x64": {
