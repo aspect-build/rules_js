@@ -15,7 +15,7 @@ repos:
           - id: buildifier-lint
     # Enforce that commit messages allow for later changelog generation
     - repo: https://github.com/commitizen-tools/commitizen
-      rev: v3.31.0
+      rev: v4.12.1
       hooks:
           # Requires that commitizen is already installed
           - id: commitizen
