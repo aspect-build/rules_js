@@ -10,6 +10,12 @@ This ruleset is a high-performance Bazel integration for JavaScript, based on th
 
 Many companies are successfully building with rules_js. If you're getting value from the project, please let us know! Just comment on our [Adoption Discussion](https://github.com/aspect-build/rules_js/discussions/1000).
 
+## Getting started
+
+The fastest way to try this in an empty project is to click the green "Use this template" button on https://github.com/bazel-starters/js.
+
+## More from Aspect
+
 rules_js is just a part Aspect's monorepo developer platform:
 
 -   [Aspect Workflows](https://docs.aspect.build/workflows) delivers on Bazel's promises of speed and cost-savings.
