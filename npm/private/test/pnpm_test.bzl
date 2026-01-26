@@ -26,6 +26,7 @@ def _resolve_test(ctx, repositories = [], notes = [], modules = [], package_json
     expected = struct(
         repositories = repositories,
         notes = notes,
+        facts = None,
     )
 
     result = resolve_pnpm_repositories(struct(modules = modules, read = lambda f: package_json_content))
@@ -77,7 +78,7 @@ def _override(ctx):
     # What happens when the root overrides the pnpm version.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": "9.1.0", "integrity": None, "include_npm": False}},
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False}},
         notes = [],
         modules = [
             _fake_mod(
@@ -104,7 +105,7 @@ def _latest(ctx):
     # - Accept a brittle test.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": None, "include_npm": False}},
+        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": "sha512-fX27yp6ZRHt8O/enMoavqva+mSUeuUmLrvp9QGiS9nuHmts6HX5of8TMwaOIxxdfuq5WeiarRNEGe1T8sNajFg==", "include_npm": False}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "latest")),
         ],
@@ -114,8 +115,8 @@ def _include_npm(ctx):
     return _resolve_test(
         ctx,
         repositories = {
-            "pnpm": {"version": "9.1.0", "integrity": None, "include_npm": True},
-            "wnpm": {"version": "9.2.0", "integrity": None, "include_npm": True},
+            "pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": True},
+            "wnpm": {"version": "9.2.0", "integrity": "sha512-mKgP0RwucJZ0d2IwQQZDKz3cZ9z1S1qMAck/aKLNXgXmghhJUioG+3YoTUGiZg1eM08u47vykYO/LnObHa+ncQ==", "include_npm": True},
         },
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "9.1.0", include_npm = True)),
@@ -128,7 +129,7 @@ def _custom_name(ctx):
     return _resolve_test(
         ctx,
         repositories = {
-            "my-pnpm": {"version": "9.1.0", "integrity": None, "include_npm": False},
+            "my-pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False},
             "pnpm": {"version": "8.6.7", "integrity": "8.6.7-integrity", "include_npm": False},
         },
         modules = [

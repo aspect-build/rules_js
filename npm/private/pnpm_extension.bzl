@@ -2,6 +2,7 @@
 
 load("@bazel_lib//lib:lists.bzl", "unique")
 load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
+load(":versions.bzl", "PNPM_VERSIONS")
 
 DEFAULT_PNPM_REPO_NAME = "pnpm"
 
@@ -20,16 +21,12 @@ def resolve_pnpm_repositories(mctx):
       A struct with the following fields:
       - `repositories`: dict (name -> {version, include_npm, integrity}) to invoke `pnpm_repository` with.
       - `notes`: list of notes to print to the user.
+      - `facts`: Bazel module Facts to persist for future use (may be None).
     """
 
-    registrations = {}
+    # Collect all the module tags and associated versions/integrities/options
     integrity = {}
-
-    result = struct(
-        notes = [],
-        repositories = {},
-    )
-
+    registrations = {}
     for mod in mctx.modules:
         for attr in mod.tags.pnpm:
             if attr.name != DEFAULT_PNPM_REPO_NAME and not mod.is_root:
@@ -78,6 +75,14 @@ def resolve_pnpm_repositories(mctx):
                 registrations[attr.name][v].append(attr.include_npm)
             if attr.pnpm_version_integrity:
                 integrity[attr.pnpm_version] = attr.pnpm_version_integrity
+
+            # If no integrity was provided or found via package.json load from known versions
+            if not integrity.get(v, False) and PNPM_VERSIONS.get(v, False):
+                integrity[v] = PNPM_VERSIONS[v]
+
+    # From the collected registrations, resolve to a single version per repository name
+    notes = []
+    repositories = {}
     for name, versions_map in registrations.items():
         # Disregard repeated version numbers and convert {version:include_npm} to version[]
         versions = unique(versions_map.keys())
@@ -92,7 +97,7 @@ def resolve_pnpm_repositories(mctx):
                     selected = versions[idx]
                     selected_tuple = _parse_version(selected)
 
-            result.notes.append("NOTE: repo '{}' has multiple versions {}; selected {}".format(name, versions, selected))
+            notes.append("NOTE: repo '{}' has multiple versions {}; selected {}".format(name, versions, selected))
         else:
             selected = versions[0]
 
@@ -102,6 +107,64 @@ def resolve_pnpm_repositories(mctx):
             "integrity": integrity.get(selected, None),
         }
 
-        result.repositories[name] = selected
+        repositories[name] = selected
 
-    return result
+    # If any repositories have no known integrity, try to fetch them from the npm registry and persist
+    # them as Facts for future use.
+    fetched_facts = None
+    used_facts = None
+    if hasattr(mctx, "facts") and len([v for v in repositories.values() if not v["integrity"]]) > 0:
+        used_facts = {}
+        for pnpm in repositories.values():
+            if not pnpm["integrity"]:
+                # Try fetching from any pre-existing facts first
+                integrity = mctx.facts.get(pnpm["version"], None)
+                if not integrity:
+                    # Only fetch the list of pnpm versions once, and only if the version is not found in existing facts
+                    if not fetched_facts:
+                        fetched_facts = _fetch_pnpm_versions(mctx)
+                    integrity = fetched_facts.get(pnpm["version"], None)
+
+                if integrity:
+                    pnpm["integrity"] = integrity
+                    used_facts[pnpm["version"]] = integrity
+
+    return struct(
+        repositories = repositories,
+        notes = notes,
+        facts = used_facts,
+    )
+
+def _fetch_pnpm_versions(module_ctx):
+    """Fetches pnpm versions and their integrity hashes from the npm registry.
+
+    Returns:
+        A dict mapping version strings to dicts with 'integrity' keys.
+    """
+    result = module_ctx.download(url = ["https://registry.npmjs.org/pnpm"], output = "pnpm_versions.json")
+    if not result.success:
+        # buildifier: disable=print
+        print("ERROR: failed to fetch pnpm versions from npm registry: {}".format(result))
+        return None
+
+    data = module_ctx.read("pnpm_versions.json")
+
+    # If the download failed such as being redirected to a custom registry page, the data may not be valid JSON
+    # and can just be ignored with warning.
+    if not data or data[0] != "{":
+        # buildifier: disable=print
+        print("ERROR: failed to read pnpm versions fetched from npm registry: {}".format(data))
+        return None
+
+    data = json.decode(data)
+    versions = {}
+    for version, info in data.get("versions", {}).items():
+        if int(version.split(".")[0]) < 9:
+            # Skip pnpm versions below 9
+            continue
+
+        dist = info.get("dist", {})
+        integrity = dist.get("integrity", None)
+        if integrity:
+            versions[version] = integrity
+    return versions
