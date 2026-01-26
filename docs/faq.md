@@ -129,4 +129,4 @@ my-workspace/
 
 Note that when following option 2, it might require updating some configuration files which refer to the original output locations. For example, your `tsconfig.json` file might have a `paths` section which points to the `../../dist` folder.
 
-To keep your legacy build system working during the migration, you might want to avoid changing those configuration files in-place. For this purpose, you can use [the `jq` rule](https://github.com/bazel-contrib/bazel-lib/blob/main/docs/jq.md) in place of `copy_to_bin`, using a `filter` expression so the copy of the configuration file in `bazel-bin` that's used by the Bazel build can have a different path than the configuration file in the source tree.
+To keep your legacy build system working during the migration, you might want to avoid changing those configuration files in-place. For this purpose, you can use [the `jq` rule](https://registry.bazel.build/docs/jq.bzl#function-jq) in place of `copy_to_bin`, using a `filter` expression so the copy of the configuration file in `bazel-bin` that's used by the Bazel build can have a different path than the configuration file in the source tree.

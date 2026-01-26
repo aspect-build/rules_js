@@ -109,8 +109,8 @@ _ATTRS = {
         This must be a target that provides a single file or a `DirectoryPathInfo`
         from `@bazel_lib//lib::directory_path.bzl`.
         
-        See https://github.com/bazel-contrib/bazel-lib/blob/main/docs/directory_path.md
-        for more info on creating a target that provides a `Info`.
+        See https://registry.bazel.build/docs/bazel_lib#provider-directorypathinfo
+        for more info on creating a target that provides a `DirectoryPathInfo`.
         """,
         mandatory = True,
     ),
