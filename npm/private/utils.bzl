@@ -1,8 +1,18 @@
 "Utility functions for npm rules"
 
+load("@bazel_features//private:util.bzl", "ge")
 load("@bazel_lib//lib:paths.bzl", "relative_file")
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+
+# Bazel 9+ supports target_type="directory" on ctx.actions.symlink which creates
+# junctions instead of file symlinks on Windows. Without this, Node.js gets EPERM
+# when traversing symlinks created by declare_symlink on Bazel 8+/Windows.
+# See https://github.com/bazelbuild/bazel/issues/26701
+# Seems like it won't be cherry picked: https://github.com/bazelbuild/bazel/issues/27607
+# Added in commit https://github.com/bazelbuild/bazel/commit/b9bbda939cddab807e34559cb7ee798febfa3861
+# If a backport happens this version just needs to be lowered to the 8.x version that has the backport
+_SUPPORTS_SYMLINK_TARGET_TYPE = ge("9.0.0")
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
 DEFAULT_REGISTRY_DOMAIN = "registry.npmjs.org"
@@ -133,10 +143,13 @@ def _friendly_name(name, version):
 
 def _make_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
-    ctx.actions.symlink(
-        output = symlink,
-        target_path = relative_file(target_path, symlink.path),
-    )
+    kwargs = {
+        "output": symlink,
+        "target_path": relative_file(target_path, symlink.path),
+    }
+    if _SUPPORTS_SYMLINK_TARGET_TYPE:
+        kwargs["target_type"] = "directory"
+    ctx.actions.symlink(**kwargs)
     return symlink
 
 def _parse_package_name(package):
@@ -308,6 +321,7 @@ utils = struct(
     reverse_force_copy = _reverse_force_copy,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
+    supports_symlink_target_type = _SUPPORTS_SYMLINK_TARGET_TYPE,
 )
 
 # Exported only to be tested

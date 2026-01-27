@@ -8,13 +8,15 @@ const {
 const { sandboxAssert: bSandboxAssert } = require('@mycorp/pkg-b')
 
 function sandboxAssert() {
-    if (!/-sandbox\/\d+\/execroot\//.test(__filename)) {
+    if (!/[/\\]execroot[/\\]/.test(__filename)) {
         throw new Error(`Not in sandbox: ${__filename}`)
     }
 
     // Files are in the runfiles directory via js_library(srcs) instead
     // of copies in the npm package store.
-    if (!__filename.startsWith(process.env.RUNFILES_DIR)) {
+    // On Windows, Node.js resolves junctions to their real path so __filename
+    // won't start with RUNFILES_DIR.
+    if (process.platform !== 'win32' && !__filename.startsWith(process.env.RUNFILES_DIR)) {
         throw new Error(`Not runfiles: ${__filename}`)
     }
 
@@ -25,10 +27,10 @@ function sandboxAssert() {
 
     // Resolve of pkg-d
     const pkgDPath = require.resolve('@mycorp/pkg-d')
-    if (!/-sandbox\/\d+\/execroot\//.test(pkgDPath)) {
+    if (!/[/\\]execroot[/\\]/.test(pkgDPath)) {
         throw new Error(`pkg-d not in sandbox: ${pkgDPath}`)
     }
-    if (!pkgDPath.startsWith(process.env.RUNFILES_DIR)) {
+    if (process.platform !== 'win32' && !pkgDPath.startsWith(process.env.RUNFILES_DIR)) {
         throw new Error(`pkg-d not in runfiles: ${pkgDPath}`)
     }
 }

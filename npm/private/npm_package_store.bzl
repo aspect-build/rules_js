@@ -493,8 +493,11 @@ def _symlink_package_store(ctx, package_store_name, target, name):
         name,
     )
     symlink = ctx.actions.declare_symlink(store_symlink_path)
-    ctx.actions.symlink(
-        output = symlink,
-        target_path = ("../../.." if "/" in name else "../..") + target,
-    )
+    kwargs = {
+        "output": symlink,
+        "target_path": ("../../.." if "/" in name else "../..") + target,
+    }
+    if utils.supports_symlink_target_type:
+        kwargs["target_type"] = "directory"
+    ctx.actions.symlink(**kwargs)
     return symlink

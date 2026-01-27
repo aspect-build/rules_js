@@ -13,25 +13,27 @@ function getAcornVersion() {
 }
 
 function sandboxAssert() {
-    if (!/-sandbox\/\d+\/execroot\//.test(__filename)) {
+    if (!/[/\\]execroot[/\\]/.test(__filename)) {
         throw new Error(`Not in sandbox: ${__filename}`)
     }
 
     // Files are in the runfiles directory via js_library(srcs) instead
     // of copies in the npm package store.
-    if (!__filename.startsWith(process.env.RUNFILES_DIR)) {
+    // On Windows, Node.js resolves junctions to their real path so __filename
+    // won't start with RUNFILES_DIR.
+    if (process.platform !== 'win32' && !__filename.startsWith(process.env.RUNFILES_DIR)) {
         throw new Error(`Not runfiles: ${__filename}`)
     }
 
     // Resolve of third-party package 'uuid'
     const uuid_path = require.resolve('uuid')
-    if (!/-sandbox\/\d+\/execroot\//.test(uuid_path)) {
+    if (!/[/\\]execroot[/\\]/.test(uuid_path)) {
         throw new Error(`uuid not in sandbox: ${uuid_path}`)
     }
-    if (!uuid_path.includes('/node_modules/.aspect_rules_js/uuid@')) {
+    if (!/[/\\]node_modules[/\\]\.aspect_rules_js[/\\]uuid@/.test(uuid_path)) {
         throw new Error(`uuid not in package store: ${uuid_path}`)
     }
-    if (!uuid_path.startsWith(process.env.RUNFILES_DIR)) {
+    if (process.platform !== 'win32' && !uuid_path.startsWith(process.env.RUNFILES_DIR)) {
         throw new Error(`uuid not in runfiles: ${uuid_path}`)
     }
 }
