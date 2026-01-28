@@ -6,7 +6,10 @@ export default pkgC
 export function sandboxAssert() {
     const __filename = fileURLToPath(import.meta.url)
 
-    if (!/[/\\]execroot[/\\]/.test(__filename)) {
+    const sandboxRe = process.platform === 'win32'
+        ? /[/\\]execroot[/\\]/
+        : /-sandbox\/\d+\/execroot\//;
+    if (!sandboxRe.test(__filename)) {
         throw new Error(`Not in sandbox: ${__filename}`)
     }
 

@@ -8,7 +8,10 @@ const {
 const { sandboxAssert: bSandboxAssert } = require('@mycorp/pkg-b')
 
 function sandboxAssert() {
-    if (!/[/\\]execroot[/\\]/.test(__filename)) {
+    const sandboxRe = process.platform === 'win32'
+        ? /[/\\]execroot[/\\]/
+        : /-sandbox\/\d+\/execroot\//;
+    if (!sandboxRe.test(__filename)) {
         throw new Error(`Not in sandbox: ${__filename}`)
     }
 
@@ -27,7 +30,7 @@ function sandboxAssert() {
 
     // Resolve of pkg-d
     const pkgDPath = require.resolve('@mycorp/pkg-d')
-    if (!/[/\\]execroot[/\\]/.test(pkgDPath)) {
+    if (!sandboxRe.test(pkgDPath)) {
         throw new Error(`pkg-d not in sandbox: ${pkgDPath}`)
     }
     if (process.platform !== 'win32' && !pkgDPath.startsWith(process.env.RUNFILES_DIR)) {

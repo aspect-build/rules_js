@@ -8,7 +8,10 @@ export { v4 as uuid } from 'uuid'
 export function sandboxAssert() {
     const __filename = fileURLToPath(import.meta.url)
 
-    if (!/[/\\]execroot[/\\]/.test(__filename)) {
+    const sandboxRe = process.platform === 'win32'
+        ? /[/\\]execroot[/\\]/
+        : /-sandbox\/\d+\/execroot\//;
+    if (!sandboxRe.test(__filename)) {
         throw new Error(`Not in sandbox: ${__filename}`)
     }
 
@@ -22,7 +25,7 @@ export function sandboxAssert() {
 
     // Resolve of third-party package 'uuid'
     const uuid_path = fileURLToPath(import.meta.resolve('uuid'))
-    if (!/[/\\]execroot[/\\]/.test(uuid_path)) {
+    if (!sandboxRe.test(uuid_path)) {
         throw new Error(`uuid not in sandbox: ${uuid_path}`)
     }
     if (!/[/\\]node_modules[/\\]\.aspect_rules_js[/\\]uuid@/.test(uuid_path)) {

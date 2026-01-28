@@ -1,7 +1,10 @@
 const pkgC = require('./pkg-c.json')
 
 function sandboxAssert() {
-    if (!/[/\\]execroot[/\\]/.test(__filename)) {
+    const sandboxRe = process.platform === 'win32'
+        ? /[/\\]execroot[/\\]/
+        : /-sandbox\/\d+\/execroot\//;
+    if (!sandboxRe.test(__filename)) {
         throw new Error(`Not in sandbox: ${__filename}`)
     }
 
