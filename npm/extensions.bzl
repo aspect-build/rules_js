@@ -358,8 +358,15 @@ def _pnpm_extension_impl(module_ctx):
         pnpm_repository(
             name = name,
             pnpm_version = pnpm["version"],
+            integrity = pnpm["integrity"],
             include_npm = pnpm["include_npm"],
         )
+
+    kwargs = {}
+    if resolved.facts:
+        kwargs["facts"] = resolved.facts
+
+    return module_ctx.extension_metadata(reproducible = True, **kwargs)
 
 pnpm = module_extension(
     implementation = _pnpm_extension_impl,
