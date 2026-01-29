@@ -1,5 +1,5 @@
 const fs = require('fs')
-const exists = require('path-exists')
+const fsPromises = require('fs/promises')
 const os = require('os')
 const path = require('path')
 const { safeReadPackageJsonFromDir } = require('@pnpm/read-package-json')
@@ -91,7 +91,12 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
 
 // Returns true if the package uses node-gyp.
 async function useNodeGyp(root) {
-    return await exists(path.join(root, 'binding.gyp'))
+    try {
+        await fsPromises.access(path.join(root, 'binding.gyp'))
+        return true
+    } catch {
+        return false
+    }
 }
 
 // Helper which is exported from @pnpm/lifecycle:

@@ -221,12 +221,12 @@ load("@npm__at_pnpm_exec.pkg-requires-build__1000.0.16__links//:defs.bzl", store
 load("@npm__at_pnpm_fetcher-base__1001.2.2__links//:defs.bzl", store_218 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_fs.packlist__1000.0.0__links//:defs.bzl", store_219 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_graceful-fs__1000.0.1__links//:defs.bzl", store_220 = "npm_imported_package_store_internal")
-load("@npm__at_pnpm_lifecycle__1001.0.33_1509092209__links//:defs.bzl", link_221 = "npm_link_imported_package_store_internal", store_221 = "npm_imported_package_store_internal")
-load("@npm__at_pnpm_link-bins__1000.3.4_at_pnpm_logger_1001.0.1__links//:defs.bzl", store_222 = "npm_imported_package_store_internal")
+load("@npm__at_pnpm_lifecycle__1001.0.34_1509092209__links//:defs.bzl", link_221 = "npm_link_imported_package_store_internal", store_221 = "npm_imported_package_store_internal")
+load("@npm__at_pnpm_link-bins__1000.3.5_at_pnpm_logger_1001.0.1__links//:defs.bzl", store_222 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_logger__1001.0.1__links//:defs.bzl", link_223 = "npm_link_imported_package_store_internal", store_223 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_manifest-utils__1002.0.4_at_pnpm_logger_1001.0.1__links//:defs.bzl", store_224 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_npm-lifecycle__1001.0.0_typanion_3.14.0__links//:defs.bzl", store_225 = "npm_imported_package_store_internal")
-load("@npm__at_pnpm_package-bins__1000.0.16__links//:defs.bzl", store_226 = "npm_imported_package_store_internal")
+load("@npm__at_pnpm_package-bins__1000.0.17__links//:defs.bzl", store_226 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_ramda__0.28.1__links//:defs.bzl", store_227 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_read-modules-dir__1000.0.0__links//:defs.bzl", store_228 = "npm_imported_package_store_internal")
 load("@npm__at_pnpm_read-package-json__1000.1.7__links//:defs.bzl", link_229 = "npm_link_imported_package_store_internal", store_229 = "npm_imported_package_store_internal")
@@ -970,7 +970,7 @@ load("@npm__parse-json__5.2.0__links//:defs.bzl", store_966 = "npm_imported_pack
 load("@npm__parse-rect__1.2.0__links//:defs.bzl", store_967 = "npm_imported_package_store_internal")
 load("@npm__parse-svg-path__0.1.2__links//:defs.bzl", store_968 = "npm_imported_package_store_internal")
 load("@npm__parse-unit__1.0.1__links//:defs.bzl", store_969 = "npm_imported_package_store_internal")
-load("@npm__path-exists__4.0.0__links//:defs.bzl", link_970 = "npm_link_imported_package_store_internal", store_970 = "npm_imported_package_store_internal")
+load("@npm__path-exists__4.0.0__links//:defs.bzl", store_970 = "npm_imported_package_store_internal")
 load("@npm__path-is-absolute__1.0.1__links//:defs.bzl", store_971 = "npm_imported_package_store_internal")
 load("@npm__path-key__3.1.1__links//:defs.bzl", store_972 = "npm_imported_package_store_internal")
 load("@npm__path-parse__1.0.7__links//:defs.bzl", store_973 = "npm_imported_package_store_internal")
@@ -1295,7 +1295,7 @@ _NPM_PACKAGE_LOCATIONS = {
     "examples/linked_pkg": ["@aspect-test/e", "alias-e", "@aspect-test/e-dev", "@aspect-test/f", "@types/node"],
     "js/private/test/node-patches": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "inline-fixtures"],
     "examples/runfiles": ["@bazel/runfiles"],
-    "npm/private/lifecycle": ["@pnpm/lifecycle", "@pnpm/logger", "@pnpm/read-package-json", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-replace", "@rollup/plugin-terser", "path-exists", "rollup"],
+    "npm/private/lifecycle": ["@pnpm/lifecycle", "@pnpm/logger", "@pnpm/read-package-json", "@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-replace", "@rollup/plugin-terser", "rollup"],
     "js/private/coverage/bundle": ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "c8", "rollup"],
     "js/private/worker/src": ["@rollup/plugin-commonjs", "@rollup/plugin-json", "@rollup/plugin-node-resolve", "@rollup/plugin-typescript", "@types/google-protobuf", "@types/node", "google-protobuf", "rollup", "tslib", "typescript"],
     "js/private/devserver/src": ["@rollup/plugin-node-resolve", "@types/node", "rollup"],
@@ -2916,13 +2916,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_243(dev=True)
             link_244(dev=True)
             link_245(dev=True)
-            link_970()
             link_1061(dev=True)
             link_targets = [
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
                 ":node_modules/@rollup/plugin-commonjs",
                 ":node_modules/@rollup/plugin-json",
                 ":node_modules/@rollup/plugin-node-resolve",
@@ -3361,7 +3359,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
             ])
         if dev:
             link_targets.extend([

@@ -93,12 +93,12 @@ load("@npm-no_optional__at_pnpm_exec.pkg-requires-build__1000.0.16__links//:defs
 load("@npm-no_optional__at_pnpm_fetcher-base__1001.2.2__links//:defs.bzl", store_90 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_fs.packlist__1000.0.0__links//:defs.bzl", store_91 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_graceful-fs__1000.0.1__links//:defs.bzl", store_92 = "npm_imported_package_store_internal")
-load("@npm-no_optional__at_pnpm_lifecycle__1001.0.33_1509092209__links//:defs.bzl", link_93 = "npm_link_imported_package_store_internal", store_93 = "npm_imported_package_store_internal")
-load("@npm-no_optional__at_pnpm_link-bins__1000.3.4_at_pnpm_logger_1001.0.1__links//:defs.bzl", store_94 = "npm_imported_package_store_internal")
+load("@npm-no_optional__at_pnpm_lifecycle__1001.0.34_1509092209__links//:defs.bzl", link_93 = "npm_link_imported_package_store_internal", store_93 = "npm_imported_package_store_internal")
+load("@npm-no_optional__at_pnpm_link-bins__1000.3.5_at_pnpm_logger_1001.0.1__links//:defs.bzl", store_94 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_logger__1001.0.1__links//:defs.bzl", link_95 = "npm_link_imported_package_store_internal", store_95 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_manifest-utils__1002.0.4_at_pnpm_logger_1001.0.1__links//:defs.bzl", store_96 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_npm-lifecycle__1001.0.0_typanion_3.14.0__links//:defs.bzl", store_97 = "npm_imported_package_store_internal")
-load("@npm-no_optional__at_pnpm_package-bins__1000.0.16__links//:defs.bzl", store_98 = "npm_imported_package_store_internal")
+load("@npm-no_optional__at_pnpm_package-bins__1000.0.17__links//:defs.bzl", store_98 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_ramda__0.28.1__links//:defs.bzl", store_99 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_read-modules-dir__1000.0.0__links//:defs.bzl", store_100 = "npm_imported_package_store_internal")
 load("@npm-no_optional__at_pnpm_read-package-json__1000.1.7__links//:defs.bzl", link_101 = "npm_link_imported_package_store_internal", store_101 = "npm_imported_package_store_internal")
@@ -747,7 +747,7 @@ load("@npm-no_optional__parse-json__5.2.0__links//:defs.bzl", store_743 = "npm_i
 load("@npm-no_optional__parse-rect__1.2.0__links//:defs.bzl", store_744 = "npm_imported_package_store_internal")
 load("@npm-no_optional__parse-svg-path__0.1.2__links//:defs.bzl", store_745 = "npm_imported_package_store_internal")
 load("@npm-no_optional__parse-unit__1.0.1__links//:defs.bzl", store_746 = "npm_imported_package_store_internal")
-load("@npm-no_optional__path-exists__4.0.0__links//:defs.bzl", link_747 = "npm_link_imported_package_store_internal", store_747 = "npm_imported_package_store_internal")
+load("@npm-no_optional__path-exists__4.0.0__links//:defs.bzl", store_747 = "npm_imported_package_store_internal")
 load("@npm-no_optional__path-is-absolute__1.0.1__links//:defs.bzl", store_748 = "npm_imported_package_store_internal")
 load("@npm-no_optional__path-key__3.1.1__links//:defs.bzl", store_749 = "npm_imported_package_store_internal")
 load("@npm-no_optional__path-parse__1.0.7__links//:defs.bzl", store_750 = "npm_imported_package_store_internal")
@@ -2417,13 +2417,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_115(dev=True)
             link_116(dev=True)
             link_117(dev=True)
-            link_747()
             link_838(dev=True)
             link_targets = [
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
                 ":node_modules/@rollup/plugin-commonjs",
                 ":node_modules/@rollup/plugin-json",
                 ":node_modules/@rollup/plugin-node-resolve",
@@ -2862,7 +2860,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
             ])
         if dev:
             link_targets.extend([
