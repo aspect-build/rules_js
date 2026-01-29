@@ -43,7 +43,7 @@ write_source_files(
         "snapshots/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
         "snapshots/fsevents_links_defs.bzl": "@npm__fsevents__2.3.3__links//:defs.bzl",
         "snapshots/circular_links_defs.bzl": "@npm__es5-ext__0.10.64__links//:defs.bzl",
-        "snapshots/closure-compiler_links_defs.bzl": "@npm__google-closure-compiler__20251111.0.0__links//:defs.bzl",
+        "snapshots/closure-compiler_links_defs.bzl": "@npm__google-closure-compiler__20251216.0.0__links//:defs.bzl",
         "snapshots/next_links_defs.bzl": "@npm__next__15.2.6_1315089095__links//:defs.bzl",
         "snapshots/rollup_links_defs.bzl": "@npm__rollup__4.55.2__links//:defs.bzl",
         "snapshots/package_json.bzl": "@npm__rollup__4.55.2//:package_json.bzl",
