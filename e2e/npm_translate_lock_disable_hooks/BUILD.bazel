@@ -17,4 +17,8 @@ write_source_files(
         "snapshots/defs.bzl": "@npm//:defs.bzl",
         "snapshots/aspect_test_c_links_defs.bzl": "@npm__at_aspect-test_c__2.0.0__links//:defs.bzl",
     },
+    tags = [
+        "skip-on-bazel8",
+        "skip-on-bazel9",
+    ],
 )

@@ -12,10 +12,6 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
-            - bazel-8:
-                  without: true
-            - bazel-9:
-                  without: true
     e2e/git_dep_metadata:
         icon: npm
         tasks: *e2e_tasks

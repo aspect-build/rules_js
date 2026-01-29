@@ -20,7 +20,7 @@ platform(
 
 filegroup(
     name = "proto",
-    data = ["@com_google_googleapis//google/cloud/speech/v1p1beta1:speech_proto"],
+    data = ["@googleapis//google/cloud/speech/v1p1beta1:speech_proto"],
 )
 
 js_binary(
