@@ -63,7 +63,7 @@ def generate_repository_files(rctx_name, attr, state, npm_imports):
     rctx_files = {
         "BUILD.bazel": [
             """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
-            """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
+            """load("@bazel_lib//:bzl_library.bzl", "bzl_library")""",
             """load("@bazel_skylib//rules:write_file.bzl", "write_file")""",
             """
 # A no-op run target that can be run to invalidate the repository
@@ -319,7 +319,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             # the package_json.bzl for this package
             if _import.package_info["has_bin"]:
                 if attr.generate_bzl_library_targets:
-                    rctx_files[build_file].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
+                    rctx_files[build_file].append("""load("@bazel_lib//:bzl_library.bzl", "bzl_library")""")
 
                     for link_alias in link_aliases:
                         rctx_files[build_file].append(_BZL_LIBRARY_TMPL.format(

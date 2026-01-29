@@ -110,6 +110,22 @@ jobs:
             folder: ${{ steps.folder.outputs.res }}
             os: ${{ steps.os.outputs.res }}
 
+    check-links:
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            LYCHEE_OUT: 'lychee-report.md'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - uses: lycheeverse/lychee-action@v1.1.0
+              id: lychee
+              with:
+                  args: --user-agent "curl/8.4.0" "*.md" "docs/*.md"
+            - name: Fail if broken links found
+              if: steps.lychee.outputs.exit_code != '0'
+              run: gh pr comment ${{ github.event.pull_request.number }} --body-file ${{ env.LYCHEE_OUT }}
+              # TODO: also enforce with exit ${{ steps.lychee.outputs.exit_code }}
+
     test:
         runs-on: ${{ matrix.os == 'macos' && 'macos-latest' || matrix.os == 'windows' && 'windows-latest' || 'ubuntu-22.04-4core' }}
         needs:
