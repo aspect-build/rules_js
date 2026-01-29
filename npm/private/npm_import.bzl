@@ -688,7 +688,7 @@ def _npm_import_rule_impl(rctx):
             rctx_files[_PACKAGE_JSON_BZL_FILENAME] = bin_bzl
 
             if rctx.attr.generate_bzl_library_targets:
-                rctx_files["BUILD.bazel"].append("""load("@bazel_lib//:bzl_library.bzl", "bzl_library")""")
+                rctx_files["BUILD.bazel"].append("""load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""")
                 rctx_files["BUILD.bazel"].append(_BZL_LIBRARY_TMPL.format(
                     name = package_name_no_scope,
                     src = _PACKAGE_JSON_BZL_FILENAME,
