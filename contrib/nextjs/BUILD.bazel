@@ -1,4 +1,4 @@
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@bazel_lib//:bzl_library.bzl", "bzl_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,10 +17,4 @@ bzl_library(
         "@bazel_lib//lib:copy_to_directory",
         "@bazel_lib//lib:directory_path",
     ],
-)
-
-starlark_doc_extract(
-    name = "defs.doc_extract",
-    src = "defs.bzl",
-    deps = [":defs"],
 )

@@ -1,4 +1,4 @@
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@bazel_lib//:bzl_library.bzl", "bzl_library")
 load(":index.bzl", "PNPM_ARCHS", "PNPM_PLATFORMS")
 
 # Constraints representing the pnpm [os] and [cpu] fields.
