@@ -23,8 +23,6 @@ bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
 bazel_dep(name = "rules_nodejs", version = "6.7.3", dev_dependency = True)
 
-bazel_dep(name = "platforms", version = "0.0.5")
-
 node = use_extension(
     "@rules_nodejs//nodejs:extensions.bzl",
     "node",
