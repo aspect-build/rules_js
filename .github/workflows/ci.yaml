@@ -18,6 +18,12 @@ concurrency:
     cancel-in-progress: ${{ github.ref_name != 'main' }}
 
 jobs:
+    org-checks:
+        uses: aspect-build/.github/.github/workflows/org-check.yaml@main
+        secrets: inherit
+        permissions:
+            contents: read
+            pull-requests: write
     # Prepares dynamic test matrix values
     matrix-prep:
         runs-on: ubuntu-latest
