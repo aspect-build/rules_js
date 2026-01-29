@@ -408,8 +408,8 @@ importers:
   npm/private/lifecycle:
     dependencies:
       '@pnpm/lifecycle':
-        specifier: ^1001.0.33
-        version: 1001.0.33(@pnpm/logger@1001.0.1)(typanion@3.14.0)
+        specifier: ^1001.0.34
+        version: 1001.0.34(@pnpm/logger@1001.0.1)(typanion@3.14.0)
       '@pnpm/logger':
         specifier: ^1001.0.1
         version: 1001.0.1
@@ -1674,14 +1674,14 @@ packages:
     resolution: {integrity: sha512-JnzaAVFJIEgwTcB55eww8N3h5B6qJdZqDA2wYkSK+OcTvvMSQb9c2STMhBP6GfkWygG1fs3w8D7JRx9SPZnxJg==}
     engines: {node: '>=18.12'}
 
-  '@pnpm/lifecycle@1001.0.33':
-    resolution: {integrity: sha512-KJL9MjGHMaGO2EzANTZh5Z1T5uGFJAdWKEQb/qGqYpC9RjlhbJ1Eu5JKHX79a2pPxGS37TVw2xvQWlsI2mzbKA==}
+  '@pnpm/lifecycle@1001.0.34':
+    resolution: {integrity: sha512-buoLKN3foLWYmcfdSY8IwNwbH35NNSaT54FW+CatLjkanwTd5/2WvjaNaYT447jrU21mDC+Cwe21e88l2lsH7w==}
     engines: {node: '>=18.12'}
     peerDependencies:
       '@pnpm/logger': '>=1001.0.0 <1002.0.0'
 
-  '@pnpm/link-bins@1000.3.4':
-    resolution: {integrity: sha512-x+jF5xZVL96pKxX1C/05+HE2/PCFu5rYRnH9d98p9bl+qRBjx5u0RvfpQtbI4nQTnRppLh1C/mUrtB51qXpx0A==}
+  '@pnpm/link-bins@1000.3.5':
+    resolution: {integrity: sha512-hUbSO13T23tgkHSN7nITST/vqUseL+lutw/NNUrdqaSOW8C33OdXWCrHTHUHndAS7mL2AykMCfwPGBRjSm15jw==}
     engines: {node: '>=18.12'}
     peerDependencies:
       '@pnpm/logger': '>=1001.0.0 <1002.0.0'
@@ -1700,8 +1700,8 @@ packages:
     resolution: {integrity: sha512-5jW/GNLdZMiw+PJ8FYSvOghoApSjsORNIro2fj8j6NHAqJxJjcHekC5/NsKaawoI5LAkU/XDDVjNC71Yz+uS1w==}
     engines: {node: '>=18.12'}
 
-  '@pnpm/package-bins@1000.0.16':
-    resolution: {integrity: sha512-FM7OzuAOKXkSxOGtTJjNEz4jcm6eqz3siREPCCX6JP0Um3Rnbeptk7EfkLHW2MGdj2vLpT1t8qEgTX+af0H9gw==}
+  '@pnpm/package-bins@1000.0.17':
+    resolution: {integrity: sha512-DD2XTIIWwN1xVRdocKRaIl4eSMp3EdhhxqogfEwEiMbmGkoE4lbnTg3f81VEfhOGl1vTaS5UoM2qxW1FGrpaZQ==}
     engines: {node: '>=18.12'}
 
   '@pnpm/ramda@0.28.1':
@@ -6863,12 +6863,12 @@ snapshots:
     dependencies:
       graceful-fs: 4.2.11
 
-  '@pnpm/lifecycle@1001.0.33(@pnpm/logger@1001.0.1)(typanion@3.14.0)':
+  '@pnpm/lifecycle@1001.0.34(@pnpm/logger@1001.0.1)(typanion@3.14.0)':
     dependencies:
       '@pnpm/core-loggers': 1001.0.9(@pnpm/logger@1001.0.1)
       '@pnpm/directory-fetcher': 1000.1.22(@pnpm/logger@1001.0.1)
       '@pnpm/error': 1000.0.5
-      '@pnpm/link-bins': 1000.3.4(@pnpm/logger@1001.0.1)
+      '@pnpm/link-bins': 1000.3.5(@pnpm/logger@1001.0.1)
       '@pnpm/logger': 1001.0.1
       '@pnpm/npm-lifecycle': 1001.0.0(typanion@3.14.0)
       '@pnpm/read-package-json': 1000.1.7
@@ -6882,13 +6882,13 @@ snapshots:
       - supports-color
       - typanion
 
-  '@pnpm/link-bins@1000.3.4(@pnpm/logger@1001.0.1)':
+  '@pnpm/link-bins@1000.3.5(@pnpm/logger@1001.0.1)':
     dependencies:
       '@pnpm/constants': 1001.3.1
       '@pnpm/error': 1000.0.5
       '@pnpm/logger': 1001.0.1
       '@pnpm/manifest-utils': 1002.0.4(@pnpm/logger@1001.0.1)
-      '@pnpm/package-bins': 1000.0.16
+      '@pnpm/package-bins': 1000.0.17
       '@pnpm/read-modules-dir': 1000.0.0
       '@pnpm/read-package-json': 1000.1.7
       '@pnpm/read-project-manifest': 1001.2.4(@pnpm/logger@1001.0.1)
@@ -6933,7 +6933,7 @@ snapshots:
       - supports-color
       - typanion
 
-  '@pnpm/package-bins@1000.0.16':
+  '@pnpm/package-bins@1000.0.17':
     dependencies:
       '@pnpm/types': 1001.3.0
       is-subdir: 1.2.0

@@ -2,7 +2,7 @@
     "name": "lifecycle-deps",
     "private": true,
     "dependencies": {
-        "@pnpm/lifecycle": "^1001.0.33",
+        "@pnpm/lifecycle": "^1001.0.34",
         "@pnpm/read-package-json": "^1000.1.7",
         "@pnpm/logger": "^1001.0.1"
     },
