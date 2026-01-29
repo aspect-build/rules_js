@@ -23,18 +23,6 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
-            - id: bazel-version
-              name: Prepare 'bazel-version' matrix axis
-              run: |
-                  v=$(head -n 1 .bazelversion)
-                  m=${v::1}
-                  a=(
-                    "major:$m, version:\"$v\""
-                    "major:8, version:\"8.1.1\""
-                    "major:9, version:\"9.0.0\""
-                  )
-                  printf -v j '{%s},' "${a[@]}"
-                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
             - id: folder
               name: Prepare 'folder' matrix axis
               run: |
@@ -106,7 +94,6 @@ jobs:
                   printf -v j '"%s",' "${a[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
         outputs:
-            bazel-version: ${{ steps.bazel-version.outputs.res }}
             folder: ${{ steps.folder.outputs.res }}
             os: ${{ steps.os.outputs.res }}
 
@@ -120,7 +107,6 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                bazel-version: ${{ fromJSON(needs.matrix-prep.outputs.bazel-version) }}
                 os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
                 folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
                 exclude:
@@ -128,37 +114,13 @@ jobs:
                     - os: windows
                     # Exclude MacOS by default, will opt-in to includes
                     - os: macos
-                    # Don't run tests with Bazel 8 by default
-                    - bazel-version:
-                          major: 8
-                    # Don't run tests with Bazel 9 by default
-                    - bazel-version:
-                          major: 9
                 include:
-                    # Include unit tests with bazel8
-                    - bazel-version:
-                          major: 8
-                      folder: .
-                      os: ubuntu
-                      config: local
-                    # Include unit tests with bazel9
-                    - bazel-version:
-                          major: 9
-                      folder: .
-                      os: ubuntu
-                      config: local
-                    # Include unit tests with bazel7 on windows
-                    - bazel-version:
-                          major: 7
-                          version: 7.7.1
-                      os: windows
+                    # Include e2e/bzlmod on windows
+                    - os: windows
                       config: local
                       folder: e2e/bzlmod
-                    # Include unit tests with bazel7 on macos
-                    - bazel-version:
-                          major: 7
-                          version: 7.7.1
-                      os: macos
+                    # Include e2e/bzlmod on macos
+                    - os: macos
                       config: local
                       folder: e2e/bzlmod
 
@@ -188,17 +150,9 @@ jobs:
                       ~/.cache/bazel
                       ~/.cache/bazelisk
                   key: >-
-                      bazel-cache-v3-${{ matrix.bazel-version.version }}-${{ matrix.os }}-${{ matrix.folder }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}-${{ hashFiles(format('{0}/MODULE.bazel', matrix.folder), format('{0}/**/pnpm-lock.yaml', matrix.folder)) }}
+                      bazel-cache-v4-${{ matrix.os }}-${{ matrix.folder }}-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'MODULE.bazel.lock') }}-${{ hashFiles(format('{0}/MODULE.bazel', matrix.folder), format('{0}/**/pnpm-lock.yaml', matrix.folder)) }}
                   restore-keys: |
-                      bazel-cache-v3-${{ matrix.bazel-version.version }}-${{ matrix.os }}-${{ matrix.folder }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}-
-
-            - name: Configure Bazel version
-              shell: bash
-              run: |
-                  # Overwrite the .bazelversion instead of using USE_BAZEL_VERSION so that Bazelisk
-                  # still bootstraps Aspect CLI from configuration in .bazeliskrc. Aspect CLI will
-                  # then use .bazelversion to determine which Bazel version to use.
-                  echo "${{ matrix.bazel-version.version }}" > .bazelversion
+                      bazel-cache-v4-${{ matrix.os }}-${{ matrix.folder }}-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'MODULE.bazel.lock') }}-
 
             - name: bazel test //...
               shell: bash
@@ -208,8 +162,8 @@ jobs:
                     test \
                     --config=local \
                     --config=ci \
-                    --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --test_tag_filters=-skip-on-bazel7 \
+                    --build_tag_filters=-skip-on-bazel7 \
                     //...
               env:
                   ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
@@ -246,8 +200,8 @@ jobs:
                     coverage \
                     --config=local \
                     --config=ci \
-                    --test_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
-                    --build_tag_filters=-skip-on-bazel${{ matrix.bazel-version.major }} \
+                    --test_tag_filters=-skip-on-bazel7 \
+                    --build_tag_filters=-skip-on-bazel7 \
                     --instrument_test_targets \
                     //...
               env:
