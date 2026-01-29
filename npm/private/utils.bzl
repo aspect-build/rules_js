@@ -1,6 +1,6 @@
 "Utility functions for npm rules"
 
-load("@bazel_features//private:util.bzl", "ge")
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_lib//lib:paths.bzl", "relative_file")
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -9,10 +9,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 # junctions instead of file symlinks on Windows. Without this, Node.js gets EPERM
 # when traversing symlinks created by declare_symlink on Bazel 8+/Windows.
 # See https://github.com/bazelbuild/bazel/issues/26701
-# Seems like it won't be cherry picked: https://github.com/bazelbuild/bazel/issues/27607
-# Added in commit https://github.com/bazelbuild/bazel/commit/b9bbda939cddab807e34559cb7ee798febfa3861
-# If a backport happens this version just needs to be lowered to the 8.x version that has the backport
-_SUPPORTS_SYMLINK_TARGET_TYPE = ge("9.0.0")
+_SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
 DEFAULT_REGISTRY_DOMAIN = "registry.npmjs.org"
