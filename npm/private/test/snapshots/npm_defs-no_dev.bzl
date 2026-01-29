@@ -970,7 +970,7 @@ load("@npm-no_dev__parse-json__5.2.0__links//:defs.bzl", store_966 = "npm_import
 load("@npm-no_dev__parse-rect__1.2.0__links//:defs.bzl", store_967 = "npm_imported_package_store_internal")
 load("@npm-no_dev__parse-svg-path__0.1.2__links//:defs.bzl", store_968 = "npm_imported_package_store_internal")
 load("@npm-no_dev__parse-unit__1.0.1__links//:defs.bzl", store_969 = "npm_imported_package_store_internal")
-load("@npm-no_dev__path-exists__4.0.0__links//:defs.bzl", link_970 = "npm_link_imported_package_store_internal", store_970 = "npm_imported_package_store_internal")
+load("@npm-no_dev__path-exists__4.0.0__links//:defs.bzl", store_970 = "npm_imported_package_store_internal")
 load("@npm-no_dev__path-is-absolute__1.0.1__links//:defs.bzl", store_971 = "npm_imported_package_store_internal")
 load("@npm-no_dev__path-key__3.1.1__links//:defs.bzl", store_972 = "npm_imported_package_store_internal")
 load("@npm-no_dev__path-parse__1.0.7__links//:defs.bzl", store_973 = "npm_imported_package_store_internal")
@@ -2691,12 +2691,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_221()
             link_223()
             link_229()
-            link_970()
             link_targets = [
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
             ]
             scope_targets = {
                 "@pnpm": [
@@ -2929,7 +2927,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
             ])
     elif bazel_package == "js/private/test/js_run_devserver":
         if prod:

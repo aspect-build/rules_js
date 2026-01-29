@@ -747,7 +747,7 @@ load("@npm-no_optional__parse-json__5.2.0__links//:defs.bzl", store_743 = "npm_i
 load("@npm-no_optional__parse-rect__1.2.0__links//:defs.bzl", store_744 = "npm_imported_package_store_internal")
 load("@npm-no_optional__parse-svg-path__0.1.2__links//:defs.bzl", store_745 = "npm_imported_package_store_internal")
 load("@npm-no_optional__parse-unit__1.0.1__links//:defs.bzl", store_746 = "npm_imported_package_store_internal")
-load("@npm-no_optional__path-exists__4.0.0__links//:defs.bzl", link_747 = "npm_link_imported_package_store_internal", store_747 = "npm_imported_package_store_internal")
+load("@npm-no_optional__path-exists__4.0.0__links//:defs.bzl", store_747 = "npm_imported_package_store_internal")
 load("@npm-no_optional__path-is-absolute__1.0.1__links//:defs.bzl", store_748 = "npm_imported_package_store_internal")
 load("@npm-no_optional__path-key__3.1.1__links//:defs.bzl", store_749 = "npm_imported_package_store_internal")
 load("@npm-no_optional__path-parse__1.0.7__links//:defs.bzl", store_750 = "npm_imported_package_store_internal")
@@ -2417,13 +2417,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_115(dev=True)
             link_116(dev=True)
             link_117(dev=True)
-            link_747()
             link_838(dev=True)
             link_targets = [
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
                 ":node_modules/@rollup/plugin-commonjs",
                 ":node_modules/@rollup/plugin-json",
                 ":node_modules/@rollup/plugin-node-resolve",
@@ -2862,7 +2860,6 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/@pnpm/lifecycle",
                 ":node_modules/@pnpm/logger",
                 ":node_modules/@pnpm/read-package-json",
-                ":node_modules/path-exists",
             ])
         if dev:
             link_targets.extend([

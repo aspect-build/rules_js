@@ -19,7 +19,6 @@ rollup_bin.rollup(
         "//npm/private/lifecycle:node_modules/@pnpm/lifecycle",
         "//npm/private/lifecycle:node_modules/@pnpm/logger",
         "//npm/private/lifecycle:node_modules/@pnpm/read-package-json",
-        "//npm/private/lifecycle:node_modules/path-exists",
         "//npm/private/lifecycle:rollup_config",
     ],
     outs = ["index.min.js"],
