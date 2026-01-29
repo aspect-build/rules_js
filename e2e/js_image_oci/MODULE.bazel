@@ -6,9 +6,15 @@ local_path_override(
 
 bazel_dep(name = "bazel_lib", version = "3.0.0", dev_dependency = True)
 bazel_dep(name = "container_structure_test", version = "1.21.1", dev_dependency = True)
+bazel_dep(name = "googleapis", version = "0.0.0-20260109-6145b5ff", dev_dependency = True)
 bazel_dep(name = "platforms", version = "0.0.10", dev_dependency = True)
 bazel_dep(name = "rules_nodejs", version = "6.7.3", dev_dependency = True)
 bazel_dep(name = "rules_oci", version = "2.0.0-alpha2", dev_dependency = True)
+bazel_dep(name = "repo", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "repo",
+    path = "./repo",
+)
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 npm.npm_translate_lock(

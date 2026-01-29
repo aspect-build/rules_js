@@ -247,4 +247,8 @@ def lockfile_test(npm_link_all_packages, name = None):
                 for f in BZLMOD_FILES.keys()
             ],
         ),
+        tags = [
+            "skip-on-bazel8",
+            "skip-on-bazel9",
+        ],
     )
