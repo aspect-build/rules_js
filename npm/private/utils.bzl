@@ -138,7 +138,7 @@ def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
-def _make_symlink(ctx, symlink_path, target_path):
+def _make_directory_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
     kwargs = {
         "output": symlink,
@@ -301,7 +301,7 @@ utils = struct(
     importer_to_link = _importer_to_link,
     package_repo_name = _package_repo_name,
     package_store_name = _package_store_name,
-    make_symlink = _make_symlink,
+    make_directory_symlink = _make_directory_symlink,
     # Symlinked node_modules structure package store path under node_modules
     package_store_root = ".aspect_rules_js",
     # Suffix for npm_import links repository

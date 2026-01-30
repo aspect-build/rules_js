@@ -326,7 +326,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.repo_name, jsinfo.target.package)
         else:
             target_path = "{}/{}".format(ctx.bin_dir.path, jsinfo.target.package)
-        package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
+        package_store_directory = utils.make_directory_symlink(ctx, symlink_path, target_path)
     elif not ctx.attr.src:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
         # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of

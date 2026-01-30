@@ -84,7 +84,7 @@ def _npm_link_package_store_impl(ctx):
     # "node_modules/{package}" so it is available as a direct dependency
     root_symlink_path = "node_modules/{}".format(package)
 
-    files = [utils.make_symlink(ctx, root_symlink_path, package_store_directory.path)]
+    files = [utils.make_directory_symlink(ctx, root_symlink_path, package_store_directory.path)]
 
     for bin_name, bin_path in ctx.attr.bins.items():
         bin_file = ctx.actions.declare_file("node_modules/.bin/{}".format(bin_name))
