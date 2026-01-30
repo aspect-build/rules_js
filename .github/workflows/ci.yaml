@@ -31,45 +31,19 @@ jobs:
             - uses: actions/checkout@v6
             - id: folder
               name: Prepare 'folder' matrix axis
+              # Include tests not run on Aspect Workflows such as: test.sh, tests depending on secrets
+              # e2e/bzlmod is only run on mac+windows (see matrix include below)
               run: |
                   a=(
-                    .
-                    e2e/bzlmod
-                    e2e/gyp_no_install_script
-                    e2e/js_binary_workspace
                     e2e/js_image_oci
                     e2e/js_run_devserver
-                    e2e/npm_link_package
-                    e2e/npm_link_package-esm
-                    e2e/npm_link_package-rerooted
-                    e2e/npm_translate_lock
-                    e2e/npm_translate_lock_disable_hooks
-                    e2e/npm_translate_lock_empty
-                    e2e/npm_translate_lock_multi
-                    e2e/npm_translate_lock_partial_clone
-                    e2e/npm_translate_lock_subdir_patch
-                    e2e/npm_translate_package_lock
-                    e2e/npm_translate_yarn_lock
-                    e2e/npm_translate_lock_exclude_package_contents
                     e2e/npm_translate_lock_package_visibility
-                    e2e/package_json_module
-                    e2e/patch_from_repo
-                    e2e/pnpm_lockfiles
-                    e2e/pnpm_repo_install
-                    e2e/pnpm_workspace
-                    e2e/pnpm_workspace_deps
-                    e2e/pnpm_workspace_rerooted
-                    e2e/pnpm_version
-                    e2e/runfiles
-                    e2e/stamped_package_json
+                    e2e/npm_translate_lock_replace_packages
                     e2e/update_pnpm_lock
                     e2e/update_pnpm_lock_with_import
-                    e2e/vendored_node
-                    e2e/vendored_tarfile
                     e2e/verify_patches
                     e2e/webpack_devserver
                     e2e/webpack_devserver_esm
-                    e2e/worker
                   )
                   if [[ "${{ env.ASPECT_GHTESTER_SSH_KEY }}" ]]; then
                     a+=(
@@ -195,8 +169,6 @@ jobs:
             #       retention-days: 5
 
             - name: bazel coverage //...
-              # Don't run on RBE. Coverage does not work properly with RBE. See: bazelbuild/bazel#4685.
-              # Don't run coverage on e2e/bzlmod. It fails evaluating js/private/coverage/BUILD.bazel because write_source_files is not yet bzlmod compatible.
               # Don't run coverage on Windows. It is currently broken.
               if: matrix.os != 'windows'
               shell: bash
