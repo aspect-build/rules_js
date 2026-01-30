@@ -4,9 +4,9 @@ name: CI
 on:
     # Triggers the workflow on push or pull request events but only for the main branch
     push:
-        branches: [main, 2.x, 3.x]
+        branches: [main, 2.x]
     pull_request:
-        branches: [main, 2.x, 3.x]
+        branches: [main, 2.x]
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
@@ -24,15 +24,14 @@ jobs:
         permissions:
             contents: read
             pull-requests: write
-    # Prepares dynamic test matrix values
-    matrix-prep:
+    # Prepares dynamic test matrix values for ubuntu tests
+    e2e-tests-list:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
             - id: folder
               name: Prepare 'folder' matrix axis
-              # Include tests not run on Aspect Workflows such as: test.sh, tests depending on secrets
-              # e2e/bzlmod is only run on mac+windows (see matrix include below)
+              # Include tests not run on Aspect Workflows: tests with test.sh, tests depending on secrets
               run: |
                   a=(
                     e2e/js_image_oci
@@ -59,161 +58,104 @@ jobs:
               env:
                   ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-            - id: os
-              name: Prepare 'os' matrix axis
-              # Only run MacOS and Windows on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
-              # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
-              run: |
-                  a=( ubuntu )
-                  if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"macos"* ]]; then
-                    a+=( macos )
-                  fi
-                  if [[ "${{ github.ref_name }}" == "main" ]] || [[ "${{ github.head_ref }}" == *"windows"* ]]; then
-                    a+=( windows )
-                  fi
-                  printf -v j '"%s",' "${a[@]}"
-                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
         outputs:
             folder: ${{ steps.folder.outputs.res }}
-            os: ${{ steps.os.outputs.res }}
 
+    # Ubuntu tests - e2e tests with test.sh or secret dependencies not tested within Aspect Workflows
     test:
-        runs-on: ${{ matrix.os == 'macos' && 'macos-latest' || matrix.os == 'windows' && 'windows-latest' || 'ubuntu-22.04-4core' }}
-        needs:
-            - matrix-prep
+        runs-on: ubuntu-22.04-4core
+        needs: e2e-tests-list
         defaults:
             run:
                 working-directory: ${{ matrix.folder }}
         strategy:
             fail-fast: false
             matrix:
-                os: ${{ fromJSON(needs.matrix-prep.outputs.os) }}
-                folder: ${{ fromJSON(needs.matrix-prep.outputs.folder) }}
-                exclude:
-                    # Exclude Windows default, will opt-in to includes
-                    - os: windows
-                    # Exclude MacOS by default, will opt-in to includes
-                    - os: macos
-                include:
-                    # Include e2e/bzlmod on windows
-                    - os: windows
-                      config: local
-                      folder: e2e/bzlmod
-                    # Include e2e/bzlmod on macos
-                    - os: macos
-                      config: local
-                      folder: e2e/bzlmod
-
-        # Steps represent a sequence of tasks that will be executed as part of the job
+                folder: ${{ fromJSON(needs.e2e-tests-list.outputs.folder) }}
+        env:
+            ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+            ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+            ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
         steps:
-            # Checks-out your repository under github.workspace, so your job can access it
             - uses: actions/checkout@v6
-
             # Setup an ssh keypair and github.com in known_hosts for e2e/git_dep_metadata,
             # which exercises fetching a git repository via ssh.
             - uses: webfactory/ssh-agent@v0.9.1
+              if: env.ASPECT_GHTESTER_SSH_KEY != ''
               env:
                   ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
-              if: env.ASPECT_GHTESTER_SSH_KEY != ''
               with:
                   ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
 
-            - name: Mount bazel caches
-              uses: actions/cache@v5
+            - uses: bazel-contrib/setup-bazel@0.14.0
               with:
-                  # Cache the --dist_cache and --repository_cache directories (see ci.bazelrc)
-                  # and the default bazel output (https://bazel.build/remote/output-directories#layout)
-                  # and bazelisk cache.
-                  path: |
-                      ~/.cache/bazel-disk-cache
-                      ~/.cache/bazel-repository-cache
-                      ~/.cache/bazel
-                      ~/.cache/bazelisk
-                  key: >-
-                      bazel-cache-v4-${{ matrix.os }}-${{ matrix.folder }}-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'MODULE.bazel.lock') }}-${{ hashFiles(format('{0}/MODULE.bazel', matrix.folder), format('{0}/**/pnpm-lock.yaml', matrix.folder)) }}
-                  restore-keys: |
-                      bazel-cache-v4-${{ matrix.os }}-${{ matrix.folder }}-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'MODULE.bazel.lock') }}-
+                  bazelisk-cache: true
+                  disk-cache: ${{ matrix.folder }}
+                  repository-cache: true
 
             - name: bazel test //...
-              shell: bash
               run: |
-                  bazel \
-                    --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
-                    test \
-                    --config=local \
-                    --config=ci \
+                  bazel test \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
                     //...
-              env:
-                  ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
 
             - name: Check that unused npm packages were not fetched
-              if: matrix.os != 'windows'
-              shell: bash
               run: ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
 
-            # Uncomment for debugging, see https://github.com/aspect-build/rules_js/pull/771
-            # - name: upload bazel-bin
-            #   if: failure() && matrix.folder == '.'
-            #   uses: actions/upload-artifact@v3
-            #   with:
-            #       name: bazel-bin-${{ matrix.bazel-version.version }}
-            #       path: |
-            #           ${{ matrix.folder }}/bazel-bin/js/private/test/image
-            #           !**/node_modules
-            #           !**/*.runfiles
-            #           !**/*.sh
-            #       retention-days: 5
-
             - name: bazel coverage //...
-              # Don't run coverage on Windows. It is currently broken.
-              if: matrix.os != 'windows'
-              shell: bash
               run: |
-                  bazel \
-                    --bazelrc=${GITHUB_WORKSPACE//\\/\/}/.github/workflows/ci.bazelrc \
-                    coverage \
-                    --config=local \
-                    --config=ci \
+                  bazel coverage \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
                     --instrument_test_targets \
                     //...
-              env:
-                  ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
 
             - name: ./test.sh
-              # Run if there is a test.sh file in the folder.
-              if: matrix.os != 'windows' && hashFiles(format('{0}//test.sh', matrix.folder)) != ''
-              shell: bash
               run: ./test.sh
-              env:
-                  ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
-                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+
+    # Mac/Windows smoke tests - only e2e/bzlmod
+    # Only run on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
+    # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
+    smoke:
+        if: github.ref_name == 'main' || contains(github.head_ref, 'macos') || contains(github.head_ref, 'windows')
+        runs-on: ${{ matrix.os }}
+        defaults:
+            run:
+                working-directory: e2e/bzlmod
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [macos-latest, windows-latest]
+        env:
+            ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: bazel-contrib/setup-bazel@0.14.0
+              with:
+                  bazelisk-cache: true
+                  disk-cache: ${{ matrix.os }}-bzlmod
+                  repository-cache: true
+
+            - name: bazel test //...
+              shell: bash
+              run: |
+                  bazel test \
+                    --test_tag_filters=-skip-on-bazel7 \
+                    --build_tag_filters=-skip-on-bazel7 \
+                    //...
 
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
     conclusion:
-        needs: test
+        needs: [test, smoke]
         runs-on: ubuntu-latest
         if: always()
         steps:
-            - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3.0.3
-
-            # Note: possible conclusion values:
-            # https://github.com/technote-space/workflow-conclusion-action/blob/main/src/constant.ts
-            - name: report success
-              if: ${{ env.WORKFLOW_CONCLUSION == 'success' }}
-              working-directory: /tmp
-              run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 0
-
-            - name: report failure
-              if: ${{ env.WORKFLOW_CONCLUSION == 'failure' }}
-              working-directory: /tmp
-              run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 1
+            - run: |
+                  if [[ "${{ needs.test.result }}" == "success" && ("${{ needs.smoke.result }}" == "success" || "${{ needs.smoke.result }}" == "skipped") ]]; then
+                    exit 0
+                  else
+                    exit 1
+                  fi
