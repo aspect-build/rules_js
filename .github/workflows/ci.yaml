@@ -18,23 +18,23 @@ concurrency:
     cancel-in-progress: ${{ github.ref_name != 'main' }}
 
 jobs:
-  check-links:
-    env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        LYCHEE_OUT: 'lychee-report.md'
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v6
-        - uses: lycheeverse/lychee-action@v2.7.0
-          id: lychee
-          with:
-              fail: false
-              args: --user-agent "curl/8.4.0" "*.md" "docs/*.md"
-        - name: Fail if broken links found
-          if: steps.lychee.outputs.exit_code != '0'
-          run: |
-              gh pr comment ${{ github.event.pull_request.number }} --body-file ${{ env.LYCHEE_OUT }} --edit-last --create-if-none
-              exit ${{ steps.lychee.outputs.exit_code }}
+    check-links:
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            LYCHEE_OUT: 'lychee-report.md'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - uses: lycheeverse/lychee-action@v2.7.0
+            id: lychee
+            with:
+                fail: false
+                args: --user-agent "curl/8.4.0" "*.md" "docs/*.md"
+            - name: Fail if broken links found
+            if: steps.lychee.outputs.exit_code != '0'
+            run: |
+                gh pr comment ${{ github.event.pull_request.number }} --body-file ${{ env.LYCHEE_OUT }} --edit-last --create-if-none
+                exit ${{ steps.lychee.outputs.exit_code }}
     # Prepares dynamic test matrix values
     matrix-prep:
         runs-on: ubuntu-latest
