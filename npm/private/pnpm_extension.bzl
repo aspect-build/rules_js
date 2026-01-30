@@ -2,6 +2,7 @@
 
 load("@bazel_lib//lib:lists.bzl", "unique")
 load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
+load(":utils.bzl", "utils")
 load(":versions.bzl", "PNPM_VERSIONS")
 
 DEFAULT_PNPM_REPO_NAME = "pnpm"
@@ -59,8 +60,10 @@ def resolve_pnpm_repositories(mctx):
                     parts = v.rsplit("+sha512.", 1)
                     v = parts[0]
 
-                    # Store the integrity hash (prepend "sha512-" as that's the expected format)
-                    integrity[v] = "sha512-" + parts[1]
+                    # Store the integrity hash. We need to convert the hex representation of the
+                    # hash used by corepack, to the one Bazel understands: base64 encoded with a
+                    # "sha512-" prefix.
+                    integrity[v] = "sha512-" + utils.hex_to_base64(parts[1])
 
             elif attr.pnpm_version == "latest":
                 v = LATEST_PNPM_VERSION

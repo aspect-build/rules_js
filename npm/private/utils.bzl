@@ -20,6 +20,9 @@ _MAX_PEER_DEP_LENGTH = 32
 # A unique separator for link: dependencies to separate the link name vs path
 _LINK_SEPARATOR = "|"
 
+# Alphabet for base64 strings.
+_B64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
 def _sorted_map(m):
     # TODO(zbarsky): maybe faster as `dict(sorted(m.items()))`?
     return {k: m[k] for k in sorted(m.keys())}
@@ -284,6 +287,64 @@ def _is_tarball_extension(ext):
     ]
     return ext in tarball_extensions
 
+def _hex_to_base64(hex_string):
+    """Converts a non-delimited hex string (like a SHA-512 checksum) to base64."""
+
+    # 1. Convert hex string to a list of integer bytes
+    bytes_list = []
+
+    # Loop with step 2 to grab hex pairs
+    for i in range(0, len(hex_string), 2):
+        bytes_list.append(int(hex_string[i:i + 2], 16))
+
+    output = []
+    length = len(bytes_list)
+
+    # 2. Process bytes in chunks of 3 using range(start, stop, step)
+    for i in range(0, length, 3):
+        b1 = bytes_list[i]
+
+        # Check if 2nd byte exists
+        if i + 1 < length:
+            b2 = bytes_list[i + 1]
+        else:
+            b2 = -1
+
+        # Check if 3rd byte exists
+        if i + 2 < length:
+            b3 = bytes_list[i + 2]
+        else:
+            b3 = -1
+
+        # Construct 24-bit buffer
+        # Use 0 for missing bytes during bitwise ops
+        val = (b1 << 16) | ((b2 if b2 != -1 else 0) << 8) | (b3 if b3 != -1 else 0)
+
+        # Extract 6-bit indices
+        c1 = (val >> 18) & 0x3F
+        c2 = (val >> 12) & 0x3F
+        c3 = (val >> 6) & 0x3F
+        c4 = val & 0x3F
+
+        output.append(_B64_CHARS[c1])
+        output.append(_B64_CHARS[c2])
+
+        # Handle Padding
+        if b2 == -1:
+            # Only 1 byte available -> Pad 2
+            output.append("=")
+            output.append("=")
+        elif b3 == -1:
+            # Only 2 bytes available -> Pad 1
+            output.append(_B64_CHARS[c3])
+            output.append("=")
+        else:
+            # All 3 bytes available -> No padding
+            output.append(_B64_CHARS[c3])
+            output.append(_B64_CHARS[c4])
+
+    return "".join(output)
+
 utils = struct(
     sorted_map = _sorted_map,
     friendly_name = _friendly_name,
@@ -308,6 +369,7 @@ utils = struct(
     reverse_force_copy = _reverse_force_copy,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
+    hex_to_base64 = _hex_to_base64,
 )
 
 # Exported only to be tested

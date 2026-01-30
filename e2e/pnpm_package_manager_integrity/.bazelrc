@@ -1,0 +1,12 @@
+import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
+
+### YOUR PROJECT SPECIFIC OPTIONS GO HERE ###
+
+build --sandbox_default_allow_network=true
+
+# Load any settings & overrides specific to the current user from `.aspect/bazelrc/user.bazelrc`.
+# This file should appear in `.gitignore` so that settings are not shared with team members. This
+# should be last statement in this config so the user configuration is able to overwrite flags from
+# this file. See https://bazel.build/configure/best-practices#bazelrc-file.
+try-import %workspace%/../../.aspect/bazelrc/user.bazelrc
