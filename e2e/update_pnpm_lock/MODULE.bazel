@@ -9,7 +9,7 @@ bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",
-    use_version_from = "//:package.json",
+    pnpm_version_from = "//:package.json",
 )
 use_repo(pnpm, "pnpm", "pnpm__links")
 
