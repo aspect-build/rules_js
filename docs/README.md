@@ -173,9 +173,9 @@ with a rule like [`copy_to_bin`](https://docs.aspect.build/bazel-contrib/bazel-l
 
 **API docs:**
 
--   [js_library](./js_library.md): Declare a logical grouping of JS files and their dependencies.
--   [js_binary](./js_binary.md): Declare a Node.js executable program.
--   [js_run_binary](./js_run_binary.md): Run a Node.js executable program as the "tool" in a Bazel action that produces outputs, similar to `genrule`.
+-   [js_library](https://registry.bazel.build/docs/aspect_rules_js#rule-js_library): Declare a logical grouping of JS files and their dependencies.
+-   [js_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_binary): Declare a Node.js executable program.
+-   [js_run_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_run_binary): Run a Node.js executable program as the "tool" in a Bazel action that produces outputs, similar to `genrule`.
 
 ### Using binaries published to npm
 
