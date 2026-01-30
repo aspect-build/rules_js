@@ -1,6 +1,6 @@
 "Internal implementation details"
 
-load("@bazel_lib//:bzl_library.bzl", "bzl_library")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -24,6 +24,12 @@ bzl_library(
     ],
 )
 
+starlark_doc_extract(
+    name = "js_info_files.doc_extract",
+    src = "js_info_files.bzl",
+    deps = [":js_info_files"],
+)
+
 bzl_library(
     name = "js_binary",
     srcs = ["js_binary.bzl"],
@@ -38,6 +44,12 @@ bzl_library(
         "@bazel_skylib//lib:dicts",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
     ],
+)
+
+starlark_doc_extract(
+    name = "js_binary.doc_extract",
+    src = "js_binary.bzl",
+    deps = [":js_binary"],
 )
 
 bzl_library(
@@ -62,6 +74,12 @@ bzl_library(
     ],
 )
 
+starlark_doc_extract(
+    name = "js_library.doc_extract",
+    src = "js_library.bzl",
+    deps = [":js_library"],
+)
+
 bzl_library(
     name = "js_run_binary",
     srcs = ["js_run_binary.bzl"],
@@ -75,6 +93,12 @@ bzl_library(
     ],
 )
 
+starlark_doc_extract(
+    name = "js_run_binary.doc_extract",
+    src = "js_run_binary.bzl",
+    deps = [":js_run_binary"],
+)
+
 bzl_library(
     name = "js_run_devserver",
     srcs = ["js_run_devserver.bzl"],
@@ -84,6 +108,13 @@ bzl_library(
         "@bazel_skylib//lib:dicts",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
     ],
+)
+
+starlark_doc_extract(
+    name = "js_run_devserver.doc_extract",
+    src = "js_run_devserver.bzl",
+    symbol_names = ["js_run_devserver"],
+    deps = [":js_run_devserver"],
 )
 
 bzl_library(
@@ -106,4 +137,10 @@ bzl_library(
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
         "@tar.bzl//tar",
     ],
+)
+
+starlark_doc_extract(
+    name = "js_image_layer.doc_extract",
+    src = "js_image_layer.bzl",
+    deps = [":js_image_layer"],
 )

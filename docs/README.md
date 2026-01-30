@@ -331,7 +331,7 @@ Continuing our example, where we wrote a macro in `tsc.bzl`, we'd write this to 
 
 ```starlark
 load("@bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
-load("@bazel_lib//:bzl_library.bzl", "bzl_library")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 bzl_library(
     name = "tsc",
