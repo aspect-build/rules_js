@@ -12,10 +12,6 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
-            - bazel-8:
-                  without: true
-            - bazel-9:
-                  without: true
     e2e/git_dep_metadata:
         icon: npm
         tasks: *e2e_tasks
@@ -27,7 +23,19 @@ workspaces:
         tasks: *e2e_tasks
     e2e/js_image_oci:
         icon: linux
-        tasks: *e2e_tasks
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+            # Broken on bazel8?
+            - bazel-8:
+                  without: true
+            # Still depends on some WORKSPACE setup
+            - bazel-9:
+                  without: true
     # No test targets. Requires running test.sh.
     # e2e/js_run_devserver:
     e2e/npm_link_package:
@@ -80,7 +88,18 @@ workspaces:
         tasks: *e2e_tasks
     e2e/patch_from_repo:
         icon: npm
-        tasks: *e2e_tasks
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+            # Has bazel7 specific absolute label in MODULE
+            - bazel-8:
+                  without: true
+            - bazel-9:
+                  without: true
     e2e/pnpm_lockfiles:
         icon: pnpm
         tasks: *e2e_tasks
