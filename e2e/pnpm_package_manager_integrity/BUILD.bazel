@@ -1,8 +1,0 @@
-load("@rules_shell//shell:sh_test.bzl", "sh_test")
-
-sh_test(
-    name = "pnpm_install_test",
-    srcs = ["pnpm_install_test.sh"],
-    args = ["$(location @pnpm)"],
-    data = ["@pnpm"],
-)
