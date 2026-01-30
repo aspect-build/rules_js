@@ -39,7 +39,7 @@ use_repo(npm, "npm")
 # The following is just a demonstration that you can skip the npm_translate_lock feature
 # and import npm packages directly, with no lock file.
 # This is not typical use.
-# See docs in /docs/npm_import.md about the difference.
+# See docs in https://registry.bazel.build/docs/aspect_rules_js#module_extension-npm_import about the difference.
 npm.npm_import(
     name = "npm_meaning-of-life",
     package = "meaning-of-life",
