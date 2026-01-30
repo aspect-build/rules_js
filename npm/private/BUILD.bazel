@@ -1,35 +1,15 @@
 "Internal implementation details"
 
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//npm:__subpackages__"])
 
 js_library(
     name = "npm_publish_mjs",
     srcs = ["npm_publish.mjs"],
+    visibility = ["//visibility:public"],
 )
-
-exports_files(glob(["*.bzl"]))
-
-# We manually keep the generated rules documentation synced.
-# Check that the signatures stay matched.
-[
-    assert_contains(
-        name = "_test_gendocs_{}_{}".format(i, j),
-        actual = actual,
-        expected = expected,
-    )
-    for i, actual in enumerate([
-        "npm_translate_lock_generate.bzl",
-        "npm_translate_lock_generate.docs.bzl",
-    ])
-    for j, expected in enumerate([
-        """def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):""",
-        """def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):""",
-    ])
-]
 
 bzl_library(
     name = "npm_package",
@@ -47,12 +27,6 @@ bzl_library(
     ],
 )
 
-starlark_doc_extract(
-    name = "npm_package.doc_extract",
-    src = "npm_package.bzl",
-    deps = [":npm_package"],
-)
-
 bzl_library(
     name = "npm_link_package",
     srcs = ["npm_link_package.bzl"],
@@ -61,12 +35,6 @@ bzl_library(
         ":npm_package_store",
         ":utils",
     ],
-)
-
-starlark_doc_extract(
-    name = "npm_link_package.doc_extract",
-    src = "npm_link_package.bzl",
-    deps = [":npm_link_package"],
 )
 
 bzl_library(
@@ -97,6 +65,8 @@ bzl_library(
 bzl_library(
     name = "npm_import",
     srcs = ["npm_import.bzl"],
+    # It's referenced by generated repositories.
+    visibility = ["//visibility:public"],
     deps = [
         ":exclude_package_contents_presets.bzl",
         ":npm_link_package_store",
@@ -115,17 +85,9 @@ bzl_library(
     ],
 )
 
-starlark_doc_extract(
-    name = "npm_import.doc_extract",
-    src = "npm_import.bzl",
-    symbol_names = ["npm_import"],
-    deps = [":npm_import"],
-)
-
 bzl_library(
     name = "npm_translate_lock_generate",
     srcs = ["npm_translate_lock_generate.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         ":starlark_codegen_utils",
         ":utils",
@@ -139,7 +101,6 @@ bzl_library(
 bzl_library(
     name = "npm_translate_lock_helpers",
     srcs = ["npm_translate_lock_helpers.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         "@bazel_skylib//lib:new_sets",
     ],
@@ -148,7 +109,6 @@ bzl_library(
 bzl_library(
     name = "npm_translate_lock_macro_helpers",
     srcs = ["npm_translate_lock_macro_helpers.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         "@bazel_skylib//lib:dicts",
     ],
@@ -157,7 +117,6 @@ bzl_library(
 bzl_library(
     name = "npm_translate_lock_state",
     srcs = ["npm_translate_lock_state.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         ":npm_translate_lock_generate",
         ":npmrc",
@@ -192,20 +151,9 @@ bzl_library(
     ],
 )
 
-starlark_doc_extract(
-    name = "npm_translate_lock.doc_extract",
-    src = "npm_translate_lock.bzl",
-    symbol_names = [
-        "list_patches",
-        "npm_translate_lock",
-    ],
-    deps = [":npm_translate_lock"],
-)
-
 bzl_library(
     name = "utils",
     srcs = ["utils.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         "@bazel_lib//lib:paths",
         "@bazel_lib//lib:repo_utils",
@@ -218,7 +166,6 @@ bzl_library(
 bzl_library(
     name = "pnpm",
     srcs = ["pnpm.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         "//platforms/pnpm:index_bzl",
     ],
@@ -227,7 +174,6 @@ bzl_library(
 bzl_library(
     name = "transitive_closure",
     srcs = ["transitive_closure.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         "utils",
         "@bazel_skylib//lib:dicts",
@@ -237,14 +183,12 @@ bzl_library(
 bzl_library(
     name = "npm_package_internal",
     srcs = ["npm_package_internal.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [":npm_package_info"],
 )
 
 bzl_library(
     name = "npm_package_store_internal",
     srcs = ["npm_package_store_internal.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         ":npm_package_info",
         ":npm_package_store",
@@ -255,7 +199,6 @@ bzl_library(
 bzl_library(
     name = "pnpm_repository",
     srcs = ["pnpm_repository.bzl"],
-    visibility = ["//npm:__subpackages__"],
     deps = [
         ":npm_import",
         ":versions",
@@ -263,21 +206,28 @@ bzl_library(
 )
 
 bzl_library(
+    name = "pnpm_extension",
+    srcs = ["pnpm_extension.bzl"],
+    deps = [
+        ":pnpm_repository",
+        ":versions",
+        "@bazel_lib//lib:lists",
+    ],
+)
+
+bzl_library(
     name = "list_sources",
     srcs = ["list_sources.bzl"],
-    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(
     name = "npm_package_info",
     srcs = ["npm_package_info.bzl"],
-    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(
     name = "npm_package_store_info",
     srcs = ["npm_package_store_info.bzl"],
-    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(
@@ -288,17 +238,14 @@ bzl_library(
 bzl_library(
     name = "npmrc",
     srcs = ["npmrc.bzl"],
-    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(
     name = "starlark_codegen_utils",
     srcs = ["starlark_codegen_utils.bzl"],
-    visibility = ["//npm:__subpackages__"],
 )
 
 bzl_library(
     name = "versions",
     srcs = ["versions.bzl"],
-    visibility = ["//npm:__subpackages__"],
 )

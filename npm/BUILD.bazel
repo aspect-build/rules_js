@@ -19,6 +19,12 @@ bzl_library(
     ],
 )
 
+starlark_doc_extract(
+    name = "defs.doc_extract",
+    src = "defs.bzl",
+    deps = [":defs"],
+)
+
 bzl_library(
     name = "libs",
     srcs = ["libs.bzl"],
@@ -49,4 +55,27 @@ bzl_library(
         "//npm/private:npm_translate_lock",
         "//npm/private:pnpm_repository",
     ],
+)
+
+bzl_library(
+    name = "extensions",
+    srcs = ["extensions.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//npm/private:npm_import",
+        "//npm/private:npm_translate_lock",
+        "//npm/private:npm_translate_lock_generate",
+        "//npm/private:npm_translate_lock_helpers",
+        "//npm/private:npm_translate_lock_macro_helpers",
+        "//npm/private:npmrc",
+        "//npm/private:pnpm_extension",
+        "//npm/private:pnpm_repository",
+        "@bazel_lib//lib:repo_utils",
+    ],
+)
+
+starlark_doc_extract(
+    name = "extensions.doc_extract",
+    src = "extensions.bzl",
+    deps = [":extensions"],
 )
