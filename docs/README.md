@@ -311,7 +311,7 @@ Aspect has written a number of these based on rules_js, such as:
 -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for <https://terser.org/> - a JavaScript minifier
 -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for <https://rollupjs.org/> - a JavaScript bundler
 -   [rules_deno](https://github.com/aspect-build/rules_deno) - Bazel rules for Deno http://deno.land
--   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://github.com/aspect-build/rules_lint/blob/main/docs/eslint.md).
+-   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://registry.bazel.build/docs/aspect_rules_lint#lint-eslint-bzl).
 
 You can also write your own custom rule, though this is an advanced topic and not covered in this documentation.
 
@@ -363,7 +363,7 @@ Or, you can use it locally within a monorepo using [pnpm workspaces].
 
 **API docs:**
 
--   [npm_package](./npm_package.md)
+-   [npm_package](https://registry.bazel.build/docs/aspect_rules_js#function-npm_package)
 
 [pnpm]: https://pnpm.io/
 [pnpm workspaces]: https://pnpm.io/workspaces

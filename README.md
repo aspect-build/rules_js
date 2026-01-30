@@ -34,7 +34,7 @@ rules_js is just a part Aspect's monorepo developer platform:
     -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
     -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
     -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
-    -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://github.com/aspect-build/rules_lint/blob/main/docs/eslint.md).
+    -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://registry.bazel.build/docs/aspect_rules_lint#lint-eslint-bzl).
 
 ## Known issues
 
@@ -155,9 +155,8 @@ This third approach has trade-offs.
 
 -   The benefit is that very intractable problems like TypeScript's `rootDirs` just go away.
     In that example, we filed https://github.com/microsoft/TypeScript/issues/37378 but it probably
-    won't be solved, so many users trip over issues like
-    [this](https://github.com/bazelbuild/rules_nodejs/issues/3423) and
-    [this](https://github.com/bazelbuild/rules_nodejs/issues/3421). Now this just works, plus results like sourcemaps look like users expect: just like they would if the tool had written outputs in the source tree.
+    won't be solved, so many users trip over issues.
+    Now this just works, plus results like sourcemaps look like users expect: just like they would if the tool had written outputs in the source tree.
 -   The downside is that Bazel rules/macro authors (even `genrule` authors) must re-path
     inputs and outputs to account for the working directory under `bazel-out`,
     and must ensure that sources are copied there first.

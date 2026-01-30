@@ -97,7 +97,7 @@ Sometimes the package intentionally doesn't list dependencies, because it discov
 This is used for tools that locate their "plugins"; `eslint` and `prettier` are common typical examples.
 
 The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/npmrc#public-hoist-pattern).
-Use the [`public_hoist_packages` attribute of `npm_translate_lock`](./npm_translate_lock.md#npm_translate_lock-public_hoist_packages).
+Use the [`public_hoist_packages` attribute of `npm_translate_lock`](https://registry.bazel.build/docs/aspect_rules_js#npm-extensions-bzl).
 The documentation says the value provided to each element in the map is:
 
 > a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree
