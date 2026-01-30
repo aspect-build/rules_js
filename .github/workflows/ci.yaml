@@ -28,6 +28,7 @@ jobs:
           - uses: lycheeverse/lychee-action@v2.7.0
             id: lychee
             with:
+                output: ${{ env.LYCHEE_OUT }}
                 fail: false
                 args: --user-agent "curl/8.4.0" "*.md" "docs/*.md"
           - name: Fail if broken links found
