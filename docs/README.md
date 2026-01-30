@@ -44,9 +44,8 @@ Installation is included in the `MODULE.bazel` snippet you pasted from the Insta
 **API docs:**
 
 -   Choosing the version of Node.js:
-    <https://bazel-contrib.github.io/rules_nodejs/install.html>
--   Rules API: <https://bazel-contrib.github.io/rules_nodejs/Core.html>
--   The Node.js toolchain: <https://bazel-contrib.github.io/rules_nodejs/Toolchains.html>
+    <https://registry.bazel.build/docs/rules_nodejs#nodejs-repositories-bzl>
+-   The Node.js toolchain: <https://github.com/bazel-contrib/rules_nodejs/blob/main/docs/Toolchains.md>
 
 ### Fetch third-party packages from npm
 
@@ -147,8 +146,8 @@ bazel-bin/packages/some_pkg/node_modules/some_dep
 
 **API docs:**
 
--   [npm_import](./npm_import.md): Import all packages from the pnpm-lock.yaml file, or import individual packages.
--   [npm_link_package](./npm_link_package.md): Link npm package(s) into the `bazel-bin/[path/to/package]/node_modules` tree so that the Node.js runtime can resolve them.
+-   [npm_import](https://registry.bazel.build/docs/aspect_rules_js#module_extension-npm_import): Import all packages from the pnpm-lock.yaml file, or import individual packages.
+-   [npm_link_package](https://registry.bazel.build/docs/aspect_rules_js#module_extension-npm_link_package): Link npm package(s) into the `bazel-bin/[path/to/package]/node_modules` tree so that the Node.js runtime can resolve them.
 
 ### JavaScript
 
@@ -206,7 +205,7 @@ If you depend on the `typescript` npm package from a nested `package.json` such 
 load("@npm//myapp:typescript/package_json.bzl", typescript_bin = "bin")
 ```
 
-Each bin exposes three rules, one for each Bazel command ("verb"): build, test and run - each aligning with the corresponding [js_run_binary](./js_run_binary.md), [js_test](#js_test) and [js_binary](./js_binary.md) rule APIs.
+Each bin exposes three rules, one for each Bazel command ("verb"): build, test and run - each aligning with the corresponding [js_run_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_run_binary), [js_test](https://registry.bazel.build/docs/aspect_rules_js#function-js_test) and [js_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_binary) rule APIs.
 
 For example:
 
