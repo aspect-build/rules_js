@@ -207,7 +207,7 @@ Args:
 
     no_optional: If True, `optionalDependencies` are not installed.
 
-        Currently `npm_translate_lock` behaves differently from pnpm in that is downloads all `optionaDependencies`
+        Currently `npm_translate_lock` behaves differently from pnpm in that it downloads all `optionalDependencies`
         while pnpm doesn't download `optionalDependencies` that are not needed for the platform pnpm is run on.
         See https://github.com/pnpm/pnpm/pull/3672 for more context.
 
