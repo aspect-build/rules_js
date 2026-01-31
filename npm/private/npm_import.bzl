@@ -1073,7 +1073,7 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 1. Point bazel to the config with a line in .bazelrc like
 common --experimental_downloader_config=.bazel_downloader_config
 
-Read more about the downloader config: <https://blog.aspect.build/configuring-bazels-downloader>
+Read more: [Configuring Bazel's Downloader](https://blog.aspect.build/configuring-bazels-downloader).
 
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
 
@@ -1183,8 +1183,7 @@ Args:
     npm_auth_password: Auth password to authenticate with npm. When using Basic authentication.
 
     extra_build_content: Additional content to append on the generated BUILD file at the root of
-        the created repository, either as a string or a list of lines similar to
-        <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
+        the created repository, either as a string or a list of lines to concatenate.
 
     bins: Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
 
