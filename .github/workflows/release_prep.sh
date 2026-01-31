@@ -18,15 +18,7 @@ PREFIX="rules_js-${TAG:1}"
 ARCHIVE="rules_js-$TAG.tar.gz"
 git archive --format=tar --prefix="${PREFIX}/" "${TAG}" | gzip >"$ARCHIVE"
 
-# Add generated API docs to the release
-# see https://github.com/bazelbuild/bazel-central-registry/blob/main/docs/stardoc.md
-docs="$(mktemp -d)"
-targets="$(mktemp)"
-bazel --output_base="$docs" query --output=label --output_file="$targets" 'kind("starlark_doc_extract rule", //...)'
-bazel --output_base="$docs" build --target_pattern_file="$targets"
-tar --create --auto-compress \
-    --directory "$(bazel --output_base="$docs" info bazel-bin)" \
-    --file "$GITHUB_WORKSPACE/${ARCHIVE%.tar.gz}.docs.tar.gz" .
+./.github/workflows/release_docs.sh "$GITHUB_WORKSPACE/${ARCHIVE%.tar.gz}.docs.tar.gz"
 
 cat <<EOF
 
