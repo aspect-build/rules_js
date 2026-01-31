@@ -43,7 +43,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     """Generated list of npm_link_package() target generators and first-party linked packages corresponding to the packages in {pnpm_lock_label}
 
-    If you use manually-written [`npm_import`](/docs/npm_import.md#npm_import) you can link these as well, for example,
+    If you use manually-written [`npm_import`](https://registry.bazel.build/docs/aspect_rules_js#module_extension-npm_import) you can link these as well, for example,
 
         load("@npm//:defs.bzl", "npm_link_all_packages")
         load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")

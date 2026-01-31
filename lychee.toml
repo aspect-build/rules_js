@@ -1,0 +1,3 @@
+check_mail = false
+# Some domains refuse our pings, like our own blog... needs fixing
+accept = ["200", "403"]

@@ -44,9 +44,8 @@ Installation is included in the `MODULE.bazel` snippet you pasted from the Insta
 **API docs:**
 
 -   Choosing the version of Node.js:
-    <https://bazel-contrib.github.io/rules_nodejs/install.html>
--   Rules API: <https://bazel-contrib.github.io/rules_nodejs/Core.html>
--   The Node.js toolchain: <https://bazel-contrib.github.io/rules_nodejs/Toolchains.html>
+    <https://registry.bazel.build/docs/rules_nodejs#nodejs-repositories-bzl>
+-   The Node.js toolchain: <https://github.com/bazel-contrib/rules_nodejs/blob/main/docs/Toolchains.md>
 
 ### Fetch third-party packages from npm
 
@@ -147,8 +146,8 @@ bazel-bin/packages/some_pkg/node_modules/some_dep
 
 **API docs:**
 
--   [npm_import](./npm_import.md): Import all packages from the pnpm-lock.yaml file, or import individual packages.
--   [npm_link_package](./npm_link_package.md): Link npm package(s) into the `bazel-bin/[path/to/package]/node_modules` tree so that the Node.js runtime can resolve them.
+-   [npm_import](https://registry.bazel.build/docs/aspect_rules_js#module_extension-npm_import): Import all packages from the pnpm-lock.yaml file, or import individual packages.
+-   [npm_link_package](https://registry.bazel.build/docs/aspect_rules_js#module_extension-npm_link_package): Link npm package(s) into the `bazel-bin/[path/to/package]/node_modules` tree so that the Node.js runtime can resolve them.
 
 ### JavaScript
 
@@ -173,9 +172,9 @@ with a rule like [`copy_to_bin`](https://docs.aspect.build/bazel-contrib/bazel-l
 
 **API docs:**
 
--   [js_library](./js_library.md): Declare a logical grouping of JS files and their dependencies.
--   [js_binary](./js_binary.md): Declare a Node.js executable program.
--   [js_run_binary](./js_run_binary.md): Run a Node.js executable program as the "tool" in a Bazel action that produces outputs, similar to `genrule`.
+-   [js_library](https://registry.bazel.build/docs/aspect_rules_js#rule-js_library): Declare a logical grouping of JS files and their dependencies.
+-   [js_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_binary): Declare a Node.js executable program.
+-   [js_run_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_run_binary): Run a Node.js executable program as the "tool" in a Bazel action that produces outputs, similar to `genrule`.
 
 ### Using binaries published to npm
 
@@ -206,7 +205,7 @@ If you depend on the `typescript` npm package from a nested `package.json` such 
 load("@npm//myapp:typescript/package_json.bzl", typescript_bin = "bin")
 ```
 
-Each bin exposes three rules, one for each Bazel command ("verb"): build, test and run - each aligning with the corresponding [js_run_binary](./js_run_binary.md), [js_test](#js_test) and [js_binary](./js_binary.md) rule APIs.
+Each bin exposes three rules, one for each Bazel command ("verb"): build, test and run - each aligning with the corresponding [js_run_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_run_binary), [js_test](https://registry.bazel.build/docs/aspect_rules_js#function-js_test) and [js_binary](https://registry.bazel.build/docs/aspect_rules_js#function-js_binary) rule APIs.
 
 For example:
 
@@ -312,7 +311,7 @@ Aspect has written a number of these based on rules_js, such as:
 -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for <https://terser.org/> - a JavaScript minifier
 -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for <https://rollupjs.org/> - a JavaScript bundler
 -   [rules_deno](https://github.com/aspect-build/rules_deno) - Bazel rules for Deno http://deno.land
--   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://github.com/aspect-build/rules_lint/blob/main/docs/eslint.md).
+-   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://registry.bazel.build/docs/aspect_rules_lint#lint-eslint-bzl).
 
 You can also write your own custom rule, though this is an advanced topic and not covered in this documentation.
 
@@ -364,7 +363,7 @@ Or, you can use it locally within a monorepo using [pnpm workspaces].
 
 **API docs:**
 
--   [npm_package](./npm_package.md)
+-   [npm_package](https://registry.bazel.build/docs/aspect_rules_js#function-npm_package)
 
 [pnpm]: https://pnpm.io/
 [pnpm workspaces]: https://pnpm.io/workspaces
