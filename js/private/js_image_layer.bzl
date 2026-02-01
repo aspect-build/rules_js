@@ -160,8 +160,6 @@ oci_image_index(
 )
 ```
 
-## Performance
-
 For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
 
 The matching order for layer groups is as follows:
