@@ -414,7 +414,10 @@ pnpm = module_extension(
                     default = DEFAULT_PNPM_VERSION,
                 ),
                 "pnpm_version_from": attr.label(
-                    doc = "Label to a package.json file to read the pnpm version from. It should be in the packageManager attribute.",
+                    doc = """Label to a package.json file to read the pnpm version from.
+
+                    It should appear as an attribute like `"packageManager": "pnpm@10.20.0"`
+                    """,
                     default = None,
                 ),
                 "pnpm_version_integrity": attr.string(),
