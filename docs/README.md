@@ -77,7 +77,7 @@ Technically, we run a port of pnpm rather than pnpm itself. Here are some design
 1. We re-use pnpm's resolver, by consuming the `pnpm-lock.yaml` file it produces.
 1. We use Bazel's downloader API to fetch package tarballs and extract them to external repositories.
    To modify the URLs Bazel uses to download packages (for example, to fetch from Artifactory), read
-   <https://blog.aspect.build/configuring-bazels-downloader>.
+   [Configuring Bazel's Downloader](https://blog.aspect.build/configuring-bazels-downloader).
 1. We re-use the [`@pnpm/lifecycle`](https://www.npmjs.com/package/@pnpm/lifecycle) package to perform postinstall steps.
    (These run as cacheable Bazel actions.)
 1. Finally, you link the `node_modules` tree by adding a `npm_link_package` or `npm_link_all_packages` in your `BUILD` file,

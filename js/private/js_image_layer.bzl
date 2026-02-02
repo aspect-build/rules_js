@@ -160,8 +160,6 @@ oci_image_index(
 )
 ```
 
-## Performance
-
 For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
 
 The matching order for layer groups is as follows:
@@ -555,8 +553,8 @@ By default symlinks within the `node_modules` is preserved.
         "layer_groups": attr.string_dict(
             doc = """Layer groups to create.
 These are utilized to categorize files into distinct layers, determined by their respective paths.
-The expected format for each entry is "<key>": "<value>", where <key> MUST be a valid Bazel and
-JavaScript identifier (alphanumeric characters), and <value> MAY be either an empty string (signifying a universal match)
+The expected format for each entry is `"<key>": "<value>"`, where `<key>` MUST be a valid Bazel and
+JavaScript identifier (alphanumeric characters), and `<value>` MAY be either an empty string (signifying a universal match)
 or a valid regular expression.""",
         ),
     },

@@ -1,5 +1,31 @@
-"""Adapt npm repository rules to be called from MODULE.bazel
-See https://bazel.build/docs/bzlmod#extension-definition
+"""Setup steps, or [extensions](https://bazel.build/docs/bzlmod#extension-definition) for pnpm.
+
+These are used in `MODULE.bazel` files to pin tooling versions, for example assuming
+
+- the desired version of Node.js is specified in a `.nvmrc` file
+- the desired version of pnpm is specified in the `package.json#packageManager` field
+- package manager preferences (especially `hoist=false`) is in `.npmrc`
+- pnpm dependencies were resolved and locked using `pnpm-lock.yaml`
+
+then the following `MODULE.bazel` file can be used:
+
+```starlark
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(node_version_from_nvmrc = "//:.nvmrc")
+use_repo(node, "nodejs_toolchains")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+use_repo(pnpm, "pnpm")
+pnpm.pnpm(pnpm_version_from = "//:package.json")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
+use_repo(npm, "npm")
+```
 """
 
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
@@ -388,7 +414,10 @@ pnpm = module_extension(
                     default = DEFAULT_PNPM_VERSION,
                 ),
                 "pnpm_version_from": attr.label(
-                    doc = "Label to a package.json file to read the pnpm version from. It should be in the packageManager attribute.",
+                    doc = """Label to a package.json file to read the pnpm version from.
+
+                    It should appear as an attribute like `"packageManager": "pnpm@10.20.0"`
+                    """,
                     default = None,
                 ),
                 "pnpm_version_integrity": attr.string(),
