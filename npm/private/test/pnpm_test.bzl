@@ -105,7 +105,7 @@ def _latest(ctx):
     # - Accept a brittle test.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": "sha512-fX27yp6ZRHt8O/enMoavqva+mSUeuUmLrvp9QGiS9nuHmts6HX5of8TMwaOIxxdfuq5WeiarRNEGe1T8sNajFg==", "include_npm": False}},
+        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": "sha512-QYcvA3rSL3NI47Heu69+hnz9RI8nJtnPdMCPGVB8MdLI56EVJbmD/rwt9kC1Q43uYCPrsfhO1DzC1lTSvDJiZA==", "include_npm": False}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "latest")),
         ],
