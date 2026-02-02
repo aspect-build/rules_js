@@ -1,7 +1,7 @@
 """npmrc utils"""
 
 def parse_npmrc(npmrc_content):
-    """Parse an `.npmrc` file in into key/value map.
+    """Parse an `.npmrc` file into a key/value map.
 
     `.npmrc` files are in [INI](https://en.wikipedia.org/wiki/INI_file#Format) format but we don't
     treat keys as [case insensitive](https://en.wikipedia.org/wiki/INI_file#Case_sensitivity) due

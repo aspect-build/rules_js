@@ -1006,7 +1006,7 @@ _ATTRS_LINKS = _COMMON_ATTRS | {
         For example:
 
         ```
-        lifecycle_hooks_execution_requirements: ["no-sandbox', "requires-network"]
+        lifecycle_hooks_execution_requirements: ["no-sandbox", "requires-network"]
         ```
 
         This defaults to ["no-sandbox"] to limit the overhead of sandbox creation and copying the output
@@ -1017,7 +1017,7 @@ _ATTRS_LINKS = _COMMON_ATTRS | {
 
         See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
 
-        This defaults to False reduce the negative effects of `use_default_shell_env`.
+        This defaults to False to reduce the negative effects of `use_default_shell_env`.
     """),
     "package_visibility": attr.string_list(default = ["//visibility:public"], doc = "Visibility of generated node_module link targets."),
     "replace_package": attr.string(doc = """
@@ -1149,8 +1149,8 @@ npm_link_types_node()
 
 This links `@types/node` into the `node_modules` of this package with the target name `:node_modules/@types/node`.
 
-A `:node_modules/@types/node/dir` filegroup target is also created that provides the the directory artifact of the npm package.
-This target can be used to create entry points for binary target or to access files within the npm package.
+A `:node_modules/@types/node/dir` filegroup target is also created that provides the directory artifact of the npm package.
+These targets can be used to create entry points for binary target or to access files within the npm package.
 
 NB: You can choose any target name for the link target but we recommend using the `node_modules/@scope/name` and
 `node_modules/name` convention for readability.
@@ -1164,8 +1164,8 @@ npm_link_all_packages()
 ```
 
 This creates `:node_modules/name` and `:node_modules/@scope/name` targets for all direct npm dependencies in the package.
-It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the the directory artifacts of their npm packages.
-These target can be used to create entry points for binary target or to access files within the npm package.
+It also creates `:node_modules/name/dir` and `:node_modules/@scope/name/dir` filegroup targets that provide the directory artifacts of their npm packages.
+These targets can be used to create entry points for binary targets or to access files within the npm package.
 
 If you have a mix of `npm_link_all_packages` and `npm_link_imported_package` functions to call you can pass the
 `npm_link_imported_package` link functions to the `imported_links` attribute of `npm_link_all_packages` to link
@@ -1182,7 +1182,7 @@ npm_link_all_packages(
 )
 ```
 
-This has the added benefit of adding the `imported_links` to the convienence `:node_modules` target which
+This has the added benefit of adding the `imported_links` to the convenience `:node_modules` target which
 includes all direct dependencies in that package.
 
 NB: You can pass an name to npm_link_all_packages and this will change the targets generated to "{name}/@scope/name" and
