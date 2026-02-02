@@ -1,6 +1,6 @@
 "Internal implementation details"
 
-load("@bazel_lib//:bzl_library.bzl", "bzl_library")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 package(default_visibility = ["//visibility:public"])
 

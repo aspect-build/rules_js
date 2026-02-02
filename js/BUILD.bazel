@@ -1,6 +1,6 @@
 "Public API"
 
-load("@bazel_lib//:bzl_library.bzl", "bzl_library")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 exports_files(
     glob(["*.bzl"]),
@@ -19,6 +19,12 @@ bzl_library(
         "//js/private:js_run_devserver",
         "@aspect_tools_telemetry_report//:defs.bzl",
     ],
+)
+
+starlark_doc_extract(
+    name = "defs.doc_extract",
+    src = "defs.bzl",
+    deps = [":defs"],
 )
 
 bzl_library(

@@ -942,10 +942,23 @@ def _to_deps_attr(deps, deps_oss, deps_cpus):
     )
 
 _COMMON_ATTRS = {
-    "package": attr.string(mandatory = True),
-    "root_package": attr.string(),
-    "version": attr.string(mandatory = True),
-    "exclude_package_contents": attr.string_list(default = []),
+    "package": attr.string(mandatory = True, doc = "Name of the npm package, such as `acorn` or `@types/node`"),
+    "root_package": attr.string(doc = """
+        The root package where the node_modules package store is linked to.
+        Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
+    """),
+    "version": attr.string(mandatory = True, doc = "Version of the npm package, such as `8.4.0`"),
+    "exclude_package_contents": attr.string_list(default = [], doc = """
+        List of glob patterns to exclude from the linked package.
+
+        This is useful for excluding files that are not needed in the linked package.
+
+        For example:
+
+        ```
+        exclude_package_contents = ["**/tests/**"]
+        ```
+    """),
     "exclude_package_contents_presets": attr.string_list(default = ["basic"]),
 }
 
@@ -954,34 +967,147 @@ _INTERNAL_COMMON_ATTRS = {
 }
 
 _ATTRS_LINKS = _COMMON_ATTRS | {
-    "bins": attr.string_dict(),
-    "deps": attr.string_dict(doc = "Mapping of dependency link names to package store keys"),
+    "bins": attr.string_dict(doc = """
+        Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
+
+        This is typically derived from the "bin" attribute in the package.json
+        file of the npm package being linked.
+
+        For example:
+
+        ```
+        bins = {
+            "foo": "./foo.js",
+            "bar": "./bar.js",
+        }
+        ```
+
+        In the future, this field may be automatically populated by npm_translate_lock
+        from information in the pnpm lock file. That feature is currently blocked on
+        https://github.com/pnpm/pnpm/issues/5131.
+    """),
+    "deps": attr.string_dict(doc = "A dict other npm packages this one depends on where the key is the package name and value is the version"),
     "lifecycle_build_target": attr.bool(),
-    "lifecycle_hooks_env": attr.string_list(),
-    "lifecycle_hooks_execution_requirements": attr.string_list(default = ["no-sandbox"]),
-    "lifecycle_hooks_use_default_shell_env": attr.bool(),
-    "package_visibility": attr.string_list(default = ["//visibility:public"]),
-    "replace_package": attr.string(),
+    "lifecycle_hooks_env": attr.string_list(doc = """
+        Environment variables set for the lifecycle hooks action for this npm
+        package if there is one.
+
+        Environment variables are defined by providing an array of "key=value" entries.
+
+        For example:
+
+        ```
+        lifecycle_hooks_env: ["PREBULT_BINARY=https://downloadurl"],
+        ```
+    """),
+    "lifecycle_hooks_execution_requirements": attr.string_list(default = ["no-sandbox"], doc = """
+        Execution requirements when running the lifecycle hooks.
+
+        For example:
+
+        ```
+        lifecycle_hooks_execution_requirements: ["no-sandbox', "requires-network"]
+        ```
+
+        This defaults to ["no-sandbox"] to limit the overhead of sandbox creation and copying the output
+        TreeArtifact out of the sandbox.
+    """),
+    "lifecycle_hooks_use_default_shell_env": attr.bool(doc = """
+        If True, the `use_default_shell_env` attribute of lifecycle hook actions is set to True.
+
+        See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
+
+        This defaults to False reduce the negative effects of `use_default_shell_env`.
+    """),
+    "package_visibility": attr.string_list(default = ["//visibility:public"], doc = "Visibility of generated node_module link targets."),
+    "replace_package": attr.string(doc = """
+        Use the specified npm_package target when linking instead of the fetched sources for this npm package.
+
+        The injected npm_package target may optionally contribute transitive npm package dependencies on top
+        of the transitive dependencies specified in the pnpm lock file for the same package, however, these
+        transitive dependencies must not collide with pnpm lock specified transitive dependencies.
+
+        Any patches specified for this package will be not applied to the injected npm_package target. They
+        will be applied, however, to the fetches sources so they can still be useful for patching the fetched
+        `package.json` file, which is used to determine the generated bin entries for the package.
+
+        NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
+        the injected npm_package. These may be disabled explicitly using the `lifecycle_hooks` attribute.
+    """),
 }
 
 _ATTRS = _COMMON_ATTRS | {
-    "commit": attr.string(),
-    "custom_postinstall": attr.string(),
-    "extra_build_content": attr.string(),
+    "commit": attr.string(doc = "Specific commit to be checked out if url is a git repository."),
+    "custom_postinstall": attr.string(doc = """
+        Custom string postinstall script to run on the installed npm package.
+
+        Runs after any existing lifecycle hooks if any are enabled.
+    """),
+    "extra_build_content": attr.string(doc = """
+        Additional content to append on the generated BUILD file at the root of
+        the created repository, either as a string or a list of lines to concatenate.
+    """),
     "extract_full_archive": attr.bool(),
-    "integrity": attr.string(),
-    "lifecycle_hooks": attr.string_list(),
-    "npm_auth": attr.string(),
-    "npm_auth_basic": attr.string(),
-    "npm_auth_password": attr.string(),
-    "npm_auth_username": attr.string(),
-    "patch_tool": attr.label(),
-    "patch_args": attr.string_list(default = ["-p0"]),
-    "patches": attr.label_list(),
-    "url": attr.string(),
+    "integrity": attr.string(doc = """
+        Expected checksum of the file downloaded, in Subresource Integrity format.
+        This must match the checksum of the file downloaded.
+
+        This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.
+
+        It is a security risk to omit the checksum as remote files can change.
+
+        At best omitting this field will make your build non-hermetic.
+
+        It is optional to make development easier but should be set before shipping.
+    """),
+    "lifecycle_hooks": attr.string_list(doc = "List of lifecycle hook `package.json` scripts to run for this package if they exist."),
+    "npm_auth": attr.string(doc = "Auth token to authenticate with npm. When using Bearer authentication."),
+    "npm_auth_basic": attr.string(doc = """
+        Auth token to authenticate with npm. When using Basic authentication.
+
+        This is typically the base64 encoded string "username:password".
+    """),
+    "npm_auth_password": attr.string(doc = "Auth password to authenticate with npm. When using Basic authentication."),
+    "npm_auth_username": attr.string(doc = "Auth username to authenticate with npm. When using Basic authentication."),
+    "patch_tool": attr.label(doc = "The patch tool to use. If not specified, the `patch` from `PATH` is used."),
+    "patch_args": attr.string_list(default = ["-p0"], doc = """
+        Arguments to pass to the patch tool.
+
+        `-p1` will usually be needed for patches generated by git.
+    """),
+    "patches": attr.label_list(doc = "Patch files to apply onto the downloaded npm package."),
+    "url": attr.string(doc = """
+        Optional url for this package. If unset, a default npm registry url is generated from
+        the package name and version.
+
+        May start with `git+ssh://` or `git+https://` to indicate a git repository. For example,
+
+        ```
+        git+ssh://git@github.com/org/repo.git
+        ```
+
+        If url is configured as a git repository, the commit attribute must be set to the
+        desired commit.
+    """),
 }
 
-_DOCS = """Import a single npm package into Bazel.
+def _get_bin_entries(pkg_json, package):
+    # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
+    bin = pkg_json.get("bin", {})
+    if type(bin) != "dict":
+        bin = {paths.basename(package): bin}
+    return bin
+
+def _make_generated_by_prefix(package_key):
+    # empty line after bzl docstring since buildifier expects this if this file is vendored in
+    return "\"@generated by @aspect_rules_js//npm/private:npm_import.bzl for npm package {package_key}\"\n".format(
+        package_key = package_key,
+    )
+
+npm_import_lib = struct(
+    attrs = _ATTRS | _ATTRS_LINKS,
+    doc = """\
+Import a single npm package into Bazel.
 
 Normally you'd want to use `npm_translate_lock` to import all your packages at once.
 It generates `npm_import` rules.
@@ -1073,166 +1199,10 @@ To change the proxy URL we use to fetch, configure the Bazel downloader:
 1. Point bazel to the config with a line in .bazelrc like
 common --experimental_downloader_config=.bazel_downloader_config
 
-Read more about the downloader config: <https://blog.aspect.build/configuring-bazels-downloader>
+Read more: [Configuring Bazel's Downloader](https://blog.aspect.build/configuring-bazels-downloader).
 
 [UrlRewriterConfig]: https://github.com/bazelbuild/bazel/blob/4.2.1/src/main/java/com/google/devtools/build/lib/bazel/repository/downloader/UrlRewriterConfig.java#L66
-
-Args:
-    name: Name for this repository rule
-
-    package: Name of the npm package, such as `acorn` or `@types/node`
-
-    version: Version of the npm package, such as `8.4.0`
-
-    deps: A dict other npm packages this one depends on where the key is the package name and value is the version
-
-    root_package: The root package where the node_modules package store is linked to.
-        Typically this is the package that the pnpm-lock.yaml file is located when using `npm_translate_lock`.
-
-    lifecycle_hooks: List of lifecycle hook `package.json` scripts to run for this package if they exist.
-
-    lifecycle_hooks_env: Environment variables set for the lifecycle hooks action for this npm
-        package if there is one.
-
-        Environment variables are defined by providing an array of "key=value" entries.
-
-        For example:
-
-        ```
-        lifecycle_hooks_env: ["PREBULT_BINARY=https://downloadurl"],
-        ```
-
-    lifecycle_hooks_execution_requirements: Execution requirements when running the lifecycle hooks.
-
-        For example:
-
-        ```
-        lifecycle_hooks_execution_requirements: ["no-sandbox', "requires-network"]
-        ```
-
-        This defaults to ["no-sandbox"] to limit the overhead of sandbox creation and copying the output
-        TreeArtifact out of the sandbox.
-
-    lifecycle_hooks_use_default_shell_env: If True, the `use_default_shell_env` attribute of lifecycle hook
-        actions is set to True.
-
-        See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
-
-        This defaults to False reduce the negative effects of `use_default_shell_env`.
-
-    integrity: Expected checksum of the file downloaded, in Subresource Integrity format.
-        This must match the checksum of the file downloaded.
-
-        This is the same as appears in the pnpm-lock.yaml, yarn.lock or package-lock.json file.
-
-        It is a security risk to omit the checksum as remote files can change.
-
-        At best omitting this field will make your build non-hermetic.
-
-        It is optional to make development easier but should be set before shipping.
-
-    url: Optional url for this package. If unset, a default npm registry url is generated from
-        the package name and version.
-
-        May start with `git+ssh://` or `git+https://` to indicate a git repository. For example,
-
-        ```
-        git+ssh://git@github.com/org/repo.git
-        ```
-
-        If url is configured as a git repository, the commit attribute must be set to the
-        desired commit.
-
-    commit: Specific commit to be checked out if url is a git repository.
-
-    replace_package: Use the specified npm_package target when linking instead of the fetched sources for this npm package.
-
-        The injected npm_package target may optionally contribute transitive npm package dependencies on top
-        of the transitive dependencies specified in the pnpm lock file for the same package, however, these
-        transitive dependencies must not collide with pnpm lock specified transitive dependencies.
-
-        Any patches specified for this package will be not applied to the injected npm_package target. They
-        will be applied, however, to the fetches sources so they can still be useful for patching the fetched
-        `package.json` file, which is used to determine the generated bin entries for the package.
-
-        NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on
-        the injected npm_package. These may be disabled explicitly using the `lifecycle_hooks` attribute.
-
-    package_visibility: Visibility of generated node_module link targets.
-
-    patch_tool: The patch tool to use. If not specified, the `patch` from `PATH` is used.
-
-    patch_args: Arguments to pass to the patch tool.
-
-        `-p1` will usually be needed for patches generated by git.
-
-    patches: Patch files to apply onto the downloaded npm package.
-
-    custom_postinstall: Custom string postinstall script to run on the installed npm package.
-
-        Runs after any existing lifecycle hooks if any are enabled.
-
-    npm_auth: Auth token to authenticate with npm. When using Bearer authentication.
-
-    npm_auth_basic: Auth token to authenticate with npm. When using Basic authentication.
-
-        This is typically the base64 encoded string "username:password".
-
-    npm_auth_username: Auth username to authenticate with npm. When using Basic authentication.
-
-    npm_auth_password: Auth password to authenticate with npm. When using Basic authentication.
-
-    extra_build_content: Additional content to append on the generated BUILD file at the root of
-        the created repository, either as a string or a list of lines similar to
-        <https://github.com/bazelbuild/bazel-skylib/blob/main/docs/write_file_doc.md>.
-
-    bins: Dictionary of `node_modules/.bin` binary files to create mapped to their node entry points.
-
-        This is typically derived from the "bin" attribute in the package.json
-        file of the npm package being linked.
-
-        For example:
-
-        ```
-        bins = {
-            "foo": "./foo.js",
-            "bar": "./bar.js",
-        }
-        ```
-
-        In the future, this field may be automatically populated by npm_translate_lock
-        from information in the pnpm lock file. That feature is currently blocked on
-        https://github.com/pnpm/pnpm/issues/5131.
-
-    exclude_package_contents: List of glob patterns to exclude from the linked package.
-
-        This is useful for excluding files that are not needed in the linked package.
-
-        For example:
-
-        ```
-        exclude_package_contents = ["**/tests/**"]
-        ```
-
-    **kwargs: Internal use only
-"""
-
-def _get_bin_entries(pkg_json, package):
-    # https://docs.npmjs.com/cli/v7/configuring-npm/package-json#bin
-    bin = pkg_json.get("bin", {})
-    if type(bin) != "dict":
-        bin = {paths.basename(package): bin}
-    return bin
-
-def _make_generated_by_prefix(package_key):
-    # empty line after bzl docstring since buildifier expects this if this file is vendored in
-    return "\"@generated by @aspect_rules_js//npm/private:npm_import.bzl for npm package {package_key}\"\n".format(
-        package_key = package_key,
-    )
-
-npm_import_lib = struct(
-    attrs = _ATTRS | _ATTRS_LINKS,
-    doc = _DOCS,
+""",
 )
 
 npm_import_links_rule = repository_rule(

@@ -23,11 +23,9 @@ nextjs_build(
 )
 ```
 
-# Macros
-
 There are two sets of macros for building Next.js applications: standard and standalone.
 
-## Standard
+### Standard Build
 
 - `nextjs()`: wrap the build+dev+start targets
 - `nextjs_build()`: the Next.js [build](https://nextjs.org/docs/app/building-your-application/deploying#production-builds) command
@@ -35,7 +33,7 @@ There are two sets of macros for building Next.js applications: standard and sta
 - `nextjs_start()`: the Next.js [start](https://nextjs.org/docs/app/building-your-application/deploying#nodejs-server) command,
    accepting a Next.js build artifact to start
 
-## Standalone
+### Standalone Mode
 
 For [standalone applications](https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files):
 - `nextjs_standalone_build()`: the Next.js [build](https://nextjs.org/docs/app/building-your-application/deploying#production-builds) command,
