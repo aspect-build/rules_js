@@ -169,7 +169,7 @@ def npm_package(
 
     7. `replace_prefixes`
 
-    For more information each filters / transformations applied, see
+    For more information on each filters / transformations applied, see
     the documentation for the specific filter / transformation attribute.
 
     Glob patterns are supported. Standard wildcards (globbing patterns) plus the `**` doublestar (aka. super-asterisk)
@@ -193,7 +193,7 @@ def npm_package(
     for more details).
 
     `npm_package` can also include npm packages sources and default runfiles from `srcs` which `copy_to_directory` does not.
-    These behaviors can be configured with the `include_npm_sourfes` and `include_runfiles` attributes
+    These behaviors can be configured with the `include_npm_sources` and `include_runfiles` attributes
     respectively.
 
     The default `include_srcs_packages`, `[".", "./**"]`, prevents files from outside of the target's
@@ -217,7 +217,7 @@ def npm_package(
             `NpmPackageStoreInfo` providers are gathered from `JsInfo` of the targets specified. Targets can be linked npm
             packages, npm package store targets or other targets that provide `JsInfo`. This is done directly from the
             `npm_package_store_infos` field of these. For linked npm package targets, the underlying npm_package_store
-            target(s) that back the links is used.
+            target(s) that back the links are used.
 
             Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies of this npm package when
             linking with `npm_link_package`.
@@ -229,14 +229,14 @@ def npm_package(
             If set, the package name set here will be used for linking if a npm_link_package does not specify a package name. A
             npm_link_package that specifies a package name will override the value here when linking.
 
-            If unset, a npm_link_package that references this npm_package must define the package name must be for linking.
+            If unset, a npm_link_package that references this npm_package must define the package name for linking.
 
         version: The package version. If set, should match the `version` field in the `package.json` file for this package.
 
             If set, a npm_link_package may omit the package version and the package version set here will be used for linking. A
             npm_link_package that specifies a package version will override the value here when linking.
 
-            If unset, a npm_link_package that references this npm_package must define the package version must be for linking.
+            If unset, a npm_link_package that references this npm_package must define the package version for linking.
 
         root_paths: List of paths (with glob support) that are roots in the output directory.
 
@@ -245,7 +245,7 @@ def npm_package(
             instead of the path relative to the file's workspace. If there are multiple
             root paths that match, the longest match wins.
 
-            Matching is done on the parent directory of the output file path so a trailing '**' glob patterm
+            Matching is done on the parent directory of the output file path so a trailing '**' glob pattern
             will match only up to the last path segment of the dirname and will not include the basename.
             Only complete path segments are matched. Partial matches on the last segment of the root path
             are ignored.
@@ -255,7 +255,7 @@ def npm_package(
             A `"."` value expands to the target's package path (`ctx.label.package`).
 
             Defaults to `["."]` which results in the output directory path of files in the
-            target's package and and sub-packages are relative to the target's package and
+            target's package and sub-packages are relative to the target's package and
             files outside of that retain their full workspace relative paths.
 
             Globs are supported (see rule docstring above).
@@ -316,7 +316,7 @@ def npm_package(
             Defaults to ["**/node_modules/**"] which excludes all node_modules folders
             from the output directory.
 
-            Files that have do not have matching Bazel packages are subject to subsequent
+            Files that do not have matching Bazel packages are subject to subsequent
             filters and transformations to determine if they are copied and what their path in the output
             directory will be.
 

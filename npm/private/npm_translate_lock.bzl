@@ -152,7 +152,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 
             See [use_default_shell_env](https://bazel.build/rules/lib/builtins/actions#run.use_default_shell_env)
 
-            This defaults to False reduce the negative effects of `use_default_shell_env`.
+            This defaults to False to reduce the negative effects of `use_default_shell_env`.
 
             Read more: [lifecycles](/docs/pnpm.md#lifecycles)
         """),
@@ -294,7 +294,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
         "verify_patches": attr.label(doc = """
             Label to a patch list file.
 
-            Use this in together with the `list_patches` macro to guarantee that all patches in a patch folder
+            Use this together with the `list_patches` macro to guarantee that all patches in a patch folder
             are included in the `patches` attribute.
 
             For example:

@@ -119,14 +119,14 @@ _ATTRS = {
         doc = """The package name to link to.
 
 If unset, the package name in the `NpmPackageInfo` src must be set.
-If set, takes precendance over the package name in the `NpmPackageInfo` src.
+If set, takes precedence over the package name in the `NpmPackageInfo` src.
 """,
     ),
     "version": attr.string(
         doc = """The package version being linked.
 
 If unset, the package version in the `NpmPackageInfo` src must be set.
-If set, takes precendance over the package version in the `NpmPackageInfo` src.
+If set, takes precedence over the package version in the `NpmPackageInfo` src.
 """,
     ),
     "hardlink": attr.string(

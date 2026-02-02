@@ -29,7 +29,7 @@ _ATTRS = {
         doc = """The package name to link to.
 
 If unset, the package name of the src npm_package_store is used.
-If set, takes precendance over the package name in the src npm_package_store.
+If set, takes precedence over the package name in the src npm_package_store.
 """,
     ),
     "dev": attr.bool(
@@ -108,7 +108,7 @@ def _npm_link_package_store_impl(ctx):
         store_js_info.transitive_sources,
     ])
 
-    # Additional npm_sources required to to run the package, in addition to other
+    # Additional npm_sources required to run the package, in addition to other
     # data included in JsInfo provider.
     npm_sources = depset(files, transitive = [
         store_info.transitive_files,

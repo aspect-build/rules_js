@@ -162,7 +162,7 @@ and Bazel places generated files in `bazel-bin/[path/to/package]`. This leaves s
 copied to this location.
 
 > Copying sources to the bazel-bin folder is surprising if you come from a Bazel background, as other
-> Bazel rulesets accomodate tooling by teaching it to mix a source folder and an output folder.
+> Bazel rulesets accommodate tooling by teaching it to mix a source folder and an output folder.
 > This is not possible with Node.js, without breaking compatibility of many tools.
 
 Our custom rules will take care of copying their sources to the `bazel-bin` output folder automatically.

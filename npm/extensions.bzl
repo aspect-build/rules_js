@@ -350,7 +350,7 @@ of the transitive dependencies specified in the pnpm lock file for their respect
 transitive dependencies must not collide with pnpm lock specified transitive dependencies.
 
 Any patches specified for the packages will be not applied to the injected package targets. They
-will be applied, however, to the fetches sources for their respecitve packages so they can still be useful
+will be applied, however, to the fetched sources for their respective packages so they can still be useful
 for patching the fetched `package.json` files, which are used to determine the generated bin entries for packages.
 
 NB: lifecycle hooks and custom_postinstall scripts, if implicitly or explicitly enabled, will be run on

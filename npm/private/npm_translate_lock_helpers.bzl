@@ -479,7 +479,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         result.append(result_pkg)
 
     # Check that all patches files specified were used; this is a defense-in-depth since it is too
-    # easy to make a type in the patches keys or for a dep to change both of with could result
+    # easy to make a typo in the patches keys or for a dep to change both of which could result
     # in a patch file being silently ignored.
     for key in attr.patches.keys():
         if key not in patches_used:
