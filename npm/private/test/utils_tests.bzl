@@ -126,6 +126,24 @@ def test_npm_registry_download_url(ctx):
     )
     return unittest.end(env)
 
+# buildifier: disable=function-docstring
+def test_hex_to_base64(ctx):
+    given_expected = {
+        "382877d089ed5e47e31d364e0dc88c163e8a8e5e8e6aeb6b537e9f77931394d89fb142f1d1d18d32536e3added79d98241048a700b1cfbce9d7167777fa8c502": "OCh30IntXkfjHTZODciMFj6Kjl6OautrU36fd5MTlNifsULx0dGNMlNuOt3tedmCQQSKcAsc+86dcWd3f6jFAg==",
+        "cf78dac1faa7faafffb89023bdf584c5cc4e219db349c376a7afc93f1dc00a08fa365732dae800646f8d99aeaa665ae85596d721c424efface8d25889f07c870": "z3jawfqn+q//uJAjvfWExcxOIZ2zScN2p6/JPx3ACgj6Nlcy2ugAZG+Nma6qZlroVZbXIcQk7/rOjSWInwfIcA==",
+        "bf28e5b00a825846c3b50e57ca6468d2a0f86ba9703be0193898d15ad5807203b7982408861e1f80275325dc6aa40bd06a7889c8b71166a072fc0e5fe0e5db29": "vyjlsAqCWEbDtQ5XymRo0qD4a6lwO+AZOJjRWtWAcgO3mCQIhh4fgCdTJdxqpAvQaniJyLcRZqBy/A5f4OXbKQ==",
+        "a3aeb971bcc746dd0c2c9b2050745833ee09c2c7d173f1d8e357b37239db2faf59deb5bab122754d874bd54a31c473c5af1b4096375de5501bc11e3f86e14392": "o665cbzHRt0MLJsgUHRYM+4JwsfRc/HY41ezcjnbL69Z3rW6sSJ1TYdL1UoxxHPFrxtAljdd5VAbwR4/huFDkg==",
+        "0f3707ebd2828c3e96e492629d6b3efcb4c03f71cb662fe4db432170a6fb622e14fb0647f5e1db307a282482ded220a2ccdfda92d6a652269e207e72c45ea5d6": "DzcH69KCjD6W5JJinWs+/LTAP3HLZi/k20MhcKb7Yi4U+wZH9eHbMHooJILe0iCizN/aktamUiaeIH5yxF6l1g==",
+    }
+    env = unittest.begin(ctx)
+    for given, expected in given_expected.items():
+        asserts.equals(
+            env,
+            expected,
+            utils.hex_to_base64(given),
+        )
+    return unittest.end(env)
+
 t1_test = unittest.make(test_bazel_name)
 t2_test = unittest.make(test_pnpm_name)
 t3_test = unittest.make(test_friendly_name)
@@ -134,6 +152,7 @@ t6_test = unittest.make(test_parse_package_name)
 t7_test = unittest.make(test_npm_registry_download_url)
 t8_test = unittest.make(test_npm_registry_url)
 t9_test = unittest.make(test_link_version)
+t10_test = unittest.make(test_hex_to_base64)
 
 def utils_tests(name):
     unittest.suite(
@@ -146,4 +165,5 @@ def utils_tests(name):
         t7_test,
         t8_test,
         t9_test,
+        t10_test,
     )
