@@ -140,13 +140,11 @@ def _friendly_name(name, version):
 
 def _make_directory_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
-    kwargs = {
-        "output": symlink,
-        "target_path": relative_file(target_path, symlink.path),
-    }
+    relative_target = relative_file(target_path, symlink.path)
     if _SUPPORTS_SYMLINK_TARGET_TYPE:
-        kwargs["target_type"] = "directory"
-    ctx.actions.symlink(**kwargs)
+        ctx.actions.symlink(output = symlink, target_path = relative_target, target_type = "directory")
+    else:
+        ctx.actions.symlink(output = symlink, target_path = relative_target)
     return symlink
 
 def _parse_package_name(package):
@@ -318,7 +316,6 @@ utils = struct(
     reverse_force_copy = _reverse_force_copy,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
-    supports_symlink_target_type = _SUPPORTS_SYMLINK_TARGET_TYPE,
 )
 
 # Exported only to be tested
