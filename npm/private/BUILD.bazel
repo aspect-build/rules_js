@@ -155,6 +155,7 @@ bzl_library(
     name = "utils",
     srcs = ["utils.bzl"],
     deps = [
+        "@bazel_features//:features",
         "@bazel_lib//lib:paths",
         "@bazel_lib//lib:repo_utils",
         "@bazel_lib//lib:utils",

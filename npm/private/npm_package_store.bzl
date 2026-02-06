@@ -1,5 +1,6 @@
 "npm_package_store rule"
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
@@ -8,6 +9,10 @@ load("//js/private:js_info.bzl", "JsInfo", "js_info")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
+
+_SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
+
+_PACKAGE_STORE_PREFIX_LEN = len("node_modules/" + utils.package_store_root)
 
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
@@ -154,8 +159,6 @@ If set, takes precedence over the package version in the `NpmPackageInfo` src.
         doc = """If true, prints out verbose logs to stdout""",
     ),
 }
-
-_PACKAGE_STORE_PREFIX_LEN = len("node_modules/" + utils.package_store_root)
 
 def _npm_package_store_impl(ctx):
     if ctx.attr.src:
@@ -326,7 +329,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.repo_name, jsinfo.target.package)
         else:
             target_path = "{}/{}".format(ctx.bin_dir.path, jsinfo.target.package)
-        package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
+        package_store_directory = utils.make_directory_symlink(ctx, symlink_path, target_path)
     elif not ctx.attr.src:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
         # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
@@ -493,8 +496,9 @@ def _symlink_package_store(ctx, package_store_name, target, name):
         name,
     )
     symlink = ctx.actions.declare_symlink(store_symlink_path)
-    ctx.actions.symlink(
-        output = symlink,
-        target_path = ("../../.." if "/" in name else "../..") + target,
-    )
+    target_path = ("../../.." if "/" in name else "../..") + target
+    if _SUPPORTS_SYMLINK_TARGET_TYPE:
+        ctx.actions.symlink(output = symlink, target_path = target_path, target_type = "directory")
+    else:
+        ctx.actions.symlink(output = symlink, target_path = target_path)
     return symlink

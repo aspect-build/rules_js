@@ -1,8 +1,15 @@
 "Utility functions for npm rules"
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_lib//lib:paths.bzl", "relative_file")
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+
+# Bazel 9+ supports target_type="directory" on ctx.actions.symlink which creates
+# junctions instead of file symlinks on Windows. Without this, Node.js gets EPERM
+# when traversing symlinks created by declare_symlink on Bazel 8+/Windows.
+# See https://github.com/bazelbuild/bazel/issues/26701
+_SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
 DEFAULT_REGISTRY_DOMAIN = "registry.npmjs.org"
@@ -134,12 +141,13 @@ def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
-def _make_symlink(ctx, symlink_path, target_path):
+def _make_directory_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
-    ctx.actions.symlink(
-        output = symlink,
-        target_path = relative_file(target_path, symlink.path),
-    )
+    relative_target = relative_file(target_path, symlink.path)
+    if _SUPPORTS_SYMLINK_TARGET_TYPE:
+        ctx.actions.symlink(output = symlink, target_path = relative_target, target_type = "directory")
+    else:
+        ctx.actions.symlink(output = symlink, target_path = relative_target)
     return symlink
 
 def _parse_package_name(package):
@@ -352,7 +360,7 @@ utils = struct(
     importer_to_link = _importer_to_link,
     package_repo_name = _package_repo_name,
     package_store_name = _package_store_name,
-    make_symlink = _make_symlink,
+    make_directory_symlink = _make_directory_symlink,
     # Symlinked node_modules structure package store path under node_modules
     package_store_root = ".aspect_rules_js",
     # Suffix for npm_import links repository
