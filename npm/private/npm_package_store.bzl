@@ -1,5 +1,6 @@
 "npm_package_store rule"
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
@@ -8,6 +9,10 @@ load("//js/private:js_info.bzl", "JsInfo", "js_info")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
+
+_SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
+
+_PACKAGE_STORE_PREFIX_LEN = len("node_modules/" + utils.package_store_root)
 
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
@@ -182,6 +187,10 @@ def _npm_package_store_impl(ctx):
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
 
+    package_store_prefix_len = _PACKAGE_STORE_PREFIX_LEN
+    if ctx.label.package:
+        package_store_prefix_len += len(ctx.label.package) + 1
+
     package_key = "{}@{}".format(package, version)
     package_store_name = utils.package_store_name(package_key)
     package_store_directory = None
@@ -282,7 +291,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             if dep_package_store_directory:
                 linked_package_store_directories.append(dep_package_store_directory)
                 for dep_alias in dep_aliases:
-                    files.append(_symlink_package_store(ctx, package_store_name, dep_package_store_directory, dep_alias))
+                    target = dep_package_store_directory.short_path[package_store_prefix_len:]
+                    files.append(_symlink_package_store(ctx, package_store_name, target, dep_alias))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm dependency will create the dep symlinks for this dep;
@@ -296,7 +306,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
             # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
             if dep_package_store_directory not in linked_package_store_directories:
-                files.append(_symlink_package_store(ctx, package_store_name, dep_package_store_directory, dep_info.package))
+                target = dep_package_store_directory.short_path[package_store_prefix_len:]
+                files.append(_symlink_package_store(ctx, package_store_name, target, dep_info.package))
 
                 # Include the store info of all linked dependencies
                 npm_package_store_infos.append(dep_info)
@@ -357,8 +368,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 actual_dep = deps_map[dep_ref_dep_key]
                 dep_ref_def_package_store_directory = actual_dep[NpmPackageStoreInfo].package_store_directory
                 if dep_ref_def_package_store_directory:
+                    target = dep_ref_def_package_store_directory.short_path[package_store_prefix_len:]
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
-                        files.append(_symlink_package_store(ctx, dep_package_store_name, dep_ref_def_package_store_directory, dep_ref_dep_alias))
+                        files.append(_symlink_package_store(ctx, dep_package_store_name, target, dep_ref_dep_alias))
     else:
         # We should _never_ get here
         fail("Internal error")
@@ -476,11 +488,17 @@ def npm_local_package_store_internal(package_store_name, package, version, src, 
 
 # Util for creating the symlink for a package store dependency referencing
 # another package store entry.
-def _symlink_package_store(ctx, package_store_name, target_directory, name):
+def _symlink_package_store(ctx, package_store_name, target, name):
     # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
     store_symlink_path = "node_modules/{}/{}/node_modules/{}".format(
         utils.package_store_root,
         package_store_name,
         name,
     )
-    return utils.make_directory_symlink(ctx, store_symlink_path, target_directory.path)
+    symlink = ctx.actions.declare_symlink(store_symlink_path)
+    target_path = ("../../.." if "/" in name else "../..") + target
+    if _SUPPORTS_SYMLINK_TARGET_TYPE:
+        ctx.actions.symlink(output = symlink, target_path = target_path, target_type = "directory")
+    else:
+        ctx.actions.symlink(output = symlink, target_path = target_path)
+    return symlink
