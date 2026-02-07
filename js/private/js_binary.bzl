@@ -324,7 +324,6 @@ _ATTRS = {
     ),
     "_fs_patch_native": attr.label(
         allow_single_file = True,
-        cfg = "exec",
         default = Label("@aspect_rules_js//js/private/fs_patches_native:fs_patch_native"),
     ),
 }
@@ -491,7 +490,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{node_wrapper}}": node_wrapper.short_path,
         "{{node}}": node_path,
         "{{npm}}": npm_path,
-        "{{fs_patch_native}}": ctx.file._fs_patch_native.short_path if (ctx.attr.patch_node_fs and not is_windows) else "",
+        "{{fs_patch_native}}": ctx.file._fs_patch_native.short_path if (ctx.attr.patch_node_fs and not is_windows and (ctx.file._fs_patch_native.basename.endswith(".so") or ctx.file._fs_patch_native.basename.endswith(".dylib"))) else "",
         "{{workspace_name}}": ctx.workspace_name,
     }
 
@@ -538,7 +537,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
     if ctx.attr.patch_node_fs and not is_windows and ctx.file._fs_patch_native:
-        launcher_files.append(ctx.file._fs_patch_native)
+        # Only include the native fs patch library (not the noop placeholder).
+        # Native FS patching is currently only supported on Linux x86_64.
+        if ctx.file._fs_patch_native.basename.endswith(".so") or ctx.file._fs_patch_native.basename.endswith(".dylib"):
+            launcher_files.append(ctx.file._fs_patch_native)
     transitive_launcher_files = None
     if ctx.attr.include_npm:
         transitive_launcher_files = nodeinfo.npm_sources

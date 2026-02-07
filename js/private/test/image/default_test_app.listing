@@ -15,7 +15,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/fs_patches_native/
--r-xr-xr-x  0 0      0       21112 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/fs_patches_native/fs_patch_linux.so
+-r-xr-xr-x  0 0      0       17008 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/fs_patches_native/fs_patch_linux.so
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/
