@@ -1,0 +1,47 @@
+package(default_visibility = ["//visibility:private"])
+
+cc_library(
+    name = "fs_patch_common",
+    srcs = [
+        "fs_patch_common.c",
+        "fs_patch_init.c",
+    ],
+    hdrs = ["fs_patch.h"],
+    copts = ["-fPIC", "-Wall", "-Wextra", "-std=c11"],
+    linkopts = ["-ldl"],
+    visibility = [
+        "//js/private:__pkg__",
+        "//js/private/fs_patches_native/test:__pkg__",
+    ],
+)
+
+cc_binary(
+    name = "fs_patch_linux.so",
+    srcs = ["fs_patch_linux.c"],
+    copts = ["-fPIC", "-Wall", "-Wextra", "-std=c11"],
+    linkshared = True,
+    linkopts = ["-ldl"],
+    target_compatible_with = ["@platforms//os:linux"],
+    deps = [":fs_patch_common"],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "fs_patch_macos.dylib",
+    srcs = ["fs_patch_macos.c"],
+    copts = ["-fPIC", "-Wall", "-Wextra", "-std=c11"],
+    linkshared = True,
+    linkopts = ["-ldl"],
+    target_compatible_with = ["@platforms//os:macos"],
+    deps = [":fs_patch_common"],
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "fs_patch_native",
+    actual = select({
+        "@platforms//os:linux": ":fs_patch_linux.so",
+        "@platforms//os:macos": ":fs_patch_macos.dylib",
+    }),
+    visibility = ["//visibility:public"],
+)
