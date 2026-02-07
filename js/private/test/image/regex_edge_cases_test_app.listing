@@ -3,7 +3,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/
--r-xr-xr-x  0 0      0       xxxxx Jan  1  1970 ./app/js/private/test/image/bin
+-r-xr-xr-x  0 0      0       25132 Jan  1  1970 ./app/js/private/test/image/bin
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/examples/
@@ -15,10 +15,12 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.
 -r-xr-xr-x  0 0      0         336 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/examples/npm_package/packages/pkg_d/package.json
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/fs_patches_native/
+-r-xr-xr-x  0 0      0       21112 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/fs_patches_native/fs_patch_linux.so
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/image/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/
--r-xr-xr-x  0 0      0       xxxxx Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/bin
+-r-xr-xr-x  0 0      0       25132 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/bin
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/
 -r-xr-xr-x  0 0      0         133 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/node
 -r-xr-xr-x  0 0      0          20 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/test/image/main.js

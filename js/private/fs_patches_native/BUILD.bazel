@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
@@ -7,7 +9,12 @@ cc_library(
         "fs_patch_init.c",
     ],
     hdrs = ["fs_patch.h"],
-    copts = ["-fPIC", "-Wall", "-Wextra", "-std=c11"],
+    copts = [
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-std=c11",
+    ],
     linkopts = ["-ldl"],
     visibility = [
         "//js/private:__pkg__",
@@ -18,23 +25,40 @@ cc_library(
 cc_binary(
     name = "fs_patch_linux.so",
     srcs = ["fs_patch_linux.c"],
-    copts = ["-fPIC", "-Wall", "-Wextra", "-std=c11"],
-    linkshared = True,
+    copts = [
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-std=c11",
+    ],
     linkopts = ["-ldl"],
+    linkshared = True,
     target_compatible_with = ["@platforms//os:linux"],
-    deps = [":fs_patch_common"],
     visibility = ["//visibility:public"],
+    deps = [":fs_patch_common"],
 )
 
 cc_binary(
     name = "fs_patch_macos.dylib",
     srcs = ["fs_patch_macos.c"],
-    copts = ["-fPIC", "-Wall", "-Wextra", "-std=c11"],
-    linkshared = True,
+    copts = [
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-std=c11",
+    ],
     linkopts = ["-ldl"],
+    linkshared = True,
     target_compatible_with = ["@platforms//os:macos"],
-    deps = [":fs_patch_common"],
     visibility = ["//visibility:public"],
+    deps = [":fs_patch_common"],
+)
+
+# Noop placeholder for platforms without native FS patching (e.g., Windows)
+genrule(
+    name = "_fs_patch_noop",
+    outs = ["fs_patch_noop"],
+    cmd = "touch $@",
 )
 
 alias(
@@ -42,6 +66,7 @@ alias(
     actual = select({
         "@platforms//os:linux": ":fs_patch_linux.so",
         "@platforms//os:macos": ":fs_patch_macos.dylib",
+        "//conditions:default": ":_fs_patch_noop",
     }),
     visibility = ["//visibility:public"],
 )

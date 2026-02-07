@@ -474,7 +474,9 @@ if [ -z "${JS_BINARY__FS_PATCH_ROOTS:-}" ]; then
 fi
 export JS_BINARY__FS_PATCH_ROOTS
 
-# Configure native fs patch library (LD_PRELOAD / DYLD_INSERT_LIBRARIES)
+# Configure native fs patch library (LD_PRELOAD on Linux)
+# Note: DYLD_INSERT_LIBRARIES on macOS is not used due to arm64/arm64e architecture
+# incompatibility on macOS 15+ and SIP restrictions. macOS relies on JS-level patches.
 fs_patch_native="js/private/fs_patches_native/fs_patch_linux.so"
 if [ "$fs_patch_native" ] && [ "${JS_BINARY__PATCH_NODE_FS:-}" != "0" ]; then
     if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
@@ -485,14 +487,6 @@ if [ "$fs_patch_native" ] && [ "${JS_BINARY__PATCH_NODE_FS:-}" != "0" ]; then
 
     if [ -f "$fs_patch_native_path" ]; then
         case "$(uname -s)" in
-        Darwin*)
-            if [ -z "${DYLD_INSERT_LIBRARIES:-}" ]; then
-                export DYLD_INSERT_LIBRARIES="$fs_patch_native_path"
-            else
-                export DYLD_INSERT_LIBRARIES="$fs_patch_native_path:$DYLD_INSERT_LIBRARIES"
-            fi
-            logf_debug "DYLD_INSERT_LIBRARIES %s" "$DYLD_INSERT_LIBRARIES"
-            ;;
         Linux*)
             if [ -z "${LD_PRELOAD:-}" ]; then
                 export LD_PRELOAD="$fs_patch_native_path"

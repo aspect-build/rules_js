@@ -324,6 +324,7 @@ _ATTRS = {
     ),
     "_fs_patch_native": attr.label(
         allow_single_file = True,
+        cfg = "exec",
         default = Label("@aspect_rules_js//js/private/fs_patches_native:fs_patch_native"),
     ),
 }
