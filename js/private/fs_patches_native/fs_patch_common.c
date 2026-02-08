@@ -251,25 +251,7 @@ char *guarded_realpath(const char *path, char *resolved_path) {
 
         struct stat st;
         if (orig_lstat(next, &st) != 0) {
-            /* Component doesn't exist.
-             * If there are remaining components, it's ENOENT.
-             * But we still need to return the path up to here
-             * with the remaining tail for the caller. */
-            char *rest = strtok_r(NULL, "", &saveptr);
-            if (rest && *rest) {
-                /* Append remaining path after the non-existent component */
-                char full[PATH_MAX];
-                snprintf(full, PATH_MAX, "%s/%s", next, rest);
-                char normed[PATH_MAX];
-                if (normalize_path(full, normed)) {
-                    if (resolved_path) {
-                        memcpy(resolved_path, normed, strlen(normed) + 1);
-                        return resolved_path;
-                    } else {
-                        return strdup(normed);
-                    }
-                }
-            }
+            /* Component doesn't exist — propagate ENOENT like real realpath(). */
             errno = ENOENT;
             return NULL;
         }
