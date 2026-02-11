@@ -4,8 +4,6 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 package(default_visibility = ["//visibility:public"])
 
-exports_files(glob(["*.bzl"]))
-
 exports_files([
     "js_binary.sh.tpl",
     "node_wrapper.bat",
@@ -21,6 +19,17 @@ bzl_library(
     deps = [
         ":js_helpers",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
+    ],
+)
+
+bzl_library(
+    name = "proto",
+    srcs = ["proto.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":js_helpers",
+        "//js:providers",
+        "@protobuf//bazel/common:proto_info_bzl",
     ],
 )
 
@@ -56,6 +65,7 @@ bzl_library(
     deps = [
         ":js_helpers",
         ":js_info",
+        ":proto",
         "@bazel_lib//lib:copy_to_bin",
         "@bazel_skylib//lib:dicts",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
