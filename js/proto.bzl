@@ -6,11 +6,11 @@ See
 """
 
 load("@protobuf//bazel/toolchains:proto_lang_toolchain.bzl", "proto_lang_toolchain")
-load("//js/private:proto.bzl", "GEN_ES_PLUGIN_TOOLCHAIN")
+load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN")
 
 def js_proto_toolchain(name, **kwargs):
     proto_lang_toolchain(
         name = name,
-        toolchain_type = GEN_ES_PLUGIN_TOOLCHAIN,
+        toolchain_type = LANG_PROTO_TOOLCHAIN,
         **kwargs
     )
