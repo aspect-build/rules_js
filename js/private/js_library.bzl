@@ -26,6 +26,7 @@ js_library(
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_runfiles")
 load(":js_info.bzl", "JsInfo", "js_info")
+load(":proto.bzl", "js_proto_aspect")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
 and derivative rule sets.
@@ -101,6 +102,7 @@ runtime dependency on this target.
 {linked_npm_deps}
 """.format(linked_npm_deps = _LINKED_NPM_DEPS_DOCSTRING),
         providers = [JsInfo],
+        aspects = [js_proto_aspect],
     ),
     "data": attr.label_list(
         doc = """Runtime dependencies to include in binaries/tests that depend on this target.
