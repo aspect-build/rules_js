@@ -28,7 +28,14 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//js/private:proto",
+        "@protobuf//bazel/toolchains:proto_lang_toolchain_bzl",
     ],
+)
+
+starlark_doc_extract(
+    name = "proto.doc_extract",
+    src = "proto.bzl",
+    deps = [":proto"],
 )
 
 bzl_library(
