@@ -23,7 +23,7 @@ gen_es.protoc_gen_es_binary(
 ### Usage
 
 Just write `proto_library` targets as usual, or have Gazelle generate them.
-Then reference them anywhere a js_library could appear, for example:
+Then reference them anywhere a `js_library` could appear, for example:
 
 ```starlark
 load("@aspect_rules_js//js:defs.bzl", "js_library")
@@ -41,7 +41,7 @@ js_library(
 )
 ```
 
-The generator you setup earlier will be invoked automatically as an action to generate the .js and .d.ts files.
+The generator you setup earlier will be invoked automatically as an action to generate the `.js` and `.d.ts` files.
 """
 
 load("@protobuf//bazel/toolchains:proto_lang_toolchain.bzl", "proto_lang_toolchain")
@@ -77,10 +77,9 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
 
         plugin_options: (List of strings) Command line flags used to invoke the plugin, based on documentation for the generator.
 
-            For example, for @bufbuild/protoc-gen-es, reference
+            For example, for `@bufbuild/protoc-gen-es`, reference the documentation at
             https://github.com/bufbuild/protobuf-es/tree/main/packages/protoc-gen-es#plugin-options
-
-            `["--es_opt=import_extension=js", "--es_out=$(OUT)"]`
+            to arrive at a value like `["import_extension=js"]`
 
         plugin_bin: The plugin to use. This should be a label of a binary target that you declared in step 2 above.
         runtime: The runtime to use, which is imported by the generated code. For example, "//:node_modules/@bufbuild/protobuf".
