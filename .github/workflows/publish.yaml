@@ -36,7 +36,7 @@ jobs:
             publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
     trigger_docsite:
         runs-on: ubuntu-latest
-        needs: ["publish"]
+        needs: ['publish']
         steps:
             - name: Trigger stardoc pipeline for docs.aspect.build
               uses: peter-evans/repository-dispatch@v4
@@ -48,4 +48,4 @@ jobs:
                   # Requires "Read and write" permissions for "Contents" to be able to do the workflow dispatch.
                   token: ${{ secrets.ASPECT_DOCS_REPO_ACCESS_TOKEN }}
                   event-type: on-docs-trigger
-                  client-payload: '{"release_tag": "${{ inputs.tag_name }}"}'
+                  client-payload: '{"release_tag": "${{ inputs.tag_name }}", "ruleset_repo": "${{ github.repository }}"}'
