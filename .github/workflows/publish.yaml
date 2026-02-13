@@ -34,3 +34,18 @@ jobs:
         secrets:
             # Necessary to push to the BCR fork, and to open a pull request against a registry
             publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}
+    trigger_docsite:
+        runs-on: ubuntu-latest
+        needs: ["publish"]
+        steps:
+            - name: Trigger stardoc pipeline for docs.aspect.build
+              uses: peter-evans/repository-dispatch@v4
+              with:
+                  repository: aspect-build/docs
+                  # Fine-grained PAT (https://github.com/settings/personal-access-tokens/new), which needs
+                  # to be exchanged once a year.
+                  # Scoped to the `bazel-contrib/bcr-ui` repository.
+                  # Requires "Read and write" permissions for "Contents" to be able to do the workflow dispatch.
+                  token: ${{ secrets.ASPECT_DOCS_REPO_ACCESS_TOKEN }}
+                  event-type: on-docs-trigger
+                  client-payload: '{"release_tag": "${{ inputs.tag_name }}"}'
