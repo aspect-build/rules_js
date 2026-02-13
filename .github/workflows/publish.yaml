@@ -44,7 +44,6 @@ jobs:
                   repository: aspect-build/docs
                   # Fine-grained PAT (https://github.com/settings/personal-access-tokens/new), which needs
                   # to be exchanged once a year.
-                  # Scoped to the `bazel-contrib/bcr-ui` repository.
                   # Requires "Read and write" permissions for "Contents" to be able to do the workflow dispatch.
                   token: ${{ secrets.ASPECT_DOCS_REPO_ACCESS_TOKEN }}
                   event-type: on-docs-trigger
