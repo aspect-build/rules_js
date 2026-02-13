@@ -36,8 +36,7 @@ jobs:
         uses: ./.github/workflows/release.yaml
         with:
             tag_name: ${{ needs.tag.outputs.new-tag-version }}
-        secrets:
-            BCR_PUBLISH_TOKEN: ${{ secrets.BCR_PUBLISH_TOKEN }}
+        secrets: inherit
         if: needs.tag.outputs.new-tag == 'true' && needs.tag.outputs.new-tag-version-type != 'major'
         permissions:
             id-token: write

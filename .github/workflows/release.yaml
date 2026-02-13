@@ -10,6 +10,8 @@ on:
         secrets:
             BCR_PUBLISH_TOKEN:
                 required: true
+            ASPECT_DOCS_REPO_ACCESS_TOKEN:
+                required: true
     # Or, developers can manually push a tag from their clone
     push:
         tags:
@@ -32,3 +34,4 @@ jobs:
             tag_name: ${{ inputs.tag_name || github.ref_name }}
         secrets:
             BCR_PUBLISH_TOKEN: ${{ secrets.BCR_PUBLISH_TOKEN }}
+            ASPECT_DOCS_REPO_ACCESS_TOKEN: ${{ secrets.ASPECT_DOCS_REPO_ACCESS_TOKEN }}
