@@ -12,7 +12,7 @@ load(":utils.bzl", "utils")
 
 _SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
 
-_PACKAGE_STORE_PREFIX_LEN = len("node_modules/" + utils.package_store_root)
+_PACKAGE_STORE_PREFIX_LEN = len("node_modules/{}/".format(utils.package_store_root))
 
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
@@ -189,7 +189,9 @@ def _npm_package_store_impl(ctx):
 
     package_store_prefix_len = _PACKAGE_STORE_PREFIX_LEN
     if ctx.label.package:
-        package_store_prefix_len += len(ctx.label.package) + 1
+        package_store_prefix_len += len(ctx.label.package)
+    if ctx.label.repo_name:
+        package_store_prefix_len += len(ctx.label.repo_name) + 3  # +3 for ../
 
     package_key = "{}@{}".format(package, version)
     package_store_name = utils.package_store_name(package_key)
@@ -496,7 +498,7 @@ def _symlink_package_store(ctx, package_store_name, target, name):
         name,
     )
     symlink = ctx.actions.declare_symlink(store_symlink_path)
-    target_path = ("../../.." if "/" in name else "../..") + target
+    target_path = ("../../../" if "/" in name else "../../") + target
     if _SUPPORTS_SYMLINK_TARGET_TYPE:
         ctx.actions.symlink(output = symlink, target_path = target_path, target_type = "directory")
     else:
