@@ -111,8 +111,13 @@ jobs:
                     --instrument_test_targets \
                     //...
 
-            - name: ./test.sh
-              run: ./test.sh
+            - name: Optional ./test.sh
+              run: |
+                  if [[ -f ./test.sh ]]; then
+                    ./test.sh
+                  else
+                    echo "No test.sh in ${PWD}; skipping"
+                  fi
 
     # Mac/Windows smoke tests - only e2e/bzlmod
     # Only run on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
