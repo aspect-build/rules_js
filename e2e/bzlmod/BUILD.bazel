@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -52,13 +52,53 @@ jasmine_bin.jasmine_test(
     target_compatible_with = not_windows,
 )
 
+# Verifies :node_modules targets can be built
 build_test(
     name = "node_modules_test",
-    targets = ["//:node_modules"],
+    targets = [
+        ":node_modules",
+        ":node_modules/chalk",
+        ":node_modules/jasmine",
+        ":node_modules/meaning-of-life",
+    ],
+)
+
+# Verifies :node_modules targets within another module can be built
+build_test(
+    name = "other_module_linked_packages",
+    targets = [
+        "@other_module//:node_modules",
+        "@other_module//:node_modules/pyright",
+        "@other_module//:node_modules/less",
+    ],
 )
 
 # Verifies that a `js_binary` target from another module can be built
 build_test(
     name = "other_module_binary_test",
     targets = ["@other_module//:pyright"],
+)
+
+# Verifies that a `js_binary` target from another module can be run
+build_test(
+    name = "other_module_run_binary_test",
+    targets = [
+        # TODO: https://github.com/aspect-build/rules_js/issues/2725
+        # js_run_binary() in @other_repo
+        # "@other_module//:my.css",
+
+        # js_run_binary() running a binary in @other_repo
+        ":run_other_module_binary_test",
+    ],
+)
+
+js_run_binary(
+    name = "run_other_module_binary_test",
+    srcs = ["my.less"],
+    outs = ["other-module-my.css"],
+    args = [
+        "my.less",
+        "other-module-my.css",
+    ],
+    tool = "@other_module//:lessc",  # A js_binary() tool in a different repo
 )

@@ -5,6 +5,7 @@
         ]
     },
     "dependencies": {
+        "less": "4.1.3",
         "pyright": "1.1.373"
     }
 }
