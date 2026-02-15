@@ -18,12 +18,24 @@ var MessageType;
     MessageType["CYCLE_COMPLETED"] = "CYCLE_COMPLETED";
     MessageType["NEGOTIATE"] = "NEGOTIATE";
     MessageType["NEGOTIATE_RESPONSE"] = "NEGOTIATE_RESPONSE";
+    MessageType["CAPS"] = "CAPS";
+    MessageType["CAPS_RESPONSE"] = "CAPS_RESPONSE";
     MessageType["EXIT"] = "EXIT";
 })(MessageType || (MessageType = {}));
 // Environment constants
 const { JS_BINARY__LOG_DEBUG: JS_BINARY__LOG_DEBUG$1 } = process.env;
+function selectVersion(versions) {
+    if (versions.includes(1)) {
+        return 1;
+    }
+    if (versions.includes(0)) {
+        return 0;
+    }
+    throw new Error(`No supported protocol versions: ${versions.join(', ')}`);
+}
 class AspectWatchProtocol {
     constructor(socketFile) {
+        this._version = -1;
         this.socketFile = socketFile;
         this.connection = new net.Socket({});
         // Propagate connection errors to a configurable callback
@@ -33,7 +45,7 @@ class AspectWatchProtocol {
      * Establish a connection to the Aspect Watcher server and complete the initial
      * handshake + negotiation.
      */
-    async connect() {
+    async connect(requestedCaps = {}) {
         await new Promise((resolve, reject) => {
             // Initial connection + success vs failure
             this.connection.once('error', reject);
@@ -47,9 +59,19 @@ class AspectWatchProtocol {
                 this.connection.off('error', reject);
             }
         });
-        await this._receive(MessageType.NEGOTIATE);
-        // TODO: throw if unsupported version
-        await this._send(MessageType.NEGOTIATE_RESPONSE, { version: 0 });
+        const { versions } = await this._receive(MessageType.NEGOTIATE);
+        const version = selectVersion(versions);
+        await this._send(MessageType.NEGOTIATE_RESPONSE, { version });
+        this._version = version;
+        if (version >= 1) {
+            await this._send(MessageType.CAPS, {
+                caps: requestedCaps,
+            });
+            const { caps: actualCaps } = await this._receive(MessageType.CAPS_RESPONSE);
+            if (JS_BINARY__LOG_DEBUG$1) {
+                console.log('AspectWatchProtocol[connect]: negotiated capabilities:', actualCaps);
+            }
+        }
         return this;
     }
     /**
@@ -58,7 +80,7 @@ class AspectWatchProtocol {
     async disconnect() {
         if (this.connection.writable) {
             try {
-                await this._send(MessageType.EXIT);
+                await this._send(MessageType.EXIT, {});
             }
             catch (e) {
                 if (JS_BINARY__LOG_DEBUG$1) {
@@ -162,7 +184,7 @@ class AspectWatchProtocol {
             }
         });
     }
-    async _send(type, data = {}) {
+    async _send(type, data) {
         await new Promise((resolve, reject) => {
             try {
                 this.connection.write(JSON.stringify(Object.assign({ kind: type }, data)) + '\n', function (err) {
