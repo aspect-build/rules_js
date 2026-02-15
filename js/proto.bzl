@@ -9,13 +9,11 @@ In a future release of rules_js this should become stable.
    In this example we'll show `@bufbuild/protoc-gen-es` that produces both message marshaling and service stubs for JavaScript and TypeScript.
    It should be added as a devDependency in your `package.json`, typically under a `/tools` directory.
    The generator is expected to produce `.js` and `.d.ts` files for each .proto file.
-2. Declare a binary target that runs the generator, typically using its package_json.bzl entry point, for example:
+2. Declare a binary target that runs the generator, typically using its package_json.bzl entry point, for example in `tools/toolchains/BUILD`:
 
 ```starlark
 load("@npm//tools:@bufbuild/protoc-gen-es/package_json.bzl", gen_es = "bin")
-gen_es.protoc_gen_es_binary(
-    name = "protoc_gen_es",
-)
+gen_es.protoc_gen_es_binary(name = "protoc_gen_es")
 ```
 3. Define a `js_proto_toolchain` that uses the plugin. See the rule documentation below.
 4. Update `MODULE.bazel` to register it, typically with a simple statement like `register_toolchains("//tools/toolchains:all")`
@@ -54,7 +52,7 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
 
     ```starlark
     js_proto_toolchain(
-        name = "gen_es_protoc_plugin",
+        name = "gen_es_toolchain",
         plugin_bin = ":protoc_gen_es",
         plugin_name = "es",
         # See https://github.com/bufbuild/protobuf-es/tree/main/packages/protoc-gen-es#plugin-options
@@ -81,7 +79,7 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
             https://github.com/bufbuild/protobuf-es/tree/main/packages/protoc-gen-es#plugin-options
             to arrive at a value like `["import_extension=js"]`
 
-        plugin_bin: The plugin to use. This should be a label of a binary target that you declared in step 2 above.
+        plugin_bin: The plugin to use. This should be the label of a binary target that you declared in step 2 above.
         runtime: The runtime to use, which is imported by the generated code. For example, "//:node_modules/@bufbuild/protobuf".
 
             Note that node module resolution requires the runtime to be in a parent folder of any package containing generated code.
