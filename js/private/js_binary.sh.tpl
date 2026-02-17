@@ -357,9 +357,7 @@ if [ -z "${JS_BINARY__FS_PATCH_ROOTS:-}" ]; then
 fi
 export JS_BINARY__FS_PATCH_ROOTS
 
-# Configure native fs patch library (LD_PRELOAD on Linux)
-# Note: DYLD_INSERT_LIBRARIES on macOS is not used due to arm64/arm64e architecture
-# incompatibility on macOS 15+ and SIP restrictions. macOS relies on JS-level patches.
+# Configure native fs patch library (LD_PRELOAD on Linux, DYLD_INSERT_LIBRARIES on macOS)
 fs_patch_native="{{fs_patch_native}}"
 if [ "$fs_patch_native" ] && [ "${JS_BINARY__PATCH_NODE_FS:-}" != "0" ]; then
     if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
@@ -377,6 +375,14 @@ if [ "$fs_patch_native" ] && [ "${JS_BINARY__PATCH_NODE_FS:-}" != "0" ]; then
                 export LD_PRELOAD="$fs_patch_native_path:$LD_PRELOAD"
             fi
             logf_debug "LD_PRELOAD %s" "$LD_PRELOAD"
+            ;;
+        Darwin*)
+            # On macOS, DYLD_INSERT_LIBRARIES is stripped by SIP when the exec chain
+            # passes through system binaries (/bin/bash, /usr/bin/env). Instead, pass
+            # the path via a SIP-safe env var. The node wrapper will set
+            # DYLD_INSERT_LIBRARIES right before exec'ing the node binary.
+            export JS_BINARY__NATIVE_PATCH_PATH="$fs_patch_native_path"
+            logf_debug "JS_BINARY__NATIVE_PATCH_PATH %s" "$JS_BINARY__NATIVE_PATCH_PATH"
             ;;
         esac
     else

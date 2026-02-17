@@ -62,10 +62,25 @@ config_setting(
     ],
 )
 
+config_setting(
+    name = "_is_macos_arm64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+config_setting(
+    name = "_is_macos_x86_64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
 # Noop placeholder for unsupported platforms.
-# Native FS patching is currently only supported on Linux x86_64.
-# - macOS: DYLD_INSERT_LIBRARIES requires arm64e on macOS 15+ (not supported yet)
-# - ARM: cross-compilation requires a CC toolchain for the target platform
+# Native FS patching is supported on Linux x86_64 and macOS (arm64 + x86_64).
+# ARM Linux cross-compilation requires a CC toolchain for the target platform.
 genrule(
     name = "_fs_patch_noop",
     outs = ["fs_patch_noop"],
@@ -76,6 +91,8 @@ alias(
     name = "fs_patch_native",
     actual = select({
         ":_is_linux_x86_64": ":fs_patch_linux.so",
+        ":_is_macos_arm64": ":fs_patch_macos.dylib",
+        ":_is_macos_x86_64": ":fs_patch_macos.dylib",
         "//conditions:default": ":_fs_patch_noop",
     }),
     visibility = ["//visibility:public"],
