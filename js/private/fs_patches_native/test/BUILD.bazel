@@ -1,0 +1,15 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+package(default_visibility = ["//visibility:private"])
+
+cc_test(
+    name = "test_common",
+    srcs = ["test_common.c"],
+    deps = ["//js/private/fs_patches_native:fs_patch_common"],
+)
+
+cc_test(
+    name = "test_realpath",
+    srcs = ["test_realpath.c"],
+    deps = ["//js/private/fs_patches_native:fs_patch_common"],
+)

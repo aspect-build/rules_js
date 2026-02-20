@@ -1,0 +1,99 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
+package(default_visibility = ["//visibility:private"])
+
+cc_library(
+    name = "fs_patch_common",
+    srcs = [
+        "fs_patch_common.c",
+        "fs_patch_init.c",
+    ],
+    hdrs = ["fs_patch.h"],
+    copts = [
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-std=c11",
+    ],
+    linkopts = ["-ldl"],
+    visibility = [
+        "//js/private:__pkg__",
+        "//js/private/fs_patches_native/test:__pkg__",
+    ],
+)
+
+cc_binary(
+    name = "fs_patch_linux.so",
+    srcs = ["fs_patch_linux.c"],
+    copts = [
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-std=c11",
+    ],
+    linkopts = ["-ldl"],
+    linkshared = True,
+    target_compatible_with = ["@platforms//os:linux"],
+    visibility = ["//visibility:public"],
+    deps = [":fs_patch_common"],
+)
+
+cc_binary(
+    name = "fs_patch_macos.dylib",
+    srcs = ["fs_patch_macos.c"],
+    copts = [
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-std=c11",
+    ],
+    linkopts = ["-ldl"],
+    linkshared = True,
+    target_compatible_with = ["@platforms//os:macos"],
+    visibility = ["//visibility:public"],
+    deps = [":fs_patch_common"],
+)
+
+config_setting(
+    name = "_is_linux_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+config_setting(
+    name = "_is_macos_arm64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+config_setting(
+    name = "_is_macos_x86_64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+# Noop placeholder for unsupported platforms.
+# Native FS patching is supported on Linux x86_64 and macOS (arm64 + x86_64).
+# ARM Linux cross-compilation requires a CC toolchain for the target platform.
+genrule(
+    name = "_fs_patch_noop",
+    outs = ["fs_patch_noop"],
+    cmd = "touch $@",
+)
+
+alias(
+    name = "fs_patch_native",
+    actual = select({
+        ":_is_linux_x86_64": ":fs_patch_linux.so",
+        ":_is_macos_arm64": ":fs_patch_macos.dylib",
+        ":_is_macos_x86_64": ":fs_patch_macos.dylib",
+        "//conditions:default": ":_fs_patch_noop",
+    }),
+    visibility = ["//visibility:public"],
+)

@@ -16,6 +16,7 @@ bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_features", version = "1.41.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_cc", version = "0.1.0")
 bazel_dep(name = "rules_nodejs", version = "6.7.3")
 
 # NB: LOWER BOUND on earliest BCR release of protobuf module, to avoid upgrading the root module by accident
