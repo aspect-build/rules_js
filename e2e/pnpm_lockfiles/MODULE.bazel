@@ -16,6 +16,7 @@ PNPM_LOCK_TEST_CASES = [
     "isaacs-cliui-v90",
     "docusaurus-direct-peer-v9",
     "versionless-patch-v9",
+    "nested-peer-v9",
 ]
 
 bazel_dep(name = "bazel_lib", version = "3.0.0")
@@ -116,3 +117,10 @@ npm = use_extension(
     )
     for lockfile in PNPM_LOCK_TEST_CASES
 ]
+
+# @nested-peer-v9 tests
+use_repo(
+    npm,
+    "nested-peer-v9__eslint-plugin-barrel-files__3.0.1_eslint_9.29.0_jiti_2.6.1",
+    "nested-peer-v9__eslint__9.29.0_jiti_2.6.1",
+)

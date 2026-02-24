@@ -33,6 +33,10 @@ def test_package_store_and_target_name(ctx):
     asserts.equals(env, "@scope+pkg@21.1.0_rollup@2.70.2_@scope+y@1.1.1", utils.package_store_name("@scope/pkg@21.1.0(rollup@2.70.2)(@scope/y@1.1.1)"))
     asserts.equals(env, "x__at_scope_pkg__21.1.0_rollup_2.70.2_at_scope_y_1.1.1", utils.package_repo_name("x", "@scope/pkg@21.1.0(rollup@2.70.2)(@scope/y@1.1.1)"))
 
+    # Nested peers
+    asserts.equals(env, "eslint-plugin-barrel-files@3.0.1_eslint@9.29.0_jiti@2.6.1", utils.package_store_name("eslint-plugin-barrel-files@3.0.1(eslint@9.29.0(jiti@2.6.1))"))
+    asserts.equals(env, "x__eslint-plugin-barrel-files__3.0.1_eslint_9.29.0_jiti_2.6.1", utils.package_repo_name("x", "eslint-plugin-barrel-files@3.0.1(eslint@9.29.0(jiti@2.6.1))"))
+
     # v9 patch_hash
     asserts.equals(env, "meaning-of-life@1.0.0_1287509853", utils.package_store_name("meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)"))
     asserts.equals(env, "x__meaning-of-life__1.0.0_1287509853", utils.package_repo_name("x", "meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)"))

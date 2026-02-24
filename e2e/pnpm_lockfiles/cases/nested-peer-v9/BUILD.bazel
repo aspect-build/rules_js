@@ -1,0 +1,23 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@nested-peer-v9//:defs.bzl", nested_peers_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+nested_peers_link_all()
+
+build_test(
+    name = "nested_peers_targets",
+    targets = [
+        ":node_modules",
+
+        # eslint has basic peers
+        ":node_modules/eslint",
+        ":.aspect_rules_js/node_modules/eslint@9.29.0_jiti@2.6.1",
+        "@nested-peer-v9__eslint__9.29.0_jiti_2.6.1//:pkg",
+
+        # eslint-plugin-barrel-files has nested peers
+        ":node_modules/eslint-plugin-barrel-files",
+        ":.aspect_rules_js/node_modules/eslint-plugin-barrel-files@3.0.1_eslint@9.29.0_jiti@2.6.1",
+        "@nested-peer-v9__eslint-plugin-barrel-files__3.0.1_eslint_9.29.0_jiti_2.6.1//:pkg",
+    ],
+)
