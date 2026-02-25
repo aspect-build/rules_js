@@ -337,17 +337,18 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
     },
 )
 
-def parse_and_verify_lock(rctx, attr):
+def parse_and_verify_lock(rctx, mod, attr):
     """Helper to parse and validate the lockfile
 
     Args:
         rctx: repository context
+        mod: the module in which the extension is declared
         attr: attributes
     Returns:
         state, importers, and packages
     """
 
-    state = npm_translate_lock_state.new(rctx, attr)
+    state = npm_translate_lock_state.new(rctx, mod, attr)
 
     if state.should_update_pnpm_lock():
         # Run `pnpm install --lockfile-only` or `pnpm import` if its inputs have changed since last update

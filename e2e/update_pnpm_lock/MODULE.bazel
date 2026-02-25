@@ -6,6 +6,12 @@ local_path_override(
 
 bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
 
+bazel_dep(name = "other_module")
+local_path_override(
+    module_name = "other_module",
+    path = "other_module",
+)
+
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",

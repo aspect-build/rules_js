@@ -9,3 +9,12 @@ build_test(
         ":node_modules",
     ],
 )
+
+# Verifies :node_modules targets within another module that also has update_pnpm_lock can be built
+build_test(
+    name = "other_module_linked_packages",
+    targets = [
+        "@other_module//:node_modules",
+        "@other_module//:node_modules/less",
+    ],
+)
