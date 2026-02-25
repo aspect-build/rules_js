@@ -202,12 +202,10 @@ def _copy_update_input_files(priv, rctx, attr):
 ################################################################################
 # we can derive input files that should be specified but are not and copy these over; we warn the user when we do this
 def _copy_unspecified_input_files(priv, rctx, attr):
-    src_root = priv["src_root"]
-
     pnpm_lock_label = priv["pnpm_lock_label"]
     pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME) if pnpm_lock_label else Label("@@//:" + PNPM_WORKSPACE_FILENAME)
     pnpm_workspace_path = rctx.path(pnpm_workspace_label)
-    pnpm_workspace_relpath = str(pnpm_workspace_path).removeprefix(src_root)
+    pnpm_workspace_relpath = _rel_path(priv, pnpm_workspace_path)
 
     # pnpm-workspace.yaml
     if _has_workspaces(priv) and not _has_input_hash(priv, pnpm_workspace_relpath):
@@ -222,13 +220,13 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
             rctx_name = priv["rctx_name"],
         ))
 
-    pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else src_root
-    rel_dir = pnpm_lock_dir.removeprefix(src_root)
+    pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else priv["src_root"]
+    rel_dir = _rel_path(priv, pnpm_lock_dir)
 
     # package.json files
     for package_json in priv["importers"].keys():
         rel_path = paths.normalize(paths.join(rel_dir, package_json, "package.json"))
-        workspace_path = paths.join(src_root, rel_path)
+        workspace_path = paths.join(priv["src_root"], rel_path)
 
         if not _has_input_hash(priv, rel_path):
             if not rctx.path(workspace_path).exists:
@@ -243,7 +241,7 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
     for patch_info in priv["pnpm_patched_dependencies"].values():
         patch = patch_info.get("path")
         rel_path = paths.normalize(paths.join(rel_dir, patch))
-        workspace_path = paths.join(src_root, rel_path)
+        workspace_path = paths.join(priv["src_root"], rel_path)
 
         if not _has_input_hash(priv, rel_path):
             if not rctx.path(workspace_path).exists:
@@ -253,6 +251,16 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                 )
                 fail(msg)
             _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)))
+
+################################################################################
+def _rel_path(priv, p):
+    p = str(p)
+    if not p.startswith(priv["src_root"]):
+        fail("internal error: expected path {} to start with src_root {}".format(p, priv["src_root"]))
+    p = p.removeprefix(priv["src_root"])
+    if not (p == "" or p.startswith("/")):
+        fail("internal error: expected path {} to be equal to src_root {} or start with src_root followed by a slash".format(p, priv["src_root"]))
+    return p.removeprefix("/")
 
 ################################################################################
 def _has_input_hash(priv, path):
@@ -311,7 +319,7 @@ def _copy_input_file(priv, rctx, attr, path, repository_path):
         # the purposes of calculating a hash of the file
         _set_input_hash(
             priv,
-            str(path).removeprefix(priv["src_root"]),
+            _rel_path(priv, path),
             utils.hash(rctx.read(path)),
         )
 
@@ -437,17 +445,21 @@ def _has_workspaces(priv):
 
 ################################################################################
 def _should_update_pnpm_lock(priv):
-    return priv["should_update_pnpm_lock"]
+    return priv["should_update_pnpm_lock"] and priv["src_root"] != None
 
 ################################################################################
-def _new(rctx, attr):
+def _new(rctx, mod, attr):
     should_update_pnpm_lock = attr.update_pnpm_lock
     if rctx.getenv(RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV):
         # Force disabled update_pnpm_lock via environment variable. This is useful for some CI use cases.
         should_update_pnpm_lock = False
 
     repo_root = str(rctx.path(""))
-    src_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
+
+    # TODO: could potentially determine the root for non-root modules as well
+    # to allow calculating the update-hash and detecting+failing if pnpm should run
+    # while not supporting auto-updating the lockfile for non-root modules.
+    src_root = str(rctx.path(Label("@@//:all"))).removesuffix("all").removesuffix("/") if mod.is_root else None
 
     priv = {
         "rctx_name": attr.name,

@@ -1,0 +1,8 @@
+{
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
+    "dependencies": {
+        "less": "4.1.3"
+    }
+}

@@ -86,7 +86,7 @@ def _npm_extension_impl(module_ctx):
     # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            _npm_translate_lock_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages)
+            _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_config, replace_packages)
 
         for i in mod.tags.npm_import:
             _npm_import_bzlmod(i)
@@ -133,8 +133,8 @@ _hub_repo = repository_rule(
     },
 )
 
-def _npm_translate_lock_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
-    state = parse_and_verify_lock(module_ctx, attr)
+def _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_config, replace_packages):
+    state = parse_and_verify_lock(module_ctx, mod, attr)
 
     module_ctx.report_progress("Generating starlark for npm dependencies")
 
