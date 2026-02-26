@@ -439,39 +439,6 @@ def _has_workspaces(priv):
 def _should_update_pnpm_lock(priv):
     return priv["should_update_pnpm_lock"]
 
-def _default_registry(priv):
-    return priv["default_registry"]
-
-def _importers(priv):
-    return priv["importers"]
-
-def _packages(priv):
-    return priv["packages"]
-
-def _pnpm_patched_dependencies(priv):
-    return priv["pnpm_patched_dependencies"]
-
-def _only_built_dependencies(priv):
-    return _pnpm_settings(priv).get("onlyBuiltDependencies", None)
-
-def _npm_registries(priv):
-    return priv["npm_registries"]
-
-def _npm_auth(priv):
-    return priv["npm_auth"]
-
-def _root_package(priv):
-    return priv["root_package"]
-
-def _pnpm_settings(priv):
-    return priv["pnpm_settings"]
-
-def _action_cache_label(priv):
-    return priv["action_cache_label"]
-
-def _pnpm_lock_label(priv):
-    return priv["pnpm_lock_label"]
-
 ################################################################################
 def _new(rctx, attr):
     should_update_pnpm_lock = attr.update_pnpm_lock
@@ -501,17 +468,17 @@ def _new(rctx, attr):
     return struct(
         repo_root = priv["repo_root"],
         name = lambda: priv["rctx_name"],
-        action_cache_label = lambda: _action_cache_label(priv),
-        pnpm_lock_label = lambda: _pnpm_lock_label(priv),
+        action_cache_label = lambda: priv["action_cache_label"],
+        pnpm_lock_label = lambda: priv["pnpm_lock_label"],
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
-        default_registry = lambda: _default_registry(priv),
-        importers = lambda: _importers(priv),
-        packages = lambda: _packages(priv),
-        pnpm_patched_dependencies = lambda: _pnpm_patched_dependencies(priv),
-        only_built_dependencies = lambda: _only_built_dependencies(priv),
-        npm_registries = lambda: _npm_registries(priv),
-        npm_auth = lambda: _npm_auth(priv),
-        root_package = lambda: _root_package(priv),
+        default_registry = lambda: priv["default_registry"],
+        importers = lambda: priv["importers"],
+        packages = lambda: priv["packages"],
+        pnpm_patched_dependencies = lambda: priv["pnpm_patched_dependencies"],
+        only_built_dependencies = lambda: priv["pnpm_settings"].get("onlyBuiltDependencies", None),
+        npm_registries = lambda: priv["npm_registries"],
+        npm_auth = lambda: priv["npm_auth"],
+        root_package = lambda: priv["root_package"],
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
         action_cache_miss = lambda: _action_cache_miss(priv, rctx),
         write_action_cache = lambda: _write_action_cache(priv, rctx),
