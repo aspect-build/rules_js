@@ -337,24 +337,23 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
     },
 )
 
-def parse_and_verify_lock(rctx, rctx_name, attr):
+def parse_and_verify_lock(rctx, attr):
     """Helper to parse and validate the lockfile
 
     Args:
         rctx: repository context
-        rctx_name: repository/hub name
         attr: attributes
     Returns:
         state, importers, and packages
     """
 
-    state = npm_translate_lock_state.new(rctx_name, rctx, attr)
+    state = npm_translate_lock_state.new(rctx, attr)
 
     if state.should_update_pnpm_lock():
         # Run `pnpm install --lockfile-only` or `pnpm import` if its inputs have changed since last update
         if state.action_cache_miss():
-            _fail_if_frozen_pnpm_lock(rctx, rctx_name, state)
-            if _update_pnpm_lock(rctx, rctx_name, attr, state):
+            _fail_if_frozen_pnpm_lock(rctx, state)
+            if _update_pnpm_lock(rctx, attr, state):
                 msg = """
 
 INFO: {} file updated. Please run your build again.
@@ -453,7 +452,7 @@ STDERR:
             fail(msg)
 
 ################################################################################
-def _update_pnpm_lock(rctx, rctx_name, attr, state):
+def _update_pnpm_lock(rctx, attr, state):
     _execute_preupdate_scripts(rctx, attr, state)
 
     pnpm_lock_label = state.pnpm_lock_label()
@@ -474,7 +473,7 @@ INFO: Updating `{pnpm_lock}` file as its inputs have changed since the last upda
             pnpm_lock = pnpm_lock_relative_path,
             pnpm_cmd = pnpm_cmd,
             wd = update_working_directory,
-            rctx_name = rctx_name,
+            rctx_name = attr.name,
         ))
 
     rctx.report_progress("Updating pnpm-lock.yaml with `pnpm {pnpm_cmd}`".format(pnpm_cmd = pnpm_cmd))
@@ -509,7 +508,7 @@ STDERR:
 {stderr}
 """.format(
             cmd = " ".join(update_cmd),
-            rctx_name = rctx_name,
+            rctx_name = attr.name,
             status = result.return_code,
             stderr = result.stderr,
             stdout = result.stdout,
@@ -534,7 +533,7 @@ INFO: {} file has changed""".format(pnpm_lock_relative_path))
     return lockfile_changed
 
 ################################################################################
-def _fail_if_frozen_pnpm_lock(rctx, rctx_name, state):
+def _fail_if_frozen_pnpm_lock(rctx, state):
     if rctx.getenv(RULES_JS_FROZEN_PNPM_LOCK_ENV):
         fail("""
 
@@ -545,5 +544,5 @@ ERROR: `{action_cache}` is out of date. `{pnpm_lock}` may require an update. To 
 """.format(
             action_cache = state.action_cache_label(),
             pnpm_lock = state.pnpm_lock_label(),
-            rctx_name = rctx_name,
+            rctx_name = state.name(),
         ))
