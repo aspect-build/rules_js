@@ -539,9 +539,9 @@ def _to_apparent_repo_name(canonical_name):
     return canonical_name[max(canonical_name.rfind("~"), canonical_name.rfind("+")) + 1:]
 
 ################################################################################
-def _verify_node_modules_ignored(rctx, attr, importers, root_package):
+def _verify_node_modules_ignored(rctx, attr, state):
     if attr.verify_node_modules_ignored != None:
-        missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(attr.verify_node_modules_ignored)))
+        missing_ignores = _find_missing_bazel_ignores(state.root_package(), state.importers().keys(), rctx.read(rctx.path(attr.verify_node_modules_ignored)))
         if missing_ignores:
             msg = """
 
