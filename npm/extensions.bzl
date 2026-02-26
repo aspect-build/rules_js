@@ -172,7 +172,6 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
     imports = npm_translate_lock_helpers.get_npm_imports(
         state = state,
         replace_packages = replace_packages,
-        rctx_name = attr.name,
         attr = attr,
         all_lifecycle_hooks = lifecycle_hooks,
         all_lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
@@ -220,7 +219,6 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         )
 
     files = generate_repository_files(
-        attr.name,
         attr,
         state,
         imports,

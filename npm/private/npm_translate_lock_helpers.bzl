@@ -268,7 +268,7 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(state, replace_packages, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, npm_auth, exclude_package_contents_config):
+def _get_npm_imports(state, replace_packages, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, npm_auth, exclude_package_contents_config):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     importers = state.importers()
@@ -498,7 +498,7 @@ Either remove this patch file if it is no longer needed or change its key to mat
 
 """.format(
                 key = key,
-                repo = rctx_name,
+                repo = attr.name,
             )
             fail(msg)
 
