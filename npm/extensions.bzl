@@ -135,7 +135,7 @@ _hub_repo = repository_rule(
 )
 
 def _npm_translate_lock_bzlmod(module_ctx, attr, exclude_package_contents_config, replace_packages):
-    state = parse_and_verify_lock(module_ctx, attr.name, attr)
+    state = parse_and_verify_lock(module_ctx, attr)
 
     module_ctx.report_progress("Generating starlark for npm dependencies")
 

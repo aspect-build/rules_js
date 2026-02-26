@@ -477,14 +477,14 @@ def _pnpm_lock_label(priv):
     return priv["pnpm_lock_label"]
 
 ################################################################################
-def _new(rctx_name, rctx, attr):
+def _new(rctx, attr):
     should_update_pnpm_lock = attr.update_pnpm_lock
     if rctx.getenv(RULES_JS_DISABLE_UPDATE_PNPM_LOCK_ENV):
         # Force disabled update_pnpm_lock via environment variable. This is useful for some CI use cases.
         should_update_pnpm_lock = False
 
     priv = {
-        "rctx_name": rctx_name,
+        "rctx_name": attr.name,
         "repo_root": str(rctx.path("")),
         "src_root": str(rctx.path(Label("@@//:all"))).removesuffix("all"),
         "default_registry": utils.default_registry(),
@@ -504,6 +504,7 @@ def _new(rctx_name, rctx, attr):
 
     return struct(
         repo_root = priv["repo_root"],
+        name = lambda: priv["rctx_name"],
         action_cache_label = lambda: _action_cache_label(priv),
         pnpm_lock_label = lambda: _pnpm_lock_label(priv),
         should_update_pnpm_lock = lambda: _should_update_pnpm_lock(priv),
