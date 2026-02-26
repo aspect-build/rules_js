@@ -459,7 +459,7 @@ def _new(rctx, attr):
         "npm_auth": {},
         "npm_registries": {},
         "packages": {},
-        "root_package": attr.pnpm_lock.package if attr.pnpm_lock else "",
+        "root_package": "",
         "pnpm_settings": {},
         "pnpm_patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
