@@ -367,7 +367,7 @@ See https://github.com/aspect-build/rules_js/issues/1445
 
     helpers.verify_patches(rctx, attr, state)
 
-    helpers.verify_lifecycle_hooks_specified(rctx, state)
+    helpers.verify_lifecycle_hooks_specified(state)
 
     return state
 
