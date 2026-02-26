@@ -268,7 +268,42 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(state, replace_packages, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, npm_auth, exclude_package_contents_config):
+def _lifecycle_attrs(attr):
+    """Convert lifecycle-related extension tag attrs into values to pass to npm_import"""
+    if not attr.run_lifecycle_hooks:
+        return False, {}, {}
+
+    # lifecycle_hooks_exclude is a convenience attribute to set `<value>: []` in `lifecycle_hooks`
+    all_lifecycle_hooks = dict(attr.lifecycle_hooks)
+    for p in attr.lifecycle_hooks_exclude:
+        if p in all_lifecycle_hooks:
+            fail("expected '{}' to be in only one of lifecycle_hooks or lifecycle_hooks_exclude".format(p))
+        all_lifecycle_hooks[p] = []
+    if "*" not in all_lifecycle_hooks:
+        all_lifecycle_hooks["*"] = ["preinstall", "install", "postinstall"]
+
+    # lifecycle_hooks_no_sandbox is a convenience attribute to set `"*": ["no-sandbox"]` in `lifecycle_hooks_execution_requirements`
+    all_lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements
+    if attr.lifecycle_hooks_no_sandbox:
+        all_lifecycle_hooks_execution_requirements = dict(all_lifecycle_hooks_execution_requirements)
+        execution_requirements = all_lifecycle_hooks_execution_requirements.get("*")
+        if not execution_requirements:
+            execution_requirements = []
+            all_lifecycle_hooks_execution_requirements["*"] = execution_requirements
+        if "no-sandbox" not in execution_requirements:
+            execution_requirements.append("no-sandbox")
+
+    # Convert {"pkg": True|False} to {"pkg": "true"|"false"} and set a default value for "*"
+    all_lifecycle_hooks_use_default_shell_env = {}
+    for p in attr.lifecycle_hooks_use_default_shell_env:
+        all_lifecycle_hooks_use_default_shell_env[p] = "true" if attr.lifecycle_hooks_use_default_shell_env[p] else "false"
+    if "*" not in all_lifecycle_hooks_use_default_shell_env:
+        all_lifecycle_hooks_use_default_shell_env["*"] = "false"
+
+    return all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env
+
+################################################################################
+def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclude_package_contents_config):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     importers = state.importers()
@@ -277,6 +312,8 @@ def _get_npm_imports(state, replace_packages, attr, all_lifecycle_hooks, all_lif
     only_built_dependencies = state.only_built_dependencies()
     root_package = state.root_package()
     default_registry = state.default_registry()
+
+    all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env = _lifecycle_attrs(attr)
 
     # Direct dependencies of 'importers' which will have public targets
     direct_deps = {}
