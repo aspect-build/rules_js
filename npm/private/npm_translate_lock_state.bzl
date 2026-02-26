@@ -315,19 +315,15 @@ def _copy_input_file(priv, rctx, attr, path, repository_path):
             utils.hash(rctx.read(path)),
         )
 
-    # Copy the file using cp (linux/macos) or xcopy (windows). Don't use the rctx.template
-    # trick with empty substitution as this does not copy over binary files properly. Also do not
-    # use the rctx.download with `file:` url trick since that messes with the
-    # experimental_remote_downloader option. rctx.read follows by rctx.file also does not
-    # work since it can't handle binary files.
-    _copy_input_file_action(rctx, attr, path, repository_path)
-
-def _copy_input_file_action(rctx, attr, src, dst):
+    # Copy the file using coreutils cp. Don't use the rctx.template trick with empty substitution
+    # as this does not copy over binary files properly. Also do not use the rctx.download with
+    # `file:` url trick since that messes with the experimental_remote_downloader option.
+    # rctx.read followed by rctx.file also does not work since it can't handle binary files.
     is_windows = repo_utils.is_windows(rctx)
     coreutils = rctx.path(Label("@coreutils_{}//:coreutils{}".format(repo_utils.platform(rctx), ".exe" if is_windows else "")))
 
     # ensure the destination directory exists
-    dst_segments = dst.split("/")
+    dst_segments = repository_path.split("/")
     if len(dst_segments) > 1:
         dirname = "/".join(dst_segments[:-1])
         mkdir_args = [coreutils, "mkdir", "-p", dirname]
@@ -339,7 +335,7 @@ def _copy_input_file_action(rctx, attr, src, dst):
             msg = "Failed to create directory for copy. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(" ".join([str(a) for a in mkdir_args]), result.return_code, result.stdout, result.stderr)
             fail(msg)
 
-    cp_args = [coreutils, "cp", src, dst]
+    cp_args = [coreutils, "cp", path, repository_path]
     result = rctx.execute(
         cp_args,
         quiet = attr.quiet,
