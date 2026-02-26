@@ -363,7 +363,7 @@ See https://github.com/aspect-build/rules_js/issues/1445
 """.format(state.pnpm_lock_label())
                 fail(msg)
 
-    helpers.verify_node_modules_ignored(rctx, attr, state.importers(), state.root_package())
+    helpers.verify_node_modules_ignored(rctx, attr, state)
 
     helpers.verify_patches(rctx, attr, state)
 
