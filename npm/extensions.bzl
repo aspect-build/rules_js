@@ -272,11 +272,6 @@ def _npm_import_bzlmod(i):
 _NPM_IMPORT_ATTRS = npm_import_lib.attrs | {
     # Add macro attrs that aren't in the rule attrs.
     "name": attr.string(),
-
-    # Attributes only used within the module extension implementation, not passed
-    # along to the npm_import[_links] rules.
-    "lifecycle_hooks_no_sandbox": attr.bool(default = False),
-    "run_lifecycle_hooks": attr.bool(default = False),
 }
 
 _EXCLUDE_PACKAGE_CONTENT_ATTRS = {
