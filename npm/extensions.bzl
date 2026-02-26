@@ -33,7 +33,6 @@ load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
 load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
-load("//npm/private:npm_translate_lock_macro_helpers.bzl", macro_helpers = "helpers")
 load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:pnpm_repository.bzl", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
@@ -161,21 +160,10 @@ def _npm_translate_lock_bzlmod(module_ctx, attr, exclude_package_contents_config
 WARNING: Cannot determine home directory in order to load home `.npmrc` file in module extension `npm_translate_lock(name = "{attr_name}")`.
 """.format(attr_name = attr.name))
 
-    lifecycle_hooks, lifecycle_hooks_execution_requirements, lifecycle_hooks_use_default_shell_env = macro_helpers.macro_lifecycle_args_to_rule_attrs(
-        lifecycle_hooks = attr.lifecycle_hooks,
-        lifecycle_hooks_exclude = attr.lifecycle_hooks_exclude,
-        run_lifecycle_hooks = attr.run_lifecycle_hooks,
-        lifecycle_hooks_no_sandbox = attr.lifecycle_hooks_no_sandbox,
-        lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements,
-        lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
-    )
     imports = npm_translate_lock_helpers.get_npm_imports(
         state = state,
         replace_packages = replace_packages,
         attr = attr,
-        all_lifecycle_hooks = lifecycle_hooks,
-        all_lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
-        all_lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         registries = registries,
         npm_auth = npm_auth,
         exclude_package_contents_config = exclude_package_contents_config,
