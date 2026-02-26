@@ -4,6 +4,7 @@ load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:pnpm.bzl", "pnpm")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:pnpm_repository.bzl", "LATEST_PNPM_VERSION")
+load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 
 def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None, include_npm = False):
     return struct(
@@ -106,7 +107,7 @@ def _latest(ctx):
     # - Accept a brittle test.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": "sha512-SY4ftMylqgbB3PJhHm+vxQly/+cYmZjECekN50VmREKY/+Q+bNKs3Hdboap8xeCSqLcFTIEbqMV3D4RpPTPS3A==", "include_npm": False}},
+        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": PNPM_VERSIONS[LATEST_PNPM_VERSION], "include_npm": False}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "latest")),
         ],
