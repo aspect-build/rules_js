@@ -170,19 +170,14 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         lifecycle_hooks_use_default_shell_env = attr.lifecycle_hooks_use_default_shell_env,
     )
     imports = npm_translate_lock_helpers.get_npm_imports(
-        importers = state.importers(),
-        packages = state.packages(),
+        state = state,
         replace_packages = replace_packages,
-        pnpm_patched_dependencies = state.pnpm_patched_dependencies(),
-        only_built_dependencies = state.only_built_dependencies(),
-        root_package = state.root_package(),
         rctx_name = attr.name,
         attr = attr,
         all_lifecycle_hooks = lifecycle_hooks,
         all_lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
         all_lifecycle_hooks_use_default_shell_env = lifecycle_hooks_use_default_shell_env,
         registries = registries,
-        default_registry = state.default_registry(),
         npm_auth = npm_auth,
         exclude_package_contents_config = exclude_package_contents_config,
     )
