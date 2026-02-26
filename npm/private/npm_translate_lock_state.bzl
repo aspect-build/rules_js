@@ -446,10 +446,12 @@ def _new(rctx, attr):
         # Force disabled update_pnpm_lock via environment variable. This is useful for some CI use cases.
         should_update_pnpm_lock = False
 
+    repo_root = str(rctx.path(""))
+    src_root = str(rctx.path(Label("@@//:all"))).removesuffix("all")
+
     priv = {
         "rctx_name": attr.name,
-        "repo_root": str(rctx.path("")),
-        "src_root": str(rctx.path(Label("@@//:all"))).removesuffix("all"),
+        "src_root": src_root,
         "default_registry": utils.default_registry(),
         "external_repository_action_cache": None,
         "importers": {},
@@ -466,7 +468,7 @@ def _new(rctx, attr):
     _init(priv, rctx, attr)
 
     return struct(
-        repo_root = priv["repo_root"],
+        repo_root = repo_root,
         name = lambda: priv["rctx_name"],
         action_cache_label = lambda: priv["action_cache_label"],
         pnpm_lock_label = lambda: priv["pnpm_lock_label"],
