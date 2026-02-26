@@ -595,7 +595,7 @@ def _normalize_bazelignore(lines):
     return result
 
 ################################################################################
-def _verify_lifecycle_hooks_specified(_, state):
+def _verify_lifecycle_hooks_specified(state):
     if state.only_built_dependencies() == None:
         msg = """\
 ERROR: pnpm 'onlyBuiltDependencies' configuration required.
