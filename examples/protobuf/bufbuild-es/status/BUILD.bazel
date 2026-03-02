@@ -1,0 +1,13 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+
+proto_library(
+    name = "status_proto",
+    srcs = [
+        "status.proto",
+    ],
+    strip_import_prefix = "/status",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@protobuf//:timestamp_proto",
+    ],
+)

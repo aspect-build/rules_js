@@ -5,12 +5,22 @@ load("@protobuf//bazel:proto_library.bzl", "proto_library")
 npm_link_all_packages()
 
 proto_library(
-    name = "foo_proto",
+    name = "user_proto",
     srcs = [
-        "status.proto",
         "user.proto",
     ],
-    deps = ["@protobuf//:timestamp_proto"],
+    deps = [
+        "//:profile_proto",
+        "//status:status_proto",
+    ],
+)
+
+proto_library(
+    name = "profile_proto",
+    srcs = [
+        "profile.proto",
+    ],
+    import_prefix = "profile/",
 )
 
 js_library(
@@ -18,7 +28,8 @@ js_library(
     # This edge runs an aspect to produce a JsInfo provider with protobuf .js/.d.ts files.
     srcs = ["test_proto.js"],
     deps = [
-        ":foo_proto",
+        ":user_proto",
+        "//status:status_proto",
     ],
 )
 
