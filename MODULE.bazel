@@ -3,6 +3,7 @@
 module(
     name = "aspect_rules_js",
     bazel_compatibility = [">=7.6.0"],
+    compatibility_level = 1,
 )
 
 # Lower-bounds (minimum) versions for direct runtime dependencies.
