@@ -326,3 +326,33 @@ use_repo(
     "acorn__8.4.0",
     "acorn__8.4.0__links",
 )
+
+# Require a newer version for our own testing only.
+single_version_override(
+    module_name = "protobuf",
+    version = "33.4",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# The usual way to obtain this protoc plugin is to use the
+# @protocolbuffers/protoc-gen-js package. However, that package downloads
+# protoc using a post-install script, and this is not easy to accommodate in
+# Bazel. Instead, we just download the release binary from GitHub.
+http_archive(
+    name = "protobuf-javascript",
+    build_file_content = """filegroup(
+    name = \"protoc-gen-js\",
+    srcs = [\"bin/protoc-gen-js\"],
+    visibility = [\"//visibility:public\"],
+)
+""",
+    dev_dependency = True,
+    integrity = "sha256-HclFw2NR1qZfmvwUQjlDNuesMl9+HCf4bKmdqn/qKRc=",
+    url = "https://github.com/protocolbuffers/protobuf-javascript/releases/download/v4.0.2/protobuf-javascript-4.0.2-linux-x86_64.tar.gz",
+)
+
+register_toolchains(
+    "//examples/protobuf/toolchains:all",
+    dev_dependency = True,
+)
