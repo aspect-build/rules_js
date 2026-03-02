@@ -154,6 +154,8 @@ export JS_BINARY__RUNFILES
 # Prepare to run main program
 # ==============================================================================
 
+ln _main c3d
+
 # Convert stdout, stderr and exit_code capture outputs paths to absolute paths
 if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
     JS_BINARY__STDOUT_OUTPUT_FILE="$PWD/$JS_BINARY__STDOUT_OUTPUT_FILE"
