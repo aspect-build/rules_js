@@ -1,0 +1,50 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+
+proto_library(
+    name = "logger_proto",
+    srcs = ["logger.proto"],
+    visibility = ["//visibility:public"],
+)
+
+# We define a flag here for determinining which JS protobuf implementation
+# should be used. The js_proto_test() macro uses a transition to set this flag
+# and thereby control the implementation used in each example.
+string_flag(
+    name = "js_proto_implementation",
+    build_setting_default = "protobuf_es",
+    values = [
+        "protobuf_es",
+        "ts_proto",
+        "google_protobuf",
+        "protobuf_ts",
+    ],
+)
+
+config_setting(
+    name = "protobuf_es",
+    flag_values = {
+        ":js_proto_implementation": "protobuf_es",
+    },
+)
+
+config_setting(
+    name = "ts_proto",
+    flag_values = {
+        ":js_proto_implementation": "ts_proto",
+    },
+)
+
+config_setting(
+    name = "google_protobuf",
+    flag_values = {
+        ":js_proto_implementation": "google_protobuf",
+    },
+)
+
+config_setting(
+    name = "protobuf_ts",
+    flag_values = {
+        ":js_proto_implementation": "protobuf_ts",
+    },
+)

@@ -26,8 +26,16 @@ def _js_proto_aspect_impl(target, ctx):
     proto_info = target[ProtoInfo]
     protoc_info = ctx.toolchains[PROTOC_TOOLCHAIN].proto
     proto_lang_toolchain_info = ctx.toolchains[LANG_PROTO_TOOLCHAIN].proto
-    js_outputs = proto_common.declare_generated_files(ctx.actions, proto_info, "_pb.js")
-    dts_outputs = proto_common.declare_generated_files(ctx.actions, proto_info, "_pb.d.ts")
+    js_proto_toolchain_info = ctx.toolchains[LANG_PROTO_TOOLCHAIN].js
+
+    js_outputs = []
+    dts_outputs = []
+    for extension in js_proto_toolchain_info.output_file_extensions:
+        if extension.endswith(".d.ts"):
+            dts_outputs.extend(proto_common.declare_generated_files(ctx.actions, proto_info, extension))
+        else:
+            js_outputs.extend(proto_common.declare_generated_files(ctx.actions, proto_info, extension))
+
     output_root = js_outputs[0].root
 
     args = ctx.actions.args()

@@ -24,6 +24,12 @@ bazel_dep(name = "bazel_lib", version = "3.2.2")
 # NB: LOWER BOUND on earliest BCR release of protobuf module, to avoid upgrading the root module by accident
 bazel_dep(name = "protobuf", version = "3.19.6")
 
+# Require a newer version for our own testing only.
+single_version_override(
+    module_name = "protobuf",
+    version = "33.4",
+)
+
 # Ensure any version of aspect_bazel_lib used includes:
 # https://github.com/bazel-contrib/bazel-lib/commit/371362199e5e5bde58aeb15b54ea6cfb164af337
 # https://github.com/bazel-contrib/bazel-lib/commit/ceaff54210291292f35d03bd4bbc0b6ceb40e77a
@@ -325,4 +331,27 @@ use_repo(
     npm,
     "acorn__8.4.0",
     "acorn__8.4.0__links",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# The usual way to obtain this protoc plugin is to use the
+# @protocolbuffers/protoc-gen-js package. However, that package downloads
+# protoc using a post-install script, and this is not easy to accommodate in
+# Bazel. Instead, we just download the release binary from GitHub.
+http_archive(
+    name = "protobuf-javascript",
+    build_file_content = """filegroup(
+    name = \"protoc-gen-js\",
+    srcs = [\"bin/protoc-gen-js\"],
+    visibility = [\"//visibility:public\"],
+)
+""",
+    integrity = "sha256-HclFw2NR1qZfmvwUQjlDNuesMl9+HCf4bKmdqn/qKRc=",
+    url = "https://github.com/protocolbuffers/protobuf-javascript/releases/download/v4.0.2/protobuf-javascript-4.0.2-linux-x86_64.tar.gz",
+)
+
+register_toolchains(
+    "//examples/protobuf/toolchains:all",
+    dev_dependency = True,
 )

@@ -18,6 +18,8 @@ gen_es.protoc_gen_es_binary(name = "protoc_gen_es")
 3. Define a `js_proto_toolchain` that uses the plugin. See the rule documentation below.
 4. Update `MODULE.bazel` to register it, typically with a simple statement like `register_toolchains("//tools/toolchains:all")`
 
+See the examples under examples/protobuf/ for how to set up the toolchain for various code generator plugins.
+
 ### Usage
 
 Just write `proto_library` targets as usual, or have Gazelle generate them.
@@ -42,10 +44,10 @@ js_library(
 The generator you setup earlier will be invoked automatically as an action to generate the `.js` and `.d.ts` files.
 """
 
-load("@protobuf//bazel/toolchains:proto_lang_toolchain.bzl", "proto_lang_toolchain")
+load("//js/private:js_proto_toolchain.bzl", _js_proto_toolchain = "js_proto_toolchain")
 load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN")
 
-def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, **kwargs):
+def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, output_file_extensions = ["_pb.js", "_pb.d.ts"], target_settings = [], **kwargs):
     """Define a proto_lang_toolchain that uses the plugin.
 
     Example:
@@ -53,6 +55,10 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
     ```starlark
     js_proto_toolchain(
         name = "gen_es_toolchain",
+        output_file_extensions = [
+            "_pb.js",
+            "_pb.d.ts",
+        ],
         plugin_bin = ":protoc_gen_es",
         plugin_name = "es",
         # See https://github.com/bufbuild/protobuf-es/tree/main/packages/protoc-gen-es#plugin-options
@@ -84,16 +90,31 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
 
             Note that node module resolution requires the runtime to be in a parent folder of any package containing generated code.
 
+        output_file_extensions: The file extensions that the plugin is expected to produce.
+
+            These are interpreted as the suffix that should replace ".proto"
+            from the input file name. This parameter has a default value for
+            backward compatibility, but should be set explicitly.
+
+        target_settings: List of target config settings the toolchain is compatible with.
+
         **kwargs: Additional arguments to pass to the [proto_lang_toolchain](https://bazel.build/reference/be/protocol-buffer#proto_lang_toolchain) rule.
     """
     command_line_flags = ["--{}_opt=%s".format(plugin_name) % o for o in plugin_options]
     command_line_flags.append("--{}_out=$(OUT)".format(plugin_name))
-    proto_lang_toolchain(
+    _js_proto_toolchain(
         name = name,
         command_line = " ".join(command_line_flags),
         plugin_format_flag = "--plugin=protoc-gen-{}=%s".format(plugin_name),
         toolchain_type = LANG_PROTO_TOOLCHAIN,
         plugin = plugin_bin,
+        output_file_extensions = output_file_extensions,
         runtime = runtime,
         **kwargs
+    )
+    native.toolchain(
+        name = name + "_toolchain",
+        toolchain_type = LANG_PROTO_TOOLCHAIN,
+        toolchain = name,
+        target_settings = target_settings,
     )
