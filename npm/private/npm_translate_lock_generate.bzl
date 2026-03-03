@@ -269,6 +269,11 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
 
             link_importer_key = package_to_importer.get(link_package)
             link_importer = importers.get(link_importer_key)
+            if link_importer == None:
+                fail("""Npm package '{}' contains invalid link_package '{}' which is not a pnpm workspace project.
+
+Valid pnpm workspace projects: {}
+""".format(_import.package, link_package, package_to_importer.keys()))
 
             # the build file for the package being linked
             build_file = "{}/{}".format(link_package, "BUILD.bazel") if link_package else "BUILD.bazel"
