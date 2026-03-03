@@ -1,7 +1,5 @@
 """Rust WASM-bindgen rules for interfacing with aspect-build/rules_js"""
 
-# buildifier: disable=bzl-visibility
-load("@rules_rust//rust/private:providers.bzl", "ClippyInfo", "RustAnalyzerGroupInfo", "RustAnalyzerInfo")
 load("@rules_rust_wasm_bindgen//private:wasm_bindgen.bzl", "WASM_BINDGEN_ATTR", "rust_wasm_bindgen_action")
 load("//js:providers.bzl", "js_info")
 
@@ -16,7 +14,7 @@ def _js_rust_wasm_bindgen_impl(ctx):
         flags = ctx.attr.bindgen_flags,
     )
 
-    providers = [
+    return [
         DefaultInfo(
             files = depset([info.wasm], transitive = [info.js, info.ts]),
         ),
@@ -30,18 +28,6 @@ def _js_rust_wasm_bindgen_impl(ctx):
             transitive_types = info.ts,
         ),
     ]
-
-    crate = ctx.attr.wasm_file[0]
-    if RustAnalyzerGroupInfo in crate:
-        providers.append(crate[RustAnalyzerGroupInfo])
-
-    if RustAnalyzerInfo in crate:
-        providers.append(crate[RustAnalyzerInfo])
-
-    if ClippyInfo in crate:
-        providers.append(crate[ClippyInfo])
-
-    return providers
 
 js_rust_wasm_bindgen = rule(
     doc = """\
