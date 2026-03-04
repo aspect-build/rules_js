@@ -12,11 +12,14 @@ bazel_dep(name = "tar.bzl", version = "0.6.0")
 bazel_dep(name = "yq.bzl", version = "0.3.2")
 bazel_dep(name = "jq.bzl", version = "0.4.0")
 bazel_dep(name = "aspect_tools_telemetry", version = "0.3.3")
-bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_features", version = "1.41.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_nodejs", version = "6.7.3")
+
+# Changes ensured by rules_js:
+# 3.2.2: https://github.com/bazel-contrib/bazel-lib/commit/cac2d7855949d1b222fa26888892fbbe1d31015d
+bazel_dep(name = "bazel_lib", version = "3.2.2")
 
 # NB: LOWER BOUND on earliest BCR release of protobuf module, to avoid upgrading the root module by accident
 bazel_dep(name = "protobuf", version = "3.19.6")
