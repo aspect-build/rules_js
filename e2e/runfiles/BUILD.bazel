@@ -55,3 +55,47 @@ assert_contains(
     actual = ":out1.txt",
     expected = "test_fixture.md.generated_file_suffix",
 )
+
+# Test that a js_binary wrapping another js_binary correctly propagates RUNFILES_DIR
+# so the inner binary's @bazel/runfiles can locate its runfiles.
+js_binary(
+    name = "outer_binary",
+    data = [
+        ":node_modules/@bazel/runfiles",
+        ":test_binary",
+    ],
+    entry_point = "outer.js",
+)
+
+js_run_binary(
+    name = "run_outer_binary",
+    srcs = ["test_fixture.md"],
+    args = [
+        "test_fixture.md",
+        "test_fixture.md.generated_file_suffix",
+    ],
+    stdout = "out2.txt",
+    tool = ":outer_binary",
+)
+
+assert_contains(
+    name = "run_outer_binary_asserts__direct_srcs",
+    actual = ":out2.txt",
+    expected = "test_fixture.md",
+)
+
+assert_contains(
+    name = "run_outer_binary_asserts__transitive_data",
+    actual = ":out2.txt",
+    expected = "test_fixture.md.generated_file_suffix",
+)
+
+js_test(
+    name = "outer_runfiles",
+    data = [
+        "test_fixture.md",
+        "test_fixture.md.generated_file_suffix",
+        ":test_binary",
+    ],
+    entry_point = "outer.js",
+)

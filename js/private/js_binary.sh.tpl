@@ -440,6 +440,14 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
     logf_info "$(echo -n "running" "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
+# De-export capture-related vars so child processes (e.g. a nested js_binary)
+# do not inherit them. The bash script has already consumed them above to set up
+# STDOUT_CAPTURE / STDERR_CAPTURE; leaking them would cause a nested js_binary
+# to silently swallow its own stdout or write to the wrong output file.
+# export -n keeps the value accessible to the _exit trap while removing it from
+# the environment seen by node and any processes it spawns.
+export -n JS_BINARY__STDOUT_OUTPUT_FILE JS_BINARY__STDERR_OUTPUT_FILE JS_BINARY__EXIT_CODE_OUTPUT_FILE JS_BINARY__SILENT_ON_SUCCESS
+
 set +e
 
 if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
