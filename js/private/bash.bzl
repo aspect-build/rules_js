@@ -1,8 +1,5 @@
 "Bash snippets for js rules"
 
-# TODO: Instead of setting a new RUNFILES env; just set RUNFILES_DIR if it is not set;
-#       needs testing to know if RUNFILES_DIR is set always set to the same value as RUNFILES
-#       when it is set.
 # Bash snipped to initialize the RUNFILES environment variable.
 # Depends on there being a logf_fatal function defined.
 # NB: If this can be generalized fully in the future and not depend on logf_fatal
@@ -113,4 +110,7 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     # to the PWD in case where RUNFILES_MANIFEST_FILE is used above.
     RUNFILES="$PWD/$RUNFILES"
 fi
+# Set RUNFILES_DIR if not already set so that tools such as @bazel/runfiles
+# can locate runfiles without requiring RUNFILES to be exported.
+export RUNFILES_DIR="${RUNFILES_DIR:-$RUNFILES}"
 """

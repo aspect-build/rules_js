@@ -18,6 +18,15 @@ function assert(t, msg) {
 
 const runfiles = new Runfiles(process.env)
 
+describe('runfiles env', () => {
+    it('should have the RUNFILES_DIR env var for use by tools such as @bazel/runfiles', () => {
+        assert(
+            !!process.env.RUNFILES_DIR,
+            'Expected the RUNFILES_DIR env var to be set'
+        )
+    })
+})
+
 describe('runfile resolution', () => {
     it('should properly resolve the files with the module(name)', () => {
         const testFixturePath = runfiles.resolve('e2e_runfiles/test_fixture.md')
