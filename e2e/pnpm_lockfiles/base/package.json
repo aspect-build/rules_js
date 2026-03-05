@@ -9,6 +9,7 @@
         "@aspect-test-a-bad-scope": "npm:@aspect-test/a",
         "@aspect-test-custom-scope/a": "npm:@aspect-test/a",
         "@isaacs/cliui": "8.0.2",
+        "@vscode/vsce-sign": "2.0.9",
         "debug": "ngokevin/debug#9742c5f383a6f8046241920156236ade8ec30d53",
         "esbuild": "0.27.0",
         "highlightjs-git-https-notar": "git+https://gitea.osmocom.org/vyanitskiy/highlight.js.git#58dc5961f6f2bb8bc8bb1e7ce39f268a2fdd874f",

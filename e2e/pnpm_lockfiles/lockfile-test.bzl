@@ -32,6 +32,7 @@ BZLMOD_FILES = {
     # optional deps, os/cpu conditions
     "esbuild_links_defs.bzl": "@REPO_NAME__esbuild__0.27.0__links//:defs.bzl",
     "sass-embedded_links_defs.bzl": "@REPO_NAME__sass-embedded__1.97.3__links//:defs.bzl",
+    "vscode_vsce-sign_links_defs.bzl": "@REPO_NAME__at_vscode_vsce-sign__2.0.9__links//:defs.bzl",
 }
 
 def lockfile_test(npm_link_all_packages, name = None):

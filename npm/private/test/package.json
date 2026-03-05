@@ -1,5 +1,11 @@
 {
     "private": true,
+    "// optionalDependencies": "test linking & building packages with os/cpu constraints etc",
+    "optionalDependencies": {
+        "@vscode/vsce-sign-alpine-arm64": "2.0.2",
+        "@vscode/vsce-sign-alpine-x64": "2.0.2",
+        "sass-embedded-all-unknown": "1.97.3"
+    },
     "// devDependencies": "test linking & building 3rd party npm packages with problematic version specifiers, postinstalls etc",
     "// devDependencies2": "See also: root package.json pnpm.onlyBuiltDependencies+packageExtensions",
     "devDependencies": {
