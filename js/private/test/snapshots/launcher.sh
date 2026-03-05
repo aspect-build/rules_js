@@ -263,6 +263,9 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     # to the PWD in case where RUNFILES_MANIFEST_FILE is used above.
     RUNFILES="$PWD/$RUNFILES"
 fi
+# Set RUNFILES_DIR if not already set so that tools such as @bazel/runfiles
+# can locate runfiles without requiring RUNFILES to be exported.
+export RUNFILES_DIR="${RUNFILES_DIR:-$RUNFILES}"
 
 JS_BINARY__RUNFILES="$RUNFILES"
 export JS_BINARY__RUNFILES
