@@ -25,7 +25,7 @@ def npm_imported_package_store_internal():
         deps = {
             ":.aspect_rules_js/node_modules/@bufbuild+protobuf@2.11.0": "@bufbuild/protobuf",
             ":.aspect_rules_js/node_modules/colorjs.io@0.5.2": "colorjs.io",
-            ":.aspect_rules_js/node_modules/immutable@5.1.4": "immutable",
+            ":.aspect_rules_js/node_modules/immutable@5.1.5": "immutable",
             ":.aspect_rules_js/node_modules/rxjs@7.8.2": "rxjs",
             ":.aspect_rules_js/node_modules/supports-color@8.1.1": "supports-color",
             ":.aspect_rules_js/node_modules/sync-child-process@1.0.2": "sync-child-process",
@@ -110,7 +110,7 @@ def npm_imported_package_store_internal():
         ref_deps = {
             ":.aspect_rules_js/node_modules/@bufbuild+protobuf@2.11.0/ref": "@bufbuild/protobuf",
             ":.aspect_rules_js/node_modules/colorjs.io@0.5.2/ref": "colorjs.io",
-            ":.aspect_rules_js/node_modules/immutable@5.1.4/ref": "immutable",
+            ":.aspect_rules_js/node_modules/immutable@5.1.5/ref": "immutable",
             ":.aspect_rules_js/node_modules/rxjs@7.8.2/ref": "rxjs",
             ":.aspect_rules_js/node_modules/supports-color@8.1.1/ref": "supports-color",
             ":.aspect_rules_js/node_modules/sync-child-process@1.0.2/ref": "sync-child-process",

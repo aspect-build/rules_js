@@ -49,4 +49,8 @@ PNPM_PLATFORMS = {
     "android": "@platforms//os:android",
     "netbsd": "@platforms//os:netbsd",
     "openharmony": None,  # TODO: confirm no bazel support
+
+    # Exotic OS values not returned by process.platform but used in some package.json#os fields.
+    # See https://github.com/aspect-build/rules_js/issues/2745
+    "alpine": None,  # Alpine Linux reports "linux" via process.platform; no distinct bazel constraint
 }

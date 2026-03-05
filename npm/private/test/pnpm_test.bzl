@@ -185,6 +185,12 @@ def _os_constraints(ctx):
     asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["win32", "linux"]))
     asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin", "sunos"]))
     asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:android", "@aspect_rules_js//platforms/pnpm:netbsd"], pnpm.to_bazel_os_constraints(["!linux", "!darwin", "!freebsd", "!openbsd", "!aix"]))
+
+    # "alpine" is not a Node.js process.platform value but is used by some packages (e.g. @vscode/vsce-sign-alpine-*).
+    # It should be recognized as a known (but unsupported) OS value and filtered out, not cause a hard failure.
+    # See https://github.com/aspect-build/rules_js/issues/2745
+    asserts.equals(env, [], pnpm.to_bazel_os_constraints(["alpine"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["alpine", "linux"]))
     return unittest.end(env)
 
 def _os_cpu_constraints(ctx):
