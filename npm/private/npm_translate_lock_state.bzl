@@ -335,7 +335,8 @@ def _copy_input_file(priv, rctx, attr, path, repository_path):
     if len(dst_segments) > 1:
         dirname = "/".join(dst_segments[:-1])
         mkdir_args = [coreutils, "mkdir", "-p", dirname]
-        result = rctx.execute(
+        result = utils.execute_with_retry(
+            rctx,
             mkdir_args,
             quiet = attr.quiet,
         )
@@ -344,7 +345,8 @@ def _copy_input_file(priv, rctx, attr, path, repository_path):
             fail(msg)
 
     cp_args = [coreutils, "cp", path, repository_path]
-    result = rctx.execute(
+    result = utils.execute_with_retry(
+        rctx,
         cp_args,
         quiet = attr.quiet,
     )
@@ -395,7 +397,7 @@ def _yaml_to_json(rctx, yaml_path, is_windows):
         yaml_path,
         "-o=json",
     ]
-    result = rctx.execute(yq_args)
+    result = utils.execute_with_retry(rctx, yq_args)
     if result.return_code:
         return None, "failed to parse {} with yq. '{}' exited with {}: \nSTDOUT:\n{}\nSTDERR:\n{}".format(yq_args, yaml_path, result.return_code, result.stdout, result.stderr)
 
