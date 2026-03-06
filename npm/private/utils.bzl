@@ -12,6 +12,36 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 _SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
+
+# macOS 26 (Tahoe) has a bug in its networking framework's pthread_atfork
+# handler that intermittently kills child processes with SIGKILL (exit 137)
+# when spawned via fork+exec. This retry wrapper handles the transient failure.
+# See https://github.com/GoogleContainerTools/skaffold/issues/9925
+_MACOS_SIGKILL_EXIT_CODE = 137
+_MACOS_SIGKILL_MAX_ATTEMPTS = 3
+
+def _execute_with_retry(rctx, args, **kwargs):
+    """Wrapper around rctx.execute that retries on SIGKILL (exit 137).
+
+    On macOS 26+, child processes spawned by Bazel repository rules can be
+    intermittently killed with SIGKILL due to a bug in the OS networking
+    framework's pthread_atfork handler. This wrapper retries the command
+    to work around the transient failure.
+    """
+    result = None
+    for attempt in range(_MACOS_SIGKILL_MAX_ATTEMPTS):
+        result = rctx.execute(args, **kwargs)
+        if result.return_code != _MACOS_SIGKILL_EXIT_CODE:
+            return result
+
+        # buildifier: disable=print
+        print("WARNING: command '{}' was killed (exit 137), attempt {}/{} failed".format(
+            " ".join([str(a) for a in args]),
+            attempt + 1,
+            _MACOS_SIGKILL_MAX_ATTEMPTS,
+        ))
+    return result
+
 DEFAULT_REGISTRY_DOMAIN = "registry.npmjs.org"
 DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
@@ -212,7 +242,7 @@ def _reverse_force_copy(rctx, label, dst = None):
     dst_dirname = paths.dirname(dst)
     if dst_dirname:
         mkdir_args = [coreutils, "mkdir", "-p", dst_dirname]
-        result = rctx.execute(mkdir_args)
+        result = _execute_with_retry(rctx, mkdir_args)
         if result.return_code != 0:
             msg = """
 
@@ -229,7 +259,7 @@ STDERR:
             fail(msg)
 
     cp_args = [coreutils, "cp", src, dst]
-    result = rctx.execute(cp_args)
+    result = _execute_with_retry(rctx, cp_args)
     if result.return_code != 0:
         msg = """
 
@@ -375,6 +405,7 @@ utils = struct(
     hash = _hash,
     dicts_match = _dicts_match,
     reverse_force_copy = _reverse_force_copy,
+    execute_with_retry = _execute_with_retry,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
     hex_to_base64 = _hex_to_base64,
