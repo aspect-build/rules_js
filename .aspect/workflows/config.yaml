@@ -121,6 +121,9 @@ workspaces:
     e2e/repo_mapping:
         icon: js
         tasks: *e2e_tasks
+    e2e/output_paths:
+        icon: js
+        tasks: *e2e_tasks
     e2e/runfiles:
         icon: js
         tasks: *e2e_tasks
