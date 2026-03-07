@@ -47,7 +47,7 @@ The generator you setup earlier will be invoked automatically as an action to ge
 load("//js/private:js_proto_toolchain.bzl", _js_proto_toolchain = "js_proto_toolchain")
 load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN")
 
-def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, output_file_extensions = ["_pb.js", "_pb.d.ts"], target_settings = [], **kwargs):
+def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, output_file_extensions = ["_pb.js", "_pb.d.ts"], target_settings = [], exec_compatible_with = [], target_compatible_with = [], **kwargs):
     """Define a proto_lang_toolchain that uses the plugin.
 
     Example:
@@ -97,6 +97,8 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, o
             backward compatibility, but should be set explicitly.
 
         target_settings: List of target config settings the toolchain is compatible with.
+        exec_compatible_with: List of constraint_values that the target platform must be compatible with.
+        target_compatible_with: List of constraint values that the execution platform must be compatible with.
 
         **kwargs: Additional arguments to pass to the [proto_lang_toolchain](https://bazel.build/reference/be/protocol-buffer#proto_lang_toolchain) rule.
     """
@@ -117,4 +119,6 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, o
         toolchain_type = LANG_PROTO_TOOLCHAIN,
         toolchain = name,
         target_settings = target_settings,
+        exec_compatible_with = exec_compatible_with,
+        target_compatible_with = target_compatible_with,
     )

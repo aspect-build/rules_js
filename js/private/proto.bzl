@@ -36,7 +36,8 @@ def _js_proto_aspect_impl(target, ctx):
         else:
             js_outputs.extend(proto_common.declare_generated_files(ctx.actions, proto_info, extension))
 
-    output_root = js_outputs[0].root
+    all_outputs = js_outputs + dts_outputs
+    output_root = all_outputs[0].root
 
     args = ctx.actions.args()
     args.add(proto_lang_toolchain_info.plugin.executable, format = proto_lang_toolchain_info.plugin_format_flag)
@@ -69,7 +70,7 @@ def _js_proto_aspect_impl(target, ctx):
         env = {"BAZEL_BINDIR": output_root.path},
         tools = [proto_lang_toolchain_info.plugin, protoc_info.proto_compiler],
         inputs = depset(proto_info.direct_sources, transitive = [proto_info.transitive_descriptor_sets]),
-        outputs = js_outputs + dts_outputs,
+        outputs = all_outputs,
         use_default_shell_env = True,
     )
 
