@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_run_binary", "js_test")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -119,4 +119,90 @@ js_test(
     name = "pkg_versions_test",
     data = [":node_modules"],
     entry_point = "versions.js",
+)
+
+# A node binary indirectly depending on a platform specific optional npm package
+js_binary(
+    name = "esbuild_entry",
+    testonly = True,
+    data = [":node_modules/esbuild"],
+    entry_point = "esbuild.js",
+)
+
+# Use a node binary consuming an optional npm package to build a file
+js_run_binary(
+    name = "versions_esbundled",
+    testonly = True,
+    srcs = [
+        "versions.js",
+        ":node_modules/lodash",
+        ":node_modules/lodash-4.17.21",
+        ":node_modules/lodash-4.17.21-tar",
+    ],
+    outs = ["versions_bundled_out.js"],
+    args = [
+        "$(location versions.js)",
+        package_name() + "/versions_bundled_out.js",
+    ],
+    tool = ":esbuild_entry",
+)
+
+# A test simply running the compiled bundle
+js_test(
+    name = "esbuilt_binary_test",
+    entry_point = "versions_bundled_out.js",
+)
+
+# A binary version of the compiled bundle
+js_binary(
+    name = "esbuilt_binary",
+    testonly = True,
+    entry_point = "versions_bundled_out.js",
+)
+
+platform(
+    name = "amd64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+platform(
+    name = "amd64_macos",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+# The compiled bundle in a platform specific container image layer
+js_image_layer(
+    name = "esbuilt_binary_image_linux",
+    testonly = True,
+    binary = ":esbuilt_binary",
+    platform = ":amd64_linux",
+)
+
+js_image_layer(
+    name = "esbuilt_binary_image_macos",
+    testonly = True,
+    binary = ":esbuilt_binary",
+    platform = ":amd64_macos",
+)
+
+build_test(
+    name = "esbuild_test",
+    targets = [
+        # The esbuild npm package including lifecycle hooks to verify platform deps
+        ":node_modules/esbuild",
+
+        # The bundle target and its output which required running esbuild
+        ":versions_esbundled",
+        "versions_bundled_out.js",
+
+        # Transitioned images using the bundle. Should still consume the original esbuild binary.
+        ":esbuilt_binary_image_linux",
+        ":esbuilt_binary_image_macos",
+    ],
 )
