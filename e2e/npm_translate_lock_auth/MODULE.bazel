@@ -22,7 +22,6 @@ npm.npm_translate_lock(
     data = ["//:package.json"],
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
-    update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "npm")
