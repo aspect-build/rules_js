@@ -24,12 +24,14 @@ _sedi 's#npmrc = "//:.npmrc",#use_home_npmrc = True,#' MODULE.bazel
 # Trigger the update of the pnpm lockfile which should exit non-zero
 if bazel run @npm//:sync; then
     echo "ERROR: expected 'update_pnpm_lock' to exit with non-zero exit code on update"
+    cat .aspect/rules/*/*
     exit 1
 fi
 
 # The lockfile has been updated and sync should now exit 0
 if ! bazel run @npm//:sync; then
     echo "ERROR: expected 'update_pnpm_lock' to exit zero once the lockfile is up to date"
+    cat .aspect/rules/*/*
     exit 1
 fi
 
