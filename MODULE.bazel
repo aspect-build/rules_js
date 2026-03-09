@@ -243,10 +243,6 @@ npm.npm_translate_lock(
             "no-sandbox",
             "requires-network",
         ],
-        "esbuild": [
-            "no-sandbox",
-            "requires-network",
-        ],
         "segfault-handler": [
             "no-sandbox",
             "requires-network",
