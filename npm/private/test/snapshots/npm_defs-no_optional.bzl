@@ -290,7 +290,7 @@ load("@npm-no_optional__es5-ext__0.10.64__links//:defs.bzl", link_286 = "npm_lin
 load("@npm-no_optional__es6-iterator__2.0.3__links//:defs.bzl", store_287 = "npm_imported_package_store_internal")
 load("@npm-no_optional__es6-symbol__3.1.4__links//:defs.bzl", store_288 = "npm_imported_package_store_internal")
 load("@npm-no_optional__es6-weak-map__2.0.3__links//:defs.bzl", store_289 = "npm_imported_package_store_internal")
-load("@npm-no_optional__esbuild__0.24.0__links//:defs.bzl", link_290 = "npm_link_imported_package_store_internal", store_290 = "npm_imported_package_store_internal")
+load("@npm-no_optional__esbuild__0.27.3__links//:defs.bzl", link_290 = "npm_link_imported_package_store_internal", store_290 = "npm_imported_package_store_internal")
 load("@npm-no_optional__escalade__3.2.0__links//:defs.bzl", store_291 = "npm_imported_package_store_internal")
 load("@npm-no_optional__escape-html__1.0.3__links//:defs.bzl", store_292 = "npm_imported_package_store_internal")
 load("@npm-no_optional__escodegen__2.1.0__links//:defs.bzl", store_293 = "npm_imported_package_store_internal")
@@ -1908,10 +1908,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "js/private/test/image":
             link_131()
+            link_290()
             _fp_link_2()
             _fp_link_3()
             link_targets = [
                 ":node_modules/acorn",
+                ":node_modules/esbuild",
                 ":node_modules/@image-test/a",
                 ":node_modules/@image-test/d",
             ]
@@ -2096,6 +2098,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         if prod:
             link_targets.extend([
                 ":node_modules/acorn",
+                ":node_modules/esbuild",
                 ":node_modules/@image-test/a",
                 ":node_modules/@image-test/d",
             ])
