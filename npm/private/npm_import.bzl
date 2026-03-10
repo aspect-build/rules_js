@@ -354,18 +354,17 @@ def npm_link_imported_package(
     )
 """
 
-def bin_internal(name, root_package, package_store_name, bin_path, bin_mnemonic, **kwargs):
-    target = "//%s:%s/node_modules/%s" % (root_package, utils.package_store_root, package_store_name)
+def bin_internal(name, store_target, store_target_dir, bin_path, bin_mnemonic, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = target + "/dir",
+        directory = store_target_dir,
         path = bin_path,
         tags = ["manual"],
     )
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = [target],
+        data = [store_target],
         include_npm = kwargs.pop("include_npm", False),
         tags = ["manual"],
     )
@@ -376,33 +375,31 @@ def bin_internal(name, root_package, package_store_name, bin_path, bin_mnemonic,
         **kwargs
     )
 
-def bin_test_internal(name, root_package, package_store_name, bin_path, **kwargs):
-    target = "//%s:%s/node_modules/%s" % (root_package, utils.package_store_root, package_store_name)
+def bin_test_internal(name, store_target, store_target_dir, bin_path, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = target + "/dir",
+        directory = store_target_dir,
         path = bin_path,
         tags = ["manual"],
     )
     _js_test(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [target],
+        data = kwargs.pop("data", []) + [store_target],
         **kwargs
     )
 
-def bin_binary_internal(name, root_package, package_store_name, bin_path, **kwargs):
-    target = "//%s:%s/node_modules/%s" % (root_package, utils.package_store_root, package_store_name)
+def bin_binary_internal(name, store_target, store_target_dir, bin_path, **kwargs):
     _directory_path(
         name = "%s__entry_point" % name,
-        directory = target + "/dir",
+        directory = store_target_dir,
         path = bin_path,
         tags = ["manual"],
     )
     _js_binary(
         name = name,
         entry_point = ":%s__entry_point" % name,
-        data = kwargs.pop("data", []) + [target],
+        data = kwargs.pop("data", []) + [store_target],
         **kwargs
     )
 
@@ -410,8 +407,8 @@ _BIN_MACRO_TMPL = """
 def {bin_name}(name, **kwargs):
     bin_internal(
         name,
-        root_package = _root_package,
-        package_store_name = _package_store_name,
+        store_target = _store_target,
+        store_target_dir = _store_target_dir,
         bin_path = "{bin_path}",
         bin_mnemonic = "{bin_mnemonic}",
         **kwargs,
@@ -420,18 +417,17 @@ def {bin_name}(name, **kwargs):
 def {bin_name}_test(name, **kwargs):
     bin_test_internal(
         name,
-        root_package = _root_package,
-        package_store_name = _package_store_name,
+        store_target = _store_target,
+        store_target_dir = _store_target_dir,
         bin_path = "{bin_path}",
         **kwargs,
     )
 
-
 def {bin_name}_binary(name, **kwargs):
     bin_binary_internal(
         name,
-        root_package = _root_package,
-        package_store_name = _package_store_name,
+        store_target = _store_target,
+        store_target_dir = _store_target_dir,
         bin_path = "{bin_path}",
         **kwargs,
     )
@@ -650,8 +646,8 @@ def _npm_import_rule_impl(rctx):
                 generated_by_prefix,
                 """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
                 "",
-                '_root_package = "%s"' % rctx.attr.root_package,
-                '_package_store_name = "%s"' % package_store_name,
+                '_store_target = Label("@%s//%s:%s/node_modules/%s")' % (rctx.attr.link_workspace, rctx.attr.root_package, utils.package_store_root, package_store_name),
+                '_store_target_dir = Label("@%s//%s:%s/node_modules/%s/dir")' % (rctx.attr.link_workspace, rctx.attr.root_package, utils.package_store_root, package_store_name),
             ]
             for name in bins:
                 bin_name = _sanitize_bin_name(name)
@@ -1219,6 +1215,7 @@ npm_import_rule = repository_rule(
     attrs = _ATTRS | _INTERNAL_COMMON_ATTRS | {
         "generate_package_json_bzl": attr.bool(),
         "generate_bzl_library_targets": attr.bool(),
+        "link_workspace": attr.string(),
     },
 )
 
@@ -1240,6 +1237,7 @@ def npm_import(
         lifecycle_hooks_execution_requirements,
         lifecycle_hooks_env,
         lifecycle_hooks_use_default_shell_env,
+        link_workspace,
         integrity,
         url,
         commit,
@@ -1267,6 +1265,7 @@ def npm_import(
         package = package,
         version = version,
         root_package = root_package,
+        link_workspace = link_workspace,
         integrity = integrity,
         url = url,
         commit = commit,

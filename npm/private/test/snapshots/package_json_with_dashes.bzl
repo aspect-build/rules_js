@@ -2,14 +2,14 @@
 
 load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")
 
-_root_package = ""
-_package_store_name = "webpack-bundle-analyzer@4.5.0_bufferutil@4.0.8"
+_store_target = Label("@@//:.aspect_rules_js/node_modules/webpack-bundle-analyzer@4.5.0_bufferutil@4.0.8")
+_store_target_dir = Label("@@//:.aspect_rules_js/node_modules/webpack-bundle-analyzer@4.5.0_bufferutil@4.0.8/dir")
 
 def webpack_bundle_analyzer(name, **kwargs):
     bin_internal(
         name,
-        root_package = _root_package,
-        package_store_name = _package_store_name,
+        store_target = _store_target,
+        store_target_dir = _store_target_dir,
         bin_path = "lib/bin/analyzer.js",
         bin_mnemonic = "WebpackBundleAnalyzer",
         **kwargs,
@@ -18,18 +18,17 @@ def webpack_bundle_analyzer(name, **kwargs):
 def webpack_bundle_analyzer_test(name, **kwargs):
     bin_test_internal(
         name,
-        root_package = _root_package,
-        package_store_name = _package_store_name,
+        store_target = _store_target,
+        store_target_dir = _store_target_dir,
         bin_path = "lib/bin/analyzer.js",
         **kwargs,
     )
 
-
 def webpack_bundle_analyzer_binary(name, **kwargs):
     bin_binary_internal(
         name,
-        root_package = _root_package,
-        package_store_name = _package_store_name,
+        store_target = _store_target,
+        store_target_dir = _store_target_dir,
         bin_path = "lib/bin/analyzer.js",
         **kwargs,
     )
