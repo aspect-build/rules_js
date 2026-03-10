@@ -17,6 +17,7 @@ PNPM_LOCK_TEST_CASES = [
     "docusaurus-direct-peer-v9",
     "versionless-patch-v9",
     "nested-peer-v9",
+    "workspace-peer-v9",
 ]
 
 bazel_dep(name = "bazel_lib", version = "3.0.0")

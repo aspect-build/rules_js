@@ -2,6 +2,8 @@ node_modules/
 cases/versionless-patch-v9/node_modules
 cases/docusaurus-direct-peer-v9/node_modules
 cases/nested-peer-v9/node_modules
+cases/workspace-peer-v9/node_modules
+cases/workspace-peer-v9/libs/chokidar/node_modules
 cases/isaacs-cliui-v90/node_modules
 cases/override-with-alias-url-v9/node_modules
 projects/a/node_modules
