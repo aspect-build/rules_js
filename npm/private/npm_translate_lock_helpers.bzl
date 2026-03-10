@@ -555,6 +555,9 @@ def _collect_dep_constraints(packages, package_info):
 
     optional_keys = package_info["optional_dependencies"].values() + package_info.get("transitive_optional_closure", {}).keys()
     for dep_key in optional_keys:
+        if dep_key.startswith("link:"):
+            continue
+
         dep = packages[dep_key]
         if dep["os"]:
             constraints_os[dep_key] = dep["os"]
