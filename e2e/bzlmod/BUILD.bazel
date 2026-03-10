@@ -3,8 +3,8 @@ load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//:jasmine/package_json.bzl", jasmine_bin = "bin")
-load("@npm//:less/package_json.bzl", less_bin = "bin")
 load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
+load("@other_module//:less.bzl", "lessc")
 
 not_windows = select({
     "@platforms//os:windows": ["@platforms//:incompatible"],
@@ -26,14 +26,9 @@ js_test(
     entry_point = "main.mjs",
 )
 
-less_bin.lessc(
+lessc(
     name = "styles",
-    srcs = ["my.less"],
-    outs = ["my.css"],
-    args = [
-        "my.less",
-        "my.css",
-    ],
+    css = "my.less",
 )
 
 assert_contains(
@@ -83,9 +78,13 @@ build_test(
 build_test(
     name = "other_module_run_binary_test",
     targets = [
-        # TODO: https://github.com/aspect-build/rules_js/issues/2725
         # js_run_binary() in @other_repo
-        # "@other_module//:my.css",
+        "@other_module//:my.css",
+        "@other_module//:styles",
+
+        # js_run_binary() with chdir in a subdir of @other_repo
+        "@other_module//subdir:my.css",
+        "@other_module//subdir:styles",
 
         # js_run_binary() running a binary in @other_repo
         ":run_other_module_binary_test",

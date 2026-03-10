@@ -27,7 +27,6 @@ npm.npm_translate_lock(
     # See https://github.com/aspect-build/rules_js/pull/1142 for more info.
     custom_postinstalls = {
         "chalk": "node --version",
-        "less": "npm --version",
         "jasmine": "tsc --version",
     },
     npmrc = "//:.npmrc",

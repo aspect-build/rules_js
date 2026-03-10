@@ -1,6 +1,6 @@
 load("@npm_other_module//:defs.bzl", "npm_link_all_packages")
-load("@npm_other_module//:less/package_json.bzl", less_bin = "bin")
 load("@npm_other_module//:pyright/package_json.bzl", pyright = "bin")
+load(":less.bzl", "lessc", "lessc_binary")
 
 npm_link_all_packages()
 
@@ -16,18 +16,13 @@ genrule(
     cmd = """ echo ".foo { color: red }" > $@""",
 )
 
-less_bin.lessc(
+lessc(
     name = "styles",
-    srcs = ["my.less"],
-    outs = ["my.css"],
-    args = [
-        "my.less",
-        "my.css",
-    ],
+    css = "my.less",
     visibility = ["//visibility:public"],
 )
 
-less_bin.lessc_binary(
+lessc_binary(
     name = "lessc",
     visibility = ["//visibility:public"],
 )

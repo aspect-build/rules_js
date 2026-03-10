@@ -39,6 +39,7 @@ def npm_import(name, package, integrity, version, **kwargs):
         lifecycle_hooks_execution_requirements = None,
         lifecycle_hooks_env = None,
         lifecycle_hooks_use_default_shell_env = None,
+        link_workspace = None,
         url = None,
         commit = None,
         replace_package = None,
