@@ -14,6 +14,10 @@ importers:
       '@aspect-priv-npm/a':
         specifier: 1.0.0
         version: 1.0.0
+    devDependencies:
+      '@types/node':
+        specifier: 22.18.13
+        version: 22.18.13
 
 packages:
 
@@ -25,8 +29,20 @@ packages:
     resolution: {integrity: sha512-M2Bt2VHhbKAtn94EVNtigQncBPo0tHCjM/6k1JV79GOLbVxtFSpwzLEyuivvjc+kyL8b2nAimlfEPhOI3G3OEA==}
     hasBin: true
 
+  '@types/node@22.18.13':
+    resolution: {integrity: sha512-Bo45YKIjnmFtv6I1TuC8AaHBbqXtIo+Om5fE4QiU1Tj8QR/qt+8O3BAtOimG5IFmwaWiPmB3Mv3jtYzBA4Us2A==}
+
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
 snapshots:
 
   '@aspect-build/a@1.0.0': {}
 
   '@aspect-priv-npm/a@1.0.0': {}
+
+  '@types/node@22.18.13':
+    dependencies:
+      undici-types: 6.21.0
+
+  undici-types@6.21.0: {}
