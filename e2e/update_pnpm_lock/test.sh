@@ -49,7 +49,7 @@ ASPECT_RULES_JS_FROZEN_PNPM_LOCK=
 ASPECT_RULES_JS_DISABLE_UPDATE_PNPM_LOCK=
 
 # Have to make another change to package.json to invalidate the repository rule
-_sedi 's#"@types/node": "20"#"@types/node": "18"#' package.json
+_sedi 's#"@types/node": "22.18.13"#"@types/node": "22"#' package.json
 
 # Trigger the update of the pnpm lockfile which should exit non-zero
 if bazel run @npm//:sync; then

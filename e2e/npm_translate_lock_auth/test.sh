@@ -14,16 +14,29 @@ _sedi() {
     sed "${sedi[@]}" "$@"
 }
 
+# Move the local .npmrc to ~/ and update MODULE.bazel to use_home_npmrc=True
 cp -f .npmrc ~/.npmrc
 rm .npmrc
-
-# update .aspect/rules/external_repository_action_cache/npm_translate_lock_<HASH>
-unset ASPECT_RULES_JS_FROZEN_PNPM_LOCK
 _sedi 's#npmrc = "//:.npmrc",#use_home_npmrc = True,#' MODULE.bazel
+
+# Have to make another change to package.json to invalidate the repository rule
+_sedi 's#"@types/node": "22.18.13"#"@types/node": "22"#' package.json
+
+# Allow updating the lockfile for this test
+unset ASPECT_RULES_JS_FROZEN_PNPM_LOCK
 
 # Trigger the update of the pnpm lockfile which should exit non-zero
 if bazel run @npm//:sync; then
     echo "ERROR: expected 'update_pnpm_lock' to exit with non-zero exit code on update"
+    exit 1
+fi
+
+if ! git status --porcelain | grep -q "\.aspect/rules/external_repository_action_cache/npm_translate_lock_"; then
+    echo "ERROR: expected .aspect/rules/external_repository_action_cache/npm_translate_lock_* to be updated by sync"
+    exit 1
+fi
+if ! git status --porcelain | grep -q "pnpm-lock.yaml"; then
+    echo "ERROR: expected pnpm-lock.yaml to be updated by sync"
     exit 1
 fi
 
