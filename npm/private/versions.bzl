@@ -113,4 +113,5 @@ PNPM_VERSIONS = {
     "10.30.2": "sha512-Ns3HB+e3lAqYjJwez4jQhPhRS1w/CF9TouJEwpIdOyVFvCDdTr4fwkX+7EY7spiuzqemPtH3aAuHfcY3nY0MtA==",
     "10.30.3": "sha512-yWHR4KLY41TsqlFmuCJRZmi39Ey1vZUSLVkN2Bki9gb1RzttI+xKW+Bef80Y6EiNR9l4u+mBhy8RRdBumnQAFw==",
     "10.31.0": "sha512-45JziL+qgHjOt5t0j/wegnToTXUWPme8IuBsDTrtQ90VMVHL8R1/gwH/SsuYxovcXK32mJUygB/6/js+SmPCaA==",
+    "10.32.0": "sha512-myY0uz/tVgHDNjPy2SWT9QYnCjljuMUdKy1qgo2mFc5One6++WFMzrvBOsjTwPnJzM61g8achXhDb6R327INcA==",
 }
