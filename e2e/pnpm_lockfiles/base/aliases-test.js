@@ -54,6 +54,17 @@ if (
     throw new Error('aliased `is-odd-v#` should have the correct version')
 }
 
+// optionalDependencies and aliases to them
+require('@aspect-test/h-is-only-optional')
+if (
+    require('@scoped/e/package.json') !== require('@scoped/e2/package.json') ||
+    require('@scoped/e/package.json') !== require('@scoped/e3/package.json')
+) {
+    throw new Error(
+        `@scoped/e, @scoped/e2, and @scoped/e3 should be the same package`
+    )
+}
+
 // `@isaacs/cliui` has transitive `npm:*` deps
 require('@isaacs/cliui')
 

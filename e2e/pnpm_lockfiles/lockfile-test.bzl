@@ -70,6 +70,7 @@ def lockfile_test(npm_link_all_packages, name = None):
         data = [
             ":node_modules/@aspect-test/a",
             ":node_modules/@aspect-test/a2",
+            ":node_modules/@aspect-test/h-is-only-optional",
             ":node_modules/aspect-test-a-no-scope",
             ":node_modules/aspect-test-a/no-at",
             ":node_modules/@aspect-test-a-bad-scope",
@@ -88,6 +89,9 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/is-odd-v3",
             ":node_modules/lodash",
             ":node_modules/@isaacs/cliui",
+            ":node_modules/@scoped/e",
+            ":node_modules/@scoped/e2",
+            ":node_modules/@scoped/e3",
         ],
         entry_point = "aliases-test.js",
     )
@@ -108,6 +112,9 @@ def lockfile_test(npm_link_all_packages, name = None):
 
             # Direct 'optionalDependencies'
             ":node_modules/@aspect-test/h-is-only-optional",
+            ":node_modules/@scoped/e",
+            ":node_modules/@scoped/e2",
+            ":node_modules/@scoped/e3",
 
             # Direct optional + dev
             ":node_modules/@aspect-test/c",

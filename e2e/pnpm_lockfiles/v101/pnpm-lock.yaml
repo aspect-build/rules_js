@@ -172,6 +172,15 @@ importers:
       '@aspect-test/h-is-only-optional':
         specifier: npm:@aspect-test/h@1.0.0
         version: '@aspect-test/h@1.0.0'
+      '@scoped/e':
+        specifier: workspace:*
+        version: link:../projects/e
+      '@scoped/e2':
+        specifier: link:../projects/e
+        version: link:../projects/e
+      '@scoped/e3':
+        specifier: file:../projects/e
+        version: '@scoped/e@file:../projects/e'
 
   ../projects/a: {}
 
@@ -230,6 +239,14 @@ importers:
       '@scoped/b':
         specifier: workspace:*
         version: link:../b
+
+  ../projects/e:
+    optionalDependencies:
+      '@scoped/f':
+        specifier: workspace:*
+        version: link:../f
+
+  ../projects/f: {}
 
   ../projects/peer-types:
     devDependencies:
@@ -569,6 +586,9 @@ packages:
     resolution: {directory: ../projects/c, type: directory}
     peerDependencies:
       '@scoped/b': workspace:*
+
+  '@scoped/e@file:../projects/e':
+    resolution: {directory: ../projects/e, type: directory}
 
   '@types/archiver@5.3.1':
     resolution: {integrity: sha512-wKYZaSXaDvTZuInAWjCeGG7BEAgTWG2zZW0/f7IYFcoHB2X2d9lkVFnrOlXl3W6NrvO6Ml3FLLu8Uksyymcpnw==, tarball: https://registry.npmjs.org/@types/archiver/-/archiver-5.3.1.tgz}
@@ -1240,6 +1260,11 @@ snapshots:
     dependencies:
       '@scoped/a': link:../a
       '@scoped/b': link:../projects/b
+
+  '@scoped/e@file:../projects/e':
+    optionalDependencies:
+      '@scoped/f': link:../projects/f
+    optional: true
 
   '@types/archiver@5.3.1':
     dependencies:

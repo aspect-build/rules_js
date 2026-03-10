@@ -55,7 +55,10 @@
     },
     "optionalDependencies": {
         "@aspect-test/c": "2.0.0",
-        "@aspect-test/h-is-only-optional": "npm:@aspect-test/h@1.0.0"
+        "@aspect-test/h-is-only-optional": "npm:@aspect-test/h@1.0.0",
+        "@scoped/e": "workspace:*",
+        "@scoped/e2": "link:../projects/e",
+        "@scoped/e3": "file:../projects/e"
     },
     "peerDependencies": {
         "@aspect-test/e": "~1.0.0"
