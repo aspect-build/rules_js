@@ -173,7 +173,7 @@ tasks:
           bazel:
               flags: ['--test_tag_filters=-skip-on-bazel9']
           env:
-              USE_BAZEL_VERSION: '9.x'
+              USE_BAZEL_VERSION: '9.0.0'
     - format:
           queue: aspect-medium
     - buildifier:
