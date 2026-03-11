@@ -7,17 +7,18 @@ settings:
 importers:
 
   .:
-    '@aspect-build/a':
-      specifier: 1.0.0
-      version: 1.0.0
-    '@aspect-priv-npm/a':
-      specifier: 1.0.0
-      version: 1.0.0
+    dependencies:
+      '@aspect-build/a':
+        specifier: 1.0.0
+        version: 1.0.0
+      '@aspect-priv-npm/a':
+        specifier: 1.0.0
+        version: 1.0.0
 
 packages:
 
   '@aspect-build/a@1.0.0':
-    resolution: {integrity: sha512-TQ8SpBPjKkHmLJoxVTU+TRU+9utF9hABiFuql5zJWPAtyUGAc3KM5+VsgpNHytqyXe5AyOUV2Ff+ScsQLNEQ7Q==, tarball: download/@aspect-build/a/1.0.0/95cfc2dab39ada95aec1736778d545403edfbf9e}
+    resolution: {integrity: sha512-RUQ9/8WXBcC9FKIkjROXvD+cTFaJwLBJa3gGKWl4E4o12vUUJFyfz5Sr+HkJkGH3FdsMXCKZgmtXBB2a1myhGg==}
     hasBin: true
 
   '@aspect-priv-npm/a@1.0.0':
@@ -25,5 +26,7 @@ packages:
     hasBin: true
 
 snapshots:
+
   '@aspect-build/a@1.0.0': {}
+
   '@aspect-priv-npm/a@1.0.0': {}
