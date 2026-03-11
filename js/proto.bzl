@@ -42,7 +42,7 @@ js_library(
 The generator you setup earlier will be invoked automatically as an action to generate the `.js` and `.d.ts` files.
 """
 
-load("@diff.bzl", "diff")
+load("@diff.bzl//diff:defs.bzl", "diff")
 load("@protobuf//bazel/toolchains:proto_lang_toolchain.bzl", "proto_lang_toolchain")
 load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN", js_proto_library_rule = "js_proto_library")
 

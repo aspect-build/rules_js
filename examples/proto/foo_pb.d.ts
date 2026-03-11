@@ -18,11 +18,6 @@ export declare type Foo = Message<'Foo'> & {
      * @generated from field: string name = 1;
      */
     name: string
-
-    /**
-     * @generated from field: int32 age = 2;
-     */
-    age: number
 }
 
 /**
