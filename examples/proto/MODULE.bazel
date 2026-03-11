@@ -1,0 +1,26 @@
+bazel_dep(name = "aspect_rules_js")
+bazel_dep(name = "diff.bzl", version = "0.4.3")
+bazel_dep(name = "protobuf", version = "33.4")  # Works with Bazel 7-9
+bazel_dep(name = "rules_nodejs", version = "6.7.3")
+
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(node_version_from_nvmrc = "//:.nvmrc")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm.pnpm(pnpm_version_from = "//:package.json")
+use_repo(pnpm, "pnpm")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
+use_repo(npm, "npm")
+
+register_toolchains("//tools/toolchains:all")

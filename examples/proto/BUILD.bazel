@@ -1,0 +1,27 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//js:proto.bzl", "js_proto_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+
+npm_link_all_packages()
+
+proto_library(
+    name = "foo_proto",
+    srcs = ["foo.proto"],
+)
+
+js_proto_library(
+    name = "foo_js_proto",
+    copy_types = "foo_pb.d.ts",
+    # An aspect is attached to this edge to produce a JsInfo provider
+    proto = ":foo_proto",
+)
+
+js_binary(
+    name = "use_proto",
+    data = [
+        ":foo_js_proto",
+        ":foo_js_proto.diff",  # ensure the types are up-to-date in the source folder
+    ],
+    entry_point = "use_proto.js",
+)

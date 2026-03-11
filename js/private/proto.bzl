@@ -22,6 +22,13 @@ load(":proto_common.bzl", "proto_common")
 LANG_PROTO_TOOLCHAIN = Label("//js/toolchains:protoc_plugin")
 PROTOC_TOOLCHAIN = Label("@protobuf//bazel/private:proto_toolchain_type")
 
+ProtoGeneratedTypesInfo = provider(
+    "provides the generated types for a proto target",
+    fields = {
+        "types": "A depset of typings files produced by running protoc plugin on the proto descriptor set",
+    },
+)
+
 def _js_proto_aspect_impl(target, ctx):
     proto_info = target[ProtoInfo]
     protoc_info = ctx.toolchains[PROTOC_TOOLCHAIN].proto
@@ -65,11 +72,13 @@ def _js_proto_aspect_impl(target, ctx):
         use_default_shell_env = True,
     )
 
+    types = depset(dts_outputs)
     return [
+        ProtoGeneratedTypesInfo(types = types),
         js_info(
             target = ctx.label,
             sources = depset(js_outputs),
-            types = depset(dts_outputs),
+            types = types,
             transitive_sources = gather_transitive_sources(js_outputs, ctx.rule.attr.deps),
             transitive_types = gather_transitive_types(dts_outputs, ctx.rule.attr.deps),
             npm_sources = gather_npm_sources(srcs = [], deps = [proto_lang_toolchain_info.runtime]),
@@ -89,4 +98,21 @@ js_proto_aspect = aspect(
         LANG_PROTO_TOOLCHAIN,
         PROTOC_TOOLCHAIN,
     ],
+)
+
+def _js_proto_library_impl(ctx):
+    return [
+        DefaultInfo(files = ctx.attr.proto[ProtoGeneratedTypesInfo].types),
+        ctx.attr.proto[JsInfo],
+    ]
+
+js_proto_library = rule(
+    implementation = _js_proto_library_impl,
+    attrs = {
+        "proto": attr.label(
+            mandatory = True,
+            providers = [ProtoInfo],
+            aspects = [js_proto_aspect],
+        ),
+    },
 )

@@ -42,8 +42,9 @@ js_library(
 The generator you setup earlier will be invoked automatically as an action to generate the `.js` and `.d.ts` files.
 """
 
+load("@diff.bzl", "diff")
 load("@protobuf//bazel/toolchains:proto_lang_toolchain.bzl", "proto_lang_toolchain")
-load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN")
+load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN", js_proto_library_rule = "js_proto_library")
 
 def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, **kwargs):
     """Define a proto_lang_toolchain that uses the plugin.
@@ -97,3 +98,22 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
         runtime = runtime,
         **kwargs
     )
+
+def js_proto_library(name, proto, copy_types = None):
+    """Wrap a proto_library to invoke the js_proto_toolchain.
+
+    Can copy .d.ts type definitions back to the source folder.
+
+    Args:
+        name: The name of the library.
+        proto: The proto_library to wrap.
+        copy_types: HACK to get the label of the file in the source folder.
+    """
+
+    js_proto_library_rule(name = name, proto = proto)
+    if copy_types:
+        diff(
+            name = name + ".diff",
+            file1 = name,
+            file2 = copy_types,
+        )

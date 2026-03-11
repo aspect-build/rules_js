@@ -8,6 +8,7 @@ module(
 
 # Lower-bounds (minimum) versions for direct runtime dependencies.
 # Do not bump these unless rules_js requires a newer version to function.
+bazel_dep(name = "diff.bzl", version = "0.4.3")
 bazel_dep(name = "tar.bzl", version = "0.6.0")
 bazel_dep(name = "yq.bzl", version = "0.3.2")
 bazel_dep(name = "jq.bzl", version = "0.4.0")
