@@ -3,6 +3,8 @@
     "dependencies": {
         "typescript": "^5.9.2",
         "@aspect-test/a": "5.0.2",
+        "@angular-devkit/core": "21.2.1",
+        "chokidar": "workspace:*",
         "lodash": "file:vendored/lodash-4.17.19.tgz"
     },
     "devDependencies": {

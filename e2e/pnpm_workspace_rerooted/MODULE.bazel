@@ -52,6 +52,7 @@ npm.npm_translate_lock(
         "//lib/a:package.json",
         "//lib/b:package.json",
         "//lib/c:package.json",
+        "//lib/chokidar:package.json",
         "//lib/d:package.json",
         "//root:package.json",
         "//root:pnpm-workspace.yaml",
