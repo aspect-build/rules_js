@@ -2,26 +2,27 @@
 // @generated from file foo.proto (syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from '@bufbuild/protobuf/codegenv1'
-import type { Message } from '@bufbuild/protobuf'
+import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file foo.proto.
  */
-export declare const file_foo: GenFile
+export declare const file_foo: GenFile;
 
 /**
  * @generated from message Foo
  */
-export declare type Foo = Message<'Foo'> & {
-    /**
-     * @generated from field: string name = 1;
-     */
-    name: string
-}
+export declare type Foo = Message<"Foo"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+};
 
 /**
  * Describes the message Foo.
  * Use `create(FooSchema)` to create a new message.
  */
-export declare const FooSchema: GenMessage<Foo>
+export declare const FooSchema: GenMessage<Foo>;
+
