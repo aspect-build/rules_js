@@ -114,11 +114,15 @@ def js_proto_library(name, proto, copy_types = []):
     js_proto_library_rule(name = name, proto = proto)
     if len(copy_types) > 0:
         native.filegroup(name = "_{}.types".format(name), srcs = [name], output_group = "types")
+        diff_targets = []
         for i, src_file in enumerate(copy_types):
             gen_file = "_{}.gen_{}.d.ts".format(name, i)
+            diff_target = "{}.diff_{}".format(name, i)
             select_file(name = gen_file, srcs = "_{}.types".format(name), subpath = src_file)
             diff(
-                name = "{}.diff_{}".format(name, i),
+                name = diff_target,
                 file1 = src_file,
                 file2 = gen_file,
             )
+            diff_targets.append(diff_target)
+        native.filegroup(name = "{}.diff".format(name), srcs = diff_targets)
