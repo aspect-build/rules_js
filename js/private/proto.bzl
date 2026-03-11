@@ -102,7 +102,7 @@ js_proto_aspect = aspect(
 
 def _js_proto_library_impl(ctx):
     return [
-        DefaultInfo(files = ctx.attr.proto[ProtoGeneratedTypesInfo].types),
+        OutputGroupInfo(types = ctx.attr.proto[JsInfo].types),
         ctx.attr.proto[JsInfo],
     ]
 

@@ -112,8 +112,9 @@ def js_proto_library(name, proto, copy_types = None):
 
     js_proto_library_rule(name = name, proto = proto)
     if copy_types:
+        native.filegroup(name = "_{}.types".format(name), srcs = [name], output_group = "types")
         diff(
-            name = name + ".diff",
-            file1 = name,
+            name = "{}.diff".format(name),
+            file1 = "_{}.types".format(name),
             file2 = copy_types,
         )

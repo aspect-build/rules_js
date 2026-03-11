@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@aspect_rules_js//js:proto.bzl", "js_proto_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
@@ -17,7 +17,7 @@ js_proto_library(
     proto = ":foo_proto",
 )
 
-js_binary(
+js_test(
     name = "use_proto",
     data = [
         ":foo_js_proto",
