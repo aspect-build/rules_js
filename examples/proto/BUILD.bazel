@@ -7,21 +7,25 @@ npm_link_all_packages()
 
 proto_library(
     name = "foo_proto",
-    srcs = ["foo.proto"],
+    srcs = [
+        "status.proto",
+        "user.proto",
+    ],
+    deps = ["@protobuf//:timestamp_proto"],
 )
 
 js_proto_library(
     name = "foo_js_proto",
-    copy_types = "foo_pb.d.ts",
+    copy_types = ["{}_pb.d.ts".format(name.replace(".proto", "")) for name in glob(["*.proto"])],
     # An aspect is attached to this edge to produce a JsInfo provider
     proto = ":foo_proto",
 )
 
 js_test(
-    name = "use_proto",
+    name = "test",
     data = [
         ":foo_js_proto",
-        ":foo_js_proto.diff",  # ensure the types are up-to-date in the source folder
+        # TODO: ensure the types are up-to-date in the source folder
     ],
-    entry_point = "use_proto.js",
+    entry_point = "test_proto.js",
 )

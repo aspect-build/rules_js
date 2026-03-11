@@ -65,12 +65,11 @@ def _js_proto_aspect_impl(target, ctx):
         use_default_shell_env = True,
     )
 
-    types = depset(dts_outputs)
     return [
         js_info(
             target = ctx.label,
             sources = depset(js_outputs),
-            types = types,
+            types = depset(dts_outputs),
             transitive_sources = gather_transitive_sources(js_outputs, ctx.rule.attr.deps),
             transitive_types = gather_transitive_types(dts_outputs, ctx.rule.attr.deps),
             npm_sources = gather_npm_sources(srcs = [], deps = [proto_lang_toolchain_info.runtime]),
