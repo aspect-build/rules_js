@@ -22,13 +22,6 @@ load(":proto_common.bzl", "proto_common")
 LANG_PROTO_TOOLCHAIN = Label("//js/toolchains:protoc_plugin")
 PROTOC_TOOLCHAIN = Label("@protobuf//bazel/private:proto_toolchain_type")
 
-ProtoGeneratedTypesInfo = provider(
-    "provides the generated types for a proto target",
-    fields = {
-        "types": "A depset of typings files produced by running protoc plugin on the proto descriptor set",
-    },
-)
-
 def _js_proto_aspect_impl(target, ctx):
     proto_info = target[ProtoInfo]
     protoc_info = ctx.toolchains[PROTOC_TOOLCHAIN].proto
@@ -74,7 +67,6 @@ def _js_proto_aspect_impl(target, ctx):
 
     types = depset(dts_outputs)
     return [
-        ProtoGeneratedTypesInfo(types = types),
         js_info(
             target = ctx.label,
             sources = depset(js_outputs),
@@ -107,6 +99,10 @@ def _js_proto_library_impl(ctx):
     ]
 
 js_proto_library = rule(
+    doc = """A rule that wraps a proto_library to invoke the js_proto_aspect.
+    
+    Useful when you must adapt a ProtoInfo provider to a JsInfo provider, for rule kinds that don't invoke the js_proto_aspect on their deps.
+    """,
     implementation = _js_proto_library_impl,
     attrs = {
         "proto": attr.label(
