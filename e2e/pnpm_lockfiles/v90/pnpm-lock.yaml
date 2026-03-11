@@ -103,7 +103,7 @@ importers:
         version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d
       jquery-github:
         specifier: github:jquery/jquery
-        version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/d1ff507a6ad9ec99e10f88f1e57cb2ebe49990ec
+        version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/882be3911e410754f0bfdd44ab695dacfc2950d3
       jquery-http-git-f85d521:
         specifier: https://github.com/jquery/jquery.git#f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
         version: jquery@https://codeload.github.com/jquery/jquery/tar.gz/f85d521cdeeb3c6d3f4563a06dba8be793e26ef0
@@ -776,8 +776,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1}
     version: 3.7.1-pre
 
-  jquery@https://codeload.github.com/jquery/jquery/tar.gz/d1ff507a6ad9ec99e10f88f1e57cb2ebe49990ec:
-    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/d1ff507a6ad9ec99e10f88f1e57cb2ebe49990ec}
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/882be3911e410754f0bfdd44ab695dacfc2950d3:
+    resolution: {tarball: https://codeload.github.com/jquery/jquery/tar.gz/882be3911e410754f0bfdd44ab695dacfc2950d3}
     version: 4.0.0
 
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d:
@@ -1425,7 +1425,7 @@ snapshots:
 
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/763ade6dda092709b36d97491951bcae415d91d1: {}
 
-  jquery@https://codeload.github.com/jquery/jquery/tar.gz/d1ff507a6ad9ec99e10f88f1e57cb2ebe49990ec: {}
+  jquery@https://codeload.github.com/jquery/jquery/tar.gz/882be3911e410754f0bfdd44ab695dacfc2950d3: {}
 
   jquery@https://codeload.github.com/jquery/jquery/tar.gz/e61fccb9d736235b4b011f89cba6866bc0b8997d: {}
 
