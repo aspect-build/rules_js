@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "status.proto";
+
+message User {
+    string name = 1;
+    status.Status status = 2;
+    repeated string tags = 3;
+}
