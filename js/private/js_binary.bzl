@@ -21,6 +21,7 @@ load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variabl
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
+load(":proto.bzl", "js_proto_aspect")
 
 _DOC = """Execute a program in the Node.js runtime.
 
@@ -99,6 +100,7 @@ _ATTRS = {
         NB: `data` files are copied to the Bazel output tree before being passed
         as inputs to runfiles. See `copy_data_to_bin` docstring for more info.
         """,
+        aspects = [js_proto_aspect],
     ),
     "entry_point": attr.label(
         allow_files = True,

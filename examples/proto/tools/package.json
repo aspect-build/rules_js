@@ -1,0 +1,7 @@
+{
+    "devDependencies": {
+        "@bufbuild/protoc-gen-es": "~2.2.4",
+        "@connectrpc/protoc-gen-connect-query": "^2.0.1",
+        "@types/node": "catalog:"
+    }
+}

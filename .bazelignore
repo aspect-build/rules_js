@@ -1,5 +1,6 @@
 # Nested modules
 e2e/
+examples/proto
 
 # TODO(bazel 8): move to REPO.bazel
 examples/js_binary/node_modules/
@@ -20,6 +21,8 @@ examples/npm_package/packages/pkg_d/node_modules/
 examples/npm_package/packages/pkg_e/node_modules/
 examples/runfiles/node_modules
 examples/stack_traces/node_modules
+examples/proto/node_modules
+examples/proto/tools/node_modules
 examples/vite3/node_modules
 examples/vite6/node_modules
 examples/webpack_cli/node_modules/
