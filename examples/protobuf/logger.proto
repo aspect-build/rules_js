@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package logger;
-
-message LogMessage {
-  string message = 1;
-}

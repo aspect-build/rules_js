@@ -2,6 +2,9 @@
     "devDependencies": {
         "@bufbuild/protoc-gen-es": "~2.2.4",
         "@connectrpc/protoc-gen-connect-query": "^2.0.1",
-        "@types/node": "catalog:"
+        "@protobuf-ts/plugin": "2.11.1",
+        "@types/node": "catalog:",
+        "google-protobuf": "4.0.2",
+        "ts-proto": "2.11.4"
     }
 }

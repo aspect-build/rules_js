@@ -1,19 +1,11 @@
 {
     "private": true,
-    "dependencies": {
-        "@bufbuild/protobuf": "2.11.0",
-        "@protobuf-ts/runtime": "2.11.1"
-    },
     "devDependencies": {
-        "@bufbuild/protoc-gen-es": "2.11.0",
-        "@protobuf-ts/plugin": "2.11.1",
+        "google-closure-compiler": "^20251111.0.0",
         "@types/node": "22.18.13",
         "chalk": "5.1.1",
         "circles": "npm:es5-ext@0.10.64",
-        "google-closure-compiler": "^20251111.0.0",
-        "google-protobuf": "4.0.2",
         "jsonpath-plus": "10.3.0",
-        "ts-proto": "2.11.4",
         "typescript": "^5.8.0"
     }
 }

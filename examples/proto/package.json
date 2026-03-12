@@ -2,7 +2,10 @@
     "private": true,
     "packageManager": "pnpm@10.20.0",
     "dependencies": {
-        "@bufbuild/protobuf": "catalog:"
+        "@bufbuild/protobuf": "catalog:",
+        "@protobuf-ts/runtime": "2.11.1",
+        "google-protobuf": "4.0.2",
+        "ts-proto": "2.11.4"
     },
     "type": "module"
 }

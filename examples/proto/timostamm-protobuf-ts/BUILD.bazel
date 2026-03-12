@@ -1,0 +1,18 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("//:js_proto_test.bzl", "js_proto_test")
+
+js_library(
+    name = "test_lib",
+    srcs = ["test_proto.js"],
+    tags = ["manual"],
+    deps = [
+        "//:foo_js_lib",
+    ],
+)
+
+js_proto_test(
+    name = "test",
+    data = [":test_lib"],
+    entry_point = "test_proto.js",
+    js_proto_implementation = "protobuf_ts",
+)

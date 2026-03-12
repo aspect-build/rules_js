@@ -1,5 +1,5 @@
-import { UserSchema } from './user_pb.js'
-import { StatusSchema } from './status_pb.js'
+import { UserSchema } from '../user_pb.js'
+import { StatusSchema } from '../status_pb.js'
 import { create, fromBinary, toBinary } from '@bufbuild/protobuf'
 import assert from 'node:assert'
 

@@ -1,14 +1,14 @@
 """A macro for running a JS or TS test using a specific protobuf implementation."""
 
-load("//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
 
 def _js_proto_toolchain_transition_impl(_settings, attr):
-    return {"//examples/protobuf:js_proto_implementation": attr.js_proto_implementation}
+    return {"//:js_proto_implementation": attr.js_proto_implementation}
 
 _js_proto_toolchain_transition = transition(
     implementation = _js_proto_toolchain_transition_impl,
     inputs = [],
-    outputs = ["//examples/protobuf:js_proto_implementation"],
+    outputs = ["//:js_proto_implementation"],
 )
 
 def _js_proto_test_impl(ctx):
@@ -50,7 +50,7 @@ def js_proto_test(name, js_proto_implementation, **kwargs):
         name: The name of the test target.
         js_proto_implementation: The name of the JavaScript or TypeScript
             protobuf implementation to use. This can be any of the values of the flag
-            //examples/protobuf:js_proto_implementation.
+            //:js_proto_implementation.
         **kwargs: Arguments to pass to js_test().
     """
     js_test(
