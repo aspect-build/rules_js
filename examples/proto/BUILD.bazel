@@ -23,6 +23,9 @@ js_proto_library(
 
 js_test(
     name = "test",
-    data = [":foo_js_proto"],
+    data = [
+        ":foo_js_proto",
+        ":foo_js_proto.diff",
+    ],
     entry_point = "test_proto.js",
 )

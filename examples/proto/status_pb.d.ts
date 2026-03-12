@@ -19,6 +19,11 @@ export declare type Status = Message<"status.Status"> & {
    * @generated from field: google.protobuf.Timestamp created_at = 1;
    */
   createdAt?: Timestamp;
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message: string;
 };
 
 /**
