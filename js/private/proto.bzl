@@ -90,24 +90,3 @@ js_proto_aspect = aspect(
         PROTOC_TOOLCHAIN,
     ],
 )
-
-def _js_proto_library_impl(ctx):
-    return [
-        OutputGroupInfo(types = ctx.attr.proto[JsInfo].types),
-        ctx.attr.proto[JsInfo],
-    ]
-
-js_proto_library = rule(
-    doc = """A rule that wraps a proto_library to invoke the js_proto_aspect.
-    
-    Useful when you must adapt a ProtoInfo provider to a JsInfo provider, for rule kinds that don't invoke the js_proto_aspect on their deps.
-    """,
-    implementation = _js_proto_library_impl,
-    attrs = {
-        "proto": attr.label(
-            mandatory = True,
-            providers = [ProtoInfo],
-            aspects = [js_proto_aspect],
-        ),
-    },
-)

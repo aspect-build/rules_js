@@ -42,8 +42,6 @@ js_library(
 The generator you setup earlier will be invoked automatically as an action to generate the `.js` and `.d.ts` files.
 """
 
-load("@bazel_skylib//rules:select_file.bzl", "select_file")
-load("@diff.bzl//diff:defs.bzl", "diff")
 load("@protobuf//bazel/toolchains:proto_lang_toolchain.bzl", "proto_lang_toolchain")
 load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN", js_proto_library_rule = "js_proto_library")
 
@@ -100,29 +98,5 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
         **kwargs
     )
 
-def js_proto_library(name, proto, copy_types = []):
-    """Wrap a proto_library to invoke the js_proto_toolchain.
-
-    Can copy .d.ts type definitions back to the source folder.
-
-    Args:
-        name: The name of the library.
-        proto: The proto_library to wrap.
-        copy_types: HACK to get the label of the file in the source folder.
-    """
-
-    js_proto_library_rule(name = name, proto = proto)
-    if len(copy_types) > 0:
-        native.filegroup(name = "_{}.types".format(name), srcs = [name], output_group = "types")
-        diff_targets = []
-        for i, src_file in enumerate(copy_types):
-            gen_file = "_{}.gen_{}.d.ts".format(name, i)
-            diff_target = "{}.diff_{}".format(name, i)
-            select_file(name = gen_file, srcs = "_{}.types".format(name), subpath = src_file)
-            diff(
-                name = diff_target,
-                file1 = src_file,
-                file2 = gen_file,
-            )
-            diff_targets.append(diff_target)
-        native.filegroup(name = "{}.diff".format(name), srcs = diff_targets)
+# TODO: expand to a macro that copies the types back to the source folder
+js_proto_library = js_proto_library_rule
