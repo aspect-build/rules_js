@@ -6,6 +6,13 @@ drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@esbuild+linux-x64@0.27.3/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@esbuild+linux-x64@0.27.3/node_modules/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@esbuild+linux-x64@0.27.3/node_modules/@esbuild/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@esbuild+linux-x64@0.27.3/node_modules/@esbuild/linux-x64/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@esbuild+linux-x64@0.27.3/node_modules/@esbuild/linux-x64/bin/
+-r-xr-xr-x  0 100    0    11108536 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@esbuild+linux-x64@0.27.3/node_modules/@esbuild/linux-x64/bin/esbuild
+-r-xr-xr-x  0 100    0         372 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@esbuild+linux-x64@0.27.3/node_modules/@esbuild/linux-x64/package.json
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/acorn@8.12.1/node_modules/acorn/
@@ -50,6 +57,20 @@ drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 -r-xr-xr-x  0 100    0         327 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/source/vendor/supports-color/browser.js
 -r-xr-xr-x  0 100    0        1008 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/source/vendor/supports-color/index.d.ts
 -r-xr-xr-x  0 100    0        3567 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/chalk@5.0.1/node_modules/chalk/source/vendor/supports-color/index.js
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/@esbuild/
+lrwxrwxr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/@esbuild/linux-x64 -> ../../../@esbuild+linux-x64@0.27.3/node_modules/@esbuild/linux-x64
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/
+-r-xr-xr-x  0 100    0          57 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/aspect_rules_js_metadata.json
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/bin/
+-r-xr-xr-x  0 100    0    10385170 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/bin/esbuild
+-r-xr-xr-x  0 100    0       11160 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/install.js
+drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/lib/
+hr-xr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/lib/downloaded-@esbuild-darwin-arm64-esbuild link to ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/bin/esbuild
+-r-xr-xr-x  0 100    0       23392 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/lib/main.d.ts
+-r-xr-xr-x  0 100    0       88698 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/lib/main.js
+-r-xr-xr-x  0 100    0        1463 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/esbuild@0.27.3/node_modules/esbuild/package.json
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/
 drwxr-xr-x  0 100    0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/uuid@8.3.2/node_modules/uuid/

@@ -400,8 +400,8 @@ load("@npm-no_optional__es6-weak-map__2.0.3__links//:defs.bzl", store_396 = "npm
 load("@npm-no_optional__esbuild__0.15.18__links//:defs.bzl", store_397 = "npm_imported_package_store_internal")
 load("@npm-no_optional__esbuild__0.19.12__links//:defs.bzl", store_398 = "npm_imported_package_store_internal")
 load("@npm-no_optional__esbuild__0.21.5__links//:defs.bzl", store_399 = "npm_imported_package_store_internal")
-load("@npm-no_optional__esbuild__0.24.0__links//:defs.bzl", link_400 = "npm_link_imported_package_store_internal", store_400 = "npm_imported_package_store_internal")
-load("@npm-no_optional__esbuild__0.25.12__links//:defs.bzl", store_401 = "npm_imported_package_store_internal")
+load("@npm-no_optional__esbuild__0.25.12__links//:defs.bzl", store_400 = "npm_imported_package_store_internal")
+load("@npm-no_optional__esbuild__0.27.3__links//:defs.bzl", link_401 = "npm_link_imported_package_store_internal", store_401 = "npm_imported_package_store_internal")
 load("@npm-no_optional__escalade__3.2.0__links//:defs.bzl", store_402 = "npm_imported_package_store_internal")
 load("@npm-no_optional__escape-html__1.0.3__links//:defs.bzl", store_403 = "npm_imported_package_store_internal")
 load("@npm-no_optional__escape-latex__1.2.0__links//:defs.bzl", store_404 = "npm_imported_package_store_internal")
@@ -2345,7 +2345,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_83("regl", dev=True)
             link_250(dev=True)
             link_350(dev=True)
-            link_400(dev=True)
+            link_401(dev=True)
             link_509("handlebars-helpers/helper-date", dev=True)
             link_511(dev=True)
             link_532(dev=True)
@@ -2620,10 +2620,12 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             }
         elif bazel_package == "js/private/test/image":
             link_196()
+            link_401()
             _fp_link_2()
             _fp_link_6()
             link_targets = [
                 ":node_modules/acorn",
+                ":node_modules/esbuild",
                 ":node_modules/@mycorp/pkg-a",
                 ":node_modules/@mycorp/pkg-d",
             ]
@@ -2970,6 +2972,7 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
         if prod:
             link_targets.extend([
                 ":node_modules/acorn",
+                ":node_modules/esbuild",
                 ":node_modules/@mycorp/pkg-a",
                 ":node_modules/@mycorp/pkg-d",
             ])
