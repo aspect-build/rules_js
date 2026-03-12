@@ -1,4 +1,5 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:proto.bzl", "js_proto_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
@@ -13,14 +14,15 @@ proto_library(
     deps = ["@protobuf//:timestamp_proto"],
 )
 
-js_library(
-    name = "foo_js_lib",
-    # This edge runs an aspect to produce a JsInfo provider with protobuf .js/.d.ts files.
-    deps = [":foo_proto"],
+js_proto_library(
+    name = "foo_js_proto",
+    copy_types = ["{}_pb.d.ts".format(name.replace(".proto", "")) for name in glob(["*.proto"])],
+    # An aspect is attached to this edge to produce a JsInfo provider
+    proto = ":foo_proto",
 )
 
 js_test(
     name = "test",
-    data = [":foo_js_lib"],
+    data = [":foo_js_proto"],
     entry_point = "test_proto.js",
 )

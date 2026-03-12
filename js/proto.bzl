@@ -43,7 +43,7 @@ The generator you setup earlier will be invoked automatically as an action to ge
 """
 
 load("@protobuf//bazel/toolchains:proto_lang_toolchain.bzl", "proto_lang_toolchain")
-load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN")
+load("//js/private:proto.bzl", "LANG_PROTO_TOOLCHAIN", js_proto_library_rule = "js_proto_library")
 
 def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, **kwargs):
     """Define a proto_lang_toolchain that uses the plugin.
@@ -97,3 +97,6 @@ def js_proto_toolchain(name, plugin_name, plugin_options, plugin_bin, runtime, *
         runtime = runtime,
         **kwargs
     )
+
+# TODO: expand to a macro that copies the types back to the source folder
+js_proto_library = js_proto_library_rule
