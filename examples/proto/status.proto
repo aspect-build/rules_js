@@ -6,4 +6,5 @@ package status;
 
 message Status {
     google.protobuf.Timestamp created_at = 1;
+    string message = 2;
 }
