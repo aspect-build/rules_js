@@ -6,7 +6,7 @@ js_library(
     srcs = ["test_proto.js"],
     tags = ["manual"],
     deps = [
-        "//:foo_js_lib",
+        "//:foo_proto",
     ],
 )
 

@@ -3,12 +3,12 @@
 load("@aspect_rules_js//js:defs.bzl", "js_test")
 
 def _js_proto_toolchain_transition_impl(_settings, attr):
-    return {"//:js_proto_implementation": attr.js_proto_implementation}
+    return {"//tools/toolchains:js_proto_implementation": attr.js_proto_implementation}
 
 _js_proto_toolchain_transition = transition(
     implementation = _js_proto_toolchain_transition_impl,
     inputs = [],
-    outputs = ["//:js_proto_implementation"],
+    outputs = ["//tools/toolchains:js_proto_implementation"],
 )
 
 def _js_proto_test_impl(ctx):
@@ -50,7 +50,7 @@ def js_proto_test(name, js_proto_implementation, **kwargs):
         name: The name of the test target.
         js_proto_implementation: The name of the JavaScript or TypeScript
             protobuf implementation to use. This can be any of the values of the flag
-            //:js_proto_implementation.
+            //tools/toolchains:js_proto_implementation.
         **kwargs: Arguments to pass to js_test().
     """
     js_test(
