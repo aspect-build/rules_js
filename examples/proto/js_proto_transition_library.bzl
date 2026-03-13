@@ -22,6 +22,11 @@ js_proto_transition_library = rule(
     implementation = _js_proto_transition_library_impl,
     attrs = {
         "target": attr.label(cfg = _js_proto_toolchain_transition),
-        "js_proto_implementation": attr.string(mandatory = True),
+        "js_proto_implementation": attr.string(mandatory = True, values = [
+            "protobuf_es",
+            "ts_proto",
+            "google_protobuf",
+            "protobuf_ts",
+        ]),
     },
 )
