@@ -1,3 +1,9 @@
+"""
+This file defines four JavaScript and TypeScript toolchains, specifically the
+ones for which Buf provides an SDK:
+https://buf.build/bazel/bazel/sdks/main:protobuf
+"""
+
 load("@aspect_rules_js//js:proto.bzl", "js_proto_toolchain")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@npm//:ts-proto/package_json.bzl", ts_proto = "bin")
