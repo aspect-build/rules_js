@@ -12,8 +12,12 @@ JavaScript or TypeScript code generators.
 
 load("@protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 load("@protobuf//bazel/common:proto_lang_toolchain_info.bzl", "ProtoLangToolchainInfo")
-load("//js/private:js_proto_toolchain_info.bzl", "JsProtoToolchainInfo")
 load("//js/private:proto.bzl", "PROTOC_TOOLCHAIN")
+
+JsProtoToolchainInfo = provider(
+    doc = "Information on how to invoke the JavaScript or TypeScript protoc plugin.",
+    fields = ["output_file_extensions"],
+)
 
 def _js_proto_toolchain_impl(ctx):
     denylisted_protos = ctx.attr.denylisted_protos
