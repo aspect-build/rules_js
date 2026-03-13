@@ -25,6 +25,9 @@ string_flag(
     ],
 )
 
+#############
+# protobuf-es
+# https://github.com/bufbuild/protobuf-es
 config_setting(
     name = "protobuf_es",
     flag_values = {
@@ -32,34 +35,8 @@ config_setting(
     },
 )
 
-config_setting(
-    name = "ts_proto",
-    flag_values = {
-        ":js_proto_implementation": "ts_proto",
-    },
-)
-
-config_setting(
-    name = "google_protobuf",
-    flag_values = {
-        ":js_proto_implementation": "google_protobuf",
-    },
-)
-
-config_setting(
-    name = "protobuf_ts",
-    flag_values = {
-        ":js_proto_implementation": "protobuf_ts",
-    },
-)
-
 gen_es.protoc_gen_es_binary(
     name = "protoc_gen_es",
-)
-
-# FIXME: wire this up to another toolchain_type symbol?
-gen_connect_query.protoc_gen_connect_query_binary(
-    name = "protoc_gen_connect_query",
 )
 
 js_proto_toolchain(
@@ -79,6 +56,16 @@ js_proto_toolchain(
     target_settings = [":protobuf_es"],
 )
 
+###################
+# stephenh-ts-proto
+# https://github.com/stephenh/ts-proto
+config_setting(
+    name = "ts_proto",
+    flag_values = {
+        ":js_proto_implementation": "ts_proto",
+    },
+)
+
 ts_proto.protoc_gen_ts_proto_binary(
     name = "protoc_gen_ts_proto",
 )
@@ -91,6 +78,16 @@ js_proto_toolchain(
     plugin_options = [],
     runtime = "//:node_modules/@bufbuild/protobuf",
     target_settings = [":ts_proto"],
+)
+
+#################
+# google-protobuf
+# https://github.com/protocolbuffers/protobuf-javascript
+config_setting(
+    name = "google_protobuf",
+    flag_values = {
+        ":js_proto_implementation": "google_protobuf",
+    },
 )
 
 js_proto_toolchain(
@@ -108,6 +105,16 @@ js_proto_toolchain(
     target_settings = [":google_protobuf"],
 )
 
+#######################
+# timostamm-protobuf-ts
+# https://github.com/timostamm/protobuf-ts
+config_setting(
+    name = "protobuf_ts",
+    flag_values = {
+        ":js_proto_implementation": "protobuf_ts",
+    },
+)
+
 protobuf_ts.protoc_gen_ts_binary(
     name = "protoc_gen_ts",
 )
@@ -123,4 +130,9 @@ js_proto_toolchain(
     plugin_options = ["output_javascript"],
     runtime = "//:node_modules/@protobuf-ts/runtime",
     target_settings = [":protobuf_ts"],
+)
+
+# FIXME: wire this up to another toolchain_type symbol?
+gen_connect_query.protoc_gen_connect_query_binary(
+    name = "protoc_gen_connect_query",
 )
