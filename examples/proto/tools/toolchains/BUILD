@@ -114,10 +114,13 @@ protobuf_ts.protoc_gen_ts_binary(
 
 js_proto_toolchain(
     name = "protoc_gen_ts_toolchain",
-    output_file_extensions = [".ts"],
+    output_file_extensions = [
+        ".js",
+        ".d.ts",
+    ],
     plugin_bin = ":protoc_gen_ts",
     plugin_name = "ts",
-    plugin_options = [],
+    plugin_options = ["output_javascript"],
     runtime = "//:node_modules/@protobuf-ts/runtime",
     target_settings = [":protobuf_ts"],
 )

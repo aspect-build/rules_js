@@ -1,4 +1,4 @@
-import { User } from '../user.ts'
+import { User } from '../user.js'
 import assert from 'node:assert'
 
 let user = User.create({
