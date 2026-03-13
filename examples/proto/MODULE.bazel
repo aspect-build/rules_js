@@ -1,4 +1,5 @@
 bazel_dep(name = "aspect_rules_js")
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "diff.bzl", version = "0.4.3")
 bazel_dep(name = "protobuf", version = "33.4")  # Works with Bazel 7-9
 bazel_dep(name = "rules_nodejs", version = "6.7.3")
@@ -22,5 +23,24 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
 )
 use_repo(npm, "npm")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# The usual way to obtain this protoc plugin is to use the
+# @protocolbuffers/protoc-gen-js package. However, that package downloads
+# protoc using a post-install script, and this is not easy to accommodate in
+# Bazel. Instead, we just download the release binary from GitHub.
+http_archive(
+    name = "protobuf-javascript",
+    build_file_content = """filegroup(
+    name = \"protoc-gen-js\",
+    srcs = [\"bin/protoc-gen-js\"],
+    visibility = [\"//visibility:public\"],
+)
+""",
+    dev_dependency = True,
+    integrity = "sha256-HclFw2NR1qZfmvwUQjlDNuesMl9+HCf4bKmdqn/qKRc=",
+    url = "https://github.com/protocolbuffers/protobuf-javascript/releases/download/v4.0.2/protobuf-javascript-4.0.2-linux-x86_64.tar.gz",
+)
 
 register_toolchains("//tools/toolchains:all")

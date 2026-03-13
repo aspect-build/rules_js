@@ -121,3 +121,14 @@ bzl_library(
         "@tar.bzl//tar",
     ],
 )
+
+bzl_library(
+    name = "js_proto_toolchain",
+    srcs = ["js_proto_toolchain.bzl"],
+    visibility = ["//js:__subpackages__"],
+    deps = [
+        ":proto",
+        "@protobuf//bazel/common:proto_info_bzl",
+        "@protobuf//bazel/common:proto_lang_toolchain_info_bzl",
+    ],
+)
