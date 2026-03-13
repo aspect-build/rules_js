@@ -1,7 +1,9 @@
 # Protobuf examples
 
 This directory contains examples of how to set up and use several different
-JavaScript and TypeScript protobuf implementations.
+JavaScript and TypeScript protobuf implementations, specifically the four
+implementations for which Buf
+[provides](https://buf.build/bazel/bazel/sdks/main:protobuf) an SDK.
 
 Note that we jump through some extra hoops here to make it possible to have
 multiple JS protobuf implementations in the same Bazel repo. We do this by
