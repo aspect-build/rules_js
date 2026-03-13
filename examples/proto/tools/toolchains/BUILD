@@ -75,7 +75,7 @@ js_proto_toolchain(
     output_file_extensions = [".ts"],
     plugin_bin = ":protoc_gen_ts_proto",
     plugin_name = "ts_proto",
-    plugin_options = [],
+    plugin_options = ["importSuffix=.js"],
     runtime = "//:node_modules/@bufbuild/protobuf",
     target_settings = [":ts_proto"],
 )
