@@ -6,8 +6,8 @@ load("@npm//tools:@connectrpc/protoc-gen-connect-query/package_json.bzl", gen_co
 load("@npm//tools:@protobuf-ts/plugin/package_json.bzl", protobuf_ts = "bin")
 
 # We define a flag here for determinining which JS protobuf implementation
-# should be used. The js_proto_test() macro uses a transition to set this flag
-# and thereby control the implementation used in each example.
+# should be used. The js_proto_transition_library() rule uses a transition to
+# set this flag and thereby control the implementation used in each example.
 string_flag(
     name = "js_proto_implementation",
     build_setting_default = "protobuf_es",

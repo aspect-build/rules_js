@@ -1,5 +1,5 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("//:js_proto_test.bzl", "js_proto_test")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("//:js_proto_transition_library.bzl", "js_proto_transition_library")
 
 js_library(
     name = "test_lib",
@@ -10,9 +10,14 @@ js_library(
     ],
 )
 
-js_proto_test(
-    name = "test",
-    data = [":test_lib"],
-    entry_point = "test_proto.js",
+js_proto_transition_library(
+    name = "test_lib_transition",
     js_proto_implementation = "ts_proto",
+    target = ":test_lib",
+)
+
+js_test(
+    name = "test",
+    data = [":test_lib_transition"],
+    entry_point = "test_proto.js",
 )
