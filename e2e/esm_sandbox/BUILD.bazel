@@ -1,0 +1,7 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+
+js_test(
+    name = "esm_sandbox_test",
+    data = ["dep.mjs"],
+    entry_point = "entry.mjs",
+)
