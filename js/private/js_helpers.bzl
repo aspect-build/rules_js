@@ -83,7 +83,7 @@ Expected to find source file {file_basename} in '{this_package}', but instead it
 All source and data files that are not in the Bazel output tree must be in the same package as the
 target so that they can be copied to the output tree in an action.
 
-See https://docs.aspect.build/rules/aspect_rules_js/docs/#javascript for more context on why this is required.
+See https://docs.aspect.build/bazel/javascript/rules_js for more context on why this is required.
 
 Either move {file_basename} to '{this_package}', or add a 'js_library'
 target in {file_basename}'s package and add that target to the deps of {this_target}:

@@ -178,7 +178,7 @@ def npm_package(
     for more information on supported globbing patterns.
 
     `npm_package` makes use of `copy_to_directory`
-    (https://docs.aspect.build/rules/bazel_lib/docs/copy_to_directory) under the hood,
+    (https://docs.aspect.build/bazel/utility/bazel_lib/lib_copy_to_directory) under the hood,
     adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
     `npm_package` includes direct and transitive sources and types files from `JsInfo` providers in srcs
     by default. The behavior of including sources and types from `JsInfo` can be configured
@@ -474,12 +474,12 @@ def stamped_package_json(name, stamp_var, **kwargs):
     In unstamped builds (typically those without `--stamp`) the version will be set to `0.0.0`.
     This ensures that actions which use the package.json file can get cache hits.
 
-    For more information on stamping, read https://docs.aspect.build/rules/bazel_lib/docs/stamping.
+    For more information on stamping, read https://docs.aspect.build/bazel/utility/bazel_lib/lib_stamping.
 
     Args:
         name: name of the resulting `jq` target, must be "package"
         stamp_var: a key from the bazel-out/stable-status.txt or bazel-out/volatile-status.txt files
-        **kwargs: additional attributes passed to the jq rule, see https://docs.aspect.build/rules/bazel_lib/docs/jq
+        **kwargs: additional attributes passed to the jq rule
     """
     if name != "package":
         fail("""stamped_package_json should always be named "package" so that the default output is named "package.json".
