@@ -17,6 +17,7 @@ PNPM_LOCK_TEST_CASES = [
     "docusaurus-direct-peer-v9",
     "versionless-patch-v9",
     "nested-peer-v9",
+    "rerooted-nested-projects-v10/root",
     "workspace-peer-v9",
 ]
 
@@ -105,7 +106,7 @@ npm = use_extension(
 
 [
     npm.npm_translate_lock(
-        name = lockfile.replace(".yaml", ""),
+        name = lockfile.split("/")[0],
         pnpm_lock = "//cases/%s:pnpm-lock.yaml" % lockfile,
         verify_node_modules_ignored = "//:.bazelignore",
     )
@@ -115,7 +116,7 @@ npm = use_extension(
 [
     use_repo(
         npm,
-        lockfile.replace(".yaml", ""),
+        lockfile.split("/")[0],
     )
     for lockfile in PNPM_LOCK_TEST_CASES
 ]

@@ -1,0 +1,4 @@
+onlyBuiltDependencies: []
+packages:
+    - ../lib
+    - ../lib/plugins/*

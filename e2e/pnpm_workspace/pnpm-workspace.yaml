@@ -1,3 +1,5 @@
 packages:
     - 'app/*'
     - 'lib/*'
+    - 'lib/d/e'
+    - 'lib/d/f'

@@ -3,6 +3,8 @@
     "private": true,
     "dependencies": {
         "@aspect-test/d": "^2.0.0",
-        "alias-2": "npm:@types/node@22.18.13"
+        "alias-2": "npm:@types/node@22.18.13",
+        "@lib/e": "workspace:*",
+        "@lib/f": "workspace:*"
     }
 }

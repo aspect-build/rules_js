@@ -108,9 +108,19 @@ importers:
       '@aspect-test/d':
         specifier: ^2.0.0
         version: 2.0.0(@aspect-test/c@2.0.2)
+      '@lib/e':
+        specifier: workspace:*
+        version: link:e
+      '@lib/f':
+        specifier: workspace:*
+        version: link:f
       alias-2:
         specifier: npm:@types/node@22.18.13
         version: '@types/node@22.18.13'
+
+  ../lib/d/e: {}
+
+  ../lib/d/f: {}
 
 packages:
 

@@ -235,7 +235,7 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                     pnpm_lock = pnpm_lock_label,
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(package_json)))
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(rel_path)))
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
     for patch_info in priv["pnpm_patched_dependencies"].values():

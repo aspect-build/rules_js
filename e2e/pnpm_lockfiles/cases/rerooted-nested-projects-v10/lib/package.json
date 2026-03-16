@@ -1,0 +1,8 @@
+{
+    "name": "plug-loader",
+    "private": true,
+    "dependencies": {
+        "@plug/a": "workspace:*",
+        "@plug/b": "workspace:*"
+    }
+}

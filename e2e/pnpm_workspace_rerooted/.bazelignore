@@ -10,3 +10,5 @@ lib/a/node_modules/
 lib/b/node_modules/
 lib/c/node_modules/
 lib/d/node_modules/
+lib/d/e/node_modules/
+lib/d/f/node_modules/

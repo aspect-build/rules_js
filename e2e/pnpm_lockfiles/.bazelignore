@@ -1,6 +1,10 @@
 node_modules/
 cases/versionless-patch-v9/node_modules
 cases/docusaurus-direct-peer-v9/node_modules
+cases/rerooted-nested-projects-v10/node_modules
+cases/rerooted-nested-projects-v10/lib/node_modules
+cases/rerooted-nested-projects-v10/lib/plugins/a/node_modules
+cases/rerooted-nested-projects-v10/lib/plugins/b/node_modules
 cases/nested-peer-v9/node_modules
 cases/workspace-peer-v9/node_modules
 cases/workspace-peer-v9/libs/chokidar/node_modules
