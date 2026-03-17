@@ -27,7 +27,7 @@ def js_run_devserver_test(
 
         **kwargs: All other args for `js_run_devserver`.
 
-            See https://docs.aspect.build/bazel/javascript/aspect_rules_js/js_defs
+            See https://docs.aspect.build/bazel/javascript/aspect_rules_js/js_defs#function-js_run_devserver
     """
     js_run_devserver(
         name,
