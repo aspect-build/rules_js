@@ -102,6 +102,9 @@ bazel_dep(name = "aspect_rules_lint", version = "2.3.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.1", dev_dependency = True)
 bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
 
+# Override transitive rules_go from rules_buf; <0.59.0 uses CcInfo as a Bazel global which was removed in Bazel 9.0.1
+bazel_dep(name = "rules_go", version = "0.60.0", dev_dependency = True, repo_name = None)
+
 host = use_extension(
     "@bazel_lib//lib:extensions.bzl",
     "host",
