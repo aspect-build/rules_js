@@ -55,7 +55,7 @@ nextjs_standalone_build(
         ":lib",
         ":nextjs-css",
     ],
-    config = "next.standalone.mjs",
+    config = "next.config.js",
     next_js_binary = ":next_js_binary",
     silent_on_success = False,
 )
