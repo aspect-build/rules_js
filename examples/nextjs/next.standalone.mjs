@@ -11,7 +11,10 @@ const nextConfig = {
 
     // Bundle everything into a standalone output
     output: 'standalone',
-    outputFileTracingRoot,
+    outputFileTracingRoot,  // If you're using NextJS 14, replace this with:
+    // experimental: {
+    //   outputFileTracingRoot,
+    // },
 }
 
 export default nextConfig
