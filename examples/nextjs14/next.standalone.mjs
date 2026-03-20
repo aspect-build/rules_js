@@ -11,7 +11,9 @@ const nextConfig = {
 
     // Bundle everything into a standalone output
     output: 'standalone',
-    outputFileTracingRoot,
+    experimental: {
+      outputFileTracingRoot,
+    },
 }
 
 export default nextConfig
