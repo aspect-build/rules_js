@@ -1,7 +1,7 @@
 load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_standalone_build", "nextjs_standalone_server")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//examples/nextjs:next/package_json.bzl", next_bin = "bin")
+load("@npm//examples/nextjs15:next/package_json.bzl", next_bin = "bin")
 
 npm_link_all_packages()
 

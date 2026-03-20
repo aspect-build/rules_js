@@ -81,13 +81,13 @@ build_test(
 
         # Packages with optional platform/os specific dependencies
         "//:node_modules/google-closure-compiler",
-        "//examples/nextjs:node_modules/next",
+        "//examples/nextjs15:node_modules/next",
 
         # Packages with known circular deps
         "//:node_modules/circles",
         "//js/private/test/node-patches:node_modules/@babel/cli",
         "//js/private/test/node-patches:node_modules/@babel/core",
-        "//examples/nextjs:node_modules/next",
+        "//examples/nextjs15:node_modules/next",
 
         # Packages of the same name with alternate aliases/versions/protocols
         ":node_modules/lodash",
