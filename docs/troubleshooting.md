@@ -199,4 +199,4 @@ npm.npm_exclude_package_contents(
 
 #### Jest
 
-See [rules_jest](https://github.com/aspect-build/rules_jest) specific [troubleshooting](https://docs.aspect.build/rulesets/aspect_rules_jest/docs/troubleshooting#performance).
+See [rules_jest](https://github.com/aspect-build/rules_jest) for troubleshooting.

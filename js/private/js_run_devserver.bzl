@@ -262,7 +262,7 @@ def js_run_devserver(
 
             `entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.
 
-            See https://docs.aspect.build/rules/aspect_rules_js/docs/js_binary
+            See https://docs.aspect.build/bazel/javascript/aspect_rules_js/js_defs
     """
     if kwargs.get("entry_point", None):
         fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")

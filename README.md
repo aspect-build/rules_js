@@ -18,14 +18,14 @@ The fastest way to try this in an empty project is to click the green "Use this 
 
 rules_js is just a part Aspect's monorepo developer platform:
 
--   [Aspect Workflows](https://docs.aspect.build/workflows) delivers on Bazel's promises of speed and cost-savings.
+-   [Aspect Workflows](https://docs.aspect.build/aspect-workflows/get-started/overview) delivers on Bazel's promises of speed and cost-savings.
     It provides Continuous Integration and Delivery, including Remote Cache and Remote Build Execution (RBE).
     Best of all, it includes all the expertise that you expect from the team at Aspect!
 -   _Need help?_
     -   Best-effort community support is available on the #javascript channel on [Bazel Slack](https://slack.bazel.build/)
     -   Commercial support as a Slack Connect channel is offered by https://aspect.build/services.
--   See [Aspect's Bazel rules](https://docs.aspect.build/rules), especially those built for rules_js:
-    -   [rules_ts](https://github.com/aspect-build/rules_ts) - Bazel rules for [TypeScript](http://typescriptlang.org)
+-   See Aspect's [Bazel Rules](https://docs.aspect.build/bazel), especially those built for rules_js:
+    -   [rules_ts](https://docs.aspect.build/bazel/javascript/typescript) - Bazel rules for [TypeScript](https://www.typescriptlang.org)
     -   [rules_swc](https://github.com/aspect-build/rules_swc) - Bazel rules for [swc](https://swc.rs)
     -   [rules_jest](https://github.com/aspect-build/rules_jest) - Bazel rules to run tests using [Jest](https://jestjs.io)
     -   [rules_esbuild](https://github.com/aspect-build/rules_esbuild) - Bazel rules for [esbuild](https://esbuild.github.io) JS bundler
@@ -33,7 +33,7 @@ rules_js is just a part Aspect's monorepo developer platform:
     -   [rules_rollup](https://github.com/aspect-build/rules_rollup) - Bazel rules for [Rollup](https://rollupjs.org) - a JavaScript bundler
     -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
     -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
-    -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
+    -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://www.cypress.io)
     -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://registry.bazel.build/docs/aspect_rules_lint#lint-eslint-bzl).
 
 ## Known issues
@@ -70,10 +70,10 @@ Larger examples can be found in our [bazel-examples](https://github.com/aspect-b
 ## Relationship to rules_nodejs
 
 rules_js is an alternative to the `build_bazel_rules_nodejs` Bazel module and
-accompanying npm packages hosted in https://github.com/bazelbuild/rules_nodejs,
+accompanying npm packages hosted in https://github.com/bazel-contrib/rules_nodejs,
 which is now unmaintained. All users are recommended to use rules_js instead.
 
-rules_js replaces some parts of [bazelbuild/rules_nodejs](http://github.com/bazelbuild/rules_nodejs) and re-uses other parts:
+rules_js replaces some parts of [bazelbuild/rules_nodejs](https://github.com/bazel-contrib/rules_nodejs) and re-uses other parts:
 
 | Layer                           | Legacy                        | Modern                  |
 | ------------------------------- | ----------------------------- | ----------------------- |

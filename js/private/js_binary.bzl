@@ -54,7 +54,7 @@ The following environment variables are made available to the Node.js runtime ba
 The following environment variables are made available to the Node.js runtime based the runtime environment:
 
 * JS_BINARY__NODE_BINARY: the Node.js binary path run by the `js_binary` target
-* JS_BINARY__NPM_BINARY: the npm binary path; this is available when [`include_npm`](https://docs.aspect.build/rules/aspect_rules_js/docs/js_binary#include_npm) is `True` on the `js_binary` target
+* JS_BINARY__NPM_BINARY: the npm binary path; this is available when `include_npm` is `True` on the `js_binary` target
 * JS_BINARY__NODE_WRAPPER: the Node.js wrapper script used to run Node.js which is available as `node` on the `PATH` at runtime
 * JS_BINARY__RUNFILES: the absolute path to the Bazel runfiles directory
 * JS_BINARY__EXECROOT: the absolute path to the root of the execution root for the action; if in the sandbox, this path absolute path to the root of the execution root within the sandbox
