@@ -1,4 +1,4 @@
-"""Implementation of js_binary and js_test rules."""
+"""Implementation details of js_binary and js_test rules."""
 
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
