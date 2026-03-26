@@ -3,7 +3,7 @@
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//examples/vite6:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//vite6:vite/package_json.bzl", vite_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 

@@ -6,24 +6,11 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/a2/
--r-xr-xr-x  0 0      0          38 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/a2/a2.d.ts
--r-xr-xr-x  0 0      0         127 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/a2/a2.js
--r-xr-xr-x  0 0      0          27 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/a2/index.d.ts
--r-xr-xr-x  0 0      0         224 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/a2/index.js
--r-xr-xr-x  0 0      0          31 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/index.d.ts
--r-xr-xr-x  0 0      0         237 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/a/index.js
--r-xr-xr-x  0 0      0        2132 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/index.js
--r-xr-xr-x  0 0      0         166 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/@mycorp/pkg-a/package.json
-lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/acorn -> ../../acorn@8.7.1/node_modules/acorn
-lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/chalk -> ../../chalk@5.0.1/node_modules/chalk
-lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-a@0.0.0/node_modules/uuid -> ../../uuid@8.3.2/node_modules/uuid
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules/
-drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules/@mycorp/
-lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules/@mycorp/pkg-d -> ../../../../../examples/npm_package/packages/pkg_d
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+a@0.0.0/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+a@0.0.0/node_modules/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+a@0.0.0/node_modules/@image-test/
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+a@0.0.0/node_modules/@image-test/a -> ../../../../../js/private/test/image-fixture-a
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+d@0.0.0/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+d@0.0.0/node_modules/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+d@0.0.0/node_modules/@image-test/
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/node_modules/.aspect_rules_js/@image-test+d@0.0.0/node_modules/@image-test/d -> ../../../../../js/private/test/image-fixture-d

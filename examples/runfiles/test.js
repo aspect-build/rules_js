@@ -21,7 +21,7 @@ const runfiles = new Runfiles(process.env)
 describe('runfile resolution', () => {
     it('should properly resolve the files with the module(name)', () => {
         const testFixturePath = runfiles.resolve(
-            'aspect_rules_js/examples/runfiles/test_fixture.md'
+            '_main/runfiles/test_fixture.md'
         )
         const expectedPath = join(__dirname, 'test_fixture.md')
 
@@ -33,7 +33,7 @@ describe('runfile resolution', () => {
 
     it('should properly resolve with forward slashes', () => {
         const testFixturePath = runfiles.resolve(
-            'aspect_rules_js\\examples\\runfiles\\test_fixture.md'
+            '_main\\runfiles\\test_fixture.md'
         )
         const expectedPath = join(__dirname, 'test_fixture.md')
 
@@ -45,7 +45,7 @@ describe('runfile resolution', () => {
 
     it('should properly resolve with the _main module alias', () => {
         const testFixturePath = runfiles.resolve(
-            '_main/examples/runfiles/test_fixture.md'
+            '_main/runfiles/test_fixture.md'
         )
         const expectedPath = join(__dirname, 'test_fixture.md')
 
@@ -56,14 +56,12 @@ describe('runfile resolution', () => {
     })
 
     it('should properly resolve a subdirectory of a runfile', () => {
-        const packagePath = runfiles.resolve('aspect_rules_js/examples')
+        const packagePath = runfiles.resolve('_main/runfiles')
         // Alternate with trailing slash
-        const packagePath2 = runfiles.resolve('aspect_rules_js/examples/')
+        const packagePath2 = runfiles.resolve('_main/runfiles/')
         const expectedPath = dirname(
-            dirname(
-                runfiles.resolve(
-                    'aspect_rules_js/examples/runfiles/test_fixture.md.generated_file_suffix'
-                )
+            runfiles.resolve(
+                '_main/runfiles/test_fixture.md.generated_file_suffix'
             )
         )
 
@@ -78,15 +76,13 @@ describe('runfile resolution', () => {
     })
 
     it('should properly resolve the workspace root of a runfile', () => {
-        const packagePath = runfiles.resolve('aspect_rules_js')
+        const packagePath = runfiles.resolve('_main')
         // Alternate with trailing slash
-        const packagePath2 = runfiles.resolve('aspect_rules_js/')
+        const packagePath2 = runfiles.resolve('_main/')
         const expectedPath = dirname(
             dirname(
-                dirname(
-                    runfiles.resolve(
-                        'aspect_rules_js/examples/runfiles/test_fixture.md.generated_file_suffix'
-                    )
+                runfiles.resolve(
+                    '_main/runfiles/test_fixture.md.generated_file_suffix'
                 )
             )
         )

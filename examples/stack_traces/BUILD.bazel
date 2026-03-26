@@ -15,7 +15,7 @@ js_test(
     node_options = [
         # Load the stack-traces library at node startup time - this could be wrapped in a `js_test` macro
         "--require",
-        "$$JS_BINARY__RUNFILES/$$JS_BINARY__WORKSPACE/examples/stack_traces/stacks.cjs",
+        "$$JS_BINARY__RUNFILES/$$JS_BINARY__WORKSPACE/stack_traces/stacks.cjs",
     ],
 )
 

@@ -12,12 +12,12 @@ load("@bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//examples/npm_deps:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
+load("@npm//npm_deps:@aspect-test/a/package_json.bzl", aspect_test_a_bin = "bin")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load(":custom_rule.bzl", "custom_rule")
 
-# Link all direct dependencies in /examples/npm_deps/package.json to
-# bazel-bin/examples/npm_deps/node_modules
+# Link all direct dependencies in /npm_deps/package.json to
+# bazel-bin/npm_deps/node_modules
 npm_link_all_packages()
 
 # A simple program that runs the Acorn JS parser to produce an AST
@@ -52,7 +52,7 @@ js_binary(
         ),
         diff_test(
             name = "test_js_binary_under_genrule_%s" % t,
-            file1 = "//examples:expected_one_ast.json",
+            file1 = "//:expected_one_ast.json",
             file2 = "out1-%s" % t,
         ),
     ]
@@ -83,7 +83,7 @@ js_binary(
         ),
         diff_test(
             name = "test_js_binary_under_js_run_binary_%s" % t,
-            file1 = "//examples:expected_one_ast.json",
+            file1 = "//:expected_one_ast.json",
             file2 = "out2_%s" % t,
         ),
     ]
@@ -116,7 +116,7 @@ js_binary(
         ),
         diff_test(
             name = "test_js_binary_under_js_run_binary_local_%s" % t,
-            file1 = "//examples:expected_one_ast.json",
+            file1 = "//:expected_one_ast.json",
             file2 = "out2_local_%s" % t,
         ),
     ]
@@ -157,7 +157,7 @@ js_run_binary(
 
 diff_test(
     name = "test_js_binary_under_js_run_binary_no_copy_data_to_bin",
-    file1 = "//examples:expected_one_ast.json",
+    file1 = "//:expected_one_ast.json",
     file2 = "out2_no_copy_data_to_bin",
 )
 
@@ -239,7 +239,7 @@ write_file(
         ),
         diff_test(
             name = "test4-%s-a" % t,
-            file1 = "//examples:expected_one_ast.json",
+            file1 = "//:expected_one_ast.json",
             file2 = ":out4-a-%s" % t,
         ),
         js_run_binary(
@@ -260,7 +260,7 @@ write_file(
         ),
         diff_test(
             name = "test4-b_%s" % t,
-            file1 = "//examples:expected_one_ast.json",
+            file1 = "//:expected_one_ast.json",
             file2 = ":out4-b_%s" % t,
         ),
     ]
@@ -463,7 +463,7 @@ js_test(
     log_level = "debug",
 )
 
-# bazel run //examples:case7_binary
+# bazel run //:case7_binary
 js_binary(
     name = "case7_binary",
     args = ["dummy"],
@@ -516,7 +516,7 @@ diff_test(
 ####################################################
 # Use case 9
 # Show that we can run a generated bin from a package where the npm package
-# is not linked. In this case @aspect-test/a is linked to the //examples/npm_deps:__pkg__
+# is not linked. In this case @aspect-test/a is linked to the //npm_deps:__pkg__
 
 aspect_test_a_bin.bin_a_test(
     name = "aspect_bin_a_test",
@@ -552,7 +552,7 @@ expand_template(
 )
 
 # NB: https://github.com/aspect-build/rules_js/issues/285 is only reproducable
-# with 'bazel run //examples/js_binary:bin10'. The genrule below that runs
+# with .bazel run //js_binary:bin10.. The genrule below that runs
 # the same binary does not reproduce as the environment is setup differently.
 sh_binary(
     name = "bin10",
@@ -584,7 +584,7 @@ custom_rule(
 
 diff_test(
     name = "test_js_binary_under_custom_rule",
-    file1 = "//examples:expected_one_ast.json",
+    file1 = "//:expected_one_ast.json",
     file2 = ":run11",
 )
 
@@ -601,7 +601,7 @@ custom_rule(
 
 diff_test(
     name = "test_js_binary_under_custom_rule_local",
-    file1 = "//examples:expected_one_ast.json",
+    file1 = "//:expected_one_ast.json",
     file2 = ":run11_local",
 )
 

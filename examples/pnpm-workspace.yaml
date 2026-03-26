@@ -1,0 +1,22 @@
+packages:
+    - '*'
+    - '!proto'
+    - 'js_lib_pkg/*'
+    - 'npm_package/libs/*'
+    - 'npm_package/packages/*'
+
+onlyBuiltDependencies:
+    - '@aspect-test/c'
+    - 'esbuild'
+    - 'fsevents'
+
+packageExtensions:
+    mocha:
+        peerDependencies:
+            'mocha-multi-reporters': '*'
+    mocha-multi-reporters:
+        peerDependencies:
+            'mocha-junit-reporter': '*'
+
+patchedDependencies:
+    'meaning-of-life@1.0.0': 'npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch'

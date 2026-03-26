@@ -1,0 +1,127 @@
+module(name = "examples")
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "..",
+)
+
+bazel_dep(name = "bazel_lib", version = "3.0.0", dev_dependency = True)
+bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
+bazel_dep(name = "platforms", version = "1.0.0", dev_dependency = True)
+bazel_dep(name = "rules_nodejs", version = "6.7.3", dev_dependency = True)
+bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
+
+node = use_extension(
+    "@rules_nodejs//nodejs:extensions.bzl",
+    "node",
+    dev_dependency = True,
+)
+use_repo(node, "nodejs_toolchains")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm.pnpm(
+    name = "pnpm",
+    pnpm_version = "10.22.0",
+    pnpm_version_integrity = "sha512-vwSe/plbKPUn/StBrgR0zikYb37cs79UUIe9Yfu+uyv3U2LRMH/aCcLSiOHkmXh6wS1Py2F6l0cYpgUfLu50HA==",
+)
+use_repo(pnpm, "pnpm", "pnpm__links")
+
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
+npm.npm_translate_lock(
+    name = "npm",
+    bins = {
+        # derived from "bin" attribute in node_modules/typescript/package.json
+        "typescript": [
+            "tsc=./bin/tsc",
+            "tsserver=./bin/tsserver",
+        ],
+    },
+    custom_postinstalls = {
+        "@aspect-test/c": "echo moo > cow.txt",
+        "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
+    },
+    data = [
+        "//:package.json",
+        "//:pnpm-workspace.yaml",
+        "//js_binary:package.json",
+        "//js_lib_pkg/a:package.json",
+        "//js_lib_pkg/b:package.json",
+        "//linked_consumer:package.json",
+        "//linked_empty_node_modules:package.json",
+        "//linked_lib:package.json",
+        "//linked_pkg:package.json",
+        "//macro:package.json",
+        "//nextjs:package.json",
+        "//npm_deps:package.json",
+        "//npm_deps/patches:meaning-of-life@1.0.0-pnpm.patch",
+        "//npm_package/libs/lib_a:package.json",
+        "//npm_package/packages/pkg_a:package.json",
+        "//npm_package/packages/pkg_b:package.json",
+        "//npm_package/packages/pkg_d:package.json",
+        "//npm_package/packages/pkg_e:package.json",
+        "//runfiles:package.json",
+        "//stack_traces:package.json",
+        "//vite3:package.json",
+        "//vite6:package.json",
+        "//webpack_cli:package.json",
+    ],
+    generate_bzl_library_targets = True,
+    lifecycle_hooks_execution_requirements = {
+        "*": [
+            "no-sandbox",
+        ],
+    },
+    npmrc = "//:.npmrc",
+    package_visibility = {
+        "@mycorp/pkg-a": [
+            "//js_binary:__subpackages__",
+            "//npm_deps:__subpackages__",
+        ],
+        "@mycorp/pkg-d": [
+            "//npm_deps:__subpackages__",
+            "//npm_package:__subpackages__",
+        ],
+        "@mycorp/pkg-e": ["//npm_deps:__subpackages__"],
+    },
+    pnpm_lock = "//:pnpm-lock.yaml",
+    public_hoist_packages = {
+        # Instructs the linker to hoist the ms@2.1.3 npm package to `node_modules/ms` in the `npm_deps` package.
+        # Similar to adding `public-hoist-pattern[]=ms` in .npmrc but with control over which version to hoist and where
+        # to hoist it. This hoisted package can be referenced by the label `//npm_deps:node_modules/ms` same as
+        # other direct dependencies in the `npm_deps/package.json`.
+        "ms@2.1.3": ["npm_deps"],
+    },
+    update_pnpm_lock = True,
+    use_pnpm = "@pnpm//:package/bin/pnpm.cjs",
+    verify_node_modules_ignored = "//:.bazelignore",
+    verify_patches = "//npm_deps/patches:patches",
+)
+use_repo(
+    npm,
+    "npm",
+    "npm__next__15.2.6_1816342077__links",
+    "npm__rollup__4.55.2",
+    "npm__rollup__4.55.2__links",
+)
+
+# As an example, manually import a package using explicit coordinates.
+# Just a demonstration of the syntax de-sugaring.
+npm.npm_import(
+    name = "acorn__8.4.0",
+    bins = {"acorn": "./bin/acorn"},
+    integrity = "sha512-ULr0LDaEqQrMFGyQ3bhJkLsbtrQ8QibAseGZeaSUiT/6zb9IvIkomWHJIvgvwad+hinRAgsI51JcWk2yvwyL+w==",
+    package = "acorn",
+    # Root package where to link the package store
+    root_package = "",
+    version = "8.4.0",
+)
+use_repo(
+    npm,
+    "acorn__8.4.0",
+    "acorn__8.4.0__links",
+)

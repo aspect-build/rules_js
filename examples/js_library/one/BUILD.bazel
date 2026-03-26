@@ -9,5 +9,5 @@ js_library(
         # downstream typecheck and so "main" field is seen at runtime
         "package.json",
     ],
-    visibility = ["//examples/js_library:__subpackages__"],
+    visibility = ["//js_library:__subpackages__"],
 )

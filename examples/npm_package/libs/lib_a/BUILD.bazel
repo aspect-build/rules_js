@@ -1,5 +1,5 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_library")
 
 npm_link_all_packages()
 
@@ -12,7 +12,7 @@ js_library(
     srcs = [
         "index.js",
     ],
-    visibility = ["//examples/npm_package:__subpackages__"],
+    visibility = ["//npm_package:__subpackages__"],
     deps = [
         ":node_modules/chalk",
     ],

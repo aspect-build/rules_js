@@ -6,9 +6,9 @@ js_library(
 )
 
 # Verify this works:
-# % bazel coverage examples/coverage --combined_report=lcov
+# % bazel coverage coverage --combined_report=lcov
 # % cat $(bazel info output_path)/_coverage/_coverage_report.dat
-# SF:examples/coverage/coverage.js
+# SF:coverage/coverage.js
 # FN:1,module.exports.test
 # FNDA:1,module.exports.test
 # ...

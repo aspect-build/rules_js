@@ -13,15 +13,12 @@ describe('mocha .js', () => {
     it('is sandboxed', () => {
         assert.match(
             process.cwd(),
-            /examples\/macro\/test(_\w+)?_\/test(_\w+)?\.runfiles/
+            /macro\/test(_\w+)?_\/test(_\w+)?\.runfiles/
         )
-        assert.match(
-            __dirname,
-            /examples\/macro\/test(_\w+)?_\/test(_\w+)?\.runfiles/
-        )
+        assert.match(__dirname, /macro\/test(_\w+)?_\/test(_\w+)?\.runfiles/)
         assert.match(
             __filename,
-            /-sandbox\/\d+\/execroot\/_main\/bazel-out\/[^/]+\/bin\/examples\/macro\/test(_\w+)?_\/test(_\w+)?\.runfiles\/_main\/examples\/macro\/test\.js/
+            /-sandbox\/\d+\/execroot\/_main\/bazel-out\/[^/]+\/bin\/macro\/test(_\w+)?_\/test(_\w+)?\.runfiles\/_main\/macro\/test\.js/
         )
         assert.equal(__dirname, dirname(__filename))
     })

@@ -1,4 +1,8 @@
+load("@acorn__8.4.0__links//:defs.bzl", npm_link_acorn = "npm_link_imported_package")
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
 ###########################
 # Fixtures for example tests
@@ -11,5 +15,45 @@ write_file(
     content = [
         """{"type":"Program","start":0,"end":1,"body":[{"type":"ExpressionStatement","start":0,"end":1,"expression":{"type":"Literal","start":0,"end":1,"value":1,"raw":"1"}}],"sourceType":"script"}\n""",
     ],
-    visibility = ["//examples:__subpackages__"],
+    visibility = ["//visibility:public"],
+)
+
+# Link all packages from the /MODULE npm_translate_lock(name = "npm") and also packages from
+# manual /MODULE npm_import rules to bazel-bin/node_modules as well as the package store
+# bazel-bin/node_modules/.aspect_rules_js since /pnpm-lock.yaml is the root of the pnpm workspace
+npm_link_all_packages(
+    imported_links = [
+        npm_link_acorn,
+    ],
+)
+
+# Example of manually linking a first-party dependency. Its transitive npm dependencies
+# are picked up automatically via 'npm_package_store_infos' in the js_library targets that
+# the `npm_package` target depends on.
+npm_link_package(
+    name = "node_modules/@mycorp/pkg-b",
+    src = "//npm_package/packages/pkg_b:pkg",
+)
+
+# Manually linked pkg-c with additional use cases.
+npm_link_package(
+    name = "node_modules/@mycorp/pkg-c1",
+    src = "//npm_package/packages/pkg_c:pkg_c1",
+)
+
+npm_link_package(
+    name = "node_modules/@mycorp/pkg-c2",
+    src = "//npm_package/packages/pkg_c:pkg_c2",
+)
+
+# Verify manually linked first-party packages (npm_link_package) are buildable.
+# These packages live in //npm_package/... and are linked into //:node_modules/
+# to demonstrate cross-package npm_link_package usage.
+build_test(
+    name = "linked_packages_build_test",
+    targets = [
+        ":node_modules/@mycorp/pkg-b",
+        ":node_modules/@mycorp/pkg-c1",
+        ":node_modules/@mycorp/pkg-c2",
+    ],
 )

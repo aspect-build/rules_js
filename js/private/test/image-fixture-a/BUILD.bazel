@@ -1,0 +1,12 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//js:defs.bzl", "js_library")
+
+npm_link_all_packages()
+
+js_library(
+    name = "pkg",
+    srcs = ["package.json"],
+    copy_data_to_bin = False,
+    visibility = ["//visibility:public"],
+    deps = [":node_modules"],
+)

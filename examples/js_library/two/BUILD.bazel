@@ -8,7 +8,7 @@ tsc(
         "tsconfig.json",
         "two.ts",
         "//:node_modules/@types/node",
-        "//examples/js_library/one",
+        "//js_library/one",
     ],
     outs = [
         "two.js",
@@ -18,7 +18,7 @@ tsc(
 
 js_test(
     name = "two_test",
-    data = ["//examples/js_library/one"],
+    data = ["//js_library/one"],
     entry_point = "two.js",
 )
 

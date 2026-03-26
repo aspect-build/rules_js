@@ -11,17 +11,11 @@ describe('mocha .cjs', () => {
     })
 
     it('is sandboxed', () => {
-        assert.match(
-            process.cwd(),
-            /examples\/macro\/test(_\w+)_\/test(_\w+)\.runfiles/
-        )
-        assert.match(
-            __dirname,
-            /examples\/macro\/test(_\w+)_\/test(_\w+)\.runfiles/
-        )
+        assert.match(process.cwd(), /macro\/test(_\w+)_\/test(_\w+)\.runfiles/)
+        assert.match(__dirname, /macro\/test(_\w+)_\/test(_\w+)\.runfiles/)
         assert.match(
             __filename,
-            /-sandbox\/\d+\/execroot\/_main\/bazel-out\/[^/]+\/bin\/examples\/macro\/test(_\w+)_\/test(_\w+).runfiles\/_main\/examples\/macro\/test\.cjs/
+            /-sandbox\/\d+\/execroot\/_main\/bazel-out\/[^/]+\/bin\/macro\/test(_\w+)_\/test(_\w+).runfiles\/_main\/macro\/test\.cjs/
         )
         assert.equal(__dirname, dirname(__filename))
     })

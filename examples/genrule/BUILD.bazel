@@ -24,7 +24,7 @@ write_file(
     name = "write_one",
     out = "one.js",
     content = ["1"],
-    visibility = ["//examples:__subpackages__"],
+    visibility = ["//visibility:public"],
 )
 
 genrule(
@@ -50,7 +50,7 @@ genrule(
 diff_test(
     name = "test_acorn",
     file1 = "out1",
-    file2 = "//examples:expected_one_ast.json",
+    file2 = "//:expected_one_ast.json",
 )
 
 ################################################
@@ -81,5 +81,5 @@ genrule(
 diff_test(
     name = "test_require_acorn",
     file1 = "out2",
-    file2 = "//examples:expected_one_ast.json",
+    file2 = "//:expected_one_ast.json",
 )

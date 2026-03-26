@@ -1,7 +1,9 @@
 load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_standalone_build", "nextjs_standalone_server")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//examples/nextjs:next/package_json.bzl", next_bin = "bin")
+load("@npm//nextjs:next/package_json.bzl", next_bin = "bin")
 
 npm_link_all_packages()
 
@@ -64,4 +66,21 @@ nextjs_standalone_build(
 nextjs_standalone_server(
     name = "server",
     app = ":standalone",
+)
+
+# Verify next (which has optional platform/os specific dependencies) can be built
+build_test(
+    name = "next_build_test",
+    targets = [":node_modules/next"],
+)
+
+write_source_files(
+    name = "write_next_links_defs",
+    files = {
+        "snapshots/next_links_defs.bzl": "@npm__next__15.2.6_1816342077__links//:defs.bzl",
+    },
+    tags = [
+        "skip-on-bazel8",
+        "skip-on-bazel9",
+    ],
 )

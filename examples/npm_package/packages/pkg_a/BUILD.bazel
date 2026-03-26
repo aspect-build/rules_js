@@ -23,7 +23,7 @@ js_library(
     # of this 'js_library' for the linker to link the as depenencies of the 'npm_package'
     # since it is linked via 'npm_link_all_packages'.
     deps = [
-        "//examples/npm_package/packages/pkg_a/a:lib",
+        "//npm_package/packages/pkg_a/a:lib",
     ],
 )
 

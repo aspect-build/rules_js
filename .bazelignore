@@ -1,31 +1,12 @@
 # Nested modules
 e2e/
-examples/protobuf
+examples/
 
 # TODO(bazel 8): move to REPO.bazel
-examples/js_binary/node_modules/
-examples/js_lib_pkg/a/node_modules
-examples/js_lib_pkg/b/node_modules
-examples/linked_consumer/node_modules
-examples/linked_empty_node_modules/node_modules
-examples/linked_lib/node_modules
-examples/linked_pkg/node_modules
-examples/macro/node_modules/
-examples/nextjs/node_modules/
-examples/npm_deps/node_modules/
-examples/npm_package/libs/lib_a/node_modules/
-examples/npm_package/packages/pkg_a/node_modules/
-examples/npm_package/packages/pkg_b/node_modules/
-examples/npm_package/packages/pkg_c/node_modules/
-examples/npm_package/packages/pkg_d/node_modules/
-examples/npm_package/packages/pkg_e/node_modules/
-examples/runfiles/node_modules
-examples/stack_traces/node_modules
-examples/vite3/node_modules
-examples/vite6/node_modules
-examples/webpack_cli/node_modules/
 js/private/coverage/bundle/node_modules
 js/private/devserver/src/node_modules/
+js/private/test/image-fixture-a/node_modules
+js/private/test/image-fixture-d/node_modules
 js/private/test/image/node_modules
 js/private/test/js_run_devserver/node_modules
 js/private/test/node-patches/node_modules

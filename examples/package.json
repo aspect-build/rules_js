@@ -1,0 +1,7 @@
+{
+    "private": true,
+    "devDependencies": {
+        "@types/node": "22.18.13",
+        "typescript": "^5.8.0"
+    }
+}

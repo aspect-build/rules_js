@@ -1,5 +1,6 @@
-load("//npm:repositories.bzl", "list_patches")
+load("@aspect_rules_js//npm:repositories.bzl", "list_patches")
 
 list_patches(
     name = "patches",
+    include_patterns = ["*.patch"],
 )

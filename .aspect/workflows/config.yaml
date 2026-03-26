@@ -147,6 +147,9 @@ workspaces:
     # e2e/update_pnpm_lock_with_import:
     # e2e/webpack_devserver:
     # e2e/webpack_devserver_esm:
+    examples:
+        icon: js
+        tasks: *e2e_tasks
     examples/protobuf/bufbuild-es:
         icon: proto
         tasks: *e2e_tasks

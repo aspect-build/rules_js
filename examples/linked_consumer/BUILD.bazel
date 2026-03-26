@@ -9,8 +9,8 @@ npm_link_all_packages()
 js_test(
     name = "direct",
     data = [
-        "//examples/linked_lib:lib",
-        "//examples/linked_pkg:lib",
+        "//linked_lib:lib",
+        "//linked_pkg:lib",
     ],
     entry_point = "test_file_all_linked.js",
 )
@@ -29,7 +29,7 @@ js_test(
 # as they can be pulled out of an unlinked js_library
 js_info_files(
     name = "unlinked_sources",
-    srcs = ["//examples/linked_lib:lib"],
+    srcs = ["//linked_lib:lib"],
     include_npm_sources = False,
     include_sources = True,
     include_transitive_sources = True,
@@ -75,7 +75,7 @@ js_info_files(
 
 js_info_files(
     name = "unlinked_types",
-    srcs = ["//examples/linked_lib:lib"],
+    srcs = ["//linked_lib:lib"],
     include_npm_sources = False,
     include_sources = False,
     include_transitive_sources = False,

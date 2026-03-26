@@ -1,12 +1,13 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 ###########################
 
 # Load from the "bin" property from the package.json of the uvu package
-load("@npm//examples/npm_deps:uvu/package_json.bzl", uvu_bin = "bin")
+load("@npm//npm_deps:uvu/package_json.bzl", uvu_bin = "bin")
 
 # Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
 # Just to show what the syntax de-sugaring looks like, and to test that
@@ -15,8 +16,8 @@ load("@npm__rollup__4.55.2//:package_json.bzl", "rollup", "rollup_binary", "roll
 
 ###########################
 
-# Link all direct dependencies in /examples/npm_deps/package.json to
-# bazel-bin/examples/npm_deps/node_modules
+# Link all direct dependencies in /npm_deps/package.json to
+# bazel-bin/npm_deps/node_modules
 npm_link_all_packages()
 
 #######################################
@@ -44,7 +45,7 @@ js_run_binary(
     name = "run1",
     srcs = [],
     outs = ["actual1"],
-    args = ["examples/npm_deps/actual1"],
+    args = ["npm_deps/actual1"],
     tool = ":bin1",
 )
 
@@ -442,4 +443,13 @@ js_test(
         "//:node_modules/@mycorp/pkg-c1",
     ],
     entry_point = "case11.mjs",
+)
+
+# Packages with known circular deps
+build_test(
+    name = "circular_deps_build_test",
+    targets = [
+        # next has known circular dependencies in its module graph
+        "//nextjs:node_modules/next",
+    ],
 )
