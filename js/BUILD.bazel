@@ -28,6 +28,8 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//js/private:proto",
+        "@bazel_skylib//rules:select_file",
+        "@diff.bzl//diff:defs",
         "@protobuf//bazel/toolchains:proto_lang_toolchain_bzl",
     ],
 )
