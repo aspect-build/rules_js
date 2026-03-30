@@ -20,7 +20,8 @@ concurrency:
 jobs:
     org-checks:
         uses: aspect-build/.github/.github/workflows/org-check.yaml@main
-        secrets: inherit
+        secrets:
+            CALLER_GH_TOKEN: ${{ github.token }}
         permissions:
             contents: read
             pull-requests: write
