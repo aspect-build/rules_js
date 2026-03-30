@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
     org-checks:
-        uses: aspect-build/.github/.github/workflows/org-check.yaml@2f3630cf772f56a92dbed6509dd870dea01cec8f
+        uses: aspect-build/.github/.github/workflows/org-check.yaml@7d96cb86d80d253ef78676676f62f91c8dbe87cf
         secrets:
             CALLER_GH_TOKEN: ${{ github.token }}
         permissions:
