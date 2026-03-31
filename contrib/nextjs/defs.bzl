@@ -276,10 +276,9 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
     NOTE: a `next.config.mjs` is generated, wrapping the passed `config`, to overcome Next.js limitation with bazel,
     rules_js and pnpm (with hoist=false, as required by rules_js).
 
-    Due to the generated `next.config.mjs` file the `nextjs_standalone_build(config)` must have a unique name
-    or file path that does not conflict with standard Next.js config files. The `config` file is also
-    automatically renamed to `__original.<basename>` internally, so it must NOT also appear in `srcs` or
-    `data` — if it does, you may see errors such as "duplicate file" or unexpected config behavior at build time.
+    The `config` file is renamed and dynamically imported by the generated `next.config.mjs`. Including the `config` file
+    elsewhere (e.g. in `srcs` or `data`) may cause issues, particularly if it follows Next.js naming conventions
+    and is loaded by Next.js instead of the generated `next.config.mjs`.
 
     Issues worked around by the generated config include:
     * https://github.com/vercel/next.js/issues/48017
