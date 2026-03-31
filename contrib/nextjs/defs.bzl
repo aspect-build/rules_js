@@ -292,17 +292,21 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
 
+    # Extract the basename from config, which may be a label like ":next.config.js"
+    # or "//pkg:next.config.js". The copy_file `out` must be a plain filename.
+    config_basename = config.split(":")[-1].split("/")[-1]
+
     copy_file(
         name = "_%s.original_config_file" % name,
         src = config,
-        out = "__original.%s" % config,
+        out = "__original.%s" % config_basename,
         visibility = ["//visibility:private"],
         tags = ["manual"],
     )
 
     # Wrap the config file to add necessary bazel logic
     env = kwargs.pop("env", {})
-    env["NEXTJS_STANDALONE_CONFIG"] = "$(locations _%s.original_config_file)" % name
+    env["NEXTJS_STANDALONE_CONFIG"] = "$(locations :_%s.original_config_file)" % name
     copy_file(
         name = "_%s.standalone_config_file" % name,
         src = _next_standalone_config,
@@ -317,10 +321,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         tool = next_js_binary,
         env = env,
         args = ["build"],
-        srcs = srcs + data + [
-            ":_%s.standalone_config_file" % name,
-            "_%s.original_config_file" % name,
-        ],
+        srcs = srcs + data + [":_%s.standalone_config_file" % name, ":_%s.original_config_file" % name],
         out_dirs = [_next_build_out],
         chdir = native.package_name(),
         mnemonic = "NextJs",

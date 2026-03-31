@@ -1,0 +1,11 @@
+{
+    "name": "next-config-esm-test",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "next": "15.2.6"
+    }
+}

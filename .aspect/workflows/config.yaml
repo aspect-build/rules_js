@@ -36,6 +36,9 @@ workspaces:
             # Still depends on some WORKSPACE setup
             - bazel-9:
                   without: true
+    e2e/nextjs:
+        icon: nextjs
+        tasks: *e2e_tasks
     # No test targets. Requires running test.sh.
     # e2e/js_run_devserver:
     e2e/npm_link_package:

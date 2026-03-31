@@ -1,0 +1,33 @@
+load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_standalone_build")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//v15/esm:next/package_json.bzl", next_bin = "bin")
+
+npm_link_all_packages()
+
+next_bin.next_binary(
+    name = "next_js_binary",
+)
+
+js_library(
+    name = "lib",
+    srcs = ["pages/index.js"],
+    deps = [
+        ":node_modules/next",
+        ":node_modules/react",
+        ":node_modules/react-dom",
+    ],
+)
+
+nextjs_standalone_build(
+    name = "standalone",
+    srcs = [":lib"],
+    config = "next.config.js",
+    next_js_binary = ":next_js_binary",
+)
+
+build_test(
+    name = "test",
+    targets = [":standalone"],
+)
