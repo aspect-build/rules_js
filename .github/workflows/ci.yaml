@@ -18,12 +18,13 @@ concurrency:
     cancel-in-progress: ${{ github.ref_name != 'main' }}
 
 jobs:
-    org-checks:
-        uses: aspect-build/.github/.github/workflows/org-check.yaml@main
-        secrets: inherit
-        permissions:
-            contents: read
-            pull-requests: write
+    semantic-pull-request:
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: amannn/action-semantic-pull-request@v5
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
     # Prepares dynamic test matrix values for ubuntu tests
     e2e-tests-list:
         runs-on: ubuntu-latest

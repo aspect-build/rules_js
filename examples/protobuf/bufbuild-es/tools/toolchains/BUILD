@@ -1,18 +1,16 @@
 load("@aspect_rules_js//js:proto.bzl", "js_proto_toolchain")
 load("@npm//tools:@bufbuild/protoc-gen-es/package_json.bzl", gen_es = "bin")
-load("@npm//tools:@connectrpc/protoc-gen-connect-query/package_json.bzl", gen_connect_query = "bin")
 
 gen_es.protoc_gen_es_binary(
     name = "protoc_gen_es",
 )
 
-# FIXME: wire this up to another toolchain_type symbol?
-gen_connect_query.protoc_gen_connect_query_binary(
-    name = "protoc_gen_connect_query",
-)
-
 js_proto_toolchain(
-    name = "example_protoc_plugin",
+    name = "protobuf_es_toolchain",
+    output_file_extensions = [
+        "_pb.js",
+        "_pb.d.ts",
+    ],
     plugin_bin = ":protoc_gen_es",
     plugin_name = "es",
     # See https://github.com/connectrpc/connect-es/blob/main/MIGRATING.md#update-plugin-options

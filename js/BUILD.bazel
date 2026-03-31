@@ -27,6 +27,7 @@ bzl_library(
     srcs = ["proto.bzl"],
     visibility = ["//visibility:public"],
     deps = [
+        "//js/private:js_proto_toolchain",
         "//js/private:proto",
         "@protobuf//bazel/toolchains:proto_lang_toolchain_bzl",
     ],

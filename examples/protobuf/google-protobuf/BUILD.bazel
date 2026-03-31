@@ -1,0 +1,28 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+
+npm_link_all_packages()
+
+proto_library(
+    name = "foo_proto",
+    srcs = [
+        "status.proto",
+        "user.proto",
+    ],
+    deps = ["@protobuf//:timestamp_proto"],
+)
+
+js_library(
+    name = "test_lib",
+    srcs = ["test_proto.js"],
+    deps = [
+        "//:foo_proto",
+    ],
+)
+
+js_test(
+    name = "test",
+    data = [":test_lib"],
+    entry_point = "test_proto.js",
+)

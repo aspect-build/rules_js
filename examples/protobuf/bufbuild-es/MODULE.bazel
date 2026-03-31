@@ -1,11 +1,12 @@
 bazel_dep(name = "aspect_rules_js")
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "diff.bzl", version = "0.4.3")
 bazel_dep(name = "protobuf", version = "33.4")  # Works with Bazel 7-9
 bazel_dep(name = "rules_nodejs", version = "6.7.3")
 
 local_path_override(
     module_name = "aspect_rules_js",
-    path = "../..",
+    path = "../../..",
 )
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
