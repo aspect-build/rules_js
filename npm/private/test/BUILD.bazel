@@ -2,6 +2,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_run_bin
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//npm/private/test:@rspack/cli/package_json.bzl", "bin")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
@@ -121,31 +122,26 @@ js_test(
     entry_point = "versions.js",
 )
 
-# A node binary indirectly depending on a platform specific optional npm package
-js_binary(
-    name = "esbuild_entry",
+bin.rspack(
+    name = "rspack_build",
+    chdir = package_name(),
     testonly = True,
-    data = [":node_modules/esbuild"],
-    entry_point = "esbuild.js",
+    args = [
+        "build",
+        "--config",
+        "rspack_config.cjs"
+    ],
+    srcs = [
+        "rspack_entry.js",
+        "rspack_config.cjs",
+        ":node_modules/@rspack/cli",
+    ],
+    outs = [
+        "rspack/main.bundle.js"
+    ]
 )
 
-# Use a node binary consuming an optional npm package to build a file
-js_run_binary(
-    name = "esbuild_build",
-    testonly = True,
-    srcs = [
-        "versions.js",
-        ":node_modules/lodash",
-        ":node_modules/lodash-4.17.21",
-        ":node_modules/lodash-4.17.21-tar",
-    ],
-    outs = ["esbuild_test_out.js"],
-    args = [
-        "$(location versions.js)",
-        package_name() + "/esbuild_test_out.js",
-    ],
-    tool = ":esbuild_entry",
-)
+
 
 # A test simply running the compiled bundle
 js_test(
@@ -155,9 +151,9 @@ js_test(
 
 # A binary version of the compiled bundle
 js_binary(
-    name = "esbuilt_binary",
+    name = "rspack_built_binary",
     testonly = True,
-    entry_point = "esbuild_test_out.js",
+    entry_point = "rspack/main.bundle.js",
 )
 
 platform(
@@ -170,9 +166,9 @@ platform(
 
 # The compiled bundle in a platform specific container image layer
 js_image_layer(
-    name = "esbuilt_binary_image",
+    name = "rspack_binary_image",
     testonly = True,
-    binary = ":esbuilt_binary",
+    binary = ":rspack_built_binary",
     platform = ":amd64_linux",
 )
 
@@ -187,6 +183,6 @@ build_test(
         "esbuild_test_out.js",
 
         # The transitioned image using the bundle which required transitioning
-        ":esbuilt_binary_image",
+        ":rspack_binary_image",
     ],
 )

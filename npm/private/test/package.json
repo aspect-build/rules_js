@@ -35,6 +35,8 @@
         "unused": "latest",
         "test-npm_package": "workspace:*",
         "webpack-bundle-analyzer": "4.5.0",
-        "pngjs": "5.0.0"
+        "pngjs": "5.0.0",
+        "@rspack/cli": "1.7.11",
+        "@rspack/core": "1.7.11"
     }
 }
