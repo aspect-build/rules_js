@@ -1,7 +1,8 @@
-load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_run_binary", "js_test")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//npm/private/test:@rspack/cli/package_json.bzl", "bin")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
@@ -119,4 +120,69 @@ js_test(
     name = "pkg_versions_test",
     data = [":node_modules"],
     entry_point = "versions.js",
+)
+
+bin.rspack(
+    name = "rspack_build",
+    chdir = package_name(),
+    testonly = True,
+    args = [
+        "build",
+        "--config",
+        "rspack_config.cjs"
+    ],
+    srcs = [
+        "rspack_entry.js",
+        "rspack_config.cjs",
+        ":node_modules/@rspack/cli",
+    ],
+    outs = [
+        "rspack/main.bundle.js"
+    ]
+)
+
+
+
+# A test simply running the compiled bundle
+js_test(
+    name = "esbuilt_binary_test",
+    entry_point = "esbuild_test_out.js",
+)
+
+# A binary version of the compiled bundle
+js_binary(
+    name = "rspack_built_binary",
+    testonly = True,
+    entry_point = "rspack/main.bundle.js",
+)
+
+platform(
+    name = "amd64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+# The compiled bundle in a platform specific container image layer
+js_image_layer(
+    name = "rspack_binary_image",
+    testonly = True,
+    binary = ":rspack_built_binary",
+    platform = ":amd64_linux",
+)
+
+build_test(
+    name = "esbuild_test",
+    targets = [
+        # The esbuild npm package including lifecycle hooks to verify platform deps
+        ":node_modules/esbuild",
+
+        # The bundle target and its output which required running esbuild
+        ":esbuild_build",
+        "esbuild_test_out.js",
+
+        # The transitioned image using the bundle which required transitioning
+        ":rspack_binary_image",
+    ],
 )
