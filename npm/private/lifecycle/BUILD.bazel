@@ -3,20 +3,6 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_library")
 
-js_binary(
-    name = "lifecycle-hooks",
-    # NB: intentionally include package.json in the runfiles of this binary to prevent
-    # https://github.com/aspect-build/rules_js/issues/447
-    data = glob(["min/**"]) + ["package.json"],
-    entry_point = "min/index.min.js",
-    include_npm = True,
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    visibility = ["//visibility:public"],
-)
-
 npm_link_all_packages()
 
 js_library(

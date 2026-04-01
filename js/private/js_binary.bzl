@@ -1,65 +1,11 @@
-"""Implementation details of js_binary and js_test rules.
+"""Implementation details of js_binary and js_test rules."""
 
-For example, this binary references the `acorn` npm package which was already linked
-using an API like `npm_link_all_packages`.
-
-```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
-
-js_binary(
-    name = "bin",
-    # Reference the location where the acorn npm module was linked in the root Bazel package
-    data = ["//:node_modules/acorn"],
-    entry_point = "require_acorn.js",
-)
-```
-"""
-
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
-load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
+load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
+load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
-load(":bat.bzl", "BAT_INITIALIZE_RUNFILES")
-load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
-
-_DOC = """Execute a program in the Node.js runtime.
-
-The version of Node.js is determined by Bazel's toolchain selection. In the WORKSPACE you used
-`nodejs_register_toolchains` to provide options to Bazel. Then Bazel selects from these options
-based on the requested target platform. Use the
-[`--toolchain_resolution_debug`](https://docs.bazel.build/versions/main/command-line-reference.html#flag--toolchain_resolution_debug)
-Bazel option to see more detail about the selection.
-
-All [common binary attributes](https://bazel.build/reference/be/common-definitions#common-attributes-binaries) are supported
-including `args` as the list of arguments passed Node.js.
-
-Node.js execution is performed by a shell script that sets environment variables and runs the Node.js binary with the `entry_point` script.
-The shell script is located relative to the directory containing the `js_binary` at `\\{name\\}_/\\{name\\}` similar to other rulesets
-such as rules_go. See [PR #1690](https://github.com/aspect-build/rules_js/pull/1690) for more information on this naming scheme.
-
-The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
-
-* JS_BINARY__BINDIR: the WORKSPACE-relative Bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_binary` target
-* JS_BINARY__COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_binary` target
-* JS_BINARY__TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_binary` target
-
-The following environment variables are made available to the Node.js runtime based on the rule context:
-
-* JS_BINARY__BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the Bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target's rule context
-* JS_BINARY__PACKAGE: the package of the Bazel target being run; equivalent to `ctx.label.package` of the `js_binary` target's rule context
-* JS_BINARY__TARGET: the full label of the Bazel target being run; a stringified version of `ctx.label` of the `js_binary` target's rule context
-* JS_BINARY__TARGET_NAME: the name of the Bazel target being run; equivalent to `ctx.label.name` of the `js_binary` target's rule context
-* JS_BINARY__WORKSPACE: the Bazel workspace name; equivalent to `ctx.workspace_name` of the `js_binary` target's rule context
-
-The following environment variables are made available to the Node.js runtime based the runtime environment:
-
-* JS_BINARY__NODE_BINARY: the Node.js binary path run by the `js_binary` target
-* JS_BINARY__NPM_BINARY: the npm binary path; this is available when [`include_npm`](https://docs.aspect.build/rules/aspect_rules_js/docs/js_binary#include_npm) is `True` on the `js_binary` target
-* JS_BINARY__NODE_WRAPPER: the Node.js wrapper script used to run Node.js which is available as `node` on the `PATH` at runtime
-* JS_BINARY__RUNFILES: the absolute path to the Bazel runfiles directory
-* JS_BINARY__EXECROOT: the absolute path to the root of the execution root for the action; if in the sandbox, this path absolute path to the root of the execution root within the sandbox
-"""
+load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
 
 _ATTRS = {
     "chdir": attr.string(
