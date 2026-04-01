@@ -20,9 +20,9 @@ Otherwise later tooling on CI will yell at you about formatting/linting violatio
 
 ## Using this as a development dependency of other rules
 
-You'll commonly find that you develop in another WORKSPACE, such as
+You'll commonly find that you develop in another MODULE, such as
 some other ruleset that depends on `@aspect_rules_js`, or in a nested
-WORKSPACE in the integration_tests folder.
+MODULE in the integration_tests folder.
 
 To always tell Bazel to use this directory rather than some release
 artifact or a version fetched from the internet, run this from this

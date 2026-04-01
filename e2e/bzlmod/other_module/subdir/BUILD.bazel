@@ -1,0 +1,14 @@
+load("@npm_other_module//:less/package_json.bzl", less_bin = "bin")
+
+# Verifies that js_run_binary() works in a subdirectory of an external module with chdir.
+less_bin.lessc(
+    name = "styles",
+    srcs = ["my.less"],
+    outs = ["my.css"],
+    args = [
+        "my.less",
+        "my.css",
+    ],
+    chdir = package_name(),
+    visibility = ["//visibility:public"],
+)

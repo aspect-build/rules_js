@@ -23,11 +23,9 @@ nextjs_build(
 )
 ```
 
-# Macros
-
 There are two sets of macros for building Next.js applications: standard and standalone.
 
-## Standard
+### Standard Build
 
 - `nextjs()`: wrap the build+dev+start targets
 - `nextjs_build()`: the Next.js [build](https://nextjs.org/docs/app/building-your-application/deploying#production-builds) command
@@ -35,7 +33,7 @@ There are two sets of macros for building Next.js applications: standard and sta
 - `nextjs_start()`: the Next.js [start](https://nextjs.org/docs/app/building-your-application/deploying#nodejs-server) command,
    accepting a Next.js build artifact to start
 
-## Standalone
+### Standalone Mode
 
 For [standalone applications](https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files):
 - `nextjs_standalone_build()`: the Next.js [build](https://nextjs.org/docs/app/building-your-application/deploying#production-builds) command,
@@ -44,9 +42,9 @@ For [standalone applications](https://nextjs.org/docs/app/api-reference/config/n
   [standalone directory structure guidelines](https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files)
 """
 
-load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
-load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
-load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@bazel_lib//lib:directory_path.bzl", "directory_path")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_run_devserver")
 
 # The Next.js output directory which is not configurable
@@ -278,8 +276,9 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
     NOTE: a `next.config.mjs` is generated, wrapping the passed `config`, to overcome Next.js limitation with bazel,
     rules_js and pnpm (with hoist=false, as required by rules_js).
 
-    Due to the generated `next.config.mjs` file the `nextjs_standalone_build(config)` must have a unique name
-    or file path that does not conflict with standard Next.js config files.
+    The `config` file is renamed and dynamically imported by the generated `next.config.mjs`. Including the `config` file
+    elsewhere (e.g. in `srcs` or `data`) may cause issues, particularly if it follows Next.js naming conventions
+    and is loaded by Next.js instead of the generated `next.config.mjs`.
 
     Issues worked around by the generated config include:
     * https://github.com/vercel/next.js/issues/48017
@@ -294,9 +293,21 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
 
+    # Extract the basename from config, which may be a label like ":next.config.js"
+    # or "//pkg:next.config.js". The copy_file `out` must be a plain filename.
+    config_basename = config.split(":")[-1].split("/")[-1]
+
+    copy_file(
+        name = "_%s.original_config_file" % name,
+        src = config,
+        out = "__original.%s" % config_basename,
+        visibility = ["//visibility:private"],
+        tags = ["manual"],
+    )
+
     # Wrap the config file to add necessary bazel logic
     env = kwargs.pop("env", {})
-    env["NEXTJS_STANDALONE_CONFIG"] = "$(locations %s)" % config
+    env["NEXTJS_STANDALONE_CONFIG"] = "$(locations :_%s.original_config_file)" % name
     copy_file(
         name = "_%s.standalone_config_file" % name,
         src = _next_standalone_config,
@@ -311,7 +322,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         tool = next_js_binary,
         env = env,
         args = ["build"],
-        srcs = srcs + data + [":_%s.standalone_config_file" % name, config],
+        srcs = srcs + data + [":_%s.standalone_config_file" % name, ":_%s.original_config_file" % name],
         out_dirs = [_next_build_out],
         chdir = native.package_name(),
         mnemonic = "NextJs",

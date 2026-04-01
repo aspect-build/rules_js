@@ -86,10 +86,40 @@ def _types_empty_srcs_test_impl(ctx):
 
     return analysistest.end(env)
 
+def _srcs_not_in_runfiles_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    target_under_test = analysistest.target_under_test(env)
+
+    # js_library(srcs) should end up in JsInfo.sources (.d.ts goes to types only)
+    sources = target_under_test[JsInfo].sources.to_list()
+    asserts.equals(env, 2, len(sources))
+    asserts.true(env, sources[0].path.find("/importing.js") != -1)
+    asserts.true(env, sources[1].path.find("/data.json") != -1)
+
+    # js_library(srcs) should NOT appear in DefaultInfo runfiles
+    runfiles_files = target_under_test[DefaultInfo].default_runfiles.files.to_list()
+    asserts.equals(env, [], runfiles_files)
+
+    return analysistest.end(env)
+
+def _data_in_runfiles_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    target_under_test = analysistest.target_under_test(env)
+
+    runfiles_files = target_under_test[DefaultInfo].default_runfiles.files.to_list()
+
+    # js_library(data) should be included in DefaultInfo runfiles
+    asserts.equals(env, 1, len(runfiles_files))
+    asserts.true(env, runfiles_files[0].path.find("/data.json") != -1)
+
+    return analysistest.end(env)
+
 # Test types
 _types_test = analysistest.make(_types_test_impl)
 _explicit_types_test = analysistest.make(_explicit_types_test_impl)
 _types_empty_srcs_test = analysistest.make(_types_empty_srcs_test_impl)
+_srcs_not_in_runfiles_test = analysistest.make(_srcs_not_in_runfiles_test_impl)
+_data_in_runfiles_test = analysistest.make(_data_in_runfiles_test_impl)
 
 def js_library_test_suite(name):
     """Test suite including all tests and data
@@ -139,11 +169,36 @@ def js_library_test_suite(name):
         target_under_test = "transitive_type_deps_empty_srcs",
     )
 
+    # srcs are build inputs, not runtime files — they should not appear in
+    # DefaultInfo runfiles
+    js_library(
+        name = "srcs_only",
+        srcs = ["importing.js", "importing.d.ts", "data.json"],
+        tags = ["manual"],
+    )
+    _srcs_not_in_runfiles_test(
+        name = "srcs_not_in_runfiles_test",
+        target_under_test = ":srcs_only",
+    )
+
+    # data files are runtime dependencies — they should appear in DefaultInfo runfiles
+    js_library(
+        name = "data_only",
+        data = ["data.json"],
+        tags = ["manual"],
+    )
+    _data_in_runfiles_test(
+        name = "data_in_runfiles_test",
+        target_under_test = ":data_only",
+    )
+
     native.test_suite(
         name = name,
         tests = [
             ":transitive_type_deps_test",
             ":explicit_types_test",
             ":transitive_type_deps_empty_srcs_test",
+            ":srcs_not_in_runfiles_test",
+            ":data_in_runfiles_test",
         ],
     )

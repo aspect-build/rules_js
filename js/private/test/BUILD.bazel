@@ -1,5 +1,5 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@aspect_bazel_lib_host//:defs.bzl", "host")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib_host//:defs.bzl", "host")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load(":js_library_test.bzl", "js_library_test_suite")
@@ -36,8 +36,8 @@ write_source_files(
         "snapshots/launcher.sh": ":shell_launcher_sed",
     },
     tags = [
-        "skip-on-bazel6",
         "skip-on-bazel8",
+        "skip-on-bazel9",
     ],
 )
 
@@ -65,39 +65,33 @@ write_file(
     out = "binary_version.js",
     content = ["""
 if (parseInt(process.version.slice(1)) !== parseInt(process.argv[2])) {
-    throw new Error(`Expected node version ${parseInt(process.version)}.* but got ${parseInt(process.argv[2])}`)
+    throw new Error(`Expected node version ~'${process.argv[2]}' but got ${process.version}`)
 }
 """],
 )
 
 js_test(
     name = "main_default_toolchain",
-    args = ["18"],
+    args = ["22"],
     entry_point = "binary_version.js",
 )
 
-js_test(
-    name = "main_toolchain_18",
-    args = ["18"],
-    entry_point = "binary_version.js",
-    # using the select statement will download toolchains for all three platforms
-    # you can also just provide an individual toolchain if you don't want to download them all
-    node_toolchain = select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node18_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node18_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node18_windows_amd64//:node_toolchain",
-    }),
-)
-
-js_test(
-    name = "main_toolchain_20",
-    args = ["20"],
-    entry_point = "binary_version.js",
-    # using the select statement will download toolchains for all three platforms
-    # you can also just provide an individual toolchain if you don't want to download them all
-    node_toolchain = select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
-    }),
-)
+[
+    js_test(
+        name = "main_toolchain_%s" % version,
+        args = [version],
+        entry_point = "binary_version.js",
+        # using the select statement will download toolchains for all three platforms
+        # you can also just provide an individual toolchain if you don't want to download them all
+        node_toolchain = select({
+            "@bazel_tools//src/conditions:linux_x86_64": "@node%s_linux_amd64//:node_toolchain" % version,
+            "@bazel_tools//src/conditions:darwin": "@node%s_darwin_amd64//:node_toolchain" % version,
+            "@bazel_tools//src/conditions:windows": "@node%s_windows_amd64//:node_toolchain" % version,
+        }),
+    )
+    for version in [
+        "20",
+        "22",
+        "24",
+    ]
+]

@@ -70,12 +70,12 @@ def test_verify_gather_package_content_works_with_simple_name(ctx):
     env = unittest.begin(ctx)
     actual = helpers_testonly.gather_package_content_excludes(
         {
-            "packageA": ["pattern1", "pattern2"],
+            "packageA": struct(patterns = ["pattern1", "pattern2"], presets = []),
         },
         "packageA",
     )
-    expected = ["pattern1", "pattern2"]
-    asserts.equals(env, expected, actual)
+    asserts.equals(env, ["pattern1", "pattern2"], actual.patterns)
+    asserts.equals(env, [], actual.presets)
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -83,12 +83,12 @@ def test_verify_gather_package_content_works_with_star_pattern(ctx):
     env = unittest.begin(ctx)
     actual = helpers_testonly.gather_package_content_excludes(
         {
-            "*": ["pattern1", "pattern2"],
+            "*": struct(patterns = ["pattern1", "pattern2"], presets = ["yarn_autoclean"]),
         },
         "packageA",
     )
-    expected = ["pattern1", "pattern2"]
-    asserts.equals(env, expected, actual)
+    asserts.equals(env, ["pattern1", "pattern2"], actual.patterns)
+    asserts.equals(env, ["yarn_autoclean"], actual.presets)
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -96,12 +96,12 @@ def test_verify_gather_package_content_works_with_dict_format(ctx):
     env = unittest.begin(ctx)
     actual = helpers_testonly.gather_package_content_excludes(
         {
-            "packageA": ["pattern1", "pattern2"],
+            "packageA": struct(patterns = ["pattern1", "pattern2"], presets = ["basic", "yarn_autoclean"]),
         },
         "packageA",
     )
-    expected = ["pattern1", "pattern2"]
-    asserts.equals(env, expected, actual)
+    asserts.equals(env, ["pattern1", "pattern2"], actual.patterns)
+    asserts.equals(env, ["basic", "yarn_autoclean"], actual.presets)
     return unittest.end(env)
 
 t2_test = unittest.make(test_verify_gather_package_content_works_with_simple_name)

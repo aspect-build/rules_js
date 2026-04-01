@@ -2,8 +2,6 @@
 
 The `js_image_layer` rule returns `tar` artifacts, suitable to include in the `tars` attribute of the `oci_image` rule from rules_oci.
 
-For an example using rules_docker rather than rules_oci, see the js_image_docker folder next to this one.
-
 ## Fine-grained layering
 
 `js_image_layer` is a macro that yields two tar files `app.tar` and `node_modules.tar`. While `app.tar` contains first-party sources, `node_modules.tar` contains all third-party dependencies.
@@ -26,10 +24,10 @@ Here is what the final image looks like when `platform = "linux/arm64"`:
 app
 |-- main
 |-- main.runfiles
-|   |-- __main__
+|   |-- _main
 |   |   |-- main.sh
 |   |   |-- node_modules
-|   |   |   `-- chalk -> /app/main.sh.runfiles/__main__/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk
+|   |   |   `-- chalk -> /app/main.sh.runfiles/_main/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk
 |   |   `-- src
 |   |       |-- ascii.art
 |   |       `-- main.js

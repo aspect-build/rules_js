@@ -1,0 +1,8 @@
+{
+    "name": "subs",
+    "private": true,
+    "dependencies": {
+        "@subs/a": "link:./a",
+        "@subs/b": "link:./b"
+    }
+}

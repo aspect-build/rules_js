@@ -2,7 +2,7 @@ import {
     isNodeModulePath,
     is1pPackageStoreDep,
     friendlyFileSize,
-} from '../../js_run_devserver.mjs'
+} from '../../devserver/js_run_devserver.mjs'
 
 // isNodeModulePath
 const isNodeModulePath_true = [

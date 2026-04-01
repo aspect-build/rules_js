@@ -7,6 +7,8 @@ module.exports = {
     test: () =>
         [
             require('@aspect-test/d').version,
+            require('@lib/e').foo,
+            require('@lib/f').bar,
             require('alias-2/package.json').name,
         ].join('\n'),
 }

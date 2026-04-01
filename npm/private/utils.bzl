@@ -1,8 +1,15 @@
 "Utility functions for npm rules"
 
-load("@aspect_bazel_lib//lib:paths.bzl", "relative_file")
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@bazel_features//:features.bzl", "bazel_features")
+load("@bazel_lib//lib:paths.bzl", "relative_file")
+load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+
+# Bazel 9+ supports target_type="directory" on ctx.actions.symlink which creates
+# junctions instead of file symlinks on Windows. Without this, Node.js gets EPERM
+# when traversing symlinks created by declare_symlink on Bazel 8+/Windows.
+# See https://github.com/bazelbuild/bazel/issues/26701
+_SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
 
 INTERNAL_ERROR_MSG = "ERROR: rules_js internal error, please file an issue: https://github.com/aspect-build/rules_js/issues"
 DEFAULT_REGISTRY_DOMAIN = "registry.npmjs.org"
@@ -10,69 +17,137 @@ DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
+# Maximum package store name length before hashing to prevent long paths
+# Similar to pnpm's limit: https://github.com/pnpm/pnpm/blob/9d4c16876f899146a45f21d93f041b42e3413011/packages/dependency-path/src/index.ts#L165
+_MAX_STORE_LENGTH = 120
+
+# Maximum length of peer dependency string before hashing to prevent long paths
+_MAX_PEER_DEP_LENGTH = 32
+
+# A unique separator for link: dependencies to separate the link name vs path
+_LINK_SEPARATOR = "|"
+
+# Alphabet for base64 strings.
+_B64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
 def _sorted_map(m):
-    result = dict()
-    for key in sorted(m.keys()):
-        result[key] = m[key]
+    # TODO(zbarsky): maybe faster as `dict(sorted(m.items()))`?
+    return {k: m[k] for k in sorted(m.keys())}
 
-    return result
+def _importer_to_link(package, path):
+    # Convert a pnpm-workspace relative path to a link: key
+    return "link:{}{}{}".format(package, _LINK_SEPARATOR, path)
 
-def _sanitize_rule_name(string):
+def _link_to_importer(link):
+    # Convert a link: key to a pnpm-workspace relative path
+    p_idx = link.find(_LINK_SEPARATOR)
+    if p_idx == -1 or not link.startswith("link:"):
+        msg = "invalid link dependency key '{}'".format(link)
+        fail(msg)
+    return link[p_idx + 1:]
+
+def _link_to_alias(link):
+    # Convert a link: key to the link alias (package name)
+    p_idx = link.find(_LINK_SEPARATOR)
+    if p_idx == -1 or not link.startswith("link:"):
+        msg = "invalid link dependency key '{}'".format(link)
+        fail(msg)
+    return link[5:p_idx]
+
+def _package_shorten_key(s):
+    # Prevent long paths similar to pnpm. The pnpm lockfile v6+ does not shorten long versions
+    # and instead relies on the lockfile processing to handle it depending on the platform.
+    #
+    # Long file paths can lead to "File name too long" build failures in bazel
+    #
+    # See:
+    #  https://github.com/pnpm/pnpm/blob/9d4c16876f899146a45f21d93f041b42e3413011/packages/dependency-path/src/index.ts#L165
+    #  https://github.com/pnpm/pnpm/blob/c5d4d81f56e53d824a8ed1a0f2b0e830ccaa9a0e/packages/dependency-path/src/index.ts#L169-L180
+    version_index = s.find("@", 1)
+    peers_index = s.find("(", version_index)
+
+    # Shorten long peer deps
+    if peers_index != -1:
+        if len(s) - peers_index > _MAX_PEER_DEP_LENGTH or len(s) > _MAX_STORE_LENGTH:
+            s = s[:peers_index] + "(" + _hash(s[peers_index:]).lstrip("-") + ")"
+    else:
+        peers_index = len(s)
+
+    # If the full key is still too long, shorten the version
+    if len(s) > _MAX_STORE_LENGTH:
+        # If hashing peers was not enough, hash the version too
+        s = s[:version_index] + "@" + _hash(s[version_index:peers_index]).lstrip("-") + s[peers_index:]
+
+    return s
+
+def _package_store_name(s):
+    # Target names may contain only A-Z, a-z, 0-9, '-', '_', '.', '+', '@' and probably more.
+    # Package store target names try to align with pnpm v9+ store naming conventions.
+    # Compare with the pnpm v9+ virtual store before modifying.
+
+    # Convert link: to {name}@0.0.0 for naming of local workspace packages
+    if s.startswith("link:"):
+        s = _link_to_alias(s) + "@0.0.0"
+    else:
+        s = _package_shorten_key(s)
+
+    r = ""
+    for c in s.elems():
+        if (c == "/" or c == ":"):
+            # use "+" path/protocol symbols like pnpm
+            r += "+"
+        elif not c.isalnum() and c != "-" and c != "_" and c != "." and c != "+" and c != "@":
+            # use "_" for all other other characters not friendly with target names
+            if r and r[-1] != "_":
+                r += "_"
+        else:
+            r += c
+
+    r = r.rstrip("_-.")
+
+    return r
+
+def _package_repo_name(prefix, s):
     # Workspace names may contain only A-Z, a-z, 0-9, '-', '_' and '.'
-    result = ""
-    for c in string.elems():
-        if c == "@" and (not result or result[-1] == "_"):
-            result += "at"
-        if not c.isalnum() and c != "-" and c != "_" and c != ".":
-            c = "_"
-        result += c
-    return result.strip("_-")
+    # Package repo names handle '/' and other characters unique to better represent npm packages.
 
-def _bazel_name(name, version = None):
-    "Make a bazel friendly name from a package name and (optionally) a version that can be used in repository and target names"
-    escaped_name = _sanitize_rule_name(name)
-    if not version:
-        return escaped_name
+    # link: packages are not supported
+    if s.startswith("link:"):
+        fail("link: packages should not be repositories")
 
-    # Separate name + version with extra _
-    return "%s__%s" % (escaped_name, _sanitize_rule_name(version))
+    s = _package_shorten_key(s)
+    version_index = s.find("@", 1)
 
-def _package_key(name, version):
-    "Make a name/version pnpm-style name for a package name and version"
-    return "%s@%s" % (name, version)
+    r = prefix + "__"
+    for i, c in enumerate(s.elems()):
+        if i == version_index:
+            # Separate package name and version with double underscore
+            r += "__"
+        elif c == "@" and (i == 0 or s[i - 1] == "("):
+            # Replace scope and peer/patch separator with 'at_'
+            if r and r[-1] != "_":
+                r += "_"
+            r += "at_"
+        elif c == ")":
+            pass  # skip closing peer/patch parentheses
+        elif not c.isalnum() and c != "-" and c != "_" and c != ".":
+            r += "_"
+        else:
+            r += c
+
+    return r.rstrip("_-.")
 
 def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
-def _escape_target_name(name):
-    return name.replace("://", "/").replace("/", "+").replace(":", "+")
-
-def _package_store_name(pnpm_name, pnpm_version):
-    "Make a package store name for a given package and version"
-
-    if pnpm_version.startswith("link:") or pnpm_version.startswith("file:"):
-        name = pnpm_name
-        version = "0.0.0"
-    elif pnpm_version.startswith("npm:"):
-        name, version = pnpm_version[4:].rsplit("@", 1)
-    else:
-        name = pnpm_name
-        version = pnpm_version
-
-    if version.startswith("@"):
-        # Special case where the package name should _not_ be included in the package store name.
-        # See https://github.com/aspect-build/rules_js/issues/423 for more context.
-        return _escape_target_name(version)
-    else:
-        return "%s@%s" % (_escape_target_name(name), _escape_target_name(version))
-
-def _make_symlink(ctx, symlink_path, target_path):
+def _make_directory_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
-    ctx.actions.symlink(
-        output = symlink,
-        target_path = relative_file(target_path, symlink.path),
-    )
+    relative_target = relative_file(target_path, symlink.path)
+    if _SUPPORTS_SYMLINK_TARGET_TYPE:
+        ctx.actions.symlink(output = symlink, target_path = relative_target, target_type = "directory")
+    else:
+        ctx.actions.symlink(output = symlink, target_path = relative_target)
     return symlink
 
 def _parse_package_name(package):
@@ -98,12 +173,8 @@ def _npm_registry_download_url(package, version, registries, default_registry):
         registry.removesuffix("/"),
         package,
         package_name_no_scope,
-        # Strip the rules_js peer/patch metadata off the version. See pnpm.bzl
-        version[:version.find("_")] if version.find("_") != -1 else version,
+        version,
     )
-
-def _is_git_repository_url(url):
-    return url.startswith("git+ssh://") or url.startswith("git+https://") or url.startswith("git@")
 
 def _to_registry_url(url):
     return "{}://{}".format(DEFAULT_REGISTRY_PROTOCOL, url) if url.find("//") == -1 else url
@@ -134,21 +205,31 @@ def _reverse_force_copy(rctx, label, dst = None):
         fail(INTERNAL_ERROR_MSG)
     dst = dst if dst else str(rctx.path(label))
     src = str(rctx.path(paths.join(label.package, label.name)))
-    if repo_utils.is_windows(rctx):
-        fail("Not yet implemented for Windows")
-        #         rctx.file("_reverse_force_copy.bat", content = """
-        # @REM needs a mkdir dirname(%2)
-        # xcopy /Y %1 %2
-        # """, executable = True)
-        #         result = rctx.execute(["cmd.exe", "/C", "_reverse_force_copy.bat", src.replace("/", "\\"), dst.replace("/", "\\")])
+    is_windows = repo_utils.is_windows(rctx)
+    coreutils = rctx.path(Label("@coreutils_{}//:coreutils{}".format(repo_utils.platform(rctx), ".exe" if is_windows else "")))
 
-    else:
-        rctx.file("_reverse_force_copy.sh", content = """#!/usr/bin/env bash
-set -o errexit -o nounset -o pipefail
-mkdir -p $(dirname $2)
-cp -f $1 $2
-""", executable = True)
-        result = rctx.execute(["./_reverse_force_copy.sh", src, dst])
+    # ensure the destination directory exists
+    dst_dirname = paths.dirname(dst)
+    if dst_dirname:
+        mkdir_args = [coreutils, "mkdir", "-p", dst_dirname]
+        result = rctx.execute(mkdir_args)
+        if result.return_code != 0:
+            msg = """
+
+ERROR: failed to create directory {dst_dirname}:
+STDOUT:
+{stdout}
+STDERR:
+{stderr}
+""".format(
+                dst_dirname = dst_dirname,
+                stdout = result.stdout,
+                stderr = result.stderr,
+            )
+            fail(msg)
+
+    cp_args = [coreutils, "cp", src, dst]
+    result = rctx.execute(cp_args)
     if result.return_code != 0:
         msg = """
 
@@ -165,41 +246,14 @@ STDERR:
         )
         fail(msg)
 
-# This uses `rctx.execute` to check if the file exists since `rctx.exists` does not exist.
-def _exists(rctx, p):
-    if type(p) == "Label":
-        fail("ERROR: dynamic labels not accepted since they should be converted paths at the top of the repository rule implementation to avoid restarts after rctx.execute() calls")
-    p = str(p)
-    if repo_utils.is_windows(rctx):
-        fail("Not yet implemented for Windows")
-        #         rctx.file("_exists.bat", content = """IF EXIST %1 (
-        #     EXIT /b 0
-        # ) ELSE (
-        #     EXIT /b 42
-        # )""", executable = True)
-        #         result = rctx.execute(["cmd.exe", "/C", "_exists.bat", str(p).replace("/", "\\")])
-
-    else:
-        rctx.file("_exists.sh", content = """#!/usr/bin/env bash
-set -o errexit -o nounset -o pipefail
-if [ ! -f $1 ]; then exit 42; fi
-""", executable = True)
-        result = rctx.execute(["./_exists.sh", str(p)])
-    if result.return_code == 0:  # file exists
-        return True
-    elif result.return_code == 42:  # file does not exist
-        return False
-    else:
-        fail(INTERNAL_ERROR_MSG)
-
-def _replace_npmrc_token_envvar(token, npmrc_path, environ):
+def _replace_npmrc_token_envvar(token, npmrc_path, rctx):
     # A token can be a reference to an environment variable
     if token.startswith("$"):
         # ${NPM_TOKEN} -> NPM_TOKEN
         # $NPM_TOKEN -> NPM_TOKEN
         token = token.removeprefix("$").removeprefix("{").removesuffix("}")
-        if environ.get(token, False):
-            token = environ[token]
+        if rctx.getenv(token) != None:
+            token = rctx.getenv(token)
         else:
             # buildifier: disable=print
             print("""
@@ -241,13 +295,72 @@ def _is_tarball_extension(ext):
     ]
     return ext in tarball_extensions
 
+def _hex_to_base64(hex_string):
+    """Converts a non-delimited hex string (like a SHA-512 checksum) to base64."""
+
+    # 1. Convert hex string to a list of integer bytes
+    bytes_list = []
+
+    # Loop with step 2 to grab hex pairs
+    for i in range(0, len(hex_string), 2):
+        bytes_list.append(int(hex_string[i:i + 2], 16))
+
+    output = []
+    length = len(bytes_list)
+
+    # 2. Process bytes in chunks of 3 using range(start, stop, step)
+    for i in range(0, length, 3):
+        b1 = bytes_list[i]
+
+        # Check if 2nd byte exists
+        if i + 1 < length:
+            b2 = bytes_list[i + 1]
+        else:
+            b2 = -1
+
+        # Check if 3rd byte exists
+        if i + 2 < length:
+            b3 = bytes_list[i + 2]
+        else:
+            b3 = -1
+
+        # Construct 24-bit buffer
+        # Use 0 for missing bytes during bitwise ops
+        val = (b1 << 16) | ((b2 if b2 != -1 else 0) << 8) | (b3 if b3 != -1 else 0)
+
+        # Extract 6-bit indices
+        c1 = (val >> 18) & 0x3F
+        c2 = (val >> 12) & 0x3F
+        c3 = (val >> 6) & 0x3F
+        c4 = val & 0x3F
+
+        output.append(_B64_CHARS[c1])
+        output.append(_B64_CHARS[c2])
+
+        # Handle Padding
+        if b2 == -1:
+            # Only 1 byte available -> Pad 2
+            output.append("=")
+            output.append("=")
+        elif b3 == -1:
+            # Only 2 bytes available -> Pad 1
+            output.append(_B64_CHARS[c3])
+            output.append("=")
+        else:
+            # All 3 bytes available -> No padding
+            output.append(_B64_CHARS[c3])
+            output.append(_B64_CHARS[c4])
+
+    return "".join(output)
+
 utils = struct(
-    bazel_name = _bazel_name,
     sorted_map = _sorted_map,
-    package_key = _package_key,
     friendly_name = _friendly_name,
+    link_to_importer = _link_to_importer,
+    importer_to_link = _importer_to_link,
+    package_repo_name = _package_repo_name,
     package_store_name = _package_store_name,
-    make_symlink = _make_symlink,
+    make_directory_symlink = _make_directory_symlink,
     # Symlinked node_modules structure package store path under node_modules
     package_store_root = ".aspect_rules_js",
     # Suffix for npm_import links repository
@@ -256,16 +369,15 @@ utils = struct(
     package_directory_output_group = "package_directory",
     npm_registry_url = _npm_registry_url,
     npm_registry_download_url = _npm_registry_download_url,
-    is_git_repository_url = _is_git_repository_url,
     to_registry_url = _to_registry_url,
     default_external_repository_action_cache = _default_external_repository_action_cache,
     default_registry = _default_registry_url,
     hash = _hash,
     dicts_match = _dicts_match,
     reverse_force_copy = _reverse_force_copy,
-    exists = _exists,
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
+    hex_to_base64 = _hex_to_base64,
 )
 
 # Exported only to be tested

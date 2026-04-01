@@ -1,18 +1,24 @@
-lockfileVersion: '6.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  '@aspect-test/test-private-npm-package':
-    specifier: git+ssh://git@github.com:aspect-test/test-private-npm-package#a09b6c1084c15c0dcd230a7017aefee66e6bb9db
-    version: git/github.com+aspect-test/test-private-npm-package/a09b6c1084c15c0dcd230a7017aefee66e6bb9db
+importers:
+
+  .:
+    dependencies:
+      '@aspect-test/test-private-npm-package':
+        specifier: git+ssh://git@github.com:aspect-test/test-private-npm-package#a09b6c1084c15c0dcd230a7017aefee66e6bb9db
+        version: git+https://git@github.com:aspect-test/test-private-npm-package.git#a09b6c1084c15c0dcd230a7017aefee66e6bb9db
 
 packages:
 
-  git/github.com+aspect-test/test-private-npm-package/a09b6c1084c15c0dcd230a7017aefee66e6bb9db:
+  '@aspect-test/test-private-npm-package@git+https://git@github.com:aspect-test/test-private-npm-package.git#a09b6c1084c15c0dcd230a7017aefee66e6bb9db':
     resolution: {commit: a09b6c1084c15c0dcd230a7017aefee66e6bb9db, repo: git@github.com:aspect-test/test-private-npm-package.git, type: git}
     name: '@aspect-test/test-private-npm-package'
     version: 1.0.0
-    dev: false
+
+snapshots:
+
+  '@aspect-test/test-private-npm-package@git+https://git@github.com:aspect-test/test-private-npm-package.git#a09b6c1084c15c0dcd230a7017aefee66e6bb9db': {}

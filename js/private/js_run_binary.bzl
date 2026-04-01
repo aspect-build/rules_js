@@ -10,9 +10,9 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 ```
 """
 
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
-load("@aspect_bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
-load("@aspect_bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
+load("@bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
+load("@bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
+load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
 load(":js_library.bzl", _js_library = "js_library")
@@ -44,25 +44,25 @@ def js_run_binary(
         stamp = 0,
         patch_node_fs = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
-        use_default_shell_env = None,
+        use_default_shell_env = False,
         **kwargs):
-    """Wrapper around @aspect_bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
+    """Wrapper around @bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
 
     This rule does not require Bash `native.genrule`.
 
     The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
 
-    * BAZEL_BINDIR: the WORKSPACE-relative bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
+    * BAZEL_BINDIR: the bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
     * BAZEL_COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
     * BAZEL_TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
 
     The following environment variables are made available to the Node.js runtime based on the rule context:
 
-    * BAZEL_BUILD_FILE_PATH: the WORKSPACE-relative path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
+    * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
     * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
     * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
     * BAZEL_TARGET: the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
-    * BAZEL_WORKSPACE: the bazel workspace name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
+    * BAZEL_WORKSPACE: the bazel repository name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
 
     Args:
         name: Target name
@@ -229,12 +229,10 @@ def js_run_binary(
 
             See `use_execroot_entry_point` doc for more info.
 
-        use_default_shell_env: If set, passed to the underlying run_binary.
+        use_default_shell_env: Passed to the underlying ctx.actions.run.
 
             May introduce non-determinism when True; use with care!
             See e.g. https://github.com/bazelbuild/bazel/issues/4912
-
-            Requires a minimum of aspect_bazel_lib v1.40.3 or v2.4.2.
 
             Refer to https://bazel.build/rules/lib/builtins/actions#run for more details.
 
@@ -246,25 +244,6 @@ def js_run_binary(
         fail("Use srcs instead of data in js_run_binary: https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_binary#srcs")
     if "deps" in kwargs.keys():
         fail("Use srcs instead of deps in js_run_binary: https://docs.aspect.build/rules/aspect_rules_js/docs/js_run_binary#srcs")
-
-    # For backward compat
-    # TODO(3.0): remove backward compat handling
-    include_npm_linked_packages = kwargs.pop("include_npm_linked_packages", None)
-    if include_npm_linked_packages != None:
-        # buildifier: disable=print
-        print("""
-WARNING: js_run_binary 'include_npm_linked_packages' is deprecated. Use 'include_npm_sources' instead.""")
-        include_npm_sources = include_npm_linked_packages
-
-    # For backward compat
-    # TODO(3.0): remove backward compat handling
-    include_declarations = kwargs.pop("include_declarations", False)
-    if include_declarations:
-        # buildifier: disable=print
-        print("""
-WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' instead.""")
-        include_types = include_declarations
-        include_transitive_types = include_declarations
 
     extra_srcs = []
 
@@ -316,7 +295,23 @@ WARNING: js_library 'include_declarations' is deprecated. Use 'include_types' in
 
     # Configure working directory to `chdir` is set
     if chdir:
-        fixed_env["JS_BINARY__CHDIR"] = chdir
+        normalized_chdir = chdir
+        repo = native.repo_name()
+
+        # Normalize workspace-relative chdir for external repositories so callers can pass
+        # native.package_name() without worrying about external/ prefixing.
+        # - Leave absolute paths and already-external paths untouched.
+        # - For external repos, prefix with "external/<repo>/".
+        if (
+            repo and
+            not (chdir.startswith("external/") or chdir.startswith("/")) and
+            not chdir.startswith("@")
+        ):
+            if chdir == ".":
+                normalized_chdir = "external/{}".format(repo)
+            else:
+                normalized_chdir = "external/{}/{}".format(repo, chdir)
+        fixed_env["JS_BINARY__CHDIR"] = normalized_chdir
 
     # Configure capturing stdout, stderr and/or the exit code
     extra_outs = []
@@ -390,13 +385,6 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     if allow_execroot_entry_point_with_no_copy_data_to_bin:
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
 
-    # Pass use_default_shell_env via kwargs and only if it is not None since older versions of
-    # aspect_bazel_lib run_binary don't support this attribute. We set the correct 1.x minimum for
-    # bzlmod but users could have a 2.x version < 2.4.2. For users using WORKSPACE, an older
-    # aspect_bazel_lib may sneak in since order matters for WORKSPACE deps.
-    if use_default_shell_env != None:
-        kwargs["use_default_shell_env"] = use_default_shell_env
-
     _run_binary(
         name = name,
         tool = tool,
@@ -409,5 +397,6 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         progress_message = progress_message,
         execution_requirements = execution_requirements,
         stamp = stamp,
+        use_default_shell_env = use_default_shell_env,
         **kwargs
     )

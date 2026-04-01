@@ -24,7 +24,7 @@ coverage_fail_test(
     name = "fail",
     data = ["lib.js"],
     enable_runfiles = select({
-        "@aspect_bazel_lib//lib:enable_runfiles": True,
+        "@bazel_lib//lib:enable_runfiles": True,
         "//conditions:default": False,
     }),
     entry_point = "lib.js",
@@ -52,7 +52,7 @@ coverage_pass_test(
     name = "pass",
     data = ["lib.js"],
     enable_runfiles = select({
-        "@aspect_bazel_lib//lib:enable_runfiles": True,
+        "@bazel_lib//lib:enable_runfiles": True,
         "//conditions:default": False,
     }),
     entry_point = "lib.js",

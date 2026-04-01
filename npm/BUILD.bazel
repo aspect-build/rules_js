@@ -1,26 +1,9 @@
 "Public API"
 
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
 exports_files(
     glob(["*.bzl"]),
-    visibility = ["//visibility:public"],
-)
-
-# Allows for faster dev roundtrip by excluding type-checking from libraries that are
-# internally used via npm_package
-# TODO(3.0): remove
-bool_flag(
-    name = "exclude_types_from_npm_packages",
-    build_setting_default = False,
-    visibility = ["//visibility:public"],
-)
-
-# TODO(3.0): remove
-config_setting(
-    name = "exclude_types_from_npm_packages_flag",
-    flag_values = {":exclude_types_from_npm_packages": "true"},
     visibility = ["//visibility:public"],
 )
 
@@ -34,6 +17,12 @@ bzl_library(
         "//npm/private:npm_package_info",
         "//npm/private:npm_package_store_info",
     ],
+)
+
+starlark_doc_extract(
+    name = "defs.doc_extract",
+    src = "defs.bzl",
+    deps = [":defs"],
 )
 
 bzl_library(
@@ -66,4 +55,26 @@ bzl_library(
         "//npm/private:npm_translate_lock",
         "//npm/private:pnpm_repository",
     ],
+)
+
+bzl_library(
+    name = "extensions",
+    srcs = ["extensions.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//npm/private:npm_import",
+        "//npm/private:npm_translate_lock",
+        "//npm/private:npm_translate_lock_generate",
+        "//npm/private:npm_translate_lock_helpers",
+        "//npm/private:npmrc",
+        "//npm/private:pnpm_extension",
+        "//npm/private:pnpm_repository",
+        "@bazel_lib//lib:repo_utils",
+    ],
+)
+
+starlark_doc_extract(
+    name = "extensions.doc_extract",
+    src = "extensions.bzl",
+    deps = [":extensions"],
 )

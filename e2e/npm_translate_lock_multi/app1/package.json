@@ -1,4 +1,7 @@
 {
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
         "chalk": "5.3.0"
     }

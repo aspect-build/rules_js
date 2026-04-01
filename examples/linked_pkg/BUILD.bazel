@@ -2,7 +2,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # A basic library with 2 simple dependencies (packages with no dependencies)
 js_library(
@@ -11,6 +11,7 @@ js_library(
     visibility = ["//visibility:public"],
     deps = [
         ":node_modules/@aspect-test/e",
+        ":node_modules/@aspect-test/e-dev",
         ":node_modules/@aspect-test/f",
         ":node_modules/@types/node",
         ":node_modules/alias-e",

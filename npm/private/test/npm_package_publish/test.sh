@@ -7,11 +7,11 @@ readonly PUBLISH_B="$2"
 # to ensure package directory is properly passed and npm can read it.
 $PUBLISH_A 2>pub_a.log
 
-cat pub_a.log | grep 'npm notice package: @mycorp/pkg-b@'
+cat pub_a.log | grep 'npm notice package: @mycorp/pkg-to-publish@'
 
 # shellcheck disable=SC2181
 if [ $? != 0 ]; then
-    echo "FAIL: expected 'npm notice package: @mycorp/pkg-b@' error, GOT: $(cat pub_a.log)"
+    echo "FAIL: expected 'npm notice package: @mycorp/pkg-to-publish@' error, GOT: $(cat pub_a.log)"
     exit 1
 fi
 

@@ -1,8 +1,11 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_test_suite")
+load(":npm_package_visibility_test.bzl", "npm_package_visibility_tests")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":parse_pnpm_lock_tests.bzl", "parse_pnpm_lock_tests")
 load(":pnpm_test.bzl", "pnpm_tests")
@@ -10,7 +13,7 @@ load(":transitive_closure_tests.bzl", "transitive_closure_tests")
 load(":translate_lock_helpers_tests.bzl", "translate_lock_helpers_tests")
 load(":utils_tests.bzl", "utils_tests")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # Unit tests
 utils_tests(name = "test_utils")
@@ -27,21 +30,28 @@ parse_pnpm_lock_tests(name = "test_parse_pnpm_lock")
 
 generated_pkg_json_test(name = "test_generated_pkg_json")
 
+npm_package_visibility_tests(name = "test_npm_package_visibility")
+
 npm_auth_test_suite()
 
 write_source_files(
     name = "write_npm_translate_lock",
     files = {
         "snapshots/npm_defs.bzl": "@npm//:defs.bzl",
+        "snapshots/npm_defs-no_optional.bzl": "@npm-no_optional//:defs.bzl",
+        "snapshots/npm_defs-no_dev.bzl": "@npm-no_dev//:defs.bzl",
         "snapshots/unused_links_defs.bzl": "@npm__unused__0.2.2__links//:defs.bzl",
-        "snapshots/fsevents_links_defs.bzl": "@npm__fsevents__2.3.2__links//:defs.bzl",
-        "snapshots/rollup_links_defs.bzl": "@npm__rollup__2.70.2__links//:defs.bzl",
-        "snapshots/package_json.bzl": "@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl",
-        "snapshots/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8//npm/private/test:package_json.bzl",
+        "snapshots/fsevents_links_defs.bzl": "@npm__fsevents__2.3.3__links//:defs.bzl",
+        "snapshots/circular_links_defs.bzl": "@npm__es5-ext__0.10.64__links//:defs.bzl",
+        "snapshots/closure-compiler_links_defs.bzl": "@npm__google-closure-compiler__20251111.0.0__links//:defs.bzl",
+        "snapshots/next_links_defs.bzl": "@npm__next__15.2.6_1642820312__links//:defs.bzl",
+        "snapshots/rollup_links_defs.bzl": "@npm__rollup__4.55.2__links//:defs.bzl",
+        "snapshots/package_json.bzl": "@npm__rollup__4.55.2//:package_json.bzl",
+        "snapshots/package_json_with_dashes.bzl": "@npm__webpack-bundle-analyzer__4.5.0_bufferutil_4.0.8//:package_json.bzl",
     },
     tags = [
-        "skip-on-bazel6",
         "skip-on-bazel8",
+        "skip-on-bazel9",
     ],
 )
 
@@ -56,6 +66,33 @@ build_test(
 
         # @fastify/send (@3.3.0) contains spaces and a ☃ character in paths
         ":node_modules/@fastify/send",
+
+        # Test scope targets (aggregated js_library for all packages in a scope)
+        ":node_modules/@fastify",
+        ":node_modules/@figma",
+        ":node_modules/@kubernetes",
+        ":node_modules/@plotly",
+
+        # odd URL/protocol versions
+        ":node_modules/@kubernetes/client-node",
+        ":node_modules/inline-fixtures",
+        ":node_modules/protoc-gen-grpc",
+        ":node_modules/syncpack",
+
+        # Packages with optional platform/os specific dependencies
+        "//:node_modules/google-closure-compiler",
+        "//examples/nextjs:node_modules/next",
+
+        # Packages with known circular deps
+        "//:node_modules/circles",
+        "//js/private/test/node-patches:node_modules/@babel/cli",
+        "//js/private/test/node-patches:node_modules/@babel/core",
+        "//examples/nextjs:node_modules/next",
+
+        # Packages of the same name with alternate aliases/versions/protocols
+        ":node_modules/lodash",
+        ":node_modules/lodash-4.17.21",
+        ":node_modules/lodash-4.17.21-tar",
     ],
 )
 
@@ -80,5 +117,11 @@ sh_test(
         "@platforms//os:windows": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    toolchains = ["@nodejs_toolchains//:resolved_toolchain"],
+    toolchains = ["@rules_nodejs//nodejs:current_node_runtime"],
+)
+
+js_test(
+    name = "pkg_versions_test",
+    data = [":node_modules"],
+    entry_point = "versions.js",
 )

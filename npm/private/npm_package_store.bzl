@@ -1,6 +1,8 @@
 "npm_package_store rule"
 
-load("@aspect_bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
+load("@bazel_features//:features.bzl", "bazel_features")
+load("@bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
+load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo", "js_info")
@@ -8,12 +10,16 @@ load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
 
+_SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
+
+_PACKAGE_STORE_PREFIX_LEN = len("node_modules/{}/".format(utils.package_store_root))
+
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
 The npm package is linked with a pnpm style symlinked node_modules output tree.
 
 The term "package" is defined at
-<https://nodejs.org/docs/latest-v16.x/api/packages.html>
+<https://nodejs.org/docs/latest-v22.x/api/packages.html>
 
 See https://pnpm.io/symlinked-node-modules-structure for more information on
 the symlinked node_modules structure.
@@ -118,18 +124,15 @@ _ATTRS = {
         doc = """The package name to link to.
 
 If unset, the package name in the `NpmPackageInfo` src must be set.
-If set, takes precendance over the package name in the `NpmPackageInfo` src.
+If set, takes precedence over the package name in the `NpmPackageInfo` src.
 """,
     ),
     "version": attr.string(
         doc = """The package version being linked.
 
 If unset, the package version in the `NpmPackageInfo` src must be set.
-If set, takes precendance over the package version in the `NpmPackageInfo` src.
+If set, takes precedence over the package version in the `NpmPackageInfo` src.
 """,
-    ),
-    "dev": attr.bool(
-        doc = """Whether this npm package is a dev dependency""",
     ),
     "hardlink": attr.string(
         values = ["auto", "off", "on"],
@@ -180,11 +183,18 @@ def _npm_package_store_impl(ctx):
         version = ctx.attr.version
 
     if not package:
-        fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
+        fail("No package name specified to link to. Package name must either be specified explicitly via 'package' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
     if not version:
-        fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'NpmPackageInfo', typically a 'npm_package' target")
+        fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
 
-    package_store_name = utils.package_store_name(package, version)
+    package_store_prefix_len = _PACKAGE_STORE_PREFIX_LEN
+    if ctx.label.package:
+        package_store_prefix_len += len(ctx.label.package)
+    if ctx.label.repo_name:
+        package_store_prefix_len += len(ctx.label.repo_name) + 3  # +3 for ../
+
+    package_key = "{}@{}".format(package, version)
+    package_store_name = utils.package_store_name(package_key)
     package_store_directory = None
 
     # files required to create the package store entry
@@ -229,34 +239,27 @@ def _npm_package_store_impl(ctx):
                 # tho the name is not predictable we can use the --strip-components 1 argument with
                 # tar to strip one directory level. Some packages have directory permissions missing
                 # executable which make the directories not listable (pngjs@5.0.0 for example).
-                bsdtar = ctx.toolchains["@aspect_bazel_lib//lib:tar_toolchain_type"]
+                bsdtar = ctx.toolchains[tar_lib.toolchain_type]
 
-                tar_exclude_package_contents = []
-                if ctx.attr.exclude_package_contents:
-                    for pattern in ctx.attr.exclude_package_contents:
-                        if pattern == "":
-                            continue
-                        tar_exclude_package_contents.append("--exclude")
-                        tar_exclude_package_contents.append(pattern)
+                args = ctx.actions.args()
+                args.add("--extract")
+                args.add("--no-same-owner")
+                args.add("--no-same-permissions")
+                args.add("--strip-components", "1")
+                args.add("--file", src)
+                args.add_all("--directory", [package_store_directory], expand_directories = False)
+                args.add_all(ctx.attr.exclude_package_contents, before_each = "--exclude")
 
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
-                    inputs = depset(direct = [src], transitive = [bsdtar.default.files]),
+                    inputs = [src],
                     outputs = [package_store_directory],
-                    arguments = [
-                        "--extract",
-                    ] + tar_exclude_package_contents + [
-                        "--no-same-owner",
-                        "--no-same-permissions",
-                        "--strip-components",
-                        "1",
-                        "--file",
-                        src.path,
-                        "--directory",
-                        package_store_directory.path,
-                    ],
+                    arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
+                    execution_requirements = {
+                        "supports-path-mapping": "1",
+                    },
 
                     # Always override the locale to give better hermeticity.
                     # See https://github.com/aspect-build/rules_js/issues/2039
@@ -267,7 +270,7 @@ def _npm_package_store_impl(ctx):
                     ctx,
                     src = src,
                     dst = package_store_directory,
-                    copy_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
+                    copy_directory_bin = ctx.toolchains["@bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin,
                     # Hardlinking source files in external repositories as was done under the hood
                     # prior to https://github.com/aspect-build/rules_js/pull/1533 may lead to flaky build
                     # failures as reported in https://github.com/aspect-build/rules_js/issues/1412.
@@ -290,9 +293,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             if dep_package_store_directory:
                 linked_package_store_directories.append(dep_package_store_directory)
                 for dep_alias in dep_aliases:
-                    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                    dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_alias)
-                    files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
+                    target = dep_package_store_directory.short_path[package_store_prefix_len:]
+                    files.append(_symlink_package_store(ctx, package_store_name, target, dep_alias))
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package
                 # for this npm dependency will create the dep symlinks for this dep;
@@ -306,9 +308,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             # only link npm package store deps from NpmPackageInfo if they have _not_ already been linked directly
             # from deps; fixes https://github.com/aspect-build/rules_js/issues/1110.
             if dep_package_store_directory not in linked_package_store_directories:
-                # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, package_store_name, dep_info.package)
-                files.append(utils.make_symlink(ctx, dep_symlink_path, dep_package_store_directory.path))
+                target = dep_package_store_directory.short_path[package_store_prefix_len:]
+                files.append(_symlink_package_store(ctx, package_store_name, target, dep_info.package))
 
                 # Include the store info of all linked dependencies
                 npm_package_store_infos.append(dep_info)
@@ -330,7 +331,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.repo_name, jsinfo.target.package)
         else:
             target_path = "{}/{}".format(ctx.bin_dir.path, jsinfo.target.package)
-        package_store_directory = utils.make_symlink(ctx, symlink_path, target_path)
+        package_store_directory = utils.make_directory_symlink(ctx, symlink_path, target_path)
     elif not ctx.attr.src:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
         # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
@@ -342,7 +343,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
             # create a map of deps that have package store directories
             if dep_info.package_store_directory:
-                deps_map[utils.package_store_name(dep_info.package, dep_info.version)] = dep
+                deps_map[dep_info.key] = dep
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
@@ -352,27 +353,26 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
         for dep in ctx.attr.deps:
             dep_info = dep[NpmPackageStoreInfo]
-            dep_package_store_name = utils.package_store_name(dep_info.package, dep_info.version)
+            dep_package_store_name = utils.package_store_name(dep_info.key)
 
-            if package_store_name == dep_package_store_name:
+            if package_key == dep_info.key:
                 # provide the node_modules directory for this package if found in the transitive_closure
                 package_store_directory = dep_info.package_store_directory
 
             for dep_ref_dep, dep_ref_dep_aliases in dep_info.ref_deps.items():
-                dep_ref_dep_package_store_name = utils.package_store_name(dep_ref_dep[NpmPackageStoreInfo].package, dep_ref_dep[NpmPackageStoreInfo].version)
-                if not dep_ref_dep_package_store_name in deps_map:
+                dep_ref_dep_key = dep_ref_dep[NpmPackageStoreInfo].key
+                if not dep_ref_dep_key in deps_map:
                     # This can happen in lifecycle npm package targets. We have no choice but to
                     # ignore reference back to self in dyadic circular deps in this case since a
                     # transitive dep on this npm package is impossible in an action that is
                     # outputting the package store tree artifact that circular dep would point to.
                     continue
-                actual_dep = deps_map[dep_ref_dep_package_store_name]
+                actual_dep = deps_map[dep_ref_dep_key]
                 dep_ref_def_package_store_directory = actual_dep[NpmPackageStoreInfo].package_store_directory
                 if dep_ref_def_package_store_directory:
+                    target = dep_ref_def_package_store_directory.short_path[package_store_prefix_len:]
                     for dep_ref_dep_alias in dep_ref_dep_aliases:
-                        # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
-                        dep_ref_dep_symlink_path = "node_modules/{}/{}/node_modules/{}".format(utils.package_store_root, dep_package_store_name, dep_ref_dep_alias)
-                        files.append(utils.make_symlink(ctx, dep_ref_dep_symlink_path, dep_ref_def_package_store_directory.path))
+                        files.append(_symlink_package_store(ctx, dep_package_store_name, target, dep_ref_dep_alias))
     else:
         # We should _never_ get here
         fail("Internal error")
@@ -417,6 +417,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             transitive_types = types_depset,
         ),
         NpmPackageStoreInfo(
+            key = package_key,
             root_package = ctx.label.package,
             package = package,
             version = version,
@@ -424,7 +425,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             package_store_directory = package_store_directory,
             files = files_depset,
             transitive_files = transitive_files_depset,
-            dev = ctx.attr.dev,
         ),
     ]
 
@@ -446,8 +446,8 @@ npm_package_store_lib = struct(
     implementation = _npm_package_store_impl,
     provides = [DefaultInfo, NpmPackageStoreInfo],
     toolchains = [
-        Label("@aspect_bazel_lib//lib:copy_directory_toolchain_type"),
-        Label("@aspect_bazel_lib//lib:tar_toolchain_type"),
+        Label("@bazel_lib//lib:copy_directory_toolchain_type"),
+        tar_lib.toolchain_type,
     ],
 )
 
@@ -462,8 +462,8 @@ npm_package_store = rule(
 # Invoked by generated package store targets for local packages
 # buildifier: disable=function-docstring
 # buildifier: disable=unnamed-macro
-def npm_local_package_store_internal(link_root_name, package_store_name, package, version, src, deps, visibility, tags):
-    store_target_name = "%s/%s/%s" % (utils.package_store_root, link_root_name, package_store_name)
+def npm_local_package_store_internal(package_store_name, package, version, src, deps, visibility, tags):
+    store_target_name = "%s/node_modules/%s" % (utils.package_store_root, package_store_name)
 
     npm_package_store(
         name = store_target_name,
@@ -487,3 +487,20 @@ def npm_local_package_store_internal(link_root_name, package_store_name, package
         actual = store_target_name,
         visibility = visibility,
     )
+
+# Util for creating the symlink for a package store dependency referencing
+# another package store entry.
+def _symlink_package_store(ctx, package_store_name, target, name):
+    # "node_modules/{package_store_root}/{package_store_name}/node_modules/{package}"
+    store_symlink_path = "node_modules/{}/{}/node_modules/{}".format(
+        utils.package_store_root,
+        package_store_name,
+        name,
+    )
+    symlink = ctx.actions.declare_symlink(store_symlink_path)
+    target_path = ("../../../" if "/" in name else "../../") + target
+    if _SUPPORTS_SYMLINK_TARGET_TYPE:
+        ctx.actions.symlink(output = symlink, target_path = target_path, target_type = "directory")
+    else:
+        ctx.actions.symlink(output = symlink, target_path = target_path)
+    return symlink

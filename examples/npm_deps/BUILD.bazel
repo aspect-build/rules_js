@@ -1,5 +1,5 @@
-load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
@@ -11,13 +11,13 @@ load("@npm//examples/npm_deps:uvu/package_json.bzl", uvu_bin = "bin")
 # Directly load from rollup's bin entries, skipping the "bin" helper from package_json.bzl
 # Just to show what the syntax de-sugaring looks like, and to test that
 # bare `npm_import` produces working binaries.
-load("@npm__rollup__2.70.2//examples/npm_deps:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
+load("@npm__rollup__4.55.2//:package_json.bzl", "rollup", "rollup_binary", "rollup_test")
 
 ###########################
 
 # Link all direct dependencies in /examples/npm_deps/package.json to
 # bazel-bin/examples/npm_deps/node_modules
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 #######################################
 # Use case 1: transitive npm dependencies
@@ -62,9 +62,6 @@ js_test(
         ":node_modules/@rollup/plugin-commonjs",
         ":node_modules/mobx-react",
         ":node_modules/react",
-        # TODO: fix this test so we test a peer dependency without requiring it as a direct
-        # dependency https://github.com/aspect-build/rules_js/issues/92
-        ":node_modules/rollup",
     ],
     entry_point = "peer_test.js",
 )
@@ -95,7 +92,7 @@ js_test(
 
 #######################################
 # Use case 4: custom postinstall creates a file
-# See postinstall on @aspect-test/c in WORKSPACE
+# See lifecycle_hooks on @aspect-test/c in MODULE.bazel
 
 write_file(
     name = "write4",
@@ -145,7 +142,7 @@ write_file(
     name = "expected5",
     out = "expected5.txt",
     content = [
-        "rollup v2.70.2",
+        "rollup v4.55.2",
         "",
     ],
     newline = "unix",
@@ -240,18 +237,55 @@ js_test(
 # Case 7: use a first-party npm package within our Bazel monorepo workspace from an npm_package target
 
 write_file(
-    name = "write7",
-    out = "case7.js",
+    name = "write7_a",
+    out = "case7_a.js",
     content = ["require('@mycorp/pkg-a')"],
 )
 
 js_test(
-    name = "test7",
+    name = "test7_a",
     data = [
         ":node_modules/@mycorp/pkg-a",
     ],
-    entry_point = "case7.js",
+    entry_point = "case7_a.js",
 )
+
+write_file(
+    name = "write7_b_mjs",
+    out = "case7_b.mjs",
+    content = [
+        "import { sandboxAssert, getAcornVersion } from '@mycorp/pkg-b'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssert();",
+        "(await import('@mycorp/pkg-b')).sandboxAssert();",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+write_file(
+    name = "write7_b_cjs",
+    out = "case7_b.cjs",
+    content = [
+        "const { sandboxAssert, getAcornVersion } = require('@mycorp/pkg-b')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssert()",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+[
+    js_test(
+        name = "test7_b_%s" % t,
+        data = [
+            "//:node_modules/@mycorp/pkg-b",
+        ],
+        entry_point = "case7_b.%s" % t,
+    )
+    for t in [
+        "cjs",
+        "mjs",
+    ]
+]
 
 #######################################
 # Case 8: patch applied via `pnpm.patchesDependencies` then by `patches`
@@ -267,32 +301,145 @@ js_test(
 # Case 9: use a first-party npm package within our Bazel monorepo workspace from a js_library target
 
 write_file(
-    name = "write9",
-    out = "case9.js",
-    content = ["require('@mycorp/pkg-d')"],
+    name = "write9_cjs",
+    out = "case9.cjs",
+    content = [
+        "const { sandboxAssert, getAcornVersion } = require('@mycorp/pkg-d')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssert()",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+write_file(
+    name = "write9_mjs",
+    out = "case9.mjs",
+    content = [
+        "import { sandboxAssert, getAcornVersion } from '@mycorp/pkg-d'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssert();",
+        "(await import('@mycorp/pkg-d')).sandboxAssert();",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
 )
 
 js_test(
-    name = "test9",
+    name = "test9_cjs",
     data = [
         ":node_modules/@mycorp/pkg-d",
     ],
-    entry_point = "case9.js",
+    entry_point = "case9.cjs",
+)
+
+js_test(
+    name = "test9_mjs",
+    data = [
+        ":node_modules/@mycorp/pkg-d",
+    ],
+    entry_point = "case9.mjs",
 )
 
 #######################################
 # Case 10: use a first-party npm package a transitive dependency on a monorepo workspace from a js_library target
 
 write_file(
-    name = "write10",
-    out = "case10.js",
-    content = ["require('@mycorp/pkg-e')"],
+    name = "write10_cjs",
+    out = "case10.cjs",
+    content = [
+        "const { sandboxAssert, getAcornVersion } = require('@mycorp/pkg-e')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssert()",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
+)
+
+write_file(
+    name = "write10_mjs",
+    out = "case10.mjs",
+    content = [
+        "import { sandboxAssert, getAcornVersion } from '@mycorp/pkg-e'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssert();",
+        "(await import('@mycorp/pkg-e')).sandboxAssert();",
+        "deepEqual('8.7.1', getAcornVersion())",
+    ],
 )
 
 js_test(
-    name = "test10",
+    name = "test10_cjs",
     data = [
         ":node_modules/@mycorp/pkg-e",
     ],
-    entry_point = "case10.js",
+    entry_point = "case10.cjs",
+)
+
+js_test(
+    name = "test10_mjs",
+    data = [
+        ":node_modules/@mycorp/pkg-e",
+    ],
+    entry_point = "case10.mjs",
+)
+
+#######################################
+# Case 11: use first-party packages directly and indirectly multiple times
+
+write_file(
+    name = "write11_cjs",
+    out = "case11.cjs",
+    content = [
+        "const { sandboxAssert: sandboxAssertB } = require('@mycorp/pkg-b')",
+        "const { sandboxAssert: sandboxAssertC1 } = require('@mycorp/pkg-c1')",
+        "const { sandboxAssert: sandboxAssertD, getAcornVersion: getAcornVersionD } = require('@mycorp/pkg-d')",
+        "const { sandboxAssert: sandboxAssertE, getAcornVersion: getAcornVersionE } = require('@mycorp/pkg-e')",
+        "const { deepEqual } = require('node:assert')",
+        "sandboxAssertB()",
+        "sandboxAssertC1()",
+        "sandboxAssertD()",
+        "sandboxAssertE()",
+        "deepEqual(getAcornVersionD(), getAcornVersionE())",
+    ],
+)
+
+write_file(
+    name = "write11_mjs",
+    out = "case11.mjs",
+    content = [
+        "import { sandboxAssert as sandboxAssertB } from '@mycorp/pkg-b'",
+        "import { sandboxAssert as sandboxAssertC1 } from '@mycorp/pkg-c1'",
+        "import { sandboxAssert as sandboxAssertD, getAcornVersion as getAcornVersionD } from '@mycorp/pkg-d'",
+        "import { sandboxAssert as sandboxAssertE, getAcornVersion as getAcornVersionE } from '@mycorp/pkg-e'",
+        "import { deepEqual } from 'node:assert'",
+        "sandboxAssertB()",
+        "sandboxAssertC1()",
+        "sandboxAssertD()",
+        "sandboxAssertE();",
+        "(await import('@mycorp/pkg-b')).sandboxAssert();",
+        "(await import('@mycorp/pkg-c1')).sandboxAssert();",
+        "(await import('@mycorp/pkg-d')).sandboxAssert();",
+        "(await import('@mycorp/pkg-e')).sandboxAssert();",
+        "deepEqual(getAcornVersionD(), getAcornVersionE())",
+    ],
+)
+
+js_test(
+    name = "test11_cjs",
+    data = [
+        ":node_modules/@mycorp/pkg-d",
+        ":node_modules/@mycorp/pkg-e",
+        "//:node_modules/@mycorp/pkg-b",
+        "//:node_modules/@mycorp/pkg-c1",
+    ],
+    entry_point = "case11.cjs",
+)
+
+js_test(
+    name = "test11_mjs",
+    data = [
+        ":node_modules/@mycorp/pkg-d",
+        ":node_modules/@mycorp/pkg-e",
+        "//:node_modules/@mycorp/pkg-b",
+        "//:node_modules/@mycorp/pkg-c1",
+    ],
+    entry_point = "case11.mjs",
 )

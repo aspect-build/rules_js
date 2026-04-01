@@ -1,0 +1,12 @@
+{
+    "name": "nested-peer-deps",
+    "private": true,
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
+    "devDependencies": {
+        "jiti": "2.6.1",
+        "eslint": "9.29.0",
+        "eslint-plugin-barrel-files": "3.0.1"
+    }
+}

@@ -1,6 +1,13 @@
 {
     "name": "@mycorp/pkg-b",
     "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": "./index.mjs",
+            "require": "./index.cjs"
+        }
+    },
     "dependencies": {
         "uuid": "8.3.2"
     },

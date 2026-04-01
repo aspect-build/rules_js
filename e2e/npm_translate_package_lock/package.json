@@ -1,11 +1,16 @@
 {
     "private": true,
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "fsevents"
+        ]
+    },
     "dependencies": {
         "botframework-connector": "4.19.3",
         "karma-typescript": "5.5.4",
         "lodash": "4.17.21"
     },
     "overrides": {
-        "@types/node": "18.11.18"
+        "@types/node": "22.18.13"
     }
 }

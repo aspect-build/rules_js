@@ -1,8 +1,12 @@
 {
     "name": "@scoped/c",
+    "version": "0.0.1",
     "private": true,
     "dependencies": {
         "@scoped/a": "link:../a"
+    },
+    "devDependencies": {
+        "a-types": "file:../a-types"
     },
     "peerDependencies": {
         "@scoped/b": "workspace:*"

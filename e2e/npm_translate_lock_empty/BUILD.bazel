@@ -1,8 +1,8 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 build_test(
     name = "test",
@@ -12,12 +12,8 @@ build_test(
 )
 
 write_source_files(
-    name = "write_npm_translate_lock_wksp",
+    name = "write_npm_translate_lock_bzlmod",
     files = {
-        "snapshots/wksp/repositories.bzl": "@npm//:repositories.bzl",
+        "snapshots/npm_defs.bzl": "@npm//:defs.bzl",
     },
-    target_compatible_with = select({
-        "@aspect_bazel_lib//lib:bzlmod": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )

@@ -2,20 +2,6 @@
 title: FAQ
 ---
 
-## Flaky build failure: Exec failed due to IOException
-
-Known issue: we sometimes see
-
-```
-(00:55:55) ERROR: /mnt/ephemeral/workdir/BUILD.bazel:46:22: Copying directory aspect_rules_js~1.37.0~npm~npm__picocolors__1.0.0/package failed: Exec failed due to IOException: /mnt/ephemeral/output/__main__/execroot/_main/external/aspect_rules_js~1.37.0~npm~npm__picocolors__1.0.0/package (No such file or directory)
-```
-
-This is most likely caused by https://github.com/bazelbuild/bazel/issues/22073. You can either update to Bazel 7.2.0rc1 or later or temporarily add this line to `.bazelrc`:
-
-```
-common --noexperimental_merged_skyframe_analysis_execution
-```
-
 ## Why does my program fail with "Module not found"?
 
 See the [Troubleshooting guide](./troubleshooting.md).
@@ -65,15 +51,7 @@ Try running Bazel with `--experimental_check_output_files=false` so that your ed
 
 Yes, just run `bazel run -- @pnpm//:pnpm --dir $PWD` followed by the usual arguments to pnpm.
 
-If you're bootstrapping a new project, you'll need to add this to your WORKSPACE:
-
-```starlark
-load("@aspect_rules_js//npm:repositories.bzl", "pnpm_repository")
-
-pnpm_repository(name = "pnpm")
-```
-
-Or, if you're using [bzlmod](https://bazel.build/external/overview#bzlmod), add these lines to your MODULE.bazel:
+Add these lines to your MODULE.bazel:
 
 ```starlark
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
@@ -82,8 +60,7 @@ use_repo(pnpm, "pnpm")
 ```
 
 This defines the `@pnpm` repository so that you can create the lockfile with
-`bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only`, and then once the file exists you'll
-be able to add the `pnpm_translate_lock` to the `WORKSPACE` which requires the lockfile.
+`bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only`.
 
 Consider documenting running pnpm through bazel as a good practice for your team, so that all developers run the exact same pnpm and node versions that Bazel does.
 
@@ -152,4 +129,4 @@ my-workspace/
 
 Note that when following option 2, it might require updating some configuration files which refer to the original output locations. For example, your `tsconfig.json` file might have a `paths` section which points to the `../../dist` folder.
 
-To keep your legacy build system working during the migration, you might want to avoid changing those configuration files in-place. For this purpose, you can use [the `jq` rule](https://github.com/bazel-contrib/bazel-lib/blob/main/docs/jq.md) in place of `copy_to_bin`, using a `filter` expression so the copy of the configuration file in `bazel-bin` that's used by the Bazel build can have a different path than the configuration file in the source tree.
+To keep your legacy build system working during the migration, you might want to avoid changing those configuration files in-place. For this purpose, you can use [the `jq` rule](https://registry.bazel.build/docs/jq.bzl#function-jq) in place of `copy_to_bin`, using a `filter` expression so the copy of the configuration file in `bazel-bin` that's used by the Bazel build can have a different path than the configuration file in the source tree.

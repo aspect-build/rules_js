@@ -1,6 +1,3 @@
-// AbortController is available on version > 16. We need to provide a polyfill so that it works on node 12, node 14 etc.
-import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
-
 import { readWorkRequestSize, writeWorkResponseSize } from './size'
 import { blaze } from './worker_protocol'
 import { Writable } from 'stream'

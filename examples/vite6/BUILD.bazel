@@ -1,0 +1,30 @@
+# An example/repro of https://github.com/aspect-build/rules_js/issues/656
+# using vite v3 and react
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//examples/vite6:vite/package_json.bzl", vite_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+vite_bin.vite(
+    name = "build",
+    srcs = [
+        "index.html",
+        "src/index.jsx",
+        "vite.config.mjs",
+    ] + [
+        ":node_modules/@vitejs/plugin-react",
+        ":node_modules/react",
+        ":node_modules/react-dom",
+        ":node_modules/vite",
+    ],
+    args = ["build"],
+    chdir = package_name(),
+    out_dirs = ["build"],
+)
+
+build_test(
+    name = "build_test",
+    targets = [":build"],
+)

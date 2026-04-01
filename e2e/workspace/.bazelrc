@@ -1,2 +1,0 @@
-import %workspace%/../../tools/preset.bazelrc
-

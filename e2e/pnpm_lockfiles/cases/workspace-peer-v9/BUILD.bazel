@@ -1,0 +1,14 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@workspace-peer-v9//:defs.bzl", "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+npm_link_all_packages()
+
+build_test(
+    name = "optional_peers_targets",
+    targets = [
+        ":node_modules",
+        ":node_modules/chokidar",
+    ],
+)

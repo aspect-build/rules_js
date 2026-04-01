@@ -1,6 +1,7 @@
 "Private lifecycle files"
 
-load("//js:defs.bzl", "js_binary")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//js:defs.bzl", "js_library")
 
 js_binary(
     name = "lifecycle-hooks",
@@ -14,4 +15,19 @@ js_binary(
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
+)
+
+npm_link_all_packages()
+
+js_library(
+    name = "rollup_config",
+    srcs = ["rollup.config.mjs"],
+    visibility = [":__subpackages__"],
+    deps = [
+        ":node_modules/@rollup/plugin-commonjs",
+        ":node_modules/@rollup/plugin-json",
+        ":node_modules/@rollup/plugin-node-resolve",
+        ":node_modules/@rollup/plugin-replace",
+        ":node_modules/@rollup/plugin-terser",
+    ],
 )

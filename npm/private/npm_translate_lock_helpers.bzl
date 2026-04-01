@@ -1,7 +1,6 @@
 """Starlark helpers for npm_translate_lock."""
 
-load("@aspect_bazel_lib//lib:base64.bzl", "base64")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_lib//lib:base64.bzl", "base64")
 load("@bazel_skylib//lib:new_sets.bzl", "sets")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":utils.bzl", "utils")
@@ -49,20 +48,36 @@ Check the public_hoist_packages attribute for duplicates.
 
 ################################################################################
 def _gather_package_content_excludes(config, *names):
-    found = False
-    excludes = []
+    """Gather exclude patterns and presets for a package.
 
+    More specific package matches override less specific ones (first match wins).
+    The wildcard "*" config is only used if no specific package match is found.
+
+    Args:
+        config: Dict mapping package names to struct(patterns, presets)
+        *names: Package names to look up in order of precedence (e.g., name, friendly_name, unfriendly_name)
+
+    Returns:
+        A struct with patterns (list or None) and presets (list)
+    """
+
+    # Find the first matching config (most specific match wins, does not extend)
     for name in names:
         if name in config:
-            found = True
             value = config[name]
-            excludes.extend(value)
+            return struct(
+                patterns = value.patterns,
+                presets = value.presets,
+            )
 
-    if not found and "*" in config:
-        value = config["*"]
-        excludes.extend(value)
+    # Fall back to wildcard if no specific match
+    if "*" in config:
+        wildcard = config["*"]
+        return struct(patterns = wildcard.patterns, presets = wildcard.presets)
 
-    return None if len(excludes) == 0 else excludes
+    # Must repeat the default here since it is passed through to `npm_import()`
+    # and overrides the default exclude patterns defined by the rule.
+    return struct(patterns = None, presets = ["basic"])
 
 ################################################################################
 def _gather_values_from_matching_names(additive, keyed_lists, *names):
@@ -88,7 +103,7 @@ def _gather_values_from_matching_names(additive, keyed_lists, *names):
     return (result, keys)
 
 ################################################################################
-def _get_npm_auth(npmrc, npmrc_path, environ):
+def _get_npm_auth(npmrc, npmrc_path, rctx):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
     - creates a token by registry dict: {registry: token}
@@ -135,7 +150,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
     Args:
         npmrc: The `.npmrc` file.
         npmrc_path: The file path to `.npmrc`.
-        environ: A map of environment variables with their values.
+        rctx: the repository_ctx or module_ctx to fetch environment vars from
 
     Returns:
         A tuple (registries, auth).
@@ -160,7 +175,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
 
             # envvar replacement is supported for `_authToken`
             # https://pnpm.io/npmrc#url_authtoken
-            token = utils.replace_npmrc_token_envvar(v, npmrc_path, environ)
+            token = utils.replace_npmrc_token_envvar(v, npmrc_path, rctx)
 
             if registry not in auth:
                 auth[registry] = {}
@@ -183,7 +198,7 @@ def _get_npm_auth(npmrc, npmrc_path, environ):
             registry = k.removeprefix("//").removesuffix(_NPM_AUTH).removesuffix(":").removesuffix("/")
 
             # envvar replacement is supported for `_auth` as well
-            token = utils.replace_npmrc_token_envvar(v, npmrc_path, environ)
+            token = utils.replace_npmrc_token_envvar(v, npmrc_path, rctx)
 
             if registry not in auth:
                 auth[registry] = {}
@@ -253,52 +268,85 @@ def _select_npm_auth(url, npm_auth):
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
 ################################################################################
-def _get_npm_imports(importers, packages, patched_dependencies, only_built_dependencies, root_package, rctx_name, attr, all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env, registries, default_registry, npm_auth, exclude_package_contents_config = None):
-    "Converts packages from the lockfile to a struct of attributes for npm_import"
-    if attr.prod and attr.dev:
-        fail("prod and dev attributes cannot both be set to true")
+def _lifecycle_attrs(attr):
+    """Convert lifecycle-related extension tag attrs into values to pass to npm_import"""
+    if not attr.run_lifecycle_hooks:
+        return False, {}, {}
 
-    # make a lookup table of package to link name for each importer
-    importer_links = {}
-    for import_path, importer in importers.items():
-        dependencies = importer.get("all_deps")
-        if type(dependencies) != "dict":
-            msg = "expected dict of dependencies in processed importer '{}'".format(import_path)
-            fail(msg)
-        links = {
-            "link_package": _link_package(root_package, import_path),
-        }
-        linked_packages = {}
-        for dep_package, dep_version in dependencies.items():
-            if dep_version.startswith("link:"):
+    # lifecycle_hooks_exclude is a convenience attribute to set `<value>: []` in `lifecycle_hooks`
+    all_lifecycle_hooks = dict(attr.lifecycle_hooks)
+    for p in attr.lifecycle_hooks_exclude:
+        if p in all_lifecycle_hooks:
+            fail("expected '{}' to be in only one of lifecycle_hooks or lifecycle_hooks_exclude".format(p))
+        all_lifecycle_hooks[p] = []
+    if "*" not in all_lifecycle_hooks:
+        all_lifecycle_hooks["*"] = ["preinstall", "install", "postinstall"]
+
+    # lifecycle_hooks_no_sandbox is a convenience attribute to set `"*": ["no-sandbox"]` in `lifecycle_hooks_execution_requirements`
+    all_lifecycle_hooks_execution_requirements = attr.lifecycle_hooks_execution_requirements
+    if attr.lifecycle_hooks_no_sandbox:
+        all_lifecycle_hooks_execution_requirements = dict(all_lifecycle_hooks_execution_requirements)
+        execution_requirements = all_lifecycle_hooks_execution_requirements.get("*")
+        if not execution_requirements:
+            execution_requirements = []
+            all_lifecycle_hooks_execution_requirements["*"] = execution_requirements
+        if "no-sandbox" not in execution_requirements:
+            execution_requirements.append("no-sandbox")
+
+    # Convert {"pkg": True|False} to {"pkg": "true"|"false"} and set a default value for "*"
+    all_lifecycle_hooks_use_default_shell_env = {}
+    for p in attr.lifecycle_hooks_use_default_shell_env:
+        all_lifecycle_hooks_use_default_shell_env[p] = "true" if attr.lifecycle_hooks_use_default_shell_env[p] else "false"
+    if "*" not in all_lifecycle_hooks_use_default_shell_env:
+        all_lifecycle_hooks_use_default_shell_env["*"] = "false"
+
+    return all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env
+
+################################################################################
+def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclude_package_contents_config):
+    "Converts packages from the lockfile to a struct of attributes for npm_import"
+
+    importers = state.importers()
+    packages = state.packages()
+    pnpm_patched_dependencies = state.pnpm_patched_dependencies()
+    only_built_dependencies = state.only_built_dependencies()
+    root_package = state.root_package()
+    default_registry = state.default_registry()
+
+    all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env = _lifecycle_attrs(attr)
+
+    # Direct dependencies of 'importers' which will have public targets
+    direct_deps = {}
+
+    # A map of which importers depend on which packages (and by which name) to
+    # quickly map package => dependents.
+    package_importers = {}
+    for importer_path, importer in importers.items():
+        dependencies = importer["dependencies"] | importer["optional_dependencies"] | importer["dev_dependencies"]
+
+        link_package = _link_package(root_package, importer_path)
+
+        for dep_package, dep_package_key in dependencies.items():
+            direct_deps[dep_package_key] = True
+
+            if dep_package_key.startswith("link:"):
                 continue
-            if dep_version.startswith("npm:"):
-                # special case for alias dependencies such as npm:alias-to@version
-                maybe_package = dep_version[4:]
-            elif dep_version not in packages:
-                maybe_package = utils.package_key(dep_package, dep_version)
-            else:
-                maybe_package = dep_version
-            if maybe_package not in linked_packages:
-                linked_packages[maybe_package] = [dep_package]
-            else:
-                linked_packages[maybe_package].append(dep_package)
-        links["packages"] = linked_packages
-        importer_links[import_path] = links
+
+            if dep_package_key not in package_importers:
+                package_importers[dep_package_key] = {link_package: [dep_package]}
+            elif link_package not in package_importers[dep_package_key]:
+                package_importers[dep_package_key][link_package] = [dep_package]
+            elif dep_package not in package_importers[dep_package_key][link_package]:
+                package_importers[dep_package_key][link_package].append(dep_package)
 
     patches_used = []
-    result = {}
+    result = []
     for package_key, package_info in packages.items():
-        name = package_info.get("name")
-        version = package_info.get("version")
-        friendly_version = package_info.get("friendly_version")
-        deps = package_info.get("dependencies")
-        optional_deps = package_info.get("optional_dependencies")
-        dev_only = package_info.get("dev_only")
-        optional = package_info.get("optional")
-        requires_build = package_info.get("requires_build")
-        transitive_closure = package_info.get("transitive_closure")
-        resolution = package_info.get("resolution")
+        name = package_info["name"]
+        version = package_info["version"]
+        friendly_version = package_info["friendly_version"]
+        transitive_closure = package_info.get("transitive_closure", {}) | package_info.get("transitive_optional_closure", {})
+        resolution = package_info["resolution"]
 
         resolution_type = resolution.get("type", None)
         if resolution_type == "directory":
@@ -319,21 +367,6 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
             msg = "expected package {} resolution to have an integrity or tarball field but found none".format(package_key)
             fail(msg)
 
-        if attr.prod and dev_only:
-            # When prod attribute is set, skip deps explicitly marked as dev in the lockfile.
-            #
-            # NOTE: this only excludes packages explicitly marked as dev-only in the lockfile
-            # to avoid further processing. Some packages may be used as both dev and non-dev within
-            # the workspace and therefor will not be marked as dev in the lockfile.
-            continue
-
-        if attr.no_optional and optional:
-            # when no_optional attribute is set, skip optionalDependencies
-            continue
-
-        if not attr.no_optional:
-            deps = dicts.add(optional_deps, deps)
-
         friendly_name = utils.friendly_name(name, friendly_version)
         unfriendly_name = utils.friendly_name(name, version)
         if unfriendly_name == friendly_name:
@@ -346,7 +379,7 @@ def _get_npm_imports(importers, packages, patched_dependencies, only_built_depen
 
         translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
 
-        pnpm_patch = patched_dependencies.get(friendly_name, patched_dependencies.get(name, None))
+        pnpm_patch = pnpm_patched_dependencies.get(friendly_name, pnpm_patched_dependencies.get(name, None))
         pnpm_patched = pnpm_patch != None
 
         if len(translate_patches) > 0 and pnpm_patched:
@@ -371,45 +404,30 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # Resolve string patch labels relative to the root respository rather than relative to rules_js.
         # https://docs.google.com/document/d/1N81qfCa8oskCk5LqTW-LNthy6EBrDot7bdUsjz6JFC4/
-        patches = [str(attr.pnpm_lock.relative(patch)) for patch in patches]
+        patches = [attr.pnpm_lock.relative(patch) for patch in patches]
 
-        # Prepend the optional '@' to patch labels in the root repository for earlier versions of Bazel so
-        # that checked in repositories.bzl files don't fail diff tests when run under multiple versions of Bazel.
-        patches = [("@" if patch.startswith("//") else "") + patch for patch in patches]
-
-        # gather exclude patterns
-        if exclude_package_contents_config != None:
-            # bzlmod mode: use provided configuration
-            exclude_package_contents = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
-        else:
-            # WORKSPACE mode: use attribute configuration
-            exclude_package_contents = _gather_package_content_excludes(attr.exclude_package_contents, name, friendly_name, unfriendly_name)
+        exclude_package_contents_result = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
 
         # gather replace packages
-        replace_packages, _ = _gather_values_from_matching_names(True, attr.replace_packages, name, friendly_name, unfriendly_name)
-        if len(replace_packages) > 1:
+        replace_package, _ = _gather_values_from_matching_names(True, replace_packages, name, friendly_name, unfriendly_name)
+        if len(replace_package) > 1:
             msg = "Multiple package replacements found for package {}".format(name)
             fail(msg)
-        replace_package = replace_packages[0] if replace_packages else None
+        replace_package = replace_package[0] if replace_package else None
 
         # gather custom postinstalls
         custom_postinstalls, _ = _gather_values_from_matching_names(True, attr.custom_postinstalls, name, friendly_name, unfriendly_name)
         custom_postinstall = " && ".join([c for c in custom_postinstalls if c])
 
-        repo_name = "{}__{}".format(attr.name, utils.bazel_name(name, version))
+        repo_name = utils.package_repo_name(attr.name, package_key)
 
         # gather package visibility
         package_visibility, _ = _gather_values_from_matching_names(True, attr.package_visibility, "*", name, friendly_name, unfriendly_name)
         if len(package_visibility) == 0:
             package_visibility = ["//visibility:public"]
 
-        # gather all of the importers (workspace packages) that this npm package should be linked at which names
-        link_packages = {}
-        for import_path, links in importer_links.items():
-            linked_packages = links["packages"]
-            link_names = linked_packages.get(package_key, [])
-            if link_names:
-                link_packages[links["link_package"]] = link_names
+        # Bazel package which this pnpm package should be linked at which names
+        link_packages = package_importers.get(package_key, {})
 
         # check if this package should be hoisted via public_hoist_packages
         public_hoist_packages, _ = _gather_values_from_matching_names(True, attr.public_hoist_packages, name, friendly_name, unfriendly_name)
@@ -419,7 +437,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             elif name not in link_packages[public_hoist_package]:
                 link_packages[public_hoist_package].append(name)
 
-        run_lifecycle_hooks = all_lifecycle_hooks and (name in only_built_dependencies if only_built_dependencies != None else requires_build)
+        run_lifecycle_hooks = all_lifecycle_hooks and only_built_dependencies != None and name in only_built_dependencies
         if run_lifecycle_hooks:
             lifecycle_hooks, _ = _gather_values_from_matching_names(False, all_lifecycle_hooks, "*", name, friendly_name, unfriendly_name)
             lifecycle_hooks_env, _ = _gather_values_from_matching_names(True, attr.lifecycle_hooks_envs, "*", name, friendly_name, unfriendly_name)
@@ -462,23 +480,29 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
                     registry = utils.npm_registry_url(name, registries, default_registry)
                 url = "{}/{}".format(registry.removesuffix("/"), tarball)
         else:
-            url = utils.npm_registry_download_url(name, version, registries, default_registry)
+            url = utils.npm_registry_download_url(name, friendly_version, registries, default_registry)
 
         npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
 
+        deps_oss, deps_cpus = _collect_dep_constraints(packages, package_info)
+
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
-            deps = deps,
+            deps = package_info["dependencies"] | package_info["optional_dependencies"],
+            deps_oss = deps_oss,
+            deps_cpus = deps_cpus,
             integrity = integrity,
             link_packages = link_packages,
-            name = repo_name,
+            repo_name = repo_name,
+            is_direct_dep = package_key in direct_deps,
+            package_key = package_key,
             package = name,
             package_visibility = package_visibility,
             patch_tool = attr.patch_tool,
             patch_args = patch_args,
             patches = patches,
-            exclude_package_contents = exclude_package_contents,
-            root_package = root_package,
+            exclude_package_contents = exclude_package_contents_result.patterns,
+            exclude_package_contents_presets = exclude_package_contents_result.presets,
             lifecycle_hooks = lifecycle_hooks,
             lifecycle_hooks_env = lifecycle_hooks_env,
             lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
@@ -487,26 +511,19 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             npm_auth_basic = npm_auth_basic,
             npm_auth_username = npm_auth_username,
             npm_auth_password = npm_auth_password,
-            transitive_closure = transitive_closure,
+            transitive_closure = transitive_closure if len(transitive_closure) else None,
             url = url,
             commit = commit,
             version = version,
             bins = bins,
             package_info = package_info,
-            dev = dev_only,
             replace_package = replace_package,
         )
 
-        if repo_name in result:
-            msg = "ERROR: duplicate package name: {}\n\t1: {}\n\t2: {}".format(repo_name, result[repo_name], result_pkg)
-            fail(msg)
-
-        result[repo_name] = result_pkg
-
-    result = utils.sorted_map(result).values()
+        result.append(result_pkg)
 
     # Check that all patches files specified were used; this is a defense-in-depth since it is too
-    # easy to make a type in the patches keys or for a dep to change both of with could result
+    # easy to make a typo in the patches keys or for a dep to change both of which could result
     # in a patch file being silently ignored.
     for key in attr.patches.keys():
         if key not in patches_used:
@@ -518,7 +535,7 @@ Either remove this patch file if it is no longer needed or change its key to mat
 
 """.format(
                 key = key,
-                repo = rctx_name,
+                repo = attr.name,
             )
             fail(msg)
 
@@ -528,10 +545,32 @@ Either remove this patch file if it is no longer needed or change its key to mat
     return result
 
 ################################################################################
+def _collect_dep_constraints(packages, package_info):
+    # Quick-exit for packages with no optional dependencies
+    if not package_info["optional_dependencies"] and not package_info.get("transitive_optional_closure", None):
+        return None, None
+
+    constraints_os = {}
+    constraints_cpu = {}
+
+    optional_keys = package_info["optional_dependencies"].values() + package_info.get("transitive_optional_closure", {}).keys()
+    for dep_key in optional_keys:
+        if dep_key.startswith("link:"):
+            continue
+
+        dep = packages[dep_key]
+        if dep["os"]:
+            constraints_os[dep_key] = dep["os"]
+        if dep["cpu"]:
+            constraints_cpu[dep_key] = dep["cpu"]
+
+    return constraints_os, constraints_cpu
+
+################################################################################
 def _link_package(root_package, import_path, rel_path = "."):
     link_package = paths.normalize(paths.join(root_package, import_path, rel_path))
     if link_package.startswith("../"):
-        msg = "Invalid link_package outside of the WORKSPACE: {}".format(link_package)
+        msg = "Invalid link_package outside of the repository: {}".format(link_package)
         fail(msg)
     if link_package == ".":
         link_package = ""
@@ -547,9 +586,9 @@ def _to_apparent_repo_name(canonical_name):
     return canonical_name[max(canonical_name.rfind("~"), canonical_name.rfind("+")) + 1:]
 
 ################################################################################
-def _verify_node_modules_ignored(rctx, importers, root_package):
-    if rctx.attr.verify_node_modules_ignored != None:
-        missing_ignores = _find_missing_bazel_ignores(root_package, importers.keys(), rctx.read(rctx.path(rctx.attr.verify_node_modules_ignored)))
+def _verify_node_modules_ignored(rctx, attr, state):
+    if attr.verify_node_modules_ignored != None:
+        missing_ignores = _find_missing_bazel_ignores(state.root_package(), state.importers().keys(), rctx.read(rctx.path(attr.verify_node_modules_ignored)))
         if missing_ignores:
             msg = """
 
@@ -566,8 +605,8 @@ Possible fixes:
 {fixes}
                 """.format(
                 fixes = "\n".join(missing_ignores),
-                bazelignore = rctx.attr.verify_node_modules_ignored,
-                repo = rctx.name,
+                bazelignore = attr.verify_node_modules_ignored,
+                repo = attr.name,
             )
             fail(msg)
 
@@ -603,44 +642,42 @@ def _normalize_bazelignore(lines):
     return result
 
 ################################################################################
-def _verify_lifecycle_hooks_specified(_, state):
-    # lockfiles <9.0 specify the `requiresBuild` flag in the lockfile.
-    #
-    # lockfiles >=9.0 no longer specify if packages have lifecycle hooks,
-    # and declaration of hooks must be done manually in the `pnpm.onlyBuiltDependencies`.
-    if state.lockfile_version() < 9.0:
-        return
-
+def _verify_lifecycle_hooks_specified(state):
     if state.only_built_dependencies() == None:
-        fail("""\
-ERROR: pnpm.onlyBuiltDependencies required in pnpm workspace root package.json when using pnpm v9 or later
+        msg = """\
+ERROR: pnpm 'onlyBuiltDependencies' configuration required.
 
-The root package.json must be alongside the pnpm-lock.yaml file and contain a pnpm.onlyBuiltDependencies and
-will be automatically detected even if not explicitly added to data attribute.
+Packages that rules_js should generate lifecycle hook actions for must be declared in
+'onlyBuiltDependencies'.
 
-As of pnpm v9, the lockfile no longer specifies if packages have lifecycle hooks.
+As of pnpm v10 'onlyBuiltDependencies' should be configured in the pnpm-workspace.yaml file
+alongside other pnpm configuration. See https://pnpm.io/10.x/settings#onlybuiltdependencies
+for more information.
 
-Packages that rules_js should generate lifecycle hook actions for must now be declared in
-pnpm.onlyBuiltDependencies in the pnpm workspace root package.json. See
-https://pnpm.io/package_json#pnpmonlybuiltdependencies for more information.
-
-Prior to pnpm v9, rules_js keyed off of the requiresBuild attribute in the pnpm lock
-file to determine if a lifecycle hook action should be generated for an npm package.
-See [pnpm #7707](https://github.com/pnpm/pnpm/issues/7707) for the reasons that pnpm
-removed the requiresBuild attribute from the lockfile in v9.
-""")
+In pnpm v9 'onlyBuiltDependencies' is configured in the root package.json
+pnpm.onlyBuiltDependencies. The root package.json must be alongside the pnpm-lock.yaml file
+and will be automatically detected even if not explicitly added to data attribute.
+See https://pnpm.io/9.x/package_json#pnpmonlybuiltdependencies for more information.
+"""
+        fail(msg)
 
 ################################################################################
-def _verify_patches(rctx, state):
-    if rctx.attr.verify_patches and rctx.attr.patches != None:
-        rctx.report_progress("Verifying patches in {}".format(state.label_store.relative_path("verify_patches")))
+def _verify_patches(rctx, attr, state):
+    if attr.verify_patches and attr.patches != None:
+        rctx.report_progress("Verifying patches in {}".format(attr.verify_patches))
 
         # Patches in the patch list verification file
-        verify_patches_content = rctx.read(state.label_store.label("verify_patches")).strip(" \t\n\r")
+        verify_patches_content = rctx.read(rctx.path(attr.verify_patches)).strip(" \t\n\r")
         verify_patches = sets.make(verify_patches_content.split("\n"))
 
         # Patches in `patches` or `pnpm.patchedDependencies`
-        declared_patches = sets.make([state.label_store.relative_path("patches_%d" % i) for i in range(state.num_patches())])
+        declared_patches = sets.make([patch["path"] for patch in state.pnpm_patched_dependencies().values()])
+
+        # Patches in `npm_translate_lock(patches)`
+        for patches in attr.patches.values():
+            for patch in patches:
+                patch_label = attr.pnpm_lock.relative(patch)
+                sets.insert(declared_patches, paths.join(patch_label.package, patch_label.name))
 
         if not sets.is_subset(verify_patches, declared_patches):
             missing_patches = sets.to_list(sets.difference(verify_patches, declared_patches))
@@ -655,7 +692,7 @@ The following patches were found in {patches_list} but were not listed in the
 
 To disable this check, remove the `verify_patches` attribute from `npm_translate_lock`.
 
-""".format(patches_list = state.label_store.relative_path("verify_patches"), missing_patches = missing_patches_formatted))
+""".format(patches_list = attr.verify_patches, missing_patches = missing_patches_formatted))
 
 helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,

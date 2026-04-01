@@ -1,0 +1,7 @@
+packages:
+    - tools
+
+catalog:
+    '@bufbuild/protobuf': '2.7.0'
+
+onlyBuiltDependencies: []

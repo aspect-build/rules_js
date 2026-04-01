@@ -6,6 +6,13 @@ local_path_override(
 
 bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
 
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm.pnpm(
+    name = "pnpm",
+    pnpm_version = "9.15.9",
+)
+use_repo(pnpm, "pnpm", "pnpm__links")
+
 npm = use_extension(
     "@aspect_rules_js//npm:extensions.bzl",
     "npm",
@@ -23,9 +30,9 @@ npm.npm_translate_lock(
         "@gregmagolan/test-a": ["-p4"],
     },
     patches = {
-        "@gregmagolan/test-a": ["//:patches/test-a.patch"],
-        "@gregmagolan/test-a@0.0.1": ["//:patches/test-a@0.0.1.patch"],
-        "@gregmagolan/test-b": ["//:patches/test-b.patch"],
+        "@gregmagolan/test-a": ["//patches:test-a.patch"],
+        "@gregmagolan/test-a@0.0.1": ["//patches:test-a@0.0.1.patch"],
+        "@gregmagolan/test-b": ["//patches:test-b.patch"],
     },
     pnpm_lock = "//:pnpm-lock.yaml",
     update_pnpm_lock = True,

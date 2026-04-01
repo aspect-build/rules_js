@@ -1,9 +1,9 @@
-load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_binary")
 load(":asserts.bzl", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 js_binary(
     name = "bin",
@@ -28,11 +28,18 @@ sh_binary(
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )
 
+platform(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//js/private/test/image:__subpackages__"],
+)
+
 # All these golden files can be updated with
-# bazel run //js/private/test/image:default_test_update_all --enable_bzlmod
-# bazel run //js/private/test/image:custom_owner_test_update_all --enable_bzlmod
-# bazel run //js/private/test/image:default_test_update_all --noenable_bzlmod
-# bazel run //js/private/test/image:custom_owner_test_update_all --noenable_bzlmod
+# bazel run //js/private/test/image:default_test_update_all
+# bazel run //js/private/test/image:custom_owner_test_update_all
 
 # Case 0: reproducibility guarantees
 make_js_image_layer(
@@ -123,8 +130,15 @@ make_js_image_layer(
 )
 
 platform_transition_filegroup(
-    name = "transition_js_image_layer",
+    name = "transition_js_image_layer_linux_amd64",
     testonly = True,
     srcs = [":js_image_layer_untransitioned"],
     target_platform = ":linux_amd64",
+)
+
+platform_transition_filegroup(
+    name = "transition_js_image_layer_linux_arm64",
+    testonly = True,
+    srcs = [":js_image_layer_untransitioned"],
+    target_platform = ":linux_arm64",
 )

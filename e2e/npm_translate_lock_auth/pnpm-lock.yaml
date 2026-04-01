@@ -1,23 +1,48 @@
-lockfileVersion: 5.4
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
   .:
-    specifiers:
-      '@aspect-build/a': 1.0.0
-      '@aspect-priv-npm/a': 1.0.0
     dependencies:
-      '@aspect-build/a': 1.0.0
-      '@aspect-priv-npm/a': 1.0.0
+      '@aspect-build/a':
+        specifier: 1.0.0
+        version: 1.0.0
+      '@aspect-priv-npm/a':
+        specifier: 1.0.0
+        version: 1.0.0
+    devDependencies:
+      '@types/node':
+        specifier: 22.18.13
+        version: 22.18.13
 
 packages:
 
-  /@aspect-build/a/1.0.0:
-    resolution: {integrity: sha512-TQ8SpBPjKkHmLJoxVTU+TRU+9utF9hABiFuql5zJWPAtyUGAc3KM5+VsgpNHytqyXe5AyOUV2Ff+ScsQLNEQ7Q==, tarball: download/@aspect-build/a/1.0.0/95cfc2dab39ada95aec1736778d545403edfbf9e}
+  '@aspect-build/a@1.0.0':
+    resolution: {integrity: sha512-RUQ9/8WXBcC9FKIkjROXvD+cTFaJwLBJa3gGKWl4E4o12vUUJFyfz5Sr+HkJkGH3FdsMXCKZgmtXBB2a1myhGg==}
     hasBin: true
-    dev: false
 
-  /@aspect-priv-npm/a/1.0.0:
+  '@aspect-priv-npm/a@1.0.0':
     resolution: {integrity: sha512-M2Bt2VHhbKAtn94EVNtigQncBPo0tHCjM/6k1JV79GOLbVxtFSpwzLEyuivvjc+kyL8b2nAimlfEPhOI3G3OEA==}
     hasBin: true
-    dev: false
+
+  '@types/node@22.18.13':
+    resolution: {integrity: sha512-Bo45YKIjnmFtv6I1TuC8AaHBbqXtIo+Om5fE4QiU1Tj8QR/qt+8O3BAtOimG5IFmwaWiPmB3Mv3jtYzBA4Us2A==}
+
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
+snapshots:
+
+  '@aspect-build/a@1.0.0': {}
+
+  '@aspect-priv-npm/a@1.0.0': {}
+
+  '@types/node@22.18.13':
+    dependencies:
+      undici-types: 6.21.0
+
+  undici-types@6.21.0: {}

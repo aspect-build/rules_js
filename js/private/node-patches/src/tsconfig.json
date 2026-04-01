@@ -1,7 +1,10 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2017"
+        "strict": true,
+        "target": "es2017",
+        "moduleResolution": "node",
+        "types": ["node"]
     },
     "include": ["*.cts"]
 }

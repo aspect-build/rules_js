@@ -10,6 +10,12 @@ This ruleset is a high-performance Bazel integration for JavaScript, based on th
 
 Many companies are successfully building with rules_js. If you're getting value from the project, please let us know! Just comment on our [Adoption Discussion](https://github.com/aspect-build/rules_js/discussions/1000).
 
+## Getting started
+
+The fastest way to try this in an empty project is to click the green "Use this template" button on https://github.com/bazel-starters/js.
+
+## More from Aspect
+
 rules_js is just a part Aspect's monorepo developer platform:
 
 -   [Aspect Workflows](https://docs.aspect.build/workflows) delivers on Bazel's promises of speed and cost-savings.
@@ -28,7 +34,7 @@ rules_js is just a part Aspect's monorepo developer platform:
     -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
     -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
     -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://cypress.io)
-    -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://github.com/aspect-build/rules_lint/blob/main/docs/eslint.md).
+    -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://registry.bazel.build/docs/aspect_rules_lint#lint-eslint-bzl).
 
 ## Known issues
 
@@ -41,13 +47,13 @@ Follow instructions from the release you wish to use:
 
 ## Usage
 
-See the documentation in the [docs](docs/) folder.
+See the documentation in the [docs](docs/) folder and generated API docs at https://registry.bazel.build/docs/aspect_rules_js.
 
 ## Examples
 
 Basic usage examples can be found under the [examples](https://github.com/aspect-build/rules_js/tree/main/examples) folder.
 
-> Note that the examples also rely on code in the `/WORKSPACE` file in the root of this repo.
+> Note that the examples also rely on code in the `/MODULE` file in the root of this repo.
 
 The [e2e](https://github.com/aspect-build/rules_js/tree/main/e2e) folder also has a few useful examples such as [js_image_layer](https://github.com/aspect-build/rules_js/tree/main/e2e/js_image_oci) for containerizing a js_binary and [js_run_devserver](https://github.com/aspect-build/rules_js/tree/main/e2e/js_run_devserver), a generic rule for running a devserver in watch mode with [ibazel](https://github.com/bazelbuild/bazel-watcher).
 
@@ -149,9 +155,8 @@ This third approach has trade-offs.
 
 -   The benefit is that very intractable problems like TypeScript's `rootDirs` just go away.
     In that example, we filed https://github.com/microsoft/TypeScript/issues/37378 but it probably
-    won't be solved, so many users trip over issues like
-    [this](https://github.com/bazelbuild/rules_nodejs/issues/3423) and
-    [this](https://github.com/bazelbuild/rules_nodejs/issues/3421). Now this just works, plus results like sourcemaps look like users expect: just like they would if the tool had written outputs in the source tree.
+    won't be solved, so many users trip over issues.
+    Now this just works, plus results like sourcemaps look like users expect: just like they would if the tool had written outputs in the source tree.
 -   The downside is that Bazel rules/macro authors (even `genrule` authors) must re-path
     inputs and outputs to account for the working directory under `bazel-out`,
     and must ensure that sources are copied there first.

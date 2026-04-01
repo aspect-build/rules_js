@@ -1,0 +1,11 @@
+{
+    "name": "workspace-peer",
+    "private": true,
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
+    "devDependencies": {
+        "@angular-devkit/core": "21.2.1",
+        "chokidar": "workspace:*"
+    }
+}

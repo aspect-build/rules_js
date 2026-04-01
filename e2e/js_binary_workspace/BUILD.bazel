@@ -1,0 +1,16 @@
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+js_run_binary(
+    name = "run_workspace_bin",
+    stdout = "out.txt",
+    tool = "@workspace//:bin",
+)
+
+build_test(
+    name = "test",
+    targets = [
+        ":run_workspace_bin",
+        "@workspace//:run_bin",
+    ],
+)

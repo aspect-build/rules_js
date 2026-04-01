@@ -1,58 +1,71 @@
-lockfileVersion: 5.4
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
   .:
-    specifiers:
-      '@aspect-test/a': 5.0.2
-      '@aspect-test/c': 2.0.2
-      '@gregmagolan/test-b': 0.0.2
     dependencies:
-      '@aspect-test/a': 5.0.2
-      '@aspect-test/c': 2.0.2
-      '@gregmagolan/test-b': 0.0.2
+      '@aspect-test/a':
+        specifier: 5.0.2
+        version: 5.0.2
+      '@aspect-test/c':
+        specifier: 2.0.2
+        version: 2.0.2
+      '@gregmagolan/test-b':
+        specifier: 0.0.2
+        version: 0.0.2
 
 packages:
 
-  /@aspect-test/a/5.0.2:
+  '@aspect-test/a@5.0.2':
     resolution: {integrity: sha512-bURS+F0+tS2XPxUPbrqsTZxIre1U5ZglwzDqcOCrU7MbxuRrkO24hesgTMGJldCglwL/tiEGRlvdMndlPgRdNw==}
     hasBin: true
-    dependencies:
-      '@aspect-test/b': 5.0.2
-      '@aspect-test/c': 2.0.2
-      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.2
-    dev: false
 
-  /@aspect-test/b/5.0.2:
+  '@aspect-test/b@5.0.2':
     resolution: {integrity: sha512-I8wnJV5J0h8ui1O3K6XPq1qGHKopTl/OnvkSfor7uJ9yRCm2Qv6Tf2LsTgR2xzkgiwhA4iBwdYFwecwinF244w==}
     hasBin: true
-    dependencies:
-      '@aspect-test/a': 5.0.2
-      '@aspect-test/c': 2.0.2
-      '@aspect-test/d': 2.0.0_@aspect-test+c@2.0.2
-    dev: false
 
-  /@aspect-test/c/2.0.2:
+  '@aspect-test/c@2.0.2':
     resolution: {integrity: sha512-rMJmd3YBvY7y0jh+2m72TiAhe6dVKjMMNFFVOXFCbM233m7lsG4cq970H1C8rUsc3AcA5E/cEHlxSVffHlHD2Q==}
     hasBin: true
-    requiresBuild: true
-    dev: false
 
-  /@aspect-test/d/2.0.0_@aspect-test+c@2.0.2:
+  '@aspect-test/d@2.0.0':
     resolution: {integrity: sha512-jndwr8pLUfn795uApTcXG/yZ5hV2At1aS/wo5BVLxqlVVgLoOETF/Dp4QOjMHE/SXkXFowz6Hao+WpmzVvAO0A==}
     hasBin: true
     peerDependencies:
       '@aspect-test/c': x.x.x
+
+  '@gregmagolan/test-a@0.0.1':
+    resolution: {integrity: sha512-nMZ3MKkXZ+uYbrm8R3dfdt3v1gOOLtf88CdDciWxMYGLr29oVjQG11y2fz4IRBR6R7hI2Gj+G9sHZ69wLTnjfA==}
+
+  '@gregmagolan/test-b@0.0.2':
+    resolution: {integrity: sha512-h+LeJUbUued9XyQwxKMUdklGiGxPYJ1RvTAK9612ctCiMS2Fn0wu/Au5kHsMHxm8l4bOfpgAWmQ0OQQy7wUBCg==}
+
+snapshots:
+
+  '@aspect-test/a@5.0.2':
+    dependencies:
+      '@aspect-test/b': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+
+  '@aspect-test/b@5.0.2':
+    dependencies:
+      '@aspect-test/a': 5.0.2
+      '@aspect-test/c': 2.0.2
+      '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+
+  '@aspect-test/c@2.0.2': {}
+
+  '@aspect-test/d@2.0.0(@aspect-test/c@2.0.2)':
     dependencies:
       '@aspect-test/c': 2.0.2
-    dev: false
 
-  /@gregmagolan/test-a/0.0.1:
-    resolution: {integrity: sha512-nMZ3MKkXZ+uYbrm8R3dfdt3v1gOOLtf88CdDciWxMYGLr29oVjQG11y2fz4IRBR6R7hI2Gj+G9sHZ69wLTnjfA==}
-    dev: false
+  '@gregmagolan/test-a@0.0.1': {}
 
-  /@gregmagolan/test-b/0.0.2:
-    resolution: {integrity: sha512-h+LeJUbUued9XyQwxKMUdklGiGxPYJ1RvTAK9612ctCiMS2Fn0wu/Au5kHsMHxm8l4bOfpgAWmQ0OQQy7wUBCg==}
+  '@gregmagolan/test-b@0.0.2':
     dependencies:
       '@gregmagolan/test-a': 0.0.1
-    dev: false

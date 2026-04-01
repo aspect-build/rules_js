@@ -6,44 +6,103 @@ load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:utils.bzl", "utils", "utils_test")
 
 # buildifier: disable=function-docstring
-def test_bazel_name(ctx):
+def test_package_store_and_target_name(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(
-        env,
-        "at_scope_pkg_21.1.0_rollup_2.70.2_at_scope_y_1.1.1",
-        utils.bazel_name("@scope/pkg@21.1.0_rollup@2.70.2_@scope/y@1.1.1"),
-    )
-    asserts.equals(
-        env,
-        "at_scope_pkg_21.1.0",
-        utils.bazel_name("@scope/pkg@21.1.0"),
-    )
+
+    # MODIFY CAREFULLY - these are designed to be bazel-compatible while aligning with
+    # the pnpm v9/10+ store naming conventions.
+
+    # standard name@version
+    asserts.equals(env, "x@1.1.1", utils.package_store_name("x@1.1.1"))
+    asserts.equals(env, "y__x__1.1.1", utils.package_repo_name("y", "x@1.1.1"))
+
+    # standard @scoped/name@version
+    asserts.equals(env, "@scope+y@1.1.1", utils.package_store_name("@scope/y@1.1.1"))
+    asserts.equals(env, "x__at_scope_y__1.1.1", utils.package_repo_name("x", "@scope/y@1.1.1"))
+
+    # peer dependencies
+    asserts.equals(env, "@scope+y@1.1.1_x@0.1.0", utils.package_store_name("@scope/y@1.1.1(x@0.1.0)"))
+    asserts.equals(env, "x__at_scope_y__1.1.1_x_0.1.0", utils.package_repo_name("x", "@scope/y@1.1.1(x@0.1.0)"))
+
+    asserts.equals(env, "@scope+y@1.1.1_@scope+x@0.1.0", utils.package_store_name("@scope/y@1.1.1(@scope/x@0.1.0)"))
+    asserts.equals(env, "x__at_scope_y__1.1.1_at_scope_x_0.1.0", utils.package_repo_name("x", "@scope/y@1.1.1(@scope/x@0.1.0)"))
+
+    asserts.equals(env, "@scope+y@1.1.1_94025728", utils.package_store_name("@scope/y@1.1.1(@scope/w@0.0.10)(@scope/x@0.0.2)"))
+    asserts.equals(env, "x__at_scope_y__1.1.1_94025728", utils.package_repo_name("x", "@scope/y@1.1.1(@scope/w@0.0.10)(@scope/x@0.0.2)"))
+
+    asserts.equals(env, "@scope+pkg@21.1.0_rollup@2.70.2_@scope+y@1.1.1", utils.package_store_name("@scope/pkg@21.1.0(rollup@2.70.2)(@scope/y@1.1.1)"))
+    asserts.equals(env, "x__at_scope_pkg__21.1.0_rollup_2.70.2_at_scope_y_1.1.1", utils.package_repo_name("x", "@scope/pkg@21.1.0(rollup@2.70.2)(@scope/y@1.1.1)"))
+
+    # Nested peers
+    asserts.equals(env, "eslint-plugin-barrel-files@3.0.1_eslint@9.29.0_jiti@2.6.1", utils.package_store_name("eslint-plugin-barrel-files@3.0.1(eslint@9.29.0(jiti@2.6.1))"))
+    asserts.equals(env, "x__eslint-plugin-barrel-files__3.0.1_eslint_9.29.0_jiti_2.6.1", utils.package_repo_name("x", "eslint-plugin-barrel-files@3.0.1(eslint@9.29.0(jiti@2.6.1))"))
+
+    # v9 patch_hash
+    asserts.equals(env, "meaning-of-life@1.0.0_1287509853", utils.package_store_name("meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)"))
+    asserts.equals(env, "x__meaning-of-life__1.0.0_1287509853", utils.package_repo_name("x", "meaning-of-life@1.0.0(patch_hash=o3deharooos255qt5xdujc3cuq)"))
+
+    # v10 patch_hash
+    asserts.equals(env, "meaning-of-life@1.0.0_124257499", utils.package_store_name("meaning-of-life@1.0.0(patch_hash=33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0)"))
+    asserts.equals(env, "x__meaning-of-life__1.0.0_124257499", utils.package_repo_name("x", "meaning-of-life@1.0.0(patch_hash=33610921243aecf4fa5a23dc8080659f436ccda15f41ce4f53c687039a305ee0)"))
+
+    # file:
+    asserts.equals(env, "@scope+y@file+bar", utils.package_store_name("@scope/y@file:bar"))
+    asserts.equals(env, "x__at_scope_y__file_bar", utils.package_repo_name("x", "@scope/y@file:bar"))
+
+    # file: + @
+    asserts.equals(env, "@scope+y@file+@foo+bar", utils.package_store_name("@scope/y@file:@foo/bar"))
+    asserts.equals(env, "x__at_scope_y__file__foo_bar", utils.package_repo_name("x", "@scope/y@file:@foo/bar"))
+
+    # file: ../
+    asserts.equals(env, "@scope+y@file+..+foo+bar", utils.package_store_name("@scope/y@file:../foo/bar"))
+    asserts.equals(env, "x__at_scope_y__file_.._foo_bar", utils.package_repo_name("x", "@scope/y@file:../foo/bar"))
+
+    # file: ../tar
+    asserts.equals(env, "lodash@file+..+vendored+lodash-4.17.21.tgz", utils.package_store_name("lodash@file:../vendored/lodash-4.17.21.tgz"))
+    asserts.equals(env, "x__lodash__file_.._vendored_lodash-4.17.21.tgz", utils.package_repo_name("x", "lodash@file:../vendored/lodash-4.17.21.tgz"))
+
+    # file: .. (peers)
+    asserts.equals(env, "@scoped+c@file+..+projects+c_@scoped+b@projects+b", utils.package_store_name("@scoped/c@file:../projects/c(@scoped/b@projects+b)"))
+    asserts.equals(env, "x__at_scoped_c__file_.._projects_c_at_scoped_b_projects_b", utils.package_repo_name("x", "@scoped/c@file:../projects/c(@scoped/b@projects+b)"))
+
+    # file: .. (long peers)
+    asserts.equals(env, "@scoped+c@file+..+projects+c_401592697", utils.package_store_name("@scoped/c@file:../projects/c(@scoped/b@projects+b)(@scoped/d@projects+d)(@scoped/e@projects+e)"))
+    asserts.equals(env, "x__at_scoped_c__file_.._projects_c_401592697", utils.package_repo_name("x", "@scoped/c@file:../projects/c(@scoped/b@projects+b)(@scoped/d@projects+d)(@scoped/e@projects+e)"))
+
+    # URL
+    asserts.equals(env, "diff@https+++github.com+kpdecker+jsdiff+archive+refs+tags+v5.2.0.tar.gz", utils.package_store_name("diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
+    asserts.equals(env, "x__diff__https___github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz", utils.package_repo_name("x", "diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
+
+    # @ and 0.0.0 in a URL
+    asserts.equals(env, "@foo+jsonify@https+++github.com+aspect-build+test-packages+releases+download+0.0.0+@foo-jsonify-0.0.0.tgz", utils.package_store_name("@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"))
+    asserts.equals(env, "x__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0__foo-jsonify-0.0.0.tgz", utils.package_repo_name("x", "@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"))
+
+    # URLs with commit hashes
+    asserts.equals(env, "jquery@https+++codeload.github.com+jquery+jquery+tar.gz+399b201bb3143a3952894cf3489b4848fc003967", utils.package_store_name("jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
+    asserts.equals(env, "x__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967", utils.package_repo_name("x", "jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
+
+    # URL (long - see https://github.com/aspect-build/rules_js/issues/2628)
+    asserts.equals(env, "@tw+isomorphic--util@79283155", utils.package_store_name("@tw/isomorphic--util@https://artifactory.mycompany.com/artifactory/ifi-generic-local-dev/web/packages/web/isomorphic/util/8c6f424501e02117ed4b98e5f33c7a5204ebb6fb.tar.gz"))
+    asserts.equals(env, "x__at_tw_isomorphic--util__79283155", utils.package_repo_name("x", "@tw/isomorphic--util@https://artifactory.mycompany.com/artifactory/ifi-generic-local-dev/web/packages/web/isomorphic/util/8c6f424501e02117ed4b98e5f33c7a5204ebb6fb.tar.gz"))
+    asserts.equals(env, "inline-fixtures@1892187746", utils.package_store_name("inline-fixtures@https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662"))
+    asserts.equals(env, "x__inline-fixtures__1892187746", utils.package_repo_name("x", "inline-fixtures@https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662"))
+
+    # URL + peers (long - see https://github.com/aspect-build/rules_js/issues/2628)
+    asserts.equals(env, "@kubernetes+client-node@1838633845_1592917608", utils.package_store_name("@kubernetes/client-node@https://codeload.github.com/kubernetes-client/javascript/tar.gz/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9(bufferutil@4.0.8)(encoding@0.1.13)"))
+    asserts.equals(env, "x__at_kubernetes_client-node__1838633845_1592917608", utils.package_repo_name("x", "@kubernetes/client-node@https://codeload.github.com/kubernetes-client/javascript/tar.gz/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9(bufferutil@4.0.8)(encoding@0.1.13)"))
+
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
-def test_pnpm_name(ctx):
+def test_package_store_name_link_versions(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "@scope/y@1.1.1", utils.package_key("@scope/y", "1.1.1"))
-    asserts.equals(env, "@scope+y@registry+@scope+y@1.1.1", utils.package_store_name("@scope/y", "registry/@scope/y@1.1.1"))
-    asserts.equals(env, "@scope+y@1.1.1", utils.package_store_name("@scope/y", "1.1.1"))
-    return unittest.end(env)
-
-# buildifier: disable=function-docstring
-def test_link_version(ctx):
-    env = unittest.begin(ctx)
-    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "link:foo"))
-    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "file:bar"))
-    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("@scope/y", "file:@foo/bar"))
+    asserts.equals(env, "x@0.0.0", utils.package_store_name("link:x|foo/@bar/baz"))
+    asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("link:@scope/y|foo/bar"))
     return unittest.end(env)
 
 def test_friendly_name(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "@scope/y@2.1.1", utils.friendly_name("@scope/y", "2.1.1"))
-    return unittest.end(env)
-
-def test_package_store_name(ctx):
-    env = unittest.begin(ctx)
-    asserts.equals(env, "@scope+y@2.1.1", utils.package_store_name("@scope/y", "2.1.1"))
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -125,24 +184,40 @@ def test_npm_registry_download_url(ctx):
     )
     return unittest.end(env)
 
-t1_test = unittest.make(test_bazel_name)
-t2_test = unittest.make(test_pnpm_name)
+# buildifier: disable=function-docstring
+def test_hex_to_base64(ctx):
+    given_expected = {
+        "382877d089ed5e47e31d364e0dc88c163e8a8e5e8e6aeb6b537e9f77931394d89fb142f1d1d18d32536e3added79d98241048a700b1cfbce9d7167777fa8c502": "OCh30IntXkfjHTZODciMFj6Kjl6OautrU36fd5MTlNifsULx0dGNMlNuOt3tedmCQQSKcAsc+86dcWd3f6jFAg==",
+        "cf78dac1faa7faafffb89023bdf584c5cc4e219db349c376a7afc93f1dc00a08fa365732dae800646f8d99aeaa665ae85596d721c424efface8d25889f07c870": "z3jawfqn+q//uJAjvfWExcxOIZ2zScN2p6/JPx3ACgj6Nlcy2ugAZG+Nma6qZlroVZbXIcQk7/rOjSWInwfIcA==",
+        "bf28e5b00a825846c3b50e57ca6468d2a0f86ba9703be0193898d15ad5807203b7982408861e1f80275325dc6aa40bd06a7889c8b71166a072fc0e5fe0e5db29": "vyjlsAqCWEbDtQ5XymRo0qD4a6lwO+AZOJjRWtWAcgO3mCQIhh4fgCdTJdxqpAvQaniJyLcRZqBy/A5f4OXbKQ==",
+        "a3aeb971bcc746dd0c2c9b2050745833ee09c2c7d173f1d8e357b37239db2faf59deb5bab122754d874bd54a31c473c5af1b4096375de5501bc11e3f86e14392": "o665cbzHRt0MLJsgUHRYM+4JwsfRc/HY41ezcjnbL69Z3rW6sSJ1TYdL1UoxxHPFrxtAljdd5VAbwR4/huFDkg==",
+        "0f3707ebd2828c3e96e492629d6b3efcb4c03f71cb662fe4db432170a6fb622e14fb0647f5e1db307a282482ded220a2ccdfda92d6a652269e207e72c45ea5d6": "DzcH69KCjD6W5JJinWs+/LTAP3HLZi/k20MhcKb7Yi4U+wZH9eHbMHooJILe0iCizN/aktamUiaeIH5yxF6l1g==",
+    }
+    env = unittest.begin(ctx)
+    for given, expected in given_expected.items():
+        asserts.equals(
+            env,
+            expected,
+            utils.hex_to_base64(given),
+        )
+    return unittest.end(env)
+
+t2_test = unittest.make(test_package_store_and_target_name)
 t3_test = unittest.make(test_friendly_name)
-t4_test = unittest.make(test_package_store_name)
 t6_test = unittest.make(test_parse_package_name)
 t7_test = unittest.make(test_npm_registry_download_url)
 t8_test = unittest.make(test_npm_registry_url)
-t9_test = unittest.make(test_link_version)
+t9_test = unittest.make(test_package_store_name_link_versions)
+t10_test = unittest.make(test_hex_to_base64)
 
 def utils_tests(name):
     unittest.suite(
         name,
-        t1_test,
         t2_test,
         t3_test,
-        t4_test,
         t6_test,
         t7_test,
         t8_test,
         t9_test,
+        t10_test,
     )

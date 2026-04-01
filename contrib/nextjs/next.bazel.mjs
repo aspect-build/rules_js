@@ -12,6 +12,13 @@ if (nextjsStandaloneConfig.startsWith(process.env.BAZEL_BINDIR)) {
         process.env.BAZEL_BINDIR.length + 1
     )
 }
+
+// Support invocation from another workspace: strip "external/<repo>/" if present
+nextjsStandaloneConfig = nextjsStandaloneConfig.replace(
+    /^external\/[^/]+\//,
+    ''
+)
+
 if (!nextjsStandaloneConfig.startsWith(bazelPackage)) {
     throw new Error(
         `Next.js config must be relative to the app root: ${nextjsStandaloneConfig}`

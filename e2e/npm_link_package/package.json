@@ -1,5 +1,10 @@
 {
     "name": "simple",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "sharp"
+        ]
+    },
     "dependencies": {
         "@aspect-test/a": "5.0.2",
         "sharp": "0.32.1",

@@ -1,4 +1,4 @@
-"""Rules for running JavaScript programs under Bazel, as tools or with `bazel run` or `bazel test`.
+"""Implementation details of js_binary and js_test rules.
 
 For example, this binary references the `acorn` npm package which was already linked
 using an API like `npm_link_all_packages`.
@@ -18,6 +18,7 @@ js_binary(
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@aspect_bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
+load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":bat.bzl", "BAT_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_runfiles")
@@ -107,9 +108,9 @@ _ATTRS = {
         This is the module referenced by the `require.main` property in the runtime.
 
         This must be a target that provides a single file or a `DirectoryPathInfo`
-        from `@aspect_bazel_lib//lib::directory_path.bzl`.
+        from `@bazel_lib//lib::directory_path.bzl`.
         
-        See https://github.com/bazel-contrib/bazel-lib/blob/main/docs/directory_path.md
+        See https://registry.bazel.build/docs/bazel_lib#provider-directorypathinfo
         for more info on creating a target that provides a `DirectoryPathInfo`.
         """,
         mandatory = True,
@@ -243,9 +244,6 @@ _ATTRS = {
         See https://github.com/aspect-build/rules_js/issues/362 for more information. Once #362 is resolved,
         the default for this attribute can be set to False.
 
-        This flag was added in Node.js v10.2.0 (released 2018-05-23). If your node toolchain is configured to use a
-        Node.js version older than this you'll need to set this attribute to False.
-
         See https://nodejs.org/api/cli.html#--preserve-symlinks-main for more information.
         """,
         default = True,
@@ -287,7 +285,7 @@ _ATTRS = {
         """,
     ),
     "node_toolchain": attr.label(
-        doc = """The Node.js toolchain to use for this target.
+        doc = """The Node.js runtime toolchain to use for this target.
 
         See https://bazel-contrib.github.io/rules_nodejs/Toolchains.html
 
@@ -331,22 +329,13 @@ _ATTRS = {
 }
 
 # Unix shell constants
-_ENV_SET_UNIX = """export {var}=\"{value}\""""
-_ENV_SET_IFF_NOT_SET_UNIX = """if [[ -z "${{{var}:-}}" ]]; then export {var}=\"{value}\"; fi"""
+_ENV_SET_UNIX = """export {var}={quoted_value}"""
+_ENV_SET_IFF_NOT_SET_UNIX = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
 _NODE_OPTION_UNIX = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
-
 # Windows batch constants
 _ENV_SET_WINDOWS = """set "{var}={value}\""""
 _ENV_SET_IFF_NOT_SET_WINDOWS = """if not defined {var} set "{var}={value}\""""
 _NODE_OPTION_WINDOWS = """set "JS_BINARY__NODE_OPTIONS=!JS_BINARY__NODE_OPTIONS! {value}\""""
-
-# Do the opposite of _to_manifest_path in
-# https://github.com/bazelbuild/rules_nodejs/blob/8b5d27400db51e7027fe95ae413eeabea4856f8e/nodejs/toolchain.bzl#L50
-# to get back to the short_path.
-# TODO(3.0): remove this after a grace period for the DEPRECATED toolchain attributes
-# buildifier: disable=unused-variable
-def _deprecated_target_tool_path_to_short_path(tool_path):
-    return ("../" + tool_path[len("external/"):]) if tool_path.startswith("external/") else tool_path
 
 def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
@@ -366,7 +355,10 @@ def _windows_path(path):
     """
     return path.replace("/", "\\")
 
-def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env):
+def _bash_quote(value):
+    return json.encode(value)
+
+def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
     is_windows = _windows_host(ctx)
@@ -379,10 +371,10 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
     _NODE_OPTION = _NODE_OPTION_WINDOWS if is_windows else _NODE_OPTION_UNIX
 
     envs = [
-        _ENV_SET.format(var = key, value = _expand_env_if_needed(ctx, value))
+        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
         for key, value in fixed_env.items()
     ] + [
-        _ENV_SET.format(var = key, value = _expand_env_if_needed(ctx, value))
+        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
         for key, value in ctx.attr.env.items()
     ]
 
@@ -395,7 +387,7 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
     for (key, value) in makevars.items():
         envs.append(_ENV_SET.format(
             var = key,
-            value = ctx.expand_make_variables("env", value, {}),
+            quoted_value = _bash_quote(ctx.expand_make_variables("env", value, {})),
         ))
 
     # Add rule context variables to the environment
@@ -413,29 +405,48 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
     if is_windows and not ctx.attr.enable_runfiles:
         builtins["JS_BINARY__NO_RUNFILES"] = "1"
     for (key, value) in builtins.items():
-        envs.append(_ENV_SET.format(var = key, value = value))
+        envs.append(_ENV_SET.format(var = key, quoted_value = _bash_quote(value)))
 
     if ctx.attr.patch_node_fs:
         # Set patch node fs API env if not already set to allow js_run_binary to override
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__PATCH_NODE_FS", value = "1"))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(
+            var = "JS_BINARY__PATCH_NODE_FS",
+            quoted_value = _bash_quote("1"),
+        ))
 
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(
             var = "JS_BINARY__EXPECTED_EXIT_CODE",
-            value = str(ctx.attr.expected_exit_code),
+            quoted_value = _bash_quote(str(ctx.attr.expected_exit_code)),
         ))
 
     if ctx.attr.copy_data_to_bin:
         # Set an environment variable to flag that we have copied js_binary data to bin
-        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", value = "1"))
+        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _bash_quote("1")))
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", value = _expand_env_if_needed(ctx, ctx.attr.chdir)))
+        chdir_value = _expand_env_if_needed(ctx, ctx.attr.chdir)
+
+        # Normalize workspace-relative chdir for external repositories to avoid requiring
+        # callers to manually prefix with "external/<repo>/".
+        if (
+            ctx.label.repo_name and
+            not (chdir_value.startswith("external/") or chdir_value.startswith("/")) and
+            not chdir_value.startswith("@")
+        ):
+            if chdir_value == ".":
+                normalized_chdir = "external/{}".format(ctx.label.repo_name)
+            else:
+                normalized_chdir = "external/{}/{}".format(ctx.label.repo_name, chdir_value)
+        else:
+            normalized_chdir = chdir_value
+
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", quoted_value = _bash_quote(normalized_chdir)))
 
     # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, value = "1"))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, quoted_value = _bash_quote("1")))
 
     node_options = []
     for node_option in ctx.attr.node_options:
@@ -467,11 +478,7 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
 
     npm_path = ""
     if ctx.attr.include_npm:
-        if hasattr(nodeinfo, "npm"):
-            npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
-        else:
-            # TODO(3.0): drop support for deprecated toolchain attributes
-            npm_path = _deprecated_target_tool_path_to_short_path(nodeinfo.npm_path)
+        npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
         if is_windows:
             npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
             ctx.actions.expand_template(
@@ -490,11 +497,7 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
             )
         toolchain_files.append(npm_wrapper)
 
-    if hasattr(nodeinfo, "node"):
-        node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        node_path = _deprecated_target_tool_path_to_short_path(nodeinfo.target_tool_path)
+    node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
     template = ctx.file._launcher_template_bat if is_windows else ctx.file._launcher_template_sh
     template_label = ctx.attr._launcher_template_bat.label if is_windows else ctx.attr._launcher_template_sh.label
@@ -535,7 +538,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     if ctx.attr.node_toolchain:
         nodeinfo = ctx.attr.node_toolchain[platform_common.ToolchainInfo].nodeinfo
     else:
-        nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
+        nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:runtime_toolchain_type"].nodeinfo
 
     if DirectoryPathInfo in ctx.attr.entry_point:
         entry_point = ctx.attr.entry_point[DirectoryPathInfo].directory
@@ -549,27 +552,17 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    launcher, toolchain_files = _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env)
+    launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env)
 
     launcher_files = [launcher]
     launcher_files.extend(toolchain_files)
-    if hasattr(nodeinfo, "node"):
-        if nodeinfo.node:
-            launcher_files.append(nodeinfo.node)
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        launcher_files.extend(nodeinfo.tool_files)
+    if nodeinfo.node:
+        launcher_files.append(nodeinfo.node)
 
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
     transitive_launcher_files = None
     if ctx.attr.include_npm:
-        if hasattr(nodeinfo, "npm_sources"):
-            transitive_launcher_files = nodeinfo.npm_sources
-        else:
-            # TODO(3.0): drop support for deprecated toolchain attributes
-            if not hasattr(nodeinfo, "npm_files"):
-                fail("include_npm requires a minimum @rules_nodejs version of 5.7.0")
-            launcher_files.extend(nodeinfo.npm_files)
+        transitive_launcher_files = nodeinfo.npm_sources
 
     runfiles = gather_runfiles(
         ctx = ctx,
@@ -577,14 +570,18 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         data_files = [entry_point] + ctx.files.data,
         copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
-        include_sources = ctx.attr.include_sources,
-        include_types = ctx.attr.include_types,
-        include_transitive_sources = ctx.attr.include_transitive_sources,
-        include_transitive_types = ctx.attr.include_transitive_types,
-        include_npm_sources = ctx.attr.include_npm_sources,
     ).merge(ctx.runfiles(
         files = launcher_files,
         transitive_files = transitive_launcher_files,
+    )).merge(ctx.runfiles(
+        transitive_files = gather_files_from_js_infos(
+            targets = ctx.attr.data,
+            include_sources = ctx.attr.include_sources,
+            include_types = ctx.attr.include_types,
+            include_transitive_sources = ctx.attr.include_transitive_sources,
+            include_transitive_types = ctx.attr.include_transitive_types,
+            include_npm_sources = ctx.attr.include_npm_sources,
+        ),
     ))
 
     return struct(
@@ -665,12 +662,11 @@ js_binary_lib = struct(
     toolchains = [
         # TODO: on Windows this toolchain is never referenced
         "@bazel_tools//tools/sh:toolchain_type",
-        "@rules_nodejs//nodejs:toolchain_type",
+        "@rules_nodejs//nodejs:runtime_toolchain_type",
     ] + COPY_FILE_TO_BIN_TOOLCHAINS,
 )
 
 js_binary = rule(
-    doc = _DOC,
     implementation = js_binary_lib.implementation,
     attrs = js_binary_lib.attrs,
     executable = True,
@@ -678,27 +674,6 @@ js_binary = rule(
 )
 
 js_test = rule(
-    doc = """Identical to js_binary, but usable under `bazel test`.
-
-All [common test attributes](https://bazel.build/reference/be/common-definitions#common-attributes-tests) are
-supported including `args` as the list of arguments passed Node.js.
-
-Bazel will set environment variables when a test target is run under `bazel test` and `bazel run`
-that a test runner can use.
-
-A runner can write arbitrary outputs files it wants Bazel to pickup and save with the test logs to
-`TEST_UNDECLARED_OUTPUTS_DIR`. These get zipped up and saved along with the test logs.
-
-JUnit XML reports can be written to `XML_OUTPUT_FILE` for Bazel to consume.
-
-`TEST_TMPDIR` is an absolute path to a private writeable directory that the test runner can use for
-creating temporary files.
-
-LCOV coverage reports can be written to `COVERAGE_OUTPUT_FILE` when running under `bazel coverage`
-or if the `--coverage` flag is set.
-
-See the Bazel [Test encyclopedia](https://bazel.build/reference/test-encyclopedia) for details on
-the contract between Bazel and a test runner.""",
     implementation = js_binary_lib.implementation,
     attrs = dict(js_binary_lib.attrs, **{
         "env_inherit": attr.string_list(

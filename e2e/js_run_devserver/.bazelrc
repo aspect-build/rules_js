@@ -1,4 +1,5 @@
 import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
 
 
 # An override of the performance.bazelrc setting

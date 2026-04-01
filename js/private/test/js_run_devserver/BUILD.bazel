@@ -3,7 +3,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//js/private/test/js_run_devserver:jasmine/package_json.bzl", jasmine_bin = "bin")
 load(":js_run_devserver_test.bzl", "js_run_devserver_test")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 # Checks node_modules symlinks that they refer to exec root (instead of runfiles)
 # in order to make sure bundlers see exactly one node_modules tree. Checks:
@@ -36,7 +36,7 @@ jasmine_bin.jasmine_binary(
 
 js_test(
     name = "js_run_devserver_test",
-    data = ["//js/private:js_devserver_entrypoint"],
+    data = ["//js/private/devserver:js_devserver_entrypoint"],
     entry_point = "js_run_devserver.spec.mjs",
     env = {
         "__RULES_JS_UNIT_TEST__": "1",

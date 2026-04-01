@@ -1,11 +1,20 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 build_test(
     name = "test",
     targets = [
         ":node_modules",
+    ],
+)
+
+# Verifies :node_modules targets within another module that also has update_pnpm_lock can be built
+build_test(
+    name = "other_module_linked_packages",
+    targets = [
+        "@other_module//:node_modules",
+        "@other_module//:node_modules/less",
     ],
 )

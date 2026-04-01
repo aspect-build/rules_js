@@ -10,18 +10,9 @@ local_path_override(
     path = "other_module",
 )
 
-bazel_dep(name = "aspect_bazel_lib", version = "2.9.0", dev_dependency = True)
-
-# TODO: upgrade and remove override to include d042d563c6a91f7e11f66c42c83429199bd3d5d9
-archive_override(
-    module_name = "aspect_bazel_lib",
-    integrity = "sha256-iboa/H1J/MVDaY1OC/Ev0FUbu6SovyimC1cTkVmBC/c=",
-    strip_prefix = "bazel-lib-d042d563c6a91f7e11f66c42c83429199bd3d5d9",
-    urls = ["https://github.com/bazel-contrib/bazel-lib/archive/d042d563c6a91f7e11f66c42c83429199bd3d5d9.tar.gz"],
-)
-
+bazel_dep(name = "bazel_lib", version = "3.0.0", dev_dependency = True)
 bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
-bazel_dep(name = "platforms", version = "0.0.10", dev_dependency = True)
+bazel_dep(name = "platforms", version = "1.0.0", dev_dependency = True)
 
 npm = use_extension(
     "@aspect_rules_js//npm:extensions.bzl",
@@ -32,11 +23,10 @@ npm.npm_translate_lock(
     name = "npm",
     # Test that lifecycle hooks can resolve node, npm as well as dep bins on that PATH.
     # This e2e test is run on Windows as well so this test coverage is here for now. Once
-    # Windows CI runs on the root WORKSPACE, coverage can be moved there.
+    # Windows CI runs on the root MODULE, coverage can be moved there.
     # See https://github.com/aspect-build/rules_js/pull/1142 for more info.
     custom_postinstalls = {
         "chalk": "node --version",
-        "less": "npm --version",
         "jasmine": "tsc --version",
     },
     npmrc = "//:.npmrc",
@@ -48,7 +38,7 @@ use_repo(npm, "npm")
 # The following is just a demonstration that you can skip the npm_translate_lock feature
 # and import npm packages directly, with no lock file.
 # This is not typical use.
-# See docs in /docs/npm_import.md about the difference.
+# See docs in https://registry.bazel.build/docs/aspect_rules_js#module_extension-npm_import about the difference.
 npm.npm_import(
     name = "npm_meaning-of-life",
     package = "meaning-of-life",

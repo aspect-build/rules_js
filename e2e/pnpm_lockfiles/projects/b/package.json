@@ -1,11 +1,12 @@
 {
     "name": "@scoped/b",
+    "version": "0.0.1",
     "private": true,
     "dependencies": {
         "@scoped/a": "workspace:*"
     },
     "devDependencies": {
-        "@types/node": "18.19.54",
+        "@types/node": "22.18.13",
         "a-types": "workspace:*"
     }
 }

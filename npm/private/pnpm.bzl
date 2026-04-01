@@ -2,16 +2,8 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
-load(":utils.bzl", "DEFAULT_REGISTRY_DOMAIN_SLASH", "utils")
-
-def _to_package_key(name, version):
-    if not version[0].isdigit():
-        return version
-    return "{}@{}".format(name, version)
-
-def _split_name_at_version(name_version):
-    at = name_version.find("@", 1)
-    return name_version[:at], name_version[at + 1:]
+load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_ARCH_ALIASES", "PNPM_PLATFORMS")
+load(":utils.bzl", "utils")
 
 # Metadata about a pnpm "project" (importer).
 #
@@ -36,424 +28,156 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #   optional_dependencies:
 #   friendly_version:
 #
-#   dev_only: True if the package is exclusively a dev dependency throughout the workspace
-#       Removed in lockfile v9+
-#       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathdev
-#
 #   has_bin: True if the package has binaries
 #       See https://github.com/pnpm/spec/blob/master/lockfile/9.0.md#packagesdependencyidhasbin
 #
 #   optional: True if the package is exclusively an optional dependency throughout the workspace
-#       TODO: Removed in lockfile v9+?
 #       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathoptional
 #
-#   requires_build: True if pnpm predicted the package requires a build step
-#       Removed in lockfile v9+
-#       See https://github.com/pnpm/spec/blob/master/lockfile/6.0.md#packagesdependencypathrequiresbuild
-#
 #   resolution: the lockfile resolution field
-def _new_package_info(name, dependencies, optional_dependencies, dev_only, has_bin, optional, requires_build, version, friendly_version, resolution):
+#   cpu: list of allowed cpu architectures or None
+#   os: list of allowed operating systems or None
+
+def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os):
     return {
         "name": name,
         "dependencies": dependencies,
         "optional_dependencies": optional_dependencies,
-        "dev_only": dev_only,
         "has_bin": has_bin,
         "optional": optional,
-        "requires_build": requires_build,
         "version": version,
         "friendly_version": friendly_version,
         "resolution": resolution,
+        "cpu": cpu,
+        "os": os,
     }
 
-######################### Lockfile v5.4 #########################
+def _to_bazel_os_cpu_constraints(oss, cpus):
+    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
+    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
+    r = []
+    for cpu in cpus:
+        for os in oss:
+            r.append("@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu))
+    return r
 
-def _strip_v5_v6_default_registry(name_version):
-    # Strip the default registry from the name_version string
-    return name_version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH)
+def _to_bazel_os_constraints(oss):
+    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
+    return ["@aspect_rules_js//platforms/pnpm:{}".format(os) for os in oss]
 
-def _convert_v5_v6_file_package(package_path, package_snapshot):
-    if "name" not in package_snapshot:
-        msg = "expected package {} to have a name field".format(package_path)
-        fail(msg)
+def _to_bazel_cpu_constraints(cpus):
+    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
+    return ["@aspect_rules_js//platforms/pnpm:{}".format(cpu) for cpu in cpus]
 
-    name = package_snapshot["name"]
-    version = package_path
-    friendly_version = package_snapshot["version"] if "version" in package_snapshot else version
+def _resolve_pnpm_constraint_values(values, known_map, aliases_map, kind):
+    if not values:
+        return []
 
-    return name, version, friendly_version
+    is_negated = values[0].startswith("!")
 
-def _strip_v5_peer_dep_or_patched_version(version):
-    "Remove peer dependency or patched syntax from version string"
+    normalized = {}
+    for value in values:
+        key = value[1:] if is_negated else value
 
-    # 21.1.0_rollup@2.70.2 becomes 21.1.0
-    # 1.0.0_o3deharooos255qt5xdujc3cuq becomes 1.0.0
-    index = version.find("_")
-    if index != -1:
-        return version[:index]
-    return version
+        # Validate all values are either negated or not negated
+        if value.startswith("!") != is_negated:
+            fail("Unsupported mixing {} negations: {}".format(kind, values))
 
-def _strip_v5_default_registry_to_version(name, version):
-    # Quick-exit if the version string does not start with the default registry
-    if not version.startswith(DEFAULT_REGISTRY_DOMAIN_SLASH):
-        return version
+        # Validate the key is known
+        if key not in known_map and key not in aliases_map:
+            fail("Unknown pnpm {}: {}".format(kind, value))
 
-    # Strip the default registry/name@ from the version string
-    return version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH + name + "/")
+        # Convert aliases to the aliased
+        if key in aliases_map:
+            key = aliases_map[key]
+        if key:
+            normalized[key] = True
 
-def _convert_v5_importer_dependency_map(import_path, specifiers, deps):
-    result = {}
-    for name, version in deps.items():
-        specifier = specifiers.get(name)
-
-        if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
-            # Keep the npm: specifier for aliased dependencies
-            # convert v5 style aliases ([default_registry]/aliased/version) to npm:aliased@version
-            alias, version = _strip_v5_v6_default_registry(version).lstrip("/").rsplit("/", 1)
-            version = _convert_pnpm_v5_version_peer_dep(version)
-            version = "npm:{}@{}".format(alias, version)
-        elif version.startswith("link:"):
-            version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
-        elif version.startswith("file:"):
-            version = _convert_pnpm_v5_version_peer_dep(version)
-        else:
-            # Transition [registry/]name/version[_patch][_peer_data] to a rules_js version format
-            version = _convert_pnpm_v5_version_peer_dep(_strip_v5_default_registry_to_version(name, version))
-
-        result[name] = version
-    return result
-
-def _convert_v5_importers(importers):
-    result = {}
-    for import_path, importer in importers.items():
-        specifiers = importer.get("specifiers", {})
-
-        result[import_path] = _new_import_info(
-            dependencies = _convert_v5_importer_dependency_map(import_path, specifiers, importer.get("dependencies", {})),
-            dev_dependencies = _convert_v5_importer_dependency_map(import_path, specifiers, importer.get("devDependencies", {})),
-            optional_dependencies = _convert_v5_importer_dependency_map(import_path, specifiers, importer.get("optionalDependencies", {})),
-        )
-    return result
-
-def _convert_pnpm_v5_version_peer_dep(version):
-    # Convert a pnpm lock file v5 dependency version string to a format
-    # compatible with rules_js.
-    #
-    # Example versions:
-    #  1.2.3
-    #  1.2.3_@scope+peer@2.0.2_@scope+peer@4.5.6
-    #  2.0.0_@aspect-test+c@2.0.2
-    #  3.1.0_rollup@2.14.0
-    #  4.5.6_o3deharooos255qt5xdujc3cuq
-
-    # If there is a suffix to the version
-    peer_dep_index = version.find("_")
-    if peer_dep_index != -1:
-        # if the suffix contains an @version (not just a _patchhash)
-        peer_dep_at_index = version.find("@", peer_dep_index)
-        if peer_dep_at_index != -1:
-            peer_dep = version[peer_dep_index:]
-            peer_dep = peer_dep.replace("_@", "_at_").replace("@", "_").replace("/", "_").replace("+", "_")
-
-            version = version[0:peer_dep_index] + peer_dep
-
-    return version
-
-def _convert_pnpm_v5_package_dependency_version(name, version):
-    # an alias to an alternate package
-    if version.startswith("/"):
-        alias, version = version[1:].rsplit("/", 1)
-        return "npm:{}@{}".format(alias, version)
-
-    # Removing the default registry+name from the version string
-    version = _strip_v5_default_registry_to_version(name, version)
-
-    # Convert peer dependency data to rules_js ~v5 format
-    version = _convert_pnpm_v5_version_peer_dep(version)
-
-    return version
-
-def _convert_pnpm_v5_package_dependency_map(deps):
-    result = {}
-    for name, version in deps.items():
-        result[name] = _convert_pnpm_v5_package_dependency_version(name, version)
-    return result
-
-def _convert_v5_packages(packages):
-    result = {}
-    for package_path, package_snapshot in packages.items():
-        if "resolution" not in package_snapshot:
-            msg = "package {} has no resolution field".format(package_path)
-            fail(msg)
-
-        package_path = _convert_pnpm_v5_version_peer_dep(package_path)
-
-        if package_path.startswith("file:"):
-            # direct reference to file
-            name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
-        elif "name" in package_snapshot and "version" in package_snapshot:
-            # key/path is complicated enough the real name+version are properties
-            name = package_snapshot["name"]
-            version = _strip_v5_default_registry_to_version(name, package_path)
-            friendly_version = package_snapshot["version"]
-        elif package_path.startswith("/"):
-            # a simple /name/version[_peer_info]
-            name, version = package_path[1:].rsplit("/", 1)
-            friendly_version = _strip_v5_peer_dep_or_patched_version(version)
-        else:
-            msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
-            fail(msg)
-
-        package_key = _to_package_key(name, version)
-
-        package_info = _new_package_info(
-            name = name,
-            version = version,
-            friendly_version = friendly_version,
-            dependencies = _convert_pnpm_v5_package_dependency_map(package_snapshot.get("dependencies", {})),
-            optional_dependencies = _convert_pnpm_v5_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
-            dev_only = package_snapshot.get("dev", False),
-            has_bin = package_snapshot.get("hasBin", False),
-            optional = package_snapshot.get("optional", False),
-            requires_build = package_snapshot.get("requiresBuild", False),
-            resolution = package_snapshot.get("resolution"),
-        )
-
-        if package_key in result:
-            msg = "WARNING: duplicate package: {}\n\t{}\n\t{}".format(package_key, result[package_key], package_info)
-
-            # buildifier: disable=print
-            print(msg)
-
-        result[package_key] = package_info
-    return result
-
-######################### Lockfile v6 #########################
-
-def _convert_pnpm_v6_v9_version_peer_dep(version):
-    # Convert a pnpm lock file v6-9+ version string to a format compatible
-    # with rules_js.
-    #
-    # Examples:
-    #   1.2.3
-    #   1.2.3(@scope/peer@2.0.2)(@scope/peer@4.5.6)
-    #   4.5.6(patch_hash=o3deharooos255qt5xdujc3cuq)
-    if version[-1] == ")":
-        # Drop the patch_hash= not present in v5 so (patch_hash=123) -> (123) like v5
-        version = version.replace("(patch_hash=", "(")
-
-        # There is a peer dep if the string ends with ")"
-        peer_dep_index = version.find("(")
-        peer_dep = version[peer_dep_index:]
-        if len(peer_dep) > 32:
-            # Prevent long paths. The pnpm lockfile v6 no longer hashes long sequences of
-            # peer deps so we must hash here to prevent extremely long file paths that lead to
-            # "File name too long) build failures.
-            peer_dep = utils.hash(peer_dep)
-        else:
-            peer_dep = peer_dep.replace("(@", "(_at_").replace(")(", "_").replace("@", "_").replace("/", "_")
-        version = version[0:peer_dep_index] + "_" + peer_dep.strip("_-()")
-    return version
-
-def _strip_v6_default_registry_to_version(name, version):
-    # Quick-exit if the version string does not start with the default registry
-    if not version.startswith(DEFAULT_REGISTRY_DOMAIN_SLASH):
-        return version
-
-    # Strip the default registry/name@ from the version string
-    return version.removeprefix(DEFAULT_REGISTRY_DOMAIN_SLASH + name + "@")
-
-def _convert_pnpm_v6_importer_dependency_map(import_path, deps):
-    result = {}
-    for name, attributes in deps.items():
-        specifier = attributes.get("specifier")
-        version = attributes.get("version")
-
-        if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
-            # Keep the npm: specifier for aliased dependencies
-            # convert v6 style aliases ([registry]/aliased@version) to npm:aliased@version
-            alias, version = _split_name_at_version(_strip_v5_v6_default_registry(version).lstrip("/"))
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
-            version = "npm:{}@{}".format(alias, version)
-        elif version.startswith("link:"):
-            version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
-        elif version.startswith("file:"):
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
-        else:
-            # Transition [registry/]name@version[(peer)(data)] to a rules_js version format
-            version = _convert_pnpm_v6_v9_version_peer_dep(_strip_v6_default_registry_to_version(name, version))
-
-        result[name] = version
-    return result
-
-def _convert_v6_importers(importers):
-    # Convert pnpm lockfile v6 importers to a rules_js compatible ~v5 format.
-    #
-    # v5 importers:
-    #   specifiers:
-    #      pkg-a: 1.2.3
-    #      pkg-b: ^4.5.6
-    #   deps:
-    #      pkg-a: 1.2.3
-    #   devDeps:
-    #      pkg-b: 4.10.1
-    #   ...
-    #
-    # v6 pushed the 'specifiers' and 'version' into subproperties:
-    #
-    #   deps:
-    #      pkg-a:
-    #         specifier: 1.2.3
-    #         version: 1.2.3
-    #   devDeps:
-    #      pkg-b:
-    #          specifier: ^4.5.6
-    #          version: 4.10.1
-
-    result = {}
-    for import_path, importer in importers.items():
-        result[import_path] = _new_import_info(
-            dependencies = _convert_pnpm_v6_importer_dependency_map(import_path, importer.get("dependencies", {})),
-            dev_dependencies = _convert_pnpm_v6_importer_dependency_map(import_path, importer.get("devDependencies", {})),
-            optional_dependencies = _convert_pnpm_v6_importer_dependency_map(import_path, importer.get("optionalDependencies", {})),
-        )
-    return result
-
-def _convert_pnpm_v6_package_dependency_version(name, version):
-    # an alias to an alternate package
-    if version.startswith("/"):
-        # Convert peer dependency data to rules_js ~v5 format
-        version = _convert_pnpm_v6_v9_version_peer_dep(version[1:])
-
-        return "npm:{}".format(version)
-
-    # Removing the default registry+name from the version string
-    version = _strip_v6_default_registry_to_version(name, version)
-
-    # Convert peer dependency data to rules_js ~v5 format
-    version = _convert_pnpm_v6_v9_version_peer_dep(version)
-
-    return version
-
-def _convert_pnpm_v6_package_dependency_map(deps):
-    result = {}
-    for name, version in deps.items():
-        result[name] = _convert_pnpm_v6_package_dependency_version(name, version)
-    return result
-
-def _convert_v6_packages(packages):
-    # Convert pnpm lockfile v6 importers to a rules_js compatible ~v5 format.
-    #
-    # v6 package metadata mainly changed formatting of metadata such as:
-    #
-    # dependency versions with peers:
-    #   v5: 2.0.0_@aspect-test+c@2.0.2
-    #   v6: 2.0.0(@aspect-test/c@2.0.2)
-
-    result = {}
-    for package_path, package_snapshot in packages.items():
-        if "resolution" not in package_snapshot:
-            msg = "package {} has no resolution field".format(package_path)
-            fail(msg)
-
-        package_path = _convert_pnpm_v6_v9_version_peer_dep(package_path)
-
-        if package_path.startswith("file:"):
-            # direct reference to file
-            name, version, friendly_version = _convert_v5_v6_file_package(package_path, package_snapshot)
-        elif "name" in package_snapshot and "version" in package_snapshot:
-            # key/path is complicated enough the real name+version are properties
-            name = package_snapshot["name"]
-            version = _strip_v6_default_registry_to_version(name, package_path)
-            friendly_version = package_snapshot["version"]
-        elif package_path.startswith("/"):
-            # plain /pkg@version(_peer_info)
-            name, version = package_path[1:].rsplit("@", 1)
-            friendly_version = _strip_v5_peer_dep_or_patched_version(version)  # NOTE: already converted to v5 peer style
-        else:
-            msg = "unexpected package path: {} of {}".format(package_path, package_snapshot)
-            fail(msg)
-
-        package_key = _to_package_key(name, version)
-
-        package_info = _new_package_info(
-            name = name,
-            version = version,
-            friendly_version = friendly_version,
-            dependencies = _convert_pnpm_v6_package_dependency_map(package_snapshot.get("dependencies", {})),
-            optional_dependencies = _convert_pnpm_v6_package_dependency_map(package_snapshot.get("optionalDependencies", {})),
-            dev_only = package_snapshot.get("dev", False),
-            has_bin = package_snapshot.get("hasBin", False),
-            optional = package_snapshot.get("optional", False),
-            requires_build = package_snapshot.get("requiresBuild", False),
-            resolution = package_snapshot.get("resolution"),
-        )
-
-        if package_key in result:
-            msg = "ERROR: duplicate package: {}\n\t{}\n\t{}".format(package_key, result[package_key], package_info)
-
-            # buildifier: disable=print
-            print(msg)
-
-        result[package_key] = package_info
-
-    return result
+    if is_negated:
+        return [x for x in known_map.keys() if x not in normalized and known_map[x]]
+    return [x for x in normalized.keys() if known_map[x]]
 
 ######################### Lockfile v9 #########################
 
-def _convert_pnpm_v9_package_dependency_version(snapshots, name, version):
-    # Detect when an alias is just a direct reference to another snapshot
-    is_alias = version in snapshots
+def _v9_snapshot_key_to_package_key(snapshot_key):
+    peer_meta_index = snapshot_key.find("(")
+    package_key = snapshot_key[:peer_meta_index] if peer_meta_index > 0 else snapshot_key
+    return package_key
 
-    # Convert peer dependency data to rules_js ~v5 format
-    version = _convert_pnpm_v6_v9_version_peer_dep(version)
+def _v9_resolve_link_version(packages, snapshot_key, name, link):
+    package_key = _v9_snapshot_key_to_package_key(snapshot_key)
+    package = packages[package_key]
+    resolution = package["resolution"]
 
-    return "npm:{}".format(version) if is_alias else version
+    # :link dep from file:package will be relative to the file:package and not the workspace root
+    if resolution.get("type", None) == "directory":
+        # ... unless that link: dep is resolved from a peerDependency, then it is already resolved to workspace-relative
+        if "peerDependencies" in package and name in package["peerDependencies"]:
+            return link
 
-def _convert_pnpm_v9_package_dependency_map(snapshots, deps):
+        return paths.normalize(paths.join(resolution["directory"], link))
+
+    # in the standard case snapshot link: deps are already relative to the workspace root
+    return link
+
+def _convert_pnpm_v9_package_dependency_version(packages, snapshots, snapshot_key, name, version):
+    if version.startswith("link:"):
+        # Resolve link: deps to be workspace root relative
+        return utils.importer_to_link(name, _v9_resolve_link_version(packages, snapshot_key, name, version[5:]))
+
+    if version in snapshots:
+        return version
+
+    name_version = name + "@" + version
+    if name_version in snapshots:
+        return name_version
+
+    fail("Unknown package {} ({}) not in snapshots: {}".format(name, version, snapshots.keys()))
+
+def _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, deps):
     result = {}
     for name, version in deps.items():
-        result[name] = _convert_pnpm_v9_package_dependency_version(snapshots, name, version)
+        result[name] = _convert_pnpm_v9_package_dependency_version(packages, snapshots, snapshot_key, name, version)
     return result
 
-def _convert_pnpm_v9_importer_dependency_map(import_path, deps):
+def _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, deps):
     result = {}
     for name, attributes in deps.items():
-        specifier = attributes.get("specifier")
-        version = attributes.get("version")
+        version = attributes["version"]
 
-        # Transition version[(patch)(peer)(data)] to a rules_js version format
-        version = _convert_pnpm_v6_v9_version_peer_dep(version)
+        if version.startswith("link:"):
+            workspace_rel_link = paths.normalize(paths.join(import_path, version[5:]))
+            result[name] = utils.importer_to_link(name, workspace_rel_link)
+            continue
 
-        if specifier.startswith("npm:") and not specifier.startswith("npm:{}@".format(name)):
-            # Keep the npm: specifier for aliased dependencies
-            version = "npm:{}".format(version)
-        elif version.startswith("link:"):
-            version = version[:5] + paths.normalize(paths.join(import_path, version[5:]))
-        elif version.startswith("file:"):
-            version = _convert_pnpm_v6_v9_version_peer_dep(version)
+        if version in snapshots:
+            result[name] = version
+            continue
 
-        result[name] = version
+        name_version = name + "@" + version
+        if name_version in snapshots:
+            result[name] = name_version
+            continue
+
+        msg = "Import {} ({}) from project '{}' not found in snapshots: {}".format(name, version, import_path, snapshots.keys())
+        fail(msg)
     return result
 
-def _convert_v9_importers(importers):
-    # Convert pnpm lockfile v9 importers to a rules_js compatible ~v5 format.
-    # Almost identical to v6 but with fewer odd edge cases.
+def _convert_v9_importers(importers, snapshots, no_dev, no_optional):
+    # Convert pnpm lockfile v9 importers to the rules_js structure.
 
     result = {}
     for import_path, importer in importers.items():
         result[import_path] = _new_import_info(
-            dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("dependencies", {})),
-            dev_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("devDependencies", {})),
-            optional_dependencies = _convert_pnpm_v9_importer_dependency_map(import_path, importer.get("optionalDependencies", {})),
+            dependencies = _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, importer.get("dependencies", {})),
+            dev_dependencies = {} if no_dev else _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, importer.get("devDependencies", {})),
+            optional_dependencies = {} if no_optional else _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, importer.get("optionalDependencies", {})),
         )
     return result
 
-def _convert_v9_packages(packages, snapshots):
-    # Convert pnpm lockfile v9 importers to a rules_js compatible format.
+def _convert_v9_packages(packages, snapshots, no_optional):
+    # Convert pnpm lockfile v9 importers to the rules_js structure.
 
-    # v9 split package metadata (v6 "packages" field) into 2:
-    #
     # The 'snapshots' keys contain the resolved dependencies such as each unique combo of deps/peers/versions
     # while 'packages' contain the static information about each and every package@version such as hasBin,
     # resolution and static dep data.
@@ -485,9 +209,8 @@ def _convert_v9_packages(packages, snapshots):
     result = {}
 
     # Snapshots contains the packages with the keys (which include peers) to return
-    for package_key, package_snapshot in snapshots.items():
-        peer_meta_index = package_key.find("(")
-        static_key = package_key[:peer_meta_index] if peer_meta_index > 0 else package_key
+    for snapshot_key, package_snapshot in snapshots.items():
+        static_key = _v9_snapshot_key_to_package_key(snapshot_key)
         if not static_key in packages:
             msg = "package {} not found in pnpm 'packages'".format(static_key)
             fail(msg)
@@ -502,65 +225,66 @@ def _convert_v9_packages(packages, snapshots):
         version_index = static_key.index("@", 1)
         name = static_key[:version_index]
 
-        package_key = _convert_pnpm_v6_v9_version_peer_dep(package_key)
+        optional = package_snapshot.get("optional", False)
+        if optional and no_optional:
+            # when no_optional attribute is set, skip optionalDependencies
+            continue
 
         # Extract the version including peerDeps+patch from the key
-        version = _convert_pnpm_v6_v9_version_peer_dep(package_key[package_key.index("@", 1) + 1:])
+        version = snapshot_key[snapshot_key.index("@", 1) + 1:]
 
         # package_data can have the resolved "version" for things like https:// deps
         friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]
 
-        package_info = _new_package_info(
+        result[snapshot_key] = _new_package_info(
             name = name,
             version = version,
             friendly_version = friendly_version,
-            dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("dependencies", {})),
-            optional_dependencies = _convert_pnpm_v9_package_dependency_map(snapshots, package_snapshot.get("optionalDependencies", {})),
-            dev_only = None,  # NOTE: pnpm v9+ no longer marks packages as dev-only
+            dependencies = _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, package_snapshot.get("dependencies", {})),
+            optional_dependencies = {} if no_optional else _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, package_snapshot.get("optionalDependencies", {})),
             has_bin = package_data.get("hasBin", False),
-            optional = package_snapshot.get("optional", False),
-            requires_build = None,  # Unknown from lockfile in v9
-            resolution = package_data.get("resolution"),
+            optional = optional,
+            resolution = package_data["resolution"],
+            cpu = package_data.get("cpu", None),
+            os = package_data.get("os", None),
         )
-
-        if package_key in result:
-            msg = "ERROR: duplicate package: {}\n\t{}\n\t{}".format(package_key, result[package_key], package_info)
-            fail(msg)
-
-        result[package_key] = package_info
 
     return result
 
 ######################### Pnpm API #########################
 
-def _parse_pnpm_lock_json(content):
+def _parse_pnpm_lock_json(content, no_dev, no_optional):
     """Parse the content of a pnpm-lock.yaml file.
 
     Args:
         content: lockfile content as json
+        no_dev: if True, devDependencies are not included
+        no_optional: If true, optionalDependencies are not included
 
     Returns:
         A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
     """
-    return _parse_lockfile(json.decode(content) if content else None, None)
+    return _parse_lockfile(json.decode(content) if content else None, no_dev, no_optional, None)
 
-def _parse_lockfile(parsed, err):
+def _parse_lockfile(parsed, no_dev, no_optional, err):
     """Helper function used by _parse_pnpm_lock_json.
 
     Args:
         parsed: lockfile content object
-        err: any errors from pasring
+        no_dev: if True, devDependencies are not included
+        no_optional: If true, optionalDependencies are not included
+        err: any errors from parsing
 
     Returns:
         A tuple of (importers dict, packages dict, patched_dependencies dict, error string)
     """
     if err != None or parsed == None or parsed == {}:
-        return {}, {}, {}, None, err
+        return {}, {}, {}, err
 
     if not types.is_dict(parsed):
-        return {}, {}, {}, None, "lockfile should be a starlark dict"
+        return {}, {}, {}, "lockfile should be a starlark dict"
     if not parsed.get("lockfileVersion", False):
-        return {}, {}, {}, None, "expected lockfileVersion key in lockfile"
+        return {}, {}, {}, "expected lockfileVersion key in lockfile"
 
     # Lockfile version may be a float such as 5.4 or a string such as '6.0'
     lockfile_version = str(parsed["lockfileVersion"])
@@ -576,67 +300,53 @@ def _parse_lockfile(parsed, err):
     packages = parsed.get("packages", {})
     patched_dependencies = parsed.get("patchedDependencies", {})
 
-    if lockfile_version < 6.0:
-        importers = _convert_v5_importers(importers)
-        packages = _convert_v5_packages(packages)
-    elif lockfile_version < 9.0:
-        importers = _convert_v6_importers(importers)
-        packages = _convert_v6_packages(packages)
-    else:  # >= 9
-        snapshots = parsed.get("snapshots", {})
-        importers = _convert_v9_importers(importers)
-        packages = _convert_v9_packages(packages, snapshots)
-
-    importers = utils.sorted_map(importers)
-    packages = utils.sorted_map(packages)
+    snapshots = parsed.get("snapshots", {})
+    importers = _convert_v9_importers(importers, snapshots, no_dev, no_optional)
+    packages = _convert_v9_packages(packages, snapshots, no_optional)
 
     _validate_lockfile_data(importers, packages)
 
-    return importers, packages, patched_dependencies, lockfile_version, None
+    return importers, packages, patched_dependencies, None
 
 def _validate_lockfile_data(importers, packages):
-    for name, deps in importers.items():
-        _validate_lockfile_deps(packages, "importer", name, deps["dependencies"])
-        _validate_lockfile_deps(packages, "importer", name, deps["dev_dependencies"])
-        _validate_lockfile_deps(packages, "importer", name, deps["optional_dependencies"])
+    for importer_path, importer in importers.items():
+        _validate_lockfile_deps(packages, "importer", importer_path, importer["dependencies"])
+        _validate_lockfile_deps(packages, "importer", importer_path, importer["dev_dependencies"])
+        _validate_lockfile_deps(packages, "importer", importer_path, importer["optional_dependencies"])
 
-    for name, info in packages.items():
-        _validate_lockfile_deps(packages, "package", name, info["dependencies"])
-        _validate_lockfile_deps(packages, "package", name, info["optional_dependencies"])
+    for package_key, info in packages.items():
+        _validate_lockfile_deps(packages, "package", package_key, info["dependencies"])
+        _validate_lockfile_deps(packages, "package", package_key, info["optional_dependencies"])
 
 def _validate_lockfile_deps(packages, importer_type, importer, deps):
-    for dep, version in deps.items():
-        if version.startswith("npm:"):
-            version = version[4:]
+    for dep_name, dep_key in deps.items():
+        # can link: to anything
+        if dep_key.startswith("link:"):
+            continue
 
-        if version not in packages and not (version.startswith("file:") or version.startswith("link:")) and not ("{}@{}".format(dep, version) in packages):
+        # otherwise the dep must be a known package
+        if dep_key not in packages:
             msg = "ERROR: {} '{}' depends on package '{}' at version '{}' which is not in the packages: {}".format(
                 importer_type,
                 importer,
-                dep,
-                version,
+                dep_name,
+                dep_key,
                 packages.keys(),
             )
-
-            # TODO: fail instead of print
-            # buildifier: disable=print
-            print(msg)
+            fail(msg)
 
 def _assert_lockfile_version(version, testonly = False):
     if type(version) != type(1.0):
         fail("version should be passed as a float")
 
-    # Restrict the supported lock file versions to what this code has been tested with:
-    #   5.4 - pnpm v7.0.0 bumped the lockfile version to 5.4
-    #   6.0 - pnpm v8.0.0 bumped the lockfile version to 6.0; this included breaking changes
-    #   6.1 - pnpm v8.6.0 bumped the lockfile version to 6.1
-    #   9.0 - pnpm v9.0.0 bumped the lockfile version to 9.0
-    min_lock_version = 5.4
+    # Restrict the supported lock file versions to what this code has been tested with.
+    # pnpm v9.0.0 bumped the lockfile version to 9.0
+    min_lock_version = 9.0
     max_lock_version = 9.0
     msg = None
 
     if version < min_lock_version:
-        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v7 or greater.".format(
+        msg = "npm_translate_lock requires lock_version at least {min}, but found {actual}. Please upgrade to pnpm v9 or greater.".format(
             min = min_lock_version,
             actual = version,
         )
@@ -649,12 +359,32 @@ def _assert_lockfile_version(version, testonly = False):
         fail(msg)
     return msg
 
+def _parse_pnpm_workspace_json(content):
+    """Parse the content of a pnpm-workspace.yaml file.
+
+    Args:
+        content: pnpm-workspace.yaml file content as json
+
+    Returns:
+        A tuple of (packages list, error string)
+    """
+    if not content:
+        return {}, None
+
+    parsed = json.decode(content)
+    if not parsed:
+        return {}, None
+
+    if not types.is_dict(parsed):
+        return None, "pnpm-workspace should be a starlark dict"
+
+    return parsed, None
+
 pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
-)
-
-# Exported only to be tested
-pnpm_test = struct(
-    strip_v5_peer_dep_or_patched_version = _strip_v5_peer_dep_or_patched_version,
+    parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
+    to_bazel_os_cpu_constraints = _to_bazel_os_cpu_constraints,
+    to_bazel_os_constraints = _to_bazel_os_constraints,
+    to_bazel_cpu_constraints = _to_bazel_cpu_constraints,
 )

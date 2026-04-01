@@ -1,0 +1,20 @@
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+# Use the DEFAULT pnpm_version and do not override
+
+npm = use_extension(
+    "@aspect_rules_js//npm:extensions.bzl",
+    "npm",
+    dev_dependency = True,
+)
+npm.npm_translate_lock(
+    name = "npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    update_pnpm_lock = True,
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")

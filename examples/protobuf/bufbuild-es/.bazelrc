@@ -1,0 +1,3 @@
+# Avoid building protoc from source
+build --incompatible_enable_proto_toolchain_resolution
+build --@protobuf//bazel/toolchains:prefer_prebuilt_protoc

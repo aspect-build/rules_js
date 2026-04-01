@@ -4,32 +4,34 @@ load("//examples/macro:mocha.bzl", "mocha_test")
 
 # Link all direct dependencies in /examples/macro/package.json to
 # bazel-bin/examples/macro/node_modules
-npm_link_all_packages(name = "node_modules")
+npm_link_all_packages()
 
 mocha_test(
-    name = "test",
+    name = "test_js",
     srcs = ["test.js"],
+)
+
+mocha_test(
+    name = "test_cjs",
+    srcs = ["test.cjs"],
+)
+
+mocha_test(
+    name = "test_esm",
+    srcs = ["test.mjs"],
+)
+
+mocha_test(
+    name = "test_all",
+    srcs = glob(["test.*js"]),
 )
 
 bzl_library(
     name = "mocha",
     srcs = ["mocha.bzl"],
     deps = [
-        "@aspect_bazel_lib//lib:copy_to_bin",
+        "@bazel_lib//lib:copy_to_bin",
         # this is a bzl_library target, exposing the package_json.bzl file we depend on
         "@npm//examples/macro:mocha_bzl_library",
     ],
 )
-
-# TODO(derek): stardoc doesn't work under bzlmod with these
-# targets when working against an overridden version of bazel-lib.
-# Remove comments of the released version of bazel-lib succeeds.
-#
-# stardoc_with_diff_test(
-#     name = "mocha-docs",
-#     bzl_library_target = ":mocha",
-# )
-#
-# update_docs(
-#     name = "docs",
-# )

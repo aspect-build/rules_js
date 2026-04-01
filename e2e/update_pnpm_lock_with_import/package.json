@@ -1,12 +1,15 @@
 {
     "private": true,
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
         "debug": "4.3.4",
         "is-odd": "3.0.1",
         "semver": "7.5.1"
     },
     "devDependencies": {
-        "@types/node": "18.11.18",
+        "@types/node": "22.18.13",
         "@types/semver": "7.3.13"
     }
 }

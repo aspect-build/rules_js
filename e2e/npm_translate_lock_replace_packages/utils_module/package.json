@@ -1,0 +1,12 @@
+{
+    "name": "my-utils",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "utils.mjs",
+    "dependencies": {
+        "lodash": "4.17.21"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    }
+}

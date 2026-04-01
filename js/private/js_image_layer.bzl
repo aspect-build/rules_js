@@ -13,8 +13,8 @@ js_image_layer(
 ```
 """
 
-load("@aspect_bazel_lib//lib:tar.bzl", "tar_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 _DEFAULT_LAYER_GROUPS = {
     "node": "/js/private/node-patches/|/bin/nodejs/",
@@ -35,8 +35,7 @@ A proper `cmd` usually looks like /`[ js_image_layer 'root' ]`/`[ package name o
 unless you have a custom launcher script that invokes the entry_point of the `js_binary` in a different path.
 
 On the other hand, `workdir` has to be set to the "runfiles tree root" which would be exactly `cmd` **but with `.runfiles/[ name of the workspace ]` suffix**.
-If using bzlmod then name of the local workspace is always `_main`. If bzlmod is not enabled then the name of the local workspace, if not otherwise specified
-in the `WORKSPACE` file, is `__main__`. If `workdir` is not set correctly, some attributes such as `chdir` might not work properly.
+When using bzlmod then name of the local workspace is always `_main`. If `workdir` is not set correctly, some attributes such as `chdir` might not work properly.
 
 js_image_layer creates up to 5 layers depending on what files are included in the runfiles of the provided
 `binary` target.
@@ -108,10 +107,7 @@ oci_image(
     tars = [
         ":layers"
     ],
-    workdir = select({
-        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
-        "//conditions:default": "/app/bin.runfiles/__main__",
-    }),
+    workdir = "/app/bin.runfiles/_main",
 )
 ```
 
@@ -149,10 +145,7 @@ js_binary(
         tars = [
             ":{}_layers".format(arch)
         ],
-        workdir = select({
-            "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
-            "//conditions:default": "/app/bin.runfiles/__main__",
-        }),
+        workdir = "/app/bin.runfiles/_main",
     )
 
     for arch in ["amd64", "arm64"]
@@ -166,105 +159,6 @@ oci_image_index(
     ]
 )
 ```
-
-**An example using legacy rules_docker**
-
-See `e2e/js_image_docker` for full example.
-
-```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
-load("@io_bazel_rules_docker//container:container.bzl", "container_image")
-
-js_binary(
-    name = "bin",
-    data = [
-        "//:node_modules/args-parser",
-    ],
-    entry_point = "main.js",
-)
-
-js_image_layer(
-    name = "layers",
-    binary = ":bin",
-    root = "/app",
-    visibility = ["//visibility:__pkg__"],
-)
-
-filegroup(
-    name = "node_tar",
-    srcs = [":layers"],
-    output_group = "node",
-)
-
-container_layer(
-    name = "node_layer",
-    tars = [":node_tar"],
-)
-
-filegroup(
-    name = "package_store_3p_tar",
-    srcs = [":layers"],
-    output_group = "package_store_3p",
-)
-
-container_layer(
-    name = "package_store_3p_layer",
-    tars = [":package_store_3p_tar"],
-)
-
-filegroup(
-    name = "package_store_1p_tar",
-    srcs = [":layers"],
-    output_group = "package_store_1p",
-)
-
-container_layer(
-    name = "package_store_1p_layer",
-    tars = [":package_store_1p_tar"],
-)
-
-filegroup(
-    name = "node_modules_tar",
-    srcs = [":layers"],
-    output_group = "node_modules",
-)
-
-container_layer(
-    name = "node_modules_layer",
-    tars = [":node_modules_tar"],
-)
-
-filegroup(
-    name = "app_tar",
-    srcs = [":layers"],
-    output_group = "app",
-)
-
-container_layer(
-    name = "app_layer",
-    tars = [":app_tar"],
-)
-
-container_image(
-    name = "image",
-    cmd = ["/app/bin"],
-    entrypoint = ["bash"],
-    layers = [
-        ":node_layer",
-        ":package_store_3p_layer",
-        ":package_store_1p_layer",
-        ":node_modules_layer",
-        ":app_layer",
-    ],
-    workdir = select({
-        "@aspect_bazel_lib//lib:bzlmod": "/app/bin.runfiles/_main",
-        "//conditions:default": "/app/bin.runfiles/__main__",
-    }),
-)
-```
-
-
-## Performance
 
 For better performance, it is recommended to split the large parts of a `js_binary` to have a separate layer.
 
@@ -432,12 +326,8 @@ else {
         transitive = [files],
     )
 
-    nodeinfo = ctx.attr._current_node[platform_common.ToolchainInfo].nodeinfo
-    if hasattr(nodeinfo, "node"):
-        node_exec = nodeinfo.node
-    else:
-        # TODO(3.0): drop support for deprecated toolchain attributes
-        node_exec = nodeinfo.target_tool_path
+    nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
+    node_exec = nodeinfo.node
     ctx.actions.run(
         inputs = inputs,
         arguments = [splitter.path],
@@ -446,11 +336,12 @@ else {
         executable = node_exec,
         progress_message = "Computing Layer Groups %{label}",
         mnemonic = "JsImageLayerGroups",
+        toolchain = "@rules_nodejs//nodejs:toolchain_type",
     )
 
     return expected_layer_groups
 
-# This function exactly same as the one from "@aspect_bazel_lib//lib:paths.bzl"
+# This function exactly same as the one from "@bazel_lib//lib:paths.bzl"
 # except that it takes workspace_name directly instead of the ctx object.
 # Reason is the performance of Args.add_all closures where we use this function.
 # https://bazel.build/rules/lib/builtins/Args#add_all `allow_closure` explains this.
@@ -465,9 +356,6 @@ def _repo_mapping_manifest(files_to_run):
 _ENTRY = '"%s":{"dest":%s,"root":"%s","is_external":%s,"is_source":%s,"repo_name":"%s"},\n%s:"%s"'
 
 def _js_image_layer_impl(ctx):
-    if ctx.attr.generate_empty_layers:
-        # buildifier: disable=print
-        print("The `generate_empty_layers` attribute is deprecated and will be removed in the next major release. Its behavior is now implicitly `True`")
     if len(ctx.attr.binary) != 1:
         fail("binary attribute has more than one transition")
 
@@ -592,7 +480,7 @@ def _js_image_layer_impl(ctx):
     output_groups = dict()
     compress = "" if ctx.attr.compression == "none" else ctx.attr.compression
     for typ, mtree, unused_inputs in layer_groups_gen:
-        ext = tar_lib.common.compression_to_extension[compress] if compress else ""
+        ext = tar_lib.common.compression_to_extension[compress] if compress else ".tar"
         output = ctx.actions.declare_file("%s_%s%s" % (ctx.label.name, typ, ext))
 
         # add the layer group to outputgroupinfo and defaultinfo
@@ -618,7 +506,7 @@ def _js_image_layer_impl(ctx):
             outputs = [output],
             mnemonic = "JsImageLayer",
             progress_message = "JsImageLayer " + typ + " %{label}",
-            toolchain = "@aspect_bazel_lib//lib:tar_toolchain_type",
+            toolchain = tar_lib.toolchain_type,
         )
 
     return [
@@ -651,10 +539,6 @@ js_image_layer_lib = struct(
             default = "//js/private:js_image_layer.mjs",
             allow_single_file = True,
         ),
-        "_current_node": attr.label(
-            default = "@nodejs_toolchains//:resolved_toolchain",
-            cfg = "exec",
-        ),
         "binary": attr.label(
             mandatory = True,
             cfg = _js_image_layer_transition,
@@ -684,11 +568,6 @@ js_image_layer_lib = struct(
         "platform": attr.label(
             doc = "Platform to transition.",
         ),
-        "generate_empty_layers": attr.bool(
-            # TODO(3.0): remove this attribute.
-            doc = """DEPRECATED. An empty layer is always generated if the layer group have no matching files.""",
-            default = False,
-        ),
         "preserve_symlinks": attr.string(
             doc = """Preserve symlinks for entries matching the pattern.
 By default symlinks within the `node_modules` is preserved.
@@ -698,8 +577,8 @@ By default symlinks within the `node_modules` is preserved.
         "layer_groups": attr.string_dict(
             doc = """Layer groups to create.
 These are utilized to categorize files into distinct layers, determined by their respective paths.
-The expected format for each entry is "<key>": "<value>", where <key> MUST be a valid Bazel and
-JavaScript identifier (alphanumeric characters), and <value> MAY be either an empty string (signifying a universal match)
+The expected format for each entry is `"<key>": "<value>"`, where `<key>` MUST be a valid Bazel and
+JavaScript identifier (alphanumeric characters), and `<value>` MAY be either an empty string (signifying a universal match)
 or a valid regular expression.""",
         ),
     },

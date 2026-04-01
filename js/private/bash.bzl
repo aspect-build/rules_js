@@ -1,8 +1,5 @@
 "Bash snippets for js rules"
 
-# TODO: Instead of setting a new RUNFILES env; just set RUNFILES_DIR if it is not set;
-#       needs testing to know if RUNFILES_DIR is set always set to the same value as RUNFILES
-#       when it is set.
 # Bash snipped to initialize the RUNFILES environment variable.
 # Depends on there being a logf_fatal function defined.
 # NB: If this can be generalized fully in the future and not depend on logf_fatal
@@ -37,12 +34,12 @@ if [ "${TEST_SRCDIR:-}" ]; then
 elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
     RUNFILES=$RUNFILES_MANIFEST_FILE
     if [[ "${RUNFILES}" == *.runfiles_manifest ]]; then
-        # Newer versions of Bazel put the manifest besides the runfiles with the suffix .runfiles_manifest.
+        # Bazel puts the manifest besides the runfiles with the suffix .runfiles_manifest.
         # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
         # runfiles directory and named my_binary.runfiles_manifest
         RUNFILES=${RUNFILES%_manifest}
     elif [[ "${RUNFILES}" == */MANIFEST ]]; then
-        # Older versions of Bazel put the manifest file named MANIFEST in the runfiles directory
+        # Bazel for windows puts the manifest file named MANIFEST in the runfiles directory
         RUNFILES=${RUNFILES%/MANIFEST}
     else
         logf_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
@@ -87,4 +84,7 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     # to the PWD in case where RUNFILES_MANIFEST_FILE is used above.
     RUNFILES="$PWD/$RUNFILES"
 fi
+# Set RUNFILES_DIR if not already set so that tools such as @bazel/runfiles
+# can locate runfiles without requiring RUNFILES to be exported.
+export RUNFILES_DIR="${RUNFILES_DIR:-$RUNFILES}"
 """

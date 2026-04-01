@@ -3,9 +3,7 @@ set -o errexit -o nounset -o pipefail
 
 # Integration test for js_run_devserver run with ibazel
 
-BZLMOD_FLAG="${BZLMOD_FLAG:---enable_bzlmod=1}"
-
-bazel run "$BZLMOD_FLAG" -- @pnpm//:pnpm --dir "$PWD" install
+bazel run -- @pnpm --dir "$PWD" install
 
 ./serve_test.sh //src:serve
 ./serve_test.sh //src:serve_alt
@@ -13,14 +11,6 @@ bazel run "$BZLMOD_FLAG" -- @pnpm//:pnpm --dir "$PWD" install
 ./serve_test.sh //src:serve_simple_bin
 ./serve_test.sh //src:serve_naughty
 ./serve_test.sh //src:serve_naughty_bin
-
-bazel_version=$(head -n 1 .bazelversion)
-bazel_major=${bazel_version::1}
-if [[ "$bazel_major" -ge 7 ]]; then
-    # multirun rule from https://github.com/ash2k/bazel-tools not compatible with Bazel 7
-    echo "SKIPPING js_run_devserver + multirun tests since com_github_ash2k_bazel_tools is not compatible with Bazel 7"
-else
-    ./multirun_test.sh //src:serve_multi
-fi
+./multirun_test.sh //src:serve_multi
 
 echo "test.sh: PASS"

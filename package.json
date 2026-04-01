@@ -1,49 +1,11 @@
 {
     "private": true,
     "devDependencies": {
-        "@types/node": "18.19.54",
+        "google-closure-compiler": "^20251111.0.0",
+        "@types/node": "22.18.13",
         "chalk": "5.1.1",
-        "inline-fixtures": "1.1.0",
-        "jsonpath-plus": "7.2.0",
+        "circles": "npm:es5-ext@0.10.64",
+        "jsonpath-plus": "10.3.0",
         "typescript": "^5.8.0"
-    },
-    "pnpm": {
-        "packageExtensions": {
-            "mocha": {
-                "peerDependencies": {
-                    "mocha-multi-reporters": "*"
-                }
-            },
-            "mocha-multi-reporters": {
-                "peerDependencies": {
-                    "mocha-junit-reporter": "*"
-                }
-            },
-            "segfault-handler": {
-                "dependencies": {
-                    "node-gyp": "*"
-                }
-            },
-            "unix-dgram": {
-                "dependencies": {
-                    "node-gyp": "*"
-                }
-            },
-            "@kubernetes/client-node": {
-                "//1": "these deps are from devDependencies of @kubernetes/client-node and needed for 'prepare' lifecycle hook",
-                "//2": "https://github.com/kubernetes-client/javascript/blob/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9/package.json#L28",
-                "dependencies": {
-                    "typescript": "~5.6.2"
-                }
-            }
-        },
-        "overrides": {
-            "jsonify": "https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz",
-            "semver-max": "file:./npm/private/test/vendored/semver-max",
-            "is-odd": "file:./npm/private/test/vendored/is-odd"
-        },
-        "patchedDependencies": {
-            "meaning-of-life@1.0.0": "examples/npm_deps/patches/meaning-of-life@1.0.0-pnpm.patch"
-        }
     }
 }

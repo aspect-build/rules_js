@@ -1,6 +1,6 @@
 {
     "name": "js_lib_pkg_a",
     "devDependencies": {
-        "@types/node": "18.19.54"
+        "@types/node": "22.18.13"
     }
 }

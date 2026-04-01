@@ -1,0 +1,20 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  ../lib:
+    dependencies:
+      '@plug/a':
+        specifier: workspace:*
+        version: link:plugins/a
+      '@plug/b':
+        specifier: workspace:*
+        version: link:plugins/b
+
+  ../lib/plugins/a: {}
+
+  ../lib/plugins/b: {}

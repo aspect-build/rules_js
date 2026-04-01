@@ -1,0 +1,4 @@
+node_modules
+packages/from-local/node_modules
+packages/from-root/node_modules
+packages/some-dep/node_modules

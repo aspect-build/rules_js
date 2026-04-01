@@ -1,0 +1,6 @@
+packages:
+    - 'v15/cjs'
+    - 'v15/esm'
+    - 'v15/mjs'
+
+onlyBuiltDependencies: []

@@ -10,7 +10,7 @@ This is used in conjunction with the npm_package_store rule that outputs an npm 
 node_modules/.aspect_rules_js package store in a pnpm style symlinked node_modules structure.
 
 The term "package" is defined at
-<https://nodejs.org/docs/latest-v16.x/api/packages.html>
+<https://nodejs.org/docs/latest-v22.x/api/packages.html>
 
 See https://pnpm.io/symlinked-node-modules-structure for more information on
 the symlinked node_modules structure.
@@ -29,7 +29,11 @@ _ATTRS = {
         doc = """The package name to link to.
 
 If unset, the package name of the src npm_package_store is used.
-If set, takes precendance over the package name in the src npm_package_store.
+If set, takes precedence over the package name in the src npm_package_store.
+""",
+    ),
+    "dev": attr.bool(
+        doc = """Whether or not the linked package is a dev dependency.
 """,
     ),
     "bins": attr.string_dict(
@@ -80,7 +84,7 @@ def _npm_link_package_store_impl(ctx):
     # "node_modules/{package}" so it is available as a direct dependency
     root_symlink_path = "node_modules/{}".format(package)
 
-    files = [utils.make_symlink(ctx, root_symlink_path, package_store_directory.path)]
+    files = [utils.make_directory_symlink(ctx, root_symlink_path, package_store_directory.path)]
 
     for bin_name, bin_path in ctx.attr.bins.items():
         bin_file = ctx.actions.declare_file("node_modules/.bin/{}".format(bin_name))
@@ -104,7 +108,7 @@ def _npm_link_package_store_impl(ctx):
         store_js_info.transitive_sources,
     ])
 
-    # Additional npm_sources required to to run the package, in addition to other
+    # Additional npm_sources required to run the package, in addition to other
     # data included in JsInfo provider.
     npm_sources = depset(files, transitive = [
         store_info.transitive_files,
@@ -129,7 +133,7 @@ def _npm_link_package_store_impl(ctx):
             transitive_types = store_js_info.transitive_types,
             npm_sources = npm_sources,
             # only propagate non-dev npm dependencies to use as direct dependencies when linking downstream npm_package targets with npm_link_package
-            npm_package_store_infos = depset([store_info]) if not store_info.dev else depset(),
+            npm_package_store_infos = depset([store_info]) if not ctx.attr.dev else depset(),
         ),
     ]
     if OutputGroupInfo in ctx.attr.src:
@@ -143,3 +147,21 @@ npm_link_package_store = rule(
     attrs = _ATTRS,
     provides = [DefaultInfo, JsInfo],
 )
+
+# A private util method to minimize the generated code for local package store links.
+# May be changed/deleted at any time to minimize code from the generated npm_link_all_packages().
+def npm_local_link_package_store_internal(name, src, package = None, link_visibility = ["//visibility:public"]):
+    npm_link_package_store(
+        name = name,
+        src = src,
+        package = package,
+        visibility = link_visibility,
+        tags = ["manual"],
+    )
+    native.filegroup(
+        name = "{}/dir".format(name),
+        srcs = [":" + name],
+        output_group = utils.package_directory_output_group,
+        visibility = link_visibility,
+        tags = ["manual"],
+    )

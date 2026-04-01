@@ -1,6 +1,10 @@
 import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
 
 ### YOUR PROJECT SPECIFIC OPTIONS GO HERE ###
+
+# TODO: fully migrate to bzlmod
+common --enable_workspace
 
 # There are some empty globs in the LLVM toolchain
 common --noincompatible_disallow_empty_glob

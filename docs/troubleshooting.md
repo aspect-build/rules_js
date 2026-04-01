@@ -97,7 +97,7 @@ Sometimes the package intentionally doesn't list dependencies, because it discov
 This is used for tools that locate their "plugins"; `eslint` and `prettier` are common typical examples.
 
 The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/npmrc#public-hoist-pattern).
-Use the [`public_hoist_packages` attribute of `npm_translate_lock`](./npm_translate_lock.md#npm_translate_lock-public_hoist_packages).
+Use the [`public_hoist_packages` attribute of `npm_translate_lock`](https://registry.bazel.build/docs/aspect_rules_js#npm-extensions-bzl).
 The documentation says the value provided to each element in the map is:
 
 > a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree
@@ -109,10 +109,10 @@ If the lockfile is in `some/subpkg/pnpm-lock.yaml` then `"some/subpkg"` should a
 
 For example:
 
-`WORKSPACE`
+`MODULE.bazel`
 
 ```starlark
-npm_translate_lock(
+npm.npm_translate_lock(
     ...
     public_hoist_packages = {
         "eslint-config-react-app": [""],
@@ -177,27 +177,25 @@ can effect performance and are sometimes worth explicitly excluding content.
 
 In these cases you can add such packages and the respective files/folders you want to exclude.
 
-**For WORKSPACE builds:**
-```starlark
-npm_translate_lock(
-    ...
-    exclude_package_contents = {
-        "resolve": ["**/test/*"],
-    },
-)
-```
-
-**For Bzlmod builds (MODULE.bazel):**
 ```starlark
 npm.npm_exclude_package_contents(
     package = "resolve",
     patterns = ["**/test/*"],
+    use_defaults = True,
 )
 ```
 
-These examples will remove the test folder from the "resolve" package.
+These examples will remove the `test` folder from the "resolve" package as well use excluding the some default patterns
+copied from [yarn autoclean](https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/autoclean.js#L16).
 
-You can use this to remove whatever you find to be not needed for your project.
+The `package` can be dynamic, for example to opt-in to the default exclusions for all packages:
+
+```starlark
+npm.npm_exclude_package_contents(
+    package = "*",
+    use_defaults = True,
+)
+```
 
 #### Jest
 

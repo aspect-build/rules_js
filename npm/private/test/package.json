@@ -1,10 +1,16 @@
 {
     "private": true,
-    "// devDependencies": "test linking & building 3rd party npm packages with problematic postinstall",
+    "// optionalDependencies": "test linking & building packages with os/cpu constraints etc",
+    "optionalDependencies": {
+        "@vscode/vsce-sign-alpine-arm64": "2.0.2",
+        "@vscode/vsce-sign-alpine-x64": "2.0.2",
+        "sass-embedded-all-unknown": "1.97.3"
+    },
+    "// devDependencies": "test linking & building 3rd party npm packages with problematic version specifiers, postinstalls etc",
+    "// devDependencies2": "See also: root package.json pnpm.onlyBuiltDependencies+packageExtensions",
     "devDependencies": {
-        "hello": "https://gitpkg.vercel.app/EqualMa/gitpkg-hello/packages/hello",
         "@fastify/send": "3.3.0",
-        "@figma/nodegit": "^0.28.0-figma.3",
+        "@figma/nodegit": "^0.28.0-figma.6",
         "@kubernetes/client-node": "https://github.com/kubernetes-client/javascript#cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9",
         "@plotly/regl": "2.1.2",
         "bufferutil": "4.0.8",
@@ -14,8 +20,10 @@
         "hot-shots": "10.0.0",
         "inline-fixtures": "https://registry.yarnpkg.com/inline-fixtures/-/inline-fixtures-1.1.0.tgz#5f9edf644ac02a1322012dbbb9f0a4739831d662",
         "json-stable-stringify": "1.0.1",
-        "lodash": "file:vendored/lodash-4.17.21.tgz",
-        "node-gyp": "9.3.0",
+        "lodash": "4.0.0",
+        "lodash-4.17.21": "npm:lodash@4.17.21",
+        "lodash-4.17.21-tar": "file:vendored/lodash-4.17.21.tgz",
+        "node-gyp": "12.2.0",
         "plotly.js": "2.25.2",
         "protoc-gen-grpc": "git+ssh://git@github.com:gregmagolan-codaio/protoc-gen-grpc-ts#be5580b06348d3eb9b4610a4a94065154a0df41f",
         "puppeteer": "19.11.1",

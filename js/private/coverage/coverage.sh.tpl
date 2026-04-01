@@ -27,7 +27,8 @@ if [ $SPLIT_COVERAGE_POST_PROCESSING == 1 ]; then
     RUNFILES=$(_normalize_path "$LCOV_MERGER.runfiles")
 fi
 
-export RUNFILES
+JS_COVERAGE__RUNFILES="$RUNFILES"
+export JS_COVERAGE__RUNFILES
 
 # ==============================================================================
 # Prepare to run coverage program

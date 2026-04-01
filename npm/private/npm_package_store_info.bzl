@@ -7,6 +7,7 @@ NpmPackageStoreInfo = provider(
     See https://pnpm.io/symlinked-node-modules-structure for more information about
     symlinked node_modules trees.""",
     fields = {
+        "key": "a unique package store key",
         "root_package": "package that this npm package store is linked at",
         "package": "name of this npm package",
         "version": "version of this npm package",
@@ -14,6 +15,5 @@ NpmPackageStoreInfo = provider(
         "package_store_directory": "the TreeArtifact of this npm package's package store location",
         "files": "depset of files that are part of the npm package",
         "transitive_files": "depset of the files that are part of the npm package and its transitive deps",
-        "dev": "whether or not this npm package is a dev dependency",
     },
 )

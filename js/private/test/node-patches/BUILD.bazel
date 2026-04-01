@@ -1,35 +1,46 @@
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
-load("//js:defs.bzl", "js_test")
+load("@bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//js/private/test/node-patches:@babel/cli/package_json.bzl", babel_bin = "bin")
+load("//js:defs.bzl", "js_library", "js_test")
 
 TESTS = [
     "escape.js",
-    "lstat.js",
-    "opendir.js",
-    "readdir.js",
-    "readlink.js",
-    "realpath.js",
+]
+
+MJS_TESTS = [
+    "lstat.mjs",
+    "opendir.mjs",
+    "readdir.mjs",
+    "readlink.mjs",
+    "realpath.mjs",
+]
+
+CJS_TESTS = [
+    t.replace(".mjs", ".cjs")
+    for t in MJS_TESTS
 ]
 
 # Multiple node toolchains for testing across versions
 TOOLCHAINS_NAMES = [
-    "node18",
-    "node20",
+    # default name+version
+    "nodejs",
 
-    # TODO: add newer LTS when rules_nodejs upgraded
+    # custom versions for tests
+    "node20",
+    "node22",
+    "node24",
 ]
 
 TOOLCHAINS_VERSIONS = [
     select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node18_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node18_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node18_windows_amd64//:node_toolchain",
-    }),
-    select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
-    }),
+        "@bazel_tools//src/conditions:linux_x86_64": "@%s_linux_amd64//:node_toolchain" % n,
+        "@bazel_tools//src/conditions:darwin": "@%s_darwin_amd64//:node_toolchain" % n,
+        "@bazel_tools//src/conditions:windows": "@%s_windows_amd64//:node_toolchain" % n,
+    })
+    for n in TOOLCHAINS_NAMES
 ]
+
+npm_link_all_packages()
 
 # We need to copy the entry points to the bin so that the tests below don't follow the execroot
 # symlink back to the source tree since the fs patches are not on for the tests as they are the code
@@ -39,29 +50,81 @@ TOOLCHAINS_VERSIONS = [
         name = "copy_entry_{}".format(t),
         srcs = [t],
     )
-    for t in TESTS
+    for t in TESTS + MJS_TESTS
 ]
+
+js_library(
+    name = "babel_config",
+    srcs = ["babel.config.js"],
+    deps = [
+        ":node_modules/@babel/plugin-transform-modules-commonjs",
+    ],
+)
+
+babel_bin.babel(
+    name = "babel_mjs2js",
+    srcs = MJS_TESTS + [":babel_config"],
+    outs = [t.replace(".mjs", ".cjs") for t in MJS_TESTS],
+    args = [
+        "--extensions",
+        ".mjs",
+        "--out-file-extension",
+        ".cjs",
+        "--out-dir",
+        ".",
+    ] + MJS_TESTS,
+    chdir = package_name(),  # to automatically pickup babel.config.js
+)
 
 # Basic tests
 [
-    js_test(
-        name = "{}_test".format(t.replace(".js", "")),
-        data = [
-            "//:node_modules/inline-fixtures",
-            "//js/private/node-patches/src:compile",
+    [
+        # The primary tests, both .js and .mjs
+        [
+            js_test(
+                name = "{}_{}_test".format(
+                    t.replace(".mjs", "").replace(".js", ""),
+                    toolchain_name,
+                ),
+                data = [
+                    ":node_modules/inline-fixtures",
+                    "//js/private/node-patches/src:compile",
+                ],
+                entry_point = "copy_entry_{}".format(t),
+                node_toolchain = toolchain,
+                patch_node_fs = False,
+                # Without node patches on for these tests, the program is going to escape the sandbox if it
+                # is on since the fs patches are not on for the tests as they are the code under test
+                tags = ["no-sandbox"],
+            )
+            for t in TESTS + MJS_TESTS
         ],
-        entry_point = "copy_entry_{}".format(t),
-        patch_node_fs = False,
-        # Without node patches on for these tests, the program is going to escape the sandbox if it
-        # is on since the fs patches are not on for the tests as they are the code under test
-        tags = ["no-sandbox"],
-        # on windows: The expression evaluated to a falsy value: assert.ok(isSubPath('/a/b', '/a/b/c/d'))
-        target_compatible_with = select({
-            "@platforms//os:windows": ["@platforms//:incompatible"],
-            "//conditions:default": [],
-        }),
+
+        # The .cjs tests converted from .mjs
+        [
+            js_test(
+                name = "{}_{}_cjs_test".format(
+                    t.replace(".cjs", ""),
+                    toolchain_name,
+                ),
+                data = [
+                    ":node_modules/inline-fixtures",
+                    "//js/private/node-patches/src:compile",
+                ],
+                entry_point = t,
+                node_toolchain = toolchain,
+                patch_node_fs = False,
+                # Without node patches on for these tests, the program is going to escape the sandbox if it
+                # is on since the fs patches are not on for the tests as they are the code under test
+                tags = ["no-sandbox"],
+            )
+            for t in CJS_TESTS
+        ],
+    ]
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
     )
-    for t in TESTS
 ]
 
 # Node process spawning tests

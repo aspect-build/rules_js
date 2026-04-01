@@ -8,29 +8,20 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 ```
 """
 
-load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
-load("@aspect_bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
-load("@aspect_bazel_lib//lib:jq.bzl", "jq")
-load("@aspect_bazel_lib//tools:version.bzl", BAZEL_LIB_VERSION = "VERSION")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load("@bazel_skylib//lib:versions.bzl", "versions")
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
+load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
+load("@jq.bzl//jq:jq.bzl", "jq")
 load("//js:defs.bzl", "js_binary")
 load("//js:libs.bzl", "js_lib_helpers")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
-# Pull in all copy_to_directory attributes except for exclude_prefixes
 copy_to_directory_lib_attrs = dict(copy_to_directory_lib.attrs)
-copy_to_directory_lib_attrs.pop(
-    "exclude_prefixes",
-    # It was removed in bazel-lib 2.0, so default to ignoring.
-    None,
-)
 
-_NPM_PACKAGE_ATTRS = dicts.add(copy_to_directory_lib_attrs, {
+_NPM_PACKAGE_ATTRS = copy_to_directory_lib_attrs | {
     "data": attr.label_list(),
     "package": attr.string(),
     "version": attr.string(),
-})
+}
 
 _NPM_PACKAGE_FILES_ATTRS = {
     "include_types": attr.bool(),
@@ -76,7 +67,7 @@ def _npm_package_impl(ctx):
     copy_to_directory_bin_action(
         ctx,
         name = ctx.attr.name,
-        copy_to_directory_bin = ctx.toolchains["@aspect_bazel_lib//lib:copy_to_directory_toolchain_type"].copy_to_directory_info.bin,
+        copy_to_directory_bin = ctx.toolchains["@bazel_lib//lib:copy_to_directory_toolchain_type"].copy_to_directory_info.bin,
         dst = dst,
         files = ctx.files.srcs,
         targets = [t for t in ctx.attr.srcs if DirectoryPathInfo in t],
@@ -117,7 +108,7 @@ _npm_package = rule(
     implementation = npm_package_lib.implementation,
     attrs = npm_package_lib.attrs,
     provides = npm_package_lib.provides,
-    toolchains = [Label("@aspect_bazel_lib//lib:copy_to_directory_toolchain_type")],
+    toolchains = [Label("@bazel_lib//lib:copy_to_directory_toolchain_type")],
 )
 
 _npm_package_files = rule(
@@ -178,7 +169,7 @@ def npm_package(
 
     7. `replace_prefixes`
 
-    For more information each filters / transformations applied, see
+    For more information on each filters / transformations applied, see
     the documentation for the specific filter / transformation attribute.
 
     Glob patterns are supported. Standard wildcards (globbing patterns) plus the `**` doublestar (aka. super-asterisk)
@@ -187,7 +178,7 @@ def npm_package(
     for more information on supported globbing patterns.
 
     `npm_package` makes use of `copy_to_directory`
-    (https://docs.aspect.build/rules/aspect_bazel_lib/docs/copy_to_directory) under the hood,
+    (https://docs.aspect.build/rules/bazel_lib/docs/copy_to_directory) under the hood,
     adopting its API and its copy action using composition. However, unlike `copy_to_directory`,
     `npm_package` includes direct and transitive sources and types files from `JsInfo` providers in srcs
     by default. The behavior of including sources and types from `JsInfo` can be configured
@@ -202,7 +193,7 @@ def npm_package(
     for more details).
 
     `npm_package` can also include npm packages sources and default runfiles from `srcs` which `copy_to_directory` does not.
-    These behaviors can be configured with the `include_npm_sourfes` and `include_runfiles` attributes
+    These behaviors can be configured with the `include_npm_sources` and `include_runfiles` attributes
     respectively.
 
     The default `include_srcs_packages`, `[".", "./**"]`, prevents files from outside of the target's
@@ -226,7 +217,7 @@ def npm_package(
             `NpmPackageStoreInfo` providers are gathered from `JsInfo` of the targets specified. Targets can be linked npm
             packages, npm package store targets or other targets that provide `JsInfo`. This is done directly from the
             `npm_package_store_infos` field of these. For linked npm package targets, the underlying npm_package_store
-            target(s) that back the links is used.
+            target(s) that back the links are used.
 
             Gathered `NpmPackageStoreInfo` providers are used downstream as direct dependencies of this npm package when
             linking with `npm_link_package`.
@@ -238,14 +229,14 @@ def npm_package(
             If set, the package name set here will be used for linking if a npm_link_package does not specify a package name. A
             npm_link_package that specifies a package name will override the value here when linking.
 
-            If unset, a npm_link_package that references this npm_package must define the package name must be for linking.
+            If unset, a npm_link_package that references this npm_package must define the package name for linking.
 
         version: The package version. If set, should match the `version` field in the `package.json` file for this package.
 
             If set, a npm_link_package may omit the package version and the package version set here will be used for linking. A
             npm_link_package that specifies a package version will override the value here when linking.
 
-            If unset, a npm_link_package that references this npm_package must define the package version must be for linking.
+            If unset, a npm_link_package that references this npm_package must define the package version for linking.
 
         root_paths: List of paths (with glob support) that are roots in the output directory.
 
@@ -254,7 +245,7 @@ def npm_package(
             instead of the path relative to the file's workspace. If there are multiple
             root paths that match, the longest match wins.
 
-            Matching is done on the parent directory of the output file path so a trailing '**' glob patterm
+            Matching is done on the parent directory of the output file path so a trailing '**' glob pattern
             will match only up to the last path segment of the dirname and will not include the basename.
             Only complete path segments are matched. Partial matches on the last segment of the root path
             are ignored.
@@ -264,7 +255,7 @@ def npm_package(
             A `"."` value expands to the target's package path (`ctx.label.package`).
 
             Defaults to `["."]` which results in the output directory path of files in the
-            target's package and and sub-packages are relative to the target's package and
+            target's package and sub-packages are relative to the target's package and
             files outside of that retain their full workspace relative paths.
 
             Globs are supported (see rule docstring above).
@@ -283,7 +274,7 @@ def npm_package(
             `path/to/file` within the output directory.
 
             ```
-            npp_package(
+            npm_package(
                 name = "dir",
                 include_external_repositories = ["external_*"],
                 srcs = ["@external_repo//path/to:file"],
@@ -325,7 +316,7 @@ def npm_package(
             Defaults to ["**/node_modules/**"] which excludes all node_modules folders
             from the output directory.
 
-            Files that have do not have matching Bazel packages are subject to subsequent
+            Files that do not have matching Bazel packages are subject to subsequent
             filters and transformations to determine if they are copied and what their path in the output
             directory will be.
 
@@ -429,15 +420,9 @@ def npm_package(
             name = files_target,
             srcs = srcs,
             include_sources = include_sources,
-            include_types = select({
-                Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
-                "//conditions:default": include_types,
-            }),
+            include_types = include_types,
             include_transitive_sources = include_transitive_sources,
-            include_transitive_types = select({
-                Label("@aspect_rules_js//npm:exclude_types_from_npm_packages_flag"): False,
-                "//conditions:default": include_transitive_types,
-            }),
+            include_transitive_types = include_transitive_types,
             include_npm_sources = include_npm_sources,
             include_runfiles = include_runfiles,
             # Always tag the target manual since we should only build it when the final target is built.
@@ -489,12 +474,12 @@ def stamped_package_json(name, stamp_var, **kwargs):
     In unstamped builds (typically those without `--stamp`) the version will be set to `0.0.0`.
     This ensures that actions which use the package.json file can get cache hits.
 
-    For more information on stamping, read https://docs.aspect.build/rules/aspect_bazel_lib/docs/stamping.
+    For more information on stamping, read https://docs.aspect.build/rules/bazel_lib/docs/stamping.
 
     Args:
         name: name of the resulting `jq` target, must be "package"
         stamp_var: a key from the bazel-out/stable-status.txt or bazel-out/volatile-status.txt files
-        **kwargs: additional attributes passed to the jq rule, see https://docs.aspect.build/rules/aspect_bazel_lib/docs/jq
+        **kwargs: additional attributes passed to the jq rule, see https://docs.aspect.build/rules/bazel_lib/docs/jq
     """
     if name != "package":
         fail("""stamped_package_json should always be named "package" so that the default output is named "package.json".
@@ -508,11 +493,7 @@ def stamped_package_json(name, stamp_var, **kwargs):
             # This 'as' syntax results in $stamp being null in unstamped builds.
             "$ARGS.named.STAMP as $stamp",
             # Provide a default using the "alternative operator" in case $stamp is null.
-            ".version = ($stamp{}.{} // \"0.0.0\")".format(
-                # bazel-lib 1/2 require different syntax
-                "[0]" if versions.is_at_least("2.0.0", BAZEL_LIB_VERSION) else "",
-                stamp_var,
-            ),
+            ".version = ($stamp[0].{} // \"0.0.0\")".format(stamp_var),
         ]),
         **kwargs
     )

@@ -211,12 +211,12 @@ if [ "${TEST_SRCDIR:-}" ]; then
 elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
     RUNFILES=$(_normalize_path "$RUNFILES_MANIFEST_FILE")
     if [[ "${RUNFILES}" == *.runfiles_manifest ]]; then
-        # Newer versions of Bazel put the manifest besides the runfiles with the suffix .runfiles_manifest.
+        # Bazel puts the manifest besides the runfiles with the suffix .runfiles_manifest.
         # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
         # runfiles directory and named my_binary.runfiles_manifest
         RUNFILES=${RUNFILES%_manifest}
     elif [[ "${RUNFILES}" == */MANIFEST ]]; then
-        # Older versions of Bazel put the manifest file named MANIFEST in the runfiles directory
+        # Bazel for windows puts the manifest file named MANIFEST in the runfiles directory
         RUNFILES=${RUNFILES%/MANIFEST}
     else
         logf_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
@@ -263,8 +263,10 @@ if [ "${RUNFILES:0:1}" != "/" ]; then
     # to the PWD in case where RUNFILES_MANIFEST_FILE is used above.
     RUNFILES="$PWD/$RUNFILES"
 fi
+# Set RUNFILES_DIR if not already set so that tools such as @bazel/runfiles
+# can locate runfiles without requiring RUNFILES to be exported.
+export RUNFILES_DIR="${RUNFILES_DIR:-$RUNFILES}"
 
-export RUNFILES
 JS_BINARY__RUNFILES="$RUNFILES"
 export JS_BINARY__RUNFILES
 
@@ -446,7 +448,10 @@ fi
 # Change directory to user specified package if set
 if [ "${JS_BINARY__CHDIR:-}" ]; then
     logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
-    cd "$JS_BINARY__CHDIR"
+    case "$JS_BINARY__CHDIR" in
+    external/*) cd "$(resolve_execroot_bin_path "$JS_BINARY__CHDIR")" ;;
+    *) cd "$JS_BINARY__CHDIR" ;;
+    esac
 fi
 
 # Gather node options
@@ -554,6 +559,14 @@ fi
 if [ "${JS_BINARY__LOG_INFO:-}" ]; then
     logf_info "$(echo -n "running" "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
+
+# De-export capture-related vars so child processes (e.g. a nested js_binary)
+# do not inherit them. The bash script has already consumed them above to set up
+# STDOUT_CAPTURE / STDERR_CAPTURE; leaking them would cause a nested js_binary
+# to silently swallow its own stdout or write to the wrong output file.
+# export -n keeps the value accessible to the _exit trap while removing it from
+# the environment seen by node and any processes it spawns.
+export -n JS_BINARY__STDOUT_OUTPUT_FILE JS_BINARY__STDERR_OUTPUT_FILE JS_BINARY__EXIT_CODE_OUTPUT_FILE JS_BINARY__SILENT_ON_SUCCESS
 
 set +e
 

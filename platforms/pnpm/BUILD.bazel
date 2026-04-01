@@ -1,0 +1,49 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load(":index.bzl", "PNPM_ARCHS", "PNPM_PLATFORMS")
+
+# Constraints representing the pnpm [os] and [cpu] fields.
+bzl_library(
+    name = "index_bzl",
+    srcs = ["index.bzl"],
+    visibility = ["//npm:__subpackages__"],
+)
+
+# Support pnpm platforms
+[
+    alias(
+        name = p,
+        actual = target,
+        visibility = ["//visibility:public"],
+    )
+    for p, target in PNPM_PLATFORMS.items()
+    if target
+]
+
+# Support pnpm architectures
+[
+    alias(
+        name = a,
+        actual = target,
+        visibility = ["//visibility:public"],
+    )
+    for a, target in PNPM_ARCHS.items()
+    if target
+]
+
+# Supported pnpm platform * architecture pairs
+[
+    [
+        config_setting(
+            name = "{}_{}".format(p, a),
+            constraint_values = [
+                ptarget,
+                atarget,
+            ],
+            visibility = ["//visibility:public"],
+        )
+        for a, atarget in PNPM_ARCHS.items()
+        if atarget
+    ]
+    for p, ptarget in PNPM_PLATFORMS.items()
+    if ptarget
+]

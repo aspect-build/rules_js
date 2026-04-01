@@ -18,6 +18,15 @@ function assert(t, msg) {
 
 const runfiles = new Runfiles(process.env)
 
+describe('runfiles env', () => {
+    it('should have the RUNFILES_DIR env var for use by tools such as @bazel/runfiles', () => {
+        assert(
+            !!process.env.RUNFILES_DIR,
+            'Expected the RUNFILES_DIR env var to be set'
+        )
+    })
+})
+
 describe('runfile resolution', () => {
     it('should properly resolve the files with the module(name)', () => {
         const testFixturePath = runfiles.resolve('e2e_runfiles/test_fixture.md')
@@ -33,16 +42,6 @@ describe('runfile resolution', () => {
         const testFixturePath = runfiles.resolve(
             'e2e_runfiles\\test_fixture.md'
         )
-        const expectedPath = join(__dirname, 'test_fixture.md')
-
-        assert(
-            normalizePath(testFixturePath) == normalizePath(expectedPath),
-            `Expected the test fixture to be resolved next to the spec source file: ${testFixturePath} vs ${expectedPath}`
-        )
-    })
-
-    it('should properly resolve with the __main__ module alias', () => {
-        const testFixturePath = runfiles.resolve('__main__/test_fixture.md')
         const expectedPath = join(__dirname, 'test_fixture.md')
 
         assert(

@@ -1,0 +1,7 @@
+{
+    "private": true,
+    "dependencies": {
+        "@subs/a": "link:../a",
+        "lodash": "^4.17.21"
+    }
+}

@@ -4,6 +4,9 @@
         "segfault-handler": "1.3.0"
     },
     "pnpm": {
+        "onlyBuiltDependencies": [
+            "segfault-handler"
+        ],
         "packageExtensions": {
             "segfault-handler@1.3.0": {
                 "dependencies": {

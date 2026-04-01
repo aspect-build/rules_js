@@ -1,0 +1,6 @@
+import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
+
+# Output path stripping / path-mapping:
+# https://bazel.build/reference/command-line-reference#flag--experimental_output_paths
+common --experimental_output_paths=strip
