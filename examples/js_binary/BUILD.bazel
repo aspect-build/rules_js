@@ -280,7 +280,9 @@ write_file(
     content = [
         "import { writeFileSync } from 'node:fs';",
         "import { join } from 'node:path';",
-        "const jsonData = await import(join(process.cwd(), 'data.json'), { with: { type: 'json' } });",
+        "import { pathToFileURL } from 'url';",
+        "// We need to use pathToFileURL so that on Windows the path begins with \"file://\".",
+        "const jsonData = await import(pathToFileURL(join(process.cwd(), 'data.json')).href, { with: { type: 'json' } });",
         "writeFileSync(process.argv[2], JSON.stringify(jsonData.default))",
     ],
 )
