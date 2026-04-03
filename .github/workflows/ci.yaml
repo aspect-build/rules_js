@@ -128,7 +128,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         defaults:
             run:
-                working-directory: e2e/bzlmod
+                working-directory: examples/js_binary
         strategy:
             fail-fast: false
             matrix:
@@ -144,13 +144,13 @@ jobs:
                   disk-cache: ${{ matrix.os }}-bzlmod
                   repository-cache: true
 
-            - name: bazel test //...
+            - name: bazel test ...
               shell: bash
               run: |
-                  bazel test \
+                  bazel test -k --verbose_failures \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
-                    //...
+                    ...
 
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
