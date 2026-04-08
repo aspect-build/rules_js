@@ -48,6 +48,26 @@ def npm_imported_package_store_internal():
                 ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
             },
             "//conditions:default": {},
+        }) | select({
+            "@@_main~npm~rules_js_exec_platform//:linux_ia32": {
+                ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0": "google-closure-compiler-linux",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_x64": {
+                ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0": "google-closure-compiler-linux",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_arm64": {
+                ":.aspect_rules_js/node_modules/google-closure-compiler-linux-arm64@20251111.0.0": "google-closure-compiler-linux-arm64",
+            },
+            "@@_main~npm~rules_js_exec_platform//:darwin_arm64": {
+                ":.aspect_rules_js/node_modules/google-closure-compiler-macos@20251111.0.0": "google-closure-compiler-macos",
+            },
+            "@@_main~npm~rules_js_exec_platform//:win32_ia32": {
+                ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
+            },
+            "@@_main~npm~rules_js_exec_platform//:win32_x64": {
+                ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
+            },
+            "//conditions:default": {},
         }),
         ref_deps = {
             ":.aspect_rules_js/node_modules/chalk@5.1.1/ref": "chalk",

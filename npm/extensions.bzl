@@ -29,6 +29,7 @@ use_repo(npm, "npm")
 """
 
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("//npm/private:npm_exec_platform.bzl", "npm_exec_platform_detect")
 load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
 load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
@@ -69,6 +70,12 @@ def _fail_on_non_root_overrides(module, tag_class):
         ))
 
 def _npm_extension_impl(module_ctx):
+    # Create the exec platform detection repo used by _links_defs.bzl select() blocks
+    # to include exec-platform optional deps (e.g. native binaries) when packages are
+    # used as build tools. See #2121 and #2754.
+    npm_exec_platform_detect(name = "rules_js_exec_platform")
+    exec_platform_repo = "rules_js_exec_platform"
+
     # Collect all exclude_package_contents tags and build exclusion dictionary
     exclude_package_contents_config = _build_exclude_package_contents_config(module_ctx)
 
@@ -86,10 +93,10 @@ def _npm_extension_impl(module_ctx):
     # Process npm_translate_lock and npm_import tags
     for mod in module_ctx.modules:
         for attr in mod.tags.npm_translate_lock:
-            _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_config, replace_packages)
+            _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_config, replace_packages, exec_platform_repo)
 
         for i in mod.tags.npm_import:
-            _npm_import_bzlmod(i)
+            _npm_import_bzlmod(i, exec_platform_repo)
 
     return module_ctx.extension_metadata(reproducible = True)
 
@@ -133,7 +140,7 @@ _hub_repo = repository_rule(
     },
 )
 
-def _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_config, replace_packages):
+def _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_config, replace_packages, exec_platform_repo):
     state = parse_and_verify_lock(module_ctx, mod, attr)
 
     module_ctx.report_progress("Generating starlark for npm dependencies")
@@ -208,6 +215,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
             transitive_closure = i.transitive_closure,
             url = i.url,
             version = i.version,
+            exec_platform_repo = exec_platform_repo,
         )
 
     files = generate_repository_files(
@@ -221,7 +229,7 @@ WARNING: Cannot determine home directory in order to load home `.npmrc` file in 
         contents = files,
     )
 
-def _npm_import_bzlmod(i):
+def _npm_import_bzlmod(i, exec_platform_repo):
     # Assume package+version is a unique key for any package store this import is placed in
     package_key = "{}@{}".format(i.package, i.version)
 
@@ -260,6 +268,7 @@ def _npm_import_bzlmod(i):
         transitive_closure = None,
         url = i.url,
         version = i.version,
+        exec_platform_repo = exec_platform_repo,
     )
 
 _NPM_IMPORT_ATTRS = npm_import_lib.attrs | {

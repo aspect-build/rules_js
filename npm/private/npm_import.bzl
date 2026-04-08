@@ -733,6 +733,17 @@ def _npm_import_links_rule_impl(rctx):
     deps_oss = {}
     deps_cpus = {}
 
+    # When exec_platform_repo is set (bzlmod mode), compute the canonical name of
+    # the exec-platform repo so _links_defs.bzl can emit @@canonical//:condition
+    # select() keys. We derive the canonical prefix from rctx.name (the canonical
+    # name of THIS links repo) by stripping the known apparent name suffix. This
+    # avoids hardcoding the separator character ('~' in Bazel 7, '+' in Bazel 8).
+    # See #2121/#2754.
+    exec_platform_repo = None
+    if rctx.attr.exec_platform_repo:
+        prefix = rctx.name[:-len(rctx.attr.apparent_name)]
+        exec_platform_repo = prefix + rctx.attr.exec_platform_repo
+
     has_lifecycle_build_target = bool(rctx.attr.lifecycle_build_target)
     has_transitive_closure = len(rctx.attr.transitive_closure) > 0
 
@@ -795,7 +806,6 @@ def _npm_import_links_rule_impl(rctx):
             dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
             if dep_cpus:
                 deps_cpus[dep_store_target] = dep_cpus
-
     if has_lifecycle_build_target:
         # Lifecycle hooks require a self-reference. Use the regular package name if not named via transitive_closure.
         self_ref_names = self_ref_names if self_ref_names else [rctx.attr.package]
@@ -836,7 +846,6 @@ def _npm_import_links_rule_impl(rctx):
         lc_deps[dep] = ",".join(lc_deps[dep])
     for dep in ref_deps.keys():
         ref_deps[dep] = ",".join(ref_deps[dep])
-
     lifecycle_hooks_env = {}
     for env in rctx.attr.lifecycle_hooks_env:
         key_value = env.split("=", 1)
@@ -855,7 +864,7 @@ def _npm_import_links_rule_impl(rctx):
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
     npm_link_pkg_bzl_vars = dict(
-        deps = _to_deps_attr(deps, deps_oss, deps_cpus),
+        deps = _to_deps_attr(deps, deps_oss, deps_cpus, exec_platform_repo),
         npm_package_target = npm_package_target,
         lc_deps = _to_deps_attr(lc_deps, deps_oss, deps_cpus) if has_lifecycle_build_target else "{}",
         has_lifecycle_build_target = has_lifecycle_build_target,
@@ -898,7 +907,16 @@ def _npm_import_links_rule_impl(rctx):
 
     return rctx.repo_metadata(reproducible = True)
 
-def _to_deps_attr(deps, deps_oss, deps_cpus):
+def _to_exec_platform_condition(target_condition, exec_platform_repo):
+    """Transform a target-platform condition label to an exec-platform condition label.
+
+    target_condition is like "@aspect_rules_js//platforms/pnpm:darwin_arm64".
+    Returns "@@<exec_platform_repo>//:darwin_arm64".
+    """
+    name = target_condition.split(":")[-1]
+    return "@@{}//:{}".format(exec_platform_repo, name)
+
+def _to_deps_attr(deps, deps_oss, deps_cpus, exec_platform_repo = None):
     # Must split the deps into groups that share the same constraints based on
     # cpu and os conditions.
     # A bazel select() can only have one truthy condition so constraints such as:
@@ -911,28 +929,56 @@ def _to_deps_attr(deps, deps_oss, deps_cpus):
         "both": {},
     }
 
+    # Generate parallel exec-platform select() blocks so that optional
+    # platform-specific deps are present when the package is used as a build
+    # tool running on the exec machine. See #2121 and #2754.
+    exec_constrained = {
+        "os": {},
+        "cpu": {},
+        "both": {},
+    }
+
     for k, v in deps.items():
         if k in deps_oss and k in deps_cpus:
             for condition in pnpm.to_bazel_os_cpu_constraints(deps_oss[k], deps_cpus[k]):
                 if condition not in constrained["both"]:
                     constrained["both"][condition] = {}
                 constrained["both"][condition][k] = v
+                if exec_platform_repo != None:
+                    ec = _to_exec_platform_condition(condition, exec_platform_repo)
+                    if ec not in exec_constrained["both"]:
+                        exec_constrained["both"][ec] = {}
+                    exec_constrained["both"][ec][k] = v
         elif k in deps_oss:
             for condition in pnpm.to_bazel_os_constraints(deps_oss[k]):
                 if condition not in constrained["os"]:
                     constrained["os"][condition] = {}
                 constrained["os"][condition][k] = v
+                if exec_platform_repo != None:
+                    ec = _to_exec_platform_condition(condition, exec_platform_repo)
+                    if ec not in exec_constrained["os"]:
+                        exec_constrained["os"][ec] = {}
+                    exec_constrained["os"][ec][k] = v
         elif k in deps_cpus:
             for condition in pnpm.to_bazel_cpu_constraints(deps_cpus[k]):
                 if condition not in constrained["cpu"]:
                     constrained["cpu"][condition] = {}
                 constrained["cpu"][condition][k] = v
+                if exec_platform_repo != None:
+                    ec = _to_exec_platform_condition(condition, exec_platform_repo)
+                    if ec not in exec_constrained["cpu"]:
+                        exec_constrained["cpu"][ec] = {}
+                    exec_constrained["cpu"][ec][k] = v
         else:
             unconstrained[k] = v
 
+    groups = [v for v in constrained.values() if len(v) > 0]
+    if exec_platform_repo != None:
+        groups = groups + [v for v in exec_constrained.values() if len(v) > 0]
+
     return starlark_codegen_utils.to_conditional_dict_attr(
         unconstrained,
-        [v for v in constrained.values() if len(v) > 0],
+        groups,
         quote_key = False,
         indent_count = 2,
     )
@@ -1207,6 +1253,8 @@ npm_import_links_rule = repository_rule(
         "deps_oss": attr.string_list_dict(),
         "deps_cpus": attr.string_list_dict(),
         "transitive_closure": attr.string_list_dict(doc = "Mapping of package store entry labels to a list of names to reference that package as"),
+        "apparent_name": attr.string(doc = "The apparent (non-canonical) name of this repository rule; used to derive the canonical name prefix for sibling repos."),
+        "exec_platform_repo": attr.string(doc = "Apparent name of the exec-platform detection repo; used for select() conditions in _links_defs.bzl."),
     },
 )
 
@@ -1256,7 +1304,8 @@ def npm_import(
         generate_package_json_bzl,
         extract_full_archive,
         exclude_package_contents,
-        exclude_package_contents_presets):
+        exclude_package_contents_presets,
+        exec_platform_repo = None):
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
     npm_import_rule(
@@ -1291,8 +1340,10 @@ def npm_import(
 
     # By convention, the `{name}{utils.links_repo_suffix}` repository contains the generated
     # code to link this npm package into one or more node_modules trees
+    links_name = "{}{}".format(name, utils.links_repo_suffix)
     npm_import_links_rule(
-        name = "{}{}".format(name, utils.links_repo_suffix),
+        name = links_name,
+        apparent_name = links_name,
         key = key,
         package = package,
         version = version,
@@ -1310,4 +1361,5 @@ def npm_import(
         replace_package = replace_package,
         exclude_package_contents = exclude_package_contents,
         exclude_package_contents_presets = exclude_package_contents_presets,
+        exec_platform_repo = exec_platform_repo,
     )

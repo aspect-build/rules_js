@@ -85,6 +85,67 @@ def npm_imported_package_store_internal():
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2": "@rollup/rollup-win32-x64-msvc",
             },
             "//conditions:default": {},
+        }) | select({
+            "@@_main~npm~rules_js_exec_platform//:darwin": {
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
+            },
+            "//conditions:default": {},
+        }) | select({
+            "@@_main~npm~rules_js_exec_platform//:android_arm": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm-eabi@4.55.2": "@rollup/rollup-android-arm-eabi",
+            },
+            "@@_main~npm~rules_js_exec_platform//:android_arm64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm64@4.55.2": "@rollup/rollup-android-arm64",
+            },
+            "@@_main~npm~rules_js_exec_platform//:darwin_arm64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-darwin-arm64@4.55.2": "@rollup/rollup-darwin-arm64",
+            },
+            "@@_main~npm~rules_js_exec_platform//:darwin_x64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-darwin-x64@4.55.2": "@rollup/rollup-darwin-x64",
+            },
+            "@@_main~npm~rules_js_exec_platform//:freebsd_arm64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-arm64@4.55.2": "@rollup/rollup-freebsd-arm64",
+            },
+            "@@_main~npm~rules_js_exec_platform//:freebsd_x64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-x64@4.55.2": "@rollup/rollup-freebsd-x64",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_arm": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2": "@rollup/rollup-linux-arm-gnueabihf",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2": "@rollup/rollup-linux-arm-musleabihf",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_arm64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2": "@rollup/rollup-linux-arm64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2": "@rollup/rollup-linux-arm64-musl",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_ppc64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2": "@rollup/rollup-linux-ppc64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2": "@rollup/rollup-linux-ppc64-musl",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_riscv64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2": "@rollup/rollup-linux-riscv64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2": "@rollup/rollup-linux-riscv64-musl",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_s390x": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2": "@rollup/rollup-linux-s390x-gnu",
+            },
+            "@@_main~npm~rules_js_exec_platform//:linux_x64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2": "@rollup/rollup-linux-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2": "@rollup/rollup-linux-x64-musl",
+            },
+            "@@_main~npm~rules_js_exec_platform//:openbsd_x64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-openbsd-x64@4.55.2": "@rollup/rollup-openbsd-x64",
+            },
+            "@@_main~npm~rules_js_exec_platform//:win32_arm64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-arm64-msvc@4.55.2": "@rollup/rollup-win32-arm64-msvc",
+            },
+            "@@_main~npm~rules_js_exec_platform//:win32_ia32": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-ia32-msvc@4.55.2": "@rollup/rollup-win32-ia32-msvc",
+            },
+            "@@_main~npm~rules_js_exec_platform//:win32_x64": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2": "@rollup/rollup-win32-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2": "@rollup/rollup-win32-x64-msvc",
+            },
+            "//conditions:default": {},
         }),
         ref_deps = {
             ":.aspect_rules_js/node_modules/@types+estree@1.0.8/ref": "@types/estree",

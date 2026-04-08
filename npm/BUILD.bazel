@@ -62,6 +62,7 @@ bzl_library(
     srcs = ["extensions.bzl"],
     visibility = ["//visibility:public"],
     deps = [
+        "//npm/private:npm_exec_platform",
         "//npm/private:npm_import",
         "//npm/private:npm_translate_lock",
         "//npm/private:npm_translate_lock_generate",
