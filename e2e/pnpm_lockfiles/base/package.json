@@ -59,20 +59,5 @@
     },
     "peerDependencies": {
         "@aspect-test/e": "~1.0.0"
-    },
-    "pnpm": {
-        "patchedDependencies": {
-            "meaning-of-life@1.0.0": "patches/meaning-of-life@1.0.0-pnpm.patch"
-        },
-        "onlyBuiltDependencies": [
-            "@aspect-test/c"
-        ],
-        "overrides": {
-            "is-number": "file:../vendored/is-number",
-            "diff": "https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz",
-            "fsevents": "^2.3",
-            "typescript": "5.5.2",
-            "@types/glob": "^8.1.0"
-        }
     }
 }

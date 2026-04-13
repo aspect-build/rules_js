@@ -8,6 +8,7 @@ local_path_override(
 PNPM_LOCK_VERSIONS = [
     "v90",
     "v101",
+    "v110",
 ]
 
 # Lockfiles with unique test cases

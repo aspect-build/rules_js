@@ -57,7 +57,7 @@ echo "========================================"
 print_category "E2E TEST SNAPSHOTS"
 
 # pnpm_lockfiles - Multiple versions
-for version in v90 v101; do
+for version in v90 v101 v110; do
     run_target "$REPO_ROOT/e2e/pnpm_lockfiles" "//$version:repos" "pnpm_lockfiles/$version"
 done
 
