@@ -96,7 +96,7 @@ https://github.com/aspect-build/rules_js/blob/a8c192eed0e553acb7000beee00c60d60a
 Sometimes the package intentionally doesn't list dependencies, because it discovers them at runtime.
 This is used for tools that locate their "plugins"; `eslint` and `prettier` are common typical examples.
 
-The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/npmrc#public-hoist-pattern).
+The solution is based on pnpm's [public-hoist-pattern](https://pnpm.io/settings#publichoistpattern).
 Use the [`public_hoist_packages` attribute of `npm_translate_lock`](https://registry.bazel.build/docs/aspect_rules_js#npm-extensions-bzl).
 The documentation says the value provided to each element in the map is:
 

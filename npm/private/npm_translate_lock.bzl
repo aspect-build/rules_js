@@ -237,7 +237,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a list of Bazel packages in which to hoist the package to the top-level of the node_modules tree when linking.
 
-            This is similar to setting https://pnpm.io/npmrc#public-hoist-pattern in an .npmrc file outside of Bazel, however,
+            This is similar to setting https://pnpm.io/settings#publichoistpattern in an .npmrc file outside of Bazel, however,
             wild-cards are not yet supported and npm_translate_lock will fail if there are multiple versions of a package that
             are to be hoisted.
 
