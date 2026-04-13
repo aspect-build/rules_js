@@ -16,6 +16,7 @@
     },
     "devDependencies": {
         "@tailwindcss/postcss": "4.1.0",
+        "storybook": "^8",
         "tailwindcss": "4.1.0"
     }
 }
