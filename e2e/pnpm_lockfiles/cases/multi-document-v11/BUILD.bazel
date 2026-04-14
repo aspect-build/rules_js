@@ -1,0 +1,19 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@multi-document-v11//:defs.bzl", multi_document_v11_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+multi_document_v11_link_all()
+
+# Verify that rules_js can parse a pnpm 11 multi-document lockfile (where
+# configDependencies cause an env lockfile to be prepended as a second YAML
+# document) and correctly resolves the main lockfile from the last document.
+# :node_modules/ms only appears in the second document, so its presence proves
+# we are reading the correct document.
+build_test(
+    name = "multi_document_v11",
+    targets = [
+        ":node_modules",
+        ":node_modules/ms",
+    ],
+)

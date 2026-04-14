@@ -9,6 +9,7 @@ cases/nested-peer-v9/node_modules
 cases/workspace-peer-v9/node_modules
 cases/workspace-peer-v9/libs/chokidar/node_modules
 cases/isaacs-cliui-v90/node_modules
+cases/multi-document-v11/node_modules
 cases/override-with-alias-url-v9/node_modules
 projects/a/node_modules
 projects/a-types/node_modules
@@ -21,4 +22,5 @@ projects/peers-combo-1/node_modules
 projects/peers-combo-2/node_modules
 v90/node_modules/
 v101/node_modules/
+v110/node_modules/
 vendored/is-number/node_modules

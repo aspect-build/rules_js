@@ -2,3 +2,26 @@ packages:
     - '.'
     - '../projects/*'
     - '../vendored/*'
+
+# The presence of configDependencies causes pnpm-lock.yaml to be a
+# multi-document YAML file with pnpm 11.
+configDependencies:
+    semver: 7.7.4+sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==
+
+patchedDependencies:
+    meaning-of-life@1.0.0: patches/meaning-of-life@1.0.0-pnpm.patch
+
+allowBuilds:
+    '@aspect-test/c': true
+
+# pnpm 11 defaults this to true, which blocks URL-based dependencies from being
+# used as subdependencies; the test intentionally uses a URL override for diff,
+# so this needs to be disabled
+blockExoticSubdeps: false
+
+overrides:
+    is-number: 'file:../vendored/is-number'
+    diff: 'https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz'
+    fsevents: '^2.3'
+    typescript: '5.5.2'
+    '@types/glob': '^8.1.0'

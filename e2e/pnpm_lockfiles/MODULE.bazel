@@ -8,6 +8,7 @@ local_path_override(
 PNPM_LOCK_VERSIONS = [
     "v90",
     "v101",
+    "v110",
 ]
 
 # Lockfiles with unique test cases
@@ -19,6 +20,7 @@ PNPM_LOCK_TEST_CASES = [
     "nested-peer-v9",
     "rerooted-nested-projects-v10/root",
     "workspace-peer-v9",
+    "multi-document-v11",
 ]
 
 bazel_dep(name = "bazel_lib", version = "3.0.0")

@@ -145,7 +145,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/scoped/bad",
             ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
+            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@%sprojects+b" % ("+" if lock_version == "v110" else ""),
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
 
             # file: 4.17.21.tgz tarbal

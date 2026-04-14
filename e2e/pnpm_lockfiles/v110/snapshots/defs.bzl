@@ -104,9 +104,9 @@ load("@lock-<LOCKVERSION>__is-odd__1.0.0__links//:defs.bzl", link_100 = "npm_lin
 load("@lock-<LOCKVERSION>__is-odd__2.0.0__links//:defs.bzl", link_101 = "npm_link_imported_package_store_internal", store_101 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__is-odd__3.0.0__links//:defs.bzl", link_102 = "npm_link_imported_package_store_internal", store_102 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__is-odd__3.0.1__links//:defs.bzl", link_103 = "npm_link_imported_package_store_internal", store_103 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_104 = "npm_link_imported_package_store_internal", store_104 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_53a2bcf984ec5d1955d35ea9565e847cbeea0200__links//:defs.bzl", link_105 = "npm_link_imported_package_store_internal", store_105 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_763ade6dda092709b36d97491951bcae415d91d1__links//:defs.bzl", link_106 = "npm_link_imported_package_store_internal", store_106 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__git_https___git_github.com_jquery_jquery.git_763ade6dda092709b36d97491951bcae415d91d1__links//:defs.bzl", link_104 = "npm_link_imported_package_store_internal", store_104 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967__links//:defs.bzl", link_105 = "npm_link_imported_package_store_internal", store_105 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_53a2bcf984ec5d1955d35ea9565e847cbeea0200__links//:defs.bzl", link_106 = "npm_link_imported_package_store_internal", store_106 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_e61fccb9d736235b4b011f89cba6866bc0b8997d__links//:defs.bzl", link_107 = "npm_link_imported_package_store_internal", store_107 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__jquery__https___codeload.github.com_jquery_jquery_tar.gz_f85d521cdeeb3c6d3f4563a06dba8be793e26ef0__links//:defs.bzl", link_108 = "npm_link_imported_package_store_internal", store_108 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__kleur__4.1.5__links//:defs.bzl", store_109 = "npm_imported_package_store_internal")
@@ -114,7 +114,7 @@ load("@lock-<LOCKVERSION>__lodash__4.0.1__links//:defs.bzl", link_110 = "npm_lin
 load("@lock-<LOCKVERSION>__lodash__4.17.20__links//:defs.bzl", link_111 = "npm_link_imported_package_store_internal", store_111 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__lodash__4.17.21__links//:defs.bzl", link_112 = "npm_link_imported_package_store_internal", store_112 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl", link_113 = "npm_link_imported_package_store_internal", store_113 = "npm_imported_package_store_internal")
-load("@lock-<LOCKVERSION>__meaning-of-life__1.0.0_1287509853__links//:defs.bzl", link_114 = "npm_link_imported_package_store_internal", store_114 = "npm_imported_package_store_internal")
+load("@lock-<LOCKVERSION>__meaning-of-life__1.0.0_124257499__links//:defs.bzl", link_114 = "npm_link_imported_package_store_internal", store_114 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__mri__1.2.0__links//:defs.bzl", store_115 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__ms__0.7.3__links//:defs.bzl", store_116 = "npm_imported_package_store_internal")
 load("@lock-<LOCKVERSION>__node-addon-api__7.1.1__links//:defs.bzl", store_117 = "npm_imported_package_store_internal")
@@ -355,10 +355,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_161()
         store_162()
         _npm_local_package_store(
-            package_store_name = "@scoped+c@file+..+projects+c_@scoped+b@projects+b",
+            package_store_name = "@scoped+c@file+..+projects+c_@scoped+b@+projects+b",
             src = "//projects/c:pkg",
             package = "@scoped/c",
-            version = "file:../projects/c(@scoped/b@projects+b)",
+            version = "file:../projects/c(@scoped/b@+projects+b)",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
@@ -498,9 +498,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             link_102("is-odd-v3")
             link_103()
             link_103("is-odd-alias")
-            link_104("jquery-git-ssh-399b201")
-            link_105("jquery-github")
-            link_106("jquery-git-https-763ade6")
+            link_104("jquery-git-https-763ade6")
+            link_105("jquery-git-ssh-399b201")
+            link_106("jquery-github")
             link_107("jquery-git-ssh-e61fccb")
             link_108("jquery-http-git-f85d521")
             link_113()
@@ -544,9 +544,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ":node_modules/is-odd-v3",
                 ":node_modules/is-odd",
                 ":node_modules/is-odd-alias",
+                ":node_modules/jquery-git-https-763ade6",
                 ":node_modules/jquery-git-ssh-399b201",
                 ":node_modules/jquery-github",
-                ":node_modules/jquery-git-https-763ade6",
                 ":node_modules/jquery-git-ssh-e61fccb",
                 ":node_modules/jquery-http-git-f85d521",
                 ":node_modules/lodash",
@@ -764,9 +764,9 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
                 ":node_modules/is-odd-v3",
                 ":node_modules/is-odd",
                 ":node_modules/is-odd-alias",
+                ":node_modules/jquery-git-https-763ade6",
                 ":node_modules/jquery-git-ssh-399b201",
                 ":node_modules/jquery-github",
-                ":node_modules/jquery-git-https-763ade6",
                 ":node_modules/jquery-git-ssh-e61fccb",
                 ":node_modules/jquery-http-git-f85d521",
                 ":node_modules/lodash",
@@ -857,7 +857,7 @@ def _fp_link_0(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/c" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@+projects+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package

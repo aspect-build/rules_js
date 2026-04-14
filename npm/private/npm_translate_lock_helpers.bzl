@@ -645,10 +645,13 @@ def _normalize_bazelignore(lines):
 def _verify_lifecycle_hooks_specified(state):
     if state.only_built_dependencies() == None:
         msg = """\
-ERROR: pnpm 'onlyBuiltDependencies' configuration required.
+ERROR: pnpm 'allowBuilds' (or 'onlyBuiltDependencies' in pnpm < 10.26) configuration required.
 
 Packages that rules_js should generate lifecycle hook actions for must be declared in
-'onlyBuiltDependencies'.
+'allowBuilds' or 'onlyBuiltDependencies'.
+
+As of pnpm v10.26 'allowBuilds' should be configured in the pnpm-workspace.yaml file.
+See https://pnpm.io/settings#allowbuilds for more information.
 
 As of pnpm v10 'onlyBuiltDependencies' should be configured in the pnpm-workspace.yaml file
 alongside other pnpm configuration. See https://pnpm.io/10.x/settings#onlybuiltdependencies

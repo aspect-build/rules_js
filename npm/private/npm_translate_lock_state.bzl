@@ -38,15 +38,13 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         # labels only needed when updating the pnpm lock file
         _init_update_labels(priv, rctx, attr)
 
-    # parse the pnpm lock file incase since we need the importers list for additional init
+    _init_root_package(priv)
+    _init_workspace(priv, rctx, is_windows)
+
     if attr.pnpm_lock and rctx.path(attr.pnpm_lock).exists:
         rctx.report_progress("Translating {}".format(attr.pnpm_lock))
 
         _load_lockfile(priv, rctx, attr, rctx.path(attr.pnpm_lock), is_windows)
-
-    # May depend on lockfile state
-    _init_root_package(priv)
-    _init_workspace(priv, rctx, is_windows)
 
     _init_npmrc(priv, rctx, attr)
 
@@ -124,6 +122,7 @@ def _init_root_package(priv):
         fail(msg)
     priv["root_package"] = pnpm_lock_label.package
 
+################################################################################
 def _init_workspace(priv, rctx, is_windows):
     root_package_json = {}
 
@@ -147,6 +146,7 @@ def _init_workspace(priv, rctx, is_windows):
 
             if pnpm_workspace_settings:
                 priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
+                priv["only_built_dependencies"] = _only_built_dependencies(priv["pnpm_settings"])
 
         if workspace_parse_err != None:
             should_update = _should_update_pnpm_lock(priv)
@@ -392,6 +392,11 @@ def _yaml_to_json(rctx, yaml_path, is_windows):
     host_yq = Label("@yq_{}//:yq{}".format(repo_utils.platform(rctx), ".exe" if is_windows else ""))
     yq_args = [
         rctx.path(host_yq),
+        "eval-all",
+        # Do a cross-document reduce that simply returns the last document.
+        # pnpm 11 and newer will produce a two-document YAML file in some
+        # situations, but the last document is the important one.
+        ". as $d ireduce (null; $d)",
         yaml_path,
         "-o=json",
     ]
@@ -423,6 +428,24 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
 
     priv["importers"] = importers
     priv["packages"] = packages
+
+    # pnpm 11 changed the patchedDependencies format in pnpm-lock.yaml: values are now just
+    # a hash string rather than a dict with 'path' and 'hash' keys. The patch file path moved
+    # to pnpm-workspace.yaml. Normalize to always use dict form with 'path' and 'hash' keys.
+    if any([type(v) == "string" for v in pnpm_patched_dependencies.values()]):
+        normalized = {}
+        workspace_patched = priv["pnpm_settings"].get("patchedDependencies", {})
+        for name, patch_info in pnpm_patched_dependencies.items():
+            if type(patch_info) == "string":
+                # pnpm 11+ format: lockfile value is just the hash; path is in pnpm-workspace.yaml
+                patch_path = workspace_patched.get(name)
+                if not patch_path:
+                    fail("ERROR: patchedDependencies entry '{}' in pnpm-lock.yaml has no corresponding path in pnpm-workspace.yaml".format(name))
+                normalized[name] = {"path": patch_path, "hash": patch_info}
+            else:
+                normalized[name] = patch_info
+        pnpm_patched_dependencies = normalized
+
     priv["pnpm_patched_dependencies"] = pnpm_patched_dependencies
 
     if lock_parse_err != None:
@@ -446,6 +469,15 @@ def _has_workspaces(priv):
 ################################################################################
 def _should_update_pnpm_lock(priv):
     return priv["should_update_pnpm_lock"] and priv["src_root"] != None
+
+################################################################################
+def _only_built_dependencies(pnpm_settings):
+    # pnpm 11 replaced onlyBuiltDependencies (a list) with allowBuilds (a dict
+    # mapping package names to booleans). Support both.
+    allow_builds = pnpm_settings.get("allowBuilds", None)
+    if allow_builds != None:
+        return [name for name, allowed in allow_builds.items() if allowed]
+    return pnpm_settings.get("onlyBuiltDependencies", None)
 
 ################################################################################
 def _new(rctx, mod, attr):
@@ -489,7 +521,7 @@ def _new(rctx, mod, attr):
         importers = lambda: priv["importers"],
         packages = lambda: priv["packages"],
         pnpm_patched_dependencies = lambda: priv["pnpm_patched_dependencies"],
-        only_built_dependencies = lambda: priv["pnpm_settings"].get("onlyBuiltDependencies", None),
+        only_built_dependencies = lambda: priv["only_built_dependencies"],
         npm_registries = lambda: priv["npm_registries"],
         npm_auth = lambda: priv["npm_auth"],
         root_package = lambda: priv["root_package"],
