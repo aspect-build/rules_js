@@ -134,6 +134,7 @@ def _init_workspace(priv, rctx, is_windows):
         root_package_json = json.decode(rctx.read(root_package_json_path))
 
     priv["pnpm_settings"] = root_package_json.get("pnpm", {})
+    priv["only_built_dependencies"] = _only_built_dependencies(priv["pnpm_settings"])
 
     # Read settings from pnpm-workspace.yaml for pnpm v10+ (NOTE: pnpm 9-10+ has lockfile version 9).
     # Support scenario where pnpm-lock.yaml was never parsed and "lock_version" is not set.
