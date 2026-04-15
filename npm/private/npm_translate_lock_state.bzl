@@ -38,13 +38,15 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
         # labels only needed when updating the pnpm lock file
         _init_update_labels(priv, rctx, attr)
 
-    _init_root_package(priv)
-    _init_workspace(priv, rctx, is_windows)
-
+    # parse the pnpm lock file incase since we need the importers list for additional init
     if attr.pnpm_lock and rctx.path(attr.pnpm_lock).exists:
         rctx.report_progress("Translating {}".format(attr.pnpm_lock))
 
         _load_lockfile(priv, rctx, attr, rctx.path(attr.pnpm_lock), is_windows)
+
+    # May depend on lockfile state
+    _init_root_package(priv)
+    _init_workspace(priv, rctx, is_windows)
 
     _init_npmrc(priv, rctx, attr)
 
@@ -502,6 +504,7 @@ def _new(rctx, mod, attr):
         "input_hashes": {},
         "npm_auth": {},
         "npm_registries": {},
+        "only_built_dependencies": None,
         "packages": {},
         "root_package": "",
         "pnpm_settings": {},
