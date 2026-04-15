@@ -308,7 +308,6 @@ def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclud
 
     importers = state.importers()
     packages = state.packages()
-    pnpm_patched_dependencies = state.pnpm_patched_dependencies()
     only_built_dependencies = state.only_built_dependencies()
     root_package = state.root_package()
     default_registry = state.default_registry()
@@ -379,7 +378,7 @@ def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclud
 
         translate_patches, patches_keys = _gather_values_from_matching_names(True, attr.patches, name, friendly_name, unfriendly_name)
 
-        pnpm_patch = pnpm_patched_dependencies.get(friendly_name, pnpm_patched_dependencies.get(name, None))
+        pnpm_patch = state.pnpm_patch_for(friendly_name) or state.pnpm_patch_for(name)
         pnpm_patched = pnpm_patch != None
 
         if len(translate_patches) > 0 and pnpm_patched:
@@ -392,7 +391,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         # Apply patch from `pnpm.patchedDependencies` first
         if pnpm_patched:
-            patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch.get("path"))
+            patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch)
             patches.append(patch_path)
 
             # pnpm patches are always applied with -p1
@@ -674,7 +673,7 @@ def _verify_patches(rctx, attr, state):
         verify_patches = sets.make(verify_patches_content.split("\n"))
 
         # Patches in `patches` or `pnpm.patchedDependencies`
-        declared_patches = sets.make([patch["path"] for patch in state.pnpm_patched_dependencies().values()])
+        declared_patches = sets.make(state.pnpm_patches())
 
         # Patches in `npm_translate_lock(patches)`
         for patches in attr.patches.values():

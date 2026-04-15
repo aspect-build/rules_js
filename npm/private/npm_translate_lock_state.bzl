@@ -238,9 +238,9 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
             _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(rel_path)))
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
-    for patch_info in priv["pnpm_patched_dependencies"].values():
-        patch = patch_info.get("path")
-        rel_path = paths.normalize(paths.join(rel_dir, patch))
+    for name in priv["pnpm_patched_dependencies"]:
+        patch_path = _patch_path_for(priv, name)
+        rel_path = paths.normalize(paths.join(rel_dir, patch_path))
         workspace_path = paths.join(priv["src_root"], rel_path)
 
         if not _has_input_hash(priv, rel_path):
@@ -250,7 +250,7 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                     package_json = priv["pnpm_root_package_json"],
                 )
                 fail(msg)
-            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch)))
+            _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(patch_path)))
 
 ################################################################################
 def _rel_path(priv, p):
@@ -428,24 +428,6 @@ def _load_lockfile(priv, rctx, attr, pnpm_lock_path, is_windows):
 
     priv["importers"] = importers
     priv["packages"] = packages
-
-    # pnpm 11 changed the patchedDependencies format in pnpm-lock.yaml: values are now just
-    # a hash string rather than a dict with 'path' and 'hash' keys. The patch file path moved
-    # to pnpm-workspace.yaml. Normalize to always use dict form with 'path' and 'hash' keys.
-    if any([type(v) == "string" for v in pnpm_patched_dependencies.values()]):
-        normalized = {}
-        workspace_patched = priv["pnpm_settings"].get("patchedDependencies", {})
-        for name, patch_info in pnpm_patched_dependencies.items():
-            if type(patch_info) == "string":
-                # pnpm 11+ format: lockfile value is just the hash; path is in pnpm-workspace.yaml
-                patch_path = workspace_patched.get(name)
-                if not patch_path:
-                    fail("ERROR: patchedDependencies entry '{}' in pnpm-lock.yaml has no corresponding path in pnpm-workspace.yaml".format(name))
-                normalized[name] = {"path": patch_path, "hash": patch_info}
-            else:
-                normalized[name] = patch_info
-        pnpm_patched_dependencies = normalized
-
     priv["pnpm_patched_dependencies"] = pnpm_patched_dependencies
 
     if lock_parse_err != None:
@@ -469,6 +451,24 @@ def _has_workspaces(priv):
 ################################################################################
 def _should_update_pnpm_lock(priv):
     return priv["should_update_pnpm_lock"] and priv["src_root"] != None
+
+################################################################################
+def _patch_path_for(priv, name):
+    """Returns the patch file path for a patchedDependency entry by name, or None if not found.
+
+    Handles both lockfile formats:
+    - pnpm <= 10: pnpm-lock.yaml stores a dict with 'path' and 'hash' keys
+    - pnpm 11+: pnpm-lock.yaml stores only a hash string; the path is in pnpm-workspace.yaml
+    """
+    patch_info = priv["pnpm_patched_dependencies"].get(name)
+    if patch_info == None:
+        return None
+    if type(patch_info) == "string":
+        patch_path = priv["pnpm_settings"].get("patchedDependencies", {}).get(name)
+        if not patch_path:
+            fail("ERROR: patchedDependencies entry '{}' in pnpm-lock.yaml has no corresponding path in pnpm-workspace.yaml".format(name))
+        return patch_path
+    return patch_info["path"]
 
 ################################################################################
 def _only_built_dependencies(pnpm_settings):
@@ -520,7 +520,8 @@ def _new(rctx, mod, attr):
         default_registry = lambda: priv["default_registry"],
         importers = lambda: priv["importers"],
         packages = lambda: priv["packages"],
-        pnpm_patched_dependencies = lambda: priv["pnpm_patched_dependencies"],
+        pnpm_patches = lambda: [_patch_path_for(priv, name) for name in priv["pnpm_patched_dependencies"]],
+        pnpm_patch_for = lambda name: _patch_path_for(priv, name),
         only_built_dependencies = lambda: priv["only_built_dependencies"],
         npm_registries = lambda: priv["npm_registries"],
         npm_auth = lambda: priv["npm_auth"],
