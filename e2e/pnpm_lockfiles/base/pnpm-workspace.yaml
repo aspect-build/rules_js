@@ -8,6 +8,10 @@ packages:
 configDependencies:
     semver: 7.7.4+sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==
 
+# patchedDependencies, allowBuilds (or onlyBuiltDependencies), and overrides
+# are duplicated in package.json, and should be kept in sync for as long as we
+# maintain support for pnpm 9. Once we drop support for pnpm 9, we should
+# delete that information from package.json.
 patchedDependencies:
     meaning-of-life@1.0.0: patches/meaning-of-life@1.0.0-pnpm.patch
 
