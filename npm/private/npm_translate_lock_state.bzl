@@ -466,12 +466,16 @@ def _patch_path_for(priv, name):
     patch_info = priv["pnpm_patched_dependencies"].get(name)
     if patch_info == None:
         return None
-    if type(patch_info) == "string":
-        patch_path = priv["pnpm_settings"].get("patchedDependencies", {}).get(name)
-        if not patch_path:
-            fail("ERROR: patchedDependencies entry '{}' in pnpm-lock.yaml has no corresponding path in pnpm-workspace.yaml".format(name))
-        return patch_path
-    return patch_info["path"]
+
+    # pnpm <= 10
+    if type(patch_info) != "string":
+        return patch_info["path"]
+
+    # pnpm 11+
+    patch_path = priv["pnpm_settings"].get("patchedDependencies", {}).get(name)
+    if not patch_path:
+        fail("ERROR: patchedDependencies entry '{}' in pnpm-lock.yaml has no corresponding path in pnpm-workspace.yaml".format(name))
+    return patch_path
 
 ################################################################################
 def _only_built_dependencies(pnpm_settings):
