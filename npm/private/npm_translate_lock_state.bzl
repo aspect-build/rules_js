@@ -134,7 +134,7 @@ def _init_workspace(priv, rctx, is_windows):
         root_package_json = json.decode(rctx.read(root_package_json_path))
 
     priv["pnpm_settings"] = root_package_json.get("pnpm", {})
-    priv["only_built_dependencies"] = _only_built_dependencies(priv["pnpm_settings"])
+    priv["only_built_dependencies"] = _only_built_dependencies(priv)
 
     # Read settings from pnpm-workspace.yaml for pnpm v10+ (NOTE: pnpm 9-10+ has lockfile version 9).
     # Support scenario where pnpm-lock.yaml was never parsed and "lock_version" is not set.
@@ -149,7 +149,7 @@ def _init_workspace(priv, rctx, is_windows):
 
             if pnpm_workspace_settings:
                 priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
-                priv["only_built_dependencies"] = _only_built_dependencies(priv["pnpm_settings"])
+                priv["only_built_dependencies"] = _only_built_dependencies(priv)
 
         if workspace_parse_err != None:
             should_update = _should_update_pnpm_lock(priv)
@@ -478,9 +478,10 @@ def _patch_path_for(priv, name):
     return patch_path
 
 ################################################################################
-def _only_built_dependencies(pnpm_settings):
+def _only_built_dependencies(priv):
     # pnpm 11 replaced onlyBuiltDependencies (a list) with allowBuilds (a dict
     # mapping package names to booleans). Support both.
+    pnpm_settings = priv["pnpm_settings"]
     allow_builds = pnpm_settings.get("allowBuilds", None)
     if allow_builds != None:
         return [name for name, allowed in allow_builds.items() if allowed]
