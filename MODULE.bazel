@@ -90,6 +90,7 @@ use_repo(
 
 register_toolchains(
     "//js/private/test/proto:proto_toolchain_for_tests_toolchain",
+    "//js/private/test/proto:rpc_toolchain_for_tests_toolchain",
     dev_dependency = True,
 )
 

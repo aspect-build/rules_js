@@ -1,0 +1,21 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+
+write_file(
+    name = "other_proto_src",
+    out = "other.proto",
+    content = [
+        'syntax = "proto3";',
+        "",
+        "message Other {}",
+    ],
+    tags = ["manual"],
+    visibility = ["//js/private/test/proto:__pkg__"],
+)
+
+proto_library(
+    name = "other_proto",
+    srcs = [":other_proto_src"],
+    tags = ["manual"],
+    visibility = ["//js/private/test/proto:__pkg__"],
+)

@@ -1,6 +1,8 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:proto.bzl", "js_proto_toolchain")
+load("//js:rpc.bzl", "js_rpc_toolchain")
 load(":js_proto_aspect_test.bzl", "js_proto_aspect_test_suite")
+load(":js_rpc_library_test.bzl", "js_rpc_library_test_suite")
 
 ####################################################################################################
 # Proto analysis tests
@@ -33,4 +35,15 @@ js_proto_toolchain(
     visibility = ["//visibility:private"],
 )
 
+js_rpc_toolchain(
+    name = "rpc_toolchain_for_tests",
+    plugin_bin = ":fake_protoc_gen_es",
+    plugin_name = "connect-query",
+    plugin_options = [],
+    runtime = ":fake_proto_runtime",
+    visibility = ["//visibility:private"],
+)
+
 js_proto_aspect_test_suite(name = "js_proto_aspect_tests")
+
+js_rpc_library_test_suite(name = "js_rpc_library_tests")
