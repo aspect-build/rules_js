@@ -59,18 +59,21 @@ def _js_rpc_library_impl(ctx):
         host_path_separator = ctx.configuration.host_path_separator,
     )
 
-    js_outputs = [f for f in output_files if not f.path.endswith(".d.ts")]
-    dts_outputs = [f for f in output_files if f.path.endswith(".d.ts")]
+    js_outputs = depset([f for f in output_files if not f.path.endswith(".d.ts")])
+    dts_outputs = depset([f for f in output_files if f.path.endswith(".d.ts")])
 
     return [
         js_info(
             target = ctx.label,
-            sources = depset(js_outputs),
-            types = depset(dts_outputs),
-            transitive_sources = depset(js_outputs),
-            transitive_types = depset(dts_outputs),
+            sources = js_outputs,
+            types = dts_outputs,
+            transitive_sources = js_outputs,
+            transitive_types = dts_outputs,
             npm_sources = gather_npm_sources(srcs = [], deps = [proto_lang_toolchain_info.runtime]),
             npm_package_store_infos = gather_npm_package_store_infos([proto_lang_toolchain_info.runtime]),
+        ),
+        DefaultInfo(
+            files = js_outputs,
         ),
     ]
 
