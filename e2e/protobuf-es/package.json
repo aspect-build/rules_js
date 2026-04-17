@@ -2,7 +2,9 @@
     "private": true,
     "packageManager": "pnpm@10.20.0",
     "dependencies": {
-        "@bufbuild/protobuf": "catalog:"
+        "@bufbuild/protobuf": "catalog:",
+        "@connectrpc/connect": "catalog:",
+        "@connectrpc/connect-query-core": "catalog:"
     },
     "type": "module"
 }

@@ -2,6 +2,7 @@
     "private": true,
     "packageManager": "pnpm@10.20.0",
     "dependencies": {
+        "@grpc/grpc-js": "1.13.4",
         "google-protobuf": "4.0.2"
     },
     "type": "module"

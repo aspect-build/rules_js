@@ -1,0 +1,36 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("//js:proto.bzl", "js_proto_toolchain")
+load(":js_proto_aspect_test.bzl", "js_proto_aspect_test_suite")
+
+####################################################################################################
+# Proto analysis tests
+
+# A minimal fake plugin binary. Analysis tests never execute it; it only needs to be a
+# valid executable label so that toolchain resolution succeeds at analysis time.
+write_file(
+    name = "fake_protoc_gen_es",
+    out = "fake_protoc_gen_es.sh",
+    content = ["#!/usr/bin/env bash"],
+    is_executable = True,
+)
+
+# A no-op runtime target.
+filegroup(
+    name = "fake_proto_runtime",
+    srcs = [],
+)
+
+# Registered in MODULE.bazel as a dev_dependency toolchain so it is only active
+# when building this repo itself, not when rules_js is consumed as a dependency.
+js_proto_toolchain(
+    name = "proto_toolchain_for_tests",
+    out_dts_extension = "_pb.d.ts",
+    out_js_extension = "_pb.js",
+    plugin_bin = ":fake_protoc_gen_es",
+    plugin_name = "es",
+    plugin_options = [],
+    runtime = ":fake_proto_runtime",
+    visibility = ["//visibility:private"],
+)
+
+js_proto_aspect_test_suite(name = "js_proto_aspect_tests")

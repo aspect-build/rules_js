@@ -1,4 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@aspect_rules_js//js:rpc.bzl", "js_rpc_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
@@ -25,4 +26,31 @@ js_test(
     name = "test",
     data = [":test_lib"],
     entry_point = "test_proto.js",
+)
+
+proto_library(
+    name = "greeter_proto",
+    srcs = ["greeter.proto"],
+)
+
+# Generates gRPC service stubs (greeter_grpc_pb.js) via grpc_tools_node_protoc_plugin.
+js_rpc_library(
+    name = "greeter_rpc",
+    deps = [":greeter_proto"],
+)
+
+js_library(
+    name = "test_grpc_lib",
+    srcs = ["test_grpc.js"],
+    deps = [
+        ":greeter_proto",
+        ":greeter_rpc",
+        ":node_modules/@grpc/grpc-js",
+    ],
+)
+
+js_test(
+    name = "test_grpc",
+    data = [":test_grpc_lib"],
+    entry_point = "test_grpc.js",
 )

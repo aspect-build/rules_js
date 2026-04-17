@@ -51,49 +51,28 @@ def _js_proto_aspect_impl(target, ctx):
     dts_outputs = proto_common.declare_generated_files(ctx.actions, proto_info, dts_extension) if dts_extension else []
 
     all_outputs = js_outputs + dts_outputs
-    output_root = all_outputs[0].root
-
-    args = ctx.actions.args()
-    args.add(proto_lang_toolchain_info.plugin.executable, format = proto_lang_toolchain_info.plugin_format_flag)
-    proto_outdir = proto_common.output_directory(proto_info, output_root)
-    args.add_all((proto_lang_toolchain_info.out_replacement_format_flag % proto_outdir).split(" "))
-    args.add("--descriptor_set_in")
-    args.add_joined(proto_info.transitive_descriptor_sets, join_with = ctx.configuration.host_path_separator)
-
-    # Vendored: https://github.com/protocolbuffers/protobuf/blob/v31.1/bazel/common/proto_common.bzl#L193-L204
-    # Protoc searches for .protos -I paths in order they are given and then
-    # uses the path within the directory as the package.
-    # This requires ordering the paths from most specific (longest) to least
-    # specific ones, so that no path in the list is a prefix of any of the
-    # following paths in the list.
-    # For example: 'bazel-out/k8-fastbuild/bin/external/foo' needs to be listed
-    # before 'bazel-out/k8-fastbuild/bin'. If not, protoc will discover file under
-    # the shorter path and use 'external/foo/...' as its package path.
-    args.add_all(proto_info.transitive_proto_path, map_each = proto_common.import_virtual_proto_path)
-    args.add_all(proto_info.transitive_proto_path, map_each = proto_common.import_repo_proto_path)
-    args.add_all(proto_info.transitive_proto_path, map_each = proto_common.import_main_output_proto_path)
-    args.add("-I.")  # Needs to come last
 
     # Tell the plugin how to fix up imports to account for any usage of
     # import_prefix or strip_import_prefix on dependencies. For now we only do
     # this with protoc-gen-es, but ideally we should generalize this logic to
     # accommodate other plugins.
+    rewrite_args = None
     if proto_lang_toolchain_info.plugin_format_flag.startswith("--plugin=protoc-gen-es="):
-        for rewrite in _get_import_rewrites(ctx.rule.attr.deps, js_proto_toolchain_info.out_js_extension):
-            args.add("--es_opt=rewrite_imports=" + rewrite)
+        rewrite_args = [
+            "--es_opt=rewrite_imports=" + r
+            for r in _get_import_rewrites(ctx.rule.attr.deps, js_proto_toolchain_info.out_js_extension)
+        ]
 
-    args.add_all(proto_info.direct_sources)
-
-    ctx.actions.run(
-        executable = protoc_info.proto_compiler.executable,
-        arguments = [args],
-        progress_message = "Generating .js/.d.ts from %{label}",
+    proto_common.compile(
+        actions = ctx.actions,
+        proto_lang_toolchain_info = proto_lang_toolchain_info,
+        protoc_info = protoc_info,
+        generated_files = all_outputs,
+        proto_info = proto_info,
         mnemonic = "JsProtocGenerate",
-        env = {"BAZEL_BINDIR": output_root.path},
-        tools = [proto_lang_toolchain_info.plugin, protoc_info.proto_compiler],
-        inputs = depset(proto_info.direct_sources, transitive = [proto_info.transitive_descriptor_sets]),
-        outputs = all_outputs,
-        use_default_shell_env = True,
+        progress_message = "Generating .js/.d.ts from %{label}",
+        host_path_separator = ctx.configuration.host_path_separator,
+        additional_args = rewrite_args,
     )
 
     return [

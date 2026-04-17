@@ -15,7 +15,7 @@ load("@protobuf//bazel/common:proto_lang_toolchain_info.bzl", "ProtoLangToolchai
 load("//js/private:proto.bzl", "PROTOC_TOOLCHAIN")
 
 JsProtoToolchainInfo = provider(
-    doc = "Information on how to invoke the JavaScript or TypeScript protoc plugin.",
+    doc = "Information on how to invoke a JavaScript or TypeScript protoc plugin.",
     fields = ["out_dts_extension", "out_js_extension"],
 )
 

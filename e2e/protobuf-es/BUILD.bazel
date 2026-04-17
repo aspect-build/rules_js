@@ -1,4 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@aspect_rules_js//js:rpc.bzl", "js_rpc_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
@@ -37,4 +38,51 @@ js_test(
     name = "test",
     data = [":test_lib"],
     entry_point = "test_proto.js",
+)
+
+js_library(
+    name = "test_connect_lib",
+    srcs = ["test_connect.js"],
+    deps = [
+        ":node_modules/@connectrpc/connect",
+        ":user_proto",
+    ],
+)
+
+js_test(
+    name = "test_connect",
+    data = [":test_connect_lib"],
+    entry_point = "test_connect.js",
+)
+
+proto_library(
+    name = "eliza_proto",
+    srcs = ["eliza.proto"],
+)
+
+js_rpc_library(
+    name = "eliza_rpc",
+    outs = [
+        "eliza-ElizaService_connectquery.d.ts",
+        "eliza-ElizaService_connectquery.js",
+    ],
+    deps = [":eliza_proto"],
+)
+
+js_library(
+    name = "test_connect_query_lib",
+    srcs = ["test_connect_query.js"],
+    deps = [
+        ":eliza_proto",
+        ":eliza_rpc",
+        ":node_modules/@bufbuild/protobuf",
+        ":node_modules/@connectrpc/connect",
+        ":node_modules/@connectrpc/connect-query-core",
+    ],
+)
+
+js_test(
+    name = "test_connect_query",
+    data = [":test_connect_query_lib"],
+    entry_point = "test_connect_query.js",
 )

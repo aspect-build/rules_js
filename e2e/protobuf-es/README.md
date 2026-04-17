@@ -1,8 +1,9 @@
 # Buf.build protobuf-es example
 
 This directory contains an example of how to set up and use the Buf.build
-protobuf-es implementation. See also e2e/protobuf-google/ for an example of how
-to use Google's protobuf implementation.
+protobuf-es implementation, along with Connect and Connect-Query. See also
+e2e/protobuf-google/ for an example of how to use Google's protobuf
+implementation.
 
 Ideally we would like to support every JavaScript or TypeScript implementation
 for which Buf [provides](https://buf.build/bazel/bazel/sdks/main:protobuf) an

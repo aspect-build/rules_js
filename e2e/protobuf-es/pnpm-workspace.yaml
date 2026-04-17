@@ -3,5 +3,7 @@ packages:
 
 catalog:
     '@bufbuild/protobuf': '2.7.0'
+    '@connectrpc/connect': '2.1.1'
+    '@connectrpc/connect-query-core': '2.2.0'
 
 onlyBuiltDependencies: []

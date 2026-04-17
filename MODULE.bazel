@@ -88,6 +88,11 @@ use_repo(
 
 ####### Dev dependencies ########
 
+register_toolchains(
+    "//js/private/test/proto:proto_toolchain_for_tests_toolchain",
+    dev_dependency = True,
+)
+
 # Dev-only pnpm used for local testing
 pnpm10 = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
 pnpm10.pnpm(

@@ -26,10 +26,11 @@ use_repo(npm, "npm")
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# The usual way to obtain this protoc plugin is to use the
-# @protocolbuffers/protoc-gen-js package. However, that package downloads
-# protoc using a post-install script, and this is not easy to accommodate in
-# Bazel. Instead, we just download the release binary from GitHub.
+# The usual way to obtain the protoc plugins below is to use the
+# @protocolbuffers/protoc-gen-js and grpc-tools packages. However, both
+# packages download the plugins using a post-install script, and this is not
+# easy to accommodate in Bazel. Instead, we just download the release binaries
+# directly.
 http_archive(
     name = "protobuf-javascript",
     build_file_content = """filegroup(
@@ -41,6 +42,19 @@ http_archive(
     dev_dependency = True,
     integrity = "sha256-HclFw2NR1qZfmvwUQjlDNuesMl9+HCf4bKmdqn/qKRc=",
     url = "https://github.com/protocolbuffers/protobuf-javascript/releases/download/v4.0.2/protobuf-javascript-4.0.2-linux-x86_64.tar.gz",
+)
+
+http_archive(
+    name = "grpc-tools",
+    build_file_content = """filegroup(
+    name = \"grpc_node_plugin\",
+    srcs = [\"bin/grpc_node_plugin\"],
+    visibility = [\"//visibility:public\"],
+)
+""",
+    dev_dependency = True,
+    integrity = "sha256-1Lrryfk1b5tkoheXhjfiJ8rzQpwJFmmgC7TizLvfmps=",
+    url = "https://node-precompiled-binaries.grpc.io/grpc-tools/v1.12.4/linux-x64.tar.gz",
 )
 
 register_toolchains("//tools/toolchains:all")

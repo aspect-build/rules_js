@@ -40,6 +40,25 @@ starlark_doc_extract(
 )
 
 bzl_library(
+    name = "rpc",
+    srcs = ["rpc.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//js/private:js_proto_toolchain",
+        "//js/private:rpc",
+    ],
+)
+
+starlark_doc_extract(
+    name = "rpc.doc_extract",
+    src = "rpc.bzl",
+    deps = [
+        "//js/private:js_proto_toolchain",
+        "//js/private:rpc",
+    ],
+)
+
+bzl_library(
     name = "libs",
     srcs = ["libs.bzl"],
     visibility = ["//visibility:public"],

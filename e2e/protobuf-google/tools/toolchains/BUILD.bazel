@@ -1,0 +1,26 @@
+load("@aspect_rules_js//js:proto.bzl", "js_proto_toolchain")
+load("@aspect_rules_js//js:rpc.bzl", "js_rpc_toolchain")
+
+js_proto_toolchain(
+    name = "google_protobuf_toolchain",
+    out_dts_extension = None,
+    out_js_extension = "_pb.js",
+    plugin_bin = "@protobuf-javascript//:protoc-gen-js",
+    plugin_name = "js",
+    plugin_options = [
+        "import_style=commonjs",
+        "binary",
+    ],
+    runtime = "//:node_modules/google-protobuf",
+)
+
+js_rpc_toolchain(
+    name = "grpc_toolchain",
+    out_js_extension = "_grpc_pb.js",
+    plugin_bin = "@grpc-tools//:grpc_node_plugin",
+    plugin_name = "grpc",
+    # grpc_js makes the generated stubs import from @grpc/grpc-js instead of the
+    # deprecated grpc package.
+    plugin_options = ["grpc_js"],
+    runtime = "//:node_modules/@grpc/grpc-js",
+)

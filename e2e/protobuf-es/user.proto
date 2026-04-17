@@ -9,3 +9,11 @@ message User {
     repeated string tags = 3;
     Profile profile = 4;
 }
+
+message GetUserRequest {
+    string name = 1;
+}
+
+service UserService {
+    rpc GetUser(GetUserRequest) returns (User) {}
+}
