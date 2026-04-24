@@ -170,7 +170,9 @@ tasks:
           bazel:
               flags: ['--test_tag_filters=-skip-on-bazel9']
           env:
-              USE_BAZEL_VERSION: '9.x'
+              # TODO: change this back to 9.x once this bug is fixed:
+              # https://github.com/bazelbuild/bazel/issues/29393
+              USE_BAZEL_VERSION: '9.0.2'
     - format:
           queue: aspect-medium
     - buildifier:

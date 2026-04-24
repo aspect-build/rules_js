@@ -65,7 +65,7 @@ importers:
         version: link:../projects/b
       '@scoped/c':
         specifier: file:../projects/c
-        version: file:../projects/c(@scoped/b@+projects+b)
+        version: file:../projects/c(@scoped/b@projects+b)
       '@scoped/d':
         specifier: ../projects/d
         version: link:../projects/d
@@ -260,7 +260,7 @@ importers:
         version: link:../b
       '@scoped/c':
         specifier: file:../c
-        version: file:../projects/c(@scoped/b@+projects+b)
+        version: file:../projects/c(@scoped/b@projects+b)
       jsonify:
         specifier: https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz
         version: '@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz'
@@ -1273,7 +1273,7 @@ snapshots:
       picomatch: 2.3.2
       rollup: 2.14.0
 
-  '@scoped/c@file:../projects/c(@scoped/b@+projects+b)':
+  '@scoped/c@file:../projects/c(@scoped/b@projects+b)':
     dependencies:
       '@scoped/a': link:../a
       '@scoped/b': link:../projects/b

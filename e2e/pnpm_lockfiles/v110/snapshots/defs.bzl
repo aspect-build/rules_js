@@ -355,10 +355,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_161()
         store_162()
         _npm_local_package_store(
-            package_store_name = "@scoped+c@file+..+projects+c_@scoped+b@+projects+b",
+            package_store_name = "@scoped+c@file+..+projects+c_@scoped+b@projects+b",
             src = "//projects/c:pkg",
             package = "@scoped/c",
-            version = "file:../projects/c(@scoped/b@+projects+b)",
+            version = "file:../projects/c(@scoped/b@projects+b)",
             deps = {
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
                 "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
@@ -857,7 +857,7 @@ def _fp_link_0(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/c" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@+projects+b",
+        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package

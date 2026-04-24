@@ -148,7 +148,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             # Workaround for peer suffixes changing in pnpm 11. We may want to
             # revisit this depending on the outcome of:
             # https://github.com/pnpm/pnpm/issues/11272
-            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@%sprojects+b" % ("+" if lock_version == "v110" else ""),
+            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
             ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
 
             # file: 4.17.21.tgz tarbal
