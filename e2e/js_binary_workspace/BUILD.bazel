@@ -14,3 +14,13 @@ build_test(
         "@workspace//:run_bin",
     ],
 )
+
+# Verify that js_binary and js_test in an external repo with chdir =
+# package_name() run in the expected working directory.
+test_suite(
+    name = "external_tests",
+    tests = [
+        "@workspace//:js_binary_chdir_test",
+        "@workspace//:js_test_chdir_test",
+    ],
+)

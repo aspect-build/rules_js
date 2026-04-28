@@ -83,6 +83,15 @@ def js_binary(**kwargs):
     Args:
         **kwargs: All attributes of the [js_binary](#js_binary) rule.
     """
+
+    # Often a js_binary target will set "chdir = package_name()", and if it is
+    # in the top-level directory then this will result in an empty string. That
+    # argument may still be significant, though, particularly if the target is
+    # in an external repo. We make sure to replace an empty string with "." so
+    # that the underlying rule can distinguish this from an unset chdir
+    # parameter.
+    if kwargs.get("chdir") == "":
+        kwargs["chdir"] = "."
     _js_binary(
         enable_runfiles = select({
             Label("@bazel_lib//lib:enable_runfiles"): True,
@@ -117,6 +126,8 @@ def js_test(**kwargs):
     Args:
         **kwargs: All attributes of the [js_test](#js_test) rule.
     """
+    if kwargs.get("chdir") == "":
+        kwargs["chdir"] = "."
     _js_test(
         enable_runfiles = select({
             Label("@bazel_lib//lib:enable_runfiles"): True,

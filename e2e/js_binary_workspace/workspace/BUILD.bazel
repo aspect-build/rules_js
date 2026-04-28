@@ -1,4 +1,6 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 js_binary(
     name = "bin",
@@ -12,4 +14,49 @@ js_run_binary(
     stdout = "out_workspace.txt",
     tool = ":bin",
     visibility = ["//visibility:public"],
+)
+
+# Write the expected relative working directory beginning with bazel-out/
+genrule(
+    name = "working_directory_expected",
+    outs = ["working_directory_expected.txt"],
+    cmd = "echo $(@D) > $@",
+)
+
+# Check that the working directory used by js_test matches the chdir argument.
+js_test(
+    name = "js_test_chdir_test",
+    args = ["$(rlocationpath :working_directory_expected.txt)"],
+    chdir = package_name(),
+    data = [":working_directory_expected.txt"],
+    entry_point = "check_chdir.mjs",
+    tags = ["manual"],
+)
+
+write_file(
+    name = "working_directory_test_sh",
+    out = "working_directory_test.sh",
+    content = [
+        "#!/usr/bin/env bash",
+        "actual=$1",
+        "expected=$2",
+        'expected_len=$(wc -c < "$expected")',
+        # Assert that the end of $actual exactly matches $expected
+        'diff -u <(tail -c "$expected_len" "$actual") "$expected"',
+    ],
+)
+
+# Check that the working directory used by js_run_binary matches the chdir
+# argument on js_binary.
+sh_test(
+    name = "js_binary_chdir_test",
+    srcs = ["working_directory_test.sh"],
+    args = [
+        "$(rootpath :out_workspace.txt)",
+        "$(rootpath :working_directory_expected.txt)",
+    ],
+    data = [
+        ":out_workspace.txt",
+        ":working_directory_expected.txt",
+    ],
 )
