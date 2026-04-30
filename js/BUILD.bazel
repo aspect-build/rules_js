@@ -3,18 +3,17 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
-# Underscore prefix signals this is internal — do not rely on it.
-# This controls the default value of the hoist_runfiles_to_exec_cfg flag on
-# js_run_binary, and is for CI testing only.
+# This flag controls the default value of the use_execroot_exec_cfg flag on
+# js_run_binary.
 bool_flag(
-    name = "_hoist_runfiles_to_exec_cfg",
+    name = "use_execroot_exec_cfg",
     build_setting_default = False,
     visibility = ["//visibility:public"],
 )
 
 config_setting(
-    name = "_hoist_runfiles_to_exec_cfg_true",
-    flag_values = {"_hoist_runfiles_to_exec_cfg": "True"},
+    name = "_use_execroot_exec_cfg_true",
+    flag_values = {"use_execroot_exec_cfg": "True"},
 )
 
 bzl_library(

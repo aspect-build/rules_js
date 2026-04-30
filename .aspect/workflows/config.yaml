@@ -181,7 +181,7 @@ tasks:
           name: Bazel 9 with exec cfg
           id: bazel-9-exec
           bazel:
-              flags: ['--test_tag_filters=-skip-on-bazel9', '--@aspect_rules_js//js:_hoist_runfiles_to_exec_cfg=true']
+              flags: ['--test_tag_filters=-skip-on-bazel9', '--@aspect_rules_js//js:use_execroot_exec_cfg=true']
           env:
               # TODO: change this back to 9.x once this bug is fixed:
               # https://github.com/bazelbuild/bazel/issues/29393

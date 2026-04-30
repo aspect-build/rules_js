@@ -5,7 +5,7 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
 # Verify that the js_binary tool's data dependencies are built in the exec configuration
-# when hoist_runfiles_to_exec_cfg is True.
+# when use_execroot_exec_cfg is True.
 # To do this we check that js_run_binary agrees with genrule on the location of a
 # tool dependency.
 write_file(
@@ -22,7 +22,7 @@ js_binary(
 
 js_run_binary(
     name = "tools_cfg_location",
-    hoist_runfiles_to_exec_cfg = True,
+    use_execroot_exec_cfg = True,
     stdout = "tools_cfg_location.txt",
     tool = ":find_cfg_probe",
 )
@@ -40,11 +40,11 @@ diff_test(
     file2 = ":expected_tools_cfg_location.txt",
 )
 
-# Verify the opposite: with hoist_runfiles_to_exec_cfg = False, the tool's data
+# Verify the opposite: with use_execroot_exec_cfg = False, the tool's data
 # dependencies are built in the target configuration, matching a genrule srcs path.
 js_run_binary(
     name = "target_cfg_location",
-    hoist_runfiles_to_exec_cfg = False,
+    use_execroot_exec_cfg = False,
     stdout = "target_cfg_location.txt",
     tool = ":find_cfg_probe",
 )
@@ -102,7 +102,7 @@ js_run_binary(
     name = "gen_target_os",
     srcs = [":os_name.txt"],
     args = ["$(rootpath :os_name.txt)"],
-    hoist_runfiles_to_exec_cfg = True,
+    use_execroot_exec_cfg = True,
     stdout = "target_os.txt",
     tags = ["manual"],
     tool = ":read_file",

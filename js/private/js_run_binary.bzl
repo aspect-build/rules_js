@@ -31,7 +31,7 @@ def js_run_binary(
         exit_code_out = None,
         silent_on_success = True,
         use_execroot_entry_point = True,
-        hoist_runfiles_to_exec_cfg = None,
+        use_execroot_exec_cfg = None,
         copy_srcs_to_bin = True,
         include_sources = True,
         include_types = False,
@@ -150,16 +150,16 @@ def js_run_binary(
             needed by the binary are available in the execroot output tree. This requirement can be turned off with by
             setting `allow_execroot_entry_point_with_no_copy_data_to_bin` to True.
 
-        hoist_runfiles_to_exec_cfg: Hoist runfiles to the execution platform configuration instead of the target platform
+        use_execroot_exec_cfg: Hoist runfiles to the execution platform configuration instead of the target platform
             configuration.
 
-            This only has an effect when `use_execroot_entry_point` is True. Setting `hoist_runfiles_to_exec_cfg` to True
-            results in a more correct build by ensuring that code that is executed during a build action is built for the
-            execution platform, which may not be the same as the target platform.
+            This only has an effect when `use_execroot_entry_point` is True. Setting `use_execroot_exec_cfg` to True results
+            in a more correct build by ensuring that code that is executed during a build action is built for the execution
+            platform, which may not be the same as the target platform.
 
-            When set to `None` (the default), the value of the internal `//js:_hoist_runfiles_to_exec_cfg` build flag
-            is used. That flag is for internal testing only and should not be used. It is temporary and will be removed once
-            the default is changed to `True`.
+            When set to `None` (the default), the value of the internal `//js:use_execroot_exec_cfg` build flag is used. That
+            flag is for internal testing only and should not be used. It is temporary and will be removed once the default is
+            changed to `True`.
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
@@ -394,18 +394,18 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
             testonly = kwargs.get("testonly", False),
         )
         runfiles_label = ":{}".format(js_runfiles_name)
-        if hoist_runfiles_to_exec_cfg:
+        if use_execroot_exec_cfg:
             tools.append(runfiles_label)
-        elif hoist_runfiles_to_exec_cfg == False:
+        elif use_execroot_exec_cfg == False:
             extra_srcs.append(runfiles_label)
         else:
-            # hoist_runfiles_to_exec_cfg is None, so we will defer to the flag.
+            # use_execroot_exec_cfg is None, so we will defer to the flag.
             tools = tools + select({
-                "@aspect_rules_js//js:_hoist_runfiles_to_exec_cfg_true": [runfiles_label],
+                "@aspect_rules_js//js:_use_execroot_exec_cfg_true": [runfiles_label],
                 "//conditions:default": [],
             })
             extra_srcs = extra_srcs + select({
-                "@aspect_rules_js//js:_hoist_runfiles_to_exec_cfg_true": [],
+                "@aspect_rules_js//js:_use_execroot_exec_cfg_true": [],
                 "//conditions:default": [runfiles_label],
             })
 
