@@ -22,9 +22,9 @@ js_binary(
 
 js_run_binary(
     name = "tools_cfg_location",
-    use_execroot_exec_cfg = True,
     stdout = "tools_cfg_location.txt",
     tool = ":find_cfg_probe",
+    use_execroot_exec_cfg = True,
 )
 
 genrule(
@@ -44,9 +44,9 @@ diff_test(
 # dependencies are built in the target configuration, matching a genrule srcs path.
 js_run_binary(
     name = "target_cfg_location",
-    use_execroot_exec_cfg = False,
     stdout = "target_cfg_location.txt",
     tool = ":find_cfg_probe",
+    use_execroot_exec_cfg = False,
 )
 
 genrule(
@@ -102,10 +102,10 @@ js_run_binary(
     name = "gen_target_os",
     srcs = [":os_name.txt"],
     args = ["$(rootpath :os_name.txt)"],
-    use_execroot_exec_cfg = True,
     stdout = "target_os.txt",
     tags = ["manual"],
     tool = ":read_file",
+    use_execroot_exec_cfg = True,
 )
 
 platform_transition_filegroup(
