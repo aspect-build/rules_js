@@ -124,13 +124,9 @@ workspaces:
     e2e/repo_mapping:
         icon: js
         tasks:
-            - test:
-                  queue: aspect-medium
-            - format:
-                  without: true
-            - buildifier:
-                  without: true
-            - bazel-7:
+            # We need to pass a flag that begins with @aspect_rules_js//, but
+            # that repo is given a different name in e2e/repo_mapping.
+            - bazel-9-exec:
                   without: true
     e2e/output_paths:
         icon: js
@@ -162,7 +158,7 @@ tasks:
           name: Bazel 7
           id: bazel-7
           bazel:
-              flags: ['--test_tag_filters=-skip-on-bazel7', '--@aspect_rules_js//js:_hoist_runfiles_to_exec_cfg=true']
+              flags: ['--test_tag_filters=-skip-on-bazel7']
           env:
               USE_BAZEL_VERSION: '7.x'
     - test:
@@ -177,6 +173,15 @@ tasks:
           id: bazel-9
           bazel:
               flags: ['--test_tag_filters=-skip-on-bazel9']
+          env:
+              # TODO: change this back to 9.x once this bug is fixed:
+              # https://github.com/bazelbuild/bazel/issues/29393
+              USE_BAZEL_VERSION: '9.0.2'
+    - test:
+          name: Bazel 9 with exec cfg
+          id: bazel-9-exec
+          bazel:
+              flags: ['--test_tag_filters=-skip-on-bazel9', '--@aspect_rules_js//js:_hoist_runfiles_to_exec_cfg=true']
           env:
               # TODO: change this back to 9.x once this bug is fixed:
               # https://github.com/bazelbuild/bazel/issues/29393
