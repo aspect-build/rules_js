@@ -36,6 +36,8 @@ workspaces:
             # Still depends on some WORKSPACE setup
             - bazel-9:
                   without: true
+            - bazel-9-exec:
+                  without: true
     e2e/nextjs:
         icon: nextjs
         tasks: *e2e_tasks
