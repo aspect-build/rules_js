@@ -124,6 +124,12 @@ workspaces:
     e2e/repo_mapping:
         icon: js
         tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
             # We need to pass a flag that begins with @aspect_rules_js//, but
             # that repo is given a different name in e2e/repo_mapping.
             - bazel-9-exec:
