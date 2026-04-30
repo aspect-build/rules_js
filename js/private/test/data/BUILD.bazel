@@ -120,9 +120,10 @@ js_run_binary(
     srcs = ["data.json"],
     outs = ["rb0.json"],
     args = [
-        "$(rootpath rb0.json)",
-        "$(rootpath data.json)",
+        "rb0.json",
+        "data.json",
     ],
+    chdir = package_name(),
     tool = ":write-js_library-srcs",
 )
 
@@ -145,9 +146,10 @@ js_run_binary(
     srcs = ["data.json"],
     outs = ["rb1.json"],
     args = [
-        "$(rootpath rb1.json)",
-        "$(rootpath data.json)",
+        "rb1.json",
+        "data.json",
     ],
+    chdir = package_name(),
     tool = ":write-js_library-srcs",
 )
 
@@ -177,9 +179,10 @@ js_run_binary(
     srcs = ["data.json"],
     outs = ["rb2.json"],
     args = [
-        "$(rootpath rb2.json)",
-        "$(rootpath data.json)",
+        "rb2.json",
+        "data.json",
     ],
+    chdir = package_name(),
     tool = ":write-js_library-data",
 )
 
@@ -202,9 +205,10 @@ js_run_binary(
     srcs = ["data-generated.json"],
     outs = ["rb3.json"],
     args = [
-        "$(rootpath rb3.json)",
-        "$(rootpath data-generated.json)",
+        "rb3.json",
+        "data-generated.json",
     ],
+    chdir = package_name(),
     tool = ":write-genrule",
 )
 
@@ -227,9 +231,10 @@ js_run_binary(
     srcs = ["data-copied.json"],
     outs = ["rb4.json"],
     args = [
-        "$(rootpath rb4.json)",
-        "$(rootpath data-copied.json)",
+        "rb4.json",
+        "data-copied.json",
     ],
+    chdir = package_name(),
     tool = ":write-genrule-filegroup-srcs",
 )
 
