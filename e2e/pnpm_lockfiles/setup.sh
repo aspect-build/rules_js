@@ -10,5 +10,5 @@ pushd v90 && npx -y pnpm@~9 install --lockfile-only && popd
 # pnpm v10
 pushd v101 && npx -y pnpm@~10 install --lockfile-only && popd
 
-# pnpm v11 rc
-pushd v110 && npx -y pnpm@next-11 install --lockfile-only && popd
+# pnpm v11
+pushd v110 && npx -y pnpm@~11 install --lockfile-only && popd
