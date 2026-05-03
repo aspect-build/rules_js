@@ -31,6 +31,10 @@ def pnpm_repository(name, pnpm_version, include_npm, integrity):
 
     key = "{}@{}".format("pnpm", pnpm_version)
 
+    # pnpm 11 switched the bundled entry from CJS to ESM.
+    major = pnpm_version.split(".")[0]
+    ext = "mjs" if major.isdigit() and int(major) >= 11 else "cjs"
+
     _npm_import_rule(
         name = name,
         key = key,
@@ -43,10 +47,10 @@ def pnpm_repository(name, pnpm_version, include_npm, integrity):
             """js_binary(
     name = "pnpm",
     data = glob(["package/**"]),
-    entry_point = "package/dist/pnpm.cjs",
+    entry_point = "package/dist/pnpm.{ext}",
     include_npm = {include_npm},
     visibility = ["//visibility:public"],
-)""".format(include_npm = include_npm),
+)""".format(ext = ext, include_npm = include_npm),
         ]),
         extract_full_archive = True,
     )

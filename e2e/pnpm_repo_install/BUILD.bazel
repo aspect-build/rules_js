@@ -6,3 +6,17 @@ sh_test(
     args = ["$(location @pnpm)"],
     data = ["@pnpm"],
 )
+
+sh_test(
+    name = "pnpm_install_test_v10",
+    srcs = ["pnpm_install_test.sh"],
+    args = ["$(location @pnpm_v10//:pnpm)"],
+    data = ["@pnpm_v10//:pnpm"],
+)
+
+sh_test(
+    name = "pnpm_install_test_v11",
+    srcs = ["pnpm_install_test.sh"],
+    args = ["$(location @pnpm_v11//:pnpm)"],
+    data = ["@pnpm_v11//:pnpm"],
+)
