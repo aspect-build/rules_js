@@ -95,12 +95,36 @@ function logf_debug {
     fi
 }
 
+function _normalize_cpu {
+    case "$1" in
+    *aarch64* | *arm64*) echo "arm64" ;;
+    *amd64* | *k8* | *x86_64*) echo "x64" ;;
+    *) echo "$1" ;;
+    esac
+}
+
+function _use_exec_config_entry_point {
+    if [ "$(_normalize_cpu "${BAZEL_TARGET_CPU:-}")" != "$(_normalize_cpu "${JS_BINARY__TARGET_CPU:-}")" ]; then
+        return 0
+    fi
+    case "${BAZEL_BINDIR:-}" in
+    bazel-out/*-ST-* | bazel-out/platform-*) return 0 ;;
+    *) return 1 ;;
+    esac
+}
+
 function resolve_execroot_bin_path {
     local short_path="$1"
+    local bindir="${BAZEL_BINDIR:-$JS_BINARY__BINDIR}"
+    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
+        if _use_exec_config_entry_point; then
+            bindir="$JS_BINARY__BINDIR"
+        fi
+    fi
     if [[ "$short_path" == ../* ]]; then
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/external/${short_path:3}"
+        echo "$JS_BINARY__EXECROOT/$bindir/external/${short_path:3}"
     else
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$short_path"
+        echo "$JS_BINARY__EXECROOT/$bindir/$short_path"
     fi
 }
 

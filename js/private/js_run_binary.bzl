@@ -381,6 +381,16 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
             testonly = kwargs.get("testonly", False),
         )
         extra_srcs.append(":{}".format(js_runfiles_name))
+        js_exec_runfiles_name = "{}_exec_runfiles".format(name)
+        _js_binary_exec_runfiles(
+            name = js_exec_runfiles_name,
+            tool = tool,
+            # Always tag the target manual since we should only build it when the final target is built.
+            tags = kwargs.get("tags", []) + ["manual"],
+            # Always propagate the testonly attribute
+            testonly = kwargs.get("testonly", False),
+        )
+        extra_srcs.append(":{}".format(js_exec_runfiles_name))
 
     if allow_execroot_entry_point_with_no_copy_data_to_bin:
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
@@ -400,3 +410,24 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         use_default_shell_env = use_default_shell_env,
         **kwargs
     )
+
+def _js_binary_exec_runfiles_impl(ctx):
+    return DefaultInfo(
+        files = ctx.attr.tool[DefaultInfo].default_runfiles.files,
+    )
+
+_js_binary_exec_runfiles = rule(
+    implementation = _js_binary_exec_runfiles_impl,
+    attrs = {
+        "tool": attr.label(
+            doc = """The js_binary tool whose execution-configuration runfiles should be available as action inputs.
+
+            js_run_binary executes its tool in the execution configuration. When use_execroot_entry_point is enabled,
+            the tool's runfiles must come from the same configuration so native optional npm packages are filtered for
+            the platform that runs the action, not for the target platform being built.
+            """,
+            mandatory = True,
+            cfg = "exec",
+        ),
+    },
+)

@@ -1,0 +1,72 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+config_setting(
+    name = "linux_arm64_target",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+platform(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+write_file(
+    name = "write_tool",
+    out = "tool.mjs",
+    content = [
+        """import { readFileSync } from "node:fs";""",
+        """import { dirname, join } from "node:path";""",
+        """import { fileURLToPath } from "node:url";""",
+        """const here = dirname(fileURLToPath(import.meta.url));""",
+        """console.log(readFileSync(join(here, "exec_config_marker.txt"), "utf8").trim());""",
+    ],
+)
+
+write_file(
+    name = "write_exec_marker",
+    out = "exec_config_marker.txt",
+    content = ["exec-config-data"],
+)
+
+write_file(
+    name = "write_target_marker",
+    out = "target_config_marker.txt",
+    content = ["target-config-data"],
+)
+
+js_binary(
+    name = "tool",
+    data = select({
+        ":linux_arm64_target": [":target_config_marker.txt"],
+        "//conditions:default": [":exec_config_marker.txt"],
+    }),
+    entry_point = "tool.mjs",
+)
+
+js_run_binary(
+    name = "run_tool",
+    stdout = "run_tool.out",
+    tool = ":tool",
+)
+
+platform_transition_filegroup(
+    name = "run_tool_linux_arm64",
+    testonly = True,
+    srcs = [":run_tool"],
+    target_platform = ":linux_arm64",
+)
+
+assert_contains(
+    name = "run_tool_uses_exec_config_runfiles",
+    actual = ":run_tool_linux_arm64",
+    expected = "exec-config-data",
+)
