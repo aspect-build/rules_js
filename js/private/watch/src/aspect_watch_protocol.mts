@@ -7,6 +7,7 @@ import * as net from 'node:net'
 
 export enum MessageType {
     CYCLE = 'CYCLE',
+    CYCLE_RESET = 'CYCLE_RESET',
     CYCLE_FAILED = 'CYCLE_FAILED',
     CYCLE_COMPLETED = 'CYCLE_COMPLETED',
     NEGOTIATE = 'NEGOTIATE',
@@ -63,6 +64,7 @@ export interface CycleMessageSources {
 export interface CycleMessage extends Message {
     readonly kind:
         | MessageType.CYCLE
+        | MessageType.CYCLE_RESET
         | MessageType.CYCLE_FAILED
         | MessageType.CYCLE_COMPLETED
     readonly cycle_id: number
@@ -71,6 +73,10 @@ export interface CycleMessage extends Message {
 export interface CycleSourcesMessage extends CycleMessage {
     readonly kind: MessageType.CYCLE
     readonly sources: CycleMessageSources
+}
+
+export interface CycleResetMessage extends CycleMessage {
+    readonly kind: MessageType.CYCLE_RESET
 }
 
 export interface CycleFailedMessage extends CycleMessage {
@@ -90,6 +96,9 @@ export interface ExitMessage extends Message {
 const { JS_BINARY__LOG_DEBUG } = process.env
 
 function selectVersion(versions: number[]): number {
+    if (versions.includes(3)) {
+        return 3
+    }
     if (versions.includes(1)) {
         return 1
     }
@@ -219,11 +228,17 @@ export class AspectWatchProtocol {
      */
     async cycle(once?: boolean) {
         do {
-            // Only receive a cycle messages, forever up until the connection is closed.
+            // Only receive cycle messages, forever up until the connection is closed.
             // Connection errors will propagate.
-            const cycleMsg = await this._receive<CycleMessage>(
-                MessageType.CYCLE
-            )
+            const cycleMsg = await this._receive<CycleMessage>()
+            if (
+                cycleMsg.kind !== MessageType.CYCLE &&
+                cycleMsg.kind !== MessageType.CYCLE_RESET
+            ) {
+                throw new Error(
+                    `Expected CYCLE or CYCLE_RESET, got ${cycleMsg.kind}`
+                )
+            }
 
             // Invoke the cycle callback while recording+logging errors
             let cycleError = null

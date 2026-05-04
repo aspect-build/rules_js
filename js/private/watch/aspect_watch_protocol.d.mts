@@ -4,6 +4,7 @@
  */
 export declare enum MessageType {
     CYCLE = "CYCLE",
+    CYCLE_RESET = "CYCLE_RESET",
     CYCLE_FAILED = "CYCLE_FAILED",
     CYCLE_COMPLETED = "CYCLE_COMPLETED",
     NEGOTIATE = "NEGOTIATE",
@@ -46,12 +47,15 @@ export interface CycleMessageSources {
     readonly [key: string]: null | SourceInfo;
 }
 export interface CycleMessage extends Message {
-    readonly kind: MessageType.CYCLE | MessageType.CYCLE_FAILED | MessageType.CYCLE_COMPLETED;
+    readonly kind: MessageType.CYCLE | MessageType.CYCLE_RESET | MessageType.CYCLE_FAILED | MessageType.CYCLE_COMPLETED;
     readonly cycle_id: number;
 }
 export interface CycleSourcesMessage extends CycleMessage {
     readonly kind: MessageType.CYCLE;
     readonly sources: CycleMessageSources;
+}
+export interface CycleResetMessage extends CycleMessage {
+    readonly kind: MessageType.CYCLE_RESET;
 }
 export interface CycleFailedMessage extends CycleMessage {
     readonly kind: MessageType.CYCLE_FAILED;
