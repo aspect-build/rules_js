@@ -379,18 +379,18 @@ def _js_image_layer_impl(ctx):
                 if contents:
                     contents += ","
 
-                runfiles_dest = runfiles_dest + f.tree_relative_path
-                path = path + f.tree_relative_path
+                file_dest = runfiles_dest + "/" + f.tree_relative_path
+                file_path = json.encode(f.path)
                 contents += _ENTRY % (
-                    runfiles_dest,
-                    path,
+                    file_dest,
+                    file_path,
                     f.root.path,
                     "true" if f.is_source else "false",
                     f.owner.repo_name,
                     # To avoid O(N ^ N) complexity when searching for entries by their destination
                     # the map also has to have entries by their path on bazel-out,
-                    path,
-                    runfiles_dest,
+                    file_path,
+                    file_dest,
                 )
             return contents
 
