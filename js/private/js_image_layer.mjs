@@ -5,8 +5,6 @@ import * as path from 'node:path'
 /**
  * @typedef {{
  *	 is_source: boolean
- *: boolean
- *	 is_external: boolean
  *	 dest: string
  *	 root?: string
  *	 skip?: boolean
@@ -168,7 +166,7 @@ async function split() {
         if (typeof entries[key] == 'string') {
             continue
         }
-        const { dest, is_source, is_external, root, repo_name } = entries[key]
+        const { dest, is_source, root, repo_name } = entries[key]
 
         /** @type Set<string> */
         let mtree = null
@@ -213,7 +211,18 @@ async function split() {
             // it's important that we don't treat any symlink pointing out of execroot since
             // bazel symlinks external files into sandbox to make them available to us.
             if (realp) {
-                const output_path = realp.slice(realp.indexOf(root))
+                const rootIdx = realp.indexOf(root)
+                if (rootIdx < 0) {
+                    throw new Error(
+                        `Couldn't map symbolic link to a path: "${root}" not found in resolved path. Please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose\n\n` +
+                            `dest: ${dest}\n` +
+                            `realpath: ${realp}\n` +
+                            `root: ${root}\n` +
+                            `repo_name: ${repo_name}\n` +
+                            `runfiles: ${key}\n\n`
+                    )
+                }
+                const output_path = realp.slice(rootIdx)
                 // Look in all entries for symlinks since they may be in other layers
                 let linkname = findKeyByValue(entries, output_path)
 
@@ -223,23 +232,11 @@ async function split() {
                 //   external files: bazel-out/<cfg>/bin/external/<repo>/... → <repo>/...
                 //   main-workspace: bazel-out/<cfg>/bin/<pkg>/...           → REPO_NAME/<pkg>/...
                 if (linkname == undefined) {
-                    const pathAfterRoot = realp.slice(realp.indexOf(root) + root.length + 1)
+                    const pathAfterRoot = realp.slice(rootIdx + root.length).replace(/^\//, '')
                     const rloc = pathAfterRoot.startsWith('external/')
                         ? pathAfterRoot.slice('external/'.length)
                         : REPO_NAME + '/' + pathAfterRoot
                     linkname = RUNFILES_DIR + '/' + rloc
-                }
-
-                if (linkname == undefined) {
-                    throw new Error(
-                        `Couldn't map symbolic link ${output_path} to a path. please file a bug at https://github.com/aspect-build/rules_js/issues/new/choose\n\n` +
-                            `dest: ${dest}\n` +
-                            `realpath: ${realp}\n` +
-                            `output_path: ${output_path}\n` +
-                            `root: ${root}\n` +
-                            `repo_name: ${repo_name}\n` +
-                            `runfiles: ${key}\n\n`
-                    )
                 }
                 // add the symlink to the mtree
                 mtree.add(_mtree_link_line(key, linkname))
