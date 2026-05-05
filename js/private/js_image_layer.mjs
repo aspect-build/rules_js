@@ -199,9 +199,9 @@ async function split() {
             )
         }
 
-        // If its external or if it does not match the `preserve_symlinks` regex
+        // If the path does not match the `preserve_symlinks` regex
         // we don't support preserving symlinks.
-        if (is_external || !preserveSymlniksRe.test(key)) {
+        if (!preserveSymlniksRe.test(key)) {
             // Just add the file as a regular file.
             mtree.add(_mtree_file_line(key, dest))
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
@@ -217,16 +217,17 @@ async function split() {
                 // Look in all entries for symlinks since they may be in other layers
                 let linkname = findKeyByValue(entries, output_path)
 
-                // First party dependencies are linked against a folder in output tree or source tree
-                // which means that we won't have an exact match for it in the entries. We could continue
-                // doing what we have done https://github.com/aspect-build/rules_js/commit/f83467ba91deb88d43fd4ac07991b382bb14945f
-                // but that is expensive and does not scale.
-                if (linkname == undefined && !repo_name) {
-                    linkname =
-                        RUNFILES_DIR +
-                        '/' +
-                        REPO_NAME +
-                        realp.slice(realp.indexOf(root) + root.length)
+                // Symlinks may resolve to a directory (e.g. node_modules/acorn → .aspect_rules_js/acorn@x/node_modules/acorn)
+                // that has no single reverse-map entry. Fall back to computing the runfiles path
+                // using the same logic as _to_rlocation_path in js_image_layer.bzl:
+                //   external files: bazel-out/<cfg>/bin/external/<repo>/... → <repo>/...
+                //   main-workspace: bazel-out/<cfg>/bin/<pkg>/...           → REPO_NAME/<pkg>/...
+                if (linkname == undefined) {
+                    const pathAfterRoot = realp.slice(realp.indexOf(root) + root.length + 1)
+                    const rloc = pathAfterRoot.startsWith('external/')
+                        ? pathAfterRoot.slice('external/'.length)
+                        : REPO_NAME + '/' + pathAfterRoot
+                    linkname = RUNFILES_DIR + '/' + rloc
                 }
 
                 if (linkname == undefined) {
