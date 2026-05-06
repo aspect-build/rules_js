@@ -88,6 +88,15 @@ js_test(
     entry_point = "test.js",
 )
 
+# TEST: js_test(data = source file, chdir = package_name())
+js_test(
+    name = "chdir-source-data",
+    args = ["data.json"],
+    chdir = package_name(),
+    data = [":data.json"],
+    entry_point = "open_file.mjs",
+)
+
 # TEST: js_test(data = genrule()) -------------------------
 js_test(
     name = "from-genrule",
