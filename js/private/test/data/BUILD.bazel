@@ -89,10 +89,37 @@ js_test(
 )
 
 # TEST: js_test(data = source file, chdir = package_name())
+# This test and the following one verify that with `chdir = package_name()` we
+# are changing to the correct directory, by making sure data.json is present in
+# the working directory.
 js_test(
     name = "chdir-source-data",
     args = ["data.json"],
     chdir = package_name(),
+    data = [":data.json"],
+    entry_point = "open_file.mjs",
+)
+
+js_test(
+    name = "chdir-source-data-relative",
+    args = ["./data.json"],
+    chdir = package_name(),
+    data = [":data.json"],
+    entry_point = "open_file.mjs",
+)
+
+# TEST: js_test(data = source file, chdir = None) with rootpath
+js_test(
+    name = "source-data-rootpath",
+    args = ["$(rootpath :data.json)"],
+    data = [":data.json"],
+    entry_point = "open_file.mjs",
+)
+
+# TEST: js_test(data = source file, chdir = None) with execpath
+js_test(
+    name = "source-data-execpath",
+    args = ["$(execpath :data.json)"],
     data = [":data.json"],
     entry_point = "open_file.mjs",
 )
