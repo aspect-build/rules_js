@@ -97,7 +97,7 @@ js_test(
     args = ["data.json"],
     chdir = package_name(),
     data = [":data.json"],
-    entry_point = "open_file.mjs",
+    entry_point = "open_arg.mjs",
 )
 
 js_test(
@@ -105,7 +105,7 @@ js_test(
     args = ["./data.json"],
     chdir = package_name(),
     data = [":data.json"],
-    entry_point = "open_file.mjs",
+    entry_point = "open_arg.mjs",
 )
 
 # TEST: js_test(data = source file, chdir = None) with rootpath
@@ -113,7 +113,7 @@ js_test(
     name = "source-data-rootpath",
     args = ["$(rootpath :data.json)"],
     data = [":data.json"],
-    entry_point = "open_file.mjs",
+    entry_point = "open_arg.mjs",
 )
 
 # TEST: js_test(data = source file, chdir = None) with execpath
@@ -121,7 +121,7 @@ js_test(
     name = "source-data-execpath",
     args = ["$(execpath :data.json)"],
     data = [":data.json"],
-    entry_point = "open_file.mjs",
+    entry_point = "open_arg.mjs",
 )
 
 # TEST: js_test(data = genrule()) -------------------------
