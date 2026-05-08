@@ -6,6 +6,7 @@ import * as net from 'node:net';
 export var MessageType;
 (function (MessageType) {
     MessageType["CYCLE"] = "CYCLE";
+    MessageType["CYCLE_RESET"] = "CYCLE_RESET";
     MessageType["CYCLE_FAILED"] = "CYCLE_FAILED";
     MessageType["CYCLE_COMPLETED"] = "CYCLE_COMPLETED";
     MessageType["NEGOTIATE"] = "NEGOTIATE";
@@ -17,6 +18,9 @@ export var MessageType;
 // Environment constants
 const { JS_BINARY__LOG_DEBUG } = process.env;
 function selectVersion(versions) {
+    if (versions.includes(3)) {
+        return 3;
+    }
     if (versions.includes(1)) {
         return 1;
     }
@@ -109,9 +113,13 @@ export class AspectWatchProtocol {
      */
     async cycle(once) {
         do {
-            // Only receive a cycle messages, forever up until the connection is closed.
+            // Only receive cycle messages, forever up until the connection is closed.
             // Connection errors will propagate.
-            const cycleMsg = await this._receive(MessageType.CYCLE);
+            const cycleMsg = await this._receive();
+            if (cycleMsg.kind !== MessageType.CYCLE &&
+                cycleMsg.kind !== MessageType.CYCLE_RESET) {
+                throw new Error(`Expected CYCLE or CYCLE_RESET, got ${cycleMsg.kind}`);
+            }
             // Invoke the cycle callback while recording+logging errors
             let cycleError = null;
             try {

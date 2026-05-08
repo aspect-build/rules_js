@@ -6,7 +6,10 @@ import * as child_process from 'node:child_process'
 import * as crypto from 'node:crypto'
 import * as readline from 'node:readline'
 
-import { AspectWatchProtocol } from '../../watch/aspect_watch_protocol.mjs'
+import {
+    AspectWatchProtocol,
+    MessageType,
+} from '../../watch/aspect_watch_protocol.mjs'
 
 // Environment constants
 const {
@@ -668,6 +671,16 @@ async function runWatchProtocol(
 async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     // Re-parse the config file to get the latest list of data files to copy
     const newFiles = await fs.promises.readFile(entriesPath).then(JSON.parse)
+
+    // Host signaled lost delta state - sync everything from runfiles.
+    if (cycle.kind === MessageType.CYCLE_RESET) {
+        return syncFiles(
+            newFiles,
+            sandbox,
+            config.grant_sandbox_write_permissions,
+            syncRecursive
+        )
+    }
 
     // Only sync files changed in the current cycle.
     const filesToSync = newFiles.filter(([f]) =>

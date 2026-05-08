@@ -14,6 +14,7 @@ import * as net from 'node:net';
 var MessageType;
 (function (MessageType) {
     MessageType["CYCLE"] = "CYCLE";
+    MessageType["CYCLE_RESET"] = "CYCLE_RESET";
     MessageType["CYCLE_FAILED"] = "CYCLE_FAILED";
     MessageType["CYCLE_COMPLETED"] = "CYCLE_COMPLETED";
     MessageType["NEGOTIATE"] = "NEGOTIATE";
@@ -25,6 +26,9 @@ var MessageType;
 // Environment constants
 const { JS_BINARY__LOG_DEBUG: JS_BINARY__LOG_DEBUG$1 } = process.env;
 function selectVersion(versions) {
+    if (versions.includes(3)) {
+        return 3;
+    }
     if (versions.includes(1)) {
         return 1;
     }
@@ -117,9 +121,13 @@ class AspectWatchProtocol {
      */
     async cycle(once) {
         do {
-            // Only receive a cycle messages, forever up until the connection is closed.
+            // Only receive cycle messages, forever up until the connection is closed.
             // Connection errors will propagate.
-            const cycleMsg = await this._receive(MessageType.CYCLE);
+            const cycleMsg = await this._receive();
+            if (cycleMsg.kind !== MessageType.CYCLE &&
+                cycleMsg.kind !== MessageType.CYCLE_RESET) {
+                throw new Error(`Expected CYCLE or CYCLE_RESET, got ${cycleMsg.kind}`);
+            }
             // Invoke the cycle callback while recording+logging errors
             let cycleError = null;
             try {
@@ -863,6 +871,16 @@ async function runWatchProtocol(
 async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     // Re-parse the config file to get the latest list of data files to copy
     const newFiles = await fs.promises.readFile(entriesPath).then(JSON.parse);
+
+    // Host signaled lost delta state - sync everything from runfiles.
+    if (cycle.kind === MessageType.CYCLE_RESET) {
+        return syncFiles(
+            newFiles,
+            sandbox,
+            config.grant_sandbox_write_permissions,
+            syncRecursive
+        )
+    }
 
     // Only sync files changed in the current cycle.
     const filesToSync = newFiles.filter(([f]) =>
