@@ -37,6 +37,7 @@ js_binary(
         "//:node_modules/@mycorp/pkg-b",
         "//:node_modules/chalk",
         "@repo//:dir",
+        "@repo//:node_modules/acorn",
         "@repo//:source_txt",
         "@repo//:sources",
     ],
