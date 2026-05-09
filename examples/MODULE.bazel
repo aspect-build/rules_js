@@ -106,7 +106,7 @@ npm.npm_translate_lock(
 use_repo(
     npm,
     "npm",
-    "npm__next__15.2.6_1816342077__links",
+    "npm__next__14.2.35_1816342077__links",
     "npm__rollup__4.55.2",
     "npm__rollup__4.55.2__links",
 )

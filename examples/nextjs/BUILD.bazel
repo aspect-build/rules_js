@@ -77,7 +77,7 @@ build_test(
 write_source_files(
     name = "write_next_links_defs",
     files = {
-        "snapshots/next_links_defs.bzl": "@npm__next__15.2.6_1816342077__links//:defs.bzl",
+        "snapshots/next_links_defs.bzl": "@npm__next__14.2.35_1816342077__links//:defs.bzl",
     },
     tags = [
         "skip-on-bazel8",
