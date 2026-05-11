@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@bazel/runfiles':
+        specifier: 6.5.0
+        version: 6.5.0
       '@mycorp/pkg-a':
         specifier: workspace:*
         version: link:pkg/a
@@ -40,6 +43,9 @@ importers:
         version: 8.3.2
 
 packages:
+
+  '@bazel/runfiles@6.5.0':
+    resolution: {integrity: sha512-RzahvqTkfpY2jsDxo8YItPX+/iZ6hbiikw1YhE0bA9EKBR5Og8Pa6FHn9PO9M0zaXRVsr0GFQLKbB/0rzy9SzA==}
 
   acorn@8.0.0:
     resolution: {integrity: sha512-wuJmBvKP9pkjPd2m+6skNcgK6S43df5cRbUTWQlns8rukcu5bcSvx9eZjvNXTtFe4+oCslAvIhNCvYBe/69xMw==}
@@ -76,13 +82,17 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
 snapshots:
+
+  '@bazel/runfiles@6.5.0': {}
 
   acorn@8.0.0: {}
 

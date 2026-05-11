@@ -1,7 +1,17 @@
 const chalk = require('chalk')
 const fs = require('fs')
 const os = require('os')
-const path = require('path')
+const { Runfiles } = require('@bazel/runfiles')
+
+const runfiles = new Runfiles(process.env)
+
+function runfileExists(rlocation) {
+    try {
+        return fs.existsSync(runfiles.resolve(rlocation))
+    } catch {
+        return false
+    }
+}
 
 const space = ' '
 const art = fs.readFileSync(__dirname + '/ascii.art')
@@ -52,39 +62,24 @@ console.log('')
 console.log(
     chalk.bold.bgYellow(' SOURCE CHECK '),
     space,
-    chalk.yellowBright(
-        fs.existsSync(
-            path.join(process.env.JS_BINARY__RUNFILES, 'repo/source.txt')
-        )
-    )
+    chalk.yellowBright(runfileExists('repo/source.txt'))
 )
 console.log(
     chalk.bold.bgMagenta(' DIRECTORY CHECK '),
     space,
-    chalk.magentaBright(
-        fs.existsSync(
-            path.join(process.env.JS_BINARY__RUNFILES, 'repo/dir/source.txt')
-        )
-    )
+    chalk.magentaBright(runfileExists('repo/dir/source.txt'))
 )
 console.log(
     chalk.bold.bgMagenta(' SOURCE DIRECTORY CHECK '),
     space,
-    chalk.magentaBright(
-        fs.existsSync(
-            path.join(process.env.JS_BINARY__RUNFILES, 'repo/srcdir/source.txt')
-        )
-    )
+    chalk.magentaBright(runfileExists('repo/srcdir/source.txt'))
 )
 console.log(
     chalk.bold.bgWhite(' PROTO CHECK '),
     space,
     chalk.whiteBright(
-        fs.existsSync(
-            path.join(
-                process.env.JS_BINARY__RUNFILES,
-                'com_google_googleapis/google/cloud/speech/v1p1beta1/speech_proto-descriptor-set.proto.bin'
-            )
+        runfileExists(
+            'com_google_googleapis/google/cloud/speech/v1p1beta1/speech_proto-descriptor-set.proto.bin'
         )
     )
 )
