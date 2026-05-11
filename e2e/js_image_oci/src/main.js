@@ -83,3 +83,8 @@ console.log(
         )
     )
 )
+console.log(
+    chalk.bold.bgCyan(' REPO NPM CHECK '),
+    space,
+    chalk.cyanBright(runfileExists('repo/node_modules/acorn'))
+)

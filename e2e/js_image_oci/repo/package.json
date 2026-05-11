@@ -1,0 +1,9 @@
+{
+    "name": "repo",
+    "dependencies": {
+        "acorn": "^8.7.1"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    }
+}

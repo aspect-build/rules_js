@@ -20,6 +20,7 @@ commandTests:
               ' DIRECTORY CHECK    true',
               ' PROTO CHECK    true',
               ' SOURCE DIRECTORY CHECK    true',
+              ' REPO NPM CHECK    true',
           ]
     - name: 'smoke2'
       command: '/usr/bin/bash'
@@ -40,4 +41,5 @@ commandTests:
               ' DIRECTORY CHECK    true',
               ' PROTO CHECK    true',
               ' SOURCE DIRECTORY CHECK    true',
+              ' REPO NPM CHECK    true',
           ]

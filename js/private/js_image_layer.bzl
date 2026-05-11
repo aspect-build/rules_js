@@ -329,7 +329,7 @@ def _to_rlocation_path(file, workspace):
 def _repo_mapping_manifest(files_to_run):
     return getattr(files_to_run, "repo_mapping_manifest", None)
 
-_ENTRY = '"%s":{"dest":%s,"root":"%s","is_external":%s,"is_source":%s,"repo_name":"%s"},\n%s:"%s"'
+_ENTRY = '"%s":{"dest":%s,"root":"%s","is_source":%s,"repo_name":"%s"},\n%s:"%s"'
 
 def _js_image_layer_impl(ctx):
     if len(ctx.attr.binary) != 1:
@@ -362,7 +362,6 @@ def _js_image_layer_impl(ctx):
                 runfiles_dest,
                 path,
                 f.root.path,
-                "true" if f.owner.repo_name != "" else "false",
                 "true" if f.is_source else "false",
                 f.owner.repo_name,
                 # To avoid O(N ^ N) complexity when searching for entries by their destination
@@ -380,19 +379,18 @@ def _js_image_layer_impl(ctx):
                 if contents:
                     contents += ","
 
-                runfiles_dest = runfiles_dest + f.tree_relative_path
-                path = path + f.tree_relative_path
+                file_dest = runfiles_dest + "/" + f.tree_relative_path
+                file_path = json.encode(f.path)
                 contents += _ENTRY % (
-                    runfiles_dest,
-                    path,
+                    file_dest,
+                    file_path,
                     f.root.path,
-                    "true" if f.owner.repo_name != "" else "false",
                     "true" if f.is_source else "false",
                     f.owner.repo_name,
                     # To avoid O(N ^ N) complexity when searching for entries by their destination
                     # the map also has to have entries by their path on bazel-out,
-                    path,
-                    runfiles_dest,
+                    file_path,
+                    file_dest,
                 )
             return contents
 

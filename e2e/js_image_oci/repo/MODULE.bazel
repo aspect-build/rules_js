@@ -3,4 +3,20 @@ module(
     version = "0.0.0",
 )
 
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../../..",
+)
+
 bazel_dep(name = "bazel_lib", version = "3.0.0")
+bazel_dep(name = "platforms", version = "0.0.10")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "repo_npm",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "repo_npm")
