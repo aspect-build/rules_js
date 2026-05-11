@@ -30,11 +30,8 @@ workspaces:
                   without: true
             - buildifier:
                   without: true
-            # Broken on bazel8?
-            - bazel-8:
-                  without: true
-            # Still depends on some WORKSPACE setup
-            - bazel-9:
+            # The `llvm` module's hermetic toolchain requires Bazel 8+.
+            - bazel-7:
                   without: true
     e2e/nextjs:
         icon: nextjs

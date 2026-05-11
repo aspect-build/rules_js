@@ -1,6 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@container_structure_test//:defs.bzl", "container_structure_test")
-load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load")
 
 platform(
     name = "linux_amd64",
@@ -86,10 +86,10 @@ container_structure_test(
 # FIXME: due to bzlmod Node.js toolchain issuehttps://github.com/aspect-build/rules_js/issues/1530,
 # on MacOS, this target must be built with `--extra_toolchains` to select right the linux Node.js
 # toolchain for the image layer:
-# bazel run //src:image_tarball --extra_toolchains=@nodejs_toolchains//:linux_arm64_toolchain_target
+# bazel run //src:image_load --extra_toolchains=@nodejs_toolchains//:linux_arm64_toolchain_target
 # docker run -t e2e_js_image_oci:latest
-oci_tarball(
-    name = "image_tarball",
+oci_load(
+    name = "image_load",
     image = ":image",
     repo_tags = ["e2e_js_image_oci:latest"],
 )
