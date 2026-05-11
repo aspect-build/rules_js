@@ -672,39 +672,40 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     // Re-parse the config file to get the latest list of data files to copy
     const newFiles = await fs.promises.readFile(entriesPath).then(JSON.parse)
 
-    // Host signaled lost delta state - sync everything from runfiles.
-    if (cycle.kind === MessageType.CYCLE_RESET) {
-        return syncFiles(
-            newFiles,
-            sandbox,
-            config.grant_sandbox_write_permissions,
-            syncRecursive
+    const oldFiles = config.previous_files || []
+    config.previous_files = newFiles
+
+    // Re-sync everything by default
+    let filesToSync = newFiles
+    let toDelete = oldFiles
+    let toKeep = newFiles
+    let doSync = syncRecursive
+
+    // For CYCLE message we have more informatino about what changed and can do minimal syncing.
+    if (cycle.kind == MessageType.CYCLE) {
+        filesToSync = newFiles.filter(([f]) =>
+            cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`)
         )
-    }
-
-    // Only sync files changed in the current cycle.
-    const filesToSync = newFiles.filter(([f]) =>
-        cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`)
-    )
-
-    // The files marked for deletion in this cycle
-    const toDelete = []
-    for (const l in cycle.sources) {
-        if (cycle.sources[l] === null) {
-            toDelete.push([
-                l.slice(JS_BINARY__WORKSPACE.length + 1),
-                /*isDirectory=*/ false,
-            ])
+        toDelete = []
+        for (const l in cycle.sources) {
+            if (cycle.sources[l] === null) {
+                toDelete.push([
+                    l.slice(JS_BINARY__WORKSPACE.length + 1),
+                    /*isDirectory=*/ false,
+                ])
+            }
         }
+        toKeep = []
+        doSync = cycleSyncRecurse.bind(null, cycle)
     }
 
     await Promise.all([
-        deleteFiles(toDelete, [], sandbox),
+        deleteFiles(toDelete, toKeep, sandbox),
         syncFiles(
             filesToSync,
             sandbox,
             config.grant_sandbox_write_permissions,
-            cycleSyncRecurse.bind(null, cycle)
+            doSync
         ),
     ])
 }
