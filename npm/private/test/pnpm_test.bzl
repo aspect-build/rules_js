@@ -3,7 +3,7 @@
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:pnpm.bzl", "pnpm")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
-load("//npm/private:pnpm_repository.bzl", "LATEST_PNPM_VERSION")
+load("//npm/private:pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 
 def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None, include_npm = False):
@@ -168,6 +168,14 @@ def _integrity_conflict(ctx):
         ],
     )
 
+def _default_version(ctx):
+    # Lockfile format is tied to the pnpm major. Pinning the default to v10
+    # keeps the lockfile format at v9; bumping the major changes the format
+    # and is a breaking change for users. Guard against accidental bumps.
+    env = unittest.begin(ctx)
+    asserts.equals(env, "10", DEFAULT_PNPM_VERSION.split(".")[0])
+    return unittest.end(env)
+
 def _cpu_constraints(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64"], pnpm.to_bazel_cpu_constraints(["arm64"]))
@@ -211,6 +219,7 @@ include_npm_test = unittest.make(_include_npm)
 integrity_conflict_test = unittest.make(_integrity_conflict)
 from_package_json_simple_test = unittest.make(_from_package_json_simple)
 from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
+default_version_test = unittest.make(_default_version)
 cpu_constraints_test = unittest.make(_cpu_constraints)
 os_constraints_test = unittest.make(_os_constraints)
 os_cpu_constraints_test = unittest.make(_os_cpu_constraints)
@@ -226,6 +235,7 @@ def pnpm_tests(name):
         integrity_conflict_test,
         from_package_json_simple_test,
         from_package_json_with_hash_test,
+        default_version_test,
         cpu_constraints_test,
         os_constraints_test,
         os_cpu_constraints_test,
