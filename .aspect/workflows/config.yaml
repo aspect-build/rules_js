@@ -171,7 +171,7 @@ tasks:
           name: Bazel 9 (no execroot entry point)
           id: bazel-9-no-execroot-entry-point
           bazel:
-              flags: ['--test_tag_filters=-skip-on-bazel9', '--//js:use_execroot_entry_point=False']
+              flags: ['--test_tag_filters=-skip-on-bazel9', '--@aspect_rules_js//js:use_execroot_entry_point=False']
           env:
               USE_BAZEL_VERSION: '9.0.2'
     - format:
