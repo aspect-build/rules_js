@@ -260,6 +260,7 @@ def _npm_package_store_impl(ctx):
                     execution_requirements = {
                         "supports-path-mapping": "1",
                     },
+                    toolchain = tar_lib.toolchain_type,
 
                     # Always override the locale to give better hermeticity.
                     # See https://github.com/aspect-build/rules_js/issues/2039
