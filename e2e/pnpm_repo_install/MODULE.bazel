@@ -55,8 +55,8 @@ pnpm.pnpm(
 )
 pnpm.pnpm(
     name = "pnpm_patched",
+    patches = ["//:patches/pnpm_hello.patch"],
     pnpm_version = "9.15.9",
     pnpm_version_integrity = "sha512-aARhQYk8ZvrQHAeSMRKOmvuJ74fiaR1p5NQO7iKJiClf1GghgbrlW1hBjDolO95lpQXsfF+UA+zlzDzTfc8lMQ==",
-    patches = ["//:patches/pnpm_hello.patch"],
 )
 use_repo(pnpm, "pnpm", "pnpm_patched", "pnpm_v10", "pnpm_v11")

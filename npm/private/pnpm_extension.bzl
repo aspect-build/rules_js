@@ -28,6 +28,7 @@ def resolve_pnpm_repositories(mctx):
     # Collect all the module tags and associated versions/integrities/options
     integrity = {}
     registrations = {}
+
     # Patches and patch_args are per-repo-name (NOT per-version) and only
     # accepted from the root module. Multiple tags for the same repo name
     # concatenate their patches and the last patch_args wins.
