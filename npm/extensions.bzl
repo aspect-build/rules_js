@@ -368,6 +368,8 @@ def _pnpm_extension_impl(module_ctx):
             pnpm_version = pnpm["version"],
             integrity = pnpm["integrity"],
             include_npm = pnpm["include_npm"],
+            patches = pnpm.get("patches", []),
+            patch_args = pnpm.get("patch_args", ["-p1"]),
         )
 
     kwargs = {}
@@ -402,6 +404,16 @@ pnpm = module_extension(
                     default = None,
                 ),
                 "pnpm_version_integrity": attr.string(),
+                "patches": attr.label_list(
+                    doc = "Patch files to apply onto the downloaded pnpm package. " +
+                          "Paths in the patches are relative to the npm tarball root " +
+                          "(which begins with `package/`).",
+                    default = [],
+                ),
+                "patch_args": attr.string_list(
+                    doc = "Arguments for the patch tool. Defaults to [\"-p1\"].",
+                    default = ["-p1"],
+                ),
             },
         ),
     },

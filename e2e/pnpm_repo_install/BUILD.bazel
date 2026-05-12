@@ -20,3 +20,12 @@ sh_test(
     args = ["$(location @pnpm_v11//:pnpm)"],
     data = ["@pnpm_v11//:pnpm"],
 )
+
+sh_test(
+    name = "pnpm_patch_test",
+    srcs = ["pnpm_patch_test.sh"],
+    data = [
+        "@bazel_tools//tools/bash/runfiles",
+        "@pnpm_patched//:pnpm",
+    ],
+)
