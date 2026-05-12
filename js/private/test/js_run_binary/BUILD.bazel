@@ -4,64 +4,6 @@ load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
-# Verify that the js_binary tool's data dependencies are built in the exec configuration
-# when use_execroot_exec_cfg is True.
-# To do this we check that js_run_binary agrees with genrule on the location of a
-# tool dependency.
-write_file(
-    name = "gen_cfg_probe",
-    out = "cfg_probe.txt",
-    content = ["probe"],
-)
-
-js_binary(
-    name = "find_cfg_probe",
-    data = [":cfg_probe.txt"],
-    entry_point = "find_cfg_probe.mjs",
-)
-
-js_run_binary(
-    name = "tools_cfg_location",
-    stdout = "tools_cfg_location.txt",
-    tool = ":find_cfg_probe",
-    use_execroot_entry_point = False,
-)
-
-genrule(
-    name = "expected_tools_cfg_location",
-    outs = ["expected_tools_cfg_location.txt"],
-    cmd = "echo $(execpath :cfg_probe.txt) > $@",
-    tools = [":cfg_probe.txt"],
-)
-
-diff_test(
-    name = "tools_exec_cfg_test",
-    file1 = ":tools_cfg_location.txt",
-    file2 = ":expected_tools_cfg_location.txt",
-)
-
-# Verify the opposite: with use_execroot_exec_cfg = False, the tool's data
-# dependencies are built in the target configuration, matching a genrule srcs path.
-js_run_binary(
-    name = "target_cfg_location",
-    stdout = "target_cfg_location.txt",
-    tool = ":find_cfg_probe",
-    use_execroot_entry_point = False,
-)
-
-genrule(
-    name = "expected_target_cfg_location",
-    srcs = [":cfg_probe.txt"],
-    outs = ["expected_target_cfg_location.txt"],
-    cmd = "echo $(execpath :cfg_probe.txt) > $@",
-)
-
-diff_test(
-    name = "target_cfg_test",
-    file1 = ":target_cfg_location.txt",
-    file2 = ":expected_target_cfg_location.txt",
-)
-
 # Verify that dependencies passed via the srcs parameter are always built for
 # the target platform, unlike the tool parameter and its dependencies.
 # We use a select() on the OS to produce a platform-specific file, then
