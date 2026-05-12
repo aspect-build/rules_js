@@ -117,7 +117,17 @@ workspaces:
         tasks: *e2e_tasks
     e2e/repo_mapping:
         icon: js
-        tasks: *e2e_tasks
+        tasks:
+            - test:
+                  queue: aspect-medium
+            - format:
+                  without: true
+            - buildifier:
+                  without: true
+            # aspect_rules_js is given a different name in this repo, so we
+            # cannot use a flag beginning with --@aspect_rules_js//.
+            - bazel-9-no-execroot-entry-point:
+                  without: true
     e2e/output_paths:
         icon: js
         tasks: *e2e_tasks
