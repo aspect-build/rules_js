@@ -397,20 +397,18 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     if allow_execroot_entry_point_with_no_copy_data_to_bin:
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
 
-    # When use_execroot_entry_point is None we use select() for the entire env dict, since
-    # attr.string_dict does not support concatenation with select().
-    if use_execroot_entry_point == None:
-        env_arg = select({
-            Label("//js:_use_execroot_entry_point_true"): fixed_env | {"JS_BINARY__USE_EXECROOT_ENTRY_POINT": "1"} | env,
-            "//conditions:default": fixed_env | env,
-        })
-    else:
-        env_arg = fixed_env | env
+    # When use_execroot_entry_point is None, the env var is resolved at analysis time via the flag.
+    # We use a select() only for the conditional portion and merge with | outside of it, so that
+    # a user-supplied env that is itself a select() remains valid on the right-hand side.
+    env_arg = select({
+        Label("//js:_use_execroot_entry_point_true"): {"JS_BINARY__USE_EXECROOT_ENTRY_POINT": "1"},
+        "//conditions:default": {},
+    }) if use_execroot_entry_point == None else {}
 
     _run_binary(
         name = name,
         tool = tool,
-        env = env_arg,
+        env = fixed_env | env_arg | env,
         srcs = srcs + extra_srcs + execroot_extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,
