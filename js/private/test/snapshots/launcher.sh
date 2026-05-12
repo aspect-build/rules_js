@@ -464,8 +464,10 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     case "$ARG" in
     # Let users pass through arguments to node itself
     --node_options=*) JS_BINARY__NODE_OPTIONS+=("${ARG#--node_options=}") ;;
-    # Remaining argv is collected to pass to the program
-    *) ARGS+=("$ARG") ;;
+    # Remaining argv is collected to pass to the program.
+    # Expand $RUNFILES_DIR so callers can reference the runfiles directory in args
+    # using $$RUNFILES_DIR (the $$ is needed to prevent Bazel make-variable expansion).
+    *) ARGS+=("${ARG//\$RUNFILES_DIR/$RUNFILES_DIR}") ;;
     esac
 done
 
