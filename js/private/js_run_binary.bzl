@@ -400,7 +400,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     # When use_execroot_entry_point is None, the env var is resolved at analysis time via the flag.
     # We use a select() only for the conditional portion and merge with | outside of it, so that
     # a user-supplied env that is itself a select() remains valid on the right-hand side.
-    env_arg = select({
+    execroot_env = select({
         Label("//js:_use_execroot_entry_point_true"): {"JS_BINARY__USE_EXECROOT_ENTRY_POINT": "1"},
         "//conditions:default": {},
     }) if use_execroot_entry_point == None else {}
@@ -408,7 +408,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     _run_binary(
         name = name,
         tool = tool,
-        env = fixed_env | env_arg | env,
+        env = fixed_env | execroot_env | env,
         srcs = srcs + extra_srcs + execroot_extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,
