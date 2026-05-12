@@ -1,0 +1,145 @@
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+# Verify that the js_binary tool's data dependencies are built in the exec configuration
+# when use_execroot_exec_cfg is True.
+# To do this we check that js_run_binary agrees with genrule on the location of a
+# tool dependency.
+write_file(
+    name = "gen_cfg_probe",
+    out = "cfg_probe.txt",
+    content = ["probe"],
+)
+
+js_binary(
+    name = "find_cfg_probe",
+    data = [":cfg_probe.txt"],
+    entry_point = "find_cfg_probe.mjs",
+)
+
+js_run_binary(
+    name = "tools_cfg_location",
+    stdout = "tools_cfg_location.txt",
+    tool = ":find_cfg_probe",
+    use_execroot_entry_point = False,
+)
+
+genrule(
+    name = "expected_tools_cfg_location",
+    outs = ["expected_tools_cfg_location.txt"],
+    cmd = "echo $(execpath :cfg_probe.txt) > $@",
+    tools = [":cfg_probe.txt"],
+)
+
+diff_test(
+    name = "tools_exec_cfg_test",
+    file1 = ":tools_cfg_location.txt",
+    file2 = ":expected_tools_cfg_location.txt",
+)
+
+# Verify the opposite: with use_execroot_exec_cfg = False, the tool's data
+# dependencies are built in the target configuration, matching a genrule srcs path.
+js_run_binary(
+    name = "target_cfg_location",
+    stdout = "target_cfg_location.txt",
+    tool = ":find_cfg_probe",
+    use_execroot_entry_point = False,
+)
+
+genrule(
+    name = "expected_target_cfg_location",
+    srcs = [":cfg_probe.txt"],
+    outs = ["expected_target_cfg_location.txt"],
+    cmd = "echo $(execpath :cfg_probe.txt) > $@",
+)
+
+diff_test(
+    name = "target_cfg_test",
+    file1 = ":target_cfg_location.txt",
+    file2 = ":expected_target_cfg_location.txt",
+)
+
+# Verify that dependencies passed via the srcs parameter are always built for
+# the target platform, unlike the tool parameter and its dependencies.
+# We use a select() on the OS to produce a platform-specific file, then
+# transition to three different target platforms and assert the contents match.
+write_file(
+    name = "gen_os_name",
+    out = "os_name.txt",
+    content = select({
+        "@platforms//os:linux": ["linux"],
+        "@platforms//os:macos": ["macos"],
+        "@platforms//os:windows": ["windows"],
+        "//conditions:default": ["other"],
+    }),
+    tags = ["manual"],
+)
+
+platform(
+    name = "linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+platform(
+    name = "macos",
+    constraint_values = ["@platforms//os:macos"],
+)
+
+platform(
+    name = "windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
+js_binary(
+    name = "read_file",
+    entry_point = "read_file.mjs",
+)
+
+js_run_binary(
+    name = "gen_target_os",
+    srcs = [":os_name.txt"],
+    args = ["$(rootpath :os_name.txt)"],
+    stdout = "target_os.txt",
+    tags = ["manual"],
+    tool = ":read_file",
+    use_execroot_entry_point = False,
+)
+
+platform_transition_filegroup(
+    name = "target_os_linux",
+    srcs = [":gen_target_os"],
+    target_platform = ":linux",
+)
+
+platform_transition_filegroup(
+    name = "target_os_macos",
+    srcs = [":gen_target_os"],
+    target_platform = ":macos",
+)
+
+platform_transition_filegroup(
+    name = "target_os_windows",
+    srcs = [":gen_target_os"],
+    target_platform = ":windows",
+)
+
+assert_contains(
+    name = "linux_target_platform_test",
+    actual = ":target_os_linux",
+    expected = "linux",
+)
+
+assert_contains(
+    name = "macos_target_platform_test",
+    actual = ":target_os_macos",
+    expected = "macos",
+)
+
+assert_contains(
+    name = "windows_target_platform_test",
+    actual = ":target_os_windows",
+    expected = "windows",
+)
