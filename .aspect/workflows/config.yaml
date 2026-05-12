@@ -33,6 +33,8 @@ workspaces:
             # The `llvm` module's hermetic toolchain requires Bazel 8+.
             - bazel-7:
                   without: true
+            - bazel-9-no-execroot-entry-point:
+                  without: true
     e2e/nextjs:
         icon: nextjs
         tasks: *e2e_tasks
@@ -93,6 +95,8 @@ workspaces:
             - bazel-8:
                   without: true
             - bazel-9:
+                  without: true
+            - bazel-9-no-execroot-entry-point:
                   without: true
     e2e/pnpm_lockfiles:
         icon: pnpm
