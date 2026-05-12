@@ -167,6 +167,13 @@ tasks:
               # TODO: change this back to 9.x once this bug is fixed:
               # https://github.com/bazelbuild/bazel/issues/29393
               USE_BAZEL_VERSION: '9.0.2'
+    - test:
+          name: Bazel 9 (no execroot entry point)
+          id: bazel-9-no-execroot-entry-point
+          bazel:
+              flags: ['--test_tag_filters=-skip-on-bazel9', '--//js:use_execroot_entry_point=False']
+          env:
+              USE_BAZEL_VERSION: '9.0.2'
     - format:
           queue: aspect-medium
     - buildifier:
