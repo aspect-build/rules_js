@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library", "js_run_binary", "js_test")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -125,24 +125,23 @@ js_library(
     deps = [":node_modules/@rspack/cli"],
 )
 
-bin.rspack(
+bin.rspack_binary(
+    name = "rspack_binary",
+    data = [":rspack_config"],
+)
+
+js_run_binary(
     name = "rspack_build",
-    srcs = [
-        "rspack_entry.js",
-    ],
-    outs = [
-        "rspack/main.bundle.js",
-    ],
+    srcs = ["rspack_entry.js"],
+    outs = ["rspack/main.bundle.js"],
     args = [
         "build",
         "--config",
-        "../../../../../../$(execpath :rspack_config)",
+        "../../../../../../$(execpath :rspack_binary).runfiles/_main/npm/private/test/rspack_config.cjs",
     ],
     chdir = package_name(),
-    tools = [
-        ":node_modules/@rspack/cli",
-        ":rspack_config",
-    ],
+    tool = ":rspack_binary",
+    tools = [":rspack_binary"],
     use_execroot_entry_point = False,
 )
 
