@@ -28,6 +28,12 @@ def resolve_pnpm_repositories(mctx):
     # Collect all the module tags and associated versions/integrities/options
     integrity = {}
     registrations = {}
+
+    # Patches and patch_args are per-repo-name (NOT per-version) and only
+    # accepted from the root module. Multiple tags for the same repo name
+    # concatenate their patches and the last patch_args wins.
+    patches_by_repo = {}
+    patch_args_by_repo = {}
     for mod in mctx.modules:
         for attr in mod.tags.pnpm:
             if attr.name != DEFAULT_PNPM_REPO_NAME and not mod.is_root:
@@ -37,6 +43,10 @@ def resolve_pnpm_repositories(mctx):
                 """)
             if not registrations.get(attr.name, False):
                 registrations[attr.name] = {}
+            if mod.is_root and (getattr(attr, "patches", None) or getattr(attr, "patch_args", None)):
+                patches_by_repo.setdefault(attr.name, [])
+                patches_by_repo[attr.name].extend(getattr(attr, "patches", []) or [])
+                patch_args_by_repo[attr.name] = list(attr.patch_args)
 
             if attr.pnpm_version_from and attr.pnpm_version and attr.pnpm_version != DEFAULT_PNPM_VERSION:
                 fail("Cannot specify both pnpm_version = {} and pnpm_version_from = {}".format(attr.pnpm_version, attr.pnpm_version_from))
@@ -108,6 +118,8 @@ def resolve_pnpm_repositories(mctx):
             "version": selected,
             "include_npm": 0 < len([i for i in versions_map[selected] if i]),
             "integrity": integrity.get(selected, None),
+            "patches": patches_by_repo.get(name, []),
+            "patch_args": patch_args_by_repo.get(name, ["-p1"]),
         }
 
         repositories[name] = selected

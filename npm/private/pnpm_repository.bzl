@@ -10,7 +10,7 @@ LATEST_PNPM_VERSION = PNPM_VERSIONS.keys()[-1]
 # Default to the latest pnpm v10
 DEFAULT_PNPM_VERSION = [v for v in PNPM_VERSIONS.keys() if v.startswith("10")][-1]
 
-def pnpm_repository(name, pnpm_version, include_npm, integrity):
+def pnpm_repository(name, pnpm_version, include_npm, integrity, patches = [], patch_args = ["-p1"]):
     """Import https://npmjs.com/package/pnpm and provide a js_binary to run the tool.
 
     Useful as a way to run exactly the same pnpm as Bazel does, for example with:
@@ -24,6 +24,10 @@ def pnpm_repository(name, pnpm_version, include_npm, integrity):
             `curl --silent https://registry.npmjs.org/pnpm | jq '.versions["8.6.11"].dist.integrity'`
         integrity: integrity hash for the pnpm version (optional)
         include_npm: if True, include the npm package along with pnpm binary
+        patches: list of Label targets pointing to .patch files to apply to the
+            extracted pnpm package (paths relative to the tarball root, which
+            starts with "package/"). Forwarded to the underlying npm_import.
+        patch_args: list of arguments for the patch tool. Defaults to ["-p1"].
     """
 
     if native.existing_rule(name):
@@ -42,6 +46,8 @@ def pnpm_repository(name, pnpm_version, include_npm, integrity):
         package = "pnpm",
         root_package = "",
         version = pnpm_version,
+        patches = patches,
+        patch_args = patch_args,
         extra_build_content = "\n".join([
             """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
             """js_binary(

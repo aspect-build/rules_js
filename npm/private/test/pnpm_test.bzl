@@ -6,13 +6,15 @@ load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm
 load("//npm/private:pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 
-def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None, include_npm = False):
+def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None, include_npm = False, patches = [], patch_args = ["-p1"]):
     return struct(
         name = name,
         pnpm_version = version,
         pnpm_version_from = pnpm_version_from,
         pnpm_version_integrity = integrity,
         include_npm = include_npm,
+        patches = patches,
+        patch_args = patch_args,
     )
 
 def _fake_mod(is_root, *pnpm_tags):
@@ -41,7 +43,7 @@ def _basic(ctx):
     # - rules_js sets a default.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": "8.6.7", "integrity": "8.6.7-integrity", "include_npm": False}},
+        repositories = {"pnpm": {"version": "8.6.7", "integrity": "8.6.7-integrity", "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
         modules = [
             _fake_mod(True),
             _fake_mod(
@@ -56,7 +58,7 @@ def _from_package_json_simple(ctx):
     # packageManager: "pnpm@1.2.3" -> version only, no integrity tuple
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": "1.2.3", "integrity": None, "include_npm": False}},
+        repositories = {"pnpm": {"version": "1.2.3", "integrity": None, "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
         ],
@@ -69,7 +71,7 @@ def _from_package_json_with_hash(ctx):
     # packageManager: "pnpm@1.2.3+sha512.<base64>" -> (version, integrity) tuple
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": "1.2.3", "integrity": "sha512-l0Ypl1YTeLb1KsXGFPOjuSOmUq1ayYcQAobkqi2EpqBkLp5F89AdMMRrErIL6w+GrreQv5qCvFnbQrZ/5p0aJQ==", "include_npm": False}},
+        repositories = {"pnpm": {"version": "1.2.3", "integrity": "sha512-l0Ypl1YTeLb1KsXGFPOjuSOmUq1ayYcQAobkqi2EpqBkLp5F89AdMMRrErIL6w+GrreQv5qCvFnbQrZ/5p0aJQ==", "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(pnpm_version_from = "//:package.json")),
         ],
@@ -80,7 +82,7 @@ def _override(ctx):
     # What happens when the root overrides the pnpm version.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False}},
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
         notes = [],
         modules = [
             _fake_mod(
@@ -107,7 +109,7 @@ def _latest(ctx):
     # - Accept a brittle test.
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": PNPM_VERSIONS[LATEST_PNPM_VERSION], "include_npm": False}},
+        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": PNPM_VERSIONS[LATEST_PNPM_VERSION], "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "latest")),
         ],
@@ -117,8 +119,8 @@ def _include_npm(ctx):
     return _resolve_test(
         ctx,
         repositories = {
-            "pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": True},
-            "wnpm": {"version": "9.2.0", "integrity": "sha512-mKgP0RwucJZ0d2IwQQZDKz3cZ9z1S1qMAck/aKLNXgXmghhJUioG+3YoTUGiZg1eM08u47vykYO/LnObHa+ncQ==", "include_npm": True},
+            "pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": True, "patches": [], "patch_args": ["-p1"]},
+            "wnpm": {"version": "9.2.0", "integrity": "sha512-mKgP0RwucJZ0d2IwQQZDKz3cZ9z1S1qMAck/aKLNXgXmghhJUioG+3YoTUGiZg1eM08u47vykYO/LnObHa+ncQ==", "include_npm": True, "patches": [], "patch_args": ["-p1"]},
         },
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "9.1.0", include_npm = True)),
@@ -131,8 +133,8 @@ def _custom_name(ctx):
     return _resolve_test(
         ctx,
         repositories = {
-            "my-pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False},
-            "pnpm": {"version": "8.6.7", "integrity": "8.6.7-integrity", "include_npm": False},
+            "my-pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False, "patches": [], "patch_args": ["-p1"]},
+            "pnpm": {"version": "8.6.7", "integrity": "8.6.7-integrity", "include_npm": False, "patches": [], "patch_args": ["-p1"]},
         },
         modules = [
             _fake_mod(
@@ -152,7 +154,7 @@ def _integrity_conflict(ctx):
     return _resolve_test(
         ctx,
         repositories = {
-            "pnpm": {"version": "8.6.7", "integrity": "dep-integrity", "include_npm": False},
+            "pnpm": {"version": "8.6.7", "integrity": "dep-integrity", "include_npm": False, "patches": [], "patch_args": ["-p1"]},
         },
         # Modules are *BFS* from root:
         # https://bazel.build/rules/lib/builtins/module_ctx#modules
@@ -164,6 +166,19 @@ def _integrity_conflict(ctx):
             _fake_mod(
                 False,
                 _fake_pnpm_tag(version = "8.6.7", integrity = "dep-integrity"),
+            ),
+        ],
+    )
+
+def _patch_args_empty(ctx):
+    # An explicit patch_args = [] must not be silently dropped in favour of ["-p1"].
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False, "patches": ["//some:patch.patch"], "patch_args": []}},
+        modules = [
+            _fake_mod(
+                True,
+                _fake_pnpm_tag(version = "9.1.0", patches = ["//some:patch.patch"], patch_args = []),
             ),
         ],
     )
@@ -219,6 +234,7 @@ include_npm_test = unittest.make(_include_npm)
 integrity_conflict_test = unittest.make(_integrity_conflict)
 from_package_json_simple_test = unittest.make(_from_package_json_simple)
 from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
+patch_args_empty_test = unittest.make(_patch_args_empty)
 default_version_test = unittest.make(_default_version)
 cpu_constraints_test = unittest.make(_cpu_constraints)
 os_constraints_test = unittest.make(_os_constraints)
@@ -235,6 +251,7 @@ def pnpm_tests(name):
         integrity_conflict_test,
         from_package_json_simple_test,
         from_package_json_with_hash_test,
+        patch_args_empty_test,
         default_version_test,
         cpu_constraints_test,
         os_constraints_test,
