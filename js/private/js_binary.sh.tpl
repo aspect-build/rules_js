@@ -16,9 +16,9 @@ set -o pipefail -o errexit -o nounset
 # changes. runfiles_current_repository (called by rlocation) uses $BASH_SOURCE
 # to locate the calling script and makes its path absolute via cd $(dirname ...),
 # which fails when $0 is relative and the working directory has since changed.
-if [[ "$0" != /* ]]; then
-    exec "$PWD/$0" "$@"
-fi
+# if [[ "$0" != /* ]]; then
+#     exec "$PWD/$0" "$@"
+# fi
 
 {{envs}}
 
