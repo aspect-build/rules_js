@@ -32,6 +32,9 @@ if [[ -z "${JS_BINARY__PATCH_NODE_FS:-}" ]]; then export JS_BINARY__PATCH_NODE_F
 export JS_BINARY__COPY_DATA_TO_BIN="1"
 if [[ -z "${JS_BINARY__LOG_FATAL:-}" ]]; then export JS_BINARY__LOG_FATAL="1"; fi
 if [[ -z "${JS_BINARY__LOG_ERROR:-}" ]]; then export JS_BINARY__LOG_ERROR="1"; fi
+if [[ -z "${JS_BINARY__LOG_WARN:-}" ]]; then export JS_BINARY__LOG_WARN="1"; fi
+if [[ -z "${JS_BINARY__LOG_INFO:-}" ]]; then export JS_BINARY__LOG_INFO="1"; fi
+if [[ -z "${JS_BINARY__LOG_DEBUG:-}" ]]; then export JS_BINARY__LOG_DEBUG="1"; fi
 
 # ==============================================================================
 # Prepare stdout capture, stderr capture && logging
@@ -376,7 +379,9 @@ To disable this validation you can set allow_execroot_entry_point_with_no_copy_d
     fi
 fi
 
-if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    entry_point="$(rlocation _main/js/private/test/shellcheck.js)"
+elif [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     entry_point=$(resolve_execroot_bin_path "js/private/test/shellcheck.js")
 else
     entry_point="$JS_BINARY__RUNFILES/_main/js/private/test/shellcheck.js"
@@ -387,6 +392,9 @@ if [ ! -f "$entry_point" ]; then
 fi
 
 node="$(_normalize_path "../rules_nodejs~~node~nodejs_linux_amd64/bin/nodejs/bin/node")"
+if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    node="$(rlocation ${node:3})"
+fi
 if [ "${node:0:1}" = "/" ]; then
     # A user may specify an absolute path to node using target_tool_path in node_toolchain
     export JS_BINARY__NODE_BINARY="$node"
@@ -424,7 +432,7 @@ if [ "$npm" ]; then
     else
         if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
             export JS_BINARY__NPM_BINARY
-            JS_BINARY__NPM_BINARY=$(resolve_execroot_src_path "")
+            JS_BINARY__NPM_BINARY=$(rlocation "_main/")
         else
             export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/_main/"
         fi
@@ -441,7 +449,7 @@ fi
 
 if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_WRAPPER
-    JS_BINARY__NODE_WRAPPER=$(resolve_execroot_bin_path "js/private/test/shellcheck_launcher_node_bin/node")
+    JS_BINARY__NODE_WRAPPER=$(rlocation "_main/js/private/test/shellcheck_launcher_node_bin/node")
 else
     export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/_main/js/private/test/shellcheck_launcher_node_bin/node"
 fi
@@ -456,7 +464,7 @@ fi
 
 if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_PATCHES
-    JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "js/private/node-patches/register.cjs")
+    JS_BINARY__NODE_PATCHES=$(rlocation "_main/js/private/node-patches/register.cjs")
 else
     export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/_main/js/private/node-patches/register.cjs"
 fi

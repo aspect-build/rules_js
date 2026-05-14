@@ -256,7 +256,9 @@ To disable this validation you can set allow_execroot_entry_point_with_no_copy_d
     fi
 fi
 
-if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    entry_point="$(rlocation {{workspace_name}}/{{entry_point_path}})"
+elif [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     entry_point=$(resolve_execroot_bin_path "{{entry_point_path}}")
 else
     entry_point="$JS_BINARY__RUNFILES/{{workspace_name}}/{{entry_point_path}}"
@@ -267,6 +269,9 @@ if [ ! -f "$entry_point" ]; then
 fi
 
 node="$(_normalize_path "{{node}}")"
+if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    node="$(rlocation ${node:3})"
+fi
 if [ "${node:0:1}" = "/" ]; then
     # A user may specify an absolute path to node using target_tool_path in node_toolchain
     export JS_BINARY__NODE_BINARY="$node"
@@ -304,7 +309,7 @@ if [ "$npm" ]; then
     else
         if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
             export JS_BINARY__NPM_BINARY
-            JS_BINARY__NPM_BINARY=$(resolve_execroot_src_path "{{npm}}")
+            JS_BINARY__NPM_BINARY=$(rlocation "{{workspace_name}}/{{npm}}")
         else
             export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/{{workspace_name}}/{{npm}}"
         fi
@@ -321,7 +326,7 @@ fi
 
 if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_WRAPPER
-    JS_BINARY__NODE_WRAPPER=$(resolve_execroot_bin_path "{{node_wrapper}}")
+    JS_BINARY__NODE_WRAPPER=$(rlocation "{{workspace_name}}/{{node_wrapper}}")
 else
     export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_wrapper}}"
 fi
@@ -336,7 +341,7 @@ fi
 
 if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_PATCHES
-    JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "{{node_patches}}")
+    JS_BINARY__NODE_PATCHES=$(rlocation "{{workspace_name}}/{{node_patches}}")
 else
     export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_patches}}"
 fi

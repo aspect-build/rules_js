@@ -3,6 +3,7 @@
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
+load("@bazel_lib//lib:paths.bzl", "to_rlocation_path")
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
@@ -136,7 +137,7 @@ _ATTRS = {
 
         Log levels: {}""".format(", ".join(LOG_LEVELS.keys())),
         values = LOG_LEVELS.keys(),
-        default = "error",
+        default = "debug",
     ),
     "patch_node_fs": attr.bool(
         doc = """Patch the to Node.js `fs` API (https://nodejs.org/api/fs.html) for this node program
@@ -472,6 +473,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
+    entry_point_path = entry_point_path.replace("/./", "/")
     bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
