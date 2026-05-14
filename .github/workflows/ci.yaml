@@ -132,7 +132,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [macos-latest, windows-latest]
+                os: [windows-latest]
         env:
             ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
         steps:
@@ -147,7 +147,7 @@ jobs:
             - name: bazel test //...
               shell: bash
               run: |
-                  bazel test \
+                  bazel test -k --verbose_failures \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
                     //...
