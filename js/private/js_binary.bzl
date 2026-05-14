@@ -269,6 +269,9 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-patches:register.cjs"),
     ),
+    "_bash_runfiles_lib": attr.label(
+        default = Label("@bazel_tools//tools/bash/runfiles"),
+    ),
 }
 
 _ENV_SET = """export {var}={quoted_value}"""
@@ -500,7 +503,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
             include_transitive_types = ctx.attr.include_transitive_types,
             include_npm_sources = ctx.attr.include_npm_sources,
         ),
-    ))
+    )).merge(ctx.attr._bash_runfiles_lib[DefaultInfo].default_runfiles)
 
     return struct(
         executable = launcher,
