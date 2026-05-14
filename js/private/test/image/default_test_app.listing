@@ -18,3 +18,8 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/
 -r-xr-xr-x  0 0      0         133 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/node
 -r-xr-xr-x  0 0      0          20 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/main.js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/bazel_tools/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/bazel_tools/tools/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/bazel_tools/tools/bash/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/bazel_tools/tools/bash/runfiles/
+-r-xr-xr-x  0 0      0       21636 Jan  1  1970 ./js/private/test/image/bin.runfiles/bazel_tools/tools/bash/runfiles/runfiles.bash

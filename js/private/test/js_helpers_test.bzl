@@ -12,7 +12,7 @@ def _single_rlocation_ref_test(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
+        "$$(rlocation $(rlocationpath :rspack_config))",
         expand_rlocation_refs("$(rlocation :rspack_config)"),
     )
     return unittest.end(env)
@@ -21,7 +21,7 @@ def _rlocation_ref_with_surrounding_text_test(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "--config=$$RUNFILES_DIR/$(rlocationpath :my_config)",
+        "--config=$$(rlocation $(rlocationpath :my_config))",
         expand_rlocation_refs("--config=$(rlocation :my_config)"),
     )
     return unittest.end(env)
@@ -30,7 +30,7 @@ def _multiple_rlocation_refs_test(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "$$RUNFILES_DIR/$(rlocationpath :foo):$$RUNFILES_DIR/$(rlocationpath :bar)",
+        "$$(rlocation $(rlocationpath :foo)):$$(rlocation $(rlocationpath :bar))",
         expand_rlocation_refs("$(rlocation :foo):$(rlocation :bar)"),
     )
     return unittest.end(env)
@@ -39,7 +39,7 @@ def _absolute_label_rlocation_ref_test(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "$$RUNFILES_DIR/$(rlocationpath //some/pkg:target)",
+        "$$(rlocation $(rlocationpath //some/pkg:target))",
         expand_rlocation_refs("$(rlocation //some/pkg:target)"),
     )
     return unittest.end(env)

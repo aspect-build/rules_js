@@ -17,3 +17,8 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/plat
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/test/image/platform_deps/bin_node_bin/
 -r-xr-xr-x  0 0      0         133 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/test/image/platform_deps/bin_node_bin/node
 -r-xr-xr-x  0 0      0          20 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/test/image/platform_deps/main.js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/bazel_tools/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/bazel_tools/tools/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/bazel_tools/tools/bash/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/bazel_tools/tools/bash/runfiles/
+-r-xr-xr-x  0 0      0       21636 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/bazel_tools/tools/bash/runfiles/runfiles.bash

@@ -191,7 +191,7 @@ def gather_runfiles(
     ])
 
 def expand_rlocation_refs(value):
-    """Pre-processes $(rlocation <label>) into $$RUNFILES_DIR/$(rlocationpath <label>).
+    """Pre-processes $(rlocation <label>) into $$(rlocation $(rlocationpath <label>)).
 
     After this transformation, the standard expand_locations/expand_variables chain
     resolves the rlocationpath and converts $$ to a literal $.
@@ -209,7 +209,7 @@ def expand_rlocation_refs(value):
         if end == -1:
             fail("Unclosed $(rlocation ...) in: " + value)
         label_str = remaining[:end]
-        result.append("$$RUNFILES_DIR/$(rlocationpath " + label_str + ")")
+        result.append("$$(rlocation $(rlocationpath " + label_str + "))")
         remaining = remaining[end + 1:]
     result.append(remaining)
     return "".join(result)
