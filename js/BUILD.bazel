@@ -7,7 +7,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 # on js_run_binary.
 bool_flag(
     name = "use_execroot_entry_point",
-    build_setting_default = True,
+    build_setting_default = False,
     visibility = ["//visibility:public"],
 )
 
