@@ -324,6 +324,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
             ctx.label.name,
         ),
         "JS_BINARY__WORKSPACE": ctx.workspace_name,
+        "RUNFILES_LIB_DEBUG": "1",
     }
     if is_windows and not ctx.attr.enable_runfiles:
         builtins["JS_BINARY__NO_RUNFILES"] = "1"
