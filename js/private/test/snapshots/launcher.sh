@@ -12,6 +12,14 @@
 
 set -o pipefail -o errexit -o nounset
 
+# Re-exec with an absolute $0 so that rlocation works correctly after directory
+# changes. runfiles_current_repository (called by rlocation) uses $BASH_SOURCE
+# to locate the calling script and makes its path absolute via cd $(dirname ...),
+# which fails when $0 is relative and the working directory has since changed.
+if [[ "$0" != /* ]]; then
+    exec "$PWD/$0" "$@"
+fi
+
 export JS_BINARY__BINDIR="bazel-out/k8-fastbuild/bin"
 export JS_BINARY__COMPILATION_MODE="fastbuild"
 export JS_BINARY__TARGET_CPU="k8"
