@@ -1,6 +1,7 @@
 {
     "private": true,
     "devDependencies": {
+        "@bazel/runfiles": "^6.3.0",
         "google-closure-compiler": "^20251111.0.0",
         "@types/node": "22.18.13",
         "chalk": "5.1.1",

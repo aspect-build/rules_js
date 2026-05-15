@@ -1,7 +1,64 @@
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+# We want to verify that a js_binary's data dependencies are found only in the
+# runfiles when use_execroot_entry_point = False. To do this we use
+# find_cfg_probe.mjs to tell us whether cfg_probe.txt landed in just the
+# runfiles or somewhere else.
+write_file(
+    name = "gen_cfg_probe",
+    out = "cfg_probe.txt",
+    content = ["probe"],
+)
+
+js_binary(
+    name = "find_cfg_probe",
+    data = [
+        ":cfg_probe.txt",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "find_cfg_probe.mjs",
+    fixed_args = ["$(rlocationpath :cfg_probe.txt)"],
+)
+
+js_run_binary(
+    name = "runfiles_location",
+    stdout = "runfiles_location.txt",
+    tool = ":find_cfg_probe",
+    use_execroot_entry_point = False,
+)
+
+assert_contains(
+    name = "runfiles_test",
+    actual = ":runfiles_location.txt",
+    expected = "RUNFILES_ONLY",
+)
+
+# With use_execroot_entry_point = True, the tool's data dependencies are built
+# in the target configuration and we should find them in the target bin
+# directory, the same place a genrule would put its srcs.
+js_run_binary(
+    name = "target_cfg_location",
+    stdout = "target_cfg_location.txt",
+    tool = ":find_cfg_probe",
+    use_execroot_entry_point = True,
+)
+
+genrule(
+    name = "expected_target_cfg_location",
+    srcs = [":cfg_probe.txt"],
+    outs = ["expected_target_cfg_location.txt"],
+    cmd = "echo $(execpath :cfg_probe.txt) > $@",
+)
+
+diff_test(
+    name = "target_cfg_test",
+    file1 = ":target_cfg_location.txt",
+    file2 = ":expected_target_cfg_location.txt",
+)
 
 # Verify that dependencies passed via the srcs parameter are always built for
 # the target platform, unlike the tool parameter and its dependencies.
