@@ -153,6 +153,7 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs)) ---------------
 js_run_binary(
     name = "run-write-srcs",
+    srcs = ["data.json"],
     outs = ["rb0.json"],
     args = [
         "rb0.json",
@@ -178,6 +179,7 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs = js_library(srcs))) ----------------
 js_run_binary(
     name = "run-write-js_library-srcs",
+    srcs = ["data.json"],
     outs = ["rb1.json"],
     args = [
         "rb1.json",
@@ -210,6 +212,7 @@ js_binary(
 
 js_run_binary(
     name = "run-write-js_library-data",
+    srcs = ["data.json"],
     outs = ["rb2.json"],
     args = [
         "rb2.json",
@@ -235,6 +238,7 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs = genrule())) -----------------------
 js_run_binary(
     name = "run-write-generated",
+    srcs = ["data-generated.json"],
     outs = ["rb3.json"],
     args = [
         "rb3.json",
@@ -260,6 +264,7 @@ js_test(
 # TEST: js_test(data = js_run_binary(srcs = genrule(srcs = filegroup))) -------
 js_run_binary(
     name = "run-write-generated-copied",
+    srcs = ["data-copied.json"],
     outs = ["rb4.json"],
     args = [
         "rb4.json",

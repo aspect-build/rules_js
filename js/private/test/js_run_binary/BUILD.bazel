@@ -1,0 +1,86 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+# Verify that dependencies passed via the srcs parameter are always built for
+# the target platform, unlike the tool parameter and its dependencies.
+# We use a select() on the OS to produce a platform-specific file, then
+# transition to three different target platforms and assert the contents match.
+write_file(
+    name = "gen_os_name",
+    out = "os_name.txt",
+    content = select({
+        "@platforms//os:linux": ["linux"],
+        "@platforms//os:macos": ["macos"],
+        "@platforms//os:windows": ["windows"],
+        "//conditions:default": ["other"],
+    }),
+    tags = ["manual"],
+)
+
+platform(
+    name = "linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+platform(
+    name = "macos",
+    constraint_values = ["@platforms//os:macos"],
+)
+
+platform(
+    name = "windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
+js_binary(
+    name = "read_file",
+    entry_point = "read_file.mjs",
+)
+
+js_run_binary(
+    name = "gen_target_os",
+    srcs = [":os_name.txt"],
+    args = ["$(rootpath :os_name.txt)"],
+    stdout = "target_os.txt",
+    tags = ["manual"],
+    tool = ":read_file",
+    use_execroot_entry_point = False,
+)
+
+platform_transition_filegroup(
+    name = "target_os_linux",
+    srcs = [":gen_target_os"],
+    target_platform = ":linux",
+)
+
+platform_transition_filegroup(
+    name = "target_os_macos",
+    srcs = [":gen_target_os"],
+    target_platform = ":macos",
+)
+
+platform_transition_filegroup(
+    name = "target_os_windows",
+    srcs = [":gen_target_os"],
+    target_platform = ":windows",
+)
+
+assert_contains(
+    name = "linux_target_platform_test",
+    actual = ":target_os_linux",
+    expected = "linux",
+)
+
+assert_contains(
+    name = "macos_target_platform_test",
+    actual = ":target_os_macos",
+    expected = "macos",
+)
+
+assert_contains(
+    name = "windows_target_platform_test",
+    actual = ":target_os_windows",
+    expected = "windows",
+)

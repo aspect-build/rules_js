@@ -30,7 +30,7 @@ def js_run_binary(
         stderr = None,
         exit_code_out = None,
         silent_on_success = True,
-        use_execroot_entry_point = True,
+        use_execroot_entry_point = None,
         copy_srcs_to_bin = True,
         include_sources = True,
         include_types = False,
@@ -148,6 +148,9 @@ def js_run_binary(
             When True, the `js_binary` tool must have `copy_data_to_bin` set to True (the default) so that all data files
             needed by the binary are available in the execroot output tree. This requirement can be turned off with by
             setting `allow_execroot_entry_point_with_no_copy_data_to_bin` to True.
+
+            If `None` (the default), the behavior is controlled by the `//js:use_execroot_entry_point` build flag,
+            which defaults to `True`.
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
@@ -356,10 +359,10 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
             name = bazel_lib_utils.to_label(name),
         ))
 
-    # Configure run from execroot
-    if use_execroot_entry_point:
-        fixed_env["JS_BINARY__USE_EXECROOT_ENTRY_POINT"] = "1"
-
+    # Configure run from execroot.
+    # When use_execroot_entry_point is None, behavior is controlled by the //js:use_execroot_entry_point flag.
+    execroot_extra_srcs = []
+    if use_execroot_entry_point != False:
         # hoist all runfiles to srcs when running from execroot
         js_runfiles_lib_name = "{}_runfiles_lib".format(name)
         _js_library(
@@ -380,16 +383,33 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
             # Always propagate the testonly attribute
             testonly = kwargs.get("testonly", False),
         )
-        extra_srcs.append(":{}".format(js_runfiles_name))
+
+        if use_execroot_entry_point == True:
+            fixed_env["JS_BINARY__USE_EXECROOT_ENTRY_POINT"] = "1"
+            execroot_extra_srcs = [":{}".format(js_runfiles_name)]
+        else:
+            # None: use the flag to decide at analysis time
+            execroot_extra_srcs = select({
+                Label("//js:_use_execroot_entry_point_true"): [":{}".format(js_runfiles_name)],
+                "//conditions:default": [],
+            })
 
     if allow_execroot_entry_point_with_no_copy_data_to_bin:
         fixed_env["JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN"] = "1"
 
+    # When use_execroot_entry_point is None, the env var is resolved at analysis time via the flag.
+    # We use a select() only for the conditional portion and merge with | outside of it, so that
+    # a user-supplied env that is itself a select() remains valid on the right-hand side.
+    execroot_env = select({
+        Label("//js:_use_execroot_entry_point_true"): {"JS_BINARY__USE_EXECROOT_ENTRY_POINT": "1"},
+        "//conditions:default": {},
+    }) if use_execroot_entry_point == None else {}
+
     _run_binary(
         name = name,
         tool = tool,
-        env = fixed_env | env,
-        srcs = srcs + extra_srcs,
+        env = fixed_env | execroot_env | env,
+        srcs = srcs + extra_srcs + execroot_extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,
         args = args,
