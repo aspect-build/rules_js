@@ -18,6 +18,7 @@ npm_package/packages/pkg_c/node_modules
 npm_package/packages/pkg_d/node_modules
 npm_package/packages/pkg_e/node_modules
 package_json_module/node_modules
+rspack/node_modules
 runfiles/node_modules
 stack_traces/node_modules
 vite3/node_modules

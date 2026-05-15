@@ -1,0 +1,93 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library", "js_run_binary")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//rspack:@rspack/cli/package_json.bzl", "bin")
+
+npm_link_all_packages()
+
+# The Rspack config. It is natural to represent this as a js_library, because
+# it is a JavaScript source file with dependencies.
+js_library(
+    name = "rspack_config",
+    srcs = ["rspack.config.cjs"],
+    deps = [":node_modules/@rspack/cli"],
+)
+
+# The Rspack binary. We bundle the config into this binary in order to keep all
+# JavaScript sources in the runfiles directory. This is important, because if
+# we had some sources in the runfiles directory and some outside of it, then
+# imports could fail to resolve correctly or we could end up with duplicated
+# code.
+bin.rspack_binary(
+    name = "rspack_binary",
+    data = [":rspack_config"],
+    # We need to set the arguments here instead of on :rspack_build below for
+    # two reasons:
+    # - We can only call rlocationpath here, since this is where we have a
+    #   dependency on :rspack_config.
+    # - The string "$RUNFILES_DIR" will get written to the launcher script and
+    #   will be evaluated there at run time. This variable evaluation does not
+    #   happen with args set on js_run_binary().
+    fixed_args = [
+        "build",
+        "--config",
+        "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
+    ],
+)
+
+js_run_binary(
+    name = "rspack_build",
+    srcs = ["rspack_entry.js"],
+    outs = ["rspack/main.bundle.js"],
+    chdir = package_name(),
+    tool = ":rspack_binary",
+    # This option ensures that :rspack_binary is built for the execution
+    # platform rather than the target platform, which is especially important
+    # when we are building for a meaningfully different platform such as a
+    # different OS (see test below).
+    use_execroot_entry_point = False,
+)
+
+js_binary(
+    name = "rspack_built_binary",
+    entry_point = "rspack/main.bundle.js",
+)
+
+# Make sure we can handle building for a different platform. Let's build an
+# image for Linux and another for Mac OS, and at least one of these will
+# involve a target platform different from the execution platform.
+platform(
+    name = "linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+platform(
+    name = "macos",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+js_image_layer(
+    name = "rspack_image_linux",
+    binary = ":rspack_built_binary",
+    platform = ":linux",
+)
+
+js_image_layer(
+    name = "rspack_image_macos",
+    binary = ":rspack_built_binary",
+    platform = ":macos",
+)
+
+build_test(
+    name = "build_test",
+    targets = [
+        ":rspack_image_linux",
+        ":rspack_image_macos",
+    ],
+)
