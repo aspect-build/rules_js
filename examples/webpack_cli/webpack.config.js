@@ -2,10 +2,10 @@ const path = require('path')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { VanillaExtractPlugin } = require('@vanilla-extract/webpack-plugin')
 
-const out_path = path.resolve(__dirname, 'dist')
+const out_path = path.resolve(process.cwd(), 'dist')
 
 module.exports = {
-    entry: path.join(__dirname, 'index.js'),
+    entry: path.join(process.cwd(), 'index.js'),
     stats: 'verbose',
     mode: 'development',
     stats: 'detailed',
