@@ -1,27 +1,44 @@
 # An example/repro of https://github.com/aspect-build/rules_js/issues/656
-# using vite v3 and react
+# using vite v6 and react
 
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_run_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//vite6:vite/package_json.bzl", vite_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 
-vite_bin.vite(
+js_library(
+    name = "vite-config",
+    srcs = ["vite.config.mjs"],
+    deps = [
+        ":node_modules/@vitejs/plugin-react",
+        ":node_modules/vite",
+    ],
+)
+
+vite_bin.vite_binary(
+    name = "vite_binary",
+    data = [":vite-config"],
+    fixed_args = [
+        "build",
+        "--config",
+        "$$RUNFILES_DIR/$(rlocationpath :vite-config)",
+    ],
+)
+
+js_run_binary(
     name = "build",
     srcs = [
         "index.html",
         "src/index.jsx",
-        "vite.config.mjs",
-    ] + [
-        ":node_modules/@vitejs/plugin-react",
         ":node_modules/react",
         ":node_modules/react-dom",
-        ":node_modules/vite",
     ],
-    args = ["build"],
     chdir = package_name(),
     out_dirs = ["build"],
+    tool = ":vite_binary",
+    use_execroot_entry_point = False,
 )
 
 build_test(
