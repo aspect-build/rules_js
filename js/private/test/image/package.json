@@ -2,6 +2,7 @@
     "dependencies": {
         "@image-test/a": "workspace:*",
         "@image-test/d": "workspace:*",
-        "acorn": "8.12.1"
+        "acorn": "8.12.1",
+        "esbuild": "0.27.3"
     }
 }
