@@ -1,36 +1,48 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//js:defs.bzl", "js_library", "js_run_binary")
 load("@npm//js/private/worker/src:rollup/package_json.bzl", rollup_bin = "bin")
 
 npm_link_all_packages()
 
-rollup_bin.rollup(
-    name = "bundle",
-    srcs = [
-        "index.ts",
-        "rollup.config.mjs",
-        "size.ts",
-        "worker_protocol.ts",
+js_library(
+    name = "config",
+    srcs = ["rollup.config.mjs"],
+    deps = [
         ":node_modules/@rollup/plugin-commonjs",
         ":node_modules/@rollup/plugin-json",
         ":node_modules/@rollup/plugin-node-resolve",
         ":node_modules/@rollup/plugin-typescript",
         ":node_modules/@types/google-protobuf",
         ":node_modules/@types/node",
-        ":node_modules/google-protobuf",
         ":node_modules/tslib",
     ],
-    outs = [
-        "bundle.js",
-    ],
-    args = [
+)
+
+rollup_bin.rollup_binary(
+    name = "rollup_binary",
+    data = [":config"],
+    fixed_args = [
         "index.ts",
         "--config",
-        "rollup.config.mjs",
+        "$$RUNFILES_DIR/$(rlocationpath :config)",
         "--format",
         "cjs",
         "--file",
         "bundle.js",
     ],
+)
+
+js_run_binary(
+    name = "bundle",
+    srcs = [
+        "index.ts",
+        "size.ts",
+        "worker_protocol.ts",
+        ":node_modules/google-protobuf",
+    ],
+    outs = ["bundle.js"],
     chdir = package_name(),
+    tool = ":rollup_binary",
+    use_execroot_entry_point = False,
     visibility = ["//js/private/worker:__pkg__"],
 )
