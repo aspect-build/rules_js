@@ -230,6 +230,23 @@ _ATTRS = {
         to use npm.
         """,
     ),
+    "coverage_extensions": attr.string_list(
+        doc = """File extensions to instrument for code coverage.
+
+        Override the defaults when the `js_binary` entry point invokes binaries of other languages
+        (e.g., C++) whose source files use different extensions.
+        """,
+        default = [
+            "mjs",
+            "mts",
+            "cjs",
+            "cts",
+            "ts",
+            "js",
+            "jsx",
+            "tsx",
+        ],
+    ),
     "node_toolchain": attr.label(
         doc = """The Node.js runtime toolchain to use for this target.
 
@@ -551,18 +568,7 @@ def _js_binary_impl(ctx):
                 ctx,
                 source_attributes = ["data"],
                 dependency_attributes = ["data"],
-                # TODO: check if there is more extensions
-                # TODO: .ts should not be here since we ought to only instrument transpiled files?
-                extensions = [
-                    "mjs",
-                    "mts",
-                    "cjs",
-                    "cts",
-                    "ts",
-                    "js",
-                    "jsx",
-                    "tsx",
-                ],
+                extensions = ctx.attr.coverage_extensions,
             ),
         )
 
