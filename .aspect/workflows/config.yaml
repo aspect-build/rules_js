@@ -169,7 +169,6 @@ tasks:
               USE_BAZEL_VERSION: '9.0.2'
     - format:
           queue: aspect-medium
-          use_args_file: false
     - buildifier:
           queue: aspect-medium
     - finalization:
