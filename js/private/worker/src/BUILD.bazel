@@ -1,6 +1,6 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_library", "js_run_binary")
 load("@npm//js/private/worker/src:rollup/package_json.bzl", rollup_bin = "bin")
+load("//js:defs.bzl", "js_library", "js_run_binary")
 
 npm_link_all_packages()
 

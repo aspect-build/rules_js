@@ -1,5 +1,5 @@
-load("//js:defs.bzl", "js_run_binary")
 load("@npm//npm/private/lifecycle:rollup/package_json.bzl", rollup_bin = "bin")
+load("//js:defs.bzl", "js_run_binary")
 
 # Bundle our program with its dependencies, because they're large:
 # ┌─────────────────┬──────────────┬────────┐
