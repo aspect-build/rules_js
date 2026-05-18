@@ -1,26 +1,38 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//js/private/devserver/src:rollup/package_json.bzl", rollup_bin = "bin")
+load("//js:defs.bzl", "js_library", "js_run_binary")
 
 npm_link_all_packages()
 
-rollup_bin.rollup(
-    name = "js_run_devserver_bundle",
-    srcs = [
-        "js_run_devserver.mjs",
-        "rollup.config.mjs",
-        ":node_modules/@rollup/plugin-node-resolve",
-        "//js/private/watch",
-    ],
-    outs = ["bundle.mjs"],
-    args = [
+js_library(
+    name = "config",
+    srcs = ["rollup.config.mjs"],
+    deps = [":node_modules/@rollup/plugin-node-resolve"],
+)
+
+rollup_bin.rollup_binary(
+    name = "rollup_binary",
+    data = [":config"],
+    fixed_args = [
         "js_run_devserver.mjs",
         "--config",
-        "rollup.config.mjs",
+        "$$RUNFILES_DIR/$(rlocationpath :config)",
         "--format",
         "es",
         "--file",
         "bundle.mjs",
     ],
+)
+
+js_run_binary(
+    name = "js_run_devserver_bundle",
+    srcs = [
+        "js_run_devserver.mjs",
+        "//js/private/watch",
+    ],
+    outs = ["bundle.mjs"],
     chdir = package_name(),
+    tool = ":rollup_binary",
+    use_execroot_entry_point = False,
     visibility = ["//js/private/devserver:__pkg__"],
 )
