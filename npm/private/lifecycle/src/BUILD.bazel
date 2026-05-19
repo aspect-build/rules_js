@@ -20,6 +20,7 @@ rollup_bin.rollup(
         "//npm/private/lifecycle:node_modules/@pnpm/logger",
         "//npm/private/lifecycle:node_modules/@pnpm/read-package-json",
     ],
+    outs = ["index.min.js"],
     chdir = package_name(),
     data = ["//npm/private/lifecycle:rollup_config"],
     fixed_args = [
@@ -31,7 +32,6 @@ rollup_bin.rollup(
         "--file",
         "index.min.js",
     ],
-    outs = ["index.min.js"],
     use_execroot_entry_point = False,
     visibility = ["//npm/private/lifecycle:__subpackages__"],
 )

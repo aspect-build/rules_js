@@ -26,6 +26,7 @@ rollup_bin.rollup(
         "worker_protocol.ts",
         ":node_modules/google-protobuf",
     ],
+    outs = ["bundle.js"],
     chdir = package_name(),
     data = [":config"],
     fixed_args = [
@@ -37,7 +38,6 @@ rollup_bin.rollup(
         "--file",
         "bundle.js",
     ],
-    outs = ["bundle.js"],
     use_execroot_entry_point = False,
     visibility = ["//js/private/worker:__pkg__"],
 )
