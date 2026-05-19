@@ -33,6 +33,5 @@ rollup_bin.rollup(
         "--file",
         "bundle.js",
     ],
-    use_execroot_entry_point = False,
     visibility = ["//js/private/coverage:__pkg__"],
 )

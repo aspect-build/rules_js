@@ -77,7 +77,6 @@ babel_bin.babel(
         "--out-dir",
         ".",
     ] + MJS_TESTS,
-    use_execroot_entry_point = False,
 )
 
 # Basic tests

@@ -38,7 +38,6 @@ bin.webpack_cli(
         "$$RUNFILES_DIR/$(rlocationpath :webpack-config)",
     ],
     log_level = "debug",
-    use_execroot_entry_point = False,
 )
 
 js_test(
