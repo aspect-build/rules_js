@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library", "js_run_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//rspack:@rspack/cli/package_json.bzl", "bin")
@@ -13,38 +13,17 @@ js_library(
     deps = [":node_modules/@rspack/cli"],
 )
 
-# The Rspack binary. We bundle the config into this binary in order to keep all
-# JavaScript sources in the runfiles directory. This is important, because if
-# we had some sources in the runfiles directory and some outside of it, then
-# imports could fail to resolve correctly or we could end up with duplicated
-# code.
-bin.rspack_binary(
-    name = "rspack_binary",
+bin.rspack(
+    name = "rspack_build",
+    srcs = ["rspack_entry.js"],
+    outs = ["rspack/main.bundle.js"],
+    chdir = package_name(),
     data = [":rspack_config"],
-    # We need to set the arguments here instead of on :rspack_build below for
-    # two reasons:
-    # - We can only call rlocationpath here, since this is where we have a
-    #   dependency on :rspack_config.
-    # - The string "$RUNFILES_DIR" will get written to the launcher script and
-    #   will be evaluated there at run time. This variable evaluation does not
-    #   happen with args set on js_run_binary().
     fixed_args = [
         "build",
         "--config",
         "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
     ],
-)
-
-js_run_binary(
-    name = "rspack_build",
-    srcs = ["rspack_entry.js"],
-    outs = ["rspack/main.bundle.js"],
-    chdir = package_name(),
-    tool = ":rspack_binary",
-    # This option ensures that :rspack_binary is built for the execution
-    # platform rather than the target platform, which is especially important
-    # when we are building for a meaningfully different platform such as a
-    # different OS (see test below).
     use_execroot_entry_point = False,
 )
 

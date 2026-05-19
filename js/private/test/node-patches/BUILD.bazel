@@ -1,7 +1,7 @@
 load("@bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//js/private/test/node-patches:@babel/cli/package_json.bzl", babel_bin = "bin")
-load("//js:defs.bzl", "js_library", "js_run_binary", "js_test")
+load("//js:defs.bzl", "js_library", "js_test")
 
 TESTS = [
     "escape.js",
@@ -61,8 +61,12 @@ js_library(
     ],
 )
 
-babel_bin.babel_binary(
-    name = "babel_binary",
+babel_bin.babel(
+    name = "babel_mjs2js",
+    srcs = MJS_TESTS,
+    outs = CJS_TESTS,
+    args = MJS_TESTS,
+    chdir = package_name(),
     data = [":babel_config"],
     fixed_args = [
         "--config-file",
@@ -74,15 +78,6 @@ babel_bin.babel_binary(
         "--out-dir",
         ".",
     ],
-)
-
-js_run_binary(
-    name = "babel_mjs2js",
-    srcs = MJS_TESTS,
-    outs = CJS_TESTS,
-    args = MJS_TESTS,
-    chdir = package_name(),
-    tool = ":babel_binary",
     use_execroot_entry_point = False,
 )
 

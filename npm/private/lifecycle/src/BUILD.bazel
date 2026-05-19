@@ -1,5 +1,4 @@
 load("@npm//npm/private/lifecycle:rollup/package_json.bzl", rollup_bin = "bin")
-load("//js:defs.bzl", "js_run_binary")
 
 # Bundle our program with its dependencies, because they're large:
 # ┌─────────────────┬──────────────┬────────┐
@@ -13,8 +12,15 @@ load("//js:defs.bzl", "js_run_binary")
 # └─────────────────┴──────────────┴────────┘
 # This avoids users having to fetch all those packages just to run the postinstall hooks.
 
-rollup_bin.rollup_binary(
-    name = "rollup_binary",
+rollup_bin.rollup(
+    name = "bundle",
+    srcs = [
+        "lifecycle-hooks.js",
+        "//npm/private/lifecycle:node_modules/@pnpm/lifecycle",
+        "//npm/private/lifecycle:node_modules/@pnpm/logger",
+        "//npm/private/lifecycle:node_modules/@pnpm/read-package-json",
+    ],
+    chdir = package_name(),
     data = ["//npm/private/lifecycle:rollup_config"],
     fixed_args = [
         "lifecycle-hooks.js",
@@ -25,19 +31,7 @@ rollup_bin.rollup_binary(
         "--file",
         "index.min.js",
     ],
-)
-
-js_run_binary(
-    name = "bundle",
-    srcs = [
-        "lifecycle-hooks.js",
-        "//npm/private/lifecycle:node_modules/@pnpm/lifecycle",
-        "//npm/private/lifecycle:node_modules/@pnpm/logger",
-        "//npm/private/lifecycle:node_modules/@pnpm/read-package-json",
-    ],
     outs = ["index.min.js"],
-    chdir = package_name(),
-    tool = ":rollup_binary",
     use_execroot_entry_point = False,
     visibility = ["//npm/private/lifecycle:__subpackages__"],
 )

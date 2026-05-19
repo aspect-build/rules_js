@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library", "js_run_binary", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//webpack_cli:webpack-cli/package_json.bzl", "bin")
 
@@ -27,22 +27,17 @@ js_library(
     ],
 )
 
-bin.webpack_cli_binary(
-    name = "webpack_cli_binary",
+bin.webpack_cli(
+    name = "bundle",
+    srcs = [":lib"],
+    outs = ["dist/main.js"],
+    chdir = package_name(),
     data = [":webpack-config"],
     fixed_args = [
         "--config",
         "$$RUNFILES_DIR/$(rlocationpath :webpack-config)",
     ],
-)
-
-js_run_binary(
-    name = "bundle",
-    srcs = [":lib"],
-    outs = ["dist/main.js"],
-    chdir = package_name(),
     log_level = "debug",
-    tool = ":webpack_cli_binary",
     use_execroot_entry_point = False,
 )
 

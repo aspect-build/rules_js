@@ -1,6 +1,6 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//js/private/coverage/bundle:rollup/package_json.bzl", rollup_bin = "bin")
-load("//js:defs.bzl", "js_library", "js_run_binary")
+load("//js:defs.bzl", "js_library")
 
 npm_link_all_packages()
 
@@ -14,8 +14,14 @@ js_library(
     ],
 )
 
-rollup_bin.rollup_binary(
-    name = "rollup_binary",
+rollup_bin.rollup(
+    name = "bundle",
+    srcs = [
+        "c8.js",
+        "package.json",
+        ":node_modules/c8",
+    ],
+    chdir = package_name(),
     data = [":config"],
     fixed_args = [
         "c8.js",
@@ -26,18 +32,7 @@ rollup_bin.rollup_binary(
         "--file",
         "bundle.js",
     ],
-)
-
-js_run_binary(
-    name = "bundle",
-    srcs = [
-        "c8.js",
-        "package.json",
-        ":node_modules/c8",
-    ],
     outs = ["bundle.js"],
-    chdir = package_name(),
-    tool = ":rollup_binary",
     use_execroot_entry_point = False,
     visibility = ["//js/private/coverage:__pkg__"],
 )
