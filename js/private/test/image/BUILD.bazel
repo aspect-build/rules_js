@@ -1,7 +1,7 @@
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_binary")
-load(":asserts.bzl", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
+load(":asserts.bzl", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer", "symlinked_data")
 
 npm_link_all_packages()
 
@@ -116,7 +116,42 @@ assert_js_image_layer_listings(
     js_image_layer = ":custom_layers_nomatch",
 )
 
-# Case 5: transition the edge instead of just the binary
+# Case 5: symlinks in runfiles outside of node_modules
+# bazel run :symlinks_test_update_all
+symlinked_data(
+    name = "symlinked_data",
+)
+
+js_binary(
+    name = "bin_symlinks",
+    data = [
+        "checked_in_symlinks/nested/nested_link.txt",
+        "checked_in_symlinks/real.txt",
+        "checked_in_symlinks/sibling_link.txt",
+        ":node_modules",
+        ":symlinked_data",
+    ],
+    entry_point = "main.js",
+)
+
+make_js_image_layer(
+    name = "symlinks",
+    binary = ":bin_symlinks",
+    platform = ":linux_amd64",
+    # Generated symlinks under symlinked_data/ are preserved as symlinks in the layer.
+    # Checked-in symlinks under checked_in_symlinks/ go through the is_source path and
+    # are packed as regular files containing the symlink target's content, regardless
+    # of this pattern.
+    preserve_symlinks = "node_modules|/symlinked_data/|/checked_in_symlinks/",
+    root = "/app",
+)
+
+assert_js_image_layer_listings(
+    name = "symlinks_test",
+    js_image_layer = ":symlinks",
+)
+
+# Case 6: transition the edge instead of just the binary
 # bazel run :custom_owner_test_update_all
 make_js_image_layer(
     name = "js_image_layer_untransitioned",
