@@ -137,20 +137,17 @@ def js_run_binary(
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
 
+            If `None` (the default), the behavior is controlled by the `//js:use_execroot_entry_point` build flag,
+            which defaults to `True`.
+
             Runfiles of `tool` are all hoisted to `srcs` of the underlying `run_binary` so they are included as execroot
             inputs to the action.
 
-            Using the entry point script that is in the execroot output tree means that there will be no conflicting
-            runfiles `node_modules` in the node_modules resolution path which can confuse npm packages such as next and
-            react that don't like being resolved in multiple node_modules trees. This more closely emulates the
-            environment that tools such as Next.js see when they are run outside of Bazel.
-
-            When True, the `js_binary` tool must have `copy_data_to_bin` set to True (the default) so that all data files
+            When enabled, the `js_binary` tool must have `copy_data_to_bin` set to True (the default) so that all data files
             needed by the binary are available in the execroot output tree. This requirement can be turned off with by
             setting `allow_execroot_entry_point_with_no_copy_data_to_bin` to True.
 
-            If `None` (the default), the behavior is controlled by the `//js:use_execroot_entry_point` build flag,
-            which defaults to `True`.
+            See docs/use_execroot_entry_point.md for more information.
 
         copy_srcs_to_bin: When True, all srcs files are copied to the output tree that are not already there.
 
