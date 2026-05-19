@@ -22,8 +22,8 @@ bin.rspack(
     # part of the runfiles of the Rspack binary.
     data = [":rspack_config"],
     # Since :rspack_config is a dependency of the binary, we need to reference
-    # it here in fixed_args. Unlike args, fixed_args applies to the binary
-    # itself.
+    # it here in fixed_args. The fixed_args param applies to the js_binary
+    # whereas args applies to js_run_binary.
     fixed_args = [
         "build",
         "--config",
