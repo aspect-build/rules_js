@@ -19,12 +19,14 @@ js_binary(
     fixed_args = ["--my_arg"],
 )
 
-# Make sed replacements for consistency on different platform
+# Make sed replacements for consistency on different platform / Bazel version.
+# The trailing sed pipeline normalizes bzlmod canonical repo separators ~~/~
+# (Bazel 7) to ++/+ (Bazel 8+) so the snapshot matches across versions.
 genrule(
     name = "shell_launcher_sed",
     srcs = [":shellcheck_launcher"],
     outs = ["shellcheck_launcher_sed.sh"],
-    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#JS_BINARY__TARGET_CPU=\\\"$(TARGET_CPU)\\\"#JS_BINARY__TARGET_CPU=\\\"k8\\\"#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" > $@" % (
+    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#JS_BINARY__TARGET_CPU=\\\"$(TARGET_CPU)\\\"#JS_BINARY__TARGET_CPU=\\\"k8\\\"#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" | sed -E -e 's/~~/++/g' -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g' -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g' > $@" % (
         host.platform,
         host.os,
     ),
@@ -35,10 +37,6 @@ write_source_files(
     files = {
         "snapshots/launcher.sh": ":shell_launcher_sed",
     },
-    tags = [
-        "skip-on-bazel8",
-        "skip-on-bazel9",
-    ],
 )
 
 js_library_test_suite(name = "js_library_test")

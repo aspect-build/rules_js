@@ -3,10 +3,24 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
+# js_binary launcher scripts have unstable sizes across Bazel versions.
+_UNSTABLE_SIZE_BASENAMES = ["bin", "bin2"]
+
 # buildifier: disable=function-docstring
 def assert_tar_listing(name, actual, expected):
-    # Either of these two file sizes may be observed on a file like /js/private/test/image/bin
-    sanitize_cmd = "sed -E 's/239[0-9]{2}|24[0-9]{3}/xxxxx/g'"
+    launcher_alt = "|".join(_UNSTABLE_SIZE_BASENAMES)
+
+    # `$$` escapes `$` for Bazel genrule cmd Make-variable expansion.
+    size_sanitize = "sed -E '/\\/({})$$/ s/[0-9]+ Jan/xxxxx Jan/'".format(launcher_alt)
+
+    # Normalize bzlmod canonical repo separators: ~~/~ (Bazel 7) -> ++/+ (Bazel 8+).
+    repo_sep_normalize = (
+        "sed -E -e 's/~~/++/g'" +
+        " -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g'" +
+        " -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g'"
+    )
+    sanitize_cmd = "{} | {}".format(size_sanitize, repo_sep_normalize)
+
     actual_listing = "_{}_listing".format(name)
     native.genrule(
         name = actual_listing,
@@ -25,7 +39,6 @@ def assert_tar_listing(name, actual, expected):
         in_file = actual_listing,
         out_file = expected,
         testonly = True,
-        tags = ["skip-on-bazel8", "skip-on-bazel9"],
     )
 
 layers = [
@@ -52,7 +65,6 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
             "assert_{}_{}".format(name, layer)
             for layer in all_layers
         ],
-        tags = ["skip-on-bazel8", "skip-on-bazel9"],
         testonly = True,
     )
 

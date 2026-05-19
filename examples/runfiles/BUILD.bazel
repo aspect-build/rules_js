@@ -12,10 +12,6 @@ js_test(
         ":node_modules/@bazel/runfiles",
     ],
     entry_point = "test.js",
-    tags = [
-        "skip-on-bazel8",
-        "skip-on-bazel9",
-    ],
 )
 
 js_test(
