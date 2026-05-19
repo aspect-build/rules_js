@@ -65,7 +65,6 @@ babel_bin.babel(
     name = "babel_mjs2js",
     srcs = MJS_TESTS,
     outs = CJS_TESTS,
-    args = MJS_TESTS,
     chdir = package_name(),
     data = [":babel_config"],
     fixed_args = [
@@ -77,7 +76,7 @@ babel_bin.babel(
         ".cjs",
         "--out-dir",
         ".",
-    ],
+    ] + MJS_TESTS,
     use_execroot_entry_point = False,
 )
 
