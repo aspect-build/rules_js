@@ -20,9 +20,9 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_
 -r-xr-xr-x  0 0      0         133 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/bin_symlinks_node_bin/node
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/nested/
--r-xr-xr-x  0 0      0          16 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/nested/nested_link.txt
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/nested/nested_link.txt -> ../real.txt
 -r-xr-xr-x  0 0      0          16 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/real.txt
--r-xr-xr-x  0 0      0          16 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/sibling_link.txt
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/sibling_link.txt -> real.txt
 -r-xr-xr-x  0 0      0          20 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/main.js
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/symlinked_data/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/symlinked_data/nested/

@@ -124,6 +124,10 @@ symlinked_data(
 
 js_binary(
     name = "bin_symlinks",
+    # Keep the checked-in symlinks under data/ as real symlinks instead of
+    # copying their resolved content into bazel-out, so js_image_layer can
+    # actually observe and preserve them.
+    copy_data_to_bin = False,
     data = [
         "checked_in_symlinks/nested/nested_link.txt",
         "checked_in_symlinks/real.txt",
@@ -138,10 +142,10 @@ make_js_image_layer(
     name = "symlinks",
     binary = ":bin_symlinks",
     platform = ":linux_amd64",
-    # Generated symlinks under symlinked_data/ are preserved as symlinks in the layer.
-    # Checked-in symlinks under checked_in_symlinks/ go through the is_source path and
-    # are packed as regular files containing the symlink target's content, regardless
-    # of this pattern.
+    # Generated symlinks (declare_symlink) under symlinked_data/ and checked-in
+    # source symlinks under checked_in_symlinks/ are both preserved as symlinks
+    # in the layer. The latter requires copy_data_to_bin = False on the binary
+    # so the source symlinks survive (un-dereferenced) into runfiles.
     preserve_symlinks = "node_modules|/symlinked_data/|/checked_in_symlinks/",
     root = "/app",
 )
