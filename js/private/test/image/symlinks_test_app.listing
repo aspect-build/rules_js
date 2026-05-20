@@ -1,0 +1,31 @@
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/
+-r-xr-xr-x  0 0      0       xxxxx Jan  1  1970 ./app/js/private/test/image/bin_symlinks
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image-fixture-a/
+-r-xr-xr-x  0 0      0         106 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image-fixture-a/package.json
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image-fixture-d/
+-r-xr-xr-x  0 0      0         128 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image-fixture-d/package.json
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/bin_symlinks_/
+-r-xr-xr-x  0 0      0       xxxxx Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/bin_symlinks_/bin_symlinks
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/bin_symlinks_node_bin/
+-r-xr-xr-x  0 0      0         133 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/bin_symlinks_node_bin/node
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/nested/
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/nested/nested_link.txt -> ../real.txt
+-r-xr-xr-x  0 0      0          16 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/real.txt
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/checked_in_symlinks/sibling_link.txt -> real.txt
+-r-xr-xr-x  0 0      0          20 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/main.js
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/symlinked_data/
+drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/symlinked_data/nested/
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/symlinked_data/nested/nested_link.txt -> ../real.txt
+-r-xr-xr-x  0 0      0           5 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/symlinked_data/real.txt
+lrwxrwxr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin_symlinks.runfiles/_main/js/private/test/image/symlinked_data/sibling_link.txt -> real.txt

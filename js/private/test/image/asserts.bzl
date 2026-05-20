@@ -3,6 +3,30 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
+def _symlinked_data_impl(ctx):
+    # A real file in bazel-out that serves as the symlink target.
+    real_file = ctx.actions.declare_file("{}/real.txt".format(ctx.label.name))
+    ctx.actions.write(real_file, "real\n")
+
+    # Sibling symlink pointing to real.txt in the same directory.
+    sibling_link = ctx.actions.declare_symlink("{}/sibling_link.txt".format(ctx.label.name))
+    ctx.actions.symlink(output = sibling_link, target_path = "real.txt")
+
+    # Nested symlink pointing back to real.txt via a relative path.
+    nested_link = ctx.actions.declare_symlink("{}/nested/nested_link.txt".format(ctx.label.name))
+    ctx.actions.symlink(output = nested_link, target_path = "../real.txt")
+
+    files = [real_file, sibling_link, nested_link]
+    return [DefaultInfo(
+        files = depset(files),
+        runfiles = ctx.runfiles(files = files),
+    )]
+
+symlinked_data = rule(
+    implementation = _symlinked_data_impl,
+    doc = "Test helper that produces a real file plus two symlinks pointing to it.",
+)
+
 # buildifier: disable=function-docstring
 def assert_tar_listing(name, actual, expected):
     # Either of these two file sizes may be observed on a file like /js/private/test/image/bin

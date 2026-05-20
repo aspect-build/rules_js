@@ -178,18 +178,11 @@ async function split() {
         // create parents of current path.
         add_parents(mtree, key)
 
-        // A source file from workspace, not an output of a target.
-        if (is_source) {
-            mtree.add(_mtree_file_line(key, dest))
-            // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
-            splitterUnusedInputs.write(destBuf)
-            continue
-        }
-
         // root indicates where the generated source comes from. it looks like
         // `bazel-out/darwin_arm64-fastbuild` when there's no transition.
-        if (!root) {
-            // everything except sources should have
+        // Source files live directly in the workspace and have an empty root.
+        if (!is_source && !root) {
+            // everything except sources should have a root
             throw new Error(
                 `unexpected entry format. ${JSON.stringify(
                     entries[key]
@@ -204,6 +197,33 @@ async function split() {
             mtree.add(_mtree_file_line(key, dest))
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
             splitterUnusedInputs.write(destBuf)
+            continue
+        }
+
+        // Source files may be sandboxed as an absolute symlink to the workspace,
+        // so up to two readlinks are needed to reach the user-authored target.
+        if (is_source) {
+            const sourceTask = (async () => {
+                let target
+                try {
+                    target = await readlink(path.resolve(dest))
+                    if (path.isAbsolute(target)) target = await readlink(target)
+                } catch (e) {
+                    if (e.code != 'EINVAL' && e.code != 'ENOENT') throw e
+                }
+                if (target && !path.isAbsolute(target)) {
+                    mtree.add(
+                        _mtree_link_line(
+                            key,
+                            path.join(path.dirname(key), target)
+                        )
+                    )
+                } else {
+                    mtree.add(_mtree_file_line(key, dest))
+                    splitterUnusedInputs.write(destBuf)
+                }
+            })()
+            resolveTasks.push(sourceTask)
             continue
         }
 
