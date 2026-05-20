@@ -66,6 +66,7 @@ npm.npm_translate_lock(
         "//npm_package/packages/pkg_d:package.json",
         "//npm_package/packages/pkg_e:package.json",
         "//package_json_module:package.json",
+        "//rspack:package.json",
         "//runfiles:package.json",
         "//stack_traces:package.json",
         "//vite3:package.json",

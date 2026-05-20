@@ -1,0 +1,77 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//rspack:@rspack/cli/package_json.bzl", "bin")
+
+npm_link_all_packages()
+
+# The Rspack config. It is natural to represent this as a js_library, because
+# it is a JavaScript source file with dependencies.
+js_library(
+    name = "rspack_config",
+    srcs = ["rspack.config.cjs"],
+    deps = [":node_modules/@rspack/cli"],
+)
+
+bin.rspack(
+    name = "rspack_build",
+    srcs = ["rspack_entry.js"],
+    outs = ["rspack/main.bundle.js"],
+    chdir = package_name(),
+    # The config should be provided via the data parameter so that it becomes
+    # part of the runfiles of the Rspack binary.
+    data = [":rspack_config"],
+    # Since :rspack_config is a dependency of the binary, we need to reference
+    # it here in fixed_args. The fixed_args param applies to the js_binary
+    # whereas args applies to js_run_binary.
+    fixed_args = [
+        "build",
+        "--config",
+        "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
+    ],
+    use_execroot_entry_point = False,
+)
+
+js_binary(
+    name = "rspack_built_binary",
+    entry_point = "rspack/main.bundle.js",
+)
+
+# Make sure we can handle building for a different platform. Let's build an
+# image for Linux and another for Mac OS, and at least one of these will
+# involve a target platform different from the execution platform.
+platform(
+    name = "linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+platform(
+    name = "macos",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+js_image_layer(
+    name = "rspack_image_linux",
+    binary = ":rspack_built_binary",
+    platform = ":linux",
+)
+
+js_image_layer(
+    name = "rspack_image_macos",
+    binary = ":rspack_built_binary",
+    platform = ":macos",
+)
+
+build_test(
+    name = "build_test",
+    targets = [
+        ":rspack_image_linux",
+        ":rspack_image_macos",
+    ],
+)

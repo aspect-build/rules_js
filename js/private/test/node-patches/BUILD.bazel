@@ -63,9 +63,13 @@ js_library(
 
 babel_bin.babel(
     name = "babel_mjs2js",
-    srcs = MJS_TESTS + [":babel_config"],
-    outs = [t.replace(".mjs", ".cjs") for t in MJS_TESTS],
-    args = [
+    srcs = MJS_TESTS,
+    outs = CJS_TESTS,
+    chdir = package_name(),
+    data = [":babel_config"],
+    fixed_args = [
+        "--config-file",
+        "$$RUNFILES_DIR/$(rlocationpath :babel_config)",
         "--extensions",
         ".mjs",
         "--out-file-extension",
@@ -73,7 +77,6 @@ babel_bin.babel(
         "--out-dir",
         ".",
     ] + MJS_TESTS,
-    chdir = package_name(),  # to automatically pickup babel.config.js
 )
 
 # Basic tests

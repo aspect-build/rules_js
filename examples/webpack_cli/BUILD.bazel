@@ -13,26 +13,30 @@ js_library(
     ],
     deps = [
         ":node_modules/@vanilla-extract/css",
+        ":node_modules/mathjs",
+    ],
+)
+
+js_library(
+    name = "webpack-config",
+    srcs = ["webpack.config.js"],
+    deps = [
         ":node_modules/@vanilla-extract/webpack-plugin",
         ":node_modules/css-loader",
-        ":node_modules/mathjs",
         ":node_modules/mini-css-extract-plugin",
     ],
 )
 
 bin.webpack_cli(
     name = "bundle",
-    srcs = [
-        ":lib",
-        ":webpack.config.js",
-    ],
-    outs = [
-        "dist/main.js",
-    ],
-    args = [
-        "--config webpack.config.js",
-    ],
+    srcs = [":lib"],
+    outs = ["dist/main.js"],
     chdir = package_name(),
+    data = [":webpack-config"],
+    fixed_args = [
+        "--config",
+        "$$RUNFILES_DIR/$(rlocationpath :webpack-config)",
+    ],
     log_level = "debug",
 )
 

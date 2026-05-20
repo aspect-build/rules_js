@@ -364,7 +364,8 @@ def bin_internal(name, store_target, store_target_dir, bin_path, bin_mnemonic, *
     _js_binary(
         name = "%s__js_binary" % name,
         entry_point = ":%s__entry_point" % name,
-        data = [store_target],
+        data = [store_target] + kwargs.pop("data", []),
+        fixed_args = kwargs.pop("fixed_args", []),
         include_npm = kwargs.pop("include_npm", False),
         tags = ["manual"],
     )

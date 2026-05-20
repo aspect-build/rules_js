@@ -19,18 +19,18 @@ rollup_bin.rollup(
         "//npm/private/lifecycle:node_modules/@pnpm/lifecycle",
         "//npm/private/lifecycle:node_modules/@pnpm/logger",
         "//npm/private/lifecycle:node_modules/@pnpm/read-package-json",
-        "//npm/private/lifecycle:rollup_config",
     ],
     outs = ["index.min.js"],
-    args = [
+    chdir = package_name(),
+    data = ["//npm/private/lifecycle:rollup_config"],
+    fixed_args = [
         "lifecycle-hooks.js",
         "--config",
-        "../rollup.config.mjs",
+        "$$RUNFILES_DIR/$(rlocationpath //npm/private/lifecycle:rollup_config)",
         "--format",
         "cjs",
         "--file",
         "index.min.js",
     ],
-    chdir = package_name(),
     visibility = ["//npm/private/lifecycle:__subpackages__"],
 )

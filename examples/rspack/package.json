@@ -1,0 +1,8 @@
+{
+    "name": "rspack_example",
+    "private": true,
+    "devDependencies": {
+        "@rspack/cli": "1.7.11",
+        "@rspack/core": "1.7.11"
+    }
+}
