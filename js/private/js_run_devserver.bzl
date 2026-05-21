@@ -4,11 +4,7 @@ load(":js_binary.bzl", "js_binary_lib")
 load(":js_helpers.bzl", _gather_files_from_js_infos = "gather_files_from_js_infos")
 
 _attrs = js_binary_lib.attrs | {
-    "tool_exec_cfg": attr.label(
-        executable = True,
-        cfg = "exec",
-    ),
-    "tool_target_cfg": attr.label(
+    "tool": attr.label(
         executable = True,
         cfg = "target",
     ),
@@ -47,9 +43,7 @@ def _js_run_devserver_impl(ctx):
         fixed_args = [config_file.short_path, entries_json_file.short_path],
     )
 
-    use_tool = ctx.attr.tool_target_cfg or ctx.attr.tool_exec_cfg
-    if use_tool and (not ctx.attr.tool_exec_cfg or not ctx.attr.tool_target_cfg):
-        fail("Internal error")
+    use_tool = ctx.attr.tool != None
 
     if not use_tool and not ctx.attr.command:
         fail("Either tool or command must be specified")
@@ -85,16 +79,13 @@ def _js_run_devserver_impl(ctx):
     runfiles_merge_targets = ctx.attr.data[:]
 
     if use_tool:
+        config["tool"] = ctx.executable.tool.short_path
+        runfiles_merge_targets.append(ctx.attr.tool)
         if ctx.attr.use_execroot_entry_point:
-            config["tool"] = ctx.executable.tool_target_cfg.short_path
             config["use_execroot_entry_point"] = "1"
             config["bazel_bindir"] = ctx.bin_dir.path
             if ctx.attr.allow_execroot_entry_point_with_no_copy_data_to_bin:
                 config["allow_execroot_entry_point_with_no_copy_data_to_bin"] = "1"
-            runfiles_merge_targets.append(ctx.attr.tool_target_cfg)
-        else:
-            config["tool"] = ctx.executable.tool_exec_cfg.short_path
-            runfiles_merge_targets.append(ctx.attr.tool_exec_cfg)
     if ctx.attr.command:
         config["command"] = ctx.attr.command
     if ctx.attr.grant_sandbox_write_permissions:
@@ -283,8 +274,7 @@ def js_run_devserver(
             "ibazel_notify_changes",
             "supports_incremental_build_protocol",
         ],
-        tool_exec_cfg = tool,
-        tool_target_cfg = tool,
+        tool = tool,
         command = command,
         grant_sandbox_write_permissions = grant_sandbox_write_permissions,
         use_execroot_entry_point = use_execroot_entry_point,
