@@ -1,7 +1,7 @@
 # use_execroot_entry_point
 
-This page describes the `use_execroot_entry_point` option on `js_run_binary` and
-`js_run_devserver`, and provides guidance on when to use each value.
+This page describes the `use_execroot_entry_point` option on `js_run_binary`
+and provides guidance on when to use each value.
 
 ## Background
 
@@ -32,10 +32,8 @@ the target configuration and land in the target-platform bin directory. The
 entry point used is the one in that output tree (the "execroot entry point"),
 rather than the copy inside the runfiles symlink tree. With everything
 consolidated in `bazel-out/<target-cfg>/bin/`, Node.js sees a single
-`node_modules` tree. This is the right choice for Next.js for two reasons:
-Next.js expects its inputs and outputs to be in the same directory tree, and it
-performs pre-rendering during the build, which involves running target-platform
-code on the exec platform.
+`node_modules` tree. This can be the right choice for some frameworks such as
+Next.js, which expects inputs and outputs to be in the same directory tree.
 
 The tradeoff is that if the exec platform differs from the target platform (for
 example, cross-compiling from macOS to Linux), target-platform artifacts such as
@@ -55,10 +53,10 @@ runfiles resolution.
 ## Recommendation
 
 We recommend setting `use_execroot_entry_point = False` wherever possible and
-ensuring that all code executed during the build is declared as a dep of the
-`js_binary`. The main exception is Next.js and similar frameworks that expect
-inputs and outputs in the same directory tree or that execute target-platform
-code during the build, in which case `True` is required.
+ensuring that all code executed during the build is declared as a dependency of
+the `js_binary`. The main exception is Next.js and similar frameworks that
+expect inputs and outputs in the same directory tree or that execute
+target-platform code during the build, in which case `True` is required.
 
 To disable `use_execroot_entry_point` globally, pass the build flag:
 
