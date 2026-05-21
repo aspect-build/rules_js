@@ -58,7 +58,7 @@ the `js_binary`. The main exception is Next.js and similar frameworks that
 expect inputs and outputs in the same directory tree or that execute
 target-platform code during the build, in which case `True` is required.
 
-To disable `use_execroot_entry_point` globally, pass the build flag:
+To disable `use_execroot_entry_point` by default, pass the build flag:
 
 ```
 --@aspect_rules_js//js:use_execroot_entry_point=False
