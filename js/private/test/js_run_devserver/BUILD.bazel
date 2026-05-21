@@ -28,8 +28,6 @@ js_run_devserver_test(
         "no-remote-exec",
     ],
     tool = ":jasmine",
-    # TODO: update this test to work with use_execroot_entry_point = False
-    use_execroot_entry_point = True,
 )
 
 jasmine_bin.jasmine_binary(

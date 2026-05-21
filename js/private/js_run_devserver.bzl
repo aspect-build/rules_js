@@ -126,7 +126,7 @@ def js_run_devserver(
         tool = None,
         command = None,
         grant_sandbox_write_permissions = False,
-        use_execroot_entry_point = None,
+        use_execroot_entry_point = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         **kwargs):
     """Runs a devserver via binary target or command.
@@ -244,9 +244,6 @@ def js_run_devserver(
             needed by the binary are available in the execroot output tree. This requirement can be turned off with by
             setting `allow_execroot_entry_point_with_no_copy_data_to_bin` to True.
 
-            If `None` (the default), the behavior is controlled by the `//js:use_execroot_entry_point` build flag,
-            which defaults to `True`.
-
         allow_execroot_entry_point_with_no_copy_data_to_bin: Turn off validation that the `js_binary` tool
             has `copy_data_to_bin` set to True when `use_execroot_entry_point` is set to True.
 
@@ -260,12 +257,6 @@ def js_run_devserver(
     """
     if kwargs.get("entry_point", None):
         fail("`entry_point` is set implicitly by `js_run_devserver` and cannot be overridden.")
-
-    if use_execroot_entry_point == None:
-        use_execroot_entry_point = select({
-            Label("//js:_use_execroot_entry_point_true"): True,
-            "//conditions:default": False,
-        })
 
     # Allow the js_run_devserver rule to execute to be overridden for tests
     rule_to_execute = kwargs.pop("rule_to_execute", _js_run_devserver)
