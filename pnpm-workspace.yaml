@@ -3,6 +3,7 @@ packages:
     - 'js/private/devserver/src'
     - 'js/private/worker/src'
     - 'js/private/test/*'
+    - 'js/private/test/image/*'
     - 'npm/private/lifecycle'
     - 'npm/private/test'
     - 'npm/private/test/*'

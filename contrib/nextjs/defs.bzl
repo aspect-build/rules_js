@@ -173,7 +173,7 @@ def nextjs(
         **kwargs
     )
 
-def nextjs_build(name, config, srcs, next_js_binary, data = [], **kwargs):
+def nextjs_build(name, config, srcs, next_js_binary, data = [], use_execroot_entry_point = True, **kwargs):
     """Build the Next.js production artifact.
 
     See https://nextjs.org/docs/pages/api-reference/cli/next#build
@@ -191,6 +191,7 @@ def nextjs_build(name, config, srcs, next_js_binary, data = [], **kwargs):
 
             See main docstring above for example usage.
 
+        use_execroot_entry_point: passed directly to js_run_binary
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
     js_run_binary(
@@ -202,6 +203,7 @@ def nextjs_build(name, config, srcs, next_js_binary, data = [], **kwargs):
         chdir = native.package_name(),
         mnemonic = "NextJs",
         progress_message = "Compile Next.js app %{label}",
+        use_execroot_entry_point = use_execroot_entry_point,
         **kwargs
     )
 
@@ -268,7 +270,7 @@ def nextjs_dev(name, config, srcs, data, next_js_binary, **kwargs):
 # Standalone Next.js build & server binary.
 # ---------------------------------------------------------------------------------------------
 
-def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwargs):
+def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_execroot_entry_point = True, **kwargs):
     """Compile a standalone Next.js application.
 
     See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files
@@ -290,6 +292,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         srcs: the sources to include in the build, including any transitive deps
         next_js_binary: the Next.js binary to use for building
         data: the data files to include in the build
+        use_execroot_entry_point: passed directly to js_run_binary
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
 
@@ -327,6 +330,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], **kwa
         chdir = native.package_name(),
         mnemonic = "NextJs",
         progress_message = "Compile Next.js standalone app %{label}",
+        use_execroot_entry_point = use_execroot_entry_point,
         **kwargs
     )
 

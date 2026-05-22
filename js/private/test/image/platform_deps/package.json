@@ -1,0 +1,6 @@
+{
+    "dependencies": {
+        "@rspack/cli": "2.0.4",
+        "@rspack/core": "2.0.4"
+    }
+}

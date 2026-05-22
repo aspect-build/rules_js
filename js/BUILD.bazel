@@ -1,6 +1,20 @@
 "Public API"
 
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
+# This flag controls the default behavior of the use_execroot_entry_point flag
+# on js_run_binary.
+bool_flag(
+    name = "use_execroot_entry_point",
+    build_setting_default = True,
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "_use_execroot_entry_point_true",
+    flag_values = {"use_execroot_entry_point": "True"},
+)
 
 bzl_library(
     name = "defs",

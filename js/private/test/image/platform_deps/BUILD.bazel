@@ -1,0 +1,28 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//js:defs.bzl", "js_binary")
+load("//js/private/test/image:asserts.bzl", "assert_js_image_layer_listings", "make_js_image_layer")
+
+npm_link_all_packages()
+
+js_binary(
+    name = "bin",
+    data = [
+        ":node_modules/@rspack/cli",
+    ],
+    entry_point = "main.js",
+)
+
+# Verify that the arm64 binding is selected when targeting linux/arm64.
+# @rspack/binding has optional platform-specific packages.
+# bazel run //js/private/test/image/platform_deps:rspack_linux_arm64_test_update_all
+make_js_image_layer(
+    name = "rspack_linux_arm64",
+    binary = ":bin",
+    platform = "//js/private/test/image:linux_arm64",
+    root = "/app",
+)
+
+assert_js_image_layer_listings(
+    name = "rspack_linux_arm64_test",
+    js_image_layer = ":rspack_linux_arm64",
+)
