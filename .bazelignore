@@ -8,6 +8,7 @@ js/private/devserver/src/node_modules/
 js/private/test/image-fixture-a/node_modules
 js/private/test/image-fixture-d/node_modules
 js/private/test/image/node_modules
+js/private/test/image/platform_deps/node_modules
 js/private/test/js_run_devserver/node_modules
 js/private/test/node-patches/node_modules
 js/private/worker/src/node_modules
