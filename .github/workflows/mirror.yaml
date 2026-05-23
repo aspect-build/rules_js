@@ -19,3 +19,5 @@ jobs:
               uses: peter-evans/create-pull-request@v8
               with:
                   commit-message: 'chore: mirror external releases'
+                  author: "aspect-marvin <marvin@aspect.build>"
+                  committer: "aspect-marvin <marvin@aspect.build>"
