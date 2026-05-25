@@ -1,5 +1,9 @@
 # Bazel rules for JavaScript
 
+> [!NOTE]
+> This repository uses the [Aspect CLI](https://github.com/aspect-build/aspect-cli) for CI and local development.
+> See the [docs](https://docs.aspect.build/cli/overview) and [install instructions](https://docs.aspect.build/cli/install) to get started.
+
 This ruleset is a high-performance Bazel integration for JavaScript, based on the [pnpm package manager](https://pnpm.io).
 
 -   Lazy: only fetches/installs npm packages needed for the requested build/test targets.

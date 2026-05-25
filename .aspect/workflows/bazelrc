@@ -1,3 +1,0 @@
-# build without the bytes
-common --remote_download_outputs=minimal
-common --nobuild_runfile_links

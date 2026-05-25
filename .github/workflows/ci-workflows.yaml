@@ -1,0 +1,176 @@
+name: CI - Aspect Workflows
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+permissions:
+    id-token: write
+
+env:
+    ASPECT_API_TOKEN: ${{ secrets.ASPECT_API_TOKEN }}
+    INSTALL_ASPECT_LAUNCHER_VERSION: 2026.21.44
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
+jobs:
+    format:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+              with:
+                bazelisk-cache: true
+                disk-cache: ${{ github.workflow }}-format
+                repository-cache: true
+                external-cache: true
+            - name: Format
+              run: |
+                curl -fsSL https://install.aspect.build | bash -s -- "$INSTALL_ASPECT_LAUNCHER_VERSION"
+                aspect format --task-key=format
+    buildifier:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+              with:
+                bazelisk-cache: true
+                disk-cache: ${{ github.workflow }}-buildifier
+                repository-cache: true
+                external-cache: true
+            - name: Buildifier
+              run: |
+                curl -fsSL https://install.aspect.build | bash -s -- "$INSTALL_ASPECT_LAUNCHER_VERSION"
+                aspect buildifier --task-key=buildifier
+    # Builds the workspace matrix axis. e2e tests gated on secrets that forks don't have
+    # (ASPECT_GHTESTER_SSH_KEY, ASPECT_NPM_AUTH_TOKEN) are only appended when the secret is
+    # available, so PRs from forks skip them instead of failing.
+    e2e-tests-list:
+        runs-on: ubuntu-latest
+        steps:
+            - id: workspace
+              name: Prepare 'workspace' matrix axis
+              run: |
+                  paths=(
+                    .
+                    e2e/bzlmod
+                    e2e/gyp_no_install_script
+                    e2e/js_binary_workspace
+                    e2e/js_image_oci
+                    e2e/nextjs
+                    e2e/npm_link_package
+                    e2e/npm_link_package-rerooted
+                    e2e/npm_translate_lock
+                    e2e/npm_translate_lock_replace_packages
+                    e2e/npm_translate_lock_empty
+                    e2e/npm_translate_lock_exclude_package_contents
+                    e2e/npm_translate_lock_multi
+                    e2e/npm_translate_lock_partial_clone
+                    e2e/npm_translate_lock_subdir_patch
+                    e2e/npm_translate_lock_disable_hooks
+                    e2e/npm_translate_package_lock
+                    e2e/npm_translate_yarn_lock
+                    e2e/patch_from_repo
+                    e2e/pnpm_repo_install
+                    e2e/pnpm_workspace
+                    e2e/pnpm_workspace_deps
+                    e2e/pnpm_workspace_rerooted
+                    e2e/protobuf-es
+                    e2e/protobuf-google
+                    e2e/repo_mapping
+                    e2e/output_paths
+                    e2e/vendored_node
+                    e2e/vendored_tarfile
+                    e2e/verify_patches
+                    examples
+                  )
+                  # e2e/git_dep_metadata and e2e/npm_translate_lock_git+ssh clone over ssh and
+                  # require an SSH key not available on forks. e2e/pnpm_lockfiles is in this
+                  # bucket too: one of its v110 lockfile entries (jquery-git-https-763ade6)
+                  # resolves to a `type: git` repo at git@github.com:jquery/jquery.git, so
+                  # rules_js does a real SSH clone.
+                  if [[ "${{ env.ASPECT_GHTESTER_SSH_KEY }}" ]]; then
+                    paths+=(
+                      e2e/git_dep_metadata
+                      e2e/npm_translate_lock_git+ssh
+                      e2e/pnpm_lockfiles
+                    )
+                  fi
+                  # e2e/npm_translate_lock_auth requires an npm auth token not available on forks.
+                  if [[ "${{ env.ASPECT_NPM_AUTH_TOKEN }}" ]]; then
+                    paths+=( e2e/npm_translate_lock_auth )
+                  fi
+
+                  # Slug feeds aspect --task-key, the disk-cache key, and the job name, all
+                  # of which require [A-Za-z0-9_-]. Map "." → "root"; replace "/" with "-"
+                  # and "+" with "_" so e.g. e2e/npm_translate_lock_git+ssh becomes a valid
+                  # e2e-npm_translate_lock_git_ssh slug.
+                  entries=()
+                  for p in "${paths[@]}"; do
+                    if [[ "$p" == "." ]]; then
+                      slug=root
+                    else
+                      slug=${p//\//-}
+                      slug=${slug//+/_}
+                    fi
+                    entries+=( "{\"path\":\"$p\",\"slug\":\"$slug\"}" )
+                  done
+                  printf -v j '%s,' "${entries[@]}"
+                  echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
+              env:
+                  ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
+                  ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+        outputs:
+            workspace: ${{ steps.workspace.outputs.res }}
+
+    test:
+        name: test (${{ matrix.workspace.path }}, ${{ matrix.bazel.id }})
+        runs-on: ubuntu-latest
+        needs: e2e-tests-list
+        strategy:
+            fail-fast: false
+            matrix:
+                workspace: ${{ fromJSON(needs.e2e-tests-list.outputs.workspace) }}
+                bazel:
+                - { id: "bazel-7", version: "7.x", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel7" }
+                - { id: "bazel-8", version: "8.x", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel8" }
+                # TODO: change this back to 9.x once this bug is fixed: https://github.com/bazelbuild/bazel/issues/29393
+                - { id: "bazel-9", version: "9.0.2", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel9" }
+                - { id: "bazel-9-no-execroot-entry-point", version: "9.0.2", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_execroot_entry_point=False" }
+                exclude:
+                # e2e/js_image_oci pulls in the `llvm` module, whose hermetic toolchain requires Bazel 8+.
+                - { workspace: { slug: "e2e-js_image_oci" }, bazel: { id: "bazel-7" } }
+                # e2e/patch_from_repo has a bazel7-specific absolute label in its MODULE.bazel.
+                - { workspace: { slug: "e2e-patch_from_repo" }, bazel: { id: "bazel-8" } }
+                - { workspace: { slug: "e2e-patch_from_repo" }, bazel: { id: "bazel-9" } }
+                - { workspace: { slug: "e2e-patch_from_repo" }, bazel: { id: "bazel-9-no-execroot-entry-point" } }
+                # e2e/repo_mapping renames aspect_rules_js, so a flag beginning with
+                # --@aspect_rules_js// (as used by the no-execroot-entry-point variant) doesn't resolve.
+                - { workspace: { slug: "e2e-repo_mapping" }, bazel: { id: "bazel-9-no-execroot-entry-point" } }
+        env:
+            USE_BAZEL_VERSION: ${{ matrix.bazel.version }}
+            ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
+            ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
+        steps:
+            - uses: actions/checkout@v6
+            # Setup an ssh keypair for e2e tests that clone a git repository via ssh.
+            - uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+              if: matrix.workspace.slug == 'e2e-git_dep_metadata' || matrix.workspace.slug == 'e2e-npm_translate_lock_git_ssh' || matrix.workspace.slug == 'e2e-pnpm_lockfiles'
+              with:
+                  ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
+            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+              with:
+                bazelisk-cache: true
+                disk-cache: ${{ github.workflow }}-test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }}
+                repository-cache: true
+                external-cache: true
+            - name: Test
+              working-directory: ${{ matrix.workspace.path }}
+              run: |
+                curl -fsSL https://install.aspect.build | bash -s -- "$INSTALL_ASPECT_LAUNCHER_VERSION"
+                aspect test --task-key=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
