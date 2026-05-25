@@ -1,6 +1,5 @@
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@npm//:defs.bzl", "npm_link_all_packages", "npm_link_targets")
 load("@pnpm__links//:defs.bzl", npm_link_pnpm = "npm_link_imported_package")
 load("//js:defs.bzl", "js_library")
@@ -57,29 +56,12 @@ diff_test(
     file2 = "query_npm_link_targets_node_modules",
 )
 
-buildifier(
-    name = "buildifier",
-    exclude_patterns = [
-        "./.git/*",
-        "**/snapshots/*",
-    ],
-    lint_mode = "fix",
-    mode = "fix",
-    tags = ["manual"],  # tag as manual so windows ci does not build it by default
-)
-
-buildifier(
-    name = "buildifier.check",
-    exclude_patterns = [
-        "./.git/*",
-        "**/snapshots/*",
-    ],
-    lint_mode = "warn",
-    mode = "diff",
-    tags = ["manual"],  # tag as manual so windows ci does not build it by default
+alias(
+    name = "format",
+    actual = "//tools/format",
 )
 
 alias(
-    name = "format",
-    actual = "//tools:format",
+    name = "buildifier",
+    actual = "//tools/format:buildifier",
 )
