@@ -4,12 +4,24 @@ load("@aspect//feature/artifacts.axl", "ArtifactUpload")
 load("@aspect//format.axl", "format")
 load("@aspect//traits.axl", "BazelTrait")
 
-# `aspect buildifier` — alias of `aspect format` preset to the Starlark-only
-# formatter target. CI and local users can run `aspect buildifier` instead
-# of `aspect format --formatter-target=//tools/format:buildifier`.
+# `aspect buildifier` — alias of `aspect format` preset to the Starlark-only formatter target.
+# CI and local users can run `aspect buildifier` to format Starlark files only.
 buildifier = format.alias(
     defaults = {
-        "formatter_target": "//tools/format:buildifier",
+        "formatter_target": "@buildifier_prebuilt//buildifier",
+        "include_patterns": [
+            "**/BUCK",
+            "**/BUILD",
+            "**/BUILD.bazel",
+            "**/MODULE.bazel",
+            "**/*.MODULE.bazel",
+            "**/Tiltfile",
+            "**/WORKSPACE",
+            "**/WORKSPACE.bazel",
+            "**/*.axl",
+            "**/*.bzl",
+            "**/*.star",
+        ],
     },
     summary = "Format Starlark files using buildifier.",
 )
