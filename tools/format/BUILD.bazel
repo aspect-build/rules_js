@@ -7,9 +7,3 @@ format_multirun(
     shell = "@aspect_rules_lint//format:shfmt",
 )
 
-# Starlark-only formatter for the dedicated buildifier CI step.
-# See https://docs.aspect.build/cli/migration/buildifier.
-format_multirun(
-    name = "buildifier",
-    starlark = "@buildifier_prebuilt//:buildifier",
-)
