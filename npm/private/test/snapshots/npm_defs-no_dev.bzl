@@ -918,6 +918,130 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_s
 
 _IMPORTER_PACKAGES = ["", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/image-fixture-a", "js/private/test/image-fixture-d", "js/private/test/image/platform_deps", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/lifecycle", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish", "npm/private/test/subs"]
 
+def _link_pkg_0():
+    link_117()
+    link_119()
+    link_125()
+    return [
+        ":node_modules/@pnpm/lifecycle",
+        ":node_modules/@pnpm/logger",
+        ":node_modules/@pnpm/read-package-json",
+    ], {
+        "@pnpm": [
+            ":node_modules/@pnpm/lifecycle",
+            ":node_modules/@pnpm/logger",
+            ":node_modules/@pnpm/read-package-json",
+        ],
+    }
+
+def _link_pkg_1():
+    link_178()
+    link_179()
+    return [
+        ":node_modules/@rspack/cli",
+        ":node_modules/@rspack/core",
+    ], {
+        "@rspack": [
+            ":node_modules/@rspack/cli",
+            ":node_modules/@rspack/core",
+        ],
+    }
+
+def _link_pkg_2():
+    link_196()
+    link_545()
+    return [
+        ":node_modules/@types/node",
+        ":node_modules/jasmine",
+    ], {
+        "@types": [":node_modules/@types/node"],
+    }
+
+def _link_pkg_3():
+    link_205()
+    link_206()
+    link_749()
+    return [
+        ":node_modules/@vscode/vsce-sign-alpine-arm64",
+        ":node_modules/@vscode/vsce-sign-alpine-x64",
+        ":node_modules/sass-embedded-all-unknown",
+    ], {
+        "@vscode": [
+            ":node_modules/@vscode/vsce-sign-alpine-arm64",
+            ":node_modules/@vscode/vsce-sign-alpine-x64",
+        ],
+    }
+
+def _link_pkg_4():
+    link_218()
+    _fp_link_2()
+    _fp_link_3()
+    return [
+        ":node_modules/acorn",
+        ":node_modules/@image-test/a",
+        ":node_modules/@image-test/d",
+    ], {
+        "@image-test": [
+            ":node_modules/@image-test/a",
+            ":node_modules/@image-test/d",
+        ],
+    }
+
+def _link_pkg_5():
+    link_268()
+    return [":node_modules/c8"], None
+
+def _link_pkg_6():
+    link_279()
+    link_280("chalk-alt")
+    return [
+        ":node_modules/chalk",
+        ":node_modules/chalk-alt",
+    ], None
+
+def _link_pkg_7():
+    link_471()
+    link_842()
+    return [
+        ":node_modules/google-protobuf",
+        ":node_modules/tslib",
+    ], None
+
+def _link_pkg_8():
+    link_868()
+    return [":node_modules/uuid"], None
+
+def _link_pkg_9():
+    link_868()
+    return [":node_modules/uuid"], None
+
+def _link_pkg_10():
+    _fp_link_4()
+    _fp_link_5()
+    return [
+        ":node_modules/@subs/a",
+        ":node_modules/@subs/b",
+    ], {
+        "@subs": [
+            ":node_modules/@subs/a",
+            ":node_modules/@subs/b",
+        ],
+    }
+
+_LINK_PACKAGE_FNS = {
+    "npm/private/lifecycle": _link_pkg_0,
+    "js/private/test/image/platform_deps": _link_pkg_1,
+    "js/private/test/js_run_devserver": _link_pkg_2,
+    "npm/private/test": _link_pkg_3,
+    "js/private/test/image": _link_pkg_4,
+    "js/private/coverage/bundle": _link_pkg_5,
+    "npm/private/test/npm_package": _link_pkg_6,
+    "js/private/worker/src": _link_pkg_7,
+    "js/private/test/image-fixture-a": _link_pkg_8,
+    "js/private/test/image-fixture-d": _link_pkg_9,
+    "npm/private/test/subs": _link_pkg_10,
+}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if name != "node_modules":
@@ -1908,111 +2032,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     scope_targets = None
 
     if is_importer:
-        if bazel_package == "npm/private/lifecycle":
-            link_117()
-            link_119()
-            link_125()
-            link_targets = [
-                ":node_modules/@pnpm/lifecycle",
-                ":node_modules/@pnpm/logger",
-                ":node_modules/@pnpm/read-package-json",
-            ]
-            scope_targets = {
-                "@pnpm": [
-                    ":node_modules/@pnpm/lifecycle",
-                    ":node_modules/@pnpm/logger",
-                    ":node_modules/@pnpm/read-package-json",
-                ],
-            }
-        elif bazel_package == "js/private/test/image/platform_deps":
-            link_178()
-            link_179()
-            link_targets = [
-                ":node_modules/@rspack/cli",
-                ":node_modules/@rspack/core",
-            ]
-            scope_targets = {
-                "@rspack": [
-                    ":node_modules/@rspack/cli",
-                    ":node_modules/@rspack/core",
-                ],
-            }
-        elif bazel_package == "js/private/test/js_run_devserver":
-            link_196()
-            link_545()
-            link_targets = [
-                ":node_modules/@types/node",
-                ":node_modules/jasmine",
-            ]
-            scope_targets = {
-                "@types": [":node_modules/@types/node"],
-            }
-        elif bazel_package == "npm/private/test":
-            link_205()
-            link_206()
-            link_749()
-            link_targets = [
-                ":node_modules/@vscode/vsce-sign-alpine-arm64",
-                ":node_modules/@vscode/vsce-sign-alpine-x64",
-                ":node_modules/sass-embedded-all-unknown",
-            ]
-            scope_targets = {
-                "@vscode": [
-                    ":node_modules/@vscode/vsce-sign-alpine-arm64",
-                    ":node_modules/@vscode/vsce-sign-alpine-x64",
-                ],
-            }
-        elif bazel_package == "js/private/test/image":
-            link_218()
-            _fp_link_2()
-            _fp_link_3()
-            link_targets = [
-                ":node_modules/acorn",
-                ":node_modules/@image-test/a",
-                ":node_modules/@image-test/d",
-            ]
-            scope_targets = {
-                "@image-test": [
-                    ":node_modules/@image-test/a",
-                    ":node_modules/@image-test/d",
-                ],
-            }
-        elif bazel_package == "js/private/coverage/bundle":
-            link_268()
-            link_targets = [":node_modules/c8"]
-        elif bazel_package == "npm/private/test/npm_package":
-            link_279()
-            link_280("chalk-alt")
-            link_targets = [
-                ":node_modules/chalk",
-                ":node_modules/chalk-alt",
-            ]
-        elif bazel_package == "js/private/worker/src":
-            link_471()
-            link_842()
-            link_targets = [
-                ":node_modules/google-protobuf",
-                ":node_modules/tslib",
-            ]
-        elif bazel_package == "js/private/test/image-fixture-a":
-            link_868()
-            link_targets = [":node_modules/uuid"]
-        elif bazel_package == "js/private/test/image-fixture-d":
-            link_868()
-            link_targets = [":node_modules/uuid"]
-        elif bazel_package == "npm/private/test/subs":
-            _fp_link_4()
-            _fp_link_5()
-            link_targets = [
-                ":node_modules/@subs/a",
-                ":node_modules/@subs/b",
-            ]
-            scope_targets = {
-                "@subs": [
-                    ":node_modules/@subs/a",
-                    ":node_modules/@subs/b",
-                ],
-            }
+        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if _link_pkg_fn:
+            link_targets, scope_targets = _link_pkg_fn()
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -2042,6 +2064,69 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
         )
 
+_LINK_TARGETS = {
+    "npm/private/lifecycle": {
+        "prod": [
+            ":node_modules/@pnpm/lifecycle",
+            ":node_modules/@pnpm/logger",
+            ":node_modules/@pnpm/read-package-json",
+        ],
+    },
+    "js/private/test/image/platform_deps": {
+        "prod": [
+            ":node_modules/@rspack/cli",
+            ":node_modules/@rspack/core",
+        ],
+    },
+    "js/private/test/js_run_devserver": {
+        "prod": [
+            ":node_modules/@types/node",
+            ":node_modules/jasmine",
+        ],
+    },
+    "npm/private/test": {
+        "prod": [
+            ":node_modules/@vscode/vsce-sign-alpine-arm64",
+            ":node_modules/@vscode/vsce-sign-alpine-x64",
+            ":node_modules/sass-embedded-all-unknown",
+        ],
+    },
+    "js/private/test/image": {
+        "prod": [
+            ":node_modules/acorn",
+            ":node_modules/@image-test/a",
+            ":node_modules/@image-test/d",
+        ],
+    },
+    "js/private/coverage/bundle": {
+        "prod": [":node_modules/c8"],
+    },
+    "npm/private/test/npm_package": {
+        "prod": [
+            ":node_modules/chalk",
+            ":node_modules/chalk-alt",
+        ],
+    },
+    "js/private/worker/src": {
+        "prod": [
+            ":node_modules/google-protobuf",
+            ":node_modules/tslib",
+        ],
+    },
+    "js/private/test/image-fixture-a": {
+        "prod": [":node_modules/uuid"],
+    },
+    "js/private/test/image-fixture-d": {
+        "prod": [":node_modules/uuid"],
+    },
+    "npm/private/test/subs": {
+        "prod": [
+            ":node_modules/@subs/a",
+            ":node_modules/@subs/b",
+        ],
+    },
+}
+
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if name != "node_modules":
@@ -2051,68 +2136,12 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     bazel_package = package if package != None else native.package_name()
 
+    entry = _LINK_TARGETS.get(bazel_package, {})
     link_targets = []
-
-    if bazel_package == "npm/private/lifecycle":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@pnpm/lifecycle",
-                ":node_modules/@pnpm/logger",
-                ":node_modules/@pnpm/read-package-json",
-            ])
-    elif bazel_package == "js/private/test/image/platform_deps":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@rspack/cli",
-                ":node_modules/@rspack/core",
-            ])
-    elif bazel_package == "js/private/test/js_run_devserver":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@types/node",
-                ":node_modules/jasmine",
-            ])
-    elif bazel_package == "npm/private/test":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@vscode/vsce-sign-alpine-arm64",
-                ":node_modules/@vscode/vsce-sign-alpine-x64",
-                ":node_modules/sass-embedded-all-unknown",
-            ])
-    elif bazel_package == "js/private/test/image":
-        if prod:
-            link_targets.extend([
-                ":node_modules/acorn",
-                ":node_modules/@image-test/a",
-                ":node_modules/@image-test/d",
-            ])
-    elif bazel_package == "js/private/coverage/bundle":
-        if prod:
-            link_targets.extend([":node_modules/c8"])
-    elif bazel_package == "npm/private/test/npm_package":
-        if prod:
-            link_targets.extend([
-                ":node_modules/chalk",
-                ":node_modules/chalk-alt",
-            ])
-    elif bazel_package == "js/private/worker/src":
-        if prod:
-            link_targets.extend([
-                ":node_modules/google-protobuf",
-                ":node_modules/tslib",
-            ])
-    elif bazel_package == "js/private/test/image-fixture-a":
-        if prod:
-            link_targets.extend([":node_modules/uuid"])
-    elif bazel_package == "js/private/test/image-fixture-d":
-        if prod:
-            link_targets.extend([":node_modules/uuid"])
-    elif bazel_package == "npm/private/test/subs":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@subs/a",
-                ":node_modules/@subs/b",
-            ])
+    if prod and "prod" in entry:
+        link_targets.extend(entry["prod"])
+    if dev and "dev" in entry:
+        link_targets.extend(entry["dev"])
     return ["//%s%s" % (bazel_package, target) for target in link_targets]
 
 # Generated npm_link_package_store for linking of first-party "@image-test/a" package
