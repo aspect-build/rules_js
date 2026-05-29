@@ -8,6 +8,18 @@ load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
 
 _IMPORTER_PACKAGES = [""]
 
+def _link_pkg_0():
+    link_0()
+    link_1()
+    return [
+        ":node_modules/chalk",
+        ":node_modules/lodash",
+    ], None
+
+_LINK_PACKAGE_FNS = {
+    "": _link_pkg_0,
+}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if name != "node_modules":
@@ -31,13 +43,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     scope_targets = None
 
     if is_importer:
-        if bazel_package == "":
-            link_0()
-            link_1()
-            link_targets = [
-                ":node_modules/chalk",
-                ":node_modules/lodash",
-            ]
+        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if _link_pkg_fn:
+            link_targets, scope_targets = _link_pkg_fn()
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -67,6 +75,15 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
         )
 
+_LINK_TARGETS = {
+    "": {
+        "prod": [
+            ":node_modules/chalk",
+            ":node_modules/lodash",
+        ],
+    },
+}
+
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if name != "node_modules":
@@ -76,12 +93,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     bazel_package = package if package != None else native.package_name()
 
+    entry = _LINK_TARGETS.get(bazel_package, {})
     link_targets = []
-
-    if bazel_package == "":
-        if prod:
-            link_targets.extend([
-                ":node_modules/chalk",
-                ":node_modules/lodash",
-            ])
+    if prod and "prod" in entry:
+        link_targets.extend(entry["prod"])
+    if dev and "dev" in entry:
+        link_targets.extend(entry["dev"])
     return ["//%s%s" % (bazel_package, target) for target in link_targets]

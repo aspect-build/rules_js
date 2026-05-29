@@ -942,6 +942,304 @@ _NPM_PACKAGE_LOCATIONS = {
     "js/private/test/image-fixture-d": ["uuid"],
 }
 
+def _link_pkg_0():
+    link_1(dev=True)
+    link_5(dev=True)
+    link_17(dev=True)
+    link_508(dev=True)
+    return [
+        ":node_modules/@babel/cli",
+        ":node_modules/@babel/core",
+        ":node_modules/@babel/plugin-transform-modules-commonjs",
+        ":node_modules/inline-fixtures",
+    ], {
+        "@babel": [
+            ":node_modules/@babel/cli",
+            ":node_modules/@babel/core",
+            ":node_modules/@babel/plugin-transform-modules-commonjs",
+        ],
+    }
+
+def _link_pkg_1():
+    link_21(dev=True)
+    link_196(dev=True)
+    link_280(dev=True)
+    link_383("circles", dev=True)
+    link_470(dev=True)
+    link_558(dev=True)
+    link_850(dev=True)
+    return [
+        ":node_modules/@bazel/runfiles",
+        ":node_modules/@types/node",
+        ":node_modules/chalk",
+        ":node_modules/circles",
+        ":node_modules/google-closure-compiler",
+        ":node_modules/jsonpath-plus",
+        ":node_modules/typescript",
+    ], {
+        "@bazel": [":node_modules/@bazel/runfiles"],
+        "@types": [":node_modules/@types/node"],
+    }
+
+def _link_pkg_2():
+    link_51(dev=True)
+    link_52(dev=True)
+    link_67(dev=True)
+    link_107(dev=True)
+    link_107("regl", dev=True)
+    link_205()
+    link_206()
+    link_267(dev=True)
+    link_350(dev=True)
+    link_387(dev=True)
+    link_485("handlebars-helpers/helper-date", dev=True)
+    link_487(dev=True)
+    link_509(dev=True)
+    link_554(dev=True)
+    link_567(dev=True)
+    link_568("lodash-4.17.21", dev=True)
+    link_569("lodash-4.17.21-tar", dev=True)
+    link_640(dev=True)
+    link_690(dev=True)
+    link_691(dev=True)
+    link_701(dev=True)
+    link_706(dev=True)
+    link_749()
+    link_752(dev=True)
+    link_753(dev=True)
+    link_813(dev=True)
+    link_850(dev=True)
+    link_864(dev=True)
+    link_877(dev=True)
+    _fp_link_4()
+    return [
+        ":node_modules/@vscode/vsce-sign-alpine-arm64",
+        ":node_modules/@vscode/vsce-sign-alpine-x64",
+        ":node_modules/sass-embedded-all-unknown",
+        ":node_modules/@fastify/send",
+        ":node_modules/@figma/nodegit",
+        ":node_modules/@kubernetes/client-node",
+        ":node_modules/@plotly/regl",
+        ":node_modules/regl",
+        ":node_modules/bufferutil",
+        ":node_modules/debug",
+        ":node_modules/esbuild",
+        ":node_modules/handlebars-helpers/helper-date",
+        ":node_modules/hot-shots",
+        ":node_modules/inline-fixtures",
+        ":node_modules/json-stable-stringify",
+        ":node_modules/lodash",
+        ":node_modules/lodash-4.17.21",
+        ":node_modules/lodash-4.17.21-tar",
+        ":node_modules/node-gyp",
+        ":node_modules/plotly.js",
+        ":node_modules/pngjs",
+        ":node_modules/protoc-gen-grpc",
+        ":node_modules/puppeteer",
+        ":node_modules/segfault-handler",
+        ":node_modules/semver-first-satisfied",
+        ":node_modules/syncpack",
+        ":node_modules/typescript",
+        ":node_modules/webpack-bundle-analyzer",
+        ":node_modules/test-npm_package",
+    ], {
+        "@fastify": [":node_modules/@fastify/send"],
+        "@figma": [":node_modules/@figma/nodegit"],
+        "@kubernetes": [":node_modules/@kubernetes/client-node"],
+        "@plotly": [":node_modules/@plotly/regl"],
+        "@vscode": [
+            ":node_modules/@vscode/vsce-sign-alpine-arm64",
+            ":node_modules/@vscode/vsce-sign-alpine-x64",
+        ],
+    }
+
+def _link_pkg_3():
+    link_117()
+    link_119()
+    link_125()
+    link_135(dev=True)
+    link_136(dev=True)
+    link_137(dev=True)
+    link_138(dev=True)
+    link_139(dev=True)
+    link_742(dev=True)
+    return [
+        ":node_modules/@pnpm/lifecycle",
+        ":node_modules/@pnpm/logger",
+        ":node_modules/@pnpm/read-package-json",
+        ":node_modules/@rollup/plugin-commonjs",
+        ":node_modules/@rollup/plugin-json",
+        ":node_modules/@rollup/plugin-node-resolve",
+        ":node_modules/@rollup/plugin-replace",
+        ":node_modules/@rollup/plugin-terser",
+        ":node_modules/rollup",
+    ], {
+        "@pnpm": [
+            ":node_modules/@pnpm/lifecycle",
+            ":node_modules/@pnpm/logger",
+            ":node_modules/@pnpm/read-package-json",
+        ],
+        "@rollup": [
+            ":node_modules/@rollup/plugin-commonjs",
+            ":node_modules/@rollup/plugin-json",
+            ":node_modules/@rollup/plugin-node-resolve",
+            ":node_modules/@rollup/plugin-replace",
+            ":node_modules/@rollup/plugin-terser",
+        ],
+    }
+
+def _link_pkg_4():
+    link_135(dev=True)
+    link_136(dev=True)
+    link_137(dev=True)
+    link_268()
+    link_742(dev=True)
+    return [
+        ":node_modules/c8",
+        ":node_modules/@rollup/plugin-commonjs",
+        ":node_modules/@rollup/plugin-json",
+        ":node_modules/@rollup/plugin-node-resolve",
+        ":node_modules/rollup",
+    ], {
+        "@rollup": [
+            ":node_modules/@rollup/plugin-commonjs",
+            ":node_modules/@rollup/plugin-json",
+            ":node_modules/@rollup/plugin-node-resolve",
+        ],
+    }
+
+def _link_pkg_5():
+    link_135(dev=True)
+    link_136(dev=True)
+    link_137(dev=True)
+    link_140(dev=True)
+    link_190(dev=True)
+    link_196(dev=True)
+    link_471()
+    link_742(dev=True)
+    link_842()
+    link_850(dev=True)
+    return [
+        ":node_modules/google-protobuf",
+        ":node_modules/tslib",
+        ":node_modules/@rollup/plugin-commonjs",
+        ":node_modules/@rollup/plugin-json",
+        ":node_modules/@rollup/plugin-node-resolve",
+        ":node_modules/@rollup/plugin-typescript",
+        ":node_modules/@types/google-protobuf",
+        ":node_modules/@types/node",
+        ":node_modules/rollup",
+        ":node_modules/typescript",
+    ], {
+        "@rollup": [
+            ":node_modules/@rollup/plugin-commonjs",
+            ":node_modules/@rollup/plugin-json",
+            ":node_modules/@rollup/plugin-node-resolve",
+            ":node_modules/@rollup/plugin-typescript",
+        ],
+        "@types": [
+            ":node_modules/@types/google-protobuf",
+            ":node_modules/@types/node",
+        ],
+    }
+
+def _link_pkg_6():
+    link_137(dev=True)
+    link_196(dev=True)
+    link_742(dev=True)
+    return [
+        ":node_modules/@rollup/plugin-node-resolve",
+        ":node_modules/@types/node",
+        ":node_modules/rollup",
+    ], {
+        "@rollup": [":node_modules/@rollup/plugin-node-resolve"],
+        "@types": [":node_modules/@types/node"],
+    }
+
+def _link_pkg_7():
+    link_178()
+    link_179()
+    return [
+        ":node_modules/@rspack/cli",
+        ":node_modules/@rspack/core",
+    ], {
+        "@rspack": [
+            ":node_modules/@rspack/cli",
+            ":node_modules/@rspack/core",
+        ],
+    }
+
+def _link_pkg_8():
+    link_196()
+    link_545()
+    return [
+        ":node_modules/@types/node",
+        ":node_modules/jasmine",
+    ], {
+        "@types": [":node_modules/@types/node"],
+    }
+
+def _link_pkg_9():
+    link_218()
+    _fp_link_2()
+    _fp_link_3()
+    return [
+        ":node_modules/acorn",
+        ":node_modules/@image-test/a",
+        ":node_modules/@image-test/d",
+    ], {
+        "@image-test": [
+            ":node_modules/@image-test/a",
+            ":node_modules/@image-test/d",
+        ],
+    }
+
+def _link_pkg_10():
+    link_279()
+    link_280("chalk-alt")
+    return [
+        ":node_modules/chalk",
+        ":node_modules/chalk-alt",
+    ], None
+
+def _link_pkg_11():
+    link_868()
+    return [":node_modules/uuid"], None
+
+def _link_pkg_12():
+    link_868()
+    return [":node_modules/uuid"], None
+
+def _link_pkg_13():
+    _fp_link_5()
+    _fp_link_6()
+    return [
+        ":node_modules/@subs/a",
+        ":node_modules/@subs/b",
+    ], {
+        "@subs": [
+            ":node_modules/@subs/a",
+            ":node_modules/@subs/b",
+        ],
+    }
+
+_LINK_PACKAGE_FNS = {
+    "js/private/test/node-patches": _link_pkg_0,
+    "": _link_pkg_1,
+    "npm/private/test": _link_pkg_2,
+    "npm/private/lifecycle": _link_pkg_3,
+    "js/private/coverage/bundle": _link_pkg_4,
+    "js/private/worker/src": _link_pkg_5,
+    "js/private/devserver/src": _link_pkg_6,
+    "js/private/test/image/platform_deps": _link_pkg_7,
+    "js/private/test/js_run_devserver": _link_pkg_8,
+    "js/private/test/image": _link_pkg_9,
+    "npm/private/test/npm_package": _link_pkg_10,
+    "js/private/test/image-fixture-a": _link_pkg_11,
+    "js/private/test/image-fixture-d": _link_pkg_12,
+    "npm/private/test/subs": _link_pkg_13,
+}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if name != "node_modules":
@@ -1947,284 +2245,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     scope_targets = None
 
     if is_importer:
-        if bazel_package == "js/private/test/node-patches":
-            link_1(dev=True)
-            link_5(dev=True)
-            link_17(dev=True)
-            link_508(dev=True)
-            link_targets = [
-                ":node_modules/@babel/cli",
-                ":node_modules/@babel/core",
-                ":node_modules/@babel/plugin-transform-modules-commonjs",
-                ":node_modules/inline-fixtures",
-            ]
-            scope_targets = {
-                "@babel": [
-                    ":node_modules/@babel/cli",
-                    ":node_modules/@babel/core",
-                    ":node_modules/@babel/plugin-transform-modules-commonjs",
-                ],
-            }
-        elif bazel_package == "":
-            link_21(dev=True)
-            link_196(dev=True)
-            link_280(dev=True)
-            link_383("circles", dev=True)
-            link_470(dev=True)
-            link_558(dev=True)
-            link_850(dev=True)
-            link_targets = [
-                ":node_modules/@bazel/runfiles",
-                ":node_modules/@types/node",
-                ":node_modules/chalk",
-                ":node_modules/circles",
-                ":node_modules/google-closure-compiler",
-                ":node_modules/jsonpath-plus",
-                ":node_modules/typescript",
-            ]
-            scope_targets = {
-                "@bazel": [":node_modules/@bazel/runfiles"],
-                "@types": [":node_modules/@types/node"],
-            }
-        elif bazel_package == "npm/private/test":
-            link_51(dev=True)
-            link_52(dev=True)
-            link_67(dev=True)
-            link_107(dev=True)
-            link_107("regl", dev=True)
-            link_205()
-            link_206()
-            link_267(dev=True)
-            link_350(dev=True)
-            link_387(dev=True)
-            link_485("handlebars-helpers/helper-date", dev=True)
-            link_487(dev=True)
-            link_509(dev=True)
-            link_554(dev=True)
-            link_567(dev=True)
-            link_568("lodash-4.17.21", dev=True)
-            link_569("lodash-4.17.21-tar", dev=True)
-            link_640(dev=True)
-            link_690(dev=True)
-            link_691(dev=True)
-            link_701(dev=True)
-            link_706(dev=True)
-            link_749()
-            link_752(dev=True)
-            link_753(dev=True)
-            link_813(dev=True)
-            link_850(dev=True)
-            link_864(dev=True)
-            link_877(dev=True)
-            _fp_link_4()
-            link_targets = [
-                ":node_modules/@vscode/vsce-sign-alpine-arm64",
-                ":node_modules/@vscode/vsce-sign-alpine-x64",
-                ":node_modules/sass-embedded-all-unknown",
-                ":node_modules/@fastify/send",
-                ":node_modules/@figma/nodegit",
-                ":node_modules/@kubernetes/client-node",
-                ":node_modules/@plotly/regl",
-                ":node_modules/regl",
-                ":node_modules/bufferutil",
-                ":node_modules/debug",
-                ":node_modules/esbuild",
-                ":node_modules/handlebars-helpers/helper-date",
-                ":node_modules/hot-shots",
-                ":node_modules/inline-fixtures",
-                ":node_modules/json-stable-stringify",
-                ":node_modules/lodash",
-                ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash-4.17.21-tar",
-                ":node_modules/node-gyp",
-                ":node_modules/plotly.js",
-                ":node_modules/pngjs",
-                ":node_modules/protoc-gen-grpc",
-                ":node_modules/puppeteer",
-                ":node_modules/segfault-handler",
-                ":node_modules/semver-first-satisfied",
-                ":node_modules/syncpack",
-                ":node_modules/typescript",
-                ":node_modules/webpack-bundle-analyzer",
-                ":node_modules/test-npm_package",
-            ]
-            scope_targets = {
-                "@fastify": [":node_modules/@fastify/send"],
-                "@figma": [":node_modules/@figma/nodegit"],
-                "@kubernetes": [":node_modules/@kubernetes/client-node"],
-                "@plotly": [":node_modules/@plotly/regl"],
-                "@vscode": [
-                    ":node_modules/@vscode/vsce-sign-alpine-arm64",
-                    ":node_modules/@vscode/vsce-sign-alpine-x64",
-                ],
-            }
-        elif bazel_package == "npm/private/lifecycle":
-            link_117()
-            link_119()
-            link_125()
-            link_135(dev=True)
-            link_136(dev=True)
-            link_137(dev=True)
-            link_138(dev=True)
-            link_139(dev=True)
-            link_742(dev=True)
-            link_targets = [
-                ":node_modules/@pnpm/lifecycle",
-                ":node_modules/@pnpm/logger",
-                ":node_modules/@pnpm/read-package-json",
-                ":node_modules/@rollup/plugin-commonjs",
-                ":node_modules/@rollup/plugin-json",
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/@rollup/plugin-replace",
-                ":node_modules/@rollup/plugin-terser",
-                ":node_modules/rollup",
-            ]
-            scope_targets = {
-                "@pnpm": [
-                    ":node_modules/@pnpm/lifecycle",
-                    ":node_modules/@pnpm/logger",
-                    ":node_modules/@pnpm/read-package-json",
-                ],
-                "@rollup": [
-                    ":node_modules/@rollup/plugin-commonjs",
-                    ":node_modules/@rollup/plugin-json",
-                    ":node_modules/@rollup/plugin-node-resolve",
-                    ":node_modules/@rollup/plugin-replace",
-                    ":node_modules/@rollup/plugin-terser",
-                ],
-            }
-        elif bazel_package == "js/private/coverage/bundle":
-            link_135(dev=True)
-            link_136(dev=True)
-            link_137(dev=True)
-            link_268()
-            link_742(dev=True)
-            link_targets = [
-                ":node_modules/c8",
-                ":node_modules/@rollup/plugin-commonjs",
-                ":node_modules/@rollup/plugin-json",
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/rollup",
-            ]
-            scope_targets = {
-                "@rollup": [
-                    ":node_modules/@rollup/plugin-commonjs",
-                    ":node_modules/@rollup/plugin-json",
-                    ":node_modules/@rollup/plugin-node-resolve",
-                ],
-            }
-        elif bazel_package == "js/private/worker/src":
-            link_135(dev=True)
-            link_136(dev=True)
-            link_137(dev=True)
-            link_140(dev=True)
-            link_190(dev=True)
-            link_196(dev=True)
-            link_471()
-            link_742(dev=True)
-            link_842()
-            link_850(dev=True)
-            link_targets = [
-                ":node_modules/google-protobuf",
-                ":node_modules/tslib",
-                ":node_modules/@rollup/plugin-commonjs",
-                ":node_modules/@rollup/plugin-json",
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/@rollup/plugin-typescript",
-                ":node_modules/@types/google-protobuf",
-                ":node_modules/@types/node",
-                ":node_modules/rollup",
-                ":node_modules/typescript",
-            ]
-            scope_targets = {
-                "@rollup": [
-                    ":node_modules/@rollup/plugin-commonjs",
-                    ":node_modules/@rollup/plugin-json",
-                    ":node_modules/@rollup/plugin-node-resolve",
-                    ":node_modules/@rollup/plugin-typescript",
-                ],
-                "@types": [
-                    ":node_modules/@types/google-protobuf",
-                    ":node_modules/@types/node",
-                ],
-            }
-        elif bazel_package == "js/private/devserver/src":
-            link_137(dev=True)
-            link_196(dev=True)
-            link_742(dev=True)
-            link_targets = [
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/@types/node",
-                ":node_modules/rollup",
-            ]
-            scope_targets = {
-                "@rollup": [":node_modules/@rollup/plugin-node-resolve"],
-                "@types": [":node_modules/@types/node"],
-            }
-        elif bazel_package == "js/private/test/image/platform_deps":
-            link_178()
-            link_179()
-            link_targets = [
-                ":node_modules/@rspack/cli",
-                ":node_modules/@rspack/core",
-            ]
-            scope_targets = {
-                "@rspack": [
-                    ":node_modules/@rspack/cli",
-                    ":node_modules/@rspack/core",
-                ],
-            }
-        elif bazel_package == "js/private/test/js_run_devserver":
-            link_196()
-            link_545()
-            link_targets = [
-                ":node_modules/@types/node",
-                ":node_modules/jasmine",
-            ]
-            scope_targets = {
-                "@types": [":node_modules/@types/node"],
-            }
-        elif bazel_package == "js/private/test/image":
-            link_218()
-            _fp_link_2()
-            _fp_link_3()
-            link_targets = [
-                ":node_modules/acorn",
-                ":node_modules/@image-test/a",
-                ":node_modules/@image-test/d",
-            ]
-            scope_targets = {
-                "@image-test": [
-                    ":node_modules/@image-test/a",
-                    ":node_modules/@image-test/d",
-                ],
-            }
-        elif bazel_package == "npm/private/test/npm_package":
-            link_279()
-            link_280("chalk-alt")
-            link_targets = [
-                ":node_modules/chalk",
-                ":node_modules/chalk-alt",
-            ]
-        elif bazel_package == "js/private/test/image-fixture-a":
-            link_868()
-            link_targets = [":node_modules/uuid"]
-        elif bazel_package == "js/private/test/image-fixture-d":
-            link_868()
-            link_targets = [":node_modules/uuid"]
-        elif bazel_package == "npm/private/test/subs":
-            _fp_link_5()
-            _fp_link_6()
-            link_targets = [
-                ":node_modules/@subs/a",
-                ":node_modules/@subs/b",
-            ]
-            scope_targets = {
-                "@subs": [
-                    ":node_modules/@subs/a",
-                    ":node_modules/@subs/b",
-                ],
-            }
+        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if _link_pkg_fn:
+            link_targets, scope_targets = _link_pkg_fn()
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -2254,6 +2277,147 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
         )
 
+_LINK_TARGETS = {
+    "js/private/test/node-patches": {
+        "dev": [
+            ":node_modules/@babel/cli",
+            ":node_modules/@babel/core",
+            ":node_modules/@babel/plugin-transform-modules-commonjs",
+            ":node_modules/inline-fixtures",
+        ],
+    },
+    "": {
+        "dev": [
+            ":node_modules/@bazel/runfiles",
+            ":node_modules/@types/node",
+            ":node_modules/chalk",
+            ":node_modules/circles",
+            ":node_modules/google-closure-compiler",
+            ":node_modules/jsonpath-plus",
+            ":node_modules/typescript",
+        ],
+    },
+    "npm/private/test": {
+        "prod": [
+            ":node_modules/@vscode/vsce-sign-alpine-arm64",
+            ":node_modules/@vscode/vsce-sign-alpine-x64",
+            ":node_modules/sass-embedded-all-unknown",
+        ],
+        "dev": [
+            ":node_modules/@fastify/send",
+            ":node_modules/@figma/nodegit",
+            ":node_modules/@kubernetes/client-node",
+            ":node_modules/@plotly/regl",
+            ":node_modules/regl",
+            ":node_modules/bufferutil",
+            ":node_modules/debug",
+            ":node_modules/esbuild",
+            ":node_modules/handlebars-helpers/helper-date",
+            ":node_modules/hot-shots",
+            ":node_modules/inline-fixtures",
+            ":node_modules/json-stable-stringify",
+            ":node_modules/lodash",
+            ":node_modules/lodash-4.17.21",
+            ":node_modules/lodash-4.17.21-tar",
+            ":node_modules/node-gyp",
+            ":node_modules/plotly.js",
+            ":node_modules/pngjs",
+            ":node_modules/protoc-gen-grpc",
+            ":node_modules/puppeteer",
+            ":node_modules/segfault-handler",
+            ":node_modules/semver-first-satisfied",
+            ":node_modules/syncpack",
+            ":node_modules/typescript",
+            ":node_modules/webpack-bundle-analyzer",
+            ":node_modules/test-npm_package",
+        ],
+    },
+    "npm/private/lifecycle": {
+        "prod": [
+            ":node_modules/@pnpm/lifecycle",
+            ":node_modules/@pnpm/logger",
+            ":node_modules/@pnpm/read-package-json",
+        ],
+        "dev": [
+            ":node_modules/@rollup/plugin-commonjs",
+            ":node_modules/@rollup/plugin-json",
+            ":node_modules/@rollup/plugin-node-resolve",
+            ":node_modules/@rollup/plugin-replace",
+            ":node_modules/@rollup/plugin-terser",
+            ":node_modules/rollup",
+        ],
+    },
+    "js/private/coverage/bundle": {
+        "prod": [":node_modules/c8"],
+        "dev": [
+            ":node_modules/@rollup/plugin-commonjs",
+            ":node_modules/@rollup/plugin-json",
+            ":node_modules/@rollup/plugin-node-resolve",
+            ":node_modules/rollup",
+        ],
+    },
+    "js/private/worker/src": {
+        "prod": [
+            ":node_modules/google-protobuf",
+            ":node_modules/tslib",
+        ],
+        "dev": [
+            ":node_modules/@rollup/plugin-commonjs",
+            ":node_modules/@rollup/plugin-json",
+            ":node_modules/@rollup/plugin-node-resolve",
+            ":node_modules/@rollup/plugin-typescript",
+            ":node_modules/@types/google-protobuf",
+            ":node_modules/@types/node",
+            ":node_modules/rollup",
+            ":node_modules/typescript",
+        ],
+    },
+    "js/private/devserver/src": {
+        "dev": [
+            ":node_modules/@rollup/plugin-node-resolve",
+            ":node_modules/@types/node",
+            ":node_modules/rollup",
+        ],
+    },
+    "js/private/test/image/platform_deps": {
+        "prod": [
+            ":node_modules/@rspack/cli",
+            ":node_modules/@rspack/core",
+        ],
+    },
+    "js/private/test/js_run_devserver": {
+        "prod": [
+            ":node_modules/@types/node",
+            ":node_modules/jasmine",
+        ],
+    },
+    "js/private/test/image": {
+        "prod": [
+            ":node_modules/acorn",
+            ":node_modules/@image-test/a",
+            ":node_modules/@image-test/d",
+        ],
+    },
+    "npm/private/test/npm_package": {
+        "prod": [
+            ":node_modules/chalk",
+            ":node_modules/chalk-alt",
+        ],
+    },
+    "js/private/test/image-fixture-a": {
+        "prod": [":node_modules/uuid"],
+    },
+    "js/private/test/image-fixture-d": {
+        "prod": [":node_modules/uuid"],
+    },
+    "npm/private/test/subs": {
+        "prod": [
+            ":node_modules/@subs/a",
+            ":node_modules/@subs/b",
+        ],
+    },
+}
+
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if name != "node_modules":
@@ -2263,150 +2427,12 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     bazel_package = package if package != None else native.package_name()
 
+    entry = _LINK_TARGETS.get(bazel_package, {})
     link_targets = []
-
-    if bazel_package == "js/private/test/node-patches":
-        if dev:
-            link_targets.extend([
-                ":node_modules/@babel/cli",
-                ":node_modules/@babel/core",
-                ":node_modules/@babel/plugin-transform-modules-commonjs",
-                ":node_modules/inline-fixtures",
-            ])
-    elif bazel_package == "":
-        if dev:
-            link_targets.extend([
-                ":node_modules/@bazel/runfiles",
-                ":node_modules/@types/node",
-                ":node_modules/chalk",
-                ":node_modules/circles",
-                ":node_modules/google-closure-compiler",
-                ":node_modules/jsonpath-plus",
-                ":node_modules/typescript",
-            ])
-    elif bazel_package == "npm/private/test":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@vscode/vsce-sign-alpine-arm64",
-                ":node_modules/@vscode/vsce-sign-alpine-x64",
-                ":node_modules/sass-embedded-all-unknown",
-            ])
-        if dev:
-            link_targets.extend([
-                ":node_modules/@fastify/send",
-                ":node_modules/@figma/nodegit",
-                ":node_modules/@kubernetes/client-node",
-                ":node_modules/@plotly/regl",
-                ":node_modules/regl",
-                ":node_modules/bufferutil",
-                ":node_modules/debug",
-                ":node_modules/esbuild",
-                ":node_modules/handlebars-helpers/helper-date",
-                ":node_modules/hot-shots",
-                ":node_modules/inline-fixtures",
-                ":node_modules/json-stable-stringify",
-                ":node_modules/lodash",
-                ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash-4.17.21-tar",
-                ":node_modules/node-gyp",
-                ":node_modules/plotly.js",
-                ":node_modules/pngjs",
-                ":node_modules/protoc-gen-grpc",
-                ":node_modules/puppeteer",
-                ":node_modules/segfault-handler",
-                ":node_modules/semver-first-satisfied",
-                ":node_modules/syncpack",
-                ":node_modules/typescript",
-                ":node_modules/webpack-bundle-analyzer",
-                ":node_modules/test-npm_package",
-            ])
-    elif bazel_package == "npm/private/lifecycle":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@pnpm/lifecycle",
-                ":node_modules/@pnpm/logger",
-                ":node_modules/@pnpm/read-package-json",
-            ])
-        if dev:
-            link_targets.extend([
-                ":node_modules/@rollup/plugin-commonjs",
-                ":node_modules/@rollup/plugin-json",
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/@rollup/plugin-replace",
-                ":node_modules/@rollup/plugin-terser",
-                ":node_modules/rollup",
-            ])
-    elif bazel_package == "js/private/coverage/bundle":
-        if prod:
-            link_targets.extend([":node_modules/c8"])
-        if dev:
-            link_targets.extend([
-                ":node_modules/@rollup/plugin-commonjs",
-                ":node_modules/@rollup/plugin-json",
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/rollup",
-            ])
-    elif bazel_package == "js/private/worker/src":
-        if prod:
-            link_targets.extend([
-                ":node_modules/google-protobuf",
-                ":node_modules/tslib",
-            ])
-        if dev:
-            link_targets.extend([
-                ":node_modules/@rollup/plugin-commonjs",
-                ":node_modules/@rollup/plugin-json",
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/@rollup/plugin-typescript",
-                ":node_modules/@types/google-protobuf",
-                ":node_modules/@types/node",
-                ":node_modules/rollup",
-                ":node_modules/typescript",
-            ])
-    elif bazel_package == "js/private/devserver/src":
-        if dev:
-            link_targets.extend([
-                ":node_modules/@rollup/plugin-node-resolve",
-                ":node_modules/@types/node",
-                ":node_modules/rollup",
-            ])
-    elif bazel_package == "js/private/test/image/platform_deps":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@rspack/cli",
-                ":node_modules/@rspack/core",
-            ])
-    elif bazel_package == "js/private/test/js_run_devserver":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@types/node",
-                ":node_modules/jasmine",
-            ])
-    elif bazel_package == "js/private/test/image":
-        if prod:
-            link_targets.extend([
-                ":node_modules/acorn",
-                ":node_modules/@image-test/a",
-                ":node_modules/@image-test/d",
-            ])
-    elif bazel_package == "npm/private/test/npm_package":
-        if prod:
-            link_targets.extend([
-                ":node_modules/chalk",
-                ":node_modules/chalk-alt",
-            ])
-    elif bazel_package == "js/private/test/image-fixture-a":
-        if prod:
-            link_targets.extend([":node_modules/uuid"])
-    elif bazel_package == "js/private/test/image-fixture-d":
-        if prod:
-            link_targets.extend([":node_modules/uuid"])
-    elif bazel_package == "npm/private/test/subs":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@subs/a",
-                ":node_modules/@subs/b",
-            ])
+    if prod and "prod" in entry:
+        link_targets.extend(entry["prod"])
+    if dev and "dev" in entry:
+        link_targets.extend(entry["dev"])
     return ["//%s%s" % (bazel_package, target) for target in link_targets]
 
 # Generated npm_link_package_store for linking of first-party "@image-test/a" package
