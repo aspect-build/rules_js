@@ -9,6 +9,10 @@ load("@aspect//traits.axl", "BazelTrait")
 buildifier = format.alias(
     defaults = {
         "formatter_target": "@buildifier_prebuilt//buildifier",
+        # buildifier_binary is a symlink to the raw Go binary; it does not
+        # switch to $BUILD_WORKING_DIRECTORY on its own, so we run it in
+        # the user's cwd to make relative paths resolve.
+        "run_in_cwd": True,
         "include_patterns": [
             "**/BUCK",
             "**/BUILD",
