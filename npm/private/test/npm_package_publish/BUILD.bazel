@@ -20,16 +20,28 @@ npm_package(
     publishable = True,
 )
 
+npm_package(
+    name = "pkg_pnpm",
+    srcs = [
+        "pnpm_catalog/index.js",
+        "pnpm_catalog/package.json",
+    ],
+    publishable = True,
+    root_paths = [package_name() + "/pnpm_catalog"],
+)
+
 sh_test(
     name = "test",
     srcs = ["test.sh"],
     args = [
         "$(locations :pkg_a.publish)",
         "$(locations :pkg_b.publish)",
+        "$(locations :pkg_pnpm.publish)",
     ],
     data = [
         ":pkg_a.publish",
         ":pkg_b.publish",
+        ":pkg_pnpm.publish",
     ],
     tags = [
         "no-remote-exec",
