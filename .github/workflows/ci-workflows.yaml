@@ -12,7 +12,7 @@ permissions:
 
 env:
     ASPECT_API_TOKEN: ${{ secrets.ASPECT_API_TOKEN }}
-    INSTALL_ASPECT_LAUNCHER_VERSION: 2026.22.23
+    ASPECT_LAUNCHER_VERSION: 2026.22.29
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -31,7 +31,7 @@ jobs:
                 external-cache: true
             - name: Format
               run: |
-                curl -fsSL https://install.aspect.build | bash -s -- "$INSTALL_ASPECT_LAUNCHER_VERSION"
+                curl -fsSL https://install.aspect.build | bash -s -- "$ASPECT_LAUNCHER_VERSION"
                 aspect format --task-key=format
     buildifier:
         runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
                 external-cache: true
             - name: Buildifier
               run: |
-                curl -fsSL https://install.aspect.build | bash -s -- "$INSTALL_ASPECT_LAUNCHER_VERSION"
+                curl -fsSL https://install.aspect.build | bash -s -- "$ASPECT_LAUNCHER_VERSION"
                 aspect buildifier --task-key=buildifier
     # Builds the workspace matrix axis. e2e tests gated on secrets that forks don't have
     # (ASPECT_GHTESTER_SSH_KEY, ASPECT_NPM_AUTH_TOKEN) are only appended when the secret is
@@ -172,5 +172,5 @@ jobs:
             - name: Test
               working-directory: ${{ matrix.workspace.path }}
               run: |
-                curl -fsSL https://install.aspect.build | bash -s -- "$INSTALL_ASPECT_LAUNCHER_VERSION"
+                curl -fsSL https://install.aspect.build | bash -s -- "$ASPECT_LAUNCHER_VERSION"
                 aspect test --task-key=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
