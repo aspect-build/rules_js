@@ -12,7 +12,7 @@ permissions:
 
 env:
     ASPECT_API_TOKEN: ${{ secrets.ASPECT_API_TOKEN }}
-    ASPECT_LAUNCHER_VERSION: 2026.22.29
+    ASPECT_LAUNCHER_VERSION: 2026.22.39
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
