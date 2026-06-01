@@ -25,6 +25,146 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_s
 
 _IMPORTER_PACKAGES = ["root", "", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d", "lib/d/e", "lib/d/f"]
 
+def _link_pkg_0():
+    link_0()
+    link_1(dev=True)
+    link_2()
+    link_10()
+    link_11()
+    return [
+        ":node_modules/@aspect-test/a",
+        ":node_modules/@aspect-test/c",
+        ":node_modules/lodash",
+        ":node_modules/typescript",
+        ":node_modules/@aspect-test/b",
+    ], {
+        "@aspect-test": [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/b",
+            ":node_modules/@aspect-test/c",
+        ],
+    }
+
+def _link_pkg_1():
+    link_0()
+    link_6()
+    _fp_link_2()
+    return [
+        ":node_modules/@aspect-test/a",
+        ":node_modules/@aspect-test/g",
+        ":node_modules/@lib/a",
+    ], {
+        "@aspect-test": [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/g",
+        ],
+        "@lib": [":node_modules/@lib/a"],
+    }
+
+def _link_pkg_2():
+    link_0()
+    link_6()
+    _fp_link_4()
+    return [
+        ":node_modules/@aspect-test/a",
+        ":node_modules/@aspect-test/g",
+        ":node_modules/@lib/c",
+    ], {
+        "@aspect-test": [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/g",
+        ],
+        "@lib": [":node_modules/@lib/c"],
+    }
+
+def _link_pkg_3():
+    link_3()
+    link_8("alias-2")
+    _fp_link_6()
+    _fp_link_7()
+    return [
+        ":node_modules/@aspect-test/d",
+        ":node_modules/alias-2",
+        ":node_modules/@lib/e",
+        ":node_modules/@lib/f",
+    ], {
+        "@aspect-test": [":node_modules/@aspect-test/d"],
+        "@lib": [
+            ":node_modules/@lib/e",
+            ":node_modules/@lib/f",
+        ],
+    }
+
+def _link_pkg_4():
+    link_4()
+    _fp_link_0()
+    _fp_link_1()
+    _fp_link_3()
+    return [
+        ":node_modules/@aspect-test/e",
+        ":node_modules/vendored-a",
+        ":node_modules/vendored-b",
+        ":node_modules/@lib/b",
+    ], {
+        "@aspect-test": [":node_modules/@aspect-test/e"],
+        "@lib": [":node_modules/@lib/b"],
+    }
+
+def _link_pkg_5():
+    link_5()
+    link_9("alias-1")
+    return [
+        ":node_modules/@aspect-test/f",
+        ":node_modules/alias-1",
+    ], {
+        "@aspect-test": [":node_modules/@aspect-test/f"],
+    }
+
+def _link_pkg_6():
+    link_5()
+    return [":node_modules/@aspect-test/f"], {
+        "@aspect-test": [":node_modules/@aspect-test/f"],
+    }
+
+def _link_pkg_7():
+    link_6()
+    _fp_link_5()
+    return [
+        ":node_modules/@aspect-test/g",
+        ":node_modules/@lib/d",
+    ], {
+        "@aspect-test": [":node_modules/@aspect-test/g"],
+        "@lib": [":node_modules/@lib/d"],
+    }
+
+def _link_pkg_8():
+    link_7()
+    _fp_link_3()
+    _fp_link_3("@lib/b_alias")
+    return [
+        ":node_modules/@aspect-test/h",
+        ":node_modules/@lib/b",
+        ":node_modules/@lib/b_alias",
+    ], {
+        "@aspect-test": [":node_modules/@aspect-test/h"],
+        "@lib": [
+            ":node_modules/@lib/b",
+            ":node_modules/@lib/b_alias",
+        ],
+    }
+
+_LINK_PACKAGE_FNS = {
+    "": _link_pkg_0,
+    "app/a": _link_pkg_1,
+    "app/c": _link_pkg_2,
+    "lib/d": _link_pkg_3,
+    "lib/a": _link_pkg_4,
+    "lib/b": _link_pkg_5,
+    "lib/c": _link_pkg_6,
+    "app/d": _link_pkg_7,
+    "app/b": _link_pkg_8,
+}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if name != "node_modules":
@@ -150,134 +290,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     scope_targets = None
 
     if is_importer:
-        if bazel_package == "":
-            link_0()
-            link_1(dev=True)
-            link_2()
-            link_10()
-            link_11()
-            link_targets = [
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/c",
-                ":node_modules/lodash",
-                ":node_modules/typescript",
-                ":node_modules/@aspect-test/b",
-            ]
-            scope_targets = {
-                "@aspect-test": [
-                    ":node_modules/@aspect-test/a",
-                    ":node_modules/@aspect-test/b",
-                    ":node_modules/@aspect-test/c",
-                ],
-            }
-        elif bazel_package == "app/a":
-            link_0()
-            link_6()
-            _fp_link_2()
-            link_targets = [
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/g",
-                ":node_modules/@lib/a",
-            ]
-            scope_targets = {
-                "@aspect-test": [
-                    ":node_modules/@aspect-test/a",
-                    ":node_modules/@aspect-test/g",
-                ],
-                "@lib": [":node_modules/@lib/a"],
-            }
-        elif bazel_package == "app/c":
-            link_0()
-            link_6()
-            _fp_link_4()
-            link_targets = [
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/g",
-                ":node_modules/@lib/c",
-            ]
-            scope_targets = {
-                "@aspect-test": [
-                    ":node_modules/@aspect-test/a",
-                    ":node_modules/@aspect-test/g",
-                ],
-                "@lib": [":node_modules/@lib/c"],
-            }
-        elif bazel_package == "lib/d":
-            link_3()
-            link_8("alias-2")
-            _fp_link_6()
-            _fp_link_7()
-            link_targets = [
-                ":node_modules/@aspect-test/d",
-                ":node_modules/alias-2",
-                ":node_modules/@lib/e",
-                ":node_modules/@lib/f",
-            ]
-            scope_targets = {
-                "@aspect-test": [":node_modules/@aspect-test/d"],
-                "@lib": [
-                    ":node_modules/@lib/e",
-                    ":node_modules/@lib/f",
-                ],
-            }
-        elif bazel_package == "lib/a":
-            link_4()
-            _fp_link_0()
-            _fp_link_1()
-            _fp_link_3()
-            link_targets = [
-                ":node_modules/@aspect-test/e",
-                ":node_modules/vendored-a",
-                ":node_modules/vendored-b",
-                ":node_modules/@lib/b",
-            ]
-            scope_targets = {
-                "@aspect-test": [":node_modules/@aspect-test/e"],
-                "@lib": [":node_modules/@lib/b"],
-            }
-        elif bazel_package == "lib/b":
-            link_5()
-            link_9("alias-1")
-            link_targets = [
-                ":node_modules/@aspect-test/f",
-                ":node_modules/alias-1",
-            ]
-            scope_targets = {
-                "@aspect-test": [":node_modules/@aspect-test/f"],
-            }
-        elif bazel_package == "lib/c":
-            link_5()
-            link_targets = [":node_modules/@aspect-test/f"]
-            scope_targets = {
-                "@aspect-test": [":node_modules/@aspect-test/f"],
-            }
-        elif bazel_package == "app/d":
-            link_6()
-            _fp_link_5()
-            link_targets = [
-                ":node_modules/@aspect-test/g",
-                ":node_modules/@lib/d",
-            ]
-            scope_targets = {
-                "@aspect-test": [":node_modules/@aspect-test/g"],
-                "@lib": [":node_modules/@lib/d"],
-            }
-        elif bazel_package == "app/b":
-            link_7()
-            _fp_link_3()
-            _fp_link_3("@lib/b_alias")
-            link_targets = [
-                ":node_modules/@aspect-test/h",
-                ":node_modules/@lib/b",
-                ":node_modules/@lib/b_alias",
-            ]
-            scope_targets = {
-                "@aspect-test": [":node_modules/@aspect-test/h"],
-                "@lib": [
-                    ":node_modules/@lib/b",
-                    ":node_modules/@lib/b_alias",
-                ],
-            }
+        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if _link_pkg_fn:
+            link_targets, scope_targets = _link_pkg_fn()
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -307,6 +322,70 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
         )
 
+_LINK_TARGETS = {
+    "": {
+        "prod": [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/c",
+            ":node_modules/lodash",
+            ":node_modules/typescript",
+        ],
+        "dev": [":node_modules/@aspect-test/b"],
+    },
+    "app/a": {
+        "prod": [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/g",
+            ":node_modules/@lib/a",
+        ],
+    },
+    "app/c": {
+        "prod": [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/g",
+            ":node_modules/@lib/c",
+        ],
+    },
+    "lib/d": {
+        "prod": [
+            ":node_modules/@aspect-test/d",
+            ":node_modules/alias-2",
+            ":node_modules/@lib/e",
+            ":node_modules/@lib/f",
+        ],
+    },
+    "lib/a": {
+        "prod": [
+            ":node_modules/@aspect-test/e",
+            ":node_modules/vendored-a",
+            ":node_modules/vendored-b",
+            ":node_modules/@lib/b",
+        ],
+    },
+    "lib/b": {
+        "prod": [
+            ":node_modules/@aspect-test/f",
+            ":node_modules/alias-1",
+        ],
+    },
+    "lib/c": {
+        "prod": [":node_modules/@aspect-test/f"],
+    },
+    "app/d": {
+        "prod": [
+            ":node_modules/@aspect-test/g",
+            ":node_modules/@lib/d",
+        ],
+    },
+    "app/b": {
+        "prod": [
+            ":node_modules/@aspect-test/h",
+            ":node_modules/@lib/b",
+            ":node_modules/@lib/b_alias",
+        ],
+    },
+}
+
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if name != "node_modules":
@@ -316,70 +395,12 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     bazel_package = package if package != None else native.package_name()
 
+    entry = _LINK_TARGETS.get(bazel_package, {})
     link_targets = []
-
-    if bazel_package == "":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/c",
-                ":node_modules/lodash",
-                ":node_modules/typescript",
-            ])
-        if dev:
-            link_targets.extend([":node_modules/@aspect-test/b"])
-    elif bazel_package == "app/a":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/g",
-                ":node_modules/@lib/a",
-            ])
-    elif bazel_package == "app/c":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/g",
-                ":node_modules/@lib/c",
-            ])
-    elif bazel_package == "lib/d":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/d",
-                ":node_modules/alias-2",
-                ":node_modules/@lib/e",
-                ":node_modules/@lib/f",
-            ])
-    elif bazel_package == "lib/a":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/e",
-                ":node_modules/vendored-a",
-                ":node_modules/vendored-b",
-                ":node_modules/@lib/b",
-            ])
-    elif bazel_package == "lib/b":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/f",
-                ":node_modules/alias-1",
-            ])
-    elif bazel_package == "lib/c":
-        if prod:
-            link_targets.extend([":node_modules/@aspect-test/f"])
-    elif bazel_package == "app/d":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/g",
-                ":node_modules/@lib/d",
-            ])
-    elif bazel_package == "app/b":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/h",
-                ":node_modules/@lib/b",
-                ":node_modules/@lib/b_alias",
-            ])
+    if prod and "prod" in entry:
+        link_targets.extend(entry["prod"])
+    if dev and "dev" in entry:
+        link_targets.extend(entry["dev"])
     return ["//%s%s" % (bazel_package, target) for target in link_targets]
 
 # Generated npm_link_package_store for linking of first-party "vendored-a" package

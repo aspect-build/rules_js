@@ -59,6 +59,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
         )
 
+_LINK_TARGETS = {}
+
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if name != "node_modules":
@@ -68,6 +70,10 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     bazel_package = package if package != None else native.package_name()
 
+    entry = _LINK_TARGETS.get(bazel_package, {})
     link_targets = []
-
+    if prod and "prod" in entry:
+        link_targets.extend(entry["prod"])
+    if dev and "dev" in entry:
+        link_targets.extend(entry["dev"])
     return ["//%s%s" % (bazel_package, target) for target in link_targets]

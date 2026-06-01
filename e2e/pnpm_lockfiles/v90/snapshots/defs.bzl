@@ -175,6 +175,248 @@ load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_s
 
 _IMPORTER_PACKAGES = ["<LOCKVERSION>", "projects/a", "projects/a-types", "projects/alts", "projects/b", "projects/c", "projects/d", "projects/peer-types", "projects/peers-combo-1", "projects/peers-combo-2", "vendored/is-number"]
 
+def _link_pkg_0():
+    link_0("@aspect-test-a-bad-scope")
+    link_0("@aspect-test-custom-scope/a")
+    link_0()
+    link_0("@aspect-test/a2")
+    link_0("aspect-test-a-no-scope")
+    link_0("aspect-test-a/no-at")
+    link_1(dev=True)
+    link_2()
+    link_8()
+    link_9("@aspect-test/h-is-only-optional")
+    link_37("jsonify")
+    link_38()
+    link_53("rollup-plugin-with-peers")
+    link_55(dev=True)
+    link_59(dev=True)
+    link_59("alias-types-node", dev=True)
+    link_60("alias-only-sizzle", dev=True)
+    link_70()
+    link_79()
+    link_87()
+    link_93("highlightjs-git-https-notar")
+    link_99("is-odd-v0")
+    link_100("is-odd-v1")
+    link_101("is-odd-v2")
+    link_102("is-odd-v3")
+    link_103()
+    link_103("is-odd-alias")
+    link_104("jquery-git-ssh-399b201")
+    link_105("jquery-github")
+    link_106("jquery-git-https-763ade6")
+    link_107("jquery-git-ssh-e61fccb")
+    link_108("jquery-http-git-f85d521")
+    link_113()
+    link_114()
+    link_123()
+    link_124("rollup3")
+    link_145(dev=True)
+    link_156()
+    link_157()
+    link_159()
+    _fp_link_0()
+    _fp_link_2()
+    _fp_link_2("alias-project-a")
+    _fp_link_3()
+    _fp_link_3("scoped/bad")
+    _fp_link_4()
+    _fp_link_5()
+    _fp_link_6()
+    _fp_link_7()
+    _fp_link_8()
+    return [
+        ":node_modules/@aspect-test-a-bad-scope",
+        ":node_modules/@aspect-test-custom-scope/a",
+        ":node_modules/@aspect-test/a",
+        ":node_modules/@aspect-test/a2",
+        ":node_modules/aspect-test-a-no-scope",
+        ":node_modules/aspect-test-a/no-at",
+        ":node_modules/@aspect-test/c",
+        ":node_modules/@aspect-test/e",
+        ":node_modules/@aspect-test/h-is-only-optional",
+        ":node_modules/jsonify",
+        ":node_modules/@isaacs/cliui",
+        ":node_modules/rollup-plugin-with-peers",
+        ":node_modules/@vscode/vsce-sign",
+        ":node_modules/debug",
+        ":node_modules/esbuild",
+        ":node_modules/highlightjs-git-https-notar",
+        ":node_modules/is-odd-v0",
+        ":node_modules/is-odd-v1",
+        ":node_modules/is-odd-v2",
+        ":node_modules/is-odd-v3",
+        ":node_modules/is-odd",
+        ":node_modules/is-odd-alias",
+        ":node_modules/jquery-git-ssh-399b201",
+        ":node_modules/jquery-github",
+        ":node_modules/jquery-git-https-763ade6",
+        ":node_modules/jquery-git-ssh-e61fccb",
+        ":node_modules/jquery-http-git-f85d521",
+        ":node_modules/lodash",
+        ":node_modules/meaning-of-life",
+        ":node_modules/rollup",
+        ":node_modules/rollup3",
+        ":node_modules/tslib",
+        ":node_modules/typescript",
+        ":node_modules/uvu",
+        ":node_modules/@scoped/c",
+        ":node_modules/@scoped/a",
+        ":node_modules/alias-project-a",
+        ":node_modules/@scoped/b",
+        ":node_modules/scoped/bad",
+        ":node_modules/@scoped/d",
+        ":node_modules/alternate-versions",
+        ":node_modules/test-c200-d200",
+        ":node_modules/test-c201-d200",
+        ":node_modules/test-peer-types",
+        ":node_modules/@aspect-test/b",
+        ":node_modules/@types/archiver",
+        ":node_modules/@types/node",
+        ":node_modules/alias-types-node",
+        ":node_modules/alias-only-sizzle",
+        ":node_modules/sass-embedded",
+    ], {
+        "@aspect-test-a-bad-scop": [":node_modules/@aspect-test-a-bad-scope"],
+        "@aspect-test-custom-scope": [":node_modules/@aspect-test-custom-scope/a"],
+        "@aspect-test": [
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/a2",
+            ":node_modules/@aspect-test/b",
+            ":node_modules/@aspect-test/c",
+            ":node_modules/@aspect-test/e",
+            ":node_modules/@aspect-test/h-is-only-optional",
+        ],
+        "@isaacs": [":node_modules/@isaacs/cliui"],
+        "@types": [
+            ":node_modules/@types/archiver",
+            ":node_modules/@types/node",
+        ],
+        "@vscode": [":node_modules/@vscode/vsce-sign"],
+        "@scoped": [
+            ":node_modules/@scoped/c",
+            ":node_modules/@scoped/a",
+            ":node_modules/@scoped/b",
+            ":node_modules/@scoped/d",
+        ],
+    }
+
+def _link_pkg_1():
+    link_2()
+    link_5()
+    return [
+        ":node_modules/@aspect-test/c",
+        ":node_modules/@aspect-test/d",
+    ], {
+        "@aspect-test": [
+            ":node_modules/@aspect-test/c",
+            ":node_modules/@aspect-test/d",
+        ],
+    }
+
+def _link_pkg_2():
+    link_3()
+    link_6()
+    return [
+        ":node_modules/@aspect-test/c",
+        ":node_modules/@aspect-test/d",
+    ], {
+        "@aspect-test": [
+            ":node_modules/@aspect-test/c",
+            ":node_modules/@aspect-test/d",
+        ],
+    }
+
+def _link_pkg_3():
+    link_37("jsonify", dev=True)
+    _fp_link_0()
+    _fp_link_2()
+    _fp_link_3()
+    return [
+        ":node_modules/jsonify",
+        ":node_modules/@scoped/c",
+        ":node_modules/@scoped/a",
+        ":node_modules/@scoped/b",
+    ], {
+        "@scoped": [
+            ":node_modules/@scoped/c",
+            ":node_modules/@scoped/a",
+            ":node_modules/@scoped/b",
+        ],
+    }
+
+def _link_pkg_4():
+    link_59()
+    return [":node_modules/@types/node"], {
+        "@types": [":node_modules/@types/node"],
+    }
+
+def _link_pkg_5():
+    link_59(dev=True)
+    _fp_link_2()
+    _fp_link_9()
+    return [
+        ":node_modules/@scoped/a",
+        ":node_modules/@types/node",
+        ":node_modules/a-types",
+    ], {
+        "@types": [":node_modules/@types/node"],
+        "@scoped": [":node_modules/@scoped/a"],
+    }
+
+def _link_pkg_6():
+    link_110()
+    link_111("lodash-4.17.20")
+    link_112("lodash-4.17.21")
+    link_113("lodash-4.17.21-file")
+    return [
+        ":node_modules/lodash",
+        ":node_modules/lodash-4.17.20",
+        ":node_modules/lodash-4.17.21",
+        ":node_modules/lodash-4.17.21-file",
+    ], None
+
+def _link_pkg_7():
+    _fp_link_2()
+    _fp_link_3()
+    _fp_link_9()
+    return [
+        ":node_modules/@scoped/a",
+        ":node_modules/@scoped/b",
+        ":node_modules/a-types",
+    ], {
+        "@scoped": [
+            ":node_modules/@scoped/a",
+            ":node_modules/@scoped/b",
+        ],
+    }
+
+def _link_pkg_8():
+    _fp_link_2()
+    _fp_link_3()
+    return [
+        ":node_modules/@scoped/a",
+        ":node_modules/@scoped/b",
+    ], {
+        "@scoped": [
+            ":node_modules/@scoped/a",
+            ":node_modules/@scoped/b",
+        ],
+    }
+
+_LINK_PACKAGE_FNS = {
+    "<LOCKVERSION>": _link_pkg_0,
+    "projects/peers-combo-2": _link_pkg_1,
+    "projects/peers-combo-1": _link_pkg_2,
+    "projects/peer-types": _link_pkg_3,
+    "projects/a-types": _link_pkg_4,
+    "projects/b": _link_pkg_5,
+    "projects/alts": _link_pkg_6,
+    "projects/c": _link_pkg_7,
+    "projects/d": _link_pkg_8,
+}
+
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     if name != "node_modules":
@@ -470,235 +712,9 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     scope_targets = None
 
     if is_importer:
-        if bazel_package == "<LOCKVERSION>":
-            link_0("@aspect-test-a-bad-scope")
-            link_0("@aspect-test-custom-scope/a")
-            link_0()
-            link_0("@aspect-test/a2")
-            link_0("aspect-test-a-no-scope")
-            link_0("aspect-test-a/no-at")
-            link_1(dev=True)
-            link_2()
-            link_8()
-            link_9("@aspect-test/h-is-only-optional")
-            link_37("jsonify")
-            link_38()
-            link_53("rollup-plugin-with-peers")
-            link_55(dev=True)
-            link_59(dev=True)
-            link_59("alias-types-node", dev=True)
-            link_60("alias-only-sizzle", dev=True)
-            link_70()
-            link_79()
-            link_87()
-            link_93("highlightjs-git-https-notar")
-            link_99("is-odd-v0")
-            link_100("is-odd-v1")
-            link_101("is-odd-v2")
-            link_102("is-odd-v3")
-            link_103()
-            link_103("is-odd-alias")
-            link_104("jquery-git-ssh-399b201")
-            link_105("jquery-github")
-            link_106("jquery-git-https-763ade6")
-            link_107("jquery-git-ssh-e61fccb")
-            link_108("jquery-http-git-f85d521")
-            link_113()
-            link_114()
-            link_123()
-            link_124("rollup3")
-            link_145(dev=True)
-            link_156()
-            link_157()
-            link_159()
-            _fp_link_0()
-            _fp_link_2()
-            _fp_link_2("alias-project-a")
-            _fp_link_3()
-            _fp_link_3("scoped/bad")
-            _fp_link_4()
-            _fp_link_5()
-            _fp_link_6()
-            _fp_link_7()
-            _fp_link_8()
-            link_targets = [
-                ":node_modules/@aspect-test-a-bad-scope",
-                ":node_modules/@aspect-test-custom-scope/a",
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/a2",
-                ":node_modules/aspect-test-a-no-scope",
-                ":node_modules/aspect-test-a/no-at",
-                ":node_modules/@aspect-test/c",
-                ":node_modules/@aspect-test/e",
-                ":node_modules/@aspect-test/h-is-only-optional",
-                ":node_modules/jsonify",
-                ":node_modules/@isaacs/cliui",
-                ":node_modules/rollup-plugin-with-peers",
-                ":node_modules/@vscode/vsce-sign",
-                ":node_modules/debug",
-                ":node_modules/esbuild",
-                ":node_modules/highlightjs-git-https-notar",
-                ":node_modules/is-odd-v0",
-                ":node_modules/is-odd-v1",
-                ":node_modules/is-odd-v2",
-                ":node_modules/is-odd-v3",
-                ":node_modules/is-odd",
-                ":node_modules/is-odd-alias",
-                ":node_modules/jquery-git-ssh-399b201",
-                ":node_modules/jquery-github",
-                ":node_modules/jquery-git-https-763ade6",
-                ":node_modules/jquery-git-ssh-e61fccb",
-                ":node_modules/jquery-http-git-f85d521",
-                ":node_modules/lodash",
-                ":node_modules/meaning-of-life",
-                ":node_modules/rollup",
-                ":node_modules/rollup3",
-                ":node_modules/tslib",
-                ":node_modules/typescript",
-                ":node_modules/uvu",
-                ":node_modules/@scoped/c",
-                ":node_modules/@scoped/a",
-                ":node_modules/alias-project-a",
-                ":node_modules/@scoped/b",
-                ":node_modules/scoped/bad",
-                ":node_modules/@scoped/d",
-                ":node_modules/alternate-versions",
-                ":node_modules/test-c200-d200",
-                ":node_modules/test-c201-d200",
-                ":node_modules/test-peer-types",
-                ":node_modules/@aspect-test/b",
-                ":node_modules/@types/archiver",
-                ":node_modules/@types/node",
-                ":node_modules/alias-types-node",
-                ":node_modules/alias-only-sizzle",
-                ":node_modules/sass-embedded",
-            ]
-            scope_targets = {
-                "@aspect-test-a-bad-scop": [":node_modules/@aspect-test-a-bad-scope"],
-                "@aspect-test-custom-scope": [":node_modules/@aspect-test-custom-scope/a"],
-                "@aspect-test": [
-                    ":node_modules/@aspect-test/a",
-                    ":node_modules/@aspect-test/a2",
-                    ":node_modules/@aspect-test/b",
-                    ":node_modules/@aspect-test/c",
-                    ":node_modules/@aspect-test/e",
-                    ":node_modules/@aspect-test/h-is-only-optional",
-                ],
-                "@isaacs": [":node_modules/@isaacs/cliui"],
-                "@types": [
-                    ":node_modules/@types/archiver",
-                    ":node_modules/@types/node",
-                ],
-                "@vscode": [":node_modules/@vscode/vsce-sign"],
-                "@scoped": [
-                    ":node_modules/@scoped/c",
-                    ":node_modules/@scoped/a",
-                    ":node_modules/@scoped/b",
-                    ":node_modules/@scoped/d",
-                ],
-            }
-        elif bazel_package == "projects/peers-combo-2":
-            link_2()
-            link_5()
-            link_targets = [
-                ":node_modules/@aspect-test/c",
-                ":node_modules/@aspect-test/d",
-            ]
-            scope_targets = {
-                "@aspect-test": [
-                    ":node_modules/@aspect-test/c",
-                    ":node_modules/@aspect-test/d",
-                ],
-            }
-        elif bazel_package == "projects/peers-combo-1":
-            link_3()
-            link_6()
-            link_targets = [
-                ":node_modules/@aspect-test/c",
-                ":node_modules/@aspect-test/d",
-            ]
-            scope_targets = {
-                "@aspect-test": [
-                    ":node_modules/@aspect-test/c",
-                    ":node_modules/@aspect-test/d",
-                ],
-            }
-        elif bazel_package == "projects/peer-types":
-            link_37("jsonify", dev=True)
-            _fp_link_0()
-            _fp_link_2()
-            _fp_link_3()
-            link_targets = [
-                ":node_modules/jsonify",
-                ":node_modules/@scoped/c",
-                ":node_modules/@scoped/a",
-                ":node_modules/@scoped/b",
-            ]
-            scope_targets = {
-                "@scoped": [
-                    ":node_modules/@scoped/c",
-                    ":node_modules/@scoped/a",
-                    ":node_modules/@scoped/b",
-                ],
-            }
-        elif bazel_package == "projects/a-types":
-            link_59()
-            link_targets = [":node_modules/@types/node"]
-            scope_targets = {
-                "@types": [":node_modules/@types/node"],
-            }
-        elif bazel_package == "projects/b":
-            link_59(dev=True)
-            _fp_link_2()
-            _fp_link_9()
-            link_targets = [
-                ":node_modules/@scoped/a",
-                ":node_modules/@types/node",
-                ":node_modules/a-types",
-            ]
-            scope_targets = {
-                "@types": [":node_modules/@types/node"],
-                "@scoped": [":node_modules/@scoped/a"],
-            }
-        elif bazel_package == "projects/alts":
-            link_110()
-            link_111("lodash-4.17.20")
-            link_112("lodash-4.17.21")
-            link_113("lodash-4.17.21-file")
-            link_targets = [
-                ":node_modules/lodash",
-                ":node_modules/lodash-4.17.20",
-                ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash-4.17.21-file",
-            ]
-        elif bazel_package == "projects/c":
-            _fp_link_2()
-            _fp_link_3()
-            _fp_link_9()
-            link_targets = [
-                ":node_modules/@scoped/a",
-                ":node_modules/@scoped/b",
-                ":node_modules/a-types",
-            ]
-            scope_targets = {
-                "@scoped": [
-                    ":node_modules/@scoped/a",
-                    ":node_modules/@scoped/b",
-                ],
-            }
-        elif bazel_package == "projects/d":
-            _fp_link_2()
-            _fp_link_3()
-            link_targets = [
-                ":node_modules/@scoped/a",
-                ":node_modules/@scoped/b",
-            ]
-            scope_targets = {
-                "@scoped": [
-                    ":node_modules/@scoped/a",
-                    ":node_modules/@scoped/b",
-                ],
-            }
+        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if _link_pkg_fn:
+            link_targets, scope_targets = _link_pkg_fn()
     for link_fn in imported_links:
         new_link_targets, new_scope_targets = link_fn(name, prod, dev)
         if not link_targets:
@@ -728,6 +744,116 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             visibility = ["//visibility:public"],
         )
 
+_LINK_TARGETS = {
+    "<LOCKVERSION>": {
+        "prod": [
+            ":node_modules/@aspect-test-a-bad-scope",
+            ":node_modules/@aspect-test-custom-scope/a",
+            ":node_modules/@aspect-test/a",
+            ":node_modules/@aspect-test/a2",
+            ":node_modules/aspect-test-a-no-scope",
+            ":node_modules/aspect-test-a/no-at",
+            ":node_modules/@aspect-test/c",
+            ":node_modules/@aspect-test/e",
+            ":node_modules/@aspect-test/h-is-only-optional",
+            ":node_modules/jsonify",
+            ":node_modules/@isaacs/cliui",
+            ":node_modules/rollup-plugin-with-peers",
+            ":node_modules/@vscode/vsce-sign",
+            ":node_modules/debug",
+            ":node_modules/esbuild",
+            ":node_modules/highlightjs-git-https-notar",
+            ":node_modules/is-odd-v0",
+            ":node_modules/is-odd-v1",
+            ":node_modules/is-odd-v2",
+            ":node_modules/is-odd-v3",
+            ":node_modules/is-odd",
+            ":node_modules/is-odd-alias",
+            ":node_modules/jquery-git-ssh-399b201",
+            ":node_modules/jquery-github",
+            ":node_modules/jquery-git-https-763ade6",
+            ":node_modules/jquery-git-ssh-e61fccb",
+            ":node_modules/jquery-http-git-f85d521",
+            ":node_modules/lodash",
+            ":node_modules/meaning-of-life",
+            ":node_modules/rollup",
+            ":node_modules/rollup3",
+            ":node_modules/tslib",
+            ":node_modules/typescript",
+            ":node_modules/uvu",
+            ":node_modules/@scoped/c",
+            ":node_modules/@scoped/a",
+            ":node_modules/alias-project-a",
+            ":node_modules/@scoped/b",
+            ":node_modules/scoped/bad",
+            ":node_modules/@scoped/d",
+            ":node_modules/alternate-versions",
+            ":node_modules/test-c200-d200",
+            ":node_modules/test-c201-d200",
+            ":node_modules/test-peer-types",
+        ],
+        "dev": [
+            ":node_modules/@aspect-test/b",
+            ":node_modules/@types/archiver",
+            ":node_modules/@types/node",
+            ":node_modules/alias-types-node",
+            ":node_modules/alias-only-sizzle",
+            ":node_modules/sass-embedded",
+        ],
+    },
+    "projects/peers-combo-2": {
+        "prod": [
+            ":node_modules/@aspect-test/c",
+            ":node_modules/@aspect-test/d",
+        ],
+    },
+    "projects/peers-combo-1": {
+        "prod": [
+            ":node_modules/@aspect-test/c",
+            ":node_modules/@aspect-test/d",
+        ],
+    },
+    "projects/peer-types": {
+        "dev": [
+            ":node_modules/jsonify",
+            ":node_modules/@scoped/c",
+            ":node_modules/@scoped/a",
+            ":node_modules/@scoped/b",
+        ],
+    },
+    "projects/a-types": {
+        "prod": [":node_modules/@types/node"],
+    },
+    "projects/b": {
+        "prod": [":node_modules/@scoped/a"],
+        "dev": [
+            ":node_modules/@types/node",
+            ":node_modules/a-types",
+        ],
+    },
+    "projects/alts": {
+        "prod": [
+            ":node_modules/lodash",
+            ":node_modules/lodash-4.17.20",
+            ":node_modules/lodash-4.17.21",
+            ":node_modules/lodash-4.17.21-file",
+        ],
+    },
+    "projects/c": {
+        "prod": [
+            ":node_modules/@scoped/a",
+            ":node_modules/@scoped/b",
+        ],
+        "dev": [":node_modules/a-types"],
+    },
+    "projects/d": {
+        "prod": [
+            ":node_modules/@scoped/a",
+            ":node_modules/@scoped/b",
+        ],
+    },
+}
+
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if name != "node_modules":
@@ -737,118 +863,12 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     bazel_package = package if package != None else native.package_name()
 
+    entry = _LINK_TARGETS.get(bazel_package, {})
     link_targets = []
-
-    if bazel_package == "<LOCKVERSION>":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test-a-bad-scope",
-                ":node_modules/@aspect-test-custom-scope/a",
-                ":node_modules/@aspect-test/a",
-                ":node_modules/@aspect-test/a2",
-                ":node_modules/aspect-test-a-no-scope",
-                ":node_modules/aspect-test-a/no-at",
-                ":node_modules/@aspect-test/c",
-                ":node_modules/@aspect-test/e",
-                ":node_modules/@aspect-test/h-is-only-optional",
-                ":node_modules/jsonify",
-                ":node_modules/@isaacs/cliui",
-                ":node_modules/rollup-plugin-with-peers",
-                ":node_modules/@vscode/vsce-sign",
-                ":node_modules/debug",
-                ":node_modules/esbuild",
-                ":node_modules/highlightjs-git-https-notar",
-                ":node_modules/is-odd-v0",
-                ":node_modules/is-odd-v1",
-                ":node_modules/is-odd-v2",
-                ":node_modules/is-odd-v3",
-                ":node_modules/is-odd",
-                ":node_modules/is-odd-alias",
-                ":node_modules/jquery-git-ssh-399b201",
-                ":node_modules/jquery-github",
-                ":node_modules/jquery-git-https-763ade6",
-                ":node_modules/jquery-git-ssh-e61fccb",
-                ":node_modules/jquery-http-git-f85d521",
-                ":node_modules/lodash",
-                ":node_modules/meaning-of-life",
-                ":node_modules/rollup",
-                ":node_modules/rollup3",
-                ":node_modules/tslib",
-                ":node_modules/typescript",
-                ":node_modules/uvu",
-                ":node_modules/@scoped/c",
-                ":node_modules/@scoped/a",
-                ":node_modules/alias-project-a",
-                ":node_modules/@scoped/b",
-                ":node_modules/scoped/bad",
-                ":node_modules/@scoped/d",
-                ":node_modules/alternate-versions",
-                ":node_modules/test-c200-d200",
-                ":node_modules/test-c201-d200",
-                ":node_modules/test-peer-types",
-            ])
-        if dev:
-            link_targets.extend([
-                ":node_modules/@aspect-test/b",
-                ":node_modules/@types/archiver",
-                ":node_modules/@types/node",
-                ":node_modules/alias-types-node",
-                ":node_modules/alias-only-sizzle",
-                ":node_modules/sass-embedded",
-            ])
-    elif bazel_package == "projects/peers-combo-2":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/c",
-                ":node_modules/@aspect-test/d",
-            ])
-    elif bazel_package == "projects/peers-combo-1":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@aspect-test/c",
-                ":node_modules/@aspect-test/d",
-            ])
-    elif bazel_package == "projects/peer-types":
-        if dev:
-            link_targets.extend([
-                ":node_modules/jsonify",
-                ":node_modules/@scoped/c",
-                ":node_modules/@scoped/a",
-                ":node_modules/@scoped/b",
-            ])
-    elif bazel_package == "projects/a-types":
-        if prod:
-            link_targets.extend([":node_modules/@types/node"])
-    elif bazel_package == "projects/b":
-        if prod:
-            link_targets.extend([":node_modules/@scoped/a"])
-        if dev:
-            link_targets.extend([
-                ":node_modules/@types/node",
-                ":node_modules/a-types",
-            ])
-    elif bazel_package == "projects/alts":
-        if prod:
-            link_targets.extend([
-                ":node_modules/lodash",
-                ":node_modules/lodash-4.17.20",
-                ":node_modules/lodash-4.17.21",
-                ":node_modules/lodash-4.17.21-file",
-            ])
-    elif bazel_package == "projects/c":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@scoped/a",
-                ":node_modules/@scoped/b",
-            ])
-        if dev:
-            link_targets.extend([":node_modules/a-types"])
-    elif bazel_package == "projects/d":
-        if prod:
-            link_targets.extend([
-                ":node_modules/@scoped/a",
-                ":node_modules/@scoped/b",
-            ])
+    if prod and "prod" in entry:
+        link_targets.extend(entry["prod"])
+    if dev and "dev" in entry:
+        link_targets.extend(entry["dev"])
     return ["//%s%s" % (bazel_package, target) for target in link_targets]
 
 # Generated npm_link_package_store for linking of first-party "@scoped/c" package

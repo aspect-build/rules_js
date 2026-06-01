@@ -26,6 +26,9 @@ buildifier = format.alias(
             "**/*.bzl",
             "**/*.star",
         ],
+        "exclude_patterns": [
+            "**/snapshots/**",
+        ],
     },
     summary = "Format Starlark files using buildifier.",
 )
