@@ -20,7 +20,11 @@ permissions:
     contents: write
 jobs:
     release:
-        uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@e5ab8fc4c23cb13783fad499e8bd865fd9f6d669 # v7.6.0
+        # SLSA trusted-builder reusable workflows MUST be referenced by a semantic
+        # version tag, not a commit SHA: slsa-verifier reads the builder ref from the
+        # provenance and rejects a bare SHA ("unexpected ref type"), which breaks the
+        # release-artifact attestations that BCR's presubmit verifies. Do not SHA-pin.
+        uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.6.0
         with:
             release_files: rules_js-*.tar.gz
             prerelease: false
