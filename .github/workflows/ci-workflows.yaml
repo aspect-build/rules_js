@@ -10,10 +10,6 @@ on:
 permissions:
     id-token: write
 
-env:
-    ASPECT_API_TOKEN: ${{ secrets.ASPECT_API_TOKEN }}
-    ASPECT_LAUNCHER_VERSION: 2026.22.39
-
 concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
     cancel-in-progress: true
@@ -23,30 +19,20 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
-            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+            - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
-                bazelisk-cache: true
-                disk-cache: ${{ github.workflow }}-format
-                repository-cache: true
-                external-cache: true
+                aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Format
-              run: |
-                curl -fsSL https://install.aspect.build | bash -s -- "$ASPECT_LAUNCHER_VERSION"
-                aspect format --task-key=format
+              run: aspect format --task-key=format
     buildifier:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
-            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+            - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
-                bazelisk-cache: true
-                disk-cache: ${{ github.workflow }}-buildifier
-                repository-cache: true
-                external-cache: true
+                aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Buildifier
-              run: |
-                curl -fsSL https://install.aspect.build | bash -s -- "$ASPECT_LAUNCHER_VERSION"
-                aspect buildifier --task-key=buildifier
+              run: aspect buildifier --task-key=buildifier
     # Builds the workspace matrix axis. e2e tests gated on secrets that forks don't have
     # (ASPECT_GHTESTER_SSH_KEY, ASPECT_NPM_AUTH_TOKEN) are only appended when the secret is
     # available, so PRs from forks skip them instead of failing.
@@ -163,14 +149,9 @@ jobs:
               if: matrix.workspace.slug == 'e2e-git_dep_metadata' || matrix.workspace.slug == 'e2e-npm_translate_lock_git_ssh' || matrix.workspace.slug == 'e2e-pnpm_lockfiles'
               with:
                   ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
-            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+            - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
-                bazelisk-cache: true
-                disk-cache: ${{ github.workflow }}-test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }}
-                repository-cache: true
-                external-cache: true
+                aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Test
               working-directory: ${{ matrix.workspace.path }}
-              run: |
-                curl -fsSL https://install.aspect.build | bash -s -- "$ASPECT_LAUNCHER_VERSION"
-                aspect test --task-key=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
+              run: aspect test --task-key=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
