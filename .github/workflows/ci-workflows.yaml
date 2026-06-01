@@ -41,7 +41,8 @@ jobs:
         steps:
             - id: workspace
               name: Prepare 'workspace' matrix axis
-              run:   paths=(
+              run: |
+                  paths=(
                     .
                     e2e/bzlmod
                     e2e/gyp_no_install_script
