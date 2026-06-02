@@ -9,6 +9,22 @@ load("@aspect//traits.axl", "BazelTrait")
 buildifier = format.alias(
     defaults = {
         "formatter_target": "@buildifier_prebuilt//buildifier",
+        # Fires only when the format task would otherwise pass zero files
+        # to the formatter (e.g. `--scope=all`, or a `--scope=changed` run
+        # that degraded because no changed files matched). The bare
+        # buildifier binary needs `-r .` to walk the tree on its own. Inert
+        # whenever a file list is passed, so `--scope=changed` (the default)
+        # and per-file invocations are unaffected.
+        #
+        # Caveat: `buildifier -r .` auto-discovers only BUILD, BUILD.bazel,
+        # MODULE.bazel, WORKSPACE, WORKSPACE.bazel, *.bzl, and *.star, so
+        # `--scope=all` silently skips *.axl, *.MODULE.bazel, Tiltfile, and
+        # BUCK files from the `include_patterns` list below. `--scope=changed`
+        # passes the changed file list positionally, so those extensions are
+        # covered there. See
+        # https://docs.aspect.build/cli/tasks/buildifier#run-it-locally for
+        # the user-facing reference.
+        "formatter_args_for_tree_walk": ["-r", "."],
         # buildifier_binary is a symlink to the raw Go binary; it does not
         # switch to $BUILD_WORKING_DIRECTORY on its own, so we run it in
         # the user's cwd to make relative paths resolve.
