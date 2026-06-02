@@ -191,7 +191,7 @@ def _npm_package_store_impl(ctx):
     if ctx.label.package:
         package_store_prefix_len += len(ctx.label.package)
     if ctx.label.repo_name:
-        package_store_prefix_len += len(ctx.label.repo_name) + 3  # +3 for ../
+        package_store_prefix_len += len(ctx.label.repo_name) + 4  # +3 for ../ and +1 for / after repo name
 
     package_key = "{}@{}".format(package, version)
     package_store_name = utils.package_store_name(package_key)
