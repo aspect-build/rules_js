@@ -141,6 +141,7 @@ def _init_workspace(priv, rctx, is_windows):
     pnpm_lock_label = priv["pnpm_lock_label"]
     pnpm_workspace_label = pnpm_lock_label.same_package_label(PNPM_WORKSPACE_FILENAME)
     pnpm_workspace_path = rctx.path(pnpm_workspace_label)
+    rctx.watch(pnpm_workspace_path)
     if pnpm_workspace_path.exists:
         pnpm_workspace_json, workspace_parse_err = _yaml_to_json(rctx, pnpm_workspace_path, is_windows)
 
