@@ -21,8 +21,8 @@ def _rlocation_ref_with_surrounding_text_test(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "--config $$RUNFILES_DIR/$(rlocationpath :my_config) --output out.js",
-        expand_rlocation_refs("--config $(rlocation :my_config) --output out.js"),
+        "--config=$$RUNFILES_DIR/$(rlocationpath :my_config)",
+        expand_rlocation_refs("--config=$(rlocation :my_config)"),
     )
     return unittest.end(env)
 
@@ -30,8 +30,8 @@ def _multiple_rlocation_refs_test(ctx):
     env = unittest.begin(ctx)
     asserts.equals(
         env,
-        "$$RUNFILES_DIR/$(rlocationpath :foo) $$RUNFILES_DIR/$(rlocationpath :bar)",
-        expand_rlocation_refs("$(rlocation :foo) $(rlocation :bar)"),
+        "$$RUNFILES_DIR/$(rlocationpath :foo):$$RUNFILES_DIR/$(rlocationpath :bar)",
+        expand_rlocation_refs("$(rlocation :foo):$(rlocation :bar)"),
     )
     return unittest.end(env)
 
