@@ -1,5 +1,14 @@
 common --noenable_workspace
 
+# Run with the incompatible flags the BCR presubmit tests so breakages are caught
+# before a release is published, e.g. https://github.com/bazelbuild/bazel-central-registry/pull/9120.
+# Flag list: https://github.com/bazelbuild/bazel-central-registry/blob/main/incompatible_flags.yml
+common --incompatible_config_setting_private_default_visibility
+common --incompatible_disable_starlark_host_transitions
+common --incompatible_disable_native_repo_rules
+common --incompatible_autoload_externally=
+common --incompatible_strict_action_env
+
 # Build without the bytes
 common:ci --remote_download_outputs=minimal
 common:ci --nobuild_runfile_links
