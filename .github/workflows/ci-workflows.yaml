@@ -1,38 +1,55 @@
-name: CI - Aspect Workflows
+name: CI
 
+# Controls when the action will run
 on:
+    # Triggers the workflow on push or pull request events but only for the main and 2.x branches
     push:
-        branches: [main]
+        branches: [main, 2.x]
     pull_request:
-        branches: [main]
-    workflow_dispatch:
+        branches: [main, 2.x]
 
-permissions:
-    id-token: write
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
     cancel-in-progress: true
 
 jobs:
+    semantic-pull-request:
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
+
     format:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
         steps:
             - uses: actions/checkout@v6
             - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
-                aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Format
               run: aspect format --task-key=format
+
     buildifier:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
         steps:
             - uses: actions/checkout@v6
             - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
-                aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Buildifier
               run: aspect buildifier --task-key=buildifier
+
     # Builds the workspace matrix axis. e2e tests gated on secrets that forks don't have
     # (ASPECT_GHTESTER_SSH_KEY, ASPECT_NPM_AUTH_TOKEN) are only appended when the secret is
     # available, so PRs from forks skip them instead of failing.
@@ -48,6 +65,7 @@ jobs:
                     e2e/gyp_no_install_script
                     e2e/js_binary_workspace
                     e2e/js_image_oci
+                    e2e/js_run_devserver
                     e2e/nextjs
                     e2e/npm_link_package
                     e2e/npm_link_package-rerooted
@@ -56,6 +74,7 @@ jobs:
                     e2e/npm_translate_lock_empty
                     e2e/npm_translate_lock_exclude_package_contents
                     e2e/npm_translate_lock_multi
+                    e2e/npm_translate_lock_package_visibility
                     e2e/npm_translate_lock_partial_clone
                     e2e/npm_translate_lock_subdir_patch
                     e2e/npm_translate_lock_disable_hooks
@@ -70,9 +89,13 @@ jobs:
                     e2e/protobuf-google
                     e2e/repo_mapping
                     e2e/output_paths
+                    e2e/update_pnpm_lock
+                    e2e/update_pnpm_lock_with_import
                     e2e/vendored_node
                     e2e/vendored_tarfile
                     e2e/verify_patches
+                    e2e/webpack_devserver
+                    e2e/webpack_devserver_esm
                     examples
                   )
                   # e2e/git_dep_metadata and e2e/npm_translate_lock_git+ssh clone over ssh and
@@ -118,26 +141,60 @@ jobs:
         name: test (${{ matrix.workspace.path }}, ${{ matrix.bazel.id }})
         runs-on: ubuntu-latest
         needs: e2e-tests-list
+        permissions:
+            contents: read
+            id-token: write
         strategy:
             fail-fast: false
             matrix:
                 workspace: ${{ fromJSON(needs.e2e-tests-list.outputs.workspace) }}
                 bazel:
-                - { id: "bazel-7", version: "7.x", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel7" }
-                - { id: "bazel-8", version: "8.x", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel8" }
-                # TODO: change this back to 9.x once this bug is fixed: https://github.com/bazelbuild/bazel/issues/29393
-                - { id: "bazel-9", version: "9.0.2", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel9" }
-                - { id: "bazel-9-no-execroot-entry-point", version: "9.0.2", flags: "--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_execroot_entry_point=False" }
+                    - {
+                          id: 'bazel-7',
+                          version: '7.x',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel7',
+                      }
+                    - {
+                          id: 'bazel-8',
+                          version: '8.x',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel8',
+                      }
+                    # TODO: change this back to 9.x once this bug is fixed: https://github.com/bazelbuild/bazel/issues/29393
+                    - {
+                          id: 'bazel-9',
+                          version: '9.0.2',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9',
+                      }
+                    - {
+                          id: 'bazel-9-no-execroot-entry-point',
+                          version: '9.0.2',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_execroot_entry_point=False',
+                      }
                 exclude:
-                # e2e/js_image_oci pulls in the `llvm` module, whose hermetic toolchain requires Bazel 8+.
-                - { workspace: { slug: "e2e-js_image_oci" }, bazel: { id: "bazel-7" } }
-                # e2e/patch_from_repo has a bazel7-specific absolute label in its MODULE.bazel.
-                - { workspace: { slug: "e2e-patch_from_repo" }, bazel: { id: "bazel-8" } }
-                - { workspace: { slug: "e2e-patch_from_repo" }, bazel: { id: "bazel-9" } }
-                - { workspace: { slug: "e2e-patch_from_repo" }, bazel: { id: "bazel-9-no-execroot-entry-point" } }
-                # e2e/repo_mapping renames aspect_rules_js, so a flag beginning with
-                # --@aspect_rules_js// (as used by the no-execroot-entry-point variant) doesn't resolve.
-                - { workspace: { slug: "e2e-repo_mapping" }, bazel: { id: "bazel-9-no-execroot-entry-point" } }
+                    # e2e/js_image_oci pulls in the `llvm` module, whose hermetic toolchain requires Bazel 8+.
+                    - {
+                          workspace: { slug: 'e2e-js_image_oci' },
+                          bazel: { id: 'bazel-7' },
+                      }
+                    # e2e/patch_from_repo has a bazel7-specific absolute label in its MODULE.bazel.
+                    - {
+                          workspace: { slug: 'e2e-patch_from_repo' },
+                          bazel: { id: 'bazel-8' },
+                      }
+                    - {
+                          workspace: { slug: 'e2e-patch_from_repo' },
+                          bazel: { id: 'bazel-9' },
+                      }
+                    - {
+                          workspace: { slug: 'e2e-patch_from_repo' },
+                          bazel: { id: 'bazel-9-no-execroot-entry-point' },
+                      }
+                    # e2e/repo_mapping renames aspect_rules_js, so a flag beginning with
+                    # --@aspect_rules_js// (as used by the no-execroot-entry-point variant) doesn't resolve.
+                    - {
+                          workspace: { slug: 'e2e-repo_mapping' },
+                          bazel: { id: 'bazel-9-no-execroot-entry-point' },
+                      }
         env:
             USE_BAZEL_VERSION: ${{ matrix.bazel.version }}
             ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
@@ -151,7 +208,90 @@ jobs:
                   ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
             - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
-                aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Test
               working-directory: ${{ matrix.workspace.path }}
               run: aspect test --task-key=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
+
+            # The root workspace lockfile contains an intentionally-unused npm package
+            # (npm/private/test/package.json) to assert that rules_js fetches packages
+            # lazily. Its generated __links repo is expected; the package content repo
+            # must never be fetched.
+            - name: Check that unused npm packages were not fetched
+              if: matrix.workspace.path == '.'
+              # bazel rather than aspect: the aspect CLI task runner has no `info` subcommand.
+              # bazelisk resolves the same USE_BAZEL_VERSION and the same output base.
+              run: ls $(bazel info output_base)/external | grep -v __links | grep -vz unused
+
+            # Smoke test that coverage collection works, once per CI run. Scoped to the
+            # coverage tests (js/private/test/coverage), whose custom lcov mergers assert
+            # coverage behavior but only exercise it when run in coverage mode. Not //...:
+            # instrumentation changes launcher env/output, breaking golden-output tests
+            # (js_binary_sh, fixed_args, ...) that were never run instrumented.
+            - name: Coverage
+              if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-7'
+              run: aspect test --task-key=coverage-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets -- //js/private/test/coverage/...
+
+            # Skipped on the no-execroot-entry-point variant: test.sh scripts invoke plain
+            # `bazel` without matrix.bazel.flags, so that leg wouldn't exercise the flag —
+            # it would only duplicate the bazel-9 run.
+            - name: Optional ./test.sh
+              if: matrix.bazel.id != 'bazel-9-no-execroot-entry-point'
+              working-directory: ${{ matrix.workspace.path }}
+              env:
+                  ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+              run: |
+                  if [[ -f ./test.sh ]]; then
+                    ./test.sh
+                  else
+                    echo "No test.sh in ${PWD}; skipping"
+                  fi
+
+    # Mac/Windows smoke tests - only e2e/bzlmod
+    # Only run on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
+    # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
+    smoke:
+        if: github.ref_name == 'main' || contains(github.head_ref, 'macos') || contains(github.head_ref, 'windows')
+        runs-on: ${{ matrix.os }}
+        defaults:
+            run:
+                working-directory: e2e/bzlmod
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [macos-latest, windows-latest]
+        env:
+            ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+              with:
+                  bazelisk-cache: true
+                  disk-cache: ${{ matrix.os }}-bzlmod
+                  repository-cache: true
+
+            - name: bazel test //...
+              shell: bash
+              run: |
+                  bazel test \
+                    --test_tag_filters=-skip-on-bazel7 \
+                    --build_tag_filters=-skip-on-bazel7 \
+                    //...
+
+    # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
+    # on "all matrix jobs were successful".
+    conclusion:
+        needs: [format, buildifier, test, smoke]
+        runs-on: ubuntu-latest
+        if: always()
+        steps:
+            - run: |
+                  if [[ "${{ needs.format.result }}" == "success" \
+                     && "${{ needs.buildifier.result }}" == "success" \
+                     && "${{ needs.test.result }}" == "success" \
+                     && ("${{ needs.smoke.result }}" == "success" || "${{ needs.smoke.result }}" == "skipped") ]]; then
+                    exit 0
+                  else
+                    exit 1
+                  fi
