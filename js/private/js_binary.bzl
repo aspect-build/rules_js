@@ -72,8 +72,7 @@ _ATTRS = {
     "env": attr.string_dict(
         doc = """Environment variables of the action.
 
-        Subject to `$(rlocation ...)`,
-        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
         and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_env` is set to True.
         """,
     ),
@@ -87,8 +86,7 @@ _ATTRS = {
     ),
     "expand_env": attr.bool(
         default = True,
-        doc = """Enables `$(rlocation ...)`,
-        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
         and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `env`.
 
         This comes at some analysis-time cost even for a set of envs that does not have any expansions.""",
@@ -305,7 +303,6 @@ def _expand_rlocation_refs(value):
 
 def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
-        value = _expand_rlocation_refs(value)
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
 
