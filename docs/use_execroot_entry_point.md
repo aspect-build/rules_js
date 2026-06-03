@@ -121,9 +121,9 @@ Key points:
    directory adjacent to the other exec-platform sources, which will allow
    module resolution to proceed correctly.
 - `chdir = package_name()` causes the working directory to be
-  `bazel-out/<target-cfg>/bin/examples/rspack`. This is not strictly
-   necessary, but it is convenient to have the outputs go directly in the
-   build action's current directory.
+  `bazel-out/<target-cfg>/bin/rspack`. This is not strictly necessary, but it
+  is convenient to have the outputs go directly in the build action's current
+  directory.
 - The config file (`rspack.config.cjs`) refers to `process.cwd()`, not
   `__dirname`, for specifying the output path. This is key, because the config
   file (and therefore `__dirname`) will be in the runfiles directory and not
