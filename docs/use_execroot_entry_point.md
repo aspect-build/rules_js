@@ -3,8 +3,8 @@
 This page describes the `use_execroot_entry_point` option on `js_run_binary`
 and provides guidance on when to use each value. The short version is that
 `use_execroot_entry_point=True` sets up a directory layout that is more
-friendly to some JavaScript tools, but at the expense of causing problems for
-cross-platform builds.
+friendly to some JavaScript tools, but at the expense of a performance hit and
+issues with cross-platform builds.
 
 ## Background
 
@@ -82,11 +82,11 @@ behavior by default.
 
 ### Example
 
-A simple example of the recommended way to set up a `js_run_binary` target is
-[here](../examples/rspack/BUILD.bazel). This particular case *requires*
-`use_execroot_entry_point = False`, because otherwise the cross-platform build
-in that file would fail as a result of Bazel trying to use the wrong Rspack
-binary. Below is the key part, edited slightly for brevity:
+A simple demonstration of the recommended way to set up a `js_run_binary`
+target is the [Rspack example](../examples/rspack/BUILD.bazel). This particular
+case *requires* `use_execroot_entry_point = False`, because otherwise the
+cross-platform build in that file would fail as a result of Bazel trying to use
+the wrong Rspack binary. Below is the key part, edited slightly for brevity:
 
 ```
 js_library(
@@ -126,10 +126,12 @@ Key points:
    build action's current directory.
 - The config file (`rspack.config.cjs`) refers to `process.cwd()`, not
   `__dirname`, for specifying the output path. This is key, because the config
-  file will be in the runfiles directory and thus `__dirname` will not be
-  anywhere near the output tree.
+  file (and therefore `__dirname`) will be in the runfiles directory and not
+  the output tree.
 - We refer to `"$$RUNFILES_DIR/$(rlocationpath :rspack_config)"` in
-  `fixed_args`. This slightly convoluted syntax is necessary to determine an
-  absolute path to the config file in the runfiles directory. This must go in
-  `fixed_args` rather than `args`, to allow `$RUNFILES_DIR` to be evaluated at
-  run time.
+  `fixed_args`. `$(rlocationpath ...)` is evaluated at analysis time and
+  determines the path to the config file within the runfiles directory. This
+  argument must go in `fixed_args` rather than `args`, to allow `$RUNFILES_DIR`
+  to be evaluated at run time. Note the double dollar sign (`$$`) to prevent
+  the `js_binary` implementation from attempting to evaluate that variable at
+  analysis time.
