@@ -1,6 +1,8 @@
 """Aspect CLI configuration."""
 
 load("@aspect//feature/artifacts.axl", "ArtifactUpload")
+load("@aspect//feature/github_status_checks.axl", "GithubStatusChecks")
+load("@aspect//feature/github_status_comments.axl", "GithubStatusComments")
 load("@aspect//format.axl", "format")
 load("@aspect//traits.axl", "BazelTrait")
 
@@ -53,6 +55,12 @@ def config(ctx: ConfigContext):
         ctx.traits[BazelTrait].extra_flags.extend([
             "--config=ci",
         ])
+
+    # rules_js has too many tasks which are using up too much of our GitHub API rate limit for
+    # status checks and PR summary comments; disabling for now until we address this with smarter
+    # API call rate limiting
+    ctx.features[GithubStatusChecks].enabled = False
+    ctx.features[GithubStatusComments].enabled = False
 
     # Register the buildifier alias as a real CLI command.
     ctx.tasks.add(buildifier)
