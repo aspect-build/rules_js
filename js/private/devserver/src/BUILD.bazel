@@ -22,7 +22,7 @@ rollup_bin.rollup(
     fixed_args = [
         "js_run_devserver.mjs",
         "--config",
-        "$$RUNFILES_DIR/$(rlocationpath :config)",
+        "$(rlocation :config)",
         "--format",
         "es",
         "--file",

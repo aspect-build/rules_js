@@ -69,7 +69,7 @@ babel_bin.babel(
     data = [":babel_config"],
     fixed_args = [
         "--config-file",
-        "$$RUNFILES_DIR/$(rlocationpath :babel_config)",
+        "$(rlocation :babel_config)",
         "--extensions",
         ".mjs",
         "--out-file-extension",

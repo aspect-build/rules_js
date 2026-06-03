@@ -27,7 +27,7 @@ bin.rspack(
     fixed_args = [
         "build",
         "--config",
-        "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
+        "$(rlocation :rspack_config)",
     ],
     use_execroot_entry_point = False,
 )

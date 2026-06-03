@@ -72,20 +72,23 @@ _ATTRS = {
     "env": attr.string_dict(
         doc = """Environment variables of the action.
 
-        Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        Subject to `$(rlocation ...)`,
+        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
         and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_env` is set to True.
         """,
     ),
     "expand_args": attr.bool(
         default = True,
-        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        doc = """Enables `$(rlocation ...)`,
+        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
         and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `fixed_args`.
 
         This comes at some analysis-time cost even for a set of args that does not have any expansions.""",
     ),
     "expand_env": attr.bool(
         default = True,
-        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        doc = """Enables `$(rlocation ...)`,
+        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
         and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `env`.
 
         This comes at some analysis-time cost even for a set of envs that does not have any expansions.""",
@@ -94,7 +97,8 @@ _ATTRS = {
         doc = """Fixed command line arguments to pass to the Node.js when this
         binary target is executed.
 
-        Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
+        Subject to `$(rlocation ...)`,
+        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
         and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_args` is set to True.
 
         Unlike the built-in `args`, which are only passed to the target when it is
@@ -275,8 +279,33 @@ _ENV_SET = """export {var}={quoted_value}"""
 _ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
 _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 
+def _expand_rlocation_refs(value):
+    """Pre-processes $(rlocation <label>) into $$RUNFILES_DIR/$(rlocationpath <label>).
+
+    After this transformation, the standard expand_locations/expand_variables chain
+    resolves the rlocationpath and converts $$ to a literal $.
+    """
+    result = []
+    remaining = value
+    prefix = "$(rlocation "
+    for _ in range(len(value)):
+        idx = remaining.find(prefix)
+        if idx == -1:
+            break
+        result.append(remaining[:idx])
+        remaining = remaining[idx + len(prefix):]
+        end = remaining.find(")")
+        if end == -1:
+            fail("Unclosed $(rlocation ...) in: " + value)
+        label_str = remaining[:end]
+        result.append("$$RUNFILES_DIR/$(rlocationpath " + label_str + ")")
+        remaining = remaining[end + 1:]
+    result.append(remaining)
+    return "".join(result)
+
 def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
+        value = _expand_rlocation_refs(value)
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
 
@@ -374,7 +403,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         node_options.append(_NODE_OPTION.format(value = "--preserve-symlinks-main"))
 
     if ctx.attr.expand_args:
-        fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
+        fixed_args = [expand_variables(ctx, expand_locations(ctx, _expand_rlocation_refs(fixed_arg), ctx.attr.data)) for fixed_arg in fixed_args]
 
     toolchain_files = []
     if is_windows:

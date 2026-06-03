@@ -30,7 +30,7 @@ vite_bin.vite(
     fixed_args = [
         "build",
         "--config",
-        "$$RUNFILES_DIR/$(rlocationpath :vite-config)",
+        "$(rlocation :vite-config)",
     ],
     out_dirs = ["build"],
 )

@@ -27,7 +27,7 @@ rollup_bin.rollup(
     fixed_args = [
         "c8.js",
         "--config",
-        "$$RUNFILES_DIR/$(rlocationpath :config)",
+        "$(rlocation :config)",
         "--format",
         "cjs",
         "--file",

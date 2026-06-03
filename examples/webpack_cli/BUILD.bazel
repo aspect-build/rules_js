@@ -35,7 +35,7 @@ bin.webpack_cli(
     data = [":webpack-config"],
     fixed_args = [
         "--config",
-        "$$RUNFILES_DIR/$(rlocationpath :webpack-config)",
+        "$(rlocation :webpack-config)",
     ],
     log_level = "debug",
 )

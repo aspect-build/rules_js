@@ -26,7 +26,7 @@ rollup_bin.rollup(
     fixed_args = [
         "lifecycle-hooks.js",
         "--config",
-        "$$RUNFILES_DIR/$(rlocationpath //npm/private/lifecycle:rollup_config)",
+        "$(rlocation //npm/private/lifecycle:rollup_config)",
         "--format",
         "cjs",
         "--file",
