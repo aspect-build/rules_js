@@ -104,7 +104,7 @@ bin.rspack(
     fixed_args = [
         "build",
         "--config",
-        "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
+        "$(rlocation :rspack_config)",
     ],
     use_execroot_entry_point = False,
 )
@@ -128,10 +128,7 @@ Key points:
   `__dirname`, for specifying the output path. This is key, because the config
   file (and therefore `__dirname`) will be in the runfiles directory and not
   the output tree.
-- We refer to `"$$RUNFILES_DIR/$(rlocationpath :rspack_config)"` in
-  `fixed_args`. `$(rlocationpath ...)` is evaluated at analysis time and
-  determines the path to the config file within the runfiles directory. This
-  argument must go in `fixed_args` rather than `args`, to allow `$RUNFILES_DIR`
-  to be evaluated at run time. Note the double dollar sign (`$$`) to prevent
-  the `js_binary` implementation from attempting to evaluate that variable at
-  analysis time.
+- We refer to `"$(rlocation :rspack_config)"` in `fixed_args`. The `js_binary`
+  implementation expands this to the absolute path to the config file in the
+  runfiles directory. Note that this must go in `fixed_args` rather than
+  `args`.
