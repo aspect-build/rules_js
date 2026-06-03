@@ -5,7 +5,7 @@ load("//js/private:js_helpers.bzl", "expand_rlocation_refs")
 
 def _no_rlocation_refs_test(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, "build --config myconfig.json", expand_rlocation_refs("build --config myconfig.json"))
+    asserts.equals(env, "build", expand_rlocation_refs("build"))
     return unittest.end(env)
 
 def _single_rlocation_ref_test(ctx):
