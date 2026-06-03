@@ -190,6 +190,30 @@ def gather_runfiles(
         for target in deps
     ])
 
+def expand_rlocation_refs(value):
+    """Pre-processes $(rlocation <label>) into $$RUNFILES_DIR/$(rlocationpath <label>).
+
+    After this transformation, the standard expand_locations/expand_variables chain
+    resolves the rlocationpath and converts $$ to a literal $.
+    """
+    result = []
+    remaining = value
+    prefix = "$(rlocation "
+    for _ in range(len(value)):
+        idx = remaining.find(prefix)
+        if idx == -1:
+            break
+        result.append(remaining[:idx])
+        remaining = remaining[idx + len(prefix):]
+        end = remaining.find(")")
+        if end == -1:
+            fail("Unclosed $(rlocation ...) in: " + value)
+        label_str = remaining[:end]
+        result.append("$$RUNFILES_DIR/$(rlocationpath " + label_str + ")")
+        remaining = remaining[end + 1:]
+    result.append(remaining)
+    return "".join(result)
+
 LOG_LEVELS = {
     "fatal": 1,
     "error": 2,
