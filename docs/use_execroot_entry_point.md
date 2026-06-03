@@ -1,15 +1,18 @@
 # use_execroot_entry_point
 
 This page describes the `use_execroot_entry_point` option on `js_run_binary`
-and provides guidance on when to use each value.
+and provides guidance on when to use each value. The short version is that
+`use_execroot_entry_point=True` sets up a directory layout that is more
+friendly to some JavaScript tools, but at the expense of a performance hit and
+issues with cross-platform builds.
 
 ## Background
 
 When a `js_binary` is used as a tool in `js_run_binary`, Bazel runs it as a
 build action on the exec platform. The execroot is the root of the build
 sandbox; beneath it sits `bazel-out/`, which contains output directories for
-both the exec and target configurations. The tool's sources can therefore appear
-in up to three places:
+both the exec and target configurations. The tool's sources can therefore
+potentially appear in up to three places:
 
 - **Exec-platform bin** (`bazel-out/<exec-cfg>/bin/`): where build artifacts for
   the exec platform land.
@@ -17,21 +20,23 @@ in up to three places:
   where the tool's runtime dependencies (including `node_modules`) are
   symlinked and made available to the build action.
 - **Target-platform bin** (`bazel-out/<target-cfg>/bin/`): where the `srcs` of
-  the `js_run_binary` action land.
+  the `js_run_binary` action land. This is also the default working directory
+  for the build action, though it can be adjusted via the `chdir` attribute.
 
-When Node.js resolves `require()`, it walks up the directory tree looking for
-`node_modules`. If the working directory is somewhere that can see
-`node_modules` from both the exec output tree and the runfiles tree, the same
-package can resolve from two different paths, which can cause subtle bugs.
+Resolving the same package in more than one location can result in subtle bugs,
+so this is a potential danger here given that the same sources can appear in up
+to three places. As described below, `use_execroot_entry_point = True`
+addresses the problem by keeping all sources in the target-platform bin
+directory, but this has downsides.
 
 ## What `use_execroot_entry_point` does
 
 **`use_execroot_entry_point = True` (the current default):**
-The tool's runfiles are hoisted into `srcs`, which causes them to be rebuilt in
-the target configuration and land in the target-platform bin directory. The
-entry point used is the one in that output tree (the "execroot entry point"),
-rather than the copy inside the runfiles symlink tree. With everything
-consolidated in `bazel-out/<target-cfg>/bin/`, Node.js sees a single
+The entry point used is the one in the target-platform bin
+directory--confusingly called the "execroot entry point" even though the
+execroot encompasses the whole sandbox. In order for the tool's sources to land
+in that directory, they end up being rebuilt for the target platform. With
+everything consolidated in `bazel-out/<target-cfg>/bin/`, Node.js sees a single
 `node_modules` tree. This can be the right choice for some frameworks such as
 Next.js, which expects inputs and outputs to be in the same directory tree.
 
@@ -46,17 +51,17 @@ the build action runs from the runfiles tree, which avoids cross-platform
 issues. However, you must ensure that any code executed during the build (for
 example, JavaScript config files for tools like Webpack or Rspack) is a declared
 dependency of the `js_binary` tool, not merely a source file passed to
-`js_run_binary`. Config files in the `js_run_binary`'s `srcs` will land in the
+`js_run_binary`. Source files in the `js_run_binary`'s `srcs` will land in the
 target-platform bin directory and will therefore not be visible to the tool's
 runfiles resolution.
 
 ## Recommendation
 
-We recommend setting `use_execroot_entry_point = False` wherever possible and
-ensuring that all code executed during the build is declared as a dependency of
-the `js_binary`. The main exception is Next.js and similar frameworks that
-expect inputs and outputs in the same directory tree or that execute
-target-platform code during the build, in which case `True` is required.
+We recommend setting `use_execroot_entry_point = False`, unless your tool
+requires its config and outputs to be adjacent to each other in the same
+directory (such as Next.js for example). If you do this and ensure that all
+code executed during the build is declared as a dependency of the `js_binary`,
+then your build will work reliably even in cross-platform situations.
 
 To disable `use_execroot_entry_point` by default, pass the build flag:
 
@@ -64,8 +69,69 @@ To disable `use_execroot_entry_point` by default, pass the build flag:
 --@aspect_rules_js//js:use_execroot_entry_point=False
 ```
 
+You may want to set it in your `.bazelrc` as follows:
+```
+common --@aspect_rules_js//js:use_execroot_entry_point=False
+```
+
 Individual targets can still override the flag by explicitly setting
 `use_execroot_entry_point = True` or `use_execroot_entry_point = False`.
 
 In a future major version, we will likely disable the `use_execroot_entry_point`
 behavior by default.
+
+### Example
+
+A simple demonstration of the recommended way to set up a `js_run_binary`
+target is the [Rspack example](../examples/rspack/BUILD.bazel). This particular
+case *requires* `use_execroot_entry_point = False`, because otherwise the
+cross-platform build in that file would fail as a result of Bazel trying to use
+the wrong Rspack binary. Below is the key part, edited slightly for brevity:
+
+```
+js_library(
+    name = "rspack_config",
+    srcs = ["rspack.config.cjs"],
+    deps = [":node_modules/@rspack/cli"],
+)
+
+bin.rspack(
+    name = "rspack_build",
+    srcs = ["rspack_entry.js"],
+    outs = ["rspack/main.bundle.js"],
+    chdir = package_name(),
+    data = [":rspack_config"],
+    fixed_args = [
+        "build",
+        "--config",
+        "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
+    ],
+    use_execroot_entry_point = False,
+)
+```
+
+Note that in this case `bin.rspack()` is a generated macro that creates both
+the `js_binary` for Rspack *and* the `js_run_binary` target that runs it.
+
+Key points:
+- The `rspack.config.cjs` file is wrapped in a `js_library` and taken as a
+  `data` dependency of the `js_binary`. This ensures that the config file and
+   its dependencies are built for the exec platform, which is appropriate
+   since they will run during the build action. They will land in the runfiles
+   directory adjacent to the other exec-platform sources, which will allow
+   module resolution to proceed correctly.
+- `chdir = package_name()` causes the working directory to be
+  `bazel-out/<target-cfg>/bin/rspack`. This is not strictly necessary, but it
+  is convenient to have the outputs go directly in the build action's current
+  directory.
+- The config file (`rspack.config.cjs`) refers to `process.cwd()`, not
+  `__dirname`, for specifying the output path. This is key, because the config
+  file (and therefore `__dirname`) will be in the runfiles directory and not
+  the output tree.
+- We refer to `"$$RUNFILES_DIR/$(rlocationpath :rspack_config)"` in
+  `fixed_args`. `$(rlocationpath ...)` is evaluated at analysis time and
+  determines the path to the config file within the runfiles directory. This
+  argument must go in `fixed_args` rather than `args`, to allow `$RUNFILES_DIR`
+  to be evaluated at run time. Note the double dollar sign (`$$`) to prevent
+  the `js_binary` implementation from attempting to evaluate that variable at
+  analysis time.
