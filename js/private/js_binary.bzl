@@ -78,9 +78,9 @@ _ATTRS = {
     ),
     "expand_args": attr.bool(
         default = True,
-        doc = """Enables `$(rlocation ...)`,
-        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
-        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution for `fixed_args`.
+        doc = """Enables [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables),
+        ["Make variable"](https://bazel.build/reference/be/make-variables), and our own custom `$(rlocation)`
+        substitution for `fixed_args`.
 
         This comes at some analysis-time cost even for a set of args that does not have any expansions.""",
     ),
@@ -95,9 +95,14 @@ _ATTRS = {
         doc = """Fixed command line arguments to pass to the Node.js when this
         binary target is executed.
 
-        Subject to `$(rlocation ...)`,
-        [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables)
-        and ["Make variable"](https://bazel.build/reference/be/make-variables) substitution if `expand_args` is set to True.
+        Subject to [$(location)](https://bazel.build/reference/be/make-variables#predefined_label_variables),
+        ["Make variable"](https://bazel.build/reference/be/make-variables), and `$(rlocation)` substitution
+        if `expand_args` is set to True.
+
+        The `$(rlocation :label)` syntax is unique to `js_binary` and expands to the
+        absolute path to `:label` in the runfiles. This is supported only in `fixed_args`,
+        because part of the evaluation has to occur at run time, inside the wrapper
+        script.
 
         Unlike the built-in `args`, which are only passed to the target when it is
         executed either by the `bazel run` command or as a test, `fixed_args` are baked
