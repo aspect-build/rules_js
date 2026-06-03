@@ -315,7 +315,7 @@ Valid pnpm workspace projects: {}
 
                 final_rctx_files[resolved_json_file_path] = json.encode({
                     # Allow consumers to auto-detect this filetype
-                    "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
+                    "$schema": "https://docs.aspect.build/bazel/javascript/aspect_rules_js/npm_extensions#tag-npm_translate_lock",
                     "version": _import.version,
                     "integrity": _import.integrity,
                 })
