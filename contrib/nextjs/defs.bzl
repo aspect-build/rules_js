@@ -296,6 +296,10 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
 
+    tags = kwargs.pop("tags", [])
+    testonly = kwargs.pop("testonly", False)
+    visibility = kwargs.pop("visibility", [])
+
     # Extract the basename from config, which may be a label like ":next.config.js"
     # or "//pkg:next.config.js". The copy_file `out` must be a plain filename.
     config_basename = config.split(":")[-1].split("/")[-1]
@@ -305,7 +309,8 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         src = config,
         out = "__original.%s" % config_basename,
         visibility = ["//visibility:private"],
-        tags = ["manual"],
+        tags = tags + ["manual"],
+        testonly = testonly,
     )
 
     # Wrap the config file to add necessary bazel logic
@@ -316,7 +321,8 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         src = _next_standalone_config,
         out = _next_build_config,
         visibility = ["//visibility:private"],
-        tags = ["manual"],
+        tags = tags + ["manual"],
+        testonly = testonly,
     )
 
     # `next build` of the standalone application.
@@ -337,13 +343,18 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         mnemonic = "NextJs",
         progress_message = "Compile Next.js standalone app %{label}",
         use_execroot_entry_point = use_execroot_entry_point,
-        tags = ["manual"],
+        tags = tags + ["manual"],
+        testonly = testonly,
+        visibility = ["//visibility:private"],
         **kwargs
     )
 
     _copy_exec_to_bin(
         name = name,
         src = "_%s.next_build" % name,
+        tags = tags,
+        testonly = testonly,
+        visibility = visibility,
     )
 
 def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
