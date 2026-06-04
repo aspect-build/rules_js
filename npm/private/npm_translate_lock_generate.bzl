@@ -314,8 +314,11 @@ Valid pnpm workspace projects: {}
                 resolved_json_file_path = "{}/{}".format(link_package, resolved_json_rel_path) if link_package else resolved_json_rel_path
 
                 final_rctx_files[resolved_json_file_path] = json.encode({
-                    # Allow consumers to auto-detect this filetype
-                    "$schema": "https://docs.aspect.build/bazel/javascript/aspect_rules_js/npm_extensions#tag-npm_translate_lock",
+                    # Allow consumers to auto-detect this filetype.
+                    # This value is a format discriminator relied upon by consumers (e.g. rules_ts
+                    # `ts_version_from`, see https://github.com/aspect-build/rules_js/issues/2877)
+                    # and must NOT change, even if the docs URL it once pointed to moves.
+                    "$schema": "https://docs.aspect.build/rules/aspect_rules_js/docs/npm_translate_lock",
                     "version": _import.version,
                     "integrity": _import.integrity,
                 })

@@ -1,0 +1,9 @@
+{
+    "private": true,
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
+    "devDependencies": {
+        "typescript": "5.8.3"
+    }
+}
