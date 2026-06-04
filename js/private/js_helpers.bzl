@@ -205,6 +205,7 @@ def expand_rlocation_refs(value):
             break
         result.append(remaining[:idx])
         remaining = remaining[idx + len(prefix):]
+
         # Parentheses are allowed in Bazel target names and could therefore
         # theoretically appear in a label. We just look for the first closing
         # parenthesis without handling that possibility, as this is what Bazel
