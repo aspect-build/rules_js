@@ -89,6 +89,7 @@ jobs:
                     e2e/protobuf-google
                     e2e/repo_mapping
                     e2e/output_paths
+                    e2e/ts_version_from_rules_ts_3.8.10
                     e2e/update_pnpm_lock
                     e2e/update_pnpm_lock_with_import
                     e2e/vendored_node
@@ -117,8 +118,8 @@ jobs:
 
                   # Slug feeds aspect --task-key, the disk-cache key, and the job name, all
                   # of which require [A-Za-z0-9_-]. Map "." → "root"; replace "/" with "-"
-                  # and "+" with "_" so e.g. e2e/npm_translate_lock_git+ssh becomes a valid
-                  # e2e-npm_translate_lock_git_ssh slug.
+                  # and "+" and "." with "_" so e.g. e2e/npm_translate_lock_git+ssh becomes
+                  # a valid e2e-npm_translate_lock_git_ssh slug.
                   entries=()
                   for p in "${paths[@]}"; do
                     if [[ "$p" == "." ]]; then
@@ -126,6 +127,7 @@ jobs:
                     else
                       slug=${p//\//-}
                       slug=${slug//+/_}
+                      slug=${slug//./_}
                     fi
                     entries+=( "{\"path\":\"$p\",\"slug\":\"$slug\"}" )
                   done

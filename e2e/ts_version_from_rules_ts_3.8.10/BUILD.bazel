@@ -1,0 +1,17 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+ts_project(
+    name = "lib",
+    srcs = ["main.ts"],
+    transpiler = "tsc",
+    tsconfig = "tsconfig.json",
+)
+
+build_test(
+    name = "test",
+    targets = [":lib"],
+)
