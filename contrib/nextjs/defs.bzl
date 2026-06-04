@@ -319,9 +319,15 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         tags = ["manual"],
     )
 
-    # `next build` of the standalone application
+    # `next build` of the standalone application.
+    # Next.js is tricky to handle in Bazel, because during its pre-rendering it
+    # executes some of the sources it is operating on. We run the risk of
+    # either trying to run code for an incompatible platform, or mixing
+    # node_modules directories from two different platforms. We work around
+    # these issues by building for the exec platform and then copying that
+    # result verbatim to the target platform bin directory.
     js_run_binary(
-        name = name,
+        name = "_%s.next_build" % name,
         tool = next_js_binary,
         env = env,
         args = ["build"],
@@ -331,7 +337,13 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         mnemonic = "NextJs",
         progress_message = "Compile Next.js standalone app %{label}",
         use_execroot_entry_point = use_execroot_entry_point,
+        tags = ["manual"],
         **kwargs
+    )
+
+    _copy_exec_to_bin(
+        name = name,
+        src = "_%s.next_build" % name,
     )
 
 def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
@@ -409,3 +421,34 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
         visibility = ["//visibility:private"],
         tags = ["manual"],
     )
+
+def _copy_exec_to_bin_impl(ctx):
+    src_files = ctx.files.src
+    if len(src_files) != 1:
+        fail("src must provide exactly one artifact; got %d" % len(src_files))
+    src = src_files[0]
+    out = ctx.actions.declare_directory(ctx.label.name)
+    ctx.actions.run_shell(
+        inputs = [src],
+        outputs = [out],
+        command = "mkdir -p {out} && cp -r {src}/. {out}/".format(
+            src = src.path,
+            out = out.path,
+        ),
+        mnemonic = "CopyExecToBin",
+        progress_message = "Copying exec-platform artifact to target bin %{label}",
+    )
+    return [DefaultInfo(files = depset([out]))]
+
+_copy_exec_to_bin = rule(
+    implementation = _copy_exec_to_bin_impl,
+    attrs = {
+        "src": attr.label(
+            mandatory = True,
+            allow_files = True,
+            cfg = "exec",
+            doc = "A tree-artifact target to copy from exec-platform to target-platform bin.",
+        ),
+    },
+    doc = "Copies a tree artifact built in the exec configuration into the target-platform bin directory.",
+)
