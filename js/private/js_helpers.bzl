@@ -205,6 +205,11 @@ def expand_rlocation_refs(value):
             break
         result.append(remaining[:idx])
         remaining = remaining[idx + len(prefix):]
+        # Parentheses are allowed in Bazel target names and could therefore
+        # theoretically appear in a label. We just look for the first closing
+        # parenthesis without handling that possibility, as this is what Bazel
+        # itself does:
+        # https://github.com/bazelbuild/bazel/blob/b4f16d988ddebc1891d7af57622ec5aff149a838/src/main/java/com/google/devtools/build/lib/analysis/LocationExpander.java#L179
         end = remaining.find(")")
         if end == -1:
             fail("Unclosed $(rlocation ...) in: " + value)
