@@ -161,15 +161,14 @@ jobs:
                           version: '8.x',
                           flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel8',
                       }
-                    # TODO: change this back to 9.x once this bug is fixed: https://github.com/bazelbuild/bazel/issues/29393
                     - {
                           id: 'bazel-9',
-                          version: '9.0.2',
+                          version: '9.x',
                           flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9',
                       }
                     - {
                           id: 'bazel-9-no-execroot-entry-point',
-                          version: '9.0.2',
+                          version: '9.x',
                           flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_execroot_entry_point=False',
                       }
                 exclude:
