@@ -11,11 +11,11 @@ npm.npm_translate_lock(
 )
 use_repo(npm, "npm_other_module")
 
-pnpm = use_extension(
-    "@aspect_rules_js//npm:extensions.bzl",
-    "pnpm",
-    dev_dependency = True,
-)
+# A non-root module may request a pnpm version for the default "pnpm" repo, but
+# the version requested by the e2e test root module takes priority. The e2e test
+# root module uses pnpm_version_from, which must win over this registration; this
+# is asserted by //:pnpm_versions_test in the e2e test root module.
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",
     pnpm_version = "9.15.9",
