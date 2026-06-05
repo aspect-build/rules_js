@@ -1,5 +1,5 @@
 load("@aspect_rules_js//contrib/nextjs:defs.bzl", "nextjs_standalone_build", "nextjs_standalone_server")
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_js//js:defs.bzl", "js_image_layer", "js_library")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -66,6 +66,42 @@ nextjs_standalone_build(
 nextjs_standalone_server(
     name = "server",
     app = ":standalone",
+)
+
+platform(
+    name = "linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+platform(
+    name = "macos",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+js_image_layer(
+    name = "server_linux",
+    binary = ":server",
+    platform = ":linux",
+)
+
+js_image_layer(
+    name = "server_macos",
+    binary = ":server",
+    platform = ":macos",
+)
+
+build_test(
+    name = "cross_platform_build_test",
+    targets = [
+        ":server_linux",
+        ":server_macos",
+    ],
 )
 
 # Verify next (which has optional platform/os specific dependencies) can be built

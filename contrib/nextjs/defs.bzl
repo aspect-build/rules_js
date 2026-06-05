@@ -42,6 +42,7 @@ For [standalone applications](https://nextjs.org/docs/app/api-reference/config/n
   [standalone directory structure guidelines](https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files)
 """
 
+load("@bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@bazel_lib//lib:directory_path.bzl", "directory_path")
@@ -296,6 +297,10 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
 
+    tags = kwargs.pop("tags", [])
+    testonly = kwargs.pop("testonly", False)
+    visibility = kwargs.pop("visibility", [])
+
     # Extract the basename from config, which may be a label like ":next.config.js"
     # or "//pkg:next.config.js". The copy_file `out` must be a plain filename.
     config_basename = config.split(":")[-1].split("/")[-1]
@@ -305,7 +310,8 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         src = config,
         out = "__original.%s" % config_basename,
         visibility = ["//visibility:private"],
-        tags = ["manual"],
+        tags = tags + ["manual"],
+        testonly = testonly,
     )
 
     # Wrap the config file to add necessary bazel logic
@@ -316,12 +322,19 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         src = _next_standalone_config,
         out = _next_build_config,
         visibility = ["//visibility:private"],
-        tags = ["manual"],
+        tags = tags + ["manual"],
+        testonly = testonly,
     )
 
-    # `next build` of the standalone application
+    # `next build` of the standalone application.
+    # Next.js is tricky to handle in Bazel, because during its pre-rendering it
+    # executes some of the sources it is operating on. We run the risk of
+    # either trying to run code for an incompatible platform, or mixing
+    # node_modules directories from two different platforms. We work around
+    # these issues by building for the exec platform and then copying that
+    # result verbatim to the target platform bin directory.
     js_run_binary(
-        name = name,
+        name = "_%s.next_build" % name,
         tool = next_js_binary,
         env = env,
         args = ["build"],
@@ -331,7 +344,18 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         mnemonic = "NextJs",
         progress_message = "Compile Next.js standalone app %{label}",
         use_execroot_entry_point = use_execroot_entry_point,
+        tags = tags + ["manual"],
+        testonly = testonly,
+        visibility = ["//visibility:private"],
         **kwargs
+    )
+
+    _copy_exec_to_bin(
+        name = name,
+        src = "_%s.next_build" % name,
+        tags = tags,
+        testonly = testonly,
+        visibility = visibility,
     )
 
 def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
@@ -409,3 +433,33 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
         visibility = ["//visibility:private"],
         tags = ["manual"],
     )
+
+def _copy_exec_to_bin_impl(ctx):
+    dst = ctx.actions.declare_directory(ctx.label.name)
+    copy_directory_bin = ctx.toolchains["@bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin
+    copy_directory_bin_action(
+        ctx,
+        src = ctx.file.src,
+        dst = dst,
+        copy_directory_bin = copy_directory_bin,
+    )
+    return [
+        DefaultInfo(
+            files = depset([dst]),
+            runfiles = ctx.runfiles([dst]),
+        ),
+    ]
+
+_copy_exec_to_bin = rule(
+    implementation = _copy_exec_to_bin_impl,
+    attrs = {
+        "src": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+            cfg = "exec",
+            doc = "A tree-artifact target to copy from exec-platform to target-platform bin.",
+        ),
+    },
+    toolchains = ["@bazel_lib//lib:copy_directory_toolchain_type"],
+    doc = "Copies a tree artifact built in the exec configuration into the target-platform bin directory.",
+)
