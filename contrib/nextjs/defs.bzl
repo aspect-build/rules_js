@@ -42,6 +42,7 @@ For [standalone applications](https://nextjs.org/docs/app/api-reference/config/n
   [standalone directory structure guidelines](https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files)
 """
 
+load("@bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@bazel_lib//lib:directory_path.bzl", "directory_path")
@@ -434,32 +435,31 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
     )
 
 def _copy_exec_to_bin_impl(ctx):
-    src_files = ctx.files.src
-    if len(src_files) != 1:
-        fail("src must provide exactly one artifact; got %d" % len(src_files))
-    src = src_files[0]
-    out = ctx.actions.declare_directory(ctx.label.name)
-    ctx.actions.run_shell(
-        inputs = [src],
-        outputs = [out],
-        command = "mkdir -p {out} && cp -r {src}/. {out}/".format(
-            src = src.path,
-            out = out.path,
-        ),
-        mnemonic = "CopyExecToBin",
-        progress_message = "Copying exec-platform artifact to target bin %{label}",
+    dst = ctx.actions.declare_directory(ctx.label.name)
+    copy_directory_bin = ctx.toolchains["@bazel_lib//lib:copy_directory_toolchain_type"].copy_directory_info.bin
+    copy_directory_bin_action(
+        ctx,
+        src = ctx.file.src,
+        dst = dst,
+        copy_directory_bin = copy_directory_bin,
     )
-    return [DefaultInfo(files = depset([out]))]
+    return [
+        DefaultInfo(
+            files = depset([dst]),
+            runfiles = ctx.runfiles([dst]),
+        ),
+    ]
 
 _copy_exec_to_bin = rule(
     implementation = _copy_exec_to_bin_impl,
     attrs = {
         "src": attr.label(
             mandatory = True,
-            allow_files = True,
+            allow_single_file = True,
             cfg = "exec",
             doc = "A tree-artifact target to copy from exec-platform to target-platform bin.",
         ),
     },
+    toolchains = ["@bazel_lib//lib:copy_directory_toolchain_type"],
     doc = "Copies a tree artifact built in the exec configuration into the target-platform bin directory.",
 )

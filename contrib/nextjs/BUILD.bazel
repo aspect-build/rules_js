@@ -13,6 +13,7 @@ bzl_library(
     srcs = ["defs.bzl"],
     deps = [
         "//js:defs",
+        "@bazel_lib//lib:copy_directory",
         "@bazel_lib//lib:copy_file",
         "@bazel_lib//lib:copy_to_directory",
         "@bazel_lib//lib:directory_path",
