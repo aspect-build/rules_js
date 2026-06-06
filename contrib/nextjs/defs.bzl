@@ -430,6 +430,7 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
             "public": "standalone/{}/public".format(pkg),
         },
         out = standalone_outdir,
+        allow_overwrites = True,
         visibility = ["//visibility:private"],
         tags = ["manual"],
     )
