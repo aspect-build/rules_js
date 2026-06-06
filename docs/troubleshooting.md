@@ -200,3 +200,30 @@ npm.npm_exclude_package_contents(
 #### Jest
 
 See [rules_jest](https://github.com/aspect-build/rules_jest) for troubleshooting.
+
+### Remote cache and npm package extraction
+
+rules_js extracts each third-party npm package with one `NpmPackageExtract` action per
+package, producing tree artifacts that can add up to a large number of files. Remote
+caches generally store tree artifacts file-by-file, so caching these actions can involve
+many network round trips, and in a cache-only setup (no remote execution) it may be
+slower than simply re-extracting the tarballs locally; see
+[#2715](https://github.com/aspect-build/rules_js/issues/2715) for an example.
+
+If your builds spend significant time on `NpmPackageExtract` actions when using a remote
+cache, you may want to experiment with excluding them from it:
+
+```
+# Don't upload or fetch npm package extraction results; re-extract locally instead.
+common --modify_execution_info=NpmPackageExtract=+no-remote-cache
+```
+
+With remote execution the extracted outputs are needed in the remote CAS anyway, so
+there you most likely want to keep these actions cached, especially when combined with
+Build without the Bytes (`--remote_download_minimal`). There is no setting that is right
+for everyone, which is why rules_js leaves this choice to you.
+
+You can also reduce the size of the extracted packages themselves with
+`npm.npm_exclude_package_contents`, which removes files you consider unnecessary (docs,
+tests, etc.) at extraction time; see
+[Unnecessary npm package content](#unnecessary-npm-package-content) above.
