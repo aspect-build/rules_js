@@ -3,6 +3,8 @@
 readonly PUBLISH_A="$1"
 readonly PUBLISH_B="$2"
 readonly PUBLISH_PNPM="$3"
+readonly PNPM="$(cd "$(dirname "$4")" && pwd)/$(basename "$4")"
+readonly PKG_PNPM="$(cd "$(dirname "$5")" && pwd)/$(basename "$5")"
 
 # Assert that pnpm reads package.json from the package directory.
 $PUBLISH_A >pub_a.log 2>&1
@@ -56,12 +58,41 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-# The source package.json is 132 bytes. pnpm rewrites catalog: to the concrete
-# version before packing, producing the smaller manifest below.
-cat pub_pnpm.log | grep '"size": 116'
+mkdir -p "${TMP_WORKSPACE}/package" "${TMP_WORKSPACE}/packed"
+cp -R "${PKG_PNPM}/." "${TMP_WORKSPACE}/package/"
+
+cat >"${TMP_WORKSPACE}/pnpm-workspace.yaml" <<'EOF'
+packages:
+    - package
+catalog:
+    typescript: 5.9.3
+EOF
+
+(
+    cd "${TMP_WORKSPACE}/package"
+    BAZEL_BINDIR=. "${PNPM}" pack \
+        --pack-destination "${TMP_WORKSPACE}/packed" \
+        --json >pack.log
+)
 
 # shellcheck disable=SC2181
 if [ $? != 0 ]; then
-    echo "FAIL: expected pnpm publish to resolve catalog: in package.json, GOT: $(cat pub_pnpm.log)"
+    echo "FAIL: expected pnpm pack to resolve catalog dependencies, GOT: $(cat "${TMP_WORKSPACE}/package/pack.log")"
+    exit 1
+fi
+
+readonly PACKED_ARCHIVE="$(find "${TMP_WORKSPACE}/packed" -name '*.tgz' -print -quit)"
+tar -xOf "${PACKED_ARCHIVE}" package/package.json >packed-package.json
+
+grep '"typescript": "5.9.3"' packed-package.json
+
+# shellcheck disable=SC2181
+if [ $? != 0 ]; then
+    echo "FAIL: expected packed package.json to contain the resolved catalog version, GOT: $(cat packed-package.json)"
+    exit 1
+fi
+
+if grep -q 'catalog:' packed-package.json; then
+    echo "FAIL: expected packed package.json not to contain catalog:, GOT: $(cat packed-package.json)"
     exit 1
 fi

@@ -154,6 +154,16 @@ def npm_package(
     pnpm publishing uses the configured `pnpm_binary` and can resolve pnpm workspace settings such as `catalog` entries from
     `pnpm-workspace.yaml`. Workspace protocol dependencies follow pnpm's own resolution requirements.
 
+    The default `pnpm_binary` requires the consuming module to define and import the `@pnpm` repository:
+
+    ```starlark
+    pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+    pnpm.pnpm(name = "pnpm")
+    use_repo(pnpm, "pnpm")
+    ```
+
+    Pass a different `pnpm_binary` label when the pnpm repository uses another name.
+
     Files and directories can be arranged as needed in the output directory using
     the `root_paths`, `include_srcs_patterns`, `exclude_srcs_patterns` and `replace_prefixes` attributes.
 
@@ -413,8 +423,9 @@ def npm_package(
 
         publishable: When True, enable generation of `{name}.publish` target
 
-        pnpm_binary: Label of the pnpm binary used for publishing. This is typically `@pnpm//:pnpm`
-            from the `pnpm` extension in `@aspect_rules_js//npm:extensions.bzl`.
+        pnpm_binary: Label of the pnpm binary used for publishing. The default `@pnpm//:pnpm`
+            requires the consuming module to define the `pnpm` extension repository and import it
+            with `use_repo(pnpm, "pnpm")`.
 
         verbose: If true, prints out verbose logs to stdout
 

@@ -37,11 +37,15 @@ sh_test(
         "$(locations :pkg_a.publish)",
         "$(locations :pkg_b.publish)",
         "$(locations :pkg_pnpm.publish)",
+        "$(locations @pnpm//:pnpm)",
+        "$(locations :pkg_pnpm)",
     ],
     data = [
         ":pkg_a.publish",
         ":pkg_b.publish",
+        ":pkg_pnpm",
         ":pkg_pnpm.publish",
+        "@pnpm//:pnpm",
     ],
     tags = [
         "no-remote-exec",
