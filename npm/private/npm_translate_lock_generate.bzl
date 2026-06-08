@@ -292,7 +292,7 @@ Valid pnpm workspace projects: {}
                 is_alias = link_alias != _import.package
                 is_dev = link_alias not in link_importer["dependencies"] and link_alias not in link_importer["optional_dependencies"]
 
-                links_pkg_bzl[link_package].append("""            link_{i}({maybe_alias}{maybe_dev})""".format(
+                links_pkg_bzl[link_package].append("""    link_{i}({maybe_alias}{maybe_dev})""".format(
                     i = i,
                     maybe_alias = '"{}"'.format(link_alias) if is_alias else "",
                     maybe_dev = (", " if is_alias else "") + "dev=True" if is_dev else "",
@@ -410,13 +410,40 @@ Valid pnpm workspace projects: {}
                 links_pkg_bzl[link_package] = []
             for alias in aliases.keys():
                 if alias == fp_package:
-                    links_pkg_bzl[link_package].append("""            _fp_link_{i}()""".format(i = i))
+                    links_pkg_bzl[link_package].append("""    _fp_link_{i}()""".format(i = i))
                 else:
-                    links_pkg_bzl[link_package].append("""            _fp_link_{i}("{alias}")""".format(i = i, alias = alias))
+                    links_pkg_bzl[link_package].append("""    _fp_link_{i}("{alias}")""".format(i = i, alias = alias))
 
     if stores_bzl:
         npm_link_all_packages_bzl.append("""    if is_root:""")
         npm_link_all_packages_bzl.extend(stores_bzl)
+
+    # Generate one function per pnpm workspace project that performs the linking
+    # for that project and returns its (link_targets, scope_targets), collected
+    # into the `_LINK_PACKAGE_FNS` dict for dispatch by package name.
+    link_pkg_fns_bzl = []
+    link_pkg_dispatch = {}
+    for i, (link_package, bzl) in enumerate(links_pkg_bzl.items()):
+        fn_name = "_link_pkg_%d" % i
+        link_pkg_dispatch[link_package] = fn_name
+
+        if link_package in links_targets and (links_targets[link_package]["prod"] or links_targets[link_package]["dev"]):
+            link_targets_repr = starlark_codegen_utils.to_list_attr(links_targets[link_package]["prod"] + links_targets[link_package]["dev"], 1, 4, quote_value = False)
+        else:
+            link_targets_repr = "None"
+
+        if links_scope_targets.get(link_package):
+            scope_targets_repr = starlark_codegen_utils.to_dict_list_attr(links_scope_targets[link_package], 1, 4, quote_list_value = False)
+        else:
+            scope_targets_repr = "None"
+
+        fn_lines = ["""def {fn_name}():""".format(fn_name = fn_name)]
+        fn_lines.extend(bzl)
+        fn_lines.append("""    return {link_targets}, {scope_targets}""".format(
+            link_targets = link_targets_repr,
+            scope_targets = scope_targets_repr,
+        ))
+        link_pkg_fns_bzl.append("\n".join(fn_lines))
 
     # Start with empty link and scope targets
     npm_link_all_packages_bzl.append("""
@@ -424,28 +451,12 @@ Valid pnpm workspace projects: {}
     scope_targets = None
 """)
 
-    # Invoke and collect link targets based on package
-    if links_pkg_bzl:
-        npm_link_all_packages_bzl.append("""    if is_importer:""")
-        first_link = True
-        for link_package, bzl in links_pkg_bzl.items():
-            npm_link_all_packages_bzl.append("""        {els}if bazel_package == "{pkg}":""".format(
-                els = "" if first_link else "el",
-                pkg = link_package,
-            ))
-            npm_link_all_packages_bzl.extend(bzl)
-
-            if link_package in links_targets and (links_targets[link_package]["prod"] or links_targets[link_package]["dev"]):
-                npm_link_all_packages_bzl.append("""            link_targets = {targets}""".format(
-                    targets = starlark_codegen_utils.to_list_attr(links_targets[link_package]["prod"] + links_targets[link_package]["dev"], 3, 4, quote_value = False),
-                ))
-
-            if links_scope_targets.get(link_package):
-                npm_link_all_packages_bzl.append("""            scope_targets = {targets}""".format(
-                    targets = starlark_codegen_utils.to_dict_list_attr(links_scope_targets[link_package], 3, 4, quote_list_value = False),
-                ))
-
-            first_link = False
+    # Dispatch to this importer's link function, if any.
+    if link_pkg_dispatch:
+        npm_link_all_packages_bzl.append("""    if is_importer:
+        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if _link_pkg_fn:
+            link_targets, scope_targets = _link_pkg_fn()""")
 
     # Invoke and collect link targets from the `imported_links` param
     npm_link_all_packages_bzl.append("""\
@@ -480,7 +491,7 @@ Valid pnpm workspace projects: {}
             visibility = ["//visibility:public"],
         )""")
 
-    npm_link_targets_bzl = _generate_npm_link_targets(links_targets)
+    npm_link_targets_const, npm_link_targets_bzl = _generate_npm_link_targets(links_targets)
 
     defs_bzl_header.append("")
     defs_bzl_header.append("# buildifier: disable=bzl-visibility")
@@ -510,11 +521,25 @@ Valid pnpm workspace projects: {}
     defs_bzl_contents.extend(["", npm_visibility_config] if npm_visibility_config else [])
     defs_bzl_contents.extend(["", npm_package_locations] if npm_package_locations else [])
 
+    # Per-package link functions + dispatch dict, emitted before npm_link_all_packages
+    # which references _LINK_PACKAGE_FNS.
+    if link_pkg_fns_bzl:
+        defs_bzl_contents.extend([
+            "",
+            "\n\n".join(link_pkg_fns_bzl),
+            "",
+            "_LINK_PACKAGE_FNS = {dispatch}".format(
+                dispatch = starlark_codegen_utils.to_dict_attr(link_pkg_dispatch, 0, 4, quote_value = False),
+            ),
+        ])
+
     defs_bzl_contents.extend([
         "",
         "\n".join(npm_link_all_packages_bzl),
         "",
-        "\n".join(npm_link_targets_bzl),
+        npm_link_targets_const,
+        "",
+        npm_link_targets_bzl,
         "",
         "\n\n".join(link_factories_bzl),
     ])
@@ -527,9 +552,37 @@ Valid pnpm workspace projects: {}
     }
 
 def _generate_npm_link_targets(links_targets):
-    """Generate the npm_link_targets() macro given the links_targets struct"""
-    npm_link_targets_bzl = [
-        """\
+    """Generate the npm_link_targets() macro and its `_LINK_TARGETS` data table.
+
+    The per-package prod/dev targets are stored in the `_LINK_TARGETS` dict and
+    looked up at runtime by package name.
+
+    Returns:
+        A (link_targets_const, npm_link_targets_bzl) tuple of source strings, where
+        link_targets_const is the `_LINK_TARGETS = {...}` table and
+        npm_link_targets_bzl is the npm_link_targets() macro definition.
+    """
+    link_targets_const_lines = []
+    for link_package, lists in links_targets.items():
+        if not lists["prod"] and not lists["dev"]:
+            continue
+        link_targets_const_lines.append("""    "{pkg}": {{""".format(pkg = link_package))
+        if lists["prod"]:
+            link_targets_const_lines.append("""        "prod": {targets},""".format(
+                targets = starlark_codegen_utils.to_list_attr(lists["prod"], 2, 4, quote_value = False),
+            ))
+        if lists["dev"]:
+            link_targets_const_lines.append("""        "dev": {targets},""".format(
+                targets = starlark_codegen_utils.to_list_attr(lists["dev"], 2, 4, quote_value = False),
+            ))
+        link_targets_const_lines.append("    },")
+
+    if link_targets_const_lines:
+        link_targets_const = "_LINK_TARGETS = {\n" + "\n".join(link_targets_const_lines) + "\n}"
+    else:
+        link_targets_const = "_LINK_TARGETS = {}"
+
+    npm_link_targets_bzl = """\
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     if name != "node_modules":
@@ -539,29 +592,15 @@ def npm_link_targets(name = "node_modules", package = None, prod = True, dev = T
 
     bazel_package = package if package != None else native.package_name()
 
+    entry = _LINK_TARGETS.get(bazel_package, {})
     link_targets = []
-""",
-    ]
-    first_link = True
-    for link_package, lists in links_targets.items():
-        npm_link_targets_bzl.append("""    {els}if bazel_package == "{pkg}":""".format(
-            els = "" if first_link else "el",
-            pkg = link_package,
-        ))
-        if lists["prod"]:
-            npm_link_targets_bzl.append("""        if prod:""")
-            npm_link_targets_bzl.append("""            link_targets.extend({targets})""".format(
-                targets = starlark_codegen_utils.to_list_attr(lists["prod"], 3, 4, quote_value = False),
-            ))
+    if prod and "prod" in entry:
+        link_targets.extend(entry["prod"])
+    if dev and "dev" in entry:
+        link_targets.extend(entry["dev"])
+    return ["//%s%s" % (bazel_package, target) for target in link_targets]"""
 
-        if lists["dev"]:
-            npm_link_targets_bzl.append("""        if dev:""")
-            npm_link_targets_bzl.append("""            link_targets.extend({targets})""".format(
-                targets = starlark_codegen_utils.to_list_attr(lists["dev"], 3, 4, quote_value = False),
-            ))
-        first_link = False
-    npm_link_targets_bzl.append("""    return ["//%s%s" % (bazel_package, target) for target in link_targets]""")
-    return npm_link_targets_bzl
+    return link_targets_const, npm_link_targets_bzl
 
 def _generate_npm_visibility_config(package_visibility_attr):
     """Generate visibility configuration for npm packages"""
