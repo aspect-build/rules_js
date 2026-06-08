@@ -22,6 +22,12 @@ platform(
     visibility = ["//js/private/test/image:__subpackages__"],
 )
 
+sh_binary(
+    name = "tar_listing",
+    srcs = ["tar_listing.sh"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
 platform(
     name = "linux_arm64",
     constraint_values = [

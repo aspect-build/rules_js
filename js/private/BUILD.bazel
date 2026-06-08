@@ -5,6 +5,7 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 package(default_visibility = ["//visibility:public"])
 
 exports_files([
+    "js_binary.bat.tpl",
     "js_binary.sh.tpl",
     "node_wrapper.bat",
     "node_wrapper.sh",
