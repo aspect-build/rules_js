@@ -120,6 +120,25 @@ if !errorlevel! neq 0 (
     set "RUNFILES=%CD%\!RUNFILES!"
 )
 
+
+rem ==============================================================================
+rem Configure NODE_PATH with forward-slash normalized paths for module resolution
+rem ==============================================================================
+rem This is essential for tools like jest-cli that use import-local/resolve-cwd.
+rem Node.js on Windows returns backslash-separated paths by default, but our
+rem symlink resolution code (js_image_layer.mjs) normalizes to forward slashes.
+rem To ensure modules like resolve-cwd can find transitive dependencies, we need
+rem to explicitly set NODE_PATH with forward-slash normalized paths.
+rem See: https://github.com/aspect-build/rules_js/issues/2325
+
+if not defined NODE_PATH (
+    rem Initialize NODE_PATH to runfiles node_modules
+    set "NODE_PATH=!JS_BINARY__RUNFILES!\_main\node_modules"
+    
+    rem Convert backslashes to forward slashes for consistent Node module resolution
+    set "NODE_PATH=!NODE_PATH:\=/!"
+)
+
 goto :runfiles_init_done
 
 :extract_runfiles_path

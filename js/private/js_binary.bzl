@@ -304,6 +304,11 @@ def _windows_path(path):
 def _bash_quote(value):
     return json.encode(value)
 
+def _bat_quote(value):
+    # Windows batch: set "VAR=VALUE" already provides quoting via the template,
+    # so the value must NOT be wrapped in extra quotes (json.encode adds "...")
+    return value
+
 def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
@@ -315,12 +320,13 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     _ENV_SET = _ENV_SET_WINDOWS if is_windows else _ENV_SET_UNIX
     _ENV_SET_IFF_NOT_SET = _ENV_SET_IFF_NOT_SET_WINDOWS if is_windows else _ENV_SET_IFF_NOT_SET_UNIX
     _NODE_OPTION = _NODE_OPTION_WINDOWS if is_windows else _NODE_OPTION_UNIX
+    _quote = _bat_quote if is_windows else _bash_quote
 
     envs = [
-        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
+        _ENV_SET.format(var = key, quoted_value = _quote(_expand_env_if_needed(ctx, value)))
         for key, value in fixed_env.items()
     ] + [
-        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
+        _ENV_SET.format(var = key, quoted_value = _quote(_expand_env_if_needed(ctx, value)))
         for key, value in ctx.attr.env.items()
     ]
 
@@ -333,7 +339,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     for (key, value) in makevars.items():
         envs.append(_ENV_SET.format(
             var = key,
-            quoted_value = _bash_quote(ctx.expand_make_variables("env", value, {})),
+            quoted_value = _quote(ctx.expand_make_variables("env", value, {})),
         ))
 
     # Add rule context variables to the environment
@@ -351,24 +357,24 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if is_windows and not ctx.attr.enable_runfiles:
         builtins["JS_BINARY__NO_RUNFILES"] = "1"
     for (key, value) in builtins.items():
-        envs.append(_ENV_SET.format(var = key, quoted_value = _bash_quote(value)))
+        envs.append(_ENV_SET.format(var = key, quoted_value = _quote(value)))
 
     if ctx.attr.patch_node_fs:
         # Set patch node fs API env if not already set to allow js_run_binary to override
         envs.append(_ENV_SET_IFF_NOT_SET.format(
             var = "JS_BINARY__PATCH_NODE_FS",
-            quoted_value = _bash_quote("1"),
+            quoted_value = _quote("1"),
         ))
 
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(
             var = "JS_BINARY__EXPECTED_EXIT_CODE",
-            quoted_value = _bash_quote(str(ctx.attr.expected_exit_code)),
+            quoted_value = _quote(str(ctx.attr.expected_exit_code)),
         ))
 
     if ctx.attr.copy_data_to_bin:
         # Set an environment variable to flag that we have copied js_binary data to bin
-        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _bash_quote("1")))
+        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _quote("1")))
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
@@ -388,11 +394,11 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         else:
             normalized_chdir = chdir_value
 
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", quoted_value = _bash_quote(normalized_chdir)))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", quoted_value = _quote(normalized_chdir)))
 
     # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, quoted_value = _bash_quote("1")))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, quoted_value = _quote("1")))
 
     node_options = []
     for node_option in ctx.attr.node_options:
