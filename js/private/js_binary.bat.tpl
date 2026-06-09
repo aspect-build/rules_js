@@ -127,7 +127,7 @@ if defined STDERR_CAPTURE (
     if defined JS_BINARY__STDERR_OUTPUT_FILE (
         copy "!STDERR_CAPTURE!" "%JS_BINARY__STDERR_OUTPUT_FILE%" >nul
     )
-    if %ERRORLEVEL% neq 0 (
+    if %_exit_code% neq 0 (
         type "!STDERR_CAPTURE!" >&2
     ) else if not defined JS_BINARY__SILENT_ON_SUCCESS (
         type "!STDERR_CAPTURE!" >&2
@@ -139,7 +139,7 @@ if defined STDOUT_CAPTURE (
     if defined JS_BINARY__STDOUT_OUTPUT_FILE (
         copy "!STDOUT_CAPTURE!" "%JS_BINARY__STDOUT_OUTPUT_FILE%" >nul
     )
-    if %ERRORLEVEL% neq 0 (
+    if %_exit_code% neq 0 (
         type "!STDOUT_CAPTURE!"
     ) else if not defined JS_BINARY__SILENT_ON_SUCCESS (
         type "!STDOUT_CAPTURE!"
@@ -148,15 +148,14 @@ if defined STDOUT_CAPTURE (
 )
 
 if defined JS_BINARY__LOG_DEBUG (
-    call :logf_debug "exit code: %ERRORLEVEL%"
+    call :logf_debug "exit code: %_exit_code%"
 )
 
 if defined JS_BINARY__PUSHD (
     popd
 )
 
-endlocal
-exit /b %ERRORLEVEL%
+endlocal & exit /b %_exit_code%
 
 :main
 
@@ -221,12 +220,13 @@ if defined bazel_out_segment (
         )
     ) else (
         rem We are in execroot or in some other context all together such as a nodejs_image or a manually run js_binary
-        set "JS_BINARY__EXECROOT=%~dp0"
+        set "JS_BINARY__EXECROOT=%CD%"
     )
 
     if not defined JS_BINARY__NO_CD_BINDIR (
         if not defined BAZEL_BINDIR (
             call :logf_fatal "BAZEL_BINDIR must be set in environment to the makevar $(BINDIR) in js_binary build actions (which run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended rule to use for using a js_binary as the tool of a build action. If this is not a build action you can set the BAZEL_BINDIR to '.' instead to suppress this error. For more context on this design decision, please read the aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs."
+            set "_exit_code=1"
             goto :cleanup_and_exit
         )
 
@@ -243,11 +243,13 @@ if defined bazel_out_segment (
 if defined JS_BINARY__USE_EXECROOT_ENTRY_POINT (
     if not defined BAZEL_BINDIR (
         call :logf_fatal "Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
+        set "_exit_code=1"
         goto :cleanup_and_exit
     )
     if not defined JS_BINARY__COPY_DATA_TO_BIN (
         if not defined JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN (
             call :logf_fatal "Expected js_binary copy_data_to_bin to be True when js_run_binary use_execroot_entry_point is True. To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary"
+            set "_exit_code=1"
             goto :cleanup_and_exit
         )
     )
@@ -257,6 +259,7 @@ if defined JS_BINARY__NO_RUNFILES (
     if not defined JS_BINARY__COPY_DATA_TO_BIN (
         if not defined JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN (
             call :logf_fatal "Expected js_binary copy_data_to_bin to be True when js_binary use_execroot_entry_point is True. To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary"
+            set "_exit_code=1"
             goto :cleanup_and_exit
         )
     )
@@ -273,6 +276,7 @@ if defined JS_BINARY__USE_EXECROOT_ENTRY_POINT (
 )
 if not exist "!entry_point!" (
     call :logf_fatal "the entry_point '%entry_point%' not found"
+    set "_exit_code=1"
     goto :cleanup_and_exit
 )
 
@@ -284,6 +288,7 @@ if %errorlevel% equ 0 (
     set "JS_BINARY__NODE_BINARY=%node%"
     if not exist "!JS_BINARY__NODE_BINARY!" (
         call :logf_fatal "node binary '%JS_BINARY__NODE_BINARY%' not found"
+        set "_exit_code=1"
         goto :cleanup_and_exit
     )
 ) else (
@@ -295,6 +300,7 @@ if %errorlevel% equ 0 (
     )
     if not exist "!JS_BINARY__NODE_BINARY!" (
         call :logf_fatal "node binary '%JS_BINARY__NODE_BINARY%' not found"
+        set "_exit_code=1"
         goto :cleanup_and_exit
     )
 )
@@ -307,6 +313,7 @@ if defined npm (
         set "JS_BINARY__NPM_BINARY=%npm%"
         if not exist "!JS_BINARY__NPM_BINARY!" (
             call :logf_fatal "npm binary '%JS_BINARY__NPM_BINARY%' not found"
+            set "_exit_code=1"
             goto :cleanup_and_exit
         )
     ) else (
@@ -318,6 +325,7 @@ if defined npm (
         )
         if not exist "!JS_BINARY__NPM_BINARY!" (
             call :logf_fatal "npm binary '%JS_BINARY__NPM_BINARY%' not found"
+            set "_exit_code=1"
             goto :cleanup_and_exit
         )
     )
@@ -331,6 +339,7 @@ if defined JS_BINARY__NO_RUNFILES (
 )
 if not exist "%JS_BINARY__NODE_WRAPPER%" (
     call :logf_fatal "node wrapper '%JS_BINARY__NODE_WRAPPER%' not found"
+    set "_exit_code=1"
     goto :cleanup_and_exit
 )
 
@@ -342,6 +351,7 @@ if defined JS_BINARY__NO_RUNFILES (
 )
 if not exist "%JS_BINARY__NODE_PATCHES%" (
     call :logf_fatal "node patches '%JS_BINARY__NODE_PATCHES%' not found"
+    set "_exit_code=1"
     goto :cleanup_and_exit
 )
 
@@ -459,25 +469,25 @@ if defined JS_BINARY__EXPECTED_EXIT_CODE (
             rem This exit code is handled specially by Bazel:
             rem https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
             set "BAZEL_EXIT_TESTS_FAILED=3"
-            call :cleanup_and_exit
-            exit /b 3
+            set "_exit_code=3"
+            goto :cleanup_and_exit
         )
-        call :cleanup_and_exit
-        exit /b %RESULT%
+        set "_exit_code=%RESULT%"
+        goto :cleanup_and_exit
     ) else (
-        call :cleanup_and_exit
-        exit /b 0
+        set "_exit_code=0"
+        goto :cleanup_and_exit
     )
 )
 
 if defined JS_BINARY__EXIT_CODE_OUTPUT_FILE (
     rem Exit zero if the exit code was captured
     echo %RESULT%> "%JS_BINARY__EXIT_CODE_OUTPUT_FILE%"
-    call :cleanup_and_exit
-    exit /b 0
+    set "_exit_code=0"
+    goto :cleanup_and_exit
 ) else (
-    call :cleanup_and_exit
-    exit /b %RESULT%
+    set "_exit_code=%RESULT%"
+    goto :cleanup_and_exit
 )
 
 rem ==============================================================================
