@@ -35,7 +35,7 @@ def assert_tar_listing(name, actual, expected):
         # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
         # we need to exclude it from checksums
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
-        cmd ='TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" | {} >$@'.format(actual, sanitize_cmd),
+        cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" | {} >$@'.format(actual, sanitize_cmd),
         toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
     )
     write_source_file(
