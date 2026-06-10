@@ -377,9 +377,12 @@ set "JS_BINARY__NODE_OPTIONS="
 {{node_options}}
 
 rem Process command line arguments
-set "ARGS="
-set "ALL_ARGS={{fixed_args}} %*"
-for %%a in (%ALL_ARGS%) do (
+rem Fixed args are baked in at build time; put them directly into ARGS.
+rem They may contain double-quotes or parentheses so we cannot expand them
+rem inside a for-loop or a set "..." literal.
+set ARGS={{fixed_args}}
+rem Process runtime args to extract any --node_options= flags.
+for %%a in (%*) do (
     set "ARG=%%a"
     if "!ARG:~0,15!"=="--node_options=" (
         set "JS_BINARY__NODE_OPTIONS=!JS_BINARY__NODE_OPTIONS! !ARG:~15!"
@@ -449,21 +452,23 @@ rem Run the main program
 rem ==============================================================================
 
 if defined JS_BINARY__LOG_INFO (
-    call :logf_info "running %JS_BINARY__NODE_WRAPPER% %JS_BINARY__NODE_OPTIONS% -- %entry_point% %ARGS%"
+    call :logf_info "running %JS_BINARY__NODE_WRAPPER% !JS_BINARY__NODE_OPTIONS! -- %entry_point% !ARGS!"
 )
 
-rem Execute the node wrapper with proper output redirection
+rem Execute the node wrapper with proper output redirection.
+rem Use delayed expansion (!ARGS!, !JS_BINARY__NODE_OPTIONS!) so that parentheses
+rem in expanded values are not mis-parsed as CMD block delimiters.
 if defined STDOUT_CAPTURE (
     if defined STDERR_CAPTURE (
-        "%JS_BINARY__NODE_WRAPPER%" %JS_BINARY__NODE_OPTIONS% -- "%entry_point%" %ARGS% 1>>"%STDOUT_CAPTURE%" 2>>"%STDERR_CAPTURE%"
+        "%JS_BINARY__NODE_WRAPPER%" !JS_BINARY__NODE_OPTIONS! -- "%entry_point%" !ARGS! 1>>"%STDOUT_CAPTURE%" 2>>"%STDERR_CAPTURE%"
     ) else (
-        "%JS_BINARY__NODE_WRAPPER%" %JS_BINARY__NODE_OPTIONS% -- "%entry_point%" %ARGS% 1>>"%STDOUT_CAPTURE%"
+        "%JS_BINARY__NODE_WRAPPER%" !JS_BINARY__NODE_OPTIONS! -- "%entry_point%" !ARGS! 1>>"%STDOUT_CAPTURE%"
     )
 ) else (
     if defined STDERR_CAPTURE (
-        "%JS_BINARY__NODE_WRAPPER%" %JS_BINARY__NODE_OPTIONS% -- "%entry_point%" %ARGS% 2>>"%STDERR_CAPTURE%"
+        "%JS_BINARY__NODE_WRAPPER%" !JS_BINARY__NODE_OPTIONS! -- "%entry_point%" !ARGS! 2>>"%STDERR_CAPTURE%"
     ) else (
-        "%JS_BINARY__NODE_WRAPPER%" %JS_BINARY__NODE_OPTIONS% -- "%entry_point%" %ARGS%
+        "%JS_BINARY__NODE_WRAPPER%" !JS_BINARY__NODE_OPTIONS! -- "%entry_point%" !ARGS!
     )
 )
 

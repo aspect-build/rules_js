@@ -301,6 +301,23 @@ def _windows_path(path):
     """
     return path.replace("/", "\\")
 
+def _bat_safe_name(name):
+    """Return a CMD-safe filename by replacing characters that break CMD path parsing.
+
+    CMD cannot invoke a .bat file whose path contains parentheses or spaces
+    because it treats them as special characters before quote processing.
+    Replace them with underscores so the generated .bat path is CMD-safe.
+    The target label name is still used inside the .bat content where it is
+    safely enclosed in set "..." or delayed-expansion !VAR! contexts.
+    """
+    safe = ""
+    for ch in name.elems():
+        if ch in ("(", ")", " "):
+            safe += "_"
+        else:
+            safe += ch
+    return safe
+
 def _bash_quote(value):
     return json.encode(value)
 
@@ -441,9 +458,13 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if ctx.attr.expand_args:
         fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
 
+    # Use a CMD-safe name for output file paths on Windows: CMD cannot invoke a .bat
+    # whose path contains parentheses or spaces (they are special CMD syntax characters).
+    launcher_name = _bat_safe_name(ctx.label.name) if is_windows else ctx.label.name
+
     toolchain_files = []
     if is_windows:
-        node_wrapper = ctx.actions.declare_file("%s_node_bin/node.bat" % ctx.label.name)
+        node_wrapper = ctx.actions.declare_file("%s_node_bin/node.bat" % launcher_name)
         ctx.actions.expand_template(
             template = ctx.file._node_wrapper_bat,
             output = node_wrapper,
@@ -464,7 +485,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if ctx.attr.include_npm:
         npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
         if is_windows:
-            npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
+            npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % launcher_name)
             ctx.actions.expand_template(
                 template = ctx.file._npm_wrapper_bat,
                 output = npm_wrapper,
@@ -507,7 +528,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     # The '_' avoids collisions with another file matching the label name.
     # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
     # https://github.com/bazelbuild/rules_go/blob/f3cc8a2d670c7ccd5f45434ab226b25a76d44de1/go/private/context.bzl#L144
-    launcher = ctx.actions.declare_file("{}_/{}{}".format(ctx.label.name, ctx.label.name, ".bat" if is_windows else ""))
+    launcher = ctx.actions.declare_file("{}_/{}{}".format(launcher_name, launcher_name, ".bat" if is_windows else ""))
     ctx.actions.expand_template(
         template = template,
         output = launcher,
