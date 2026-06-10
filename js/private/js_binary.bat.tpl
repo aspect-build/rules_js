@@ -225,12 +225,15 @@ if defined bazel_out_segment (
 
     if not defined JS_BINARY__NO_CD_BINDIR (
         if not defined BAZEL_BINDIR (
-            if defined BUILD_WORKSPACE_DIRECTORY (
-                rem BUILD_WORKSPACE_DIRECTORY is set by Bazel during 'bazel run' but not during build actions.
-                rem On Windows, 'bazel run' does not set the working directory to the runfiles tree (which would
-                rem contain \bazel-out\ and skip this code path), unlike Linux/Mac. So we detect the 'bazel run'
-                rem context here and skip the BAZEL_BINDIR requirement. See https://github.com/aspect-build/rules_js/issues/481
-                call :logf_debug "BUILD_WORKSPACE_DIRECTORY is set, skipping BAZEL_BINDIR requirement as this is a 'bazel run' context"
+            rem On Windows, 'bazel run' and 'bazel test' do not set the working directory inside the
+            rem runfiles tree (which would contain \bazel-out\ and skip this code path), unlike Linux/Mac.
+            rem Detect these contexts via env vars that Bazel sets only for run/test, not build actions.
+            rem See https://github.com/aspect-build/rules_js/issues/481
+            set "_is_bazel_run_or_test="
+            if defined BUILD_WORKSPACE_DIRECTORY set "_is_bazel_run_or_test=1"
+            if defined TEST_TMPDIR set "_is_bazel_run_or_test=1"
+            if defined _is_bazel_run_or_test (
+                call :logf_debug "skipping BAZEL_BINDIR requirement as this is a 'bazel run' or 'bazel test' context"
             ) else (
                 call :logf_fatal "BAZEL_BINDIR must be set in environment to the makevar $(BINDIR) in js_binary build actions (which run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended rule to use for using a js_binary as the tool of a build action. If this is not a build action you can set the BAZEL_BINDIR to '.' instead to suppress this error. For more context on this design decision, please read the aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs."
                 set "_exit_code=1"

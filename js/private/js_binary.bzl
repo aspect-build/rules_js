@@ -304,10 +304,42 @@ def _windows_path(path):
 def _bash_quote(value):
     return json.encode(value)
 
+_ENV_VAR_CHARS = {c: True for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_".elems()}
+
 def _bat_quote(value):
     # Windows batch: set "VAR=VALUE" already provides quoting via the template,
     # so the value must NOT be wrapped in extra quotes (json.encode adds "...")
-    return value
+    #
+    # Convert $VAR env-var references to Windows batch %VAR% syntax.
+    # The $$ convention (used by rules like jest_test for $$XML_OUTPUT_FILE)
+    # gets reduced to $VAR by expand_locations/expand_variables before reaching
+    # here. On bash $VAR is a valid env-var dereference; on batch it's a literal
+    # string. Convert $VAR and ${VAR} to %VAR% so batch expands them at runtime.
+    #
+    # Example: required for $XML_OUTPUT_FILE from rules_jest
+    result = value
+    for _i in range(20):
+        pos = result.find("$")
+        if pos < 0:
+            break
+        rest = result[pos + 1:]
+        if len(rest) > 0 and rest[0] == "{":
+            brace_end = rest.find("}")
+            if brace_end < 0:
+                break
+            var_name = rest[1:brace_end]
+            result = result[:pos] + "%" + var_name + "%" + rest[brace_end + 1:]
+        else:
+            var_name = ""
+            for ch in rest.elems():
+                if ch in _ENV_VAR_CHARS:
+                    var_name += ch
+                else:
+                    break
+            if not var_name:
+                break
+            result = result[:pos] + "%" + var_name + "%" + rest[len(var_name):]
+    return result
 
 def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env):
     # Explicitly disable node fs patches on Windows:
