@@ -393,8 +393,10 @@ pnpm = module_extension(
                     default = False,
                 ),
                 "pnpm_version": attr.string(
-                    doc = "pnpm version to use. The string `latest` will be resolved to LATEST_PNPM_VERSION.",
-                    default = DEFAULT_PNPM_VERSION,
+                    doc = """pnpm version to use. The string `latest` will be resolved to LATEST_PNPM_VERSION.
+
+                    If unset, a default version chosen by rules_js is used, but only if no other
+                    module requests an explicit version for this repository.""",
                 ),
                 "pnpm_version_from": attr.label(
                     doc = """Label to a package.json file to read the pnpm version from.

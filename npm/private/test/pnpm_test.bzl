@@ -6,7 +6,9 @@ load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm
 load("//npm/private:pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
 load("//npm/private:versions.bzl", "PNPM_VERSIONS")
 
-def _fake_pnpm_tag(version = None, name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None, include_npm = False, patches = [], patch_args = ["-p1"]):
+# NB: version defaults to the empty sentinel, mirroring the real tag attribute, so a
+# bare _fake_pnpm_tag() is equivalent to the default registration from rules_js itself.
+def _fake_pnpm_tag(version = "", name = DEFAULT_PNPM_REPO_NAME, integrity = None, pnpm_version_from = None, include_npm = False, patches = [], patch_args = ["-p1"]):
     return struct(
         name = name,
         pnpm_version = version,
@@ -129,6 +131,21 @@ def _include_npm(ctx):
         ],
     )
 
+def _include_npm_other_version_wins(ctx):
+    # include_npm is a per-repo setting, not per-version: a version-less tag asking to
+    # bundle npm must be honored even when another module's explicit version is the one
+    # selected. Otherwise the npm request would be silently dropped.
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": True, "patches": [], "patch_args": ["-p1"]}},
+        modules = [
+            # Root brings the repo into scope and wants npm, but expresses no version.
+            _fake_mod(True, _fake_pnpm_tag(include_npm = True)),
+            # A dependency pins the version that ends up selected.
+            _fake_mod(False, _fake_pnpm_tag(version = "9.1.0")),
+        ],
+    )
+
 def _custom_name(ctx):
     return _resolve_test(
         ctx,
@@ -145,6 +162,85 @@ def _custom_name(ctx):
                 False,
                 _fake_pnpm_tag(version = "8.6.7", integrity = "8.6.7-integrity"),
             ),
+        ],
+    )
+
+def _dep_version_with_default_registration(ctx):
+    # A non-root module explicitly requests a pnpm version while another non-root
+    # module (rules_js itself, which always registers `pnpm.pnpm(name = "pnpm")`)
+    # carries the default version.
+    #
+    # The rules_js registration comes first in BFS order ("aspect_rules_js" sorts
+    # before nearly all module names) and must not mask the explicit request,
+    # even when the explicit request is for a lower version than the default.
+    # See https://github.com/aspect-build/rules_js/pull/2349#discussion_r3362093839
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
+        modules = [
+            _fake_mod(True),
+            # rules_js itself: a bare pnpm.pnpm(name = "pnpm") tag carrying the default version
+            _fake_mod(False, _fake_pnpm_tag()),
+            _fake_mod(False, _fake_pnpm_tag(version = "9.1.0")),
+        ],
+    )
+
+def _dep_versions_mvs(ctx):
+    # Multiple non-root modules explicitly request different pnpm versions:
+    # the highest wins, with a note. The default registration from rules_js
+    # does not participate in the selection.
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {"version": "9.2.0", "integrity": "sha512-mKgP0RwucJZ0d2IwQQZDKz3cZ9z1S1qMAck/aKLNXgXmghhJUioG+3YoTUGiZg1eM08u47vykYO/LnObHa+ncQ==", "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
+        notes = ["""NOTE: repo 'pnpm' has multiple versions ["9.1.0", "9.2.0"]; selected 9.2.0"""],
+        modules = [
+            _fake_mod(True),
+            _fake_mod(False, _fake_pnpm_tag()),
+            _fake_mod(False, _fake_pnpm_tag(version = "9.1.0")),
+            _fake_mod(False, _fake_pnpm_tag(version = "9.2.0")),
+        ],
+    )
+
+def _root_default_dep_version(ctx):
+    # The root module registers a bare tag (no version preference, e.g. just to
+    # bring the repo into scope). A dep's explicit version wins over the default
+    # version carried by the root's bare tag.
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag()),
+            _fake_mod(False, _fake_pnpm_tag(version = "9.1.0")),
+        ],
+    )
+
+def _root_explicit_default_beats_dep(ctx):
+    # Explicitly requesting the default version is distinct from not requesting a
+    # version at all: it is a real request from the root module and therefore wins
+    # over a (higher) version requested by a non-root module.
+    # See https://github.com/aspect-build/rules_js/pull/2883#discussion_r3367024654
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {"version": DEFAULT_PNPM_VERSION, "integrity": PNPM_VERSIONS[DEFAULT_PNPM_VERSION], "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(version = DEFAULT_PNPM_VERSION)),
+            _fake_mod(False, _fake_pnpm_tag(version = "11.0.9")),
+        ],
+    )
+
+def _root_lower_than_default(ctx):
+    # The realistic override case: the root module pins the default "pnpm" repo to
+    # a version *lower* than DEFAULT_PNPM_VERSION, while rules_js itself carries the
+    # default registration. The root's explicit (lower) pin must win; a naive
+    # "Minimal Version Selection across all registrations" would wrongly keep the
+    # higher default and silently ignore the user's pin.
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {"version": "9.1.0", "integrity": "sha512-Z/WHmRapKT5c8FnCOFPVcb6vT3U8cH9AyyK+1fsVeMaq07bEEHzLO6CzW+AD62IaFkcayDbIe+tT+dVLtGEnJA==", "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(version = "9.1.0")),
+            # rules_js itself: a bare pnpm.pnpm(name = "pnpm") tag carrying DEFAULT_PNPM_VERSION
+            _fake_mod(False, _fake_pnpm_tag()),
         ],
     )
 
@@ -228,9 +324,15 @@ def _os_cpu_constraints(ctx):
 
 basic_test = unittest.make(_basic)
 override_test = unittest.make(_override)
+dep_version_with_default_registration_test = unittest.make(_dep_version_with_default_registration)
+dep_versions_mvs_test = unittest.make(_dep_versions_mvs)
+root_default_dep_version_test = unittest.make(_root_default_dep_version)
+root_explicit_default_beats_dep_test = unittest.make(_root_explicit_default_beats_dep)
+root_lower_than_default_test = unittest.make(_root_lower_than_default)
 latest_test = unittest.make(_latest)
 custom_name_test = unittest.make(_custom_name)
 include_npm_test = unittest.make(_include_npm)
+include_npm_other_version_wins_test = unittest.make(_include_npm_other_version_wins)
 integrity_conflict_test = unittest.make(_integrity_conflict)
 from_package_json_simple_test = unittest.make(_from_package_json_simple)
 from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
@@ -245,9 +347,15 @@ def pnpm_tests(name):
         name,
         basic_test,
         override_test,
+        dep_version_with_default_registration_test,
+        dep_versions_mvs_test,
+        root_default_dep_version_test,
+        root_explicit_default_beats_dep_test,
+        root_lower_than_default_test,
         latest_test,
         custom_name_test,
         include_npm_test,
+        include_npm_other_version_wins_test,
         integrity_conflict_test,
         from_package_json_simple_test,
         from_package_json_with_hash_test,

@@ -1,6 +1,5 @@
 """pnpm extension logic (the extension itself is in npm/extensions.bzl)."""
 
-load("@bazel_lib//lib:lists.bzl", "unique")
 load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
 load(":utils.bzl", "utils")
 load(":versions.bzl", "PNPM_VERSIONS")
@@ -27,13 +26,22 @@ def resolve_pnpm_repositories(mctx):
 
     # Collect all the module tags and associated versions/integrities/options
     integrity = {}
-    registrations = {}
+
+    # Whether npm should be bundled with pnpm, OR'd across all tags for a repo
+    # (name -> bool). Like patches, this is a per-repo setting, not per-version.
+    include_npm_by_repo = {}
 
     # Patches and patch_args are per-repo-name (NOT per-version) and only
     # accepted from the root module. Multiple tags for the same repo name
     # concatenate their patches and the last patch_args wins.
     patches_by_repo = {}
     patch_args_by_repo = {}
+
+    # Versions explicitly requested for each repo: name -> version -> is_root. Tags
+    # that carry no version (the default, e.g. the always-present registration from
+    # rules_js itself) are excluded, so they only matter as a fallback. A version
+    # requested by the root module (is_root = True) takes priority over the rest.
+    requested = {}
     for mod in mctx.modules:
         for attr in mod.tags.pnpm:
             if attr.name != DEFAULT_PNPM_REPO_NAME and not mod.is_root:
@@ -41,15 +49,23 @@ def resolve_pnpm_repositories(mctx):
                 Only the root module may override the default name for the pnpm repository.
                 This prevents conflicting registrations in the global namespace of external repos.
                 """)
-            if not registrations.get(attr.name, False):
-                registrations[attr.name] = {}
+            if attr.name not in requested:
+                requested[attr.name] = {}
+                include_npm_by_repo[attr.name] = False
+            include_npm_by_repo[attr.name] = include_npm_by_repo[attr.name] or attr.include_npm
             if mod.is_root and (getattr(attr, "patches", None) or getattr(attr, "patch_args", None)):
                 patches_by_repo.setdefault(attr.name, [])
                 patches_by_repo[attr.name].extend(getattr(attr, "patches", []) or [])
                 patch_args_by_repo[attr.name] = list(attr.patch_args)
 
-            if attr.pnpm_version_from and attr.pnpm_version and attr.pnpm_version != DEFAULT_PNPM_VERSION:
+            if attr.pnpm_version_from and attr.pnpm_version:
                 fail("Cannot specify both pnpm_version = {} and pnpm_version_from = {}".format(attr.pnpm_version, attr.pnpm_version_from))
+
+            # A tag that specifies no version (neither pnpm_version nor pnpm_version_from)
+            # carries the default version, e.g. the registration from rules_js itself.
+            # Such registrations must not influence version selection when any module
+            # explicitly requests a version.
+            is_default_registration = attr.pnpm_version == "" and attr.pnpm_version_from == None
 
             # Handle pnpm_version_from by reading package.json
             if attr.pnpm_version_from != None:
@@ -77,17 +93,15 @@ def resolve_pnpm_repositories(mctx):
 
             elif attr.pnpm_version == "latest":
                 v = LATEST_PNPM_VERSION
+            elif attr.pnpm_version == "":
+                v = DEFAULT_PNPM_VERSION
             else:
                 v = attr.pnpm_version
 
-            # Avoid inserting the default version from a non-root module
-            # (likely rules_js itself) if the root module already has a version.
-            if mod.is_root or len(registrations[attr.name]) == 0:
-                if v not in registrations[attr.name]:
-                    registrations[attr.name][v] = []
-                registrations[attr.name][v].append(attr.include_npm)
+            if not is_default_registration:
+                requested[attr.name][v] = requested[attr.name].get(v, False) or mod.is_root
             if attr.pnpm_version_integrity:
-                integrity[attr.pnpm_version] = attr.pnpm_version_integrity
+                integrity[v] = attr.pnpm_version_integrity
 
             # If no integrity was provided or found via package.json load from known versions
             if not integrity.get(v, False) and PNPM_VERSIONS.get(v, False):
@@ -96,11 +110,15 @@ def resolve_pnpm_repositories(mctx):
     # From the collected registrations, resolve to a single version per repository name
     notes = []
     repositories = {}
-    for name, versions_map in registrations.items():
-        # Disregard repeated version numbers and convert {version:include_npm} to version[]
-        versions = unique(versions_map.keys())
+    for name, version_requests in requested.items():
+        # Versions requested by the root module take priority, then versions requested
+        # by any other module, falling back to the default version when no module
+        # requested a specific version.
+        root_versions = [v for v in version_requests if version_requests[v]]
+        versions = root_versions or version_requests.keys() or [DEFAULT_PNPM_VERSION]
 
-        # Use "Minimal Version Selection" like bzlmod does for resolving module conflicts
+        # Within the selected tier, pick the highest version like bzlmod does. This
+        # runs after the tiering above, so a root request wins even if it is lower.
         # Note, the 'sorted(list)' function in starlark doesn't allow us to provide a custom comparator
         if len(versions) > 1:
             selected = versions[0]
@@ -116,7 +134,7 @@ def resolve_pnpm_repositories(mctx):
 
         selected = {
             "version": selected,
-            "include_npm": 0 < len([i for i in versions_map[selected] if i]),
+            "include_npm": include_npm_by_repo[name],
             "integrity": integrity.get(selected, None),
             "patches": patches_by_repo.get(name, []),
             "patch_args": patch_args_by_repo.get(name, ["-p1"]),

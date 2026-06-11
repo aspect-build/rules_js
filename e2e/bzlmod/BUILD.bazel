@@ -26,6 +26,49 @@ js_test(
     entry_point = "main.mjs",
 )
 
+# Capture the versions of the pnpm binaries resolved by the pnpm module extension
+# so :pnpm_versions_test can assert on them.
+js_run_binary(
+    name = "pnpm_version",
+    args = ["--version"],
+    stdout = "pnpm_version.txt",
+    tool = "@pnpm",
+)
+
+js_run_binary(
+    name = "other_pnpm_version",
+    args = ["--version"],
+    stdout = "other_pnpm_version.txt",
+    tool = "@other_pnpm//:pnpm",
+)
+
+# Run npm via the resolved @pnpm to prove it was bundled (include_npm). This only
+# succeeds if npm is on PATH, which requires the version-less include_npm tag to be
+# honored even though @pnpm's version comes from a different tag. A package.json must
+# be present for `pnpm exec` to run.
+js_run_binary(
+    name = "pnpm_npm_version",
+    srcs = ["package.json"],
+    args = [
+        "exec",
+        "npm",
+        "--version",
+    ],
+    stdout = "pnpm_npm_version.txt",
+    tool = "@pnpm",
+)
+
+js_test(
+    name = "pnpm_versions_test",
+    data = [
+        "other_pnpm_version.txt",
+        "package.json",
+        "pnpm_npm_version.txt",
+        "pnpm_version.txt",
+    ],
+    entry_point = "pnpm_versions.test.mjs",
+)
+
 lessc(
     name = "styles",
     css = "my.less",

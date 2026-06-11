@@ -55,6 +55,14 @@ pnpm.pnpm(
     name = "pnpm",
     pnpm_version_from = "//:package.json",
 )
+
+# A second, version-less tag for the same repo that only asks to bundle npm. The
+# version is selected by the tag above; include_npm must still be honored even
+# though it comes from a different (version-less) tag.
+pnpm.pnpm(
+    name = "pnpm",
+    include_npm = True,
+)
 pnpm.pnpm(
     name = "other_pnpm",
     pnpm_version = "9.15.9",
