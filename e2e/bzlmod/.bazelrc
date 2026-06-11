@@ -1,2 +1,6 @@
 import %workspace%/../../tools/preset.bazelrc
 import %workspace%/../e2e.bazelrc
+
+# Materialize the runfiles tree on Windows (default elsewhere) so tests can read
+# data files via relative paths.
+common:windows --enable_runfiles
