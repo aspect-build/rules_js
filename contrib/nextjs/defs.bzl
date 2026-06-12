@@ -393,6 +393,18 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
     if pkg == None:
         pkg = native.package_name()
 
+    # The `app` tree artifact (from `nextjs_standalone_build`) exposes its files under a directory
+    # named after the build target rather than under a `.next/` prefix. `nextjs_standalone_build`
+    # runs `next build` (which writes to `.next`) and then copies that tree into a directory named
+    # after the build target via `_copy_exec_to_bin` (it cannot reuse `.next`, which is already
+    # owned by the build action). So a build target `:foo` yields paths like `foo/standalone/...`,
+    # `foo/static/...`. Derive that prefix from the `app` label to match the actual layout.
+    #
+    # Strip only the package portion (everything up to and including the last `:`); Bazel target
+    # names may legitimately contain slashes (e.g. `:web/next`), and those slashes are part of the
+    # directory name, so they must be preserved.
+    app_dir = app.split(":")[-1] if ":" in app else app.split("/")[-1]
+
     # The standalone server binary
     js_binary(
         name = name,
@@ -418,15 +430,15 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
         srcs = [app] + native.glob(["public/**"]),
         include_srcs_patterns = [
             "public/**",
-            "{}/static/**".format(_next_build_out),
-            "{}/standalone/**".format(_next_build_out),
+            "{}/static/**".format(app_dir),
+            "{}/standalone/**".format(app_dir),
         ],
         exclude_srcs_patterns = [
             # TODO: exclude non-deterministic and log/trace files?
         ],
         replace_prefixes = {
-            "{}/standalone".format(_next_build_out): "standalone",
-            "{}/static".format(_next_build_out): "standalone/{}/{}/static".format(pkg, _next_build_out),
+            "{}/standalone".format(app_dir): "standalone",
+            "{}/static".format(app_dir): "standalone/{}/{}/static".format(pkg, _next_build_out),
             "public": "standalone/{}/public".format(pkg),
         },
         out = standalone_outdir,
