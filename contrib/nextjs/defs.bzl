@@ -405,15 +405,6 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
     # directory name, so they must be preserved.
     app_dir = app.split(":")[-1] if ":" in app else app.split("/")[-1]
 
-    # The standalone server binary
-    js_binary(
-        name = name,
-        entry_point = ":_{}.js".format(name),
-        chdir = native.package_name(),
-        data = data,
-        **kwargs
-    )
-
     # The server entry point into the standalone directory.
     directory_path(
         name = "_{}.js".format(name),
@@ -445,6 +436,15 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
         allow_overwrites = True,
         visibility = ["//visibility:private"],
         tags = ["manual"],
+    )
+
+    # The standalone server binary
+    js_binary(
+        name = name,
+        entry_point = ":_{}.js".format(name),
+        chdir = native.package_name(),
+        data = data + ["_{}.standalone".format(name)],
+        **kwargs
     )
 
 def _copy_exec_to_bin_impl(ctx):
