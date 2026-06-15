@@ -4,6 +4,7 @@ load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//nextjs:next/package_json.bzl", next_bin = "bin")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 npm_link_all_packages()
 
@@ -66,6 +67,10 @@ nextjs_standalone_build(
 nextjs_standalone_server(
     name = "server",
     app = ":standalone",
+    data = [
+        ":node_modules/next",
+        ":node_modules/react",
+    ],
 )
 
 platform(
@@ -108,6 +113,14 @@ build_test(
 build_test(
     name = "next_build_test",
     targets = [":node_modules/next"],
+)
+
+# Verify that the standalone server actually starts and serves HTTP.
+sh_test(
+    name = "server_test",
+    srcs = ["server_test.sh"],
+    args = ["$(rootpath :server)"],
+    data = [":server"],
 )
 
 write_source_files(
