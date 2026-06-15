@@ -20,7 +20,7 @@ for i in $(seq 1 "$TIMEOUT"); do
         echo "FAIL: Server process died before responding"
         exit 1
     fi
-    if curl -sf "http://localhost:$PORT/" > /dev/null 2>&1; then
+    if curl -sf "http://localhost:$PORT/" >/dev/null 2>&1; then
         echo "PASS: Next.js standalone server responded on port $PORT"
         exit 0
     fi
