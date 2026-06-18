@@ -1,0 +1,31 @@
+load("@aspect_rules_js//npm:defs.bzl", "publish_package_json")
+load("@jq.bzl//jq:jq.bzl", "jq", "jq_test")
+
+publish_package_json(
+    name = "package",
+)
+
+jq(
+    name = "expected",
+    srcs = [],
+    filter = """
+{
+    name: "@example/publish-config",
+    version: "1.0.0",
+    main: "./dist/index.js",
+    types: "./dist/index.d.ts",
+    exports: {
+        ".": {
+            types: "./dist/index.d.ts",
+            import: "./dist/index.js"
+        }
+    }
+}
+""",
+)
+
+jq_test(
+    name = "publish_config_test",
+    file1 = ":package",
+    file2 = ":expected",
+)

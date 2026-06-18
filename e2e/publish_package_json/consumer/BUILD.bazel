@@ -1,0 +1,12 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages()
+
+js_test(
+    name = "test",
+    data = [
+        ":node_modules/@lib/test",
+    ],
+    entry_point = "test.js",
+)

@@ -468,6 +468,75 @@ def npm_package(
         **kwargs
     )
 
+_PUBLISH_CONFIG_FIELDS = [
+    "bin",
+    "browser",
+    "cpu",
+    "engines",
+    "es2015",
+    "esnext",
+    "exports",
+    "imports",
+    "libc",
+    "main",
+    "module",
+    "os",
+    "type",
+    "types",
+    "typesVersions",
+    "typings",
+    "umd:main",
+    "unpkg",
+]
+
+def publish_package_json(name, stamp_var = None, publish_config_fields = None, **kwargs):
+    """Convenience wrapper to apply publishConfig field promotion to package.json.
+
+    Mimics `pnpm publish` behavior: fields within the `publishConfig` object are promoted to the
+    top level of the package.json, then `publishConfig` is removed. This is useful when your source
+    package.json uses `publishConfig` to override fields like `exports`, `main`, `types`, etc. for
+    the published artifact.
+
+    Optionally stamps the `version` field using a Bazel stamp variable, combining the behavior of
+    `stamped_package_json`.
+
+    For more information on pnpm's publishConfig behavior, see https://pnpm.io/package_json#publishconfig
+
+    Args:
+        name: name of the resulting `jq` target, must be "package"
+        stamp_var: optional key from the bazel-out/stable-status.txt or bazel-out/volatile-status.txt files.
+            When set, the version field is stamped just like `stamped_package_json`.
+        publish_config_fields: optional list of field names to promote from `publishConfig`. Defaults to the
+            set of fields that pnpm promotes: bin, browser, cpu, exports, imports, libc, main, module, os,
+            type, types, typings.
+        **kwargs: additional attributes passed to the jq rule
+    """
+    if name != "package":
+        fail("""publish_package_json should always be named "package" so that the default output is named "package.json".
+        This is required since Bazel doesn't allow a predeclared output to have the same name as an input file.""")
+
+    fields = publish_config_fields if publish_config_fields != None else _PUBLISH_CONFIG_FIELDS
+
+    promote_parts = [
+        "if .publishConfig[\"{field}\"] then .[\"{field}\"] = .publishConfig[\"{field}\"] else . end".format(field = f)
+        for f in fields
+    ]
+
+    filters = promote_parts + ["del(.publishConfig)"]
+
+    if stamp_var:
+        filters = [
+            "$ARGS.named.STAMP as $stamp",
+            ".version = ($stamp[0].{} // \"0.0.0\")".format(stamp_var),
+        ] + filters
+
+    jq(
+        name = name,
+        srcs = ["package.json"],
+        filter = " | ".join(filters),
+        **kwargs
+    )
+
 def stamped_package_json(name, stamp_var, **kwargs):
     """Convenience wrapper to set the "version" property in package.json with the git tag.
 

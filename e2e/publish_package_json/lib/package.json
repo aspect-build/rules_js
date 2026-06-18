@@ -1,0 +1,8 @@
+{
+    "name": "@lib/test",
+    "private": true,
+    "main": "./src/index.js",
+    "publishConfig": {
+        "main": "./dist/index.js"
+    }
+}

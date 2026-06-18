@@ -1,0 +1,24 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package", "publish_package_json")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages()
+
+publish_package_json(
+    name = "package",
+)
+
+js_library(
+    name = "lib",
+    srcs = [
+        "dist/index.js",
+        ":package",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+npm_package(
+    name = "pkg",
+    srcs = [":lib"],
+    visibility = ["//visibility:public"],
+)

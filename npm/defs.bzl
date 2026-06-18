@@ -9,9 +9,11 @@ load(
 load(
     "//npm/private:npm_package.bzl",
     _npm_package = "npm_package",
+    _publish_package_json = "publish_package_json",
     _stamped_package_json = "stamped_package_json",
 )
 
 npm_package = _npm_package
 npm_link_package = _npm_link_package
+publish_package_json = _publish_package_json
 stamped_package_json = _stamped_package_json
