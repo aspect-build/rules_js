@@ -45,7 +45,7 @@ sh_test(
         ":pkg_b.publish",
         ":pkg_pnpm",
         ":pkg_pnpm.publish",
-        "@pnpm//:pnpm",
+        "@pnpm",
     ],
     tags = [
         "no-remote-exec",
