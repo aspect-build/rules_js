@@ -1,7 +1,7 @@
 {
     "name": "@lib/test",
     "private": true,
-    "main": "./src/index.js",
+    "main": "./src/foo.js",
     "publishConfig": {
         "main": "./dist/index.js"
     }
