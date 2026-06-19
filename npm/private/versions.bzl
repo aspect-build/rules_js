@@ -124,6 +124,7 @@ PNPM_VERSIONS = {
     "10.34.1": "sha512-tY+95tymapKVOAIVgfZItFcLbKGbGOfL1/LAenskRUFVOI2s3wjyrzZ46IptH+BPnWCd8kv1FzWgYOoEGzdKtw==",
     "10.34.2": "sha512-mufj/kd8UrvOHdyKoZb/JD7UtI8c6qdFWCCt+npItfV+gX7S0g5fPCw2Rt/tujYFZ2k+U0Vy3M0lL7Lri3wETA==",
     "10.34.3": "sha512-8sUxsIgp175/A8kK3cJmYV+cVHdGPkvx0nXLJjzp6lfPDVWZEQ2UZJqbs/7Z8LXvzqdKcBa2FTKiTLmth4YMHQ==",
+    "10.34.4": "sha512-h2i+VSAK4/Iia2Un/Momh+FLxOXxLXchoPJdo99HkVF3BYZI20F3uvNIEg+guidS2NjZP2vq8f5krhjajelhrw==",
     "11.0.0": "sha512-W9GHUA5JzGw9iR2XO0MsArhEpetyCRcskKUXo+9PV57Vwj1Am2meap3EGP97KxiQ5j9tdPHT/EmEjzd3nInITA==",
     "11.0.1": "sha512-3bHwpT+1ZgPtlrAY28/4P/HF+1EMn5fCrvGa9Rx3bI2Qxn4SwiPDTbeSt1Y0cA4VQZy4c0G6SUei/BUYIvvc8g==",
     "11.0.2": "sha512-aSbPfNeBKygA46IQVRteyEX3fr66gWQkqVAU3jAh0ZOztVxbS3S6xOuhBpeeeYqgUFZGGBzmckdQcxJTKmYXhw==",
@@ -149,4 +150,5 @@ PNPM_VERSIONS = {
     "11.5.3": "sha512-esHJGTQcITo03A0Cr7cUPFwmrCbujEeC3uqCG4rGTSE0oIH9iUHa5uKbu0j1jfwrf7zuzMB8svCdIZ00Kklp7Q==",
     "11.6.0": "sha512-mjZRgiQIDG/lFlr9z+eb+hGMKb5wPz9GKx4y7+HpjkfodQsUjggoYlCq1BE8x5k8pBPE4s1Ed1JwjC7ldRvJXw==",
     "11.7.0": "sha512-GcyFLBIMcSV2DyRD7mvgyltA+fUFmN4aCaHxd1A+AQ5Xwjx3ZG4B52HeWb+HT7IqM5jDOrlpH8E+uUa28PTWIA==",
+    "11.8.0": "sha512-wfXnxMskHI8XS3Q4UdgvQrgCMkr8iw8Ra5atsVqgZmSUjd42lgo7oQebpbSyndAUATW5S1tfUmNZIknWjlVfJg==",
 }
