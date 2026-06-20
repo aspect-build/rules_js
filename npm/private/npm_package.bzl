@@ -11,7 +11,7 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@jq.bzl//jq:jq.bzl", "jq")
-load("//js:defs.bzl", "js_binary")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
 load("//js:libs.bzl", "js_lib_helpers")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
@@ -141,6 +141,7 @@ def npm_package(
         hardlink = "auto",
         publishable = False,
         pnpm_binary = "@pnpm//:pnpm",
+        pnpm_workspace = None,
         verbose = False,
         **kwargs):
     """A macro that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
@@ -427,6 +428,12 @@ def npm_package(
             requires the consuming module to define the `pnpm` extension repository and import it
             with `use_repo(pnpm, "pnpm")`.
 
+        pnpm_workspace: Label of the `pnpm-workspace.yaml` file. When set, the `package.json`
+            in `srcs` is transformed at build time: `catalog:` specifiers are resolved,
+            `publishConfig` fields are promoted, and pnpm-specific fields are stripped.
+            This ensures workspace consumers see a fully resolved `package.json` in the
+            output directory.
+
         verbose: If true, prints out verbose logs to stdout
 
         **kwargs: Additional attributes such as `tags` and `visibility`
@@ -449,6 +456,34 @@ def npm_package(
             testonly = kwargs.get("testonly", False),
         )
         srcs = srcs + [files_target]
+
+    if pnpm_workspace:
+        # Find package.json in srcs and replace it with a transformed version.
+        pkg_json_src = None
+        for src in srcs:
+            if type(src) == "string" and src.endswith("package.json"):
+                pkg_json_src = src
+                break
+
+        if pkg_json_src:
+            transform_name = "{}._publish_manifest".format(name)
+            transform_srcs = [pkg_json_src, pnpm_workspace]
+            js_run_binary(
+                name = transform_name,
+                tool = Label("@aspect_rules_js//npm/private:create_publish_manifest"),
+                srcs = transform_srcs,
+                outs = ["{}/_package.json".format(name)],
+                args = [
+                    "$(location {})".format(pkg_json_src),
+                    "$(location {}/_package.json)".format(name),
+                    "$(location {})".format(pnpm_workspace),
+                ],
+                tags = kwargs.get("tags", []) + ["manual"],
+                testonly = kwargs.get("testonly", False),
+            )
+            srcs = [s for s in srcs if s != pkg_json_src] + [":{}/_package.json".format(name)]
+            replace_prefixes = dict(replace_prefixes)
+            replace_prefixes["{}/_package.json".format(name)] = "package.json"
 
     if publishable:
         js_binary(

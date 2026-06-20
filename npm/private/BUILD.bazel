@@ -6,6 +6,18 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 package(default_visibility = ["//npm:__subpackages__"])
 
 js_library(
+    name = "create_publish_manifest_mjs",
+    srcs = ["create_publish_manifest.mjs"],
+    visibility = ["//visibility:public"],
+)
+
+js_binary(
+    name = "create_publish_manifest",
+    entry_point = "create_publish_manifest.mjs",
+    visibility = ["//visibility:public"],
+)
+
+js_library(
     name = "npm_publish_mjs",
     srcs = ["npm_publish.mjs"],
     visibility = ["//visibility:public"],

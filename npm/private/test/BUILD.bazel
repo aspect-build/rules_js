@@ -117,3 +117,10 @@ js_test(
     data = [":node_modules"],
     entry_point = "versions.js",
 )
+
+js_test(
+    name = "create_publish_manifest_test",
+    data = ["//npm/private:create_publish_manifest_mjs"],
+    entry_point = "create_publish_manifest_test.mjs",
+    fixed_args = ["$(rootpath //npm/private:create_publish_manifest_mjs)"],
+)
