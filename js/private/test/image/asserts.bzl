@@ -3,6 +3,11 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
+NOT_WINDOWS = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 # js_binary launcher scripts have unstable sizes across Bazel versions.
 _UNSTABLE_SIZE_BASENAMES = ["bin", "bin2"]
 
@@ -28,12 +33,11 @@ def assert_tar_listing(name, actual, expected):
         testonly = True,
         outs = ["_{}.listing".format(name)],
         # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
-        # we need to exlude it from checksums
+        # we need to exclude it from checksums
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
         cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" | {} >$@'.format(actual, sanitize_cmd),
         toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
     )
-
     write_source_file(
         name = name,
         in_file = actual_listing,
@@ -58,7 +62,6 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
             actual = "{}_{}".format(js_image_layer, layer),
             expected = "{}_{}.listing".format(name, layer),
         )
-
     write_source_files(
         name = name + "_update_all",
         additional_update_targets = [
@@ -96,14 +99,16 @@ def assert_checksum(name, image_layer):
         testonly = True,
         srcs = ["{}_{}".format(image_layer, layer) for layer in layers],
         outs = [name + ".checksums"],
-        # TODO: now that app layer has repo_mapping file in it which is not stable between different operating systems
-        # we need to exlude it from checksums
+        # now that app layer has repo_mapping file in it which is not stable between different operating systems
+        # we need to exclude it from checksums
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
+        # also exclude node layer which is different between windows and linux
+        # and ignore sha256sum windows difference (it prints '*' before each filename)
         cmd = """
 COREUTILS_BIN=$$(realpath $(COREUTILS_BIN)) &&
 RESULT="$$($$COREUTILS_BIN sha256sum $(SRCS))"
 BINDIR="$(BINDIR)/"
-echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
+echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 | $$COREUTILS_BIN tail -n -3 | tr '*' ' ' > $@
     """,
         output_to_bindir = True,
         toolchains = ["@coreutils_toolchains//:resolved_toolchain"],

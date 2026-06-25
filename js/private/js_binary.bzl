@@ -3,8 +3,8 @@
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
-load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
+load(":bat.bzl", "BAT_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
 
 _ATTRS = {
@@ -240,8 +240,12 @@ _ATTRS = {
         for more information.
         """,
     ),
-    "_launcher_template": attr.label(
+    "_launcher_template_sh": attr.label(
         default = Label("//js/private:js_binary.sh.tpl"),
+        allow_single_file = True,
+    ),
+    "_launcher_template_bat": attr.label(
+        default = Label("//js/private:js_binary.bat.tpl"),
         allow_single_file = True,
     ),
     "_node_wrapper_sh": attr.label(
@@ -260,7 +264,6 @@ _ATTRS = {
         default = Label("//js/private:npm_wrapper.bat"),
         allow_single_file = True,
     ),
-    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
         default = [Label("@aspect_rules_js//js/private/node-patches:fs.cjs")],
@@ -271,29 +274,108 @@ _ATTRS = {
     ),
 }
 
-_ENV_SET = """export {var}={quoted_value}"""
-_ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
-_NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
+# Unix shell constants
+_ENV_SET_UNIX = """export {var}={quoted_value}"""
+_ENV_SET_IFF_NOT_SET_UNIX = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
+_NODE_OPTION_UNIX = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
+# Windows batch constants
+_ENV_SET_WINDOWS = """set "{var}={quoted_value}\""""
+_ENV_SET_IFF_NOT_SET_WINDOWS = """if not defined {var} set "{var}={quoted_value}\""""
+_NODE_OPTION_WINDOWS = """set "JS_BINARY__NODE_OPTIONS=!JS_BINARY__NODE_OPTIONS! {value}\""""
 
 def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
 
+def _windows_host(ctx):
+    """Returns true if the host platform is windows.
+    
+    The typical approach using ctx.target_platform_has_constraint does not work for transitioned
+    build targets. We need to know the host platform, not the target platform.
+    """
+    return ctx.configuration.host_path_separator == ";"
+
+def _windows_path(path):
+    """Convert a Unix-style path to a Windows-style path.
+    """
+    return path.replace("/", "\\")
+
+def _bat_safe_name(name):
+    """Return a CMD-safe filename by replacing characters that break CMD path parsing.
+
+    CMD cannot invoke a .bat file whose path contains parentheses or spaces
+    because it treats them as special characters before quote processing.
+    Replace them with underscores so the generated .bat path is CMD-safe.
+    The target label name is still used inside the .bat content where it is
+    safely enclosed in set "..." or delayed-expansion !VAR! contexts.
+    """
+    safe = ""
+    for ch in name.elems():
+        if ch in ("(", ")", " "):
+            safe += "_"
+        else:
+            safe += ch
+    return safe
+
 def _bash_quote(value):
     return json.encode(value)
 
-def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
+_ENV_VAR_CHARS = {c: True for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_".elems()}
+
+def _bat_quote(value):
+    # Windows batch: set "VAR=VALUE" already provides quoting via the template,
+    # so the value must NOT be wrapped in extra quotes (json.encode adds "...")
+    #
+    # Convert $VAR env-var references to Windows batch %VAR% syntax.
+    # The $$ convention (used by rules like jest_test for $$XML_OUTPUT_FILE)
+    # gets reduced to $VAR by expand_locations/expand_variables before reaching
+    # here. On bash $VAR is a valid env-var dereference; on batch it's a literal
+    # string. Convert $VAR and ${VAR} to %VAR% so batch expands them at runtime.
+    #
+    # Example: required for $XML_OUTPUT_FILE from rules_jest
+    result = value
+    for _i in range(20):
+        pos = result.find("$")
+        if pos < 0:
+            break
+        rest = result[pos + 1:]
+        if len(rest) > 0 and rest[0] == "{":
+            brace_end = rest.find("}")
+            if brace_end < 0:
+                break
+            var_name = rest[1:brace_end]
+            result = result[:pos] + "%" + var_name + "%" + rest[brace_end + 1:]
+        else:
+            var_name = ""
+            for ch in rest.elems():
+                if ch in _ENV_VAR_CHARS:
+                    var_name += ch
+                else:
+                    break
+            if not var_name:
+                break
+            result = result[:pos] + "%" + var_name + "%" + rest[len(var_name):]
+    return result
+
+def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
+    is_windows = _windows_host(ctx)
     if is_windows:
         fixed_env = dict(fixed_env, **{"JS_BINARY__PATCH_NODE_FS": "0"})
 
+    # Use Windows batch syntax or Unix shell syntax based on platform
+    _ENV_SET = _ENV_SET_WINDOWS if is_windows else _ENV_SET_UNIX
+    _ENV_SET_IFF_NOT_SET = _ENV_SET_IFF_NOT_SET_WINDOWS if is_windows else _ENV_SET_IFF_NOT_SET_UNIX
+    _NODE_OPTION = _NODE_OPTION_WINDOWS if is_windows else _NODE_OPTION_UNIX
+    _quote = _bat_quote if is_windows else _bash_quote
+
     envs = [
-        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
+        _ENV_SET.format(var = key, quoted_value = _quote(_expand_env_if_needed(ctx, value)))
         for key, value in fixed_env.items()
     ] + [
-        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
+        _ENV_SET.format(var = key, quoted_value = _quote(_expand_env_if_needed(ctx, value)))
         for key, value in ctx.attr.env.items()
     ]
 
@@ -306,7 +388,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     for (key, value) in makevars.items():
         envs.append(_ENV_SET.format(
             var = key,
-            quoted_value = _bash_quote(ctx.expand_make_variables("env", value, {})),
+            quoted_value = _quote(ctx.expand_make_variables("env", value, {})),
         ))
 
     # Add rule context variables to the environment
@@ -324,24 +406,24 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if is_windows and not ctx.attr.enable_runfiles:
         builtins["JS_BINARY__NO_RUNFILES"] = "1"
     for (key, value) in builtins.items():
-        envs.append(_ENV_SET.format(var = key, quoted_value = _bash_quote(value)))
+        envs.append(_ENV_SET.format(var = key, quoted_value = _quote(value)))
 
     if ctx.attr.patch_node_fs:
         # Set patch node fs API env if not already set to allow js_run_binary to override
         envs.append(_ENV_SET_IFF_NOT_SET.format(
             var = "JS_BINARY__PATCH_NODE_FS",
-            quoted_value = _bash_quote("1"),
+            quoted_value = _quote("1"),
         ))
 
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(
             var = "JS_BINARY__EXPECTED_EXIT_CODE",
-            quoted_value = _bash_quote(str(ctx.attr.expected_exit_code)),
+            quoted_value = _quote(str(ctx.attr.expected_exit_code)),
         ))
 
     if ctx.attr.copy_data_to_bin:
         # Set an environment variable to flag that we have copied js_binary data to bin
-        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _bash_quote("1")))
+        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _quote("1")))
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
@@ -361,11 +443,11 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         else:
             normalized_chdir = chdir_value
 
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", quoted_value = _bash_quote(normalized_chdir)))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", quoted_value = _quote(normalized_chdir)))
 
     # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, quoted_value = _bash_quote("1")))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, quoted_value = _quote("1")))
 
     node_options = []
     for node_option in ctx.attr.node_options:
@@ -376,9 +458,13 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if ctx.attr.expand_args:
         fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
 
+    # Use a CMD-safe name for output file paths on Windows: CMD cannot invoke a .bat
+    # whose path contains parentheses or spaces (they are special CMD syntax characters).
+    launcher_name = _bat_safe_name(ctx.label.name) if is_windows else ctx.label.name
+
     toolchain_files = []
     if is_windows:
-        node_wrapper = ctx.actions.declare_file("%s_node_bin/node.bat" % ctx.label.name)
+        node_wrapper = ctx.actions.declare_file("%s_node_bin/node.bat" % launcher_name)
         ctx.actions.expand_template(
             template = ctx.file._node_wrapper_bat,
             output = node_wrapper,
@@ -399,7 +485,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if ctx.attr.include_npm:
         npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
         if is_windows:
-            npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % ctx.label.name)
+            npm_wrapper = ctx.actions.declare_file("%s_node_bin/npm.bat" % launcher_name)
             ctx.actions.expand_template(
                 template = ctx.file._npm_wrapper_bat,
                 output = npm_wrapper,
@@ -418,30 +504,33 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
+    template = ctx.file._launcher_template_bat if is_windows else ctx.file._launcher_template_sh
+    template_label = ctx.attr._launcher_template_bat.label if is_windows else ctx.attr._launcher_template_sh.label
+
     launcher_subst = {
         "{{target_label}}": str(ctx.label),
-        "{{template_label}}": str(ctx.attr._launcher_template.label),
+        "{{template_label}}": str(template_label),
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
-        "{{entry_point_path}}": entry_point_path,
+        "{{entry_point_path}}": _windows_path(entry_point_path) if is_windows else entry_point_path,
         "{{envs}}": "\n".join(envs),
         "{{fixed_args}}": " ".join(fixed_args),
-        "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
+        "{{initialize_runfiles}}": BAT_INITIALIZE_RUNFILES if is_windows else BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),
-        "{{node_patches}}": ctx.file._node_patches.short_path,
-        "{{node_wrapper}}": node_wrapper.short_path,
-        "{{node}}": node_path,
-        "{{npm}}": npm_path,
+        "{{node_patches}}": _windows_path(ctx.file._node_patches.short_path) if is_windows else ctx.file._node_patches.short_path,
+        "{{node_wrapper}}": _windows_path(node_wrapper.short_path) if is_windows else node_wrapper.short_path,
+        "{{node}}": _windows_path(node_path) if is_windows else node_path,
+        "{{npm}}": _windows_path(npm_path) if is_windows else npm_path,
         "{{workspace_name}}": ctx.workspace_name,
     }
 
     # The '_' avoids collisions with another file matching the label name.
     # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
     # https://github.com/bazelbuild/rules_go/blob/f3cc8a2d670c7ccd5f45434ab226b25a76d44de1/go/private/context.bzl#L144
-    launcher = ctx.actions.declare_file("{}_/{}".format(ctx.label.name, ctx.label.name))
+    launcher = ctx.actions.declare_file("{}_/{}{}".format(launcher_name, launcher_name, ".bat" if is_windows else ""))
     ctx.actions.expand_template(
-        template = ctx.file._launcher_template,
+        template = template,
         output = launcher,
         substitutions = launcher_subst,
         is_executable = True,
@@ -450,7 +539,6 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     return launcher, toolchain_files
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
-    is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
 
     if ctx.attr.node_toolchain:
         nodeinfo = ctx.attr.node_toolchain[platform_common.ToolchainInfo].nodeinfo
@@ -469,10 +557,9 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
-    launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
+    launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env)
 
-    launcher_files = [bash_launcher]
+    launcher_files = [launcher]
     launcher_files.extend(toolchain_files)
     if nodeinfo.node:
         launcher_files.append(nodeinfo.node)
