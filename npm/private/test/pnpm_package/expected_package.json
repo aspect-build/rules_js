@@ -1,8 +1,27 @@
 {
   "name": "@test/pnpm-pkg",
   "version": "1.0.0",
+  "main": "./dist/index.js",
+  "bin": {
+    "pnpm-pkg": "./bin/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/test/pnpm-pkg.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "react": "^18.2.0",
     "underscore": "1.13.6"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
   }
 }
