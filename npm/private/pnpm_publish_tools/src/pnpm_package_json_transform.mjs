@@ -53,14 +53,9 @@ const exportedManifest = await createExportableManifest(packageDir, manifest, {
   catalogs,
 });
 
-const depFields = new Set([
-  'dependencies',
-  'devDependencies',
-  'peerDependencies',
-  'optionalDependencies',
-]);
+delete exportedManifest.devDependencies;
 
-for (const field of depFields) {
+for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
   const deps = exportedManifest[field];
   if (deps && typeof deps === 'object' && !Array.isArray(deps)) {
     const sorted = {};
