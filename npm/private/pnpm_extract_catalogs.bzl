@@ -1,35 +1,29 @@
-"""Private rule for extracting pnpm catalog definitions."""
+"""Macro for extracting pnpm catalog definitions from pnpm-workspace.yaml.
 
-def _pnpm_extract_catalogs_impl(ctx):
-    output = ctx.actions.declare_file("catalogs.json")
+Uses yq to select the catalog/catalogs sections and emit a JSON file
+mapping catalog names to {package: version} dicts. The unnamed catalog:
+section is keyed as "default".
+"""
 
-    args = ctx.actions.args()
-    args.add("--workspace-manifest", ctx.file.workspace_manifest)
-    args.add("--output", output)
+load("@yq.bzl//yq:yq.bzl", "yq")
 
-    ctx.actions.run(
-        executable = ctx.executable._extract_tool,
-        arguments = [args],
-        inputs = [ctx.file.workspace_manifest],
-        outputs = [output],
-        env = {"BAZEL_BINDIR": ctx.bin_dir.path},
+def pnpm_extract_catalogs(
+        name,
+        workspace_manifest = "//:pnpm-workspace.yaml",
+        **kwargs):
+    """Extracts catalog/catalogs sections from pnpm-workspace.yaml into a JSON file.
+
+    Args:
+        name: Target name. Output will be catalogs.json.
+        workspace_manifest: The pnpm-workspace.yaml file to extract catalogs from.
+            Defaults to //:pnpm-workspace.yaml.
+        **kwargs: Additional arguments passed to the underlying yq rule.
+    """
+    yq(
+        name = name,
+        srcs = [workspace_manifest],
+        expression = '{"default": .catalog} * (.catalogs // {}) | with_entries(select(.value != null))',
+        args = ["-o=json"],
+        outs = ["catalogs.json"],
+        **kwargs
     )
-
-    return [DefaultInfo(files = depset([output]))]
-
-pnpm_extract_catalogs = rule(
-    implementation = _pnpm_extract_catalogs_impl,
-    attrs = {
-        "workspace_manifest": attr.label(
-            allow_single_file = True,
-            default = "//:pnpm-workspace.yaml",
-            doc = "The pnpm-workspace.yaml file to extract catalogs from",
-        ),
-        "_extract_tool": attr.label(
-            executable = True,
-            cfg = "exec",
-            default = "@aspect_rules_js//npm/private:pnpm_extract_catalogs_bin",
-        ),
-    },
-    doc = "Extracts catalog/catalogs sections from pnpm-workspace.yaml into a JSON file",
-)

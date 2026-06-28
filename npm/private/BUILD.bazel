@@ -12,12 +12,6 @@ js_library(
 )
 
 js_binary(
-    name = "pnpm_extract_catalogs_bin",
-    entry_point = "pnpm_extract_catalogs.mjs",
-    visibility = ["//visibility:public"],
-)
-
-js_binary(
     name = "pnpm_package_json_transform_bin",
     entry_point = "pnpm_package_json_transform.mjs",
     visibility = ["//visibility:public"],
@@ -26,6 +20,7 @@ js_binary(
 bzl_library(
     name = "pnpm_extract_catalogs",
     srcs = ["pnpm_extract_catalogs.bzl"],
+    deps = ["@yq.bzl//yq:yq"],
 )
 
 bzl_library(
