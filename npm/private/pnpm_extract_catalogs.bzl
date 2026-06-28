@@ -28,7 +28,7 @@ pnpm_extract_catalogs = rule(
         "_extract_tool": attr.label(
             executable = True,
             cfg = "exec",
-            default = "@aspect_rules_js//npm/private/pnpm_publish_tools/min:pnpm_extract_catalogs_bin",
+            default = "@aspect_rules_js//npm/private:pnpm_extract_catalogs_bin",
         ),
     },
     doc = "Extracts catalog/catalogs sections from pnpm-workspace.yaml into a JSON file",

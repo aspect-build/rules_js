@@ -14,7 +14,6 @@ js/private/test/node-patches/node_modules
 js/private/worker/src/node_modules
 node_modules/
 npm/private/lifecycle/node_modules/
-npm/private/pnpm_publish_tools/node_modules
 npm/private/test/node_modules/
 npm/private/test/npm_package/node_modules/
 npm/private/test/npm_package_publish/node_modules

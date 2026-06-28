@@ -1,6 +1,6 @@
 "Internal implementation details"
 
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 package(default_visibility = ["//npm:__subpackages__"])
@@ -8,6 +8,18 @@ package(default_visibility = ["//npm:__subpackages__"])
 js_library(
     name = "npm_publish_mjs",
     srcs = ["npm_publish.mjs"],
+    visibility = ["//visibility:public"],
+)
+
+js_binary(
+    name = "pnpm_extract_catalogs_bin",
+    entry_point = "pnpm_extract_catalogs.mjs",
+    visibility = ["//visibility:public"],
+)
+
+js_binary(
+    name = "pnpm_package_json_transform_bin",
+    entry_point = "pnpm_package_json_transform.mjs",
     visibility = ["//visibility:public"],
 )
 
@@ -22,7 +34,6 @@ bzl_library(
     deps = [
         ":npm_package",
         ":pnpm_package_json_transform",
-        "//js:defs",
     ],
 )
 

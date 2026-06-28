@@ -53,7 +53,7 @@ pnpm_package_json_transform = rule(
         "_transform_tool": attr.label(
             executable = True,
             cfg = "exec",
-            default = "@aspect_rules_js//npm/private/pnpm_publish_tools/min:pnpm_package_json_transform_bin",
+            default = "@aspect_rules_js//npm/private:pnpm_package_json_transform_bin",
         ),
     },
     doc = "Transforms package.json to resolve pnpm workspace protocols (catalog:, workspace:, etc.)",
