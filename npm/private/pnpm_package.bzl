@@ -29,12 +29,6 @@ def _pnpm_publish_impl(ctx):
     pnpm_path = _runfiles_path(ctx, pnpm_bin)
     pkg_path = _runfiles_path(ctx, pkg_dir)
 
-    # Resolve npm from the Node.js toolchain so pnpm can find it on PATH.
-    # pnpm internally shells out to npm for publish operations.
-    nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:runtime_toolchain_type"].nodeinfo
-    npm_file = nodeinfo.npm
-    npm_runfiles_path = _runfiles_path(ctx, npm_file) if npm_file else ""
-
     ctx.actions.write(
         output = launcher,
         content = """\
@@ -51,29 +45,18 @@ else
     exit 1
 fi
 
-# Add npm to PATH — pnpm shells out to npm for publish operations
-{npm_path_setup}
-
 exec "${{RUNFILES}}/{pnpm}" publish --no-git-checks "${{RUNFILES}}/{pkg}" {extra_args} "$@"
 """.format(
             pnpm = pnpm_path,
             pkg = pkg_path,
             extra_args = " ".join(["'%s'" % a for a in ctx.attr.extra_args]),
-            npm_path_setup = 'export PATH="$(dirname "${{RUNFILES}}/{npm}"):$PATH"'.format(npm = npm_runfiles_path) if npm_runfiles_path else "",
         ),
         is_executable = True,
     )
 
-    runfiles_files = [launcher, pkg_dir]
-    runfiles = ctx.runfiles(files = runfiles_files)
+    runfiles = ctx.runfiles(files = [launcher, pkg_dir])
     runfiles = runfiles.merge(ctx.attr._pnpm[DefaultInfo].default_runfiles)
     runfiles = runfiles.merge(ctx.attr.pkg[DefaultInfo].default_runfiles)
-
-    # Merge npm sources from the Node.js toolchain into runfiles
-    if nodeinfo.npm_sources:
-        runfiles = runfiles.merge(ctx.runfiles(transitive_files = nodeinfo.npm_sources))
-    if npm_file:
-        runfiles = runfiles.merge(ctx.runfiles(files = [npm_file]))
 
     return [DefaultInfo(
         executable = launcher,
@@ -97,9 +80,6 @@ _pnpm_publish = rule(
             default = "@pnpm//:pnpm",
         ),
     },
-    toolchains = [
-        "@rules_nodejs//nodejs:runtime_toolchain_type",
-    ],
 )
 
 def pnpm_package(
@@ -183,9 +163,13 @@ def pnpm_package(
     replace_prefixes = dict(kwargs.pop("replace_prefixes", {}))
     replace_prefixes[transform_name + "/"] = ""
 
+    npm_package_kwargs = dict(kwargs)
+    if version:
+        npm_package_kwargs["version"] = version
+
     _npm_package(
         name = name,
         srcs = srcs + [":" + transform_name],
         replace_prefixes = replace_prefixes,
-        **kwargs
+        **npm_package_kwargs
     )

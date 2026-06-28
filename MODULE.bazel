@@ -51,7 +51,10 @@ use_repo(
 
 # The default + public version of pnpm used by default.
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
-pnpm.pnpm(name = "pnpm")
+pnpm.pnpm(
+    name = "pnpm",
+    include_npm = True,
+)
 use_repo(pnpm, "pnpm", "pnpm__links")
 
 bazel_lib_toolchains = use_extension("@bazel_lib//lib:extensions.bzl", "toolchains")
