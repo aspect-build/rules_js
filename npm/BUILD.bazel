@@ -16,6 +16,8 @@ bzl_library(
         "//npm/private:npm_package",
         "//npm/private:npm_package_info",
         "//npm/private:npm_package_store_info",
+        "//npm/private:pnpm_extract_catalogs",
+        "//npm/private:pnpm_package",
     ],
 )
 

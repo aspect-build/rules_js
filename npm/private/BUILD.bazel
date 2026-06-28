@@ -12,6 +12,26 @@ js_library(
 )
 
 bzl_library(
+    name = "pnpm_extract_catalogs",
+    srcs = ["pnpm_extract_catalogs.bzl"],
+)
+
+bzl_library(
+    name = "pnpm_package",
+    srcs = ["pnpm_package.bzl"],
+    deps = [
+        ":npm_package",
+        ":pnpm_package_json_transform",
+        "//js:defs",
+    ],
+)
+
+bzl_library(
+    name = "pnpm_package_json_transform",
+    srcs = ["pnpm_package_json_transform.bzl"],
+)
+
+bzl_library(
     name = "npm_package",
     srcs = ["npm_package.bzl"],
     deps = [

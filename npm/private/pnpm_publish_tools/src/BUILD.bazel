@@ -1,0 +1,45 @@
+load("@npm//npm/private/pnpm_publish_tools:rollup/package_json.bzl", rollup_bin = "bin")
+
+rollup_bin.rollup(
+    name = "bundle_extract_catalogs",
+    srcs = [
+        "pnpm_extract_catalogs.mjs",
+        "//npm/private/pnpm_publish_tools:node_modules/@pnpm/catalogs.config",
+        "//npm/private/pnpm_publish_tools:node_modules/@pnpm/workspace.read-manifest",
+    ],
+    outs = ["pnpm_extract_catalogs.min.js"],
+    chdir = package_name(),
+    data = ["//npm/private/pnpm_publish_tools:rollup_config"],
+    fixed_args = [
+        "pnpm_extract_catalogs.mjs",
+        "--config",
+        "$$RUNFILES_DIR/$(rlocationpath //npm/private/pnpm_publish_tools:rollup_config)",
+        "--format",
+        "esm",
+        "--file",
+        "pnpm_extract_catalogs.min.js",
+    ],
+    visibility = ["//npm/private/pnpm_publish_tools:__subpackages__"],
+)
+
+rollup_bin.rollup(
+    name = "bundle_transform",
+    srcs = [
+        "pnpm_package_json_transform.mjs",
+        "//npm/private/pnpm_publish_tools:node_modules/@pnpm/exportable-manifest",
+        "//npm/private/pnpm_publish_tools:node_modules/@pnpm/releasing.exportable-manifest",
+    ],
+    outs = ["pnpm_package_json_transform.min.js"],
+    chdir = package_name(),
+    data = ["//npm/private/pnpm_publish_tools:rollup_config"],
+    fixed_args = [
+        "pnpm_package_json_transform.mjs",
+        "--config",
+        "$$RUNFILES_DIR/$(rlocationpath //npm/private/pnpm_publish_tools:rollup_config)",
+        "--format",
+        "esm",
+        "--file",
+        "pnpm_package_json_transform.min.js",
+    ],
+    visibility = ["//npm/private/pnpm_publish_tools:__subpackages__"],
+)

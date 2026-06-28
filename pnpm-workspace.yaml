@@ -5,6 +5,7 @@ packages:
     - 'js/private/test/*'
     - 'js/private/test/image/*'
     - 'npm/private/lifecycle'
+    - 'npm/private/pnpm_publish_tools'
     - 'npm/private/test'
     - 'npm/private/test/*'
     # NOTE: ensure npm/private/test/subs/* is NOT included
