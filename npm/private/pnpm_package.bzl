@@ -11,9 +11,96 @@ load("@aspect_rules_js//npm:defs.bzl", "pnpm_package")
 ```
 """
 
-load("//js:defs.bzl", "js_binary")
 load(":npm_package.bzl", _npm_package = "npm_package")
 load(":pnpm_package_json_transform.bzl", _pnpm_package_json_transform = "pnpm_package_json_transform")
+
+def _runfiles_path(ctx, f):
+    p = f.short_path
+    if p.startswith("../"):
+        return p[3:]
+    return ctx.workspace_name + "/" + p
+
+def _pnpm_publish_impl(ctx):
+    launcher = ctx.actions.declare_file(ctx.label.name + ".sh")
+
+    pnpm_bin = ctx.executable._pnpm
+    pkg_dir = ctx.attr.pkg[DefaultInfo].files.to_list()[0]
+
+    pnpm_path = _runfiles_path(ctx, pnpm_bin)
+    pkg_path = _runfiles_path(ctx, pkg_dir)
+
+    # Resolve npm from the Node.js toolchain so pnpm can find it on PATH.
+    # pnpm internally shells out to npm for publish operations.
+    nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:runtime_toolchain_type"].nodeinfo
+    npm_file = nodeinfo.npm
+    npm_runfiles_path = _runfiles_path(ctx, npm_file) if npm_file else ""
+
+    ctx.actions.write(
+        output = launcher,
+        content = """\
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve the runfiles directory
+if [[ -d "$0.runfiles" ]]; then
+    RUNFILES="$0.runfiles"
+elif [[ "${{RUNFILES_DIR:-}}" ]]; then
+    RUNFILES="${{RUNFILES_DIR}}"
+else
+    echo >&2 "ERROR: Cannot find runfiles directory"
+    exit 1
+fi
+
+# Add npm to PATH — pnpm shells out to npm for publish operations
+{npm_path_setup}
+
+exec "${{RUNFILES}}/{pnpm}" publish --no-git-checks "${{RUNFILES}}/{pkg}" {extra_args} "$@"
+""".format(
+            pnpm = pnpm_path,
+            pkg = pkg_path,
+            extra_args = " ".join(["'%s'" % a for a in ctx.attr.extra_args]),
+            npm_path_setup = 'export PATH="$(dirname "${{RUNFILES}}/{npm}"):$PATH"'.format(npm = npm_runfiles_path) if npm_runfiles_path else "",
+        ),
+        is_executable = True,
+    )
+
+    runfiles_files = [launcher, pkg_dir]
+    runfiles = ctx.runfiles(files = runfiles_files)
+    runfiles = runfiles.merge(ctx.attr._pnpm[DefaultInfo].default_runfiles)
+    runfiles = runfiles.merge(ctx.attr.pkg[DefaultInfo].default_runfiles)
+
+    # Merge npm sources from the Node.js toolchain into runfiles
+    if nodeinfo.npm_sources:
+        runfiles = runfiles.merge(ctx.runfiles(transitive_files = nodeinfo.npm_sources))
+    if npm_file:
+        runfiles = runfiles.merge(ctx.runfiles(files = [npm_file]))
+
+    return [DefaultInfo(
+        executable = launcher,
+        runfiles = runfiles,
+    )]
+
+_pnpm_publish = rule(
+    implementation = _pnpm_publish_impl,
+    executable = True,
+    attrs = {
+        "pkg": attr.label(
+            mandatory = True,
+            doc = "The npm_package target to publish",
+        ),
+        "extra_args": attr.string_list(
+            doc = "Additional arguments passed to pnpm publish",
+        ),
+        "_pnpm": attr.label(
+            executable = True,
+            cfg = "target",
+            default = "@pnpm//:pnpm",
+        ),
+    },
+    toolchains = [
+        "@rules_nodejs//nodejs:runtime_toolchain_type",
+    ],
+)
 
 def pnpm_package(
         name,
@@ -84,16 +171,10 @@ def pnpm_package(
     )
 
     if publishable:
-        js_binary(
+        _pnpm_publish(
             name = "{}.publish".format(name),
-            entry_point = Label("@aspect_rules_js//npm/private/pnpm_publish_tools/min:pnpm_publish_mjs"),
-            fixed_args = [
-                "./$(rootpath :{})".format(name),
-                "--tag",
-                tag,
-            ],
-            data = [name],
-            include_npm = True,
+            pkg = name,
+            extra_args = ["--tag", tag],
             tags = kwargs.get("tags", []) + ["manual"],
             testonly = kwargs.get("testonly", False),
             visibility = kwargs.get("visibility", None),

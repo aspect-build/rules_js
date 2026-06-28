@@ -1,6 +1,6 @@
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
-load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//npm:defs.bzl", "pnpm_extract_catalogs", "pnpm_package")
 
 # Extract catalogs from the test pnpm-workspace.yaml
@@ -67,7 +67,7 @@ diff_test(
     file2 = ":expected_pkg_versioned",
 )
 
-# Test 4: pnpm_package with publishable=True creates a .publish target that builds
+# Test 4: pnpm_package with publishable=True invokes pnpm from the toolchain
 pnpm_package(
     name = "pkg_publishable",
     srcs = ["index.js"],
@@ -76,10 +76,13 @@ pnpm_package(
     publishable = True,
 )
 
-build_test(
-    name = "test_publish_builds",
-    targets = [
-        ":pkg_publishable",
-        ":pkg_publishable.publish",
+sh_test(
+    name = "test_publish",
+    srcs = ["test_publish.sh"],
+    args = ["$(locations :pkg_publishable.publish)"],
+    data = [":pkg_publishable.publish"],
+    tags = [
+        "no-remote-exec",
+        "no-sandbox",
     ],
 )
