@@ -9,17 +9,18 @@ function resolvePath(p) {
 }
 
 const args = process.argv.slice(2)
-let catalogsJsonArg, packageJsonArg, outputArg, versionArg
+let catalogsJsonArg, packageJsonArg, outputArg, versionArg, nodeModulesRootArg
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--catalogs-json') catalogsJsonArg = args[++i]
   else if (args[i] === '--package-json') packageJsonArg = args[++i]
   else if (args[i] === '--output') outputArg = args[++i]
   else if (args[i] === '--version') versionArg = args[++i]
+  else if (args[i] === '--node-modules-root') nodeModulesRootArg = args[++i]
 }
 
 if (!catalogsJsonArg || !packageJsonArg || !outputArg) {
   process.stderr.write(
-    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>]\n'
+    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>] [--workspace-version name=ver]...\n'
   )
   process.exit(1)
 }
@@ -42,7 +43,17 @@ function resolveVersion(pkgName, version) {
   }
   if (version.startsWith('workspace:')) {
     const rest = version.slice('workspace:'.length)
-    if (rest === '*' || rest === '^' || rest === '~') return version
+    if (rest === '*' || rest === '^' || rest === '~') {
+      if (!nodeModulesRootArg) throw new Error(`workspace: protocol requires node_modules but --node-modules-root was not provided`)
+      const depPkgPath = resolvePath(`${nodeModulesRootArg}/${pkgName}/package.json`)
+      let depPkg
+      try { depPkg = JSON.parse(readFileSync(depPkgPath, 'utf8')) }
+      catch { throw new Error(`Could not read workspace package '${pkgName}' at ${depPkgPath}`) }
+      const resolved = depPkg.version
+      if (!resolved) throw new Error(`Workspace package '${pkgName}' has no version field`)
+      if (rest === '*') return resolved
+      return rest + resolved
+    }
     return rest
   }
   return version

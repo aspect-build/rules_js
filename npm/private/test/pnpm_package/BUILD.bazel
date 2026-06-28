@@ -16,7 +16,16 @@ diff_test(
     file2 = "expected_catalogs.json",
 )
 
-# Test 2: Basic pnpm_package with catalog protocol resolution
+# Mock node_modules with a sibling workspace package
+copy_to_directory(
+    name = "node_modules",
+    srcs = ["sibling_package.json"],
+    replace_prefixes = {
+        "sibling_package.json": "@test/sibling/package.json",
+    },
+)
+
+# Test 2: Basic pnpm_package with catalog and workspace protocol resolution
 pnpm_package(
     name = "pkg",
     srcs = ["index.js"],

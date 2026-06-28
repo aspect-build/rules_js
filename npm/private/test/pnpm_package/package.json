@@ -20,6 +20,7 @@
         "access": "public"
     },
     "dependencies": {
+        "@test/sibling": "workspace:^",
         "react": "catalog:",
         "underscore": "catalog:utils"
     },

@@ -20,6 +20,12 @@ def _pnpm_package_json_transform_impl(ctx):
 
     inputs = [ctx.file.pnpm_catalogs, ctx.file.package_json]
 
+    if ctx.attr.node_modules:
+        node_modules_files = ctx.attr.node_modules[DefaultInfo].files
+        node_modules_dir = node_modules_files.to_list()[0]
+        args.add("--node-modules-root", node_modules_dir.path)
+        inputs = depset(inputs, transitive = [node_modules_files])
+
     ctx.actions.run(
         executable = ctx.executable._transform_tool,
         arguments = [args],
@@ -42,6 +48,9 @@ pnpm_package_json_transform = rule(
             allow_single_file = True,
             mandatory = True,
             doc = "The extracted catalogs JSON file from pnpm_extract_catalogs",
+        ),
+        "node_modules": attr.label(
+            doc = "The node_modules target for the calling package, used to resolve workspace: protocols",
         ),
         "stamped": attr.bool(
             default = False,

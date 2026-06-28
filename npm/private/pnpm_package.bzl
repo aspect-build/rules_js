@@ -87,6 +87,7 @@ def pnpm_package(
         srcs,
         pnpm_catalogs,
         package_json = "package.json",
+        node_modules = None,
         version = None,
         stamped = False,
         publishable = False,
@@ -119,7 +120,6 @@ def pnpm_package(
         name = "my_package",
         srcs = [":my_lib"],
         pnpm_catalogs = "//:pnpm_catalogs",
-        package = "@my-scope/my-package",
     )
     ```
 
@@ -128,12 +128,17 @@ def pnpm_package(
         srcs: Source files to include in the package (excluding package.json)
         pnpm_catalogs: Label of the pnpm_extract_catalogs target providing catalog definitions
         package_json: The package.json file to transform (default: "package.json")
+        node_modules: The node_modules target for resolving workspace: protocols.
+            Defaults to `:node_modules` in the calling package.
         version: Override the version in the output package.json
         stamped: When True, appends BUILD_TIMESTAMP-SHORT_GIT_COMMIT to the version
         publishable: When True, also creates a {name}.publish target
         tag: The dist-tag to use when publishing (default: "latest")
         **kwargs: Additional arguments passed to the upstream npm_package rule
     """
+    if node_modules == None:
+        node_modules = "//" + native.package_name() + ":node_modules"
+
     transform_name = name + "_package_json"
 
     transform_kwargs = {}
@@ -146,6 +151,7 @@ def pnpm_package(
         name = transform_name,
         package_json = package_json,
         pnpm_catalogs = pnpm_catalogs,
+        node_modules = node_modules,
         tags = kwargs.get("tags", []) + ["manual"],
         **transform_kwargs
     )
