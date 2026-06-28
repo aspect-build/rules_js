@@ -15,21 +15,26 @@ const { values: argv } = parseArgs({
     'package-json': { type: 'string' },
     'output': { type: 'string' },
     'version': { type: 'string' },
-    'node-modules-root': { type: 'string' },
+    'workspace-version': { type: 'string', multiple: true },
   },
   strict: true,
 })
 
 if (!argv['catalogs-json'] || !argv['package-json'] || !argv['output']) {
   process.stderr.write(
-    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>] [--node-modules-root <path>]\n'
+    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>] [--workspace-version name=ver]...\n'
   )
   process.exit(1)
 }
 
 const catalogs = JSON.parse(readFileSync(resolvePath(argv['catalogs-json']), 'utf8'))
 const manifest = JSON.parse(readFileSync(resolvePath(argv['package-json']), 'utf8'))
-const nodeModulesRoot = argv['node-modules-root']
+
+const workspaceVersions = {}
+for (const entry of argv['workspace-version'] ?? []) {
+  const eq = entry.indexOf('=')
+  workspaceVersions[entry.slice(0, eq)] = entry.slice(eq + 1)
+}
 
 if (argv.version) manifest.version = argv.version
 
@@ -47,13 +52,8 @@ function resolveVersion(pkgName, version) {
   if (version.startsWith('workspace:')) {
     const rest = version.slice('workspace:'.length)
     if (rest === '*' || rest === '^' || rest === '~') {
-      if (!nodeModulesRoot) throw new Error(`workspace: protocol requires node_modules but --node-modules-root was not provided`)
-      const depPkgPath = resolvePath(`${nodeModulesRoot}/${pkgName}/package.json`)
-      let depPkg
-      try { depPkg = JSON.parse(readFileSync(depPkgPath, 'utf8')) }
-      catch { throw new Error(`Could not read workspace package '${pkgName}' at ${depPkgPath}`) }
-      const resolved = depPkg.version
-      if (!resolved) throw new Error(`Workspace package '${pkgName}' has no version field`)
+      const resolved = workspaceVersions[pkgName]
+      if (!resolved) throw new Error(`Workspace package '${pkgName}' not found in srcs dependencies.`)
       if (rest === '*') return resolved
       return rest + resolved
     }

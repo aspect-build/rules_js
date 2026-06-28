@@ -1,5 +1,8 @@
 """Private rule for transforming package.json to resolve pnpm workspace protocols."""
 
+load("//js:providers.bzl", "JsInfo")
+load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
+
 def _pnpm_package_json_transform_impl(ctx):
     output = ctx.actions.declare_file(ctx.label.name + "/package.json")
 
@@ -18,13 +21,12 @@ def _pnpm_package_json_transform_impl(ctx):
     if version:
         args.add("--version", version)
 
-    inputs = [ctx.file.pnpm_catalogs, ctx.file.package_json]
+    for target in ctx.attr.srcs + ctx.attr.deps:
+        if JsInfo in target:
+            for info in target[JsInfo].npm_package_store_infos.to_list():
+                args.add("--workspace-version", "{}={}".format(info.package, info.version))
 
-    if ctx.attr.node_modules:
-        node_modules_files = ctx.attr.node_modules[DefaultInfo].files
-        node_modules_dir = node_modules_files.to_list()[0]
-        args.add("--node-modules-root", node_modules_dir.path)
-        inputs = depset(inputs, transitive = [node_modules_files])
+    inputs = [ctx.file.pnpm_catalogs, ctx.file.package_json]
 
     ctx.actions.run(
         executable = ctx.executable._transform_tool,
@@ -49,8 +51,11 @@ pnpm_package_json_transform = rule(
             mandatory = True,
             doc = "The extracted catalogs JSON file from pnpm_extract_catalogs",
         ),
-        "node_modules": attr.label(
-            doc = "The node_modules target for the calling package, used to resolve workspace: protocols",
+        "srcs": attr.label_list(
+            doc = "Source targets whose transitive NpmPackageStoreInfo deps are used to resolve workspace: protocols",
+        ),
+        "deps": attr.label_list(
+            doc = "Additional dependency targets for resolving workspace: protocols not included in srcs",
         ),
         "stamped": attr.bool(
             default = False,
