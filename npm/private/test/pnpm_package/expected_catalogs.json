@@ -1,0 +1,9 @@
+{
+  "default": {
+    "react": "^18.2.0",
+    "lodash": "^4.17.21"
+  },
+  "utils": {
+    "underscore": "1.13.6"
+  }
+}

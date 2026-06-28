@@ -1,0 +1,11 @@
+{
+    "name": "@test/pnpm-pkg",
+    "version": "1.0.0",
+    "dependencies": {
+        "react": "catalog:",
+        "underscore": "catalog:utils"
+    },
+    "devDependencies": {
+        "lodash": "catalog:"
+    }
+}

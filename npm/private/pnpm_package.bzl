@@ -99,8 +99,12 @@ def pnpm_package(
             visibility = kwargs.get("visibility", None),
         )
 
+    replace_prefixes = dict(kwargs.pop("replace_prefixes", {}))
+    replace_prefixes[transform_name + "/"] = ""
+
     _npm_package(
         name = name,
         srcs = srcs + [":" + transform_name],
+        replace_prefixes = replace_prefixes,
         **kwargs
     )

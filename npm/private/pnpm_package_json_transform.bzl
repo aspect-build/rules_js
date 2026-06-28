@@ -1,7 +1,7 @@
 """Private rule for transforming package.json to resolve pnpm workspace protocols."""
 
 def _pnpm_package_json_transform_impl(ctx):
-    output = ctx.actions.declare_file("package.json")
+    output = ctx.actions.declare_file(ctx.label.name + "/package.json")
 
     version = ctx.attr.version
     if version and ctx.attr.stamped:

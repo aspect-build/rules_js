@@ -1,0 +1,85 @@
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("//npm:defs.bzl", "pnpm_extract_catalogs", "pnpm_package")
+
+# Extract catalogs from the test pnpm-workspace.yaml
+pnpm_extract_catalogs(
+    name = "pnpm_catalogs",
+    workspace_manifest = "pnpm-workspace.yaml",
+)
+
+# Test 1: Verify extracted catalogs match expected output
+diff_test(
+    name = "test_extract_catalogs",
+    file1 = ":pnpm_catalogs",
+    file2 = "expected_catalogs.json",
+)
+
+# Test 2: Basic pnpm_package with catalog protocol resolution
+pnpm_package(
+    name = "pkg",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = ":pnpm_catalogs",
+)
+
+copy_to_directory(
+    name = "expected_pkg",
+    srcs = [
+        "expected_package.json",
+        "index.js",
+    ],
+    replace_prefixes = {
+        "expected_package.json": "package.json",
+    },
+)
+
+diff_test(
+    name = "test_pkg",
+    file1 = ":pkg",
+    file2 = ":expected_pkg",
+)
+
+# Test 3: pnpm_package with version override
+pnpm_package(
+    name = "pkg_versioned",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = ":pnpm_catalogs",
+    version = "2.0.0-rc.1",
+)
+
+copy_to_directory(
+    name = "expected_pkg_versioned",
+    srcs = [
+        "expected_package_versioned.json",
+        "index.js",
+    ],
+    replace_prefixes = {
+        "expected_package_versioned.json": "package.json",
+    },
+)
+
+diff_test(
+    name = "test_pkg_versioned",
+    file1 = ":pkg_versioned",
+    file2 = ":expected_pkg_versioned",
+)
+
+# Test 4: pnpm_package with publishable=True creates a .publish target that builds
+pnpm_package(
+    name = "pkg_publishable",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = ":pnpm_catalogs",
+    publishable = True,
+)
+
+build_test(
+    name = "test_publish_builds",
+    targets = [
+        ":pkg_publishable",
+        ":pkg_publishable.publish",
+    ],
+)
