@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve, isAbsolute } from 'node:path'
+import { parseArgs } from 'node:util'
 
 function resolvePath(p) {
   if (isAbsolute(p)) return p
@@ -8,27 +9,29 @@ function resolvePath(p) {
   return resolve(p)
 }
 
-const args = process.argv.slice(2)
-let catalogsJsonArg, packageJsonArg, outputArg, versionArg, nodeModulesRootArg
-for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--catalogs-json') catalogsJsonArg = args[++i]
-  else if (args[i] === '--package-json') packageJsonArg = args[++i]
-  else if (args[i] === '--output') outputArg = args[++i]
-  else if (args[i] === '--version') versionArg = args[++i]
-  else if (args[i] === '--node-modules-root') nodeModulesRootArg = args[++i]
-}
+const { values: argv } = parseArgs({
+  options: {
+    'catalogs-json': { type: 'string' },
+    'package-json': { type: 'string' },
+    'output': { type: 'string' },
+    'version': { type: 'string' },
+    'node-modules-root': { type: 'string' },
+  },
+  strict: true,
+})
 
-if (!catalogsJsonArg || !packageJsonArg || !outputArg) {
+if (!argv['catalogs-json'] || !argv['package-json'] || !argv['output']) {
   process.stderr.write(
-    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>] [--workspace-version name=ver]...\n'
+    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>] [--node-modules-root <path>]\n'
   )
   process.exit(1)
 }
 
-const catalogs = JSON.parse(readFileSync(resolvePath(catalogsJsonArg), 'utf8'))
-const manifest = JSON.parse(readFileSync(resolvePath(packageJsonArg), 'utf8'))
+const catalogs = JSON.parse(readFileSync(resolvePath(argv['catalogs-json']), 'utf8'))
+const manifest = JSON.parse(readFileSync(resolvePath(argv['package-json']), 'utf8'))
+const nodeModulesRoot = argv['node-modules-root']
 
-if (versionArg) manifest.version = versionArg
+if (argv.version) manifest.version = argv.version
 
 // --- Dependency protocol resolution ---
 
@@ -44,8 +47,8 @@ function resolveVersion(pkgName, version) {
   if (version.startsWith('workspace:')) {
     const rest = version.slice('workspace:'.length)
     if (rest === '*' || rest === '^' || rest === '~') {
-      if (!nodeModulesRootArg) throw new Error(`workspace: protocol requires node_modules but --node-modules-root was not provided`)
-      const depPkgPath = resolvePath(`${nodeModulesRootArg}/${pkgName}/package.json`)
+      if (!nodeModulesRoot) throw new Error(`workspace: protocol requires node_modules but --node-modules-root was not provided`)
+      const depPkgPath = resolvePath(`${nodeModulesRoot}/${pkgName}/package.json`)
       let depPkg
       try { depPkg = JSON.parse(readFileSync(depPkgPath, 'utf8')) }
       catch { throw new Error(`Could not read workspace package '${pkgName}' at ${depPkgPath}`) }
@@ -131,4 +134,4 @@ if (typeof manifest.repository === 'string') {
   manifest.repository = { type: 'git', url: manifest.repository }
 }
 
-writeFileSync(resolvePath(outputArg), JSON.stringify(manifest, null, 2) + '\n')
+writeFileSync(resolvePath(argv.output), JSON.stringify(manifest, null, 2) + '\n')
