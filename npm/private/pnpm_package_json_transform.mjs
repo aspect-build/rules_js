@@ -15,14 +15,16 @@ const { values: argv } = parseArgs({
     'package-json': { type: 'string' },
     'output': { type: 'string' },
     'version': { type: 'string' },
-    'workspace-version': { type: 'string', multiple: true },
+    'version-file': { type: 'string' },
+    'workspace-versions-json': { type: 'string' },
+    'workspace-dep-package-json': { type: 'string', multiple: true },
   },
   strict: true,
 })
 
 if (!argv['catalogs-json'] || !argv['package-json'] || !argv['output']) {
   process.stderr.write(
-    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>] [--workspace-version name=ver]...\n'
+    'usage: pnpm_package_json_transform --catalogs-json <path> --package-json <path> --output <path> [--version <ver>] [--version-file <path>] [--workspace-versions-json <path>]\n'
   )
   process.exit(1)
 }
@@ -30,13 +32,19 @@ if (!argv['catalogs-json'] || !argv['package-json'] || !argv['output']) {
 const catalogs = JSON.parse(readFileSync(resolvePath(argv['catalogs-json']), 'utf8'))
 const manifest = JSON.parse(readFileSync(resolvePath(argv['package-json']), 'utf8'))
 
-const workspaceVersions = {}
-for (const entry of argv['workspace-version'] ?? []) {
-  const eq = entry.indexOf('=')
-  workspaceVersions[entry.slice(0, eq)] = entry.slice(eq + 1)
+const workspaceVersions = argv['workspace-versions-json']
+  ? JSON.parse(readFileSync(resolvePath(argv['workspace-versions-json']), 'utf8'))
+  : {}
+
+for (const depPath of argv['workspace-dep-package-json'] ?? []) {
+  const dep = JSON.parse(readFileSync(resolvePath(depPath), 'utf8'))
+  if (dep.name && dep.version) {
+    workspaceVersions[dep.name] = dep.version
+  }
 }
 
-if (argv.version) manifest.version = argv.version
+const version = argv.version ?? (argv['version-file'] ? readFileSync(resolvePath(argv['version-file']), 'utf8').trim() : null)
+if (version) manifest.version = version
 
 // --- Dependency protocol resolution ---
 
@@ -53,7 +61,7 @@ function resolveVersion(pkgName, version) {
     const rest = version.slice('workspace:'.length)
     if (rest === '*' || rest === '^' || rest === '~') {
       const resolved = workspaceVersions[pkgName]
-      if (!resolved) throw new Error(`Workspace package '${pkgName}' not found in srcs dependencies.`)
+      if (!resolved) throw new Error(`Workspace package '${pkgName}' not found in workspace_versions.json. Ensure the package has a name and version in its package.json.`)
       if (rest === '*') return resolved
       return rest + resolved
     }

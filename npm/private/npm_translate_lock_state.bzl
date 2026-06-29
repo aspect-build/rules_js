@@ -152,6 +152,15 @@ def _init_workspace(priv, rctx, is_windows):
                 priv["pnpm_settings"] = priv["pnpm_settings"] | pnpm_workspace_settings
                 priv["only_built_dependencies"] = _only_built_dependencies(priv)
 
+            workspace_data = json.decode(pnpm_workspace_json)
+            catalogs = {}
+            default_catalog = workspace_data.get("catalog")
+            if default_catalog:
+                catalogs["default"] = default_catalog
+            named_catalogs = workspace_data.get("catalogs", {})
+            catalogs.update(named_catalogs)
+            priv["pnpm_catalogs"] = catalogs
+
         if workspace_parse_err != None:
             should_update = _should_update_pnpm_lock(priv)
             msg = """
@@ -227,7 +236,8 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
     pnpm_lock_dir = str(rctx.path(pnpm_lock_label).dirname) if pnpm_lock_label else priv["src_root"]
     rel_dir = _rel_path(priv, pnpm_lock_dir)
 
-    # package.json files
+    # package.json files — read each workspace package's name and version
+    workspace_package_versions = {}
     for package_json in priv["importers"].keys():
         rel_path = paths.normalize(paths.join(rel_dir, package_json, "package.json"))
         workspace_path = paths.join(priv["src_root"], rel_path)
@@ -240,6 +250,16 @@ ERROR: Implicitly using pnpm-workspace.yaml file `{pnpm_workspace}` since the `{
                 )
                 fail(msg)
             _copy_input_file(priv, rctx, attr, workspace_path, str(rctx.path(rel_path)))
+
+        pkg_json_path = rctx.path(rel_path)
+        if pkg_json_path.exists:
+            pkg_json = json.decode(rctx.read(pkg_json_path))
+            pkg_name = pkg_json.get("name")
+            pkg_version = pkg_json.get("version")
+            if pkg_name and pkg_version:
+                workspace_package_versions[pkg_name] = pkg_version
+
+    priv["workspace_package_versions"] = workspace_package_versions
 
     # Read patches from pnpm-lock.yaml `patchedDependencies`
     for name in priv["pnpm_patched_dependencies"]:
@@ -517,6 +537,8 @@ def _new(rctx, mod, attr):
         "pnpm_settings": {},
         "pnpm_patched_dependencies": {},
         "should_update_pnpm_lock": should_update_pnpm_lock,
+        "workspace_package_versions": {},
+        "pnpm_catalogs": {},
     }
 
     _init(priv, rctx, attr)
@@ -538,6 +560,8 @@ def _new(rctx, mod, attr):
         root_package = lambda: priv["root_package"],
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),
         action_cache_miss = lambda: _action_cache_miss(priv, rctx),
+        workspace_package_versions = lambda: priv["workspace_package_versions"],
+        pnpm_catalogs = lambda: priv["pnpm_catalogs"],
         write_action_cache = lambda: _write_action_cache(priv, rctx),
     )
 

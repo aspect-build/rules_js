@@ -58,7 +58,13 @@ def generate_repository_files(attr, state, npm_imports):
     packages = state.packages()
     root_package = state.root_package()
 
-    final_rctx_files = {}
+    workspace_package_versions = state.workspace_package_versions()
+    pnpm_catalogs = state.pnpm_catalogs()
+
+    final_rctx_files = {
+        "workspace_versions.json": json.encode(workspace_package_versions),
+        "catalogs.json": json.encode(pnpm_catalogs),
+    }
 
     rctx_files = {
         "BUILD.bazel": [
@@ -75,6 +81,8 @@ js_binary(name = "sync", entry_point = "noop.js")
             "",
             "exports_files({})".format(starlark_codegen_utils.to_list_attr([
                 _DEFS_BZL_FILENAME,
+                "workspace_versions.json",
+                "catalogs.json",
             ])),
         ],
     }

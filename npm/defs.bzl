@@ -19,7 +19,6 @@ load(
     "//npm/private:pnpm_package.bzl",
     _pnpm_package = "pnpm_package",
 )
-
 npm_package = _npm_package
 npm_link_package = _npm_link_package
 pnpm_extract_catalogs = _pnpm_extract_catalogs

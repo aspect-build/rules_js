@@ -17,6 +17,7 @@ js_binary(
     visibility = ["//visibility:public"],
 )
 
+
 bzl_library(
     name = "pnpm_extract_catalogs",
     srcs = ["pnpm_extract_catalogs.bzl"],
