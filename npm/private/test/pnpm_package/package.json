@@ -1,0 +1,36 @@
+{
+    "name": "@test/pnpm-pkg",
+    "version": "1.0.0",
+    "main": "./src/index.js",
+    "bin": "./bin/cli.js",
+    "repository": "https://github.com/test/pnpm-pkg.git",
+    "scripts": {
+        "build": "tsc",
+        "test": "jest",
+        "prepublishOnly": "npm run build",
+        "prepare": "npm run build",
+        "postpublish": "echo done"
+    },
+    "publishConfig": {
+        "main": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "exports": {
+            ".": "./dist/index.js"
+        },
+        "access": "public"
+    },
+    "dependencies": {
+        "@test/sibling": "workspace:^",
+        "react": "catalog:",
+        "underscore": "catalog:utils"
+    },
+    "devDependencies": {
+        "lodash": "catalog:"
+    },
+    "pnpm": {
+        "overrides": {
+            "foo": "1.0.0"
+        }
+    },
+    "packageManager": "pnpm@9.0.0"
+}

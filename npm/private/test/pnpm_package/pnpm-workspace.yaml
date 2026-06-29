@@ -1,0 +1,10 @@
+packages:
+    - 'packages/*'
+
+catalog:
+    react: ^18.2.0
+    lodash: ^4.17.21
+
+catalogs:
+    utils:
+        underscore: 1.13.6

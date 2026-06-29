@@ -1,0 +1,174 @@
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("//npm:defs.bzl", "pnpm_extract_catalogs", "pnpm_package")
+
+# Extract catalogs from the test pnpm-workspace.yaml
+pnpm_extract_catalogs(
+    name = "pnpm_catalogs",
+    workspace_manifest = "pnpm-workspace.yaml",
+)
+
+# Test 1: Verify extracted catalogs match expected output
+diff_test(
+    name = "test_extract_catalogs",
+    file1 = ":pnpm_catalogs",
+    file2 = "expected_catalogs.json",
+)
+
+# Test 2: Basic pnpm_package with catalog and workspace protocol resolution
+pnpm_package(
+    name = "pkg",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = "expected_catalogs.json",
+    pnpm_workspace_versions = "workspace_versions.json",
+)
+
+copy_to_directory(
+    name = "expected_pkg",
+    srcs = [
+        "expected_package.json",
+        "index.js",
+    ],
+    replace_prefixes = {
+        "expected_package.json": "package.json",
+    },
+)
+
+diff_test(
+    name = "test_pkg",
+    file1 = ":pkg",
+    file2 = ":expected_pkg",
+)
+
+# Test 3: pnpm_package with version override
+pnpm_package(
+    name = "pkg_versioned",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = "expected_catalogs.json",
+    pnpm_workspace_versions = "workspace_versions.json",
+    version = "2.0.0-rc.1",
+)
+
+copy_to_directory(
+    name = "expected_pkg_versioned",
+    srcs = [
+        "expected_package_versioned.json",
+        "index.js",
+    ],
+    replace_prefixes = {
+        "expected_package_versioned.json": "package.json",
+    },
+)
+
+diff_test(
+    name = "test_pkg_versioned",
+    file1 = ":pkg_versioned",
+    file2 = ":expected_pkg_versioned",
+)
+
+# Test 4: pnpm_package with version_file (simulates git tag version)
+write_file(
+    name = "version_from_tag",
+    out = "version_from_tag.txt",
+    content = ["2.0.0-rc.1"],
+)
+
+pnpm_package(
+    name = "pkg_version_file",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = "expected_catalogs.json",
+    pnpm_workspace_versions = "workspace_versions.json",
+    version = ":version_from_tag",
+)
+
+diff_test(
+    name = "test_pkg_version_file",
+    file1 = ":pkg_version_file",
+    file2 = ":expected_pkg_versioned",
+)
+
+# Test 5: workspace_deps overrides base workspace_versions.json
+# Simulates: @test/sibling's source package.json has "0.0.0-development"
+# but its pnpm_package has version = "3.2.1" (e.g. from a git tag).
+# The consumer should resolve "workspace:^" to "^3.2.1", not "^0.0.0-development".
+pnpm_package(
+    name = "sibling_pkg",
+    srcs = ["index.js"],
+    package_json = "sibling_package.json",
+    pnpm_catalogs = "expected_catalogs.json",
+    pnpm_workspace_versions = "workspace_versions.json",
+    version = "3.2.1",
+)
+
+pnpm_package(
+    name = "pkg_with_workspace_deps",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = "expected_catalogs.json",
+    pnpm_workspace_versions = "base_workspace_versions.json",
+    workspace_deps = [":sibling_pkg"],
+)
+
+diff_test(
+    name = "test_workspace_deps",
+    file1 = ":pkg_with_workspace_deps",
+    file2 = ":expected_pkg",
+)
+
+# Test 6: aspect auto-discovers workspace dep versions via the transform's srcs.
+# The pnpm_package macro passes srcs to the transform rule with the aspect attached.
+# The aspect collects PnpmPackageInfo from targets in srcs without explicit workspace_deps.
+pnpm_package(
+    name = "pkg_auto_discover",
+    srcs = ["index.js", ":sibling_pkg"],
+    package_json = "package.json",
+    pnpm_catalogs = "expected_catalogs.json",
+    pnpm_workspace_versions = "base_workspace_versions.json",
+)
+
+# Verify the aspect-resolved package.json has the correct version (^3.2.1, not ^0.0.0-development).
+# The sibling_pkg files end up in the output alongside index.js; the expected_pkg_auto_discover
+# directory mirrors that structure.
+copy_to_directory(
+    name = "expected_pkg_auto_discover",
+    srcs = [
+        "expected_package.json",
+        "index.js",
+        ":sibling_pkg",
+    ],
+    replace_prefixes = {
+        "expected_package.json": "package.json",
+    },
+)
+
+diff_test(
+    name = "test_aspect_auto_discover",
+    file1 = ":pkg_auto_discover",
+    file2 = ":expected_pkg_auto_discover",
+)
+
+# Test 7: pnpm_package with publishable=True invokes pnpm from the toolchain
+pnpm_package(
+    name = "pkg_publishable",
+    srcs = ["index.js"],
+    package_json = "package.json",
+    pnpm_catalogs = "expected_catalogs.json",
+    pnpm_workspace_versions = "workspace_versions.json",
+    publishable = True,
+)
+
+sh_test(
+    name = "test_publish",
+    srcs = ["test_publish.sh"],
+    args = ["$(locations :pkg_publishable.publish)"],
+    data = [":pkg_publishable.publish"],
+    tags = [
+        "no-remote-exec",
+        "no-sandbox",
+    ],
+)
