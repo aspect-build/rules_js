@@ -7,7 +7,7 @@ readonly PUBLISH="$1"
 # pnpm publish should pick up the transformed package.json and report the package name.
 # It will fail with an auth error since we're not actually publishing, but the output
 # should contain the package name proving the package.json was correctly resolved.
-$PUBLISH 2>pub.log >pub.log || true
+$PUBLISH >pub.log 2>&1 || true
 
 if grep -q '@test/pnpm-pkg' pub.log; then
     echo "PASS: pnpm publish found @test/pnpm-pkg in output"

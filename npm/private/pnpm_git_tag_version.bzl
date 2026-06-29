@@ -29,16 +29,16 @@ def _pnpm_git_tag_version_impl(ctx):
     ctx.actions.run_shell(
         outputs = [output],
         command = """\
-version=$(git tag -l '{prefix}@*' --sort=-v:refname | head -1 | sed 's/.*@//')
+prefix="$1"
+fallback="$2"
+output="$3"
+version=$(git tag -l "${prefix}@*" --sort=-v:refname | head -1 | sed 's/.*@//')
 if [ -z "$version" ]; then
-    version="{fallback}"
+    version="${fallback}"
 fi
-printf '%s' "$version" > {output}
-""".format(
-            prefix = ctx.attr.prefix,
-            fallback = ctx.attr.fallback,
-            output = output.path,
-        ),
+printf '%s' "$version" > "${output}"
+""",
+        arguments = [ctx.attr.prefix, ctx.attr.fallback, output.path],
         execution_requirements = {
             "local": "1",
             "no-sandbox": "1",

@@ -48,17 +48,17 @@ if (version) manifest.version = version
 
 // --- Dependency protocol resolution ---
 
-function resolveVersion(pkgName, version) {
-  if (version.startsWith('catalog:')) {
-    const catalogName = version.slice('catalog:'.length) || 'default'
+function resolveVersion(pkgName, spec) {
+  if (spec.startsWith('catalog:')) {
+    const catalogName = spec.slice('catalog:'.length) || 'default'
     const catalog = catalogs[catalogName]
     if (!catalog) throw new Error(`Unknown catalog '${catalogName}' referenced by '${pkgName}'`)
     const resolved = catalog[pkgName]
     if (!resolved) throw new Error(`Package '${pkgName}' not found in catalog '${catalogName}'`)
     return resolved
   }
-  if (version.startsWith('workspace:')) {
-    const rest = version.slice('workspace:'.length)
+  if (spec.startsWith('workspace:')) {
+    const rest = spec.slice('workspace:'.length)
     if (rest === '*' || rest === '^' || rest === '~') {
       const resolved = workspaceVersions[pkgName]
       if (!resolved) throw new Error(`Workspace package '${pkgName}' not found in workspace_versions.json. Ensure the package has a name and version in its package.json.`)
@@ -67,7 +67,7 @@ function resolveVersion(pkgName, version) {
     }
     return rest
   }
-  return version
+  return spec
 }
 
 for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies']) {

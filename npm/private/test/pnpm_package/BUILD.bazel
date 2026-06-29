@@ -2,7 +2,6 @@ load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
-load("//js:defs.bzl", "js_library")
 load("//npm:defs.bzl", "pnpm_extract_catalogs", "pnpm_package")
 
 # Extract catalogs from the test pnpm-workspace.yaml
@@ -123,10 +122,7 @@ diff_test(
 
 # Test 6: aspect auto-discovers workspace dep versions via the transform's srcs.
 # The pnpm_package macro passes srcs to the transform rule with the aspect attached.
-# Here we directly test the transform rule to verify the aspect collects PnpmPackageInfo
-# from targets in its srcs without requiring explicit workspace_deps.
-load("//npm/private:pnpm_package_json_transform.bzl", "pnpm_package_json_transform")
-
+# The aspect collects PnpmPackageInfo from targets in srcs without explicit workspace_deps.
 pnpm_package(
     name = "pkg_auto_discover",
     srcs = ["index.js", ":sibling_pkg"],

@@ -72,14 +72,14 @@ def _pnpm_package_json_transform_impl(ctx):
     if ctx.file.pnpm_workspace_versions:
         inputs.append(ctx.file.pnpm_workspace_versions)
 
-    # Collect workspace dep versions from explicit workspace_deps
+    # Collect workspace dep versions from explicit workspace_deps and aspect discovery
+    seen = {}
     for dep in ctx.attr.workspace_deps:
         dep_pj = dep[PnpmPackageInfo].package_json
+        seen[dep_pj.path] = True
         args.add("--workspace-dep-package-json", dep_pj)
         inputs.append(dep_pj)
 
-    # Collect workspace dep versions discovered via aspect on srcs
-    seen = {}
     for src in ctx.attr.srcs:
         if _TransitivePnpmPackageInfos in src:
             for pj in src[_TransitivePnpmPackageInfos].package_jsons.to_list():
