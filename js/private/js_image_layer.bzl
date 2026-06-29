@@ -465,7 +465,10 @@ def _js_image_layer_impl(ctx):
         args.add("--create")
         args.add("--file")
         args.add(output)
-        tar_lib.common.add_compression_args(compress, args)
+        if ctx.executable.compressor:
+            args.add_joined("--use-compress-program", [ctx.executable.compressor.path, ctx.attr.compressor_args], join_with = " ")
+        else:
+            tar_lib.common.add_compression_args(compress, args)
         args.add(mtree, format = "@%s")
 
         ctx.actions.run(
@@ -475,6 +478,7 @@ def _js_image_layer_impl(ctx):
             ),
             arguments = [args],
             executable = tarinfo.binary,
+            tools = [ctx.executable.compressor] if ctx.executable.compressor else [],
             unused_inputs_list = unused_inputs,
             env = tarinfo.default_env,
             outputs = [output],
@@ -538,6 +542,14 @@ js_image_layer_lib = struct(
             doc = "Compression algorithm. See https://github.com/bazel-contrib/bazel-lib/blob/bdc6ade0ba1ebe88d822bcdf4d4aaa2ce7e2cd37/lib/private/tar.bzl#L29-L39",
             values = tar_lib.common.accepted_compression_types + ["none"],
             default = "gzip",
+        ),
+        "compressor": attr.label(
+            doc = "External tool which compresses each layer archive, e.g. `@pigz` for parallel gzip. Overrides bsdtar's built-in single-threaded compressor; `compression` still determines the output file extension.",
+            executable = True,
+            cfg = "exec",
+        ),
+        "compressor_args": attr.string(
+            doc = "Arg list for `compressor`.",
         ),
         "platform": attr.label(
             doc = "Platform to transition.",
