@@ -102,12 +102,12 @@ Note that you could call `npm.npm_translate_lock` more than once, if you have mo
 ## Hoisting
 
 The `node_modules` tree laid out by `rules_js` should be bug-for-bug compatible with the `node_modules` tree that
-pnpm lays out, when [hoisting](https://pnpm.io/npmrc#hoist) is disabled.
+pnpm lays out, when [hoisting](https://pnpm.io/settings#hoist) is disabled.
 
-To make the behavior outside of Bazel match, we recommend adding `hoist=false` to your `.npmrc`:
+To make the behavior outside of Bazel match, we recommend adding `hoist: false` to your `pnpm-workspace.yaml`:
 
 ```shell
-echo "hoist=false" >> .npmrc
+echo "hoist: false" >> pnpm-workspace.yaml
 ```
 
 This will prevent pnpm from creating a hidden `node_modules/.pnpm/node_modules` folder with hoisted
