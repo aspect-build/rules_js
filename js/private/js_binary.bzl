@@ -458,6 +458,23 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if ctx.attr.expand_args:
         fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
 
+    # Hoist any `--node_options=<value>` fixed args into the node options at build
+    # time so both launchers honor them consistently. The unix launcher scans BOTH
+    # fixed and runtime args for `--node_options=` at runtime, but the Windows
+    # launcher bakes fixed args in as an unscanned literal (their quotes/parens make
+    # a CMD for-loop unsafe) and only scans runtime args -- so a fixed
+    # `--node_options=` would silently never reach node on Windows. Resolving this
+    # here, before the templates diverge, keeps behavior identical on both platforms
+    # without a fragile CMD-side scan of the baked literal.
+    _NODE_OPTIONS_PREFIX = "--node_options="
+    remaining_fixed_args = []
+    for fixed_arg in fixed_args:
+        if fixed_arg.startswith(_NODE_OPTIONS_PREFIX):
+            node_options.append(_NODE_OPTION.format(value = fixed_arg[len(_NODE_OPTIONS_PREFIX):]))
+        else:
+            remaining_fixed_args.append(fixed_arg)
+    fixed_args = remaining_fixed_args
+
     # Use a CMD-safe name for output file paths on Windows: CMD cannot invoke a .bat
     # whose path contains parentheses or spaces (they are special CMD syntax characters).
     launcher_name = _bat_safe_name(ctx.label.name) if is_windows else ctx.label.name
