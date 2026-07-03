@@ -1,3 +1,5 @@
 import %workspace%/../../tools/preset.bazelrc
 import %workspace%/../e2e.bazelrc
 
+# Exercise action toolchain resolution when apparent repository names differ.
+common --incompatible_auto_exec_groups
