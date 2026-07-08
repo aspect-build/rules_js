@@ -62,6 +62,7 @@ jobs:
                   paths=(
                     .
                     e2e/bzlmod
+                    e2e/coverage
                     e2e/gyp_no_install_script
                     e2e/js_binary_workspace
                     e2e/js_image_oci
