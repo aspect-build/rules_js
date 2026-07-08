@@ -2,6 +2,20 @@ import { Report } from 'c8'
 import fs from 'fs'
 import path from 'path'
 
+// The V8->lcov conversion needs the instrumented sources, which only exist in the
+// test action (not this _lcov_merger action). So the test action runs this script
+// with JS_COVERAGE__GENERATE_ONLY=1 and leaves the report in COVERAGE_DIR; here in
+// the merger we just publish it. See aspect-build/rules_js#2901.
+const jsCovStash = path.join(process.env.COVERAGE_DIR || '', '_rules_js_report.dat')
+if (!process.env.JS_COVERAGE__GENERATE_ONLY) {
+    try {
+        if (fs.statSync(jsCovStash).size != 0) {
+            fs.renameSync(jsCovStash, process.env.COVERAGE_OUTPUT_FILE)
+            process.exit(0)
+        }
+    } catch {}
+}
+
 // bazel will create the COVERAGE_OUTPUT_FILE whilst setting up the sandbox.
 // therefore, should be doing a file size check rather than presence.
 try {
@@ -40,9 +54,13 @@ new Report({
 })
     .run()
     .then(() => {
+        // In the test action, stash the report in COVERAGE_DIR for the merger to
+        // publish; the test action's COVERAGE_OUTPUT_FILE is not the final one.
         fs.renameSync(
             path.join(process.env.COVERAGE_DIR, 'lcov.info'),
-            process.env.COVERAGE_OUTPUT_FILE
+            process.env.JS_COVERAGE__GENERATE_ONLY
+                ? jsCovStash
+                : process.env.COVERAGE_OUTPUT_FILE
         )
     })
     .catch((err) => {

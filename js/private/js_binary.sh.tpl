@@ -482,6 +482,23 @@ RESULT="$?"
 set -e
 
 # ==============================================================================
+# Generate the lcov coverage report here in the test action, where the V8
+# coverage data (NODE_V8_COVERAGE) and the instrumented sources both exist and
+# their paths match. The _lcov_merger runs in a separate action that does not
+# have the sources, so running the c8 conversion there yields 0% (see #2901).
+# The merger early-exits when COVERAGE_OUTPUT_FILE is already non-empty, keeping
+# the report produced here.
+# ==============================================================================
+if [ "${COVERAGE_DIR:-}" ] && [ "${COVERAGE_OUTPUT_FILE:-}" ]; then
+    js_coverage_report=$(find "$JS_BINARY__RUNFILES" -path '*/js/private/coverage/coverage.js' 2>/dev/null | head -1)
+    if [ -n "${js_coverage_report:-}" ]; then
+        JS_COVERAGE__RUNFILES="$JS_BINARY__RUNFILES" JS_COVERAGE__GENERATE_ONLY=1 \
+            "$JS_BINARY__NODE_BINARY" "$js_coverage_report" ||
+            logf_error "coverage report generation failed"
+    fi
+fi
+
+# ==============================================================================
 # Mop up after main program
 # ==============================================================================
 
