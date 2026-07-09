@@ -282,7 +282,8 @@ def _npm_package_store_impl(ctx):
                     verbose = ctx.attr.verbose,
                 )
 
-        linked_package_store_directories = []
+        # dict of linked package store directories for fast membership checks below
+        linked_package_store_directories = {}
         for dep, _dep_aliases in ctx.attr.deps.items():
             dep_info = dep[NpmPackageStoreInfo]
             dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_info.package]
@@ -295,7 +296,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 fail(msg)
 
             if dep_package_store_directory:
-                linked_package_store_directories.append(dep_package_store_directory)
+                linked_package_store_directories[dep_package_store_directory] = True
                 for dep_alias in dep_aliases:
                     target = dep_package_store_directory.short_path[package_store_prefix_len:]
                     files.append(_symlink_package_store(ctx, package_store_name, target, dep_alias))
