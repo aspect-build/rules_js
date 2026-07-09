@@ -129,7 +129,12 @@ jobs:
                       slug=${slug//+/_}
                       slug=${slug//./_}
                     fi
-                    entries+=( "{\"path\":\"$p\",\"slug\":\"$slug\"}" )
+                    # Slow workspaces get a larger runner.
+                    runner=ubuntu-latest
+                    if [[ "$p" == "." || "$p" == "examples" || "$p" == "e2e/js_image_oci" ]]; then
+                      runner=ubuntu-22.04-32core
+                    fi
+                    entries+=( "{\"path\":\"$p\",\"slug\":\"$slug\",\"runner\":\"$runner\"}" )
                   done
                   printf -v j '%s,' "${entries[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
@@ -141,7 +146,7 @@ jobs:
 
     test:
         name: test (${{ matrix.workspace.path }}, ${{ matrix.bazel.id }})
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.workspace.runner }}
         needs: e2e-tests-list
         permissions:
             contents: read
