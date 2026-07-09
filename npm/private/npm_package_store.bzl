@@ -14,6 +14,10 @@ _SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_t
 
 _PACKAGE_STORE_PREFIX_LEN = len("node_modules/{}/".format(utils.package_store_root))
 
+_EXTRACT_EXECUTION_REQUIREMENTS = {
+    "supports-path-mapping": "1",
+}
+
 _DOC = """Defines a npm package that is linked into a node_modules tree.
 
 The npm package is linked with a pnpm style symlinked node_modules output tree.
@@ -245,13 +249,22 @@ def _npm_package_store_impl(ctx):
                 bsdtar = ctx.toolchains[tar_lib.toolchain_type]
 
                 args = ctx.actions.args()
-                args.add("--extract")
-                args.add("--no-same-owner")
-                args.add("--no-same-permissions")
-                args.add("--strip-components", "1")
-                args.add("--file", src)
-                args.add_all("--directory", [package_store_directory], expand_directories = False)
-                args.add_all(ctx.attr.exclude_package_contents, before_each = "--exclude")
+                args.add_all(
+                    [
+                        "--extract",
+                        "--no-same-owner",
+                        "--no-same-permissions",
+                        "--strip-components",
+                        "1",
+                        "--file",
+                        src,
+                        "--directory",
+                        package_store_directory,
+                    ],
+                    expand_directories = False,
+                )
+                if ctx.attr.exclude_package_contents:
+                    args.add_all(ctx.attr.exclude_package_contents, before_each = "--exclude")
 
                 ctx.actions.run(
                     executable = bsdtar.tarinfo.binary,
@@ -260,9 +273,7 @@ def _npm_package_store_impl(ctx):
                     arguments = [args],
                     mnemonic = "NpmPackageExtract",
                     progress_message = "Extracting npm package {}@{}".format(package, version),
-                    execution_requirements = {
-                        "supports-path-mapping": "1",
-                    },
+                    execution_requirements = _EXTRACT_EXECUTION_REQUIREMENTS,
                     toolchain = Label("@tar.bzl//tar/toolchain:type"),
 
                     # Always override the locale to give better hermeticity.
