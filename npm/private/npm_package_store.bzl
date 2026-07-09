@@ -201,8 +201,11 @@ def _npm_package_store_impl(ctx):
     files = []
     transitive_files_depsets = []
 
-    # JsInfo of the package and all deps required to run
-    js_infos = []
+    # sources, types and npm_sources depsets gathered from the JsInfo of the
+    # package and all deps required to run
+    sources_depsets = []
+    types_depsets = []
+    npm_sources_depsets = []
 
     # NpmPackageStoreInfo of the package and deps
     npm_package_store_infos = []
@@ -326,7 +329,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             symlink_path = package_store_directory_path
 
         # The package JsInfo including all direct and transitive sources, store info etc.
-        js_infos.append(jsinfo)
+        sources_depsets.append(jsinfo.transitive_sources)
+        types_depsets.append(jsinfo.transitive_types)
+        npm_sources_depsets.append(jsinfo.npm_sources)
 
         if jsinfo.target.repo_name:
             target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.repo_name, jsinfo.target.package)
@@ -382,13 +387,14 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         files.append(package_store_directory)
 
     # Include the store and js info of all dependencies expected to be linked
-    for target in ctx.attr.deps:
-        js_infos.append(target[JsInfo])
-        npm_package_store_infos.append(target[NpmPackageStoreInfo])
-
     if ctx.attr.src:
-        sources_depset = depset(transitive = [jsinfo.transitive_sources for jsinfo in js_infos])
-        types_depset = depset(transitive = [jsinfo.transitive_types for jsinfo in js_infos])
+        for target in ctx.attr.deps:
+            dep_js_info = target[JsInfo]
+            sources_depsets.append(dep_js_info.transitive_sources)
+            types_depsets.append(dep_js_info.transitive_types)
+            npm_sources_depsets.append(dep_js_info.npm_sources)
+            npm_package_store_infos.append(target[NpmPackageStoreInfo])
+
         for npm_package_store_info in npm_package_store_infos:
             transitive_files_depsets.append(npm_package_store_info.transitive_files)
     else:
@@ -396,15 +402,23 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # _not_ set, this is a terminal 3p package with ctx.attr.deps being the transitive closure
         # of deps; this pattern is used to break circular dependencies between 3rd party npm deps;
         # it is not used for 1st party deps; because npm_package_store_infos is the transitive
-        # closure of all the entire package store deps, we can safely add just `files` from each of
-        # these to `transitive_files_depset`; doing so reduces the size of `transitive_files_depset`
-        # significantly and reduces analysis time and Bazel memory usage during analysis
-        sources_depset = depset(transitive = [jsinfo.sources for jsinfo in js_infos])
-        types_depset = depset(transitive = [jsinfo.types for jsinfo in js_infos])
+        # closure of all the entire package store deps, we can safely add just the flat `sources`,
+        # `types` and `files` from each of these to the transitive depsets; doing so reduces the
+        # size of the transitive depsets significantly and reduces analysis time and Bazel memory
+        # usage during analysis
+        for target in ctx.attr.deps:
+            dep_js_info = target[JsInfo]
+            sources_depsets.append(dep_js_info.sources)
+            types_depsets.append(dep_js_info.types)
+            npm_sources_depsets.append(dep_js_info.npm_sources)
+            npm_package_store_infos.append(target[NpmPackageStoreInfo])
+
         for npm_package_store_info in npm_package_store_infos:
             transitive_files_depsets.append(npm_package_store_info.files)
 
-    npm_sources = depset(files, transitive = [jsinfo.npm_sources for jsinfo in js_infos])
+    sources_depset = depset(transitive = sources_depsets)
+    types_depset = depset(transitive = types_depsets)
+    npm_sources = depset(files, transitive = npm_sources_depsets)
     transitive_files_depset = depset(files, transitive = transitive_files_depsets)
     files_depset = depset(files)
 
