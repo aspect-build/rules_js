@@ -1,6 +1,6 @@
 "npm_link_package_store rule"
 
-load("//js:providers.bzl", "JsInfo", "js_info")
+load("//js:providers.bzl", "JsInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
 
@@ -125,7 +125,7 @@ def _npm_link_package_store_impl(ctx):
             # of a generic binary target such as sh_binary
             runfiles = ctx.runfiles(transitive_files = transitive_files_depset).merge(ctx.attr.src[DefaultInfo].default_runfiles),
         ),
-        js_info(
+        JsInfo(
             target = ctx.label,
             sources = store_js_info.sources,
             transitive_sources = store_js_info.transitive_sources,
