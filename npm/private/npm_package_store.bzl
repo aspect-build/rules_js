@@ -344,12 +344,17 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # deps; this pattern is used to break circular dependencies between 3rd party npm deps; it
         # is not used for 1st party deps
         deps_map = {}
+        deps_with_ref_deps = []
         for dep, _dep_aliases in ctx.attr.deps.items():
             dep_info = dep[NpmPackageStoreInfo]
 
             # create a map of deps that have package store directories
             if dep_info.package_store_directory:
-                deps_map[dep_info.key] = dep
+                deps_map[dep_info.key] = dep_info
+
+                if package_key == dep_info.key:
+                    # provide the node_modules directory for this package if found in the transitive_closure
+                    package_store_directory = dep_info.package_store_directory
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
                 # depedency will create the dep symlinks for this dep; this pattern is used to break
@@ -357,28 +362,32 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_info.package]
                 direct_ref_deps[dep] = dep_aliases
 
-        for dep in ctx.attr.deps:
-            dep_info = dep[NpmPackageStoreInfo]
+            if dep_info.ref_deps:
+                deps_with_ref_deps.append(dep_info)
+
+            # Include the store and js info of all dependencies expected to be linked;
+            # because deps is the transitive closure, the flat (non-transitive) sources
+            # and types of each dep are sufficient
+            dep_js_info = dep[JsInfo]
+            sources_depsets.append(dep_js_info.sources)
+            types_depsets.append(dep_js_info.types)
+            npm_sources_depsets.append(dep_js_info.npm_sources)
+            npm_package_store_infos.append(dep_info)
+
+        for dep_info in deps_with_ref_deps:
             dep_package_store_name = utils.package_store_name(dep_info.key)
 
-            if package_key == dep_info.key:
-                # provide the node_modules directory for this package if found in the transitive_closure
-                package_store_directory = dep_info.package_store_directory
-
             for dep_ref_dep, dep_ref_dep_aliases in dep_info.ref_deps.items():
-                dep_ref_dep_key = dep_ref_dep[NpmPackageStoreInfo].key
-                if not dep_ref_dep_key in deps_map:
+                dep_ref_dep_info = deps_map.get(dep_ref_dep[NpmPackageStoreInfo].key)
+                if not dep_ref_dep_info:
                     # This can happen in lifecycle npm package targets. We have no choice but to
                     # ignore reference back to self in dyadic circular deps in this case since a
                     # transitive dep on this npm package is impossible in an action that is
                     # outputting the package store tree artifact that circular dep would point to.
                     continue
-                actual_dep = deps_map[dep_ref_dep_key]
-                dep_ref_def_package_store_directory = actual_dep[NpmPackageStoreInfo].package_store_directory
-                if dep_ref_def_package_store_directory:
-                    target = dep_ref_def_package_store_directory.short_path[package_store_prefix_len:]
-                    for dep_ref_dep_alias in dep_ref_dep_aliases:
-                        files.append(_symlink_package_store(ctx, dep_package_store_name, target, dep_ref_dep_alias))
+                target = dep_ref_dep_info.package_store_directory.short_path[package_store_prefix_len:]
+                for dep_ref_dep_alias in dep_ref_dep_aliases:
+                    files.append(_symlink_package_store(ctx, dep_package_store_name, target, dep_ref_dep_alias))
     else:
         # We should _never_ get here
         fail("Internal error")
@@ -405,14 +414,8 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # closure of all the entire package store deps, we can safely add just the flat `sources`,
         # `types` and `files` from each of these to the transitive depsets; doing so reduces the
         # size of the transitive depsets significantly and reduces analysis time and Bazel memory
-        # usage during analysis
-        for target in ctx.attr.deps:
-            dep_js_info = target[JsInfo]
-            sources_depsets.append(dep_js_info.sources)
-            types_depsets.append(dep_js_info.types)
-            npm_sources_depsets.append(dep_js_info.npm_sources)
-            npm_package_store_infos.append(target[NpmPackageStoreInfo])
-
+        # usage during analysis; the flat sources and types are already gathered while iterating
+        # the deps above
         for npm_package_store_info in npm_package_store_infos:
             transitive_files_depsets.append(npm_package_store_info.files)
 
