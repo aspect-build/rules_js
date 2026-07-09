@@ -5,7 +5,7 @@ load("@bazel_lib//lib:copy_directory.bzl", "copy_directory_bin_action")
 load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 # buildifier: disable=bzl-visibility
-load("//js/private:js_info.bzl", "JsInfo", "js_info")
+load("//js/private:js_info.bzl", "JsInfo")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
@@ -409,13 +409,14 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
     files_depset = depset(files)
 
     providers = [
-        js_info(
+        JsInfo(
             target = ctx.label,
             npm_sources = npm_sources,
             sources = sources_depset,
             transitive_sources = sources_depset,
             types = types_depset,
             transitive_types = types_depset,
+            npm_package_store_infos = depset(),
         ),
         NpmPackageStoreInfo(
             key = package_key,
