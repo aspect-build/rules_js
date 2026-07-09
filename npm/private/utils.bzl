@@ -1,7 +1,6 @@
 "Utility functions for npm rules"
 
 load("@bazel_features//:features.bzl", "bazel_features")
-load("@bazel_lib//lib:paths.bzl", "relative_file")
 load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
@@ -141,9 +140,24 @@ def _friendly_name(name, version):
     "Make a name@version developer-friendly name for a package name and version"
     return "%s@%s" % (name, version)
 
+def _relative_output_path(target_path, frm_file_path):
+    # Compute the relative path from the parent directory of `frm_file_path` to `target_path`.
+    #
+    # Equivalent to bazel_lib's `relative_file` for the paths used with `_make_directory_symlink`,
+    # which are always normalized output tree paths (no leading "/", no "./" or "../" segments),
+    # avoiding the generic normalization that dominates `relative_file` CPU time.
+    t = target_path.split("/")
+    f = frm_file_path.split("/")
+    common = min(len(t), len(f)) - 1
+    for i in range(common):
+        if t[i] != f[i]:
+            common = i
+            break
+    return "/".join([".."] * (len(f) - 1 - common) + t[common:])
+
 def _make_directory_symlink(ctx, symlink_path, target_path):
     symlink = ctx.actions.declare_symlink(symlink_path)
-    relative_target = relative_file(target_path, symlink.path)
+    relative_target = _relative_output_path(target_path, symlink.path)
     if _SUPPORTS_SYMLINK_TARGET_TYPE:
         ctx.actions.symlink(output = symlink, target_path = relative_target, target_type = "directory")
     else:
