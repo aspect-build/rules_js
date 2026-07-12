@@ -203,7 +203,7 @@ def npm_package(
     `node_modules` files from being included.
 
     To stamp the current git tag as the "version" in the package.json file, see
-    [stamped_package_json](#stamped_package_json)
+    [stamped_package_json](#function-stamped_package_json)
 
     Args:
         name: Unique name for this target.

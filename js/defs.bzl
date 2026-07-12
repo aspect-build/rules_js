@@ -81,7 +81,7 @@ def js_binary(**kwargs):
     * JS_BINARY__EXECROOT: the absolute path to the root of the execution root for the action; if in the sandbox, this path absolute path to the root of the execution root within the sandbox
 
     Args:
-        **kwargs: All attributes of the [js_binary](#js_binary) rule.
+        **kwargs: All attributes of the [js_binary](#function-js_binary) rule.
     """
 
     # Often a js_binary target will set "chdir = package_name()", and if it is
@@ -124,7 +124,7 @@ def js_test(**kwargs):
     the contract between Bazel and a test runner.
 
     Args:
-        **kwargs: All attributes of the [js_test](#js_test) rule.
+        **kwargs: All attributes of the [js_test](#function-js_test) rule.
     """
     if kwargs.get("chdir") == "":
         kwargs["chdir"] = "."
