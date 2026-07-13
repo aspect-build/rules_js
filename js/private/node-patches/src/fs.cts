@@ -302,7 +302,17 @@ export function patcher(roots: string[]): () => void {
             if (err) return cb(err)
             const resolved = resolvePathLike(args[0])
             const linkTarget = p!
-            const targetAbs = path.resolve(path.dirname(resolved), linkTarget)
+            // Resolve the link target against the REAL location of the link's
+            // parent directory. `resolved` may itself traverse symlinks (e.g. an
+            // aliased node_modules path of a different depth than the real dir);
+            // joining a relative target onto the lexical parent then lands at the
+            // wrong absolute path. Falls back to the old behavior if the parent
+            // cannot be realpath'd (identity transform when already resolved).
+            let linkDir = path.dirname(resolved)
+            try {
+                linkDir = origRealpathSyncNative(linkDir) as string
+            } catch {}
+            const targetAbs = path.resolve(linkDir, linkTarget)
             const escapedRoot: string | false = isEscape(resolved, targetAbs)
             if (escapedRoot) {
                 const escapedRoots = [escapedRoot]
@@ -345,7 +355,13 @@ export function patcher(roots: string[]): () => void {
     ) {
         const resolved = resolvePathLike(args[0])
         const linkTarget = origReadlinkSync(...args)
-        const targetAbs = path.resolve(path.dirname(resolved), linkTarget)
+        // Resolve the link target against the REAL location of the link's parent
+        // directory (see fs.readlink above for the rationale).
+        let linkDir = path.dirname(resolved)
+        try {
+            linkDir = origRealpathSyncNative(linkDir) as string
+        } catch {}
+        const targetAbs = path.resolve(linkDir, linkTarget)
 
         const escapedRoot: string | false = isEscape(resolved, targetAbs)
         if (escapedRoot) {
