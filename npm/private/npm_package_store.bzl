@@ -350,6 +350,28 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         else:
             target_path = "{}/{}".format(ctx.bin_dir.path, jsinfo.target.package)
         package_store_directory = utils.make_directory_symlink(ctx, symlink_path, target_path)
+
+        # Link this first-party package's direct deps into its package store's
+        # nested node_modules, mirroring the NpmPackageInfo branch above. Without
+        # this, a tool resolving a first-party package *through its package-store
+        # copy* (rather than the app-level link) cannot see the package's deps.
+        # See https://github.com/aspect-build/rules_js/issues/2915
+        for dep, _dep_aliases in ctx.attr.deps.items():
+            dep_info = dep[NpmPackageStoreInfo]
+            dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_info.package]
+            dep_package_store_directory = dep_info.package_store_directory
+
+            if dep_info.root_package != ctx.label.package:
+                msg = """npm_package_store in %s package cannot depend on npm_package_store in %s package.
+deps of npm_package_store must be in the same package.""" % (ctx.label.package, dep_info.root_package)
+                fail(msg)
+
+            if dep_package_store_directory:
+                for dep_alias in dep_aliases:
+                    target = dep_package_store_directory.short_path[package_store_prefix_len:]
+                    files.append(_symlink_package_store(ctx, package_store_name, target, dep_alias))
+            else:
+                direct_ref_deps[dep] = dep_aliases
     elif not ctx.attr.src:
         # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
         # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
