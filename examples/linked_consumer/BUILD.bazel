@@ -18,6 +18,7 @@ js_test(
 # Exposed by linked npm deps
 js_test(
     name = "pkg",
+    args = ["$(rootpaths :node_modules/@lib/test2)"],
     data = [
         ":node_modules/@lib/test",
         ":node_modules/@lib/test2",
