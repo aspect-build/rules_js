@@ -35,7 +35,7 @@ if (
     JS_BINARY__PATCH_NODE_FS != '0' &&
     JS_BINARY__FS_PATCH_ROOTS
 ) {
-    const roots = JS_BINARY__FS_PATCH_ROOTS.split(':')
+    const roots = JS_BINARY__FS_PATCH_ROOTS.split(process.platform === 'win32' ? ';' : ':')
     if (JS_BINARY__LOG_DEBUG) {
         console.error(
             `DEBUG: ${JS_BINARY__LOG_PREFIX}: node fs patches will be applied with roots: ${roots}`

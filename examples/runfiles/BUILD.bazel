@@ -21,6 +21,11 @@ js_test(
         "test_fixture.md.generated_file_suffix",
         ":node_modules/@bazel/runfiles",
     ],
+    # Error: could not resolve module aspect_rules_js/examples/runfiles/test_fixture.md
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     entry_point = "module_name_test.js",
 )
 

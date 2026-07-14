@@ -149,6 +149,11 @@ babel_bin.babel(
         entry_point = "spawn.js",
         node_toolchain = toolchain,
         patch_node_fs = True,
+        # on windows: Error: spawnSync node ENOENT
+        target_compatible_with = select({
+            "@platforms//os:windows": ["@platforms//:incompatible"],
+            "//conditions:default": [],
+        }),
     )
     for toolchain_name, toolchain in zip(
         TOOLCHAINS_NAMES,
