@@ -1,0 +1,22 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load(":bindir_path_mapping_check.bzl", "bindir_path_mapping_check")
+
+# Verifies that a --bazel-bindir=<path> argument derived from a File added to
+# an Args object (and thus subject to Bazel's path mapping) is what
+# the js_binary launcher actually sees, proving the launcher's --bazel-bindir
+# flag (js_binary.sh.tpl) is compatible with path mapping.
+js_binary(
+    name = "bindir_check",
+    entry_point = "bindir_check.mjs",
+)
+
+bindir_path_mapping_check(
+    name = "bindir_path_mapping_check",
+    tool = ":bindir_check",
+)
+
+build_test(
+    name = "bindir_path_mapping_check_test",
+    targets = [":bindir_path_mapping_check"],
+)
