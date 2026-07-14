@@ -100,14 +100,14 @@ exit /b 0
 
 :resolve_execroot_bin_path
 set "short_path=%~1"
-if "!short_path:~0,3!"=="..\\" (
+if "!short_path:~0,3!"=="..\" (
     set "RESULT=%JS_BINARY__EXECROOT%\%BAZEL_BINDIR%\external\!short_path:~3!"
 ) else (
     set "RESULT=%JS_BINARY__EXECROOT%\%BAZEL_BINDIR%\!short_path!"
 )
 if not defined BAZEL_BINDIR (
     set "RESULT=%JS_BINARY__EXECROOT%\%JS_BINARY__BINDIR%\!short_path!"
-    if "!short_path:~0,3!"=="..\\" (
+    if "!short_path:~0,3!"=="..\" (
         set "RESULT=%JS_BINARY__EXECROOT%\%JS_BINARY__BINDIR%\external\!short_path:~3!"
     )
 )
@@ -115,7 +115,7 @@ exit /b 0
 
 :resolve_execroot_src_path
 set "short_path=%~1"
-if "!short_path:~0,3!"=="..\\" (
+if "!short_path:~0,3!"=="..\" (
     set "RESULT=%JS_BINARY__EXECROOT%\external\!short_path:~3!"
 ) else (
     set "RESULT=%JS_BINARY__EXECROOT%\!short_path!"
@@ -199,11 +199,18 @@ if not defined bazel_out_segment (
     echo "%CD%" | findstr /c:"\bazel-~1\" >nul && set "bazel_out_segment=\bazel-~1\"
 )
 
+rem Inherit JS_BINARY__EXECROOT from the parent only when BOTH
+rem USE_EXECROOT_ENTRY_POINT and EXECROOT are set; otherwise derive it.
+rem Mirrors the combined `&&` condition in js_binary.sh.tpl. Without this flag,
+rem the nested `if defined` form silently leaves EXECROOT empty when
+rem USE_EXECROOT_ENTRY_POINT is set but EXECROOT was not inherited (the case for
+rem lifecycle-hook js_binary actions launched directly in the execroot).
+set "_inherit_execroot="
+if defined JS_BINARY__USE_EXECROOT_ENTRY_POINT if defined JS_BINARY__EXECROOT set "_inherit_execroot=1"
+
 if defined bazel_out_segment (
-    if defined JS_BINARY__USE_EXECROOT_ENTRY_POINT (
-        if defined JS_BINARY__EXECROOT (
-            call :logf_debug "inheriting JS_BINARY__EXECROOT %JS_BINARY__EXECROOT% from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
-        )
+    if defined _inherit_execroot (
+        call :logf_debug "inheriting JS_BINARY__EXECROOT %JS_BINARY__EXECROOT% from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
     ) else (
         rem We in runfiles and we don't yet know the execroot
         rem Find the position of bazel_out_segment and extract execroot
@@ -214,10 +221,8 @@ if defined bazel_out_segment (
         call :extract_execroot_from_path "%CD%" "!bazel_out_segment!"
     )
 ) else (
-    if defined JS_BINARY__USE_EXECROOT_ENTRY_POINT (
-        if defined JS_BINARY__EXECROOT (
-            call :logf_debug "inheriting JS_BINARY__EXECROOT %JS_BINARY__EXECROOT% from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
-        )
+    if defined _inherit_execroot (
+        call :logf_debug "inheriting JS_BINARY__EXECROOT %JS_BINARY__EXECROOT% from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
     ) else (
         rem We are in execroot or in some other context all together such as a nodejs_image or a manually run js_binary
         set "JS_BINARY__EXECROOT=%CD%"
@@ -278,10 +283,10 @@ if defined JS_BINARY__NO_RUNFILES (
 
 if defined JS_BINARY__USE_EXECROOT_ENTRY_POINT (
     call :resolve_execroot_bin_path "{{entry_point_path}}"
-    set "entry_point=%RESULT%"
+    set "entry_point=!RESULT!"
 ) else if defined JS_BINARY__NO_RUNFILES (
     call :resolve_execroot_bin_path "{{entry_point_path}}"
-    set "entry_point=%RESULT%"
+    set "entry_point=!RESULT!"
 ) else (
     set "entry_point=%JS_BINARY__RUNFILES%\{{workspace_name}}\{{entry_point_path}}"
 )
@@ -305,7 +310,7 @@ if %errorlevel% equ 0 (
 ) else (
     if defined JS_BINARY__NO_RUNFILES (
         call :resolve_execroot_src_path "{{node}}"
-        set "JS_BINARY__NODE_BINARY=%RESULT%"
+        set "JS_BINARY__NODE_BINARY=!RESULT!"
     ) else (
         set "JS_BINARY__NODE_BINARY=%JS_BINARY__RUNFILES%\{{workspace_name}}\{{node}}"
     )
@@ -330,7 +335,7 @@ if defined npm (
     ) else (
         if defined JS_BINARY__NO_RUNFILES (
             call :resolve_execroot_src_path "%npm%"
-            set "JS_BINARY__NPM_BINARY=%RESULT%"
+            set "JS_BINARY__NPM_BINARY=!RESULT!"
         ) else (
             set "JS_BINARY__NPM_BINARY=%JS_BINARY__RUNFILES%\{{workspace_name}}\%npm%"
         )
@@ -344,7 +349,7 @@ if defined npm (
 
 if defined JS_BINARY__NO_RUNFILES (
     call :resolve_execroot_bin_path "{{node_wrapper}}"
-    set "JS_BINARY__NODE_WRAPPER=%RESULT%"
+    set "JS_BINARY__NODE_WRAPPER=!RESULT!"
 ) else (
     set "JS_BINARY__NODE_WRAPPER=%JS_BINARY__RUNFILES%\{{workspace_name}}\{{node_wrapper}}"
 )
@@ -356,7 +361,7 @@ if not exist "%JS_BINARY__NODE_WRAPPER%" (
 
 if defined JS_BINARY__NO_RUNFILES (
     call :resolve_execroot_src_path "{{node_patches}}"
-    set "JS_BINARY__NODE_PATCHES=%RESULT%"
+    set "JS_BINARY__NODE_PATCHES=!RESULT!"
 ) else (
     set "JS_BINARY__NODE_PATCHES=%JS_BINARY__RUNFILES%\{{workspace_name}}\{{node_patches}}"
 )
