@@ -124,6 +124,58 @@ describe('testing readlink', async () => {
         )
     })
 
+    await it('preserves relative targets when the root is a symlink', async () => {
+        await withFixtures(
+            {
+                realroot: {
+                    a: {},
+                    b: { file: 'contents' },
+                },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+                const realRoot = path.join(fixturesDir, 'realroot')
+                const rootLink = path.join(fixturesDir, 'rootlink')
+                const relativeTarget = path.join('..', 'b', 'file')
+
+                fs.symlinkSync(
+                    realRoot,
+                    rootLink,
+                    process.platform === 'win32' ? 'junction' : 'dir'
+                )
+                fs.symlinkSync(
+                    relativeTarget,
+                    path.join(realRoot, 'a', 'link')
+                )
+
+                const revertPatches = patcher([rootLink])
+                const linkPath = path.join(rootLink, 'a', 'link')
+
+                try {
+                    assert.deepStrictEqual(
+                        fs.readlinkSync(linkPath),
+                        relativeTarget,
+                        'SYNC: should preserve target within a symlinked root'
+                    )
+
+                    assert.deepStrictEqual(
+                        await util.promisify(fs.readlink)(linkPath),
+                        relativeTarget,
+                        'CB: should preserve target within a symlinked root'
+                    )
+
+                    assert.deepStrictEqual(
+                        await fs.promises.readlink(linkPath),
+                        relativeTarget,
+                        'Promise: should preserve target within a symlinked root'
+                    )
+                } finally {
+                    revertPatches()
+                }
+            }
+        )
+    })
+
     await it('resolves relative targets from the real parent of an aliased path', async () => {
         await withFixtures(
             {

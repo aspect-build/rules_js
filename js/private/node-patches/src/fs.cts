@@ -107,6 +107,34 @@ export function patcher(roots: string[]): () => void {
         .native as typeof FsType.realpathSync.native
 
     const { canEscape, isEscape } = escapeFunction(roots)
+    const rootMappings = roots
+        .map((root) => {
+            const lexical = path.resolve(root)
+            let real = lexical
+            try {
+                real = origRealpathSyncNative(lexical) as string
+            } catch {}
+            return { lexical, real }
+        })
+        .sort((a, b) => b.lexical.length - a.lexical.length)
+
+    // Keep real paths in the lexical namespace when the configured root is
+    // itself a symlink. Nested links that leave the root remain canonical.
+    function realpathInRootNamespace(p: string): string {
+        const real = origRealpathSyncNative(p) as string
+        for (const root of rootMappings) {
+            if (
+                isSubPath(root.lexical, p) &&
+                isSubPath(root.real, real)
+            ) {
+                return path.resolve(
+                    root.lexical,
+                    path.relative(root.real, real)
+                )
+            }
+        }
+        return real
+    }
 
     // =========================================================================
     // fs.lstat
@@ -310,7 +338,7 @@ export function patcher(roots: string[]): () => void {
             // cannot be realpath'd (identity transform when already resolved).
             let linkDir = path.dirname(resolved)
             try {
-                linkDir = origRealpathSyncNative(linkDir) as string
+                linkDir = realpathInRootNamespace(linkDir)
             } catch {}
             const targetAbs = path.resolve(linkDir, linkTarget)
             const escapedRoot: string | false = isEscape(resolved, targetAbs)
@@ -359,7 +387,7 @@ export function patcher(roots: string[]): () => void {
         // directory (see fs.readlink above for the rationale).
         let linkDir = path.dirname(resolved)
         try {
-            linkDir = origRealpathSyncNative(linkDir) as string
+            linkDir = realpathInRootNamespace(linkDir)
         } catch {}
         const targetAbs = path.resolve(linkDir, linkTarget)
 

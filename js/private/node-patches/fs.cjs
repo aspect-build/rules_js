@@ -99,6 +99,29 @@ function patcher(roots) {
     const origRealpathSyncNative = fs.realpathSync
         .native;
     const { canEscape, isEscape } = escapeFunction(roots);
+    const rootMappings = roots
+        .map((root) => {
+        const lexical = path.resolve(root);
+        let real = lexical;
+        try {
+            real = origRealpathSyncNative(lexical);
+        }
+        catch (_a) { }
+        return { lexical, real };
+    })
+        .sort((a, b) => b.lexical.length - a.lexical.length);
+    // Keep real paths in the lexical namespace when the configured root is
+    // itself a symlink. Nested links that leave the root remain canonical.
+    function realpathInRootNamespace(p) {
+        const real = origRealpathSyncNative(p);
+        for (const root of rootMappings) {
+            if (isSubPath(root.lexical, p) &&
+                isSubPath(root.real, real)) {
+                return path.resolve(root.lexical, path.relative(root.real, real));
+            }
+        }
+        return real;
+    }
     // =========================================================================
     // fs.lstat
     // =========================================================================
@@ -255,7 +278,7 @@ function patcher(roots) {
             // cannot be realpath'd (identity transform when already resolved).
             let linkDir = path.dirname(resolved);
             try {
-                linkDir = origRealpathSyncNative(linkDir);
+                linkDir = realpathInRootNamespace(linkDir);
             }
             catch (_a) { }
             const targetAbs = path.resolve(linkDir, linkTarget);
@@ -299,7 +322,7 @@ function patcher(roots) {
         // directory (see fs.readlink above for the rationale).
         let linkDir = path.dirname(resolved);
         try {
-            linkDir = origRealpathSyncNative(linkDir);
+            linkDir = realpathInRootNamespace(linkDir);
         }
         catch (_a) { }
         const targetAbs = path.resolve(linkDir, linkTarget);
