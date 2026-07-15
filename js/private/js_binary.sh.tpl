@@ -15,82 +15,49 @@ set -o pipefail -o errexit -o nounset
 {{envs}}
 
 # ==============================================================================
-# Prepare stdout capture, stderr capture && logging
+# Logging
 # ==============================================================================
-
-if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-    STDOUT_CAPTURE=$(mktemp)
-fi
-
-if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-    STDERR_CAPTURE=$(mktemp)
-fi
 
 export JS_BINARY__LOG_PREFIX="{{log_prefix_rule_set}}[{{log_prefix_rule}}]"
 
 function logf_stderr {
     local format_string="$1\n"
     shift
-    if [ "${STDERR_CAPTURE:-}" ]; then
-        # shellcheck disable=SC2059,SC2046
-        echo -e $(printf "$format_string" "$@") >>"$STDERR_CAPTURE"
-    else
-        # shellcheck disable=SC2059,SC2046
-        echo -e $(printf "$format_string" "$@") >&2
-    fi
+    # shellcheck disable=SC2059,SC2046
+    echo -e $(printf "$format_string" "$@") >&2
 }
 
 function logf_fatal {
     if [ "${JS_BINARY__LOG_FATAL:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
+        printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         logf_stderr "$@"
     fi
 }
 
 function logf_error {
     if [ "${JS_BINARY__LOG_ERROR:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "ERROR: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "ERROR: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
+        printf "ERROR: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         logf_stderr "$@"
     fi
 }
 
 function logf_warn {
     if [ "${JS_BINARY__LOG_WARN:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "WARN: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "WARN: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
+        printf "WARN: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         logf_stderr "$@"
     fi
 }
 
 function logf_info {
     if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
+        printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         logf_stderr "$@"
     fi
 }
 
 function logf_debug {
     if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "DEBUG: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "DEBUG: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
+        printf "DEBUG: %s: " "$JS_BINARY__LOG_PREFIX" >&2
         logf_stderr "$@"
     fi
 }
@@ -116,26 +83,6 @@ function resolve_execroot_src_path {
 _exit() {
     EXIT_CODE=$?
 
-    if [ "${STDERR_CAPTURE:-}" ]; then
-        if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-            cp -f "$STDERR_CAPTURE" "$JS_BINARY__STDERR_OUTPUT_FILE"
-        fi
-        if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-            cat "$STDERR_CAPTURE" >&2
-        fi
-        rm "$STDERR_CAPTURE"
-    fi
-
-    if [ "${STDOUT_CAPTURE:-}" ]; then
-        if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-            cp -f "$STDOUT_CAPTURE" "$JS_BINARY__STDOUT_OUTPUT_FILE"
-        fi
-        if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-            cat "$STDOUT_CAPTURE"
-        fi
-        rm "$STDOUT_CAPTURE"
-    fi
-
     logf_debug "exit code: %s" "$EXIT_CODE"
 
     exit $EXIT_CODE
@@ -153,17 +100,6 @@ export JS_BINARY__RUNFILES
 # ==============================================================================
 # Prepare to run main program
 # ==============================================================================
-
-# Convert stdout, stderr and exit_code capture outputs paths to absolute paths
-if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDOUT_OUTPUT_FILE="$PWD/$JS_BINARY__STDOUT_OUTPUT_FILE"
-fi
-if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDERR_OUTPUT_FILE="$PWD/$JS_BINARY__STDERR_OUTPUT_FILE"
-fi
-if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$PWD/$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
-fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     bazel_out_segment="/bazel-out/"
@@ -443,25 +379,9 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
     logf_info "$(echo -n "running" "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
-# De-export capture-related vars so child processes (e.g. a nested js_binary)
-# do not inherit them. The bash script has already consumed them above to set up
-# STDOUT_CAPTURE / STDERR_CAPTURE; leaking them would cause a nested js_binary
-# to silently swallow its own stdout or write to the wrong output file.
-# export -n keeps the value accessible to the _exit trap while removing it from
-# the environment seen by node and any processes it spawns.
-export -n JS_BINARY__STDOUT_OUTPUT_FILE JS_BINARY__STDERR_OUTPUT_FILE JS_BINARY__EXIT_CODE_OUTPUT_FILE JS_BINARY__SILENT_ON_SUCCESS
-
 set +e
 
-if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
-elif [ "${STDOUT_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
-elif [ "${STDERR_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
-else
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
-fi
+"$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 
 # ==============================================================================
 # Wait for program to finish
@@ -503,10 +423,4 @@ if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
     fi
 fi
 
-if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
-    # Exit zero if the exit code was captured
-    echo -n "$RESULT" >"$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
-    exit 0
-else
-    exit $RESULT
-fi
+exit $RESULT

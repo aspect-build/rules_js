@@ -3,6 +3,11 @@
 This macro wraps Aspect bazel-lib's run_binary (https://github.com/bazel-contrib/bazel-lib/blob/main/lib/run_binary.bzl)
 and adds attributes and features specific to rules_js's js_binary.
 
+`stdout`, `stderr`, `exit_code_out`, `silent_on_success` and `fail_on` are passed straight through
+to the underlying `run_binary`, which captures them via its `spawn_binary` wrapper. `chdir` is
+handled separately by this macro (see below) since it has bindir-relative semantics that don't
+match `run_binary`'s execroot-relative `chdir` attribute.
+
 Load this with,
 
 ```starlark
@@ -30,6 +35,7 @@ def js_run_binary(
         stderr = None,
         exit_code_out = None,
         silent_on_success = True,
+        fail_on = [],
         use_execroot_entry_point = None,
         copy_srcs_to_bin = True,
         include_sources = True,
@@ -133,6 +139,13 @@ def js_run_binary(
         silent_on_success: produce no output on stdout nor stderr when program exits with status code 0.
 
             This makes node binaries match the expected bazel paradigm.
+
+        fail_on: Exit codes that should fail the action.
+
+            When set, only the listed exit codes cause the action to fail; all other exit codes are
+            treated as success. Useful for tools that use non-zero exit codes for non-error
+            conditions. Can be combined with `exit_code_out` to record the exit code while still
+            failing the action on specific codes. See bazel-lib's `run_binary` docs for more details.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
@@ -313,22 +326,6 @@ def js_run_binary(
                 normalized_chdir = "external/{}/{}".format(repo, chdir)
         fixed_env["JS_BINARY__CHDIR"] = normalized_chdir
 
-    # Configure capturing stdout, stderr and/or the exit code
-    extra_outs = []
-    if stdout:
-        fixed_env["JS_BINARY__STDOUT_OUTPUT_FILE"] = "$(execpath {})".format(stdout)
-        extra_outs.append(stdout)
-    if stderr:
-        fixed_env["JS_BINARY__STDERR_OUTPUT_FILE"] = "$(execpath {})".format(stderr)
-        extra_outs.append(stderr)
-    if exit_code_out:
-        fixed_env["JS_BINARY__EXIT_CODE_OUTPUT_FILE"] = "$(execpath {})".format(exit_code_out)
-        extra_outs.append(exit_code_out)
-
-    # Configure silent on success
-    if silent_on_success:
-        fixed_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
-
     # Disable node patches if requested
     if patch_node_fs:
         fixed_env["JS_BINARY__PATCH_NODE_FS"] = "1"
@@ -407,9 +404,14 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         tool = tool,
         env = fixed_env | execroot_env | env,
         srcs = srcs + extra_srcs + execroot_extra_srcs,
-        outs = outs + extra_outs,
+        outs = outs,
         out_dirs = out_dirs,
         args = args,
+        stdout = stdout,
+        stderr = stderr,
+        exit_code_out = exit_code_out,
+        silent_on_success = silent_on_success,
+        fail_on = fail_on,
         mnemonic = mnemonic,
         progress_message = progress_message,
         execution_requirements = execution_requirements,
