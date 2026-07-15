@@ -1,2 +1,6 @@
 import %workspace%/../../tools/preset.bazelrc
 import %workspace%/../e2e.bazelrc
+
+# Regression test for #2919: exercise execroot detection when the output base path contains a
+# "bazel-out" segment (nested so it does not clash with the bazel-out convenience symlink).
+startup --output_base=.e2e_output_base/bazel-out/base
