@@ -293,12 +293,15 @@ elif [[ "$PWD" == *"/bazel-~1/"* ]]; then
     bazel_out_segment="/bazel-~1/"
 fi
 
-if [[ "${bazel_out_segment:-}" ]]; then
+# When $PWD is a build action execroot the bindir hangs off it (BAZEL_BINDIR resolves from $PWD), so
+# $PWD is the execroot even if its path contains a "bazel-out" segment (e.g. a matching output base).
+# Otherwise scan the output tree for the execroot (runfiles, or a nested js_binary in the bindir).
+if [[ "${bazel_out_segment:-}" && ( -z "${BAZEL_BINDIR:-}" || ! -d "$PWD/$BAZEL_BINDIR" ) ]]; then
     if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
         logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
     else
-        # We in runfiles and we don't yet know the execroot
-        rest="${PWD#*"$bazel_out_segment"}"
+        # We in runfiles and we don't yet know the execroot; strip from the last "bazel-out" segment
+        rest="${PWD##*"$bazel_out_segment"}"
         index=$((${#PWD} - ${#rest} - ${#bazel_out_segment}))
         if [ ${index} -lt 0 ]; then
             printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
