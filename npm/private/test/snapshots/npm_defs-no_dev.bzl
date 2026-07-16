@@ -1013,7 +1013,13 @@ def _link_pkg_8():
 
 def _link_pkg_9():
     link_868()
-    return [":node_modules/uuid"], None
+    _fp_link_2()
+    return [
+        ":node_modules/uuid",
+        ":node_modules/@image-test/a",
+    ], {
+        "@image-test": [":node_modules/@image-test/a"],
+    }
 
 def _link_pkg_10():
     _fp_link_4()
@@ -2004,6 +2010,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@image-test/d",
             version = "0.0.0",
             deps = {
+                "//:.aspect_rules_js/node_modules/@image-test+a@0.0.0": "@image-test/a",
                 "//:.aspect_rules_js/node_modules/uuid@8.3.2": "uuid",
             },
             visibility = ["//visibility:public"],
@@ -2117,7 +2124,10 @@ _LINK_TARGETS = {
         "prod": [":node_modules/uuid"],
     },
     "js/private/test/image-fixture-d": {
-        "prod": [":node_modules/uuid"],
+        "prod": [
+            ":node_modules/uuid",
+            ":node_modules/@image-test/a",
+        ],
     },
     "npm/private/test/subs": {
         "prod": [
