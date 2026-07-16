@@ -3,10 +3,9 @@
 This macro wraps Aspect bazel-lib's run_binary (https://github.com/bazel-contrib/bazel-lib/blob/main/lib/run_binary.bzl)
 and adds attributes and features specific to rules_js's js_binary.
 
-`stdout`, `stderr`, `exit_code_out`, `silent_on_success` and `fail_on` are passed straight through
-to the underlying `run_binary`, which captures them via its `spawn_binary` wrapper. `chdir` is
-handled separately by this macro (see below) since it has bindir-relative semantics that don't
-match `run_binary`'s execroot-relative `chdir` attribute.
+`stdout`, `stderr`, `exit_code_out`, and `silent_on_success` are passed straight through to the
+underlying `run_binary`. `chdir` is handled separately by this macro (see below) since it has
+bindir-relative semantics that don't match `run_binary`'s execroot-relative `chdir` attribute.
 
 Load this with,
 
@@ -35,7 +34,6 @@ def js_run_binary(
         stderr = None,
         exit_code_out = None,
         silent_on_success = True,
-        fail_on = [],
         use_execroot_entry_point = None,
         copy_srcs_to_bin = True,
         include_sources = True,
@@ -139,13 +137,6 @@ def js_run_binary(
         silent_on_success: produce no output on stdout nor stderr when program exits with status code 0.
 
             This makes node binaries match the expected bazel paradigm.
-
-        fail_on: Exit codes that should fail the action.
-
-            When set, only the listed exit codes cause the action to fail; all other exit codes are
-            treated as success. Useful for tools that use non-zero exit codes for non-error
-            conditions. Can be combined with `exit_code_out` to record the exit code while still
-            failing the action on specific codes. See bazel-lib's `run_binary` docs for more details.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
@@ -411,7 +402,6 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         stderr = stderr,
         exit_code_out = exit_code_out,
         silent_on_success = silent_on_success,
-        fail_on = fail_on,
         mnemonic = mnemonic,
         progress_message = progress_message,
         execution_requirements = execution_requirements,
