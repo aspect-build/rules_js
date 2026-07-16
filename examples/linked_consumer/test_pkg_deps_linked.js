@@ -15,7 +15,7 @@ const packageStoreLink = process.argv
 assert.ok(packageStoreLink, 'first-party package store link should be present')
 
 const storeNodeModules = path.dirname(path.dirname(packageStoreLink))
-for (const dep of ['@aspect-test/e', 'alias-e']) {
+for (const dep of ['@aspect-test/e', '@lib/test', 'alias-e']) {
     const depPath = path.join(storeNodeModules, dep)
     assert.ok(
         fs.existsSync(depPath),
