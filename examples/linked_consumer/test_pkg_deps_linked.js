@@ -1,5 +1,28 @@
 // Asserts *only non-dev* dependencies are available from the npm package
 
+const assert = require('node:assert')
+const fs = require('node:fs')
+const path = require('node:path')
+
+const packageStoreLink = process.argv
+    .slice(2)
+    .flatMap((arg) => arg.split(' '))
+    .find(
+        (arg) =>
+            arg.includes('.aspect_rules_js') &&
+            arg.endsWith('node_modules/@lib/test2')
+    )
+assert.ok(packageStoreLink, 'first-party package store link should be present')
+
+const storeNodeModules = path.dirname(path.dirname(packageStoreLink))
+for (const dep of ['@aspect-test/e', '@lib/test', 'alias-e']) {
+    const depPath = path.join(storeNodeModules, dep)
+    assert.ok(
+        fs.existsSync(depPath),
+        `${dep} should be linked into the first-party package store at ${depPath}`
+    )
+}
+
 const testLib = require('@lib/test')
 const testLib2 = require('@lib/test2')
 

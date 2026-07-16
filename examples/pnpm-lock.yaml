@@ -66,6 +66,9 @@ importers:
       '@aspect-test/e':
         specifier: 1.0.0
         version: 1.0.0
+      '@lib/test':
+        specifier: workspace:*
+        version: link:../linked_pkg
       alias-e:
         specifier: npm:@aspect-test/e
         version: '@aspect-test/e@1.0.0'

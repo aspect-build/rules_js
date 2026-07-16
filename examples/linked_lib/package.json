@@ -3,6 +3,7 @@
     "private": true,
     "dependencies": {
         "@aspect-test/e": "1.0.0",
+        "@lib/test": "workspace:*",
         "alias-e": "npm:@aspect-test/e"
     },
     "devDependencies": {
