@@ -3,10 +3,6 @@
 This macro wraps Aspect bazel-lib's run_binary (https://github.com/bazel-contrib/bazel-lib/blob/main/lib/run_binary.bzl)
 and adds attributes and features specific to rules_js's js_binary.
 
-`stdout`, `stderr`, `exit_code_out`, and `silent_on_success` are passed straight through to the
-underlying `run_binary`. `chdir` is handled separately by this macro (see below) since it has
-bindir-relative semantics that don't match `run_binary`'s execroot-relative `chdir` attribute.
-
 Load this with,
 
 ```starlark
