@@ -54,13 +54,14 @@ class AspectWatchProtocol {
             // Initial connection + success vs failure
             this.connection.once('error', reject);
             try {
-                this.connection.connect(this.socketFile, resolve);
+                this.connection.connect(this.socketFile, () => {
+                    this.connection.off('error', reject);
+                    resolve();
+                });
             }
             catch (err) {
-                reject(err);
-            }
-            finally {
                 this.connection.off('error', reject);
+                reject(err);
             }
         });
         const { versions } = await this._receive(MessageType.NEGOTIATE);
