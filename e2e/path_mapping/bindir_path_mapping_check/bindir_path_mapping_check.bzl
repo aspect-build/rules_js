@@ -6,7 +6,7 @@ consistently across configurations.
 """
 
 def _bazel_bindir_arg(file):
-    return "--bazel-bindir=" + file.root.path
+    return file.root.path
 
 def _bindir_path_mapping_check_impl(ctx):
     output = ctx.actions.declare_file(ctx.label.name + ".ok")
@@ -17,6 +17,7 @@ def _bindir_path_mapping_check_impl(ctx):
     # args.add() or args.add_all(). To get ahold of the path-mapped output bin
     # directory, we have to add an output here and then derive the bin
     # directory from it in the map_each callback.
+    args.add("--bazel-bindir")
     args.add_all([output], map_each = _bazel_bindir_arg)
 
     # short_path never includes the bazel-out/<cfg>/bin prefix, so it needs no
