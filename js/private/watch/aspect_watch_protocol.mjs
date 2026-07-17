@@ -115,11 +115,16 @@ export class AspectWatchProtocol {
         do {
             // Only receive cycle messages, forever up until the connection is closed.
             // Connection errors will propagate.
-            const cycleMsg = await this._receive();
-            if (cycleMsg.kind !== MessageType.CYCLE &&
-                cycleMsg.kind !== MessageType.CYCLE_RESET) {
-                throw new Error(`Expected CYCLE or CYCLE_RESET, got ${cycleMsg.kind}`);
+            const msg = await this._receive();
+            // The server is shutting down; end the cycle loop cleanly.
+            if (msg.kind === MessageType.EXIT) {
+                return;
             }
+            if (msg.kind !== MessageType.CYCLE &&
+                msg.kind !== MessageType.CYCLE_RESET) {
+                throw new Error(`Expected CYCLE or CYCLE_RESET, got ${msg.kind}`);
+            }
+            const cycleMsg = msg;
             // Invoke the cycle callback while recording+logging errors
             let cycleError = null;
             try {
