@@ -103,6 +103,10 @@ function patcher(roots) {
         .map((root) => {
         const lexical = path.resolve(root);
         let real = lexical;
+        // A configured root need not exist on disk when the patch is
+        // registered (or may be inaccessible); when it can't be realpath'd
+        // we keep real == lexical, i.e. treat the root as not-symlinked so
+        // the remapping below is a no-op.
         try {
             real = origRealpathSyncNative(lexical);
         }
