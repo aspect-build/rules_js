@@ -94,15 +94,20 @@ trap _exit EXIT
 # Handle --bazel-bindir flag
 # ==============================================================================
 
-# If a --bazel-bindir=<path> flag is passed it must be the first argument. It
-# is consumed by this launcher script and used to set BAZEL_BINDIR, overriding
-# any value already set in the environment.
+# If a --bazel-bindir=<path> or --bazel-bindir <path> flag is passed it must
+# be the first argument(s). It is consumed by this launcher script and used to
+# set BAZEL_BINDIR, overriding any value already set in the environment.
 if [ $# -gt 0 ]; then
     case "$1" in
     --bazel-bindir=*)
         BAZEL_BINDIR="${1#--bazel-bindir=}"
         export BAZEL_BINDIR
         shift
+        ;;
+    --bazel-bindir)
+        BAZEL_BINDIR="$2"
+        export BAZEL_BINDIR
+        shift 2
         ;;
     esac
 fi
