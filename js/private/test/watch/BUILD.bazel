@@ -1,6 +1,12 @@
 load("//js:defs.bzl", "js_test")
 
 js_test(
+    name = "aspect_watch_protocol_test",
+    data = ["//js/private/watch"],
+    entry_point = "aspect_watch_protocol.test.mjs",
+)
+
+js_test(
     name = "connect_error_test",
     data = ["//js/private/watch"],
     entry_point = "connect_error.test.mjs",
