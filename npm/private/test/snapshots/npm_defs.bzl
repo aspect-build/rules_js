@@ -927,6 +927,7 @@ _NPM_PACKAGE_VISIBILITY = {
 
 _NPM_PACKAGE_LOCATIONS = {
     "js/private/test/image": ["@image-test/a", "@image-test/d", "acorn"],
+    "js/private/test/image-fixture-d": ["@image-test/a", "uuid"],
     "npm/private/test": ["test-npm_package", "@fastify/send", "@figma/nodegit", "@kubernetes/client-node", "@plotly/regl", "regl", "@vscode/vsce-sign-alpine-arm64", "@vscode/vsce-sign-alpine-x64", "bufferutil", "debug", "esbuild", "handlebars-helpers/helper-date", "hot-shots", "inline-fixtures", "json-stable-stringify", "lodash", "lodash-4.17.21", "lodash-4.17.21-tar", "node-gyp", "plotly.js", "pngjs", "protoc-gen-grpc", "puppeteer", "sass-embedded-all-unknown", "segfault-handler", "semver-first-satisfied", "syncpack", "typescript", "unused", "webpack-bundle-analyzer"],
     "npm/private/test/subs": ["@subs/a", "@subs/b"],
     "js/private/test/node-patches": ["@babel/cli", "@babel/core", "@babel/plugin-transform-modules-commonjs", "inline-fixtures"],
@@ -939,7 +940,6 @@ _NPM_PACKAGE_LOCATIONS = {
     "js/private/test/js_run_devserver": ["@types/node", "jasmine"],
     "npm/private/test/npm_package": ["chalk", "chalk-alt"],
     "js/private/test/image-fixture-a": ["uuid"],
-    "js/private/test/image-fixture-d": ["uuid"],
 }
 
 def _link_pkg_0():
@@ -1208,7 +1208,13 @@ def _link_pkg_11():
 
 def _link_pkg_12():
     link_868()
-    return [":node_modules/uuid"], None
+    _fp_link_2()
+    return [
+        ":node_modules/uuid",
+        ":node_modules/@image-test/a",
+    ], {
+        "@image-test": [":node_modules/@image-test/a"],
+    }
 
 def _link_pkg_13():
     _fp_link_5()
@@ -2205,6 +2211,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@image-test/d",
             version = "0.0.0",
             deps = {
+                "//:.aspect_rules_js/node_modules/@image-test+a@0.0.0": "@image-test/a",
                 "//:.aspect_rules_js/node_modules/uuid@8.3.2": "uuid",
             },
             visibility = ["//visibility:public"],
@@ -2408,7 +2415,10 @@ _LINK_TARGETS = {
         "prod": [":node_modules/uuid"],
     },
     "js/private/test/image-fixture-d": {
-        "prod": [":node_modules/uuid"],
+        "prod": [
+            ":node_modules/uuid",
+            ":node_modules/@image-test/a",
+        ],
     },
     "npm/private/test/subs": {
         "prod": [

@@ -88,6 +88,9 @@ importers:
 
   js/private/test/image-fixture-d:
     dependencies:
+      '@image-test/a':
+        specifier: workspace:*
+        version: link:../image-fixture-a
       uuid:
         specifier: 8.3.2
         version: 8.3.2

@@ -12,7 +12,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runf
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image-fixture-a/
 -r-xr-xr-x  0 0      0         106 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image-fixture-a/package.json
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image-fixture-d/
--r-xr-xr-x  0 0      0         128 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image-fixture-d/package.json
+-r-xr-xr-x  0 0      0         168 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image-fixture-d/package.json
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/
 -r-xr-xr-x  0 0      0       xxxxx Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_/bin
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./js/private/test/image/bin.runfiles/_main/js/private/test/image/bin_node_bin/
