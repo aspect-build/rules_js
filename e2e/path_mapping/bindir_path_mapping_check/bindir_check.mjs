@@ -15,7 +15,6 @@ if (bindir !== 'bazel-out/cfg/bin') {
 }
 
 const leaked = process.argv
-    .slice(2)
     .filter((arg) => arg.startsWith('--bazel-bindir='))
 if (leaked.length > 0) {
     process.stderr.write(`--bazel-bindir= flag leaked into argv: ${leaked}\n`)
