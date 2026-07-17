@@ -313,22 +313,6 @@ def js_run_binary(
                 normalized_chdir = "external/{}/{}".format(repo, chdir)
         fixed_env["JS_BINARY__CHDIR"] = normalized_chdir
 
-    # Configure capturing stdout, stderr and/or the exit code
-    extra_outs = []
-    if stdout:
-        fixed_env["JS_BINARY__STDOUT_OUTPUT_FILE"] = "$(execpath {})".format(stdout)
-        extra_outs.append(stdout)
-    if stderr:
-        fixed_env["JS_BINARY__STDERR_OUTPUT_FILE"] = "$(execpath {})".format(stderr)
-        extra_outs.append(stderr)
-    if exit_code_out:
-        fixed_env["JS_BINARY__EXIT_CODE_OUTPUT_FILE"] = "$(execpath {})".format(exit_code_out)
-        extra_outs.append(exit_code_out)
-
-    # Configure silent on success
-    if silent_on_success:
-        fixed_env["JS_BINARY__SILENT_ON_SUCCESS"] = "1"
-
     # Disable node patches if requested
     if patch_node_fs:
         fixed_env["JS_BINARY__PATCH_NODE_FS"] = "1"
@@ -407,9 +391,13 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         tool = tool,
         env = fixed_env | execroot_env | env,
         srcs = srcs + extra_srcs + execroot_extra_srcs,
-        outs = outs + extra_outs,
+        outs = outs,
         out_dirs = out_dirs,
         args = args,
+        stdout = stdout,
+        stderr = stderr,
+        exit_code_out = exit_code_out,
+        silent_on_success = silent_on_success,
         mnemonic = mnemonic,
         progress_message = progress_message,
         execution_requirements = execution_requirements,
