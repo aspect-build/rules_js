@@ -90,6 +90,7 @@ jobs:
                     e2e/protobuf-google
                     e2e/repo_mapping
                     e2e/output_paths
+                    e2e/path_mapping
                     e2e/ts_version_from_rules_ts_3.8.10
                     e2e/update_pnpm_lock
                     e2e/update_pnpm_lock_with_import

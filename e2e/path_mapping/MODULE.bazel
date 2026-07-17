@@ -1,0 +1,9 @@
+module(name = "e2e_path_mapping")
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
