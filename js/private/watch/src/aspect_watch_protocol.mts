@@ -95,6 +95,9 @@ export interface ExitMessage extends Message {
 // Environment constants
 const { JS_BINARY__LOG_DEBUG } = process.env
 
+// The message framing delimiter byte.
+const NEWLINE = '\n'.charCodeAt(0)
+
 function selectVersion(versions: number[]): number {
     if (versions.includes(3)) {
         return 3
@@ -117,12 +120,30 @@ export class AspectWatchProtocol {
     private _error: (err: Error) => void
     private _cycle: (msg: CycleMessage) => Promise<void>
 
+    // Single persistent reader state: partial trailing line, parsed but
+    // unconsumed messages, the pending _receive() and the terminal error.
+    private _readTail: Buffer = Buffer.alloc(0)
+    private _received: Message[] = []
+    private _receiver: {
+        resolve: (msg: Message) => void
+        reject: (err: Error) => void
+    } | null = null
+    private _terminated: Error | null = null
+
     constructor(socketFile: string) {
         this.socketFile = socketFile
         this.connection = new net.Socket({})
 
         // Propagate connection errors to a configurable callback
         this._error = console.error
+
+        // A single persistent reader for the lifetime of the connection so
+        // messages are framed correctly and never dropped between receives.
+        this.connection.on('data', (data) => this._dataReceived(data))
+        this.connection.on('error', (err) => this._terminate(err))
+        this.connection.on('close', () =>
+            this._terminate(new Error('watch protocol connection closed'))
+        )
     }
 
     /**
@@ -275,59 +296,86 @@ export class AspectWatchProtocol {
         } while (!once && this.connection.readable && this.connection.writable)
     }
 
+    // Split the byte stream into newline-delimited JSON messages, delivering
+    // them to the pending _receive() or queueing them until one arrives.
+    private _dataReceived(data: Buffer) {
+        const buf = this._readTail.length
+            ? Buffer.concat([this._readTail, data])
+            : data
+
+        let start = 0
+        for (
+            let nl = buf.indexOf(NEWLINE, start);
+            nl !== -1;
+            nl = buf.indexOf(NEWLINE, start)
+        ) {
+            const line = buf.subarray(start, nl).toString().trim()
+            start = nl + 1
+            if (!line) {
+                continue
+            }
+
+            let msg: Message
+            try {
+                msg = JSON.parse(line)
+            } catch (e) {
+                this._terminate(
+                    new Error(`Failed to parse watch protocol message: ${e}`)
+                )
+                this.connection.destroy()
+                return
+            }
+
+            if (this._receiver) {
+                const receiver = this._receiver
+                this._receiver = null
+                receiver.resolve(msg)
+            } else {
+                this._received.push(msg)
+            }
+        }
+
+        // Copy the partial trailing line so the full chunk can be released.
+        this._readTail =
+            start < buf.length
+                ? Buffer.from(buf.subarray(start))
+                : Buffer.alloc(0)
+    }
+
+    // Fail the pending _receive() and all future receives, e.g. on socket error or close.
+    private _terminate(err: Error) {
+        if (this._terminated) {
+            return
+        }
+        this._terminated = err
+
+        if (this._receiver) {
+            const receiver = this._receiver
+            this._receiver = null
+            receiver.reject(err)
+        }
+    }
+
     async _receive<M extends Message>(
         type: M['kind'] | null = null
     ): Promise<M> {
-        return await new Promise((resolve, reject) => {
-            const dataBufs: Buffer[] = []
-            const connection = this.connection
+        let msg: Message
+        if (this._received.length > 0) {
+            msg = this._received.shift()
+        } else if (this._terminated) {
+            throw this._terminated
+        } else if (this._receiver) {
+            throw new Error('Concurrent _receive() calls are not supported')
+        } else {
+            msg = await new Promise<Message>((resolve, reject) => {
+                this._receiver = { resolve, reject }
+            })
+        }
 
-            connection.once('error', onError)
-            connection.once('close', onError)
-            connection.on('data', dataReceived)
-
-            // Destructor removing all temporary event handlers.
-            function removeHandlers() {
-                connection.off('error', onError)
-                connection.off('close', onError)
-                connection.off('data', dataReceived)
-            }
-
-            // Error event handler
-            function onError(err) {
-                removeHandlers()
-                reject(err)
-            }
-
-            // Data event handler to receive data and determine when to resolve the promise.
-            function dataReceived(data) {
-                dataBufs.push(data)
-
-                if (data.at(data.byteLength - 1) !== '\n'.charCodeAt(0)) {
-                    return
-                }
-
-                // Removal all temporary event handlers before resolving the promise
-                removeHandlers()
-
-                try {
-                    const msg = JSON.parse(
-                        Buffer.concat(dataBufs).toString().trim()
-                    )
-                    if (type && msg.kind !== type) {
-                        reject(
-                            new Error(
-                                `Expected message kind ${type}, got ${msg.kind}`
-                            )
-                        )
-                    } else {
-                        resolve(msg)
-                    }
-                } catch (e) {
-                    reject(e)
-                }
-            }
-        })
+        if (type && msg.kind !== type) {
+            throw new Error(`Expected message kind ${type}, got ${msg.kind}`)
+        }
+        return msg as M
     }
 
     async _send<M extends Message>(type: M['kind'], data: Omit<M, 'kind'>) {

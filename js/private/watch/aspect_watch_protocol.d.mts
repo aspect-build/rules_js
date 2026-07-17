@@ -73,6 +73,10 @@ export declare class AspectWatchProtocol {
     private _version;
     private _error;
     private _cycle;
+    private _readTail;
+    private _received;
+    private _receiver;
+    private _terminated;
     constructor(socketFile: string);
     /**
      * Establish a connection to the Aspect Watcher server and complete the initial
@@ -101,6 +105,8 @@ export declare class AspectWatchProtocol {
      * the connection is closed or an error occurs.
      */
     cycle(once?: boolean): Promise<void>;
+    private _dataReceived;
+    private _terminate;
     _receive<M extends Message>(type?: M['kind'] | null): Promise<M>;
     _send<M extends Message>(type: M['kind'], data: Omit<M, 'kind'>): Promise<void>;
 }
