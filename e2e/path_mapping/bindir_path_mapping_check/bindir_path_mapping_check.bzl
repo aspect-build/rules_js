@@ -1,10 +1,8 @@
 """Test-only rule that drives a js_binary tool with a path-mapped --bazel-bindir arg.
 
-Unlike js_run_binary (whose args are built by expanding $(location)/make
-variables into plain strings), this rule builds its --bazel-bindir argument
-from a File added directly to a ctx.actions.args() object, allowing Bazel's
-path mapping (--experimental_output_paths=strip) to rewrite it consistently
-across configurations.
+This rule builds its --bazel-bindir argument from a File added directly to a
+ctx.actions.args() object, allowing Bazel's path mapping to rewrite it
+consistently across configurations.
 """
 
 def _bazel_bindir_arg(file):
