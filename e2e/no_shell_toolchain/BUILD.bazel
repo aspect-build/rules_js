@@ -1,0 +1,48 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+
+# js_binary declared @bazel_tools//tools/sh:toolchain_type as a mandatory
+# toolchain even though the rule never consumes it. Building for a platform with
+# no shell toolchain (e.g. Apple/iOS under Bazel 8+) therefore failed toolchain
+# resolution. The .bazelrc forces every target onto //:ios_like; this must build.
+js_binary(
+    name = "bin",
+    entry_point = "index.js",
+)
+
+# The #2347 scenario: js_binary used as a codegen tool. Building this runs the
+# tool, exercising the target-configured js_binary that failed to resolve the
+# shell toolchain.
+js_run_binary(
+    name = "run_bin",
+    stdout = "out.txt",
+    tool = ":bin",
+)
+
+build_test(
+    name = "build_test",
+    targets = [
+        ":bin",
+        ":run_bin",
+    ],
+)
+
+platform(
+    name = "ios_like",
+    constraint_values = [
+        "@platforms//os:ios",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+# A Node.js runtime toolchain for the iOS platform, so the only toolchain missing
+# on //:ios_like is the shell toolchain -- isolating the regression.
+toolchain(
+    name = "nodejs_ios_arm64_toolchain",
+    target_compatible_with = [
+        "@platforms//os:ios",
+        "@platforms//cpu:arm64",
+    ],
+    toolchain = "@nodejs_linux_amd64//:toolchain",
+    toolchain_type = "@rules_nodejs//nodejs:runtime_toolchain_type",
+)
