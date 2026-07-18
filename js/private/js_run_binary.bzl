@@ -111,6 +111,23 @@ def js_run_binary(
 
             You may need `../../` segments to re-relativize such paths to the new working directory.
 
+            In particular, `$(location)`/`$(execpath)`/`$@` expand to workspace-relative paths like
+            `bazel-out/<config>/bin/<package>/out`. Since `chdir` already puts the working directory inside that tree,
+            passing such a path unchanged makes the tool write to a doubled path and the declared output never appears.
+            Prepend `../` segments to climb back to the exec root first — three for `bazel-out/<config>/bin` plus one
+            per package-path segment:
+
+            ```starlark
+            js_run_binary(
+                name = "compile",
+                srcs = ["styles.scss"],
+                outs = ["styles.css"],
+                chdir = package_name(),
+                args = ["styles.scss", "../../../$@"],  # $@ is workspace-relative; climb out of chdir
+                tool = ":sass",
+            )
+            ```
+
         stderr: Output file to capture the stderr of the binary to.
 
             This can later be used as an input to another target subject to the same semantics as `outs`.
