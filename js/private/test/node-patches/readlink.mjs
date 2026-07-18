@@ -124,6 +124,119 @@ describe('testing readlink', async () => {
         )
     })
 
+    await it('preserves relative targets when the root is a symlink', async () => {
+        await withFixtures(
+            {
+                realroot: {
+                    a: {},
+                    b: { file: 'contents' },
+                },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+                const realRoot = path.join(fixturesDir, 'realroot')
+                const rootLink = path.join(fixturesDir, 'rootlink')
+                const relativeTarget = path.join('..', 'b', 'file')
+
+                fs.symlinkSync(
+                    realRoot,
+                    rootLink,
+                    process.platform === 'win32' ? 'junction' : 'dir'
+                )
+                fs.symlinkSync(
+                    relativeTarget,
+                    path.join(realRoot, 'a', 'link')
+                )
+
+                const revertPatches = patcher([rootLink])
+                const linkPath = path.join(rootLink, 'a', 'link')
+
+                try {
+                    assert.deepStrictEqual(
+                        fs.readlinkSync(linkPath),
+                        relativeTarget,
+                        'SYNC: should preserve target within a symlinked root'
+                    )
+
+                    assert.deepStrictEqual(
+                        await util.promisify(fs.readlink)(linkPath),
+                        relativeTarget,
+                        'CB: should preserve target within a symlinked root'
+                    )
+
+                    assert.deepStrictEqual(
+                        await fs.promises.readlink(linkPath),
+                        relativeTarget,
+                        'Promise: should preserve target within a symlinked root'
+                    )
+                } finally {
+                    revertPatches()
+                }
+            }
+        )
+    })
+
+    await it('resolves relative targets from the real parent of an aliased path', async () => {
+        await withFixtures(
+            {
+                execroot: { package: {} },
+                real: { file: 'contents' },
+                sandbox: { aliases: { real: {} } },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+                const execrootDir = path.join(fixturesDir, 'execroot')
+                const realFile = path.join(fixturesDir, 'real', 'file')
+                const sandboxDir = path.join(fixturesDir, 'sandbox')
+                const aliasDir = path.join(sandboxDir, 'aliases', 'package')
+
+                // The queried parent has one more path segment than its real
+                // location, so resolving ../target from the lexical parent
+                // incorrectly lands at sandbox/aliases/target.
+                fs.symlinkSync(
+                    path.join(execrootDir, 'package'),
+                    aliasDir,
+                    process.platform === 'win32' ? 'junction' : 'dir'
+                )
+                fs.symlinkSync(
+                    path.join('..', 'target'),
+                    path.join(execrootDir, 'package', 'link')
+                )
+                fs.symlinkSync(realFile, path.join(execrootDir, 'target'))
+                fs.symlinkSync(
+                    realFile,
+                    path.join(sandboxDir, 'aliases', 'real', 'file')
+                )
+
+                const revertPatches = patcher([sandboxDir])
+                const linkPath = path.join(aliasDir, 'link')
+                const expectedTarget = path.join('..', 'real', 'file')
+
+                try {
+                    assert.deepStrictEqual(
+                        fs.readlinkSync(linkPath),
+                        expectedTarget,
+                        'SYNC: should resolve from the real parent directory'
+                    )
+
+                    assert.deepStrictEqual(
+                        await util.promisify(fs.readlink)(linkPath),
+                        expectedTarget,
+                        'CB: should resolve from the real parent directory'
+                    )
+
+                    assert.deepStrictEqual(
+                        await fs.promises.readlink(linkPath),
+                        expectedTarget,
+                        'Promise: should resolve from the real parent directory'
+                    )
+                } finally {
+                    revertPatches()
+                }
+            }
+        )
+    })
+
     await it("doesn't resolve as symlink outside of root", async () => {
         await withFixtures(
             {

@@ -99,6 +99,43 @@ function patcher(roots) {
     const origRealpathSyncNative = fs.realpathSync
         .native;
     const { canEscape, isEscape } = escapeFunction(roots);
+    const rootMappings = roots
+        .map((root) => {
+        const lexical = path.resolve(root);
+        let real = lexical;
+        // A configured root need not exist on disk when the patch is
+        // registered (or may be inaccessible); when it can't be realpath'd
+        // we keep real == lexical, i.e. treat the root as not-symlinked so
+        // the remapping below is a no-op.
+        try {
+            real = origRealpathSyncNative(lexical);
+        }
+        catch (_a) { }
+        return { lexical, real };
+    })
+        .sort((a, b) => b.lexical.length - a.lexical.length);
+    // Keep real paths in the lexical namespace when the configured root is
+    // itself a symlink. Nested links that leave the root remain canonical.
+    function realpathInRootNamespace(p) {
+        const real = origRealpathSyncNative(p);
+        for (const root of rootMappings) {
+            if (isSubPath(root.lexical, p) &&
+                isSubPath(root.real, real)) {
+                return path.resolve(root.lexical, path.relative(root.real, real));
+            }
+        }
+        return real;
+    }
+    // Resolve a relative symlink `linkTarget` against the REAL location of the
+    // link's parent directory. `resolved` is an absolute path whose final
+    // component is a symlink we just read successfully, but the path we were
+    // queried through may be an alias of a different depth than the real dir
+    // (e.g. a pnpm/node_modules alias); joining `linkTarget` onto the *lexical*
+    // parent would then land at the wrong absolute path.
+    function resolveTargetAgainstRealParent(resolved, linkTarget) {
+        const linkDir = realpathInRootNamespace(path.dirname(resolved));
+        return path.resolve(linkDir, linkTarget);
+    }
     // =========================================================================
     // fs.lstat
     // =========================================================================
@@ -247,7 +284,7 @@ function patcher(roots) {
                 return cb(err);
             const resolved = resolvePathLike(args[0]);
             const linkTarget = p;
-            const targetAbs = path.resolve(path.dirname(resolved), linkTarget);
+            const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
             const escapedRoot = isEscape(resolved, targetAbs);
             if (escapedRoot) {
                 const escapedRoots = [escapedRoot];
@@ -284,7 +321,7 @@ function patcher(roots) {
     fs.readlinkSync = function readlinkSync(...args) {
         const resolved = resolvePathLike(args[0]);
         const linkTarget = origReadlinkSync(...args);
-        const targetAbs = path.resolve(path.dirname(resolved), linkTarget);
+        const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
         const escapedRoot = isEscape(resolved, targetAbs);
         if (escapedRoot) {
             const next = nextHopSync(targetAbs);
