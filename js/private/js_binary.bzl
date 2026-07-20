@@ -578,8 +578,6 @@ js_binary_lib = struct(
     create_launcher = _create_launcher,
     implementation = _js_binary_impl,
     toolchains = [
-        # TODO: on Windows this toolchain is never referenced
-        "@bazel_tools//tools/sh:toolchain_type",
         "@rules_nodejs//nodejs:runtime_toolchain_type",
     ] + COPY_FILE_TO_BIN_TOOLCHAINS,
 )

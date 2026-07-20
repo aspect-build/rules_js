@@ -67,6 +67,7 @@ jobs:
                     e2e/js_image_oci
                     e2e/js_run_devserver
                     e2e/nextjs
+                    e2e/no_shell_toolchain
                     e2e/npm_link_package
                     e2e/npm_link_package-rerooted
                     e2e/npm_translate_lock

@@ -1,0 +1,8 @@
+import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
+
+# Regression test for https://github.com/aspect-build/rules_js/issues/2347:
+# build every target for an iOS-like platform that has no shell toolchain (in
+# Bazel 8+ the built-in autodetecting sh toolchain was removed). js_binary must
+# not fail toolchain resolution on the shell toolchain it never uses.
+build --platforms=//:ios_like
