@@ -160,4 +160,5 @@ PNPM_VERSIONS = {
     "11.13.1": "sha512-svx2g7imUlQU59E+G6KMqt3elr9m7FQL+ut+cCuB8+C+TR8pXt9/n+A5Z0Co3ORQnFgt33mJH0VD/qMtN2RfJQ==",
     "11.14.0": "sha512-ZsGsTH1HYtbX3eRMfz5ac1ke0KCAbnUdTtMtTwBPJbIoWpBrH9ip4+Yh3ztOKFi/iOUODPYmvtvpd/5DSlyvhQ==",
     "11.15.0": "sha512-Jm+JV6MNK+bpRo5eZrze3TWnlBdfcbBnuoUE1obM4dDA9CmzPDI8PFaa1IkeZnV0pJ/3HRuJoizGbxPGWBjFeA==",
+    "11.15.1": "sha512-gTULB+U8lTigLx8jA7QpD6LXvgTlbiqXDEzEtBfcdh3hlu2r1J1Vx9yVgNuBAHxEFD5OPX5GKzAA0jwlUSLQZQ==",
 }
