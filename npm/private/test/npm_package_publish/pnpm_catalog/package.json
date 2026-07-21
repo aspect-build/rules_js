@@ -1,0 +1,7 @@
+{
+    "name": "@mycorp/pkg-to-publish-pnpm",
+    "version": "1.0.0",
+    "dependencies": {
+        "typescript": "catalog:"
+    }
+}

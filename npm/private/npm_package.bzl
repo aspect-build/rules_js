@@ -140,6 +140,7 @@ def npm_package(
         include_runfiles = False,
         hardlink = "auto",
         publishable = False,
+        pnpm_binary = "@pnpm//:pnpm",
         verbose = False,
         **kwargs):
     """A macro that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
@@ -147,8 +148,21 @@ def npm_package(
     This target can be used as the `src` attribute to `npm_link_package`.
 
     With `publishable = True` the macro also produces a target `[name].publish`, that can be run to publish to an npm registry.
-    Under the hood, this target runs `npm publish`. You can pass arguments to npm by escaping them from Bazel using a double-hyphen,
-    for example: `bazel run //path/to:my_package.publish -- --tag=next`
+    Under the hood, this target runs `pnpm publish`. You can pass arguments to pnpm by escaping them from Bazel using a double-hyphen,
+    for example: `bazel run //path/to:my_package.publish -- --tag=next`.
+
+    pnpm publishing uses the configured `pnpm_binary` and can resolve pnpm workspace settings such as `catalog` entries from
+    `pnpm-workspace.yaml`. Workspace protocol dependencies follow pnpm's own resolution requirements.
+
+    The default `pnpm_binary` requires the consuming module to define and import the `@pnpm` repository:
+
+    ```starlark
+    pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+    pnpm.pnpm(name = "pnpm")
+    use_repo(pnpm, "pnpm")
+    ```
+
+    Pass a different `pnpm_binary` label when the pnpm repository uses another name.
 
     Files and directories can be arranged as needed in the output directory using
     the `root_paths`, `include_srcs_patterns`, `exclude_srcs_patterns` and `replace_prefixes` attributes.
@@ -210,7 +224,7 @@ def npm_package(
 
         srcs: Files and/or directories or targets that provide `DirectoryPathInfo` to copy into the output directory.
 
-        args: Arguments that are passed down to `<name>.publish` target and `npm publish` command.
+        args: Arguments that are passed down to `<name>.publish` target and the publish command.
 
         data: Runtime / linktime npm dependencies of this npm package.
 
@@ -409,6 +423,10 @@ def npm_package(
 
         publishable: When True, enable generation of `{name}.publish` target
 
+        pnpm_binary: Label of the pnpm binary used for publishing. The default `@pnpm//:pnpm`
+            requires the consuming module to define the `pnpm` extension repository and import it
+            with `use_repo(pnpm, "pnpm")`.
+
         verbose: If true, prints out verbose logs to stdout
 
         **kwargs: Additional attributes such as `tags` and `visibility`
@@ -437,10 +455,11 @@ def npm_package(
             name = "{}.publish".format(name),
             entry_point = Label("@aspect_rules_js//npm/private:npm_publish_mjs"),
             fixed_args = [
+                "$(rootpath {})".format(pnpm_binary),
                 "./$(rootpath :{})".format(name),
             ],
-            data = [name],
-            # required to make npm to be available in PATH
+            data = [name, pnpm_binary],
+            # pnpm <11 may delegate registry operations to npm. This can be removed when rules_js drops pnpm <=10.
             include_npm = True,
             args = args,
             tags = kwargs.get("tags", []) + ["manual"],
