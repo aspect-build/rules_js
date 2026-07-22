@@ -16,9 +16,17 @@ DEFAULT_REGISTRY_DOMAIN_SLASH = "{}/".format(DEFAULT_REGISTRY_DOMAIN)
 DEFAULT_REGISTRY_PROTOCOL = "https"
 DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_action_cache"
 
-# Maximum package store name length before hashing to prevent long paths
-# Similar to pnpm's limit: https://github.com/pnpm/pnpm/blob/9d4c16876f899146a45f21d93f041b42e3413011/packages/dependency-path/src/index.ts#L165
-_MAX_STORE_LENGTH = 120
+# Maximum package store name length before hashing to prevent long paths.
+#
+# pnpm uses 120 because its virtual store lives at a short, fixed path (node_modules/.pnpm). rules_js
+# nests the store much deeper, under bazel-out/<config>/bin/node_modules/.aspect_rules_js, and the
+# package name is repeated in the trailing node_modules/<name> segment of the store path, so a
+# shorter limit is required to keep the package extraction path under the Windows MAX_PATH (260) limit.
+# https://github.com/pnpm/pnpm/blob/9d4c16876f899146a45f21d93f041b42e3413011/packages/dependency-path/src/index.ts#L165
+_MAX_STORE_LENGTH = 60
+
+# Reserve room for the hash suffix (a 32-bit hash is at most 10 digits) when truncating an over-long key.
+_STORE_HASH_LENGTH = 10
 
 # Maximum length of peer dependency string before hashing to prevent long paths
 _MAX_PEER_DEP_LENGTH = 32
@@ -72,10 +80,16 @@ def _package_shorten_key(s):
     else:
         peers_index = len(s)
 
-    # If the full key is still too long, shorten the version
+    # Still too long: hash the version, but only when that shortens it (semver is already short; URLs/git refs are not).
     if len(s) > _MAX_STORE_LENGTH:
-        # If hashing peers was not enough, hash the version too
-        s = s[:version_index] + "@" + _hash(s[version_index:peers_index]).lstrip("-") + s[peers_index:]
+        version = s[version_index:peers_index]
+        hashed_version = "@" + _hash(version).lstrip("-")
+        if len(hashed_version) < len(version):
+            s = s[:version_index] + hashed_version + s[peers_index:]
+
+    # Name alone still too long: truncate the whole key and append a hash for uniqueness (like pnpm's depPathToFilename).
+    if len(s) > _MAX_STORE_LENGTH:
+        s = s[:_MAX_STORE_LENGTH - _STORE_HASH_LENGTH - 1] + "_" + _hash(s).lstrip("-")
 
     return s
 
@@ -87,8 +101,9 @@ def _package_store_name(s):
     # Convert link: to {name}@0.0.0 for naming of local workspace packages
     if s.startswith("link:"):
         s = _link_to_alias(s) + "@0.0.0"
-    else:
-        s = _package_shorten_key(s)
+
+    # Shorten in both cases so a link: package's store is referenced identically by its raw link: key and its {name}@0.0.0 key (see fp_link handling in npm_translate_lock_generate.bzl).
+    s = _package_shorten_key(s)
 
     r = ""
     for c in s.elems():

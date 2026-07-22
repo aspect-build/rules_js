@@ -69,17 +69,17 @@ def test_package_store_and_target_name(ctx):
     asserts.equals(env, "@scoped+c@file+..+projects+c_401592697", utils.package_store_name("@scoped/c@file:../projects/c(@scoped/b@projects+b)(@scoped/d@projects+d)(@scoped/e@projects+e)"))
     asserts.equals(env, "x__at_scoped_c__file_.._projects_c_401592697", utils.package_repo_name("x", "@scoped/c@file:../projects/c(@scoped/b@projects+b)(@scoped/d@projects+d)(@scoped/e@projects+e)"))
 
-    # URL
-    asserts.equals(env, "diff@https+++github.com+kpdecker+jsdiff+archive+refs+tags+v5.2.0.tar.gz", utils.package_store_name("diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
-    asserts.equals(env, "x__diff__https___github.com_kpdecker_jsdiff_archive_refs_tags_v5.2.0.tar.gz", utils.package_repo_name("x", "diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
+    # URL (version longer than _MAX_STORE_LENGTH is hashed)
+    asserts.equals(env, "diff@1012056218", utils.package_store_name("diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
+    asserts.equals(env, "x__diff__1012056218", utils.package_repo_name("x", "diff@https://github.com/kpdecker/jsdiff/archive/refs/tags/v5.2.0.tar.gz"))
 
     # @ and 0.0.0 in a URL
-    asserts.equals(env, "@foo+jsonify@https+++github.com+aspect-build+test-packages+releases+download+0.0.0+@foo-jsonify-0.0.0.tgz", utils.package_store_name("@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"))
-    asserts.equals(env, "x__at_foo_jsonify__https___github.com_aspect-build_test-packages_releases_download_0.0.0__foo-jsonify-0.0.0.tgz", utils.package_repo_name("x", "@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"))
+    asserts.equals(env, "@foo+jsonify@2135983873", utils.package_store_name("@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"))
+    asserts.equals(env, "x__at_foo_jsonify__2135983873", utils.package_repo_name("x", "@foo/jsonify@https://github.com/aspect-build/test-packages/releases/download/0.0.0/@foo-jsonify-0.0.0.tgz"))
 
     # URLs with commit hashes
-    asserts.equals(env, "jquery@https+++codeload.github.com+jquery+jquery+tar.gz+399b201bb3143a3952894cf3489b4848fc003967", utils.package_store_name("jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
-    asserts.equals(env, "x__jquery__https___codeload.github.com_jquery_jquery_tar.gz_399b201bb3143a3952894cf3489b4848fc003967", utils.package_repo_name("x", "jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
+    asserts.equals(env, "jquery@858326369", utils.package_store_name("jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
+    asserts.equals(env, "x__jquery__858326369", utils.package_repo_name("x", "jquery@https://codeload.github.com/jquery/jquery/tar.gz/399b201bb3143a3952894cf3489b4848fc003967"))
 
     # URL (long - see https://github.com/aspect-build/rules_js/issues/2628)
     asserts.equals(env, "@tw+isomorphic--util@79283155", utils.package_store_name("@tw/isomorphic--util@https://artifactory.mycompany.com/artifactory/ifi-generic-local-dev/web/packages/web/isomorphic/util/8c6f424501e02117ed4b98e5f33c7a5204ebb6fb.tar.gz"))
@@ -91,6 +91,14 @@ def test_package_store_and_target_name(ctx):
     asserts.equals(env, "@kubernetes+client-node@1838633845_1592917608", utils.package_store_name("@kubernetes/client-node@https://codeload.github.com/kubernetes-client/javascript/tar.gz/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9(bufferutil@4.0.8)(encoding@0.1.13)"))
     asserts.equals(env, "x__at_kubernetes_client-node__1838633845_1592917608", utils.package_repo_name("x", "@kubernetes/client-node@https://codeload.github.com/kubernetes-client/javascript/tar.gz/cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9(bufferutil@4.0.8)(encoding@0.1.13)"))
 
+    # A name long enough that even with a short version the whole key is truncated and hashed to keep the store name short. See https://github.com/aspect-build/rules_js/issues/2628
+    asserts.equals(env, "@babel+plugin-bugfix-safari-id-destructuring-coll_1209153307", utils.package_store_name("@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@7.27.1"))
+    asserts.equals(env, "x__at_babel_plugin-bugfix-safari-id-destructuring-coll_1209153307", utils.package_repo_name("x", "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@7.27.1"))
+
+    # Same long name with a peer dep: peers are hashed first, then the whole key is truncated.
+    asserts.equals(env, "@babel+plugin-bugfix-safari-id-destructuring-coll_303338185", utils.package_store_name("@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@7.27.1(@babel/core@7.28.5)"))
+    asserts.equals(env, "x__at_babel_plugin-bugfix-safari-id-destructuring-coll_303338185", utils.package_repo_name("x", "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@7.27.1(@babel/core@7.28.5)"))
+
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
@@ -98,6 +106,15 @@ def test_package_store_name_link_versions(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, "x@0.0.0", utils.package_store_name("link:x|foo/@bar/baz"))
     asserts.equals(env, "@scope+y@0.0.0", utils.package_store_name("link:@scope/y|foo/bar"))
+
+    # A long link: alias must shorten to the same store name via its raw link: key and its converted {name}@0.0.0 key, else the dependency reference points at a nonexistent target.
+    long_alias = "@my-scope/some-really-quite-long-first-party-workspace-package-name"
+    asserts.equals(env, "@my-scope+some-really-quite-long-first-party-work_473865673", utils.package_store_name(long_alias + "@0.0.0"))
+    asserts.equals(
+        env,
+        utils.package_store_name(long_alias + "@0.0.0"),
+        utils.package_store_name("link:" + long_alias + "|packages/pkg"),
+    )
     return unittest.end(env)
 
 def test_friendly_name(ctx):
