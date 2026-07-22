@@ -1,17 +1,18 @@
 load("//js/private/coverage:merger.bzl", "coverage_merger")
-load(":test.bzl", "coverage_fail_test", "coverage_pass_test")
+load(":test.bzl", "coverage_expected_exit_test", "coverage_fail_test", "coverage_pass_test")
 
 package(default_testonly = True)
 
+# coverage_fail_test has no _coverage_report, so the test action stashes nothing.
+# publish.js must then leave the empty COVERAGE_OUTPUT_FILE bazel created in place.
 FAIL_CMD = """\
-echo "require('fs').writeFileSync(process.env.COVERAGE_OUTPUT_FILE, '# no coverage');" >> $@
-cat $(location //js/private/coverage:coverage.js) >> $@
-echo "process.on('exit', () => require('assert').equal(require('fs').readFileSync(process.env.COVERAGE_OUTPUT_FILE).toString(), '# no coverage'))" >> $@
+cat $(location //js/private/coverage:publish.js) >> $@
+echo "process.on('exit', () => require('assert').equal(require('fs').readFileSync(process.env.COVERAGE_OUTPUT_FILE).toString(), ''))" >> $@
 """
 
 genrule(
     name = "fail_merger_entrypoint",
-    srcs = ["//js/private/coverage:coverage.js"],
+    srcs = ["//js/private/coverage:publish.js"],
     outs = ["fail_merger_entrypoint.js"],
     cmd = FAIL_CMD,
 )
@@ -32,14 +33,16 @@ coverage_fail_test(
     entry_point = "lib.js",
 )
 
+# coverage_pass_test generates + stashes the report in the test action; publish.js
+# moves it to COVERAGE_OUTPUT_FILE, which must then hold the real lcov report.
 PASS_CMD = """\
-cat $(location //js/private/coverage:coverage.js) >> $@
-echo "process.on('exit', () => require('assert').equal(require('fs').readFileSync(process.env.COVERAGE_OUTPUT_FILE).toString().split('\\n')[1], 'SF:js/private/test/coverage/lib.js'))" >> $@
+cat $(location //js/private/coverage:publish.js) >> $@
+echo "process.on('exit', () => { const a = require('assert'); const r = require('fs').readFileSync(process.env.COVERAGE_OUTPUT_FILE).toString(); a.equal(r.split('\\n')[1], 'SF:js/private/test/coverage/lib.js'); a.ok(/^DA:\\d+,[1-9]/m.test(r), 'expected an executed line'); a.ok(/^DA:\\d+,0/m.test(r), 'expected an unexecuted line'); })" >> $@
 """
 
 genrule(
     name = "pass_merger_entrypoint",
-    srcs = ["//js/private/coverage:coverage.js"],
+    srcs = ["//js/private/coverage:publish.js"],
     outs = ["pass_merger_entrypoint.js"],
     cmd = PASS_CMD,
 )
@@ -58,4 +61,38 @@ coverage_pass_test(
         "//conditions:default": False,
     }),
     entry_point = "lib.js",
+)
+
+# Asserts real coverage without pinning the SF: path, so it works for any covered
+# source. Used by the expected_exit_code regression test.
+REAL_COVERAGE_CMD = """\
+cat $(location //js/private/coverage:publish.js) >> $@
+echo "process.on('exit', () => { const a = require('assert'); const r = require('fs').readFileSync(process.env.COVERAGE_OUTPUT_FILE).toString(); a.ok(/^DA:\\d+,[1-9]/m.test(r), 'expected an executed line'); a.ok(/^DA:\\d+,0/m.test(r), 'expected an unexecuted line'); })" >> $@
+"""
+
+genrule(
+    name = "real_coverage_merger_entrypoint",
+    srcs = ["//js/private/coverage:publish.js"],
+    outs = ["real_coverage_merger_entrypoint.js"],
+    cmd = REAL_COVERAGE_CMD,
+)
+
+coverage_merger(
+    name = "real_coverage_merger",
+    entry_point = ":real_coverage_merger_entrypoint.js",
+    visibility = ["//visibility:public"],
+)
+
+# A passing test whose raw exit status is non-zero (matches expected_exit_code).
+# Coverage must still be generated for it. Fails before the launcher's TEST_PASSED
+# fix, which gated generation on `RESULT -eq 0`. See PR #2932.
+coverage_expected_exit_test(
+    name = "expected_exit",
+    data = ["exit_nonzero.js"],
+    enable_runfiles = select({
+        "@bazel_lib//lib:enable_runfiles": True,
+        "//conditions:default": False,
+    }),
+    entry_point = "exit_nonzero.js",
+    expected_exit_code = 42,
 )

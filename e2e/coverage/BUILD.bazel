@@ -1,0 +1,46 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+
+js_library(
+    name = "lib",
+    srcs = ["lib.js"],
+)
+
+# Relative import (require("./lib.js")): source resolves inside the test's
+# runfiles src root.
+js_test(
+    name = "test",
+    data = [":lib"],
+    entry_point = "test.js",
+)
+
+# First-party package imported by name (require("@repro/lib")): resolves through
+# the .aspect_rules_js store at a realpath outside the test's runfiles src root.
+# Regression coverage for
+# https://github.com/aspect-build/rules_js/pull/2932#issuecomment-5041637627.
+npm_link_package(
+    name = "node_modules/@repro/lib",
+    src = "//pkg:lib",
+)
+
+js_test(
+    name = "first_party_npmpkg_test",
+    data = [":node_modules/@repro/lib"],
+    entry_point = "first_party.js",
+)
+
+# js_library linked directly (no npm_package repackaging) — mirrors a
+# pnpm-workspace first-party package: store symlinks to the library's natural
+# directory in bin.
+npm_link_package(
+    name = "node_modules/@repro/jslib",
+    src = "//pkg:src",
+    package = "@repro/jslib",
+    version = "0.0.0",
+)
+
+js_test(
+    name = "first_party_jslib_test",
+    data = [":node_modules/@repro/jslib"],
+    entry_point = "first_party_jslib.js",
+)
