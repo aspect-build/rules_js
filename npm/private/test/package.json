@@ -8,7 +8,10 @@
     },
     "// devDependencies": "test linking & building 3rd party npm packages with problematic version specifiers, postinstalls etc",
     "// devDependencies2": "See also: root package.json pnpm.onlyBuiltDependencies+packageExtensions",
+    "// devDependencies3": "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression has a very long name; combined with the @babel/core peer suffix its package store extraction path exceeds the Windows MAX_PATH (260) limit",
     "devDependencies": {
+        "@babel/core": "7.28.5",
+        "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression": "7.27.1",
         "@fastify/send": "3.3.0",
         "@figma/nodegit": "^0.28.0-figma.6",
         "@kubernetes/client-node": "https://github.com/kubernetes-client/javascript#cb821e92b766f6ffba6ad8cf5e7ff6ba77c3a1c9",
