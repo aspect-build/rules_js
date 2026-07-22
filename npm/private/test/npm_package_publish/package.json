@@ -1,4 +1,5 @@
 {
     "name": "@mycorp/pkg-to-publish",
+    "version": "1.0.0",
     "private": true
 }

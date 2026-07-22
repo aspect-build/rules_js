@@ -11,7 +11,7 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory_bin_action", "copy_to_directory_lib")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@jq.bzl//jq:jq.bzl", "jq")
-load("//js:defs.bzl", "js_binary")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
 load("//js:libs.bzl", "js_lib_helpers")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 
@@ -140,6 +140,7 @@ def npm_package(
         include_runfiles = False,
         hardlink = "auto",
         publishable = False,
+        packable = False,
         verbose = False,
         **kwargs):
     """A macro that packages sources into a directory (a tree artifact) and provides an `NpmPackageInfo`.
@@ -149,6 +150,13 @@ def npm_package(
     With `publishable = True` the macro also produces a target `[name].publish`, that can be run to publish to an npm registry.
     Under the hood, this target runs `npm publish`. You can pass arguments to npm by escaping them from Bazel using a double-hyphen,
     for example: `bazel run //path/to:my_package.publish -- --tag=next`
+
+    With `packable = True` the macro also produces a target `[name].pack`, that builds a `.tgz` tarball artifact
+    representing the ready-to-publish package (the same tarball `pnpm publish` would upload). The tarball is written to
+    the output tree as `[name].tgz`, so `bazel build //path/to:my_package.pack` produces `bazel-bin/path/to/my_package.tgz`.
+    Under the hood this target runs `pnpm pack`. The archive is reproducible and its contents are selected the same way
+    `pnpm pack` selects them (honoring the `files` field and `.npmignore`), placed under the conventional top-level
+    `package/` directory.
 
     Files and directories can be arranged as needed in the output directory using
     the `root_paths`, `include_srcs_patterns`, `exclude_srcs_patterns` and `replace_prefixes` attributes.
@@ -210,7 +218,7 @@ def npm_package(
 
         srcs: Files and/or directories or targets that provide `DirectoryPathInfo` to copy into the output directory.
 
-        args: Arguments that are passed down to `<name>.publish` target and `npm publish` command.
+        args: Arguments that are passed down to the `<name>.publish` target and `npm publish` command.
 
         data: Runtime / linktime npm dependencies of this npm package.
 
@@ -409,6 +417,8 @@ def npm_package(
 
         publishable: When True, enable generation of `{name}.publish` target
 
+        packable: When True, enable generation of `{name}.pack` target that builds the `{name}.tgz` tarball artifact.
+
         verbose: If true, prints out verbose logs to stdout
 
         **kwargs: Additional attributes such as `tags` and `visibility`
@@ -443,6 +453,34 @@ def npm_package(
             # required to make npm to be available in PATH
             include_npm = True,
             args = args,
+            tags = kwargs.get("tags", []) + ["manual"],
+            testonly = kwargs.get("testonly", False),
+            visibility = kwargs.get("visibility", None),
+        )
+
+    if packable:
+        # `pnpm pack` resolves --out relative to --dir (the package output
+        # directory, which is `out` or `name`). Climb back out of that directory
+        # to the Bazel package root, then down to the declared `{name}.tgz`, so
+        # the tarball lands exactly on the declared output regardless of how many
+        # path segments `out`/`name` contain.
+        pack_dir = out if out else name
+        pack_out = "{}/{}.tgz".format("/".join([".."] * len(pack_dir.split("/"))), name)
+        js_run_binary(
+            name = "{}.pack".format(name),
+            tool = Label("@pnpm//:pnpm"),
+            srcs = [name],
+            outs = ["{}.tgz".format(name)],
+            use_execroot_entry_point = False,
+            # --dir needs "../../../" to reach the package from the output tree
+            # (args are relative to the exec root).
+            args = [
+                "--dir",
+                "../../../$(execpath :{})".format(name),
+                "pack",
+                "--out",
+                pack_out,
+            ],
             tags = kwargs.get("tags", []) + ["manual"],
             testonly = kwargs.get("testonly", False),
             visibility = kwargs.get("visibility", None),

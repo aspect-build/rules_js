@@ -8,6 +8,7 @@ npm_package(
         "index.js",
         "package.json",
     ],
+    packable = True,
     publishable = True,
 )
 
@@ -18,6 +19,19 @@ npm_package(
         "index.js",
     ],
     publishable = True,
+)
+
+# Regression coverage: a multi-segment `out` must still land the .pack tarball on
+# the declared `{name}.tgz` output (pnpm resolves --out relative to --dir).
+npm_package(
+    name = "pkg_nested",
+    srcs = [
+        "index.d.ts",
+        "index.js",
+        "package.json",
+    ],
+    out = "nested/dist",
+    packable = True,
 )
 
 sh_test(
@@ -34,5 +48,18 @@ sh_test(
     tags = [
         "no-remote-exec",
         "no-sandbox",
+    ],
+)
+
+sh_test(
+    name = "pack_test",
+    srcs = ["pack_test.sh"],
+    args = [
+        "$(rootpath :pkg_a.pack)",
+        "$(rootpath :pkg_nested.pack)",
+    ],
+    data = [
+        ":pkg_a.pack",
+        ":pkg_nested.pack",
     ],
 )
