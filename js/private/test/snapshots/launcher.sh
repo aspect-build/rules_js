@@ -422,6 +422,11 @@ if [ "${COVERAGE_DIR:-}" ]; then
     export NODE_V8_COVERAGE=${COVERAGE_DIR}
 fi
 
+# Disable Node's module compile cache by default (aspect-build/rules_js#2937).
+if [ -z "${NODE_COMPILE_CACHE:-}" ] && [ -z "${NODE_DISABLE_COMPILE_CACHE:-}" ]; then
+    export NODE_DISABLE_COMPILE_CACHE=1
+fi
+
 # Put the node wrapper directory on the path so that child processes find it first
 PATH="$(dirname "$JS_BINARY__NODE_WRAPPER"):$PATH"
 export PATH
