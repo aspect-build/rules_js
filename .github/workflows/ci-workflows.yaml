@@ -254,19 +254,26 @@ jobs:
                     echo "No test.sh in ${PWD}; skipping"
                   fi
 
-    # Mac/Windows smoke tests - only e2e/bzlmod
+    # Mac/Windows smoke tests for the root workspace and e2e/bzlmod.
     # Only run on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
+    # unless the branch name contains 'macos' or 'windows'.
     # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
     smoke:
+        name: smoke (${{ matrix.workspace.path }}, ${{ matrix.os }})
         if: github.ref_name == 'main' || contains(github.head_ref, 'macos') || contains(github.head_ref, 'windows')
         runs-on: ${{ matrix.os }}
-        defaults:
-            run:
-                working-directory: e2e/bzlmod
         strategy:
             fail-fast: false
             matrix:
                 os: [macos-latest, windows-latest]
+                workspace:
+                    - { path: ., slug: root }
+                    - { path: e2e/bzlmod, slug: bzlmod }
+                exclude:
+                    # The root workspace only builds cleanly on macOS for now; Windows has broad
+                    # pre-existing failures. e2e/bzlmod still smoke-tests on both OSes.
+                    - os: windows-latest
+                      workspace: { path: ., slug: root }
         env:
             ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
         steps:
@@ -275,11 +282,12 @@ jobs:
             - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
               with:
                   bazelisk-cache: true
-                  disk-cache: ${{ matrix.os }}-bzlmod
+                  disk-cache: ${{ matrix.os }}-${{ matrix.workspace.slug }}
                   repository-cache: true
 
             - name: bazel test //...
               shell: bash
+              working-directory: ${{ matrix.workspace.path }}
               run: |
                   bazel test \
                     --test_tag_filters=-skip-on-bazel7 \

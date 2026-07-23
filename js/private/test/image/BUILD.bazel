@@ -1,7 +1,7 @@
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_binary")
-load(":asserts.bzl", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
+load(":asserts.bzl", "SKIP_ON_WINDOWS", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
 
 npm_link_all_packages()
 
@@ -11,6 +11,7 @@ js_binary(
         ":node_modules",
     ],
     entry_point = "main.js",
+    target_compatible_with = SKIP_ON_WINDOWS,
 )
 
 platform(
@@ -127,6 +128,7 @@ platform_transition_filegroup(
     name = "transition_js_image_layer_linux_amd64",
     testonly = True,
     srcs = [":js_image_layer_untransitioned"],
+    target_compatible_with = SKIP_ON_WINDOWS,
     target_platform = ":linux_amd64",
 )
 
@@ -134,5 +136,6 @@ platform_transition_filegroup(
     name = "transition_js_image_layer_linux_arm64",
     testonly = True,
     srcs = [":js_image_layer_untransitioned"],
+    target_compatible_with = SKIP_ON_WINDOWS,
     target_platform = ":linux_arm64",
 )

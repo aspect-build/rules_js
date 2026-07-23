@@ -1,6 +1,6 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_binary")
-load("//js/private/test/image:asserts.bzl", "assert_js_image_layer_listings", "make_js_image_layer")
+load("//js/private/test/image:asserts.bzl", "SKIP_ON_WINDOWS", "assert_js_image_layer_listings", "make_js_image_layer")
 
 npm_link_all_packages()
 
@@ -10,6 +10,7 @@ js_binary(
         ":node_modules/@rspack/cli",
     ],
     entry_point = "main.js",
+    target_compatible_with = SKIP_ON_WINDOWS,
 )
 
 # Verify that the arm64 binding is selected when targeting linux/arm64.

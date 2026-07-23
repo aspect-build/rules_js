@@ -52,6 +52,12 @@ write_source_files(
         "skip-on-bazel8",
         "skip-on-bazel9",
     ],
+    # The generated defs.bzl enumerates host-platform-specific optional packages, so these snapshots
+    # (checked in from Linux/macOS) don't match on Windows; skip them there rather than maintain a variant.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 build_test(
