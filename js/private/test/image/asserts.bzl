@@ -3,6 +3,13 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
 
+# These fixtures build Linux OCI layers from non-portable inputs (non-ASCII filenames, bsdtar
+# listings) that don't resolve on a Windows host, so skip the whole image test tree on Windows.
+SKIP_ON_WINDOWS = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 # js_binary launcher scripts have unstable sizes across Bazel versions.
 _UNSTABLE_SIZE_BASENAMES = ["bin", "bin2"]
 
@@ -32,6 +39,7 @@ def assert_tar_listing(name, actual, expected):
         # See: https://github.com/aspect-build/rules_js/actions/runs/11749187598/job/32734931009?pr=2011
         cmd = 'TZ="UTC" LC_ALL="en_US.UTF-8" $(BSDTAR_BIN) -tvf $(execpath {}) --exclude "**/_repo_mapping" | {} >$@'.format(actual, sanitize_cmd),
         toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
+        target_compatible_with = SKIP_ON_WINDOWS,
     )
 
     write_source_file(
@@ -39,6 +47,7 @@ def assert_tar_listing(name, actual, expected):
         in_file = actual_listing,
         out_file = expected,
         testonly = True,
+        target_compatible_with = SKIP_ON_WINDOWS,
     )
 
 layers = [
@@ -66,6 +75,7 @@ def assert_js_image_layer_listings(name, js_image_layer, additional_layers = [])
             for layer in all_layers
         ],
         testonly = True,
+        target_compatible_with = SKIP_ON_WINDOWS,
     )
 
 # buildifier: disable=function-docstring
@@ -79,6 +89,7 @@ def make_js_image_layer(name, layer_groups = {}, **kwargs):
             "no-remote-exec",
         ],
         layer_groups = layer_groups,
+        target_compatible_with = SKIP_ON_WINDOWS,
         **kwargs
     )
 
@@ -88,6 +99,7 @@ def make_js_image_layer(name, layer_groups = {}, **kwargs):
             srcs = [name],
             output_group = layer,
             testonly = 1,
+            target_compatible_with = SKIP_ON_WINDOWS,
         )
 
 def assert_checksum(name, image_layer):
@@ -107,6 +119,7 @@ echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
     """,
         output_to_bindir = True,
         toolchains = ["@coreutils_toolchains//:resolved_toolchain"],
+        target_compatible_with = SKIP_ON_WINDOWS,
     )
 
     write_source_file(
@@ -115,4 +128,5 @@ echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
         in_file = name,
         out_file = name + ".expected",
         tags = ["skip-on-bazel8", "skip-on-bazel9"],
+        target_compatible_with = SKIP_ON_WINDOWS,
     )
