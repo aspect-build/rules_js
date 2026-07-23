@@ -66,6 +66,11 @@ build_test(
         # @fastify/send (@3.3.0) contains spaces and a ☃ character in paths
         ":node_modules/@fastify/send",
 
+        # A package whose name is long enough that, combined with the @babel/core peer
+        # suffix in the package store name, the extraction --directory path exceeds the
+        # Windows MAX_PATH (260) limit and tar.exe fails to chdir into it.
+        ":node_modules/@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression",
+
         # Test scope targets (aggregated js_library for all packages in a scope)
         ":node_modules/@fastify",
         ":node_modules/@figma",
