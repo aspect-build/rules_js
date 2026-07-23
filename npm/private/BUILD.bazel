@@ -91,6 +91,7 @@ bzl_library(
     deps = [
         ":starlark_codegen_utils",
         ":utils",
+        "@bazel_features//:features",
         "@bazel_lib//lib:base64",
         "@bazel_skylib//lib:dicts",
         "@bazel_skylib//lib:partial",

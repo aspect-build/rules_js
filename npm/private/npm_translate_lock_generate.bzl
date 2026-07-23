@@ -1,10 +1,13 @@
 """Starlark generation helpers for npm_translate_lock.
 """
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load(":npm_translate_lock_helpers.bzl", "helpers")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
+
+_SUPPORTS_SYMBOLIC_MACROS = bazel_features.globals.macro != None and hasattr(attr, "label_list_dict")
 
 ################################################################################
 
@@ -25,6 +28,17 @@ _FP_STORE_TMPL = \
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )"""
+
+_FP_STORE_MACRO_TMPL = \
+    """    _npm_local_package_store(
+        package_store_name = "{package_store_name}",
+        src = "{npm_package_target}",
+        package = "{package}",
+        version = "{version}",
+        deps = {deps},
+        visibility = ["//visibility:public"],
+        tags = ["manual"],
+    )"""
 
 _FP_DIRECT_TMPL = \
     """\
@@ -263,7 +277,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ),
             )
 
-        stores_bzl.append("""        store_{i}()""".format(i = i))
+        if _SUPPORTS_SYMBOLIC_MACROS:
+            stores_bzl.append("""    store_{i}()""".format(i = i))
+        else:
+            stores_bzl.append("""        store_{i}()""".format(i = i))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
 
@@ -381,8 +398,13 @@ Valid pnpm workspace projects: {}
                         links_scope_targets[fp_link_package][package_scope] = []
                     links_scope_targets[fp_link_package][package_scope].append(link_target)
 
-        stores_bzl.append(_FP_STORE_TMPL.format(
-            deps = starlark_codegen_utils.to_dict_attr(fp_deps, 3, quote_key = False),
+        fp_store_tmpl = _FP_STORE_MACRO_TMPL if _SUPPORTS_SYMBOLIC_MACROS else _FP_STORE_TMPL
+        stores_bzl.append(fp_store_tmpl.format(
+            deps = starlark_codegen_utils.to_dict_attr(
+                fp_deps,
+                2 if _SUPPORTS_SYMBOLIC_MACROS else 3,
+                quote_key = False,
+            ),
             npm_package_target = fp_target,
             package = fp_package,
             version = fp_version,
@@ -414,9 +436,19 @@ Valid pnpm workspace projects: {}
                 else:
                     links_pkg_bzl[link_package].append("""    _fp_link_{i}("{alias}")""".format(i = i, alias = alias))
 
+    all_stores_bzl = ""
     if stores_bzl:
         npm_link_all_packages_bzl.append("""    if is_root:""")
-        npm_link_all_packages_bzl.extend(stores_bzl)
+        if _SUPPORTS_SYMBOLIC_MACROS:
+            npm_link_all_packages_bzl.append("""        _all_stores(name = ".aspect_rules")""")
+            all_stores_bzl = """
+def _all_stores_impl(name, visibility):
+{all_stores}
+
+_all_stores = macro(implementation = _all_stores_impl)""".format(
+                all_stores = "\n".join(stores_bzl))
+        else:
+            npm_link_all_packages_bzl.extend(stores_bzl)
 
     # Generate one function per pnpm workspace project that performs the linking
     # for that project and returns its (link_targets, scope_targets), collected
@@ -473,7 +505,44 @@ Valid pnpm workspace projects: {}
             scope_targets[_scope].extend(_targets)""")
 
     # Generate catch all & scoped js_library targets
-    npm_link_all_packages_bzl.append("""
+    if _SUPPORTS_SYMBOLIC_MACROS:
+        npm_link_all_packages_bzl.append("""
+
+    _npm_link_all_packages(
+        name = name,
+        link_targets = link_targets,
+        scope_targets = scope_targets,
+        is_importer = is_importer,
+    )
+
+def _npm_link_all_packages_impl(name, visibility, link_targets, scope_targets, is_importer):
+    if scope_targets:
+        for scope, scoped_targets in scope_targets.items():
+            _js_library(
+                name = "node_modules/{}".format(scope),
+                srcs = scoped_targets,
+                tags = ["manual"],
+                visibility = ["//visibility:public"],
+            )
+
+    if is_importer:
+        _js_library(
+            name = "node_modules",
+            srcs = link_targets if link_targets else [],
+            tags = ["manual"],
+            visibility = ["//visibility:public"],
+        )
+
+_npm_link_all_packages = macro(
+    implementation = _npm_link_all_packages_impl,
+    attrs = {
+        "link_targets": attr.label_list(configurable = False),
+        "scope_targets": attr.label_list_dict(configurable = False),
+        "is_importer": attr.bool(configurable = False),
+    },
+)""")
+    else:
+        npm_link_all_packages_bzl.append("""
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
             _js_library(
@@ -543,6 +612,12 @@ Valid pnpm workspace projects: {}
         "",
         "\n\n".join(link_factories_bzl),
     ])
+
+    if all_stores_bzl:
+        defs_bzl_contents.extend([
+            "",
+            all_stores_bzl,
+        ])
 
     rctx_files[_DEFS_BZL_FILENAME] = defs_bzl_contents
 
