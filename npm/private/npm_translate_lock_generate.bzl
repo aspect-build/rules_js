@@ -504,45 +504,11 @@ _all_stores = macro(implementation = _all_stores_impl)""".format(
                 scope_targets[_scope] = []
             scope_targets[_scope].extend(_targets)""")
 
-    # Generate catch all & scoped js_library targets
-    if _SUPPORTS_SYMBOLIC_MACROS:
-        npm_link_all_packages_bzl.append("""
-
-    _npm_link_all_packages(
-        name = name,
-        link_targets = link_targets,
-        scope_targets = scope_targets,
-        is_importer = is_importer,
-    )
-
-def _npm_link_all_packages_impl(name, visibility, link_targets, scope_targets, is_importer):
-    if scope_targets:
-        for scope, scoped_targets in scope_targets.items():
-            _js_library(
-                name = "node_modules/{}".format(scope),
-                srcs = scoped_targets,
-                tags = ["manual"],
-                visibility = ["//visibility:public"],
-            )
-
-    if is_importer:
-        _js_library(
-            name = "node_modules",
-            srcs = link_targets if link_targets else [],
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
-
-_npm_link_all_packages = macro(
-    implementation = _npm_link_all_packages_impl,
-    attrs = {
-        "link_targets": attr.label_list(configurable = False),
-        "scope_targets": attr.label_list_dict(configurable = False),
-        "is_importer": attr.bool(configurable = False),
-    },
-)""")
-    else:
-        npm_link_all_packages_bzl.append("""
+    # Generate catch all & scoped js_library targets.
+    # These stay inline (not in a symbolic macro) because scoped targets use
+    # "node_modules/{scope}" names and "/" is not a valid symbolic-macro
+    # name separator.
+    npm_link_all_packages_bzl.append("""
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
             _js_library(
