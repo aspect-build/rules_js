@@ -237,3 +237,107 @@ assert_contains(
     actual = ":env_json",
     expected = "export JSON_ENCODE=\"[\\\"twx\\\"]\"",
 )
+
+####################################################################################################
+# Node module compile cache: disabled under ephemeral sandbox paths, left enabled otherwise.
+# https://github.com/aspect-build/rules_js/issues/2937
+
+write_file(
+    name = "write_compile_cache",
+    out = "compile_cache.js",
+    # Ask Node to enable the cache (into a sandbox-relative dir so nothing leaks out)
+    # and report the resulting status. It comes back DISABLED only when the launcher
+    # exported NODE_DISABLE_COMPILE_CACHE.
+    content = ["""
+        const { enableCompileCache, constants } = require("node:module");
+        const { status } = enableCompileCache("node-compile-cache");
+        const disabled = status === constants.compileCacheStatus.DISABLED;
+        console.log("COMPILE_CACHE_DISABLED=" + (disabled ? "yes" : "no"));
+    """],
+)
+
+# Default: js_run_binary is a sandboxed build action with ephemeral paths, so the
+# compile cache is disabled to avoid polluting disk.
+js_binary(
+    name = "compile_cache_default",
+    entry_point = "compile_cache.js",
+)
+
+js_run_binary(
+    name = "_compile_cache_default",
+    silent_on_success = False,
+    stdout = "compile-cache-default-stdout",
+    tool = ":compile_cache_default",
+)
+
+assert_contains(
+    name = "compile_cache_disabled_by_default_test",
+    actual = ":compile-cache-default-stdout",
+    expected = "COMPILE_CACHE_DISABLED=yes",
+)
+
+# Opt-in: an explicit NODE_COMPILE_CACHE (relative, so it stays inside the sandbox)
+# means the cache should be left enabled. Prepares for #2938.
+js_binary(
+    name = "compile_cache_optin",
+    entry_point = "compile_cache.js",
+    env = {"NODE_COMPILE_CACHE": "node-compile-cache"},
+)
+
+js_run_binary(
+    name = "_compile_cache_optin",
+    silent_on_success = False,
+    stdout = "compile-cache-optin-stdout",
+    tool = ":compile_cache_optin",
+)
+
+assert_contains(
+    name = "compile_cache_optin_test",
+    actual = ":compile-cache-optin-stdout",
+    expected = "COMPILE_CACHE_DISABLED=no",
+)
+
+# bazel run: the cache is disabled here too for now (simulated via the env attribute);
+# a `bazel run` marker like BUILD_WORKSPACE_DIRECTORY must not re-enable it.
+js_binary(
+    name = "compile_cache_bazel_run",
+    entry_point = "compile_cache.js",
+    env = {"BUILD_WORKSPACE_DIRECTORY": "/fake/workspace"},
+)
+
+js_run_binary(
+    name = "_compile_cache_bazel_run",
+    silent_on_success = False,
+    stdout = "compile-cache-bazel-run-stdout",
+    tool = ":compile_cache_bazel_run",
+)
+
+assert_contains(
+    name = "compile_cache_bazel_run_test",
+    actual = ":compile-cache-bazel-run-stdout",
+    expected = "COMPILE_CACHE_DISABLED=yes",
+)
+
+# An explicit NODE_DISABLE_COMPILE_CACHE is respected even when a cache dir is
+# also set, matching Node's own precedence (disable wins).
+js_binary(
+    name = "compile_cache_explicit_disable",
+    entry_point = "compile_cache.js",
+    env = {
+        "NODE_COMPILE_CACHE": "node-compile-cache",
+        "NODE_DISABLE_COMPILE_CACHE": "1",
+    },
+)
+
+js_run_binary(
+    name = "_compile_cache_explicit_disable",
+    silent_on_success = False,
+    stdout = "compile-cache-explicit-disable-stdout",
+    tool = ":compile_cache_explicit_disable",
+)
+
+assert_contains(
+    name = "compile_cache_explicit_disable_test",
+    actual = ":compile-cache-explicit-disable-stdout",
+    expected = "COMPILE_CACHE_DISABLED=yes",
+)
