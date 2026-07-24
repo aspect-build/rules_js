@@ -12,11 +12,11 @@ _POSIX_ONLY = select({
 })
 
 # ==================================================================================================
-# Case 1: the launcher forwards a directed termination signal to node.
+# Case 1: a directed termination signal reaches node's own handler.
 #
-# signal_driver spawns signal_target and sends the signal to the launcher PID. The launcher backgrounds
-# node and forwards trapped signals, so node's own handler runs and prints HANDLED. SIGTERM and SIGINT
-# are forwarded via separate traps in the launcher, so both are exercised.
+# signal_driver spawns signal_target and sends the signal to the launcher PID. On the exec path the
+# launcher has replaced itself with node, so the signal is delivered straight to node and its handler
+# runs and prints HANDLED. SIGTERM and SIGINT are both exercised.
 
 js_binary(
     name = "signal_target_sigterm",
@@ -61,10 +61,62 @@ js_test(
 )
 
 # ==================================================================================================
-# Case 2: node killed by an unhandled signal is reported as exit code 128+N.
+# Case 1b: a directed termination signal reaches node's own handler on the expected_exit_code path.
 #
-# stay_alive installs no signal handlers, so the forwarded signal terminates node. The launcher's
-# wait picks up node's signal death and propagates 128+N (143 for SIGTERM, 130 for SIGINT).
+# With expected_exit_code set the launcher cannot exec (it must observe node's exit code to remap
+# it), so it must forward a directed signal to node itself. node's handler must still run and print
+# HANDLED. SIGTERM and SIGINT are both exercised.
+
+js_binary(
+    name = "signal_target_remap_sigterm",
+    entry_point = "signal_target.mjs",
+    expected_exit_code = 42,
+    fixed_args = ["SIGTERM"],
+)
+
+js_test(
+    name = "signal_forwarding_remap_sigterm_test",
+    size = "small",
+    data = [
+        ":signal_target_remap_sigterm",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "signal_driver.mjs",
+    fixed_args = [
+        "$(rlocationpath :signal_target_remap_sigterm)",
+        "SIGTERM",
+    ],
+    target_compatible_with = _POSIX_ONLY,
+)
+
+js_binary(
+    name = "signal_target_remap_sigint",
+    entry_point = "signal_target.mjs",
+    expected_exit_code = 42,
+    fixed_args = ["SIGINT"],
+)
+
+js_test(
+    name = "signal_forwarding_remap_sigint_test",
+    size = "small",
+    data = [
+        ":signal_target_remap_sigint",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "signal_driver.mjs",
+    fixed_args = [
+        "$(rlocationpath :signal_target_remap_sigint)",
+        "SIGINT",
+    ],
+    target_compatible_with = _POSIX_ONLY,
+)
+
+# ==================================================================================================
+# Case 2: node killed by an unhandled signal is terminated by that signal.
+#
+# stay_alive installs no signal handlers. On the exec path the launcher has replaced itself with
+# node, so the signal kills node directly and the process is reported as signal-terminated
+# (code=null, signal=<name>) rather than exiting with a 128+N code.
 
 js_binary(
     name = "stay_alive_bin",
@@ -82,7 +134,6 @@ js_test(
     fixed_args = [
         "$(rlocationpath :stay_alive_bin)",
         "SIGTERM",
-        "143",
     ],
     target_compatible_with = _POSIX_ONLY,
 )
@@ -98,7 +149,6 @@ js_test(
     fixed_args = [
         "$(rlocationpath :stay_alive_bin)",
         "SIGINT",
-        "130",
     ],
     target_compatible_with = _POSIX_ONLY,
 )
