@@ -1,16 +1,16 @@
 // Spawns the target js_binary, waits for it to report READY, sends the signal
-// named by argv[3], and asserts the launcher exits with the code in argv[4].
-// When node is terminated by a signal it does not handle, the launcher must
-// surface that as exit code 128+N (e.g. 143 for SIGTERM, 130 for SIGINT).
+// named by argv[3], and asserts node is terminated by that signal. On the exec
+// path the launcher has replaced itself with node, so an unhandled fatal signal
+// kills node directly and it is reported as signal-terminated (code=null),
+// rather than the launcher surfacing a 128+N exit code.
 import { spawn } from 'node:child_process'
 import { runfiles } from '@bazel/runfiles'
 
 const targetRlocation = process.argv[2]
 const signal = process.argv[3]
-const expectedCode = Number(process.argv[4])
-if (!targetRlocation || !signal || Number.isNaN(expectedCode)) {
+if (!targetRlocation || !signal) {
     process.stderr.write(
-        'Usage: signal_exit_driver.mjs <target-rlocationpath> <signal> <expected-exit-code>\n'
+        'Usage: signal_exit_driver.mjs <target-rlocationpath> <signal>\n'
     )
     process.exit(1)
 }
@@ -39,11 +39,11 @@ child.stdout.on('data', (chunk) => {
 
 child.on('exit', (code, sig) => {
     clearTimeout(timeout)
-    if (code === expectedCode) {
+    if (code === null && sig === signal) {
         process.exit(0)
     }
     process.stderr.write(
-        `launcher exited with code=${code} signal=${sig}, expected exit code ${expectedCode}\n`
+        `expected node to be terminated by ${signal}, but exited with code=${code} signal=${sig}\n`
     )
     process.exit(1)
 })
