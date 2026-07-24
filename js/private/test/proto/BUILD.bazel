@@ -4,6 +4,8 @@ load("//js:rpc.bzl", "js_rpc_toolchain")
 load(":js_proto_aspect_test.bzl", "js_proto_aspect_test_suite")
 load(":js_rpc_library_test.bzl", "js_rpc_library_test_suite")
 
+package(default_testonly = True)
+
 ####################################################################################################
 # Proto analysis tests
 

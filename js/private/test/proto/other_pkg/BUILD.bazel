@@ -1,6 +1,8 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
+package(default_testonly = True)
+
 write_file(
     name = "other_proto_src",
     out = "other.proto",
