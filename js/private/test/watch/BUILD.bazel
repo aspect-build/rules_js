@@ -1,5 +1,7 @@
 load("//js:defs.bzl", "js_test")
 
+package(default_testonly = True)
+
 js_test(
     name = "aspect_watch_protocol_test",
     data = ["//js/private/watch"],

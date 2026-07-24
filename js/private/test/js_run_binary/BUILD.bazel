@@ -4,6 +4,8 @@ load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
+package(default_testonly = True)
+
 # We want to verify that a js_binary's data dependencies are found only in the
 # runfiles when use_execroot_entry_point = False. To do this we use
 # find_cfg_probe.mjs to tell us whether cfg_probe.txt landed in just the

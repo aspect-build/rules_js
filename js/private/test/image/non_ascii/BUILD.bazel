@@ -1,6 +1,8 @@
 load("//js:defs.bzl", "js_binary")
 load("//js/private/test/image:asserts.bzl", "SKIP_ON_WINDOWS", "assert_js_image_layer_listings", "make_js_image_layer")
 
+package(default_testonly = True)
+
 # Case 3: Layer groups
 # bazel run //js/private/test/image/non_ascii:custom_layer_groups_test_update_all
 js_binary(

@@ -3,6 +3,8 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//js/private/test/node-patches:@babel/cli/package_json.bzl", babel_bin = "bin")
 load("//js:defs.bzl", "js_library", "js_test")
 
+package(default_testonly = True)
+
 TESTS = [
     "escape.js",
 ]

@@ -1,6 +1,8 @@
 load("//js/private/coverage:merger.bzl", "coverage_merger")
 load(":test.bzl", "coverage_fail_test", "coverage_pass_test")
 
+package(default_testonly = True)
+
 FAIL_CMD = """\
 echo "require('fs').writeFileSync(process.env.COVERAGE_OUTPUT_FILE, '# no coverage');" >> $@
 cat $(location //js/private/coverage:coverage.js) >> $@

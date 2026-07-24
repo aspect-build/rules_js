@@ -2,6 +2,8 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//js:defs.bzl", "js_binary")
 load("//js/private/test/image:asserts.bzl", "SKIP_ON_WINDOWS", "assert_js_image_layer_listings", "make_js_image_layer")
 
+package(default_testonly = True)
+
 npm_link_all_packages()
 
 js_binary(

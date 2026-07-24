@@ -119,7 +119,6 @@ js_binary(
 
 js_run_binary(
     name = "exit_zero_run",
-    testonly = True,
     chdir = package_name(),
     exit_code_out = "exit_zero_code.txt",
     stderr = "exit_zero_stderr.txt",
@@ -148,7 +147,6 @@ js_binary(
 
 js_run_binary(
     name = "exit_seven_run",
-    testonly = True,
     chdir = package_name(),
     exit_code_out = "exit_seven_code.txt",
     stderr = "exit_seven_stderr.txt",
@@ -177,7 +175,6 @@ js_binary(
 
 js_run_binary(
     name = "exit_expected_run",
-    testonly = True,
     chdir = package_name(),
     exit_code_out = "exit_expected_code.txt",
     stderr = "exit_expected_stderr.txt",
@@ -208,7 +205,6 @@ js_binary(
 
 js_run_binary(
     name = "exit_plain_run",
-    testonly = True,
     chdir = package_name(),
     exit_code_out = "exit_plain_code.txt",
     stderr = "exit_plain_stderr.txt",
@@ -259,7 +255,6 @@ js_binary(
 
 js_run_binary(
     name = "stdout_stderr_run",
-    testonly = True,
     chdir = package_name(),
     stderr = "stdout_stderr_stderr.txt",
     stdout = "stdout_stderr_stdout.txt",

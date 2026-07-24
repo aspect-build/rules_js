@@ -1,5 +1,7 @@
 load(":custom_test.bzl", "custom_test")
 
+package(default_testonly = True)
+
 custom_test(
     name = "test",
     entry_point = "test.js",

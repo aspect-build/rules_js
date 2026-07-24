@@ -1,1 +1,3 @@
+package(default_testonly = True)
+
 exports_files(["42.js"])

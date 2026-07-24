@@ -280,8 +280,7 @@ def js_run_binary(
             include_npm_sources = include_npm_sources,
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
-            # Always propagate the testonly attribute
-            testonly = kwargs.get("testonly", False),
+            testonly = kwargs.get("testonly"),
         )
         extra_srcs.append(":{}".format(js_info_files_name))
 
@@ -293,8 +292,7 @@ def js_run_binary(
             srcs = srcs,
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
-            # Always propagate the testonly attribute
-            testonly = kwargs.get("testonly", False),
+            testonly = kwargs.get("testonly"),
         )
         extra_srcs.append(":{}".format(copy_to_bin_name))
 
@@ -368,8 +366,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
             srcs = [tool],
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
-            # Always propagate the testonly attribute
-            testonly = kwargs.get("testonly", False),
+            testonly = kwargs.get("testonly"),
         )
         js_runfiles_name = "{}_runfiles".format(name)
         native.filegroup(
@@ -378,8 +375,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
             srcs = [":{}".format(js_runfiles_lib_name)],
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
-            # Always propagate the testonly attribute
-            testonly = kwargs.get("testonly", False),
+            testonly = kwargs.get("testonly"),
         )
 
         if use_execroot_entry_point == True:

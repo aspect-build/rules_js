@@ -1,6 +1,8 @@
 load("//js:defs.bzl", "js_binary", "js_library", "js_run_binary", "js_test")
 load(":data.bzl", "extract_test")
 
+package(default_testonly = True)
+
 # js_library(srcs) wrapper of the data
 js_library(
     name = "data-js_library-srcs",

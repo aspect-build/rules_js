@@ -437,8 +437,7 @@ def npm_package(
             include_runfiles = include_runfiles,
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
-            # Always propagate the testonly attribute
-            testonly = kwargs.get("testonly", False),
+            testonly = kwargs.get("testonly"),
         )
         srcs = srcs + [files_target]
 
@@ -454,7 +453,7 @@ def npm_package(
             include_npm = True,
             args = args,
             tags = kwargs.get("tags", []) + ["manual"],
-            testonly = kwargs.get("testonly", False),
+            testonly = kwargs.get("testonly"),
             visibility = kwargs.get("visibility", None),
         )
 
@@ -482,7 +481,7 @@ def npm_package(
                 pack_out,
             ],
             tags = kwargs.get("tags", []) + ["manual"],
-            testonly = kwargs.get("testonly", False),
+            testonly = kwargs.get("testonly"),
             visibility = kwargs.get("visibility", None),
         )
 
