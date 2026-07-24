@@ -1,0 +1,279 @@
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+
+package(default_testonly = True)
+
+# POSIX directed per-PID signal delivery; SIGTERM/SIGINT semantics differ on Windows.
+_POSIX_ONLY = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
+# ==================================================================================================
+# Case 1: the launcher forwards a directed termination signal to node.
+#
+# signal_driver spawns signal_target and sends the signal to the launcher PID. The launcher backgrounds
+# node and forwards trapped signals, so node's own handler runs and prints HANDLED. SIGTERM and SIGINT
+# are forwarded via separate traps in the launcher, so both are exercised.
+
+js_binary(
+    name = "signal_target_sigterm",
+    entry_point = "signal_target.mjs",
+    fixed_args = ["SIGTERM"],
+)
+
+js_test(
+    name = "signal_forwarding_sigterm_test",
+    size = "small",
+    data = [
+        ":signal_target_sigterm",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "signal_driver.mjs",
+    fixed_args = [
+        "$(rlocationpath :signal_target_sigterm)",
+        "SIGTERM",
+    ],
+    target_compatible_with = _POSIX_ONLY,
+)
+
+js_binary(
+    name = "signal_target_sigint",
+    entry_point = "signal_target.mjs",
+    fixed_args = ["SIGINT"],
+)
+
+js_test(
+    name = "signal_forwarding_sigint_test",
+    size = "small",
+    data = [
+        ":signal_target_sigint",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "signal_driver.mjs",
+    fixed_args = [
+        "$(rlocationpath :signal_target_sigint)",
+        "SIGINT",
+    ],
+    target_compatible_with = _POSIX_ONLY,
+)
+
+# ==================================================================================================
+# Case 2: node killed by an unhandled signal is reported as exit code 128+N.
+#
+# stay_alive installs no signal handlers, so the forwarded signal terminates node. The launcher's
+# wait picks up node's signal death and propagates 128+N (143 for SIGTERM, 130 for SIGINT).
+
+js_binary(
+    name = "stay_alive_bin",
+    entry_point = "stay_alive.mjs",
+)
+
+js_test(
+    name = "signal_exit_code_sigterm_test",
+    size = "small",
+    data = [
+        ":stay_alive_bin",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "signal_exit_driver.mjs",
+    fixed_args = [
+        "$(rlocationpath :stay_alive_bin)",
+        "SIGTERM",
+        "143",
+    ],
+    target_compatible_with = _POSIX_ONLY,
+)
+
+js_test(
+    name = "signal_exit_code_sigint_test",
+    size = "small",
+    data = [
+        ":stay_alive_bin",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "signal_exit_driver.mjs",
+    fixed_args = [
+        "$(rlocationpath :stay_alive_bin)",
+        "SIGINT",
+        "130",
+    ],
+    target_compatible_with = _POSIX_ONLY,
+)
+
+# ==================================================================================================
+# Case 3: expected_exit_code remapping in the launcher.
+#
+# When node exits 0 but a non-zero code was expected, the launcher must report Bazel's "tests
+# failed" sentinel (exit 3). When node exits a different non-zero code, that code is propagated.
+# When node exits exactly the expected code, the launcher reports success (exit 0).
+
+js_binary(
+    name = "exit_zero_bin",
+    entry_point = "exit_with.mjs",
+    expected_exit_code = 42,
+    fixed_args = ["0"],
+)
+
+js_run_binary(
+    name = "exit_zero_run",
+    testonly = True,
+    chdir = package_name(),
+    exit_code_out = "exit_zero_code.txt",
+    stderr = "exit_zero_stderr.txt",
+    stdout = "exit_zero_stdout.txt",
+    tool = ":exit_zero_bin",
+)
+
+write_file(
+    name = "exit_zero_expected",
+    out = "exit_zero_expected.txt",
+    content = ["3"],
+)
+
+diff_test(
+    name = "remap_unexpected_success_test",
+    file1 = ":exit_zero_expected.txt",
+    file2 = ":exit_zero_code.txt",
+)
+
+js_binary(
+    name = "exit_seven_bin",
+    entry_point = "exit_with.mjs",
+    expected_exit_code = 42,
+    fixed_args = ["7"],
+)
+
+js_run_binary(
+    name = "exit_seven_run",
+    testonly = True,
+    chdir = package_name(),
+    exit_code_out = "exit_seven_code.txt",
+    stderr = "exit_seven_stderr.txt",
+    stdout = "exit_seven_stdout.txt",
+    tool = ":exit_seven_bin",
+)
+
+write_file(
+    name = "exit_seven_expected",
+    out = "exit_seven_expected.txt",
+    content = ["7"],
+)
+
+diff_test(
+    name = "remap_mismatch_test",
+    file1 = ":exit_seven_expected.txt",
+    file2 = ":exit_seven_code.txt",
+)
+
+js_binary(
+    name = "exit_expected_bin",
+    entry_point = "exit_with.mjs",
+    expected_exit_code = 42,
+    fixed_args = ["42"],
+)
+
+js_run_binary(
+    name = "exit_expected_run",
+    testonly = True,
+    chdir = package_name(),
+    exit_code_out = "exit_expected_code.txt",
+    stderr = "exit_expected_stderr.txt",
+    stdout = "exit_expected_stdout.txt",
+    tool = ":exit_expected_bin",
+)
+
+write_file(
+    name = "exit_expected_expected",
+    out = "exit_expected_expected.txt",
+    content = ["0"],
+)
+
+diff_test(
+    name = "remap_expected_match_test",
+    file1 = ":exit_expected_expected.txt",
+    file2 = ":exit_expected_code.txt",
+)
+
+# ==================================================================================================
+# Case 4: with no expected_exit_code the launcher propagates node's exit code verbatim.
+
+js_binary(
+    name = "exit_plain_bin",
+    entry_point = "exit_with.mjs",
+    fixed_args = ["7"],
+)
+
+js_run_binary(
+    name = "exit_plain_run",
+    testonly = True,
+    chdir = package_name(),
+    exit_code_out = "exit_plain_code.txt",
+    stderr = "exit_plain_stderr.txt",
+    stdout = "exit_plain_stdout.txt",
+    tool = ":exit_plain_bin",
+)
+
+write_file(
+    name = "exit_plain_expected",
+    out = "exit_plain_expected.txt",
+    content = ["7"],
+)
+
+diff_test(
+    name = "propagate_exit_code_test",
+    file1 = ":exit_plain_expected.txt",
+    file2 = ":exit_plain_code.txt",
+)
+
+# ==================================================================================================
+# Case 5: the launcher passes stdin through to node.
+
+js_binary(
+    name = "stdin_cat_bin",
+    entry_point = "stdin_cat.mjs",
+)
+
+genrule(
+    name = "stdin_run",
+    outs = ["stdin_out.txt"],
+    cmd = "printf 'hello stdin' | BAZEL_BINDIR=$(BINDIR) $(execpath :stdin_cat_bin) > $@",
+    tools = [":stdin_cat_bin"],
+)
+
+assert_contains(
+    name = "stdin_passthrough_test",
+    actual = ":stdin_out.txt",
+    expected = "hello stdin",
+)
+
+# ==================================================================================================
+# Case 6: the launcher passes node's stdout and stderr through on separate streams.
+
+js_binary(
+    name = "stdout_stderr_bin",
+    entry_point = "stdout_stderr.mjs",
+)
+
+js_run_binary(
+    name = "stdout_stderr_run",
+    testonly = True,
+    chdir = package_name(),
+    stderr = "stdout_stderr_stderr.txt",
+    stdout = "stdout_stderr_stdout.txt",
+    tool = ":stdout_stderr_bin",
+)
+
+assert_contains(
+    name = "stdout_passthrough_test",
+    actual = ":stdout_stderr_stdout.txt",
+    expected = "ON_STDOUT",
+)
+
+assert_contains(
+    name = "stderr_passthrough_test",
+    actual = ":stdout_stderr_stderr.txt",
+    expected = "ON_STDERR",
+)
