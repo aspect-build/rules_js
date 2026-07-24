@@ -386,6 +386,18 @@ fi
 
 set +e
 
+if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
+    # No exit code remapping is needed, so replace this shell with node. Signals
+    # and terminal control are then delivered directly to node instead of being
+    # proxied through a backgrounded child, and nothing runs after node exits.
+    exec "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"}
+    # exec only returns if it fails to launch the node wrapper.
+    logf_error "failed to exec node wrapper '%s'" "$JS_BINARY__NODE_WRAPPER"
+    exit 127
+fi
+
+
+# JS_BINARY__EXPECTED_EXIT_CODE is set, so node's exit code must be observed and remapped.
 "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 
 # ==============================================================================
