@@ -5,7 +5,7 @@ load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script
 load("//js/private:bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _ATTRS = {
-    "entry_point": attr.label(default = Label("//js/private/coverage:coverage.js"), allow_single_file = [".js"]),
+    "entry_point": attr.label(default = Label("//js/private/coverage:publish.js"), allow_single_file = [".js"]),
     "_launcher_template": attr.label(
         default = Label("//js/private/coverage:coverage.sh.tpl"),
         allow_single_file = True,

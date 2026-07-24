@@ -529,6 +529,29 @@ wait "$child"
 RESULT="$?"
 set -e
 
+# The test passed if it exited 0, or matched a configured non-zero expected code.
+TEST_PASSED=false
+if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
+    if [ "$RESULT" = "$JS_BINARY__EXPECTED_EXIT_CODE" ]; then
+        TEST_PASSED=true
+    fi
+elif [ "$RESULT" -eq 0 ]; then
+    TEST_PASSED=true
+fi
+
+# Generate the lcov report here in the test action (coverage.js); the
+# _lcov_merger (publish.js) just publishes it. See #2901.
+# A failure here must fail the coverage action: otherwise publish.js leaves
+# bazel's empty output file and `bazel coverage` reports a misleading 0%.
+#  is empty for js_binary (non-test) targets.
+if [ "$TEST_PASSED" = true ] && [ -n "" ] && [ "${COVERAGE_DIR:-}" ]; then
+    JS_COVERAGE__RUNFILES="$JS_BINARY__RUNFILES" \
+        "$JS_BINARY__NODE_BINARY" "$JS_BINARY__RUNFILES/_main/" || {
+        logf_error "coverage report generation failed"
+        exit 1
+    }
+fi
+
 # ==============================================================================
 # Mop up after main program
 # ==============================================================================

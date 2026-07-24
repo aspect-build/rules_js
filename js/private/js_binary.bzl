@@ -418,7 +418,12 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
+    # Only js_test declares _coverage_report; js_binary leaves this empty so the
+    # coverage generation block in the launcher is skipped. See #2901.
+    coverage_entry_point = ctx.file._coverage_report.short_path if hasattr(ctx.file, "_coverage_report") else ""
+
     launcher_subst = {
+        "{{coverage_entry_point}}": coverage_entry_point,
         "{{target_label}}": str(ctx.label),
         "{{template_label}}": str(ctx.attr._launcher_template.label),
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
@@ -546,6 +551,12 @@ def _js_binary_impl(ctx):
         # TODO: Remove once bazel<8 support is dropped.
         if hasattr(ctx.attr, "_lcov_merger"):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
+
+        # The launcher runs coverage.js after the test to generate the report, so
+        # it must be in the test's runfiles. See #2901.
+        if hasattr(ctx.file, "_coverage_report"):
+            runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
+
         providers.append(
             coverage_common.instrumented_files_info(
                 ctx,
@@ -604,6 +615,12 @@ js_test = rule(
             executable = True,
             default = Label("//js/private/coverage:merger"),
             cfg = "exec",
+        ),
+        # Script the launcher runs in the test action to generate the lcov report
+        # (the _lcov_merger's publish.js then just publishes it). See #2901.
+        "_coverage_report": attr.label(
+            default = Label("//js/private/coverage:coverage.js"),
+            allow_single_file = [".js"],
         ),
     }),
     test = True,

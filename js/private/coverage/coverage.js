@@ -16067,17 +16067,13 @@ function requireC8 () {
 
 var c8Exports = requireC8();
 
-// bazel will create the COVERAGE_OUTPUT_FILE whilst setting up the sandbox.
-// therefore, should be doing a file size check rather than presence.
-try {
-    const stats = require$$0$1.statSync(process.env.COVERAGE_OUTPUT_FILE);
-    if (stats.size != 0) {
-        // early exit here does not affect the outcome of the tests.
-        // bazel will only execute _lcov_merger when tests pass.
-        process.exit(0);
-    }
-    // in case file doesn't exist or some other error is thrown, just ignore it.
-} catch {}
+// Convert the V8 coverage data to lcov here in the test action, where the data
+// (NODE_V8_COVERAGE), instrumented sources, and V8 source URLs are all present.
+// A split post-processing action (--experimental_split_coverage_postprocessing,
+// implied by remote execution) has none of those, so it cannot. See #2901:
+// https://github.com/aspect-build/rules_js/issues/2901.
+// Handed off to the _lcov_merger action's publish.js via COVERAGE_DIR.
+const stash = require$$0$2.join(process.env.COVERAGE_DIR, '_rules_js_report.dat');
 
 const include = require$$0$1
     .readFileSync(process.env.COVERAGE_MANIFEST)
@@ -16105,10 +16101,7 @@ new c8Exports.Report({
 })
     .run()
     .then(() => {
-        require$$0$1.renameSync(
-            require$$0$2.join(process.env.COVERAGE_DIR, 'lcov.info'),
-            process.env.COVERAGE_OUTPUT_FILE
-        );
+        require$$0$1.renameSync(require$$0$2.join(process.env.COVERAGE_DIR, 'lcov.info'), stash);
     })
     .catch((err) => {
         console.error(err);
