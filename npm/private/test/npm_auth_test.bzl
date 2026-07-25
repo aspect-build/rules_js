@@ -170,6 +170,147 @@ def _plain_username_password_test_impl(ctx):
 
     return unittest.end(env)
 
+def _fake_auth_rctx(stdout = "HELPER_TOKEN\n", return_code = 0, env = {}, fail_on_execute = False):
+    def _execute(_args, **_kwargs):
+        if fail_on_execute:
+            fail("rctx.execute should not be called")
+        return struct(return_code = return_code, stdout = stdout, stderr = "")
+
+    return struct(
+        getenv = env.get,
+        execute = _execute,
+    )
+
+def _is_absolute_path_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    for path in ["/abs/token-helper", "C:\\helper", "C:/helper", "\\\\net\\share\\helper"]:
+        asserts.true(env, helpers.is_absolute_path(path), msg = "expected %r to be absolute" % path)
+
+    for path in ["./relative", "relative/path", "token-helper", ""]:
+        asserts.false(env, helpers.is_absolute_path(path), msg = "expected %r to be relative" % path)
+
+    return unittest.end(env)
+
+def _token_helper_global_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "": {
+                    "bearer": "HELPER_TOKEN",
+                },
+            },
+        ),
+        helpers.get_npm_auth(
+            {
+                "tokenHelper": "/abs/token-helper",
+            },
+            "",
+            _fake_auth_rctx(),
+            allow_token_helper = True,
+        ),
+    )
+
+    return unittest.end(env)
+
+def _token_helper_registry_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "registry1": {
+                    "bearer": "HELPER_TOKEN",
+                },
+            },
+        ),
+        helpers.get_npm_auth(
+            {
+                "//registry1/:tokenHelper": "/abs/token-helper",
+            },
+            "",
+            _fake_auth_rctx(),
+            allow_token_helper = True,
+        ),
+    )
+
+    return unittest.end(env)
+
+def _token_helper_env_path_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "registry1": {
+                    "bearer": "HELPER_TOKEN",
+                },
+            },
+        ),
+        helpers.get_npm_auth(
+            {
+                "//registry1/:tokenHelper": "${HELPER}",
+            },
+            "",
+            _fake_auth_rctx(env = {"HELPER": "/abs/token-helper"}),
+            allow_token_helper = True,
+        ),
+    )
+
+    return unittest.end(env)
+
+def _token_helper_disallowed_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        ({}, {}),
+        helpers.get_npm_auth(
+            {
+                "//registry1/:tokenHelper": "/abs/token-helper",
+            },
+            "",
+            _fake_auth_rctx(fail_on_execute = True),
+            allow_token_helper = False,
+        ),
+    )
+
+    return unittest.end(env)
+
+def _token_helper_precedence_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        (
+            {},
+            {
+                "registry1": {
+                    "bearer": "HELPER_TOKEN",
+                },
+            },
+        ),
+        helpers.get_npm_auth(
+            {
+                "//registry1/:_authToken": "STATIC",
+                "//registry1/:tokenHelper": "/abs/token-helper",
+            },
+            "",
+            _fake_auth_rctx(),
+            allow_token_helper = True,
+        ),
+    )
+
+    return unittest.end(env)
+
 def _env_var_token_test_impl(ctx):
     env = unittest.begin(ctx)
 
@@ -411,6 +552,12 @@ plain_text_token_test = unittest.make(_plain_text_token_test_impl)
 env_var_token_test = unittest.make(_env_var_token_test_impl)
 mixed_token_test = unittest.make(_mixed_token_test_impl)
 pkg_scope_test = unittest.make(_pkg_scope_test_impl)
+is_absolute_path_test = unittest.make(_is_absolute_path_test_impl)
+token_helper_global_test = unittest.make(_token_helper_global_test_impl)
+token_helper_registry_test = unittest.make(_token_helper_registry_test_impl)
+token_helper_env_path_test = unittest.make(_token_helper_env_path_test_impl)
+token_helper_disallowed_test = unittest.make(_token_helper_disallowed_test_impl)
+token_helper_precedence_test = unittest.make(_token_helper_precedence_test_impl)
 
 def npm_auth_test_suite():
     unittest.suite(
@@ -422,4 +569,10 @@ def npm_auth_test_suite():
         partial.make(env_var_token_test, timeout = "short"),
         partial.make(mixed_token_test, timeout = "short"),
         partial.make(pkg_scope_test, timeout = "short"),
+        partial.make(is_absolute_path_test, timeout = "short"),
+        partial.make(token_helper_global_test, timeout = "short"),
+        partial.make(token_helper_registry_test, timeout = "short"),
+        partial.make(token_helper_env_path_test, timeout = "short"),
+        partial.make(token_helper_disallowed_test, timeout = "short"),
+        partial.make(token_helper_precedence_test, timeout = "short"),
     )

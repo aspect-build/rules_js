@@ -280,6 +280,23 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             Because of the repository rule invalidation issue, using the home `.npmrc` is not recommended.
             `.npmrc` settings should generally go in the `npmrc` in your repository so they are shared by all
             developers. The home `.npmrc` should be reserved for authentication settings for private npm repositories.
+
+            The `tokenHelper` auth setting is only run when found in this file (or the file set by
+            `npmrc_auth_file`), never in the `npmrc` file.
+        """),
+        "npmrc_auth_file": attr.string(doc = """
+            Path to the trusted user-level auth file to read when `use_home_npmrc` is True.
+
+            This is pnpm's [`npmrcAuthFile`](https://pnpm.io/settings#npmrcauthfile) setting. When
+            set, this file is read as the user-level auth file instead of `$HOME/.npmrc`
+            (`$USERPROFILE/.npmrc` on Windows). Prefer an absolute path. This attribute has no
+            effect unless `use_home_npmrc` is True.
+
+            The path may also be set with the `PNPM_CONFIG_NPMRC_AUTH_FILE` environment variable
+            (with `NPM_CONFIG_USERCONFIG` as a fallback); this attribute takes precedence.
+
+            The `tokenHelper` auth setting is only honored from this trusted user-level auth file,
+            never from the file in the `npmrc` attribute.
         """),
         "verify_node_modules_ignored": attr.label(doc = """
             **Bazel 7.x only (deprecated)** - Verifies node_modules folders are ignored.

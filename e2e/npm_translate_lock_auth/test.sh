@@ -19,6 +19,12 @@ cp -f .npmrc ~/.npmrc
 rm .npmrc
 _sedi 's#npmrc = "//:.npmrc",#use_home_npmrc = True,#' MODULE.bazel
 
+# Replace the @aspect-build registry token with a tokenHelper that prints it instead,
+# to exercise the tokenHelper code path end to end.
+helper_path="$(cd "$(dirname "$0")" && pwd)/token-helper.sh"
+_sedi '\#//npm.pkg.github.com/:_authToken=#d' ~/.npmrc
+printf '//npm.pkg.github.com/:tokenHelper=%s\n' "$helper_path" >>~/.npmrc
+
 # Have to make another change to package.json to invalidate the repository rule
 _sedi 's#"@types/node": "22.18.13"#"@types/node": "22"#' package.json
 

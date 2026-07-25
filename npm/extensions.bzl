@@ -133,6 +133,23 @@ _hub_repo = repository_rule(
     },
 )
 
+def _resolve_npmrc_auth_file(module_ctx, attr):
+    # pnpm's npmrcAuthFile: the trusted user-level auth file, defaulting to ~/.npmrc.
+    # The attribute wins, then env vars, then the home directory default.
+    if attr.npmrc_auth_file:
+        return attr.npmrc_auth_file
+
+    for var in ["PNPM_CONFIG_NPMRC_AUTH_FILE", "NPM_CONFIG_USERCONFIG"]:
+        value = module_ctx.getenv(var)
+        if value:
+            return value
+
+    home_directory = repo_utils.get_home_directory(module_ctx)
+    if not home_directory:
+        return None
+
+    return "{}/{}".format(home_directory, ".npmrc")
+
 def _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_config, replace_packages):
     state = parse_and_verify_lock(module_ctx, mod, attr)
 
@@ -145,20 +162,19 @@ def _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_c
         (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx)
 
     if attr.use_home_npmrc:
-        home_directory = repo_utils.get_home_directory(module_ctx)
-        if home_directory:
-            home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
-            if module_ctx.path(home_npmrc_path).exists:
-                home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
-
-                (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx)
-                registries.update(registries2)
-                npm_auth.update(npm_auth2)
-        else:
+        auth_npmrc_path = _resolve_npmrc_auth_file(module_ctx, attr)
+        if not auth_npmrc_path:
             # buildifier: disable=print
             print("""
 WARNING: Cannot determine home directory in order to load home `.npmrc` file in module extension `npm_translate_lock(name = "{attr_name}")`.
 """.format(attr_name = attr.name))
+        elif module_ctx.path(auth_npmrc_path).exists:
+            home_npmrc = parse_npmrc(module_ctx.read(auth_npmrc_path))
+
+            # tokenHelper is only honored from this trusted user-level auth file
+            (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, auth_npmrc_path, module_ctx, allow_token_helper = True)
+            registries.update(registries2)
+            npm_auth.update(npm_auth2)
 
     imports = npm_translate_lock_helpers.get_npm_imports(
         state = state,

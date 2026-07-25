@@ -102,8 +102,44 @@ def _gather_values_from_matching_names(additive, keyed_lists, *names):
                 fail("expected value to be list or string")
     return (result, keys)
 
+def _is_absolute_path(path):
+    if path.startswith("/") or path.startswith("\\"):
+        return True
+
+    # Windows drive path, e.g. C:\ or C:/
+    return len(path) >= 3 and path[1] == ":" and (path[2] == "/" or path[2] == "\\")
+
+def _run_token_helper(helper, npmrc_path, rctx):
+    # user-level auth files expand env vars in credential values, including tokenHelper
+    helper = utils.replace_npmrc_token_envvar(helper, npmrc_path, rctx)
+
+    if not _is_absolute_path(helper):
+        fail("tokenHelper in \"{npmrc}\" must be an absolute path with no arguments, got: \"{helper}\"".format(
+            npmrc = npmrc_path,
+            helper = helper,
+        ))
+
+    result = rctx.execute([helper])
+    if result.return_code != 0:
+        fail("tokenHelper \"{helper}\" in \"{npmrc}\" exited with {code}:\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}".format(
+            helper = helper,
+            npmrc = npmrc_path,
+            code = result.return_code,
+            stdout = result.stdout,
+            stderr = result.stderr,
+        ))
+
+    token = result.stdout.strip()
+    if not token:
+        fail("tokenHelper \"{helper}\" in \"{npmrc}\" produced no output".format(
+            helper = helper,
+            npmrc = npmrc_path,
+        ))
+
+    return token
+
 ################################################################################
-def _get_npm_auth(npmrc, npmrc_path, rctx):
+def _get_npm_auth(npmrc, npmrc_path, rctx, allow_token_helper = False):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
     - creates a token by registry dict: {registry: token}
@@ -151,6 +187,8 @@ def _get_npm_auth(npmrc, npmrc_path, rctx):
         npmrc: The `.npmrc` file.
         npmrc_path: The file path to `.npmrc`.
         rctx: the repository_ctx or module_ctx to fetch environment vars from
+        allow_token_helper: whether to run `tokenHelper` executables found in `npmrc`.
+            Only True for the trusted user-level auth file; False (default) ignores them.
 
     Returns:
         A tuple (registries, auth).
@@ -162,9 +200,11 @@ def _get_npm_auth(npmrc, npmrc_path, rctx):
     _NPM_AUTH = "_auth"
     _NPM_USERNAME = "username"
     _NPM_PASSWORD = "_password"
+    _NPM_TOKEN_HELPER = "tokenHelper"
     _NPM_PKG_SCOPE_KEY = ":registry"
     registries = {}
     auth = {}
+    token_helpers = {}
 
     for (k, v) in npmrc.items():
         if k == _NPM_AUTH_TOKEN or k.endswith(":" + _NPM_AUTH_TOKEN):
@@ -226,6 +266,21 @@ def _get_npm_auth(npmrc, npmrc_path, rctx):
                 auth[registry] = {}
 
             auth[registry]["password"] = base64.decode(v)
+
+        if k == _NPM_TOKEN_HELPER or k.endswith(":" + _NPM_TOKEN_HELPER):
+            # //registry.corp.com/:tokenHelper=/abs/path
+            # registry: registry.corp.com
+            registry = k.removeprefix("//").removesuffix(_NPM_TOKEN_HELPER).removesuffix(":").removesuffix("/")
+            token_helpers[registry] = v
+
+    # tokenHelper runs an executable, so only honor it from a trusted user-level auth
+    # file. Run helpers last so they win over a static token for the same registry.
+    if allow_token_helper:
+        for (registry, helper) in token_helpers.items():
+            token = _run_token_helper(helper, npmrc_path, rctx)
+            if registry not in auth:
+                auth[registry] = {}
+            auth[registry]["bearer"] = token
 
     return (registries, auth)
 
@@ -700,6 +755,7 @@ helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
+    is_absolute_path = _is_absolute_path,
     link_package = _link_package,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
