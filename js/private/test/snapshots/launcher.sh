@@ -52,13 +52,6 @@ function logf_error {
     fi
 }
 
-function logf_warn {
-    if [ "${JS_BINARY__LOG_WARN:-}" ]; then
-        printf "WARN: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        logf_stderr "$@"
-    fi
-}
-
 function logf_info {
     if [ "${JS_BINARY__LOG_INFO:-}" ]; then
         printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >&2
@@ -96,7 +89,7 @@ _exit() {
 
     logf_debug "exit code: %s" "$EXIT_CODE"
 
-    exit $EXIT_CODE
+    exit "$EXIT_CODE"
 }
 
 trap _exit EXIT
