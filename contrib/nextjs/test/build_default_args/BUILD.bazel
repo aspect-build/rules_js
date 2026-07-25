@@ -1,0 +1,4 @@
+load("//contrib/nextjs/test:args_test.bzl", "nextjs_build_args_test")
+
+# The default `args = []` must produce `next build` with no additional arguments.
+nextjs_build_args_test(name = "nextjs_build_default_args_test")

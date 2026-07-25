@@ -1,0 +1,9 @@
+load("//js:defs.bzl", "js_binary")
+
+# The stand-in `next` binary shared by all test packages. The tests only inspect the
+# generated actions, so `next` is never actually run.
+js_binary(
+    name = "fake_next_binary",
+    entry_point = "fake_next.js",
+    visibility = ["//contrib/nextjs/test:__subpackages__"],
+)

@@ -1,0 +1,9 @@
+load("//contrib/nextjs/test:args_test.bzl", "nextjs_standalone_build_args_test")
+
+nextjs_standalone_build_args_test(
+    name = "nextjs_standalone_build_args_test",
+    args = [
+        "--webpack",
+        "--no-lint",
+    ],
+)
