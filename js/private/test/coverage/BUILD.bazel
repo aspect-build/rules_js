@@ -1,7 +1,10 @@
 load("//js/private/coverage:merger.bzl", "coverage_merger")
+load(":merger_test.bzl", "merger_test_suite")
 load(":test.bzl", "coverage_fail_test", "coverage_pass_test")
 
 package(default_testonly = True)
+
+merger_test_suite(name = "merger_test")
 
 FAIL_CMD = """\
 echo "require('fs').writeFileSync(process.env.COVERAGE_OUTPUT_FILE, '# no coverage');" >> $@
