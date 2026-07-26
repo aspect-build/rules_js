@@ -1,6 +1,7 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_lib_host//:defs.bzl", "host")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load(":js_library_test.bzl", "js_library_test_suite")
 load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
@@ -37,6 +38,19 @@ write_source_files(
     files = {
         "snapshots/launcher.sh": ":shell_launcher_sed",
     },
+)
+
+# Drives the merger's branches directly. //js/private/test/coverage covers them
+# too, but only under `bazel coverage`, which CI runs on one matrix leg.
+sh_test(
+    name = "coverage_merger_test",
+    srcs = ["coverage_merger_test.sh"],
+    args = ["$(rootpath //js/private/coverage:merger)"],
+    data = ["//js/private/coverage:merger"],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 js_library_test_suite(name = "js_library_test")

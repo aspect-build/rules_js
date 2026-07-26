@@ -227,3 +227,75 @@ You can also reduce the size of the extracted packages themselves with
 `npm.npm_exclude_package_contents`, which removes files you consider unnecessary (docs,
 tests, etc.) at extraction time; see
 [Unnecessary npm package content](#unnecessary-npm-package-content) above.
+
+## Code coverage
+
+Under `bazel coverage`, `js_test` produces its lcov report while the test runs,
+where the V8 coverage data and the instrumented sources are both available.
+
+### Coverage runs count against the test's timeout
+
+Because the report is produced while the test runs, generating it consumes the
+target's own `timeout`/`size` budget. Converting V8 coverage to lcov takes time
+proportional to the number of instrumented files, so a test that sits near its
+timeout under `bazel test` may need a larger `size` or `timeout` to pass under
+`bazel coverage`.
+
+For the same reason the report is produced by the target's own `node_toolchain`,
+not by the one used for build actions. A test pinned to an old Node version runs
+the coverage reporter under that version too.
+
+### Coverage requires a runfiles tree
+
+The reporter maps V8 coverage data back onto sources through the test's runfiles,
+so a target built without a runfiles tree (`enable_runfiles = False`, which is the
+default on Windows without `--enable_runfiles`) reports empty coverage and logs
+
+```
+ERROR: ...: coverage report generator '...' not found; code coverage requires a runfiles tree
+```
+
+The test itself still passes; enable runfiles to collect coverage for it.
+
+### Empty coverage reports
+
+An empty `coverage.dat` usually means nothing was instrumented — see
+`--instrumentation_filter` and `--instrument_test_targets`.
+
+If it is accompanied by
+
+```
+WARNING: no coverage report was generated in the test action, reporting empty coverage.
+```
+
+then either the target is `testonly = False`, which rules_js does not collect
+coverage for, or it is a custom test rule that reuses only part of rules_js's
+coverage support. In the latter case use `js_test`, or the test rule provided by the
+ruleset for your test framework, rather than assembling one from rules_js internals.
+
+### First-party code repackaged with `npm_package`
+
+Coverage of first-party code imported by package name (`require("@my-scope/lib")`)
+is supported when the package is linked from a `js_library` (a pnpm-workspace-style
+first-party dependency): the `.aspect_rules_js` store entry points at the library's
+own sources, so coverage attributes to them.
+
+It is **not** supported when the code is repackaged with `npm_package` and then
+linked by name. `npm_package` produces a distributable _copy_ in the store with no
+link back to the sources, so the executed file cannot be mapped to them and the
+target reports empty coverage. This is a deliberate limitation: for coverage of
+first-party code under test, depend on it as a `js_library` (by relative path or by
+name), not as a repackaged `npm_package`. See
+[#2933](https://github.com/aspect-build/rules_js/issues/2933).
+
+### Test frameworks that report their own coverage
+
+A test program that writes lcov directly to `$COVERAGE_OUTPUT_FILE` (jest, nyc, ...)
+owns that report, and rules_js will not overwrite it — but only while
+post-processing runs alongside the test. Under
+`--experimental_split_coverage_postprocessing` (required for remote execution, along
+with `--experimental_fetch_all_coverage_outputs`) Bazel discards whatever the test
+wrote there and publishes the report rules_js generated instead. Rulesets in that
+situation, such as
+[rules_jest](https://github.com/aspect-build/rules_jest), handle coverage themselves
+rather than relying on the rules_js implementation.

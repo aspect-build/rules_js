@@ -283,6 +283,12 @@ def _expand_env_if_needed(ctx, value):
 def _bash_quote(value):
     return json.encode(value)
 
+def _generates_coverage_report(ctx):
+    """Whether the launcher generates the lcov report in the test action. See #2901."""
+    return (hasattr(ctx.file, "_coverage_report") and
+            ctx.attr.testonly and
+            ctx.configuration.coverage_enabled)
+
 def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
@@ -418,7 +424,13 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
+    if _generates_coverage_report(ctx):
+        coverage_entry_point = "/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])
+    else:
+        coverage_entry_point = ""
+
     launcher_subst = {
+        "{{coverage_entry_point}}": coverage_entry_point,
         "{{target_label}}": str(ctx.label),
         "{{template_label}}": str(ctx.attr._launcher_template.label),
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
@@ -546,6 +558,12 @@ def _js_binary_impl(ctx):
         # TODO: Remove once bazel<8 support is dropped.
         if hasattr(ctx.attr, "_lcov_merger"):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
+
+        # The launcher runs coverage.js after the test to generate the report, so
+        # it must be in the test's runfiles. See #2901.
+        if _generates_coverage_report(ctx):
+            runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
+
         providers.append(
             coverage_common.instrumented_files_info(
                 ctx,
@@ -604,6 +622,13 @@ js_test = rule(
             executable = True,
             default = Label("//js/private/coverage:merger"),
             cfg = "exec",
+        ),
+        # Run by the launcher in the test action to generate the lcov report, which
+        # _lcov_merger above then publishes. A test rule built on js_binary_lib needs
+        # both halves. See #2901.
+        "_coverage_report": attr.label(
+            default = Label("//js/private/coverage:coverage.js"),
+            allow_single_file = [".js"],
         ),
     }),
     test = True,

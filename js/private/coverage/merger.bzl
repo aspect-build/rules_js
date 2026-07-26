@@ -1,12 +1,10 @@
 "Internal use only"
 
-# Simple binary that call coverage.js with node toolchain
+# Publishes the lcov report generated in the test action; see coverage.js and #2901.
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load("//js/private:bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _ATTRS = {
-    "entry_point": attr.label(default = Label("//js/private/coverage:coverage.js"), allow_single_file = [".js"]),
-    # Test-only: bash appended after the merger runs, with COVERAGE_DIR and
+    # Test-only: bash appended after the report is published, with COVERAGE_DIR and
     # COVERAGE_OUTPUT_FILE set. See //js/private/test/coverage.
     "merge_assertions": attr.string(),
     "_launcher_template": attr.label(
@@ -18,9 +16,6 @@ _ATTRS = {
 
 def _coverage_merger_impl(ctx):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
-    nodeinfo = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo
-
-    node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
     # The '_' avoids collisions with another file matching the label name.
     # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
@@ -32,24 +27,14 @@ def _coverage_merger_impl(ctx):
         substitutions = {
             # The '#' is part of the placeholder; see coverage.sh.tpl.
             "#{{merge_assertions}}": ctx.attr.merge_assertions,
-            "{{entry_point_path}}": ctx.file.entry_point.short_path,
-            "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
-            "{{node}}": node_path,
-            "{{workspace_name}}": ctx.workspace_name,
         },
         is_executable = True,
     )
 
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    runfiles = [ctx.file.entry_point]
-
-    if is_windows:
-        # The .bat launcher resolves the bash script through its own runfiles.
-        runfiles.append(bash_launcher)
-
-    if nodeinfo.node:
-        runfiles.append(nodeinfo.node)
+    # The .bat launcher resolves the bash script through its own runfiles.
+    runfiles = [bash_launcher] if is_windows else []
 
     return DefaultInfo(
         executable = launcher,
@@ -63,6 +48,5 @@ coverage_merger = rule(
     toolchains = [
         # Optional: only referenced on Windows, to wrap the bash script in a .bat launcher.
         config_common.toolchain_type("@bazel_tools//tools/sh:toolchain_type", mandatory = False),
-        "@rules_nodejs//nodejs:toolchain_type",
     ],
 )

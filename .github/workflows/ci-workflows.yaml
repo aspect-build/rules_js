@@ -243,6 +243,13 @@ jobs:
               if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-7'
               run: aspect test --task-key=coverage-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results -- //js/private/test/coverage/...
 
+            # Again with the merger as its own action, as remote execution requires. The
+            # mergers assert different things in that mode -- bazel discards a report the
+            # test wrote to COVERAGE_OUTPUT_FILE itself -- so both modes need a run.
+            - name: Coverage (split postprocessing)
+              if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-7'
+              run: aspect test --task-key=coverage-split-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results --bazel-flag=--experimental_split_coverage_postprocessing --bazel-flag=--experimental_fetch_all_coverage_outputs -- //js/private/test/coverage/...
+
             # Skipped on the no-execroot-entry-point variant: test.sh scripts invoke plain
             # `bazel` without matrix.bazel.flags, so that leg wouldn't exercise the flag —
             # it would only duplicate the bazel-9 run.

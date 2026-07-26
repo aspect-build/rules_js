@@ -16,11 +16,8 @@ set -o errexit -o nounset -o pipefail
 # Coverage is checked twice: inline (the _lcov_merger runs in the test action) and
 # split (--experimental_split_coverage_postprocessing, required for remote
 # execution), where the merger runs as its own action without the test's runfiles.
-#
-# Split mode currently reports empty coverage for every target -- the merger runs
-# where neither the V8 data nor the instrumented sources are reachable. That is
-# https://github.com/aspect-build/rules_js/issues/2901, asserted here as BROKEN so
-# the fix for it shows up as a change to this file.
+# Both must report the same coverage: the report is generated in the test action,
+# and the merger only publishes it.
 
 readonly WORKING_TARGETS=(//:test //:expected_exit_test //:first_party_jslib_test)
 readonly UNSUPPORTED_TARGETS=(//:first_party_npmpkg_test)
@@ -75,18 +72,6 @@ check_unsupported() {
     fi
 }
 
-# A scenario that should work but does not yet; fails once it starts working so the
-# expectation is updated with the fix rather than left behind.
-check_broken() {
-    local target="$1" mode="$2" issue="$3" dat="$testlogs/${1#//:}/coverage.dat" reason
-    if reason="$(coverage_is_real "$dat")"; then
-        echo "BROKEN($target, $mode) now produces coverage — $issue is fixed, assert it instead."
-        exit 1
-    else
-        echo "BROKEN($target, $mode): empty coverage, see $issue ($reason)"
-    fi
-}
-
 # The code under test executes in every scenario. If this passes but coverage below
 # is empty, the failure is in coverage reporting, not test execution.
 bazel test --nocache_test_results "${ALL_TARGETS[@]}"
@@ -106,6 +91,5 @@ bazel coverage --nocache_test_results \
     --experimental_split_coverage_postprocessing \
     --experimental_fetch_all_coverage_outputs \
     "${ALL_TARGETS[@]}"
-readonly ISSUE_2901=https://github.com/aspect-build/rules_js/issues/2901
-for t in "${WORKING_TARGETS[@]}"; do check_broken "$t" split "$ISSUE_2901"; done
+for t in "${WORKING_TARGETS[@]}"; do assert_coverage "$t" split; done
 for t in "${UNSUPPORTED_TARGETS[@]}"; do check_unsupported "$t" split; done
