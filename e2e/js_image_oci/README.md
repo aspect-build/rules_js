@@ -34,9 +34,9 @@ app
 |   |-- aspect_rules_js
 |   |   `-- js
 |   |       `-- private
-|   |           `-- node-patches
+|   |           `-- node-bootstrap
 |   |               |-- fs.cjs
-|   |               `-- register.cjs
+|   |               `-- bootstrap.cjs
 |   |-- bazel_tools
 |   |   `-- tools
 |   |       `-- bash

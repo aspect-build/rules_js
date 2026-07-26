@@ -17,7 +17,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 _DEFAULT_LAYER_GROUPS = {
-    "node": "/js/private/node-patches/|/bin/nodejs/",
+    "node": "/js/private/node-bootstrap/|/bin/nodejs/",
     "package_store_3p": "/\\.aspect_rules_js/(?!.*@0\\.0\\.0).*/node_modules",
     "package_store_1p": "\\.aspect_rules_js/.*@0\\.0\\.0/node_modules",
     "node_modules": "/node_modules/",
@@ -172,7 +172,7 @@ The default layer groups are as follows and always created.
 
 ```
 {
-    "node": "/js/private/node-patches/|/bin/nodejs/",
+    "node": "/js/private/node-bootstrap/|/bin/nodejs/",
     "package_store_1p": "\\.aspect_rules_js/.*@0\\.0\\.0/node_modules",
     "package_store_3p": "\\.aspect_rules_js/.*/node_modules",
     "node_modules": "/node_modules/",

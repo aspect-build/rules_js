@@ -19,7 +19,7 @@ make_js_image_layer(
     name = "custom_layer_groups",
     binary = ":bin2",
     layer_groups = {
-        "just_the_fs_patch": ".*js\\/private\\/node-patches\\/fs\\.cjs",
+        "just_the_fs_patch": ".*js\\/private\\/node-bootstrap\\/fs\\.cjs",
     },
     platform = "//js/private/test/image:linux_amd64",
     root = "/app",

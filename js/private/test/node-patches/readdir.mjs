@@ -20,7 +20,7 @@ import { withFixtures } from 'inline-fixtures'
 import * as path from 'node:path'
 import * as util from 'node:util'
 
-import { patcher } from '../../node-patches/src/fs.cjs'
+import { patcher } from '../../node-bootstrap/src/fs.cjs'
 
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {

@@ -93,7 +93,7 @@ babel_bin.babel(
                 ),
                 data = [
                     ":node_modules/inline-fixtures",
-                    "//js/private/node-patches/src:compile",
+                    "//js/private/node-bootstrap/src:compile",
                 ],
                 entry_point = "copy_entry_{}".format(t),
                 node_toolchain = toolchain,
@@ -114,7 +114,7 @@ babel_bin.babel(
                 ),
                 data = [
                     ":node_modules/inline-fixtures",
-                    "//js/private/node-patches/src:compile",
+                    "//js/private/node-bootstrap/src:compile",
                 ],
                 entry_point = t,
                 node_toolchain = toolchain,
