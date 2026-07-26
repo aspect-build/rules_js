@@ -17,5 +17,5 @@ def _coverage_test(merger):
         toolchains = js_binary_lib.toolchains,
     )
 
-coverage_fail_test = _coverage_test("fail_merger")
+coverage_preexisting_test = _coverage_test("preexisting_merger")
 coverage_pass_test = _coverage_test("pass_merger")

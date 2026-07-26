@@ -6,6 +6,9 @@ load("//js/private:bash.bzl", "BASH_INITIALIZE_RUNFILES")
 
 _ATTRS = {
     "entry_point": attr.label(default = Label("//js/private/coverage:coverage.js"), allow_single_file = [".js"]),
+    # Test-only: bash appended after the merger runs, with COVERAGE_DIR and
+    # COVERAGE_OUTPUT_FILE set. See //js/private/test/coverage.
+    "merge_assertions": attr.string(),
     "_launcher_template": attr.label(
         default = Label("//js/private/coverage:coverage.sh.tpl"),
         allow_single_file = True,
@@ -27,6 +30,8 @@ def _coverage_merger_impl(ctx):
         template = ctx.file._launcher_template,
         output = bash_launcher,
         substitutions = {
+            # The '#' is part of the placeholder; see coverage.sh.tpl.
+            "#{{merge_assertions}}": ctx.attr.merge_assertions,
             "{{entry_point_path}}": ctx.file.entry_point.short_path,
             "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
             "{{node}}": node_path,
