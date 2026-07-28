@@ -25,6 +25,9 @@ common --check_direct_dependencies=off
 # generated due to `coverage --build_runfile_links`
 coverage --deleted_packages=js/private/test/image/non_ascii
 
+# js/private/test/coverage instruments the test's own entry_point; matches what CI passes.
+coverage --instrument_test_targets
+
 # Build without the bytes
 common:ci --remote_download_outputs=minimal
 common:ci --nobuild_runfile_links
