@@ -39,6 +39,10 @@ def _coverage_merger_impl(ctx):
 
     runfiles = [ctx.file.entry_point]
 
+    if is_windows:
+        # The .bat launcher resolves the bash script through its own runfiles.
+        runfiles.append(bash_launcher)
+
     if nodeinfo.node:
         runfiles.append(nodeinfo.node)
 
@@ -52,7 +56,8 @@ coverage_merger = rule(
     attrs = _ATTRS,
     executable = True,
     toolchains = [
-        "@bazel_tools//tools/sh:toolchain_type",
+        # Optional: only referenced on Windows, to wrap the bash script in a .bat launcher.
+        config_common.toolchain_type("@bazel_tools//tools/sh:toolchain_type", mandatory = False),
         "@rules_nodejs//nodejs:toolchain_type",
     ],
 )
