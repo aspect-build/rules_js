@@ -591,6 +591,9 @@ def _js_binary_impl(ctx):
         ),
     ]
 
+def _bazel_bindir_arg(file):
+    return file.root.path
+
 def js_run_binary_action(ctx, **kwargs):
     """Runs a `js_binary` as a tool in a custom rule's action.
 
@@ -603,9 +606,20 @@ def js_run_binary_action(ctx, **kwargs):
         **kwargs: additional arguments forwarded to `ctx.actions.run`, e.g. `executable`,
             `arguments`, `inputs`, `outputs`, `mnemonic`, `execution_requirements`, `env`
     """
-    env = kwargs.pop("env", None) or {}
+    args = kwargs.pop("args", None) or []
+    outputs = kwargs.pop("outputs", [])
+
+    # The only way to trigger path mapping is by passing a File directly to
+    # args.add() or args.add_all(). To get ahold of the path-mapped output bin
+    # directory, we have to add an output here and then derive the bin
+    # directory from it in the map_each callback.
+    extra_args = ctx.actions.args()
+    extra_args.add("--bazel-bindir")
+    extra_args.add_all(outputs[0], map_each = _bazel_bindir_arg)
+
     ctx.actions.run(
-        env = dict(env) | {"BAZEL_BINDIR": ctx.bin_dir.path},
+        args = extra_args + args,
+        outputs = outputs,
         **kwargs
     )
 
