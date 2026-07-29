@@ -1,10 +1,12 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@bazel_lib_host//:defs.bzl", "host")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load(":js_library_test.bzl", "js_library_test_suite")
+load(":launcher_snapshot.bzl", "launcher_snapshot", "launcher_with_coverage")
 load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
+
+package(default_testonly = True)
 
 ####################################################################################################
 # Write a js_binary launcher to the source tree so it is shell checked on commit
@@ -14,29 +16,42 @@ write_file(
     out = "shellcheck.js",
 )
 
+# Not testonly so the snapshot keeps the js_binary log prefix. See js_binary.bzl.
 js_binary(
     name = "shellcheck_launcher",
+    testonly = False,
     entry_point = "shellcheck.js",
     fixed_args = ["--my_arg"],
 )
 
-# Make sed replacements for consistency on different platform / Bazel version.
-# The trailing sed pipeline normalizes bzlmod canonical repo separators ~~/~
-# (Bazel 7) to ++/+ (Bazel 8+) so the snapshot matches across versions.
-genrule(
+launcher_snapshot(
     name = "shell_launcher_sed",
-    srcs = [":shellcheck_launcher"],
-    outs = ["shellcheck_launcher_sed.sh"],
-    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#JS_BINARY__TARGET_CPU=\\\"$(TARGET_CPU)\\\"#JS_BINARY__TARGET_CPU=\\\"k8\\\"#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" | sed -E -e 's/~~/++/g' -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g' -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g' > $@" % (
-        host.platform,
-        host.os,
-    ),
+    src = ":shellcheck_launcher",
+)
+
+# The lcov report generation logic is only emitted into launchers that collect
+# coverage, so it needs a launcher of its own to be shell checked. See #2901.
+js_test(
+    name = "shellcheck_coverage_test",
+    entry_point = "shellcheck.js",
+    fixed_args = ["--my_arg"],
+)
+
+launcher_with_coverage(
+    name = "shellcheck_coverage_launcher",
+    target = ":shellcheck_coverage_test",
+)
+
+launcher_snapshot(
+    name = "shell_coverage_launcher_sed",
+    src = ":shellcheck_coverage_launcher",
 )
 
 write_source_files(
     name = "write_launcher",
     files = {
         "snapshots/launcher.sh": ":shell_launcher_sed",
+        "snapshots/launcher_coverage.sh": ":shell_coverage_launcher_sed",
     },
 )
 

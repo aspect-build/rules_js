@@ -570,10 +570,8 @@ export -n JS_BINARY__STDOUT_OUTPUT_FILE JS_BINARY__STDERR_OUTPUT_FILE JS_BINARY_
 
 set +e
 
-# Generate the lcov report for a passing test; empty when not collecting coverage. See #2901.
-coverage_entry_point=""
-
-if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ] && [ -z "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ] && [ -z "${STDOUT_CAPTURE:-}" ] && [ -z "${STDERR_CAPTURE:-}" ] && [ -z "$coverage_entry_point" ]; then
+# The leading literal is 'false' only when this launcher generates an lcov report below.
+if true && [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ] && [ -z "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ] && [ -z "${STDOUT_CAPTURE:-}" ] && [ -z "${STDERR_CAPTURE:-}" ]; then
     # Nothing must run after node exits, so replace this shell with node. Signals
     # and terminal control are then delivered directly to node instead of being
     # proxied through a backgrounded child.
@@ -611,26 +609,6 @@ wait "$child"
 
 RESULT="$?"
 set -e
-
-if [ -n "$coverage_entry_point" ] && [ "$RESULT" = "${JS_BINARY__EXPECTED_EXIT_CODE:-0}" ] && [ -n "${COVERAGE_DIR:-}" ] &&
-    # A test reporting its own coverage owns it, except in split mode where bazel drops it.
-    { [ ! -s "${COVERAGE_OUTPUT_FILE:-}" ] || [ "${SPLIT_COVERAGE_POST_PROCESSING:-0}" = "1" ]; }; then
-    coverage_entry_point="$JS_BINARY__RUNFILES/$coverage_entry_point"
-    if [ ! -f "$coverage_entry_point" ]; then
-        # Report empty coverage rather than fail an otherwise passing test.
-        logf_error "coverage report generator '%s' not found; code coverage requires a runfiles tree" "$coverage_entry_point"
-    else
-        # NODE_V8_COVERAGE unset so this process writes no profile of its own.
-        (
-            unset NODE_V8_COVERAGE
-            export JS_COVERAGE__RUNFILES="$JS_BINARY__RUNFILES"
-            exec "$JS_BINARY__NODE_BINARY" "$coverage_entry_point"
-        ) || {
-            logf_error "coverage report generation failed"
-            exit 1
-        }
-    fi
-fi
 
 # ==============================================================================
 # Mop up after main program

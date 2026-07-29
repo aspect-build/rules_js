@@ -114,3 +114,29 @@ fi
 # can locate runfiles without requiring RUNFILES to be exported.
 export RUNFILES_DIR="${RUNFILES_DIR:-$RUNFILES}"
 """
+
+# Bash snippet to generate the lcov report for a passing test. See #2901.
+# Only emitted into launchers that collect coverage, preceded by the coverage_entry_point
+# assignment it consumes; depends on $RESULT holding the program exit code.
+BASH_COVERAGE_REPORT = r"""
+# Generate the lcov report for a passing test.
+if [ "$RESULT" = "${JS_BINARY__EXPECTED_EXIT_CODE:-0}" ] && [ -n "${COVERAGE_DIR:-}" ] &&
+    # A test reporting its own coverage owns it, except in split mode where bazel drops it.
+    { [ ! -s "${COVERAGE_OUTPUT_FILE:-}" ] || [ "${SPLIT_COVERAGE_POST_PROCESSING:-0}" = "1" ]; }; then
+    coverage_entry_point="$JS_BINARY__RUNFILES/$coverage_entry_point"
+    if [ ! -f "$coverage_entry_point" ]; then
+        # Report empty coverage rather than fail an otherwise passing test.
+        logf_error "coverage report generator '%s' not found; code coverage requires a runfiles tree" "$coverage_entry_point"
+    else
+        # NODE_V8_COVERAGE unset so this process writes no profile of its own.
+        (
+            unset NODE_V8_COVERAGE
+            export JS_COVERAGE__RUNFILES="$JS_BINARY__RUNFILES"
+            exec "$JS_BINARY__NODE_BINARY" "$coverage_entry_point"
+        ) || {
+            logf_error "coverage report generation failed"
+            exit 1
+        }
+    fi
+fi
+"""

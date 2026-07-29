@@ -4,7 +4,7 @@ load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
+load(":bash.bzl", "BASH_COVERAGE_REPORT", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
 
 _ATTRS = {
@@ -424,13 +424,18 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
+    # Only launchers that collect coverage carry the lcov report generation logic. See #2901.
     if _generates_coverage_report(ctx):
-        coverage_entry_point = "/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])
+        coverage_report = "\ncoverage_entry_point={}{}".format(
+            _bash_quote("/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])),
+            BASH_COVERAGE_REPORT,
+        )
     else:
-        coverage_entry_point = ""
+        coverage_report = ""
 
     launcher_subst = {
-        "{{coverage_entry_point}}": coverage_entry_point,
+        "{{coverage_report}}": coverage_report,
+        "{{nothing_after_node}}": "false" if coverage_report else "true",
         "{{target_label}}": str(ctx.label),
         "{{template_label}}": str(ctx.attr._launcher_template.label),
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
