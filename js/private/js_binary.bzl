@@ -615,11 +615,8 @@ def js_run_binary_action(ctx, **kwargs):
     extra_args.add("--bazel-bindir")
     extra_args.add_all([outputs[0]], map_each = _bazel_bindir_arg)
 
-    args = kwargs.pop("arguments", None) or []
-    arguments = [extra_args, args] if type(args) == "Args" else [extra_args] + args
-
     ctx.actions.run(
-        arguments = arguments,
+        arguments = [extra_args] + kwargs.pop("arguments", None) or [],
         outputs = outputs,
         **kwargs
     )
