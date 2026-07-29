@@ -1,5 +1,7 @@
 """A dummy pi rule for end-to-end testing of worker library"""
 
+load("@aspect_rules_js//js:libs.bzl", "js_run_binary_action")
+
 def _pi_impl(ctx):
     output = ctx.actions.declare_file(ctx.label.name)
 
@@ -8,7 +10,8 @@ def _pi_impl(ctx):
     arguments.set_param_file_format("multiline")
     arguments.add(output.short_path)
 
-    ctx.actions.run(
+    js_run_binary_action(
+        ctx,
         executable = ctx.executable.worker,
         inputs = [],
         arguments = [arguments],
@@ -17,9 +20,6 @@ def _pi_impl(ctx):
         execution_requirements = {
             "supports-workers": "1",
             "worker-key-mnemonic": "Pi",
-        },
-        env = {
-            "BAZEL_BINDIR": ctx.bin_dir.path,
         },
     )
 

@@ -591,6 +591,29 @@ def _js_binary_impl(ctx):
         ),
     ]
 
+def js_run_binary_action(ctx, **kwargs):
+    """Runs a `js_binary` as a tool in a custom rule's action.
+
+    `js_binary`'s launcher script requires the `BAZEL_BINDIR` environment variable to be
+    set to the root of the Bazel output tree whenever it is run as a build tool (as
+    opposed to via `bazel run`). This wraps `ctx.actions.run`, setting `BAZEL_BINDIR`
+    correctly so rule authors invoking a `js_binary` (or similar) executable don't have
+    to know this detail.
+
+    We recommend that rule authors use this helper function whenever possible, instead of
+    directly invoking a `js_binary`.
+
+    Args:
+        ctx: the rule context
+        **kwargs: additional arguments forwarded to `ctx.actions.run`, e.g. `executable`,
+            `arguments`, `inputs`, `outputs`, `mnemonic`, `execution_requirements`, `env`
+    """
+    env = kwargs.pop("env", None) or {}
+    ctx.actions.run(
+        env = dict(env) | {"BAZEL_BINDIR": ctx.bin_dir.path},
+        **kwargs
+    )
+
 js_binary_lib = struct(
     attrs = _ATTRS,
     create_launcher = _create_launcher,
