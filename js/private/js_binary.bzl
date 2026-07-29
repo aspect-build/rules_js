@@ -591,6 +591,24 @@ def _js_binary_impl(ctx):
         ),
     ]
 
+def js_run_binary_action(ctx, **kwargs):
+    """Runs a `js_binary` as a tool in a custom rule's action.
+
+    This helper function handles internal implementation details related to invoking a
+    `js_binary`. We recommend that rule authors use this whenever possible, rather than
+    directly invoking the `js_binary`.
+
+    Args:
+        ctx: the rule context
+        **kwargs: additional arguments forwarded to `ctx.actions.run`, e.g. `executable`,
+            `arguments`, `inputs`, `outputs`, `mnemonic`, `execution_requirements`, `env`
+    """
+    env = kwargs.pop("env", None) or {}
+    ctx.actions.run(
+        env = dict(env) | {"BAZEL_BINDIR": ctx.bin_dir.path},
+        **kwargs
+    )
+
 js_binary_lib = struct(
     attrs = _ATTRS,
     create_launcher = _create_launcher,

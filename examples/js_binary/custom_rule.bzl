@@ -1,15 +1,15 @@
 "A simple custom rule for testing js_binary used in a custom rule"
 
+load("@aspect_rules_js//js:libs.bzl", "js_run_binary_action")
+
 def _custom_rule_impl(ctx):
     out = ctx.actions.declare_file("{}.out".format(ctx.label.name))
     args = ctx.actions.args()
     args.add(out.short_path)
-    ctx.actions.run(
+    js_run_binary_action(
+        ctx,
         arguments = [args],
         outputs = [out],
-        env = {
-            "BAZEL_BINDIR": ctx.bin_dir.path,
-        },
         executable = ctx.executable.tool,
         execution_requirements = ctx.attr.execution_requirements,
     )
