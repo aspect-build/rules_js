@@ -447,6 +447,17 @@ export -n JS_BINARY__STDOUT_OUTPUT_FILE JS_BINARY__STDERR_OUTPUT_FILE JS_BINARY_
 
 set +e
 
+# Generate the lcov report for a passing test; empty when not collecting coverage. See #2901.
+coverage_entry_point="{{coverage_entry_point}}"
+
+if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ] && [ -z "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ] && [ -z "${STDOUT_CAPTURE:-}" ] && [ -z "${STDERR_CAPTURE:-}" ] && [ -z "$coverage_entry_point" ]; then
+    # Nothing must run after node exits, so replace this shell with node. Signals
+    # and terminal control are then delivered directly to node instead of being
+    # proxied through a backgrounded child.
+    exec "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"}
+    exit 127
+fi
+
 if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
     "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
 elif [ "${STDOUT_CAPTURE:-}" ]; then
@@ -477,9 +488,6 @@ wait "$child"
 
 RESULT="$?"
 set -e
-
-# Generate the lcov report for a passing test; empty when not collecting coverage. See #2901.
-coverage_entry_point="{{coverage_entry_point}}"
 
 if [ -n "$coverage_entry_point" ] && [ "$RESULT" = "${JS_BINARY__EXPECTED_EXIT_CODE:-0}" ] && [ -n "${COVERAGE_DIR:-}" ] &&
     # A test reporting its own coverage owns it, except in split mode where bazel drops it.
