@@ -1,11 +1,7 @@
 """Test-only rule that drives a js_binary tool with a path-mapped --bazel-bindir arg.
-
-This rule builds its --bazel-bindir argument from a File added directly to a
-ctx.actions.args() object, allowing Bazel's path mapping to rewrite it
-consistently across configurations.
 """
 
-load("//js/private:js_binary.bzl", "js_run_binary_action")
+load("@aspect_rules_js//js:libs.bzl", "js_run_binary_action")
 
 def _bindir_path_mapping_check_impl(ctx):
     output = ctx.actions.declare_file(ctx.label.name + ".ok")
