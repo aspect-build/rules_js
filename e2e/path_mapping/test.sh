@@ -20,11 +20,8 @@ trap 'rm -rf "$scratch"' EXIT
 disk_cache="$scratch/disk_cache"
 exec_log="$scratch/exec_log.json"
 
-# Force the BindirPathMappingCheck action to be treated as new on every run of this
-# script, rather than being served by leftover local build state from earlier CI
-# steps, by baking a fresh value into it via --action_env on each run. Both builds
-# below must use the same value so that the -c opt build can still share the cache
-# entry produced by the -c fastbuild build.
+# Force the BindirPathMappingCheck action to be treated as new on every run of
+# this script.
 invalidate="$(date +%s)"
 
 bazel build -c fastbuild //bindir_path_mapping_check \
