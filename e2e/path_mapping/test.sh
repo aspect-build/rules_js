@@ -20,15 +20,20 @@ trap 'rm -rf "$scratch"' EXIT
 disk_cache="$scratch/disk_cache"
 exec_log="$scratch/exec_log.json"
 
-# Start from a clean slate so this build actually executes the action, rather
-# than being served by leftover local build state from earlier CI steps.
-bazel clean
+# Force the BindirPathMappingCheck action to be treated as new on every run of this
+# script, rather than being served by leftover local build state from earlier CI
+# steps, by baking a fresh value into it via --action_env on each run. Both builds
+# below must use the same value so that the -c opt build can still share the cache
+# entry produced by the -c fastbuild build.
+invalidate="$(date +%s)"
 
 bazel build -c fastbuild //bindir_path_mapping_check \
-    --disk_cache="$disk_cache"
+    --disk_cache="$disk_cache" \
+    --action_env="BINDIR_PATH_MAPPING_CHECK_INVALIDATE=$invalidate"
 
 bazel build -c opt //bindir_path_mapping_check \
     --disk_cache="$disk_cache" \
+    --action_env="BINDIR_PATH_MAPPING_CHECK_INVALIDATE=$invalidate" \
     --execution_log_json_file="$exec_log"
 
 matches="$(jq -s '[.[] | select(.mnemonic == "BindirPathMappingCheck")]' "$exec_log")"
