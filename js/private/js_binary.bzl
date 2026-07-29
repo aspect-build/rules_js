@@ -599,7 +599,7 @@ def js_run_binary_action(ctx, **kwargs):
 
     This helper function handles internal implementation details related to invoking a
     `js_binary`. We recommend that rule authors use this whenever possible, rather than
-    directly invoking the `js_binary`.
+    directly invoking the `js_binary`. The `executable` must be a `js_binary` target.
 
     Args:
         ctx: the rule context
@@ -610,9 +610,12 @@ def js_run_binary_action(ctx, **kwargs):
     # The only way to trigger path mapping is by passing a File directly to args.add() or
     # args.add_all(). To get ahold of the path-mapped output bin directory, we have to add
     # an output here and then derive the bin directory from it in the map_each callback.
+    outputs = kwargs.get("outputs")
+    if not outputs:
+        fail("js_run_binary_action requires at least one output")
     extra_args = ctx.actions.args()
     extra_args.add("--bazel-bindir")
-    extra_args.add_all([kwargs["outputs"][0]], map_each = _bazel_bindir_arg)
+    extra_args.add_all([outputs[0]], map_each = _bazel_bindir_arg)
 
     ctx.actions.run(
         arguments = [extra_args] + kwargs.pop("arguments", None) or [],

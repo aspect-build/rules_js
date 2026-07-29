@@ -151,6 +151,10 @@ trap _exit EXIT
 # arguments. It is consumed by this launcher script and used to set
 # BAZEL_BINDIR, overriding any value already set in the environment.
 if [ $# -gt 0 ] && [ "$1" = "--bazel-bindir" ]; then
+    if [ $# -lt 2 ]; then
+        echo "ERROR: --bazel-bindir flag requires a value" >&2
+        exit 1
+    fi
     BAZEL_BINDIR="$2"
     export BAZEL_BINDIR
     shift 2
