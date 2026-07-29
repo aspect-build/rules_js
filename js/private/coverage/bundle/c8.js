@@ -2,17 +2,9 @@ import { Report } from 'c8'
 import fs from 'fs'
 import path from 'path'
 
-// bazel will create the COVERAGE_OUTPUT_FILE whilst setting up the sandbox.
-// therefore, should be doing a file size check rather than presence.
-try {
-    const stats = fs.statSync(process.env.COVERAGE_OUTPUT_FILE)
-    if (stats.size != 0) {
-        // early exit here does not affect the outcome of the tests.
-        // bazel will only execute _lcov_merger when tests pass.
-        process.exit(0)
-    }
-    // in case file doesn't exist or some other error is thrown, just ignore it.
-} catch {}
+// Runs in the test action, the only place the V8 data and instrumented sources are
+// both present. coverage.sh.tpl reads back this exact filename; keep them in sync.
+const stash = path.join(process.env.COVERAGE_DIR, '_rules_js_report.lcov')
 
 const include = fs
     .readFileSync(process.env.COVERAGE_MANIFEST)
@@ -40,10 +32,7 @@ new Report({
 })
     .run()
     .then(() => {
-        fs.renameSync(
-            path.join(process.env.COVERAGE_DIR, 'lcov.info'),
-            process.env.COVERAGE_OUTPUT_FILE
-        )
+        fs.renameSync(path.join(process.env.COVERAGE_DIR, 'lcov.info'), stash)
     })
     .catch((err) => {
         console.error(err)

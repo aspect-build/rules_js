@@ -1,27 +1,41 @@
 load("//js/private/coverage:merger.bzl", "coverage_merger")
 load(":merger_test.bzl", "merger_test_suite")
-load(":test.bzl", "coverage_pass_test", "coverage_preexisting_test")
+load(":test.bzl", "coverage_no_report_test", "coverage_pass_test", "coverage_preexisting_test")
 
 package(default_testonly = True)
 
 merger_test_suite(name = "merger_test")
 
 # The test program reported its own coverage to COVERAGE_OUTPUT_FILE, so the merger
-# must publish that report rather than the c8 one.
-# See https://github.com/aspect-build/rules_js/pull/430.
+# must publish that report rather than the c8 one. See
+# https://github.com/aspect-build/rules_js/pull/430. Under
+# --experimental_split_coverage_postprocessing bazel discards what the test wrote, so
+# the c8 report is published instead; SPLIT_COVERAGE_POST_PROCESSING tells them apart.
 coverage_merger(
     name = "preexisting_merger",
     merge_assertions = """\
-grep -q '^# reported by the test itself$' "$COVERAGE_OUTPUT_FILE" || {
-    echo "the test's own report was overwritten with:" >&2
-    cat "$COVERAGE_OUTPUT_FILE" >&2
-    exit 1
-}
-! grep -q '^SF:' "$COVERAGE_OUTPUT_FILE" || {
-    echo "the c8 report was merged into the test's own:" >&2
-    cat "$COVERAGE_OUTPUT_FILE" >&2
-    exit 1
-}
+if [ "${SPLIT_COVERAGE_POST_PROCESSING:-0}" = "1" ]; then
+    grep -q '^SF:js/private/test/coverage/preexisting.js$' "$COVERAGE_OUTPUT_FILE" || {
+        echo "expected the c8 report for preexisting.js, got:" >&2
+        cat "$COVERAGE_OUTPUT_FILE" >&2
+        exit 1
+    }
+else
+    grep -q '^# reported by the test itself$' "$COVERAGE_OUTPUT_FILE" || {
+        echo "expected the report the test wrote, got:" >&2
+        cat "$COVERAGE_OUTPUT_FILE" >&2
+        exit 1
+    }
+    ! grep -q '^SF:' "$COVERAGE_OUTPUT_FILE" || {
+        echo "the c8 report was merged into the test's own:" >&2
+        cat "$COVERAGE_OUTPUT_FILE" >&2
+        exit 1
+    }
+    [ ! -e "$COVERAGE_DIR/_rules_js_report.lcov" ] || {
+        echo "the report was generated even though the test wrote its own" >&2
+        exit 1
+    }
+fi
 """,
     visibility = ["//visibility:public"],
 )
@@ -36,20 +50,53 @@ coverage_preexisting_test(
     entry_point = "preexisting.js",
 )
 
-# The merger publishes the c8 report, so COVERAGE_OUTPUT_FILE must hold real lcov.
-# The SF: check is a directory prefix so any entry_point in this package works.
+# The test action generates + stashes the report, the merger publishes it, and
+# COVERAGE_OUTPUT_FILE must then hold the real lcov report. The SF: check is a
+# directory prefix so any entry_point in this package works.
 coverage_merger(
     name = "pass_merger",
     merge_assertions = """\
 grep -q '^SF:js/private/test/coverage/' "$COVERAGE_OUTPUT_FILE" || { echo "expected SF: under this package" >&2; exit 1; }
 grep -Eq '^DA:[0-9]+,[1-9]' "$COVERAGE_OUTPUT_FILE" || { echo "expected an executed line" >&2; exit 1; }
 grep -Eq '^DA:[0-9]+,0' "$COVERAGE_OUTPUT_FILE" || { echo "expected an unexecuted line" >&2; exit 1; }
+
+# The launcher clears NODE_V8_COVERAGE before running coverage.js, so coverage.js
+# must not have written its own profile alongside the ones it just read.
+if grep -l 'js/private/coverage/coverage.js' "$COVERAGE_DIR"/coverage-*.json >/dev/null 2>&1; then
+    echo "coverage.js wrote its own V8 profile into COVERAGE_DIR:" >&2
+    grep -l 'js/private/coverage/coverage.js' "$COVERAGE_DIR"/coverage-*.json >&2
+    exit 1
+fi
 """,
     visibility = ["//visibility:public"],
 )
 
 coverage_pass_test(
     name = "pass",
+    data = ["lib.js"],
+    enable_runfiles = select({
+        "@bazel_lib//lib:enable_runfiles": True,
+        "//conditions:default": False,
+    }),
+    entry_point = "lib.js",
+)
+
+# coverage_no_report_test has no _coverage_report, so the test action stashes nothing
+# and the merger must leave the empty COVERAGE_OUTPUT_FILE bazel created in place.
+coverage_merger(
+    name = "no_report_merger",
+    merge_assertions = """\
+if [ -s "$COVERAGE_OUTPUT_FILE" ]; then
+    echo "expected empty coverage output, got:" >&2
+    cat "$COVERAGE_OUTPUT_FILE" >&2
+    exit 1
+fi
+""",
+    visibility = ["//visibility:public"],
+)
+
+coverage_no_report_test(
+    name = "no_report",
     data = ["lib.js"],
     enable_runfiles = select({
         "@bazel_lib//lib:enable_runfiles": True,
