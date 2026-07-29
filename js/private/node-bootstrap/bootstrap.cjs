@@ -29,14 +29,7 @@ if (!process.env.JS_BINARY__NODE_PATCHES_DEPTH) {
 // is unaffected since it was already resolved to an absolute path by the launcher. Only do this
 // on the main thread: cwd is process-wide (already inherited by any worker thread once the main
 // thread has changed it), and process.chdir() throws if called from within a worker thread.
-//
-// A process that inherited NODE_OPTIONS from an already-running js_binary process (for example a
-// worker pool that forks using process.execPath, which we override below to the node wrapper)
-// re-runs this script with the same JS_BINARY__CHDIR still set. JS_BINARY__CHDIR_APPLIED records
-// the value we last chdir'd to for this env lineage, so such a re-invocation is a no-op instead
-// of retrying a chdir that's already been done (or, worse, one relative to a cwd the caller set
-// deliberately, e.g. an explicit `cwd` option on a spawned child unrelated to this package).
-if (JS_BINARY__CHDIR && isMainThread && process.env.JS_BINARY__CHDIR_APPLIED !== JS_BINARY__CHDIR) {
+if (JS_BINARY__CHDIR && isMainThread) {
     // Mirrors resolve_execroot_bin_path in js_binary.sh.tpl for the "external/*" case; for a
     // plain package-relative value, cwd is already BAZEL_BINDIR (or the runfiles root, when
     // running from within a test sandbox) by the time this launcher's bash script exec'd node,
@@ -54,7 +47,13 @@ if (JS_BINARY__CHDIR && isMainThread && process.env.JS_BINARY__CHDIR_APPLIED !==
         )
     }
     process.chdir(target)
-    process.env.JS_BINARY__CHDIR_APPLIED = JS_BINARY__CHDIR
+    // Clear this so a process that inherits NODE_OPTIONS from this one (for example a worker
+    // pool that forks using process.execPath, which we override below to the node wrapper) won't
+    // see it set and try to re-apply it — by then cwd is already the target directory, and a
+    // relative chdir against that would incorrectly try to go one level deeper. js_run_devserver
+    // is the one other consumer of this variable; it infers the same value by comparing its own
+    // (already chdir'd) cwd against RUNFILES_ROOT / BAZEL_BINDIR instead of reading this env var.
+    delete process.env.JS_BINARY__CHDIR
 }
 
 // subprocess patch
