@@ -606,10 +606,10 @@ def js_run_binary_action(ctx, **kwargs):
         **kwargs: additional arguments forwarded to `ctx.actions.run`, e.g. `executable`,
             `arguments`, `inputs`, `outputs`, `mnemonic`, `execution_requirements`, `env`
     """
-    # The only way to trigger path mapping is by passing a File directly to
-    # args.add() or args.add_all(). To get ahold of the path-mapped output bin
-    # directory, we have to add an output here and then derive the bin
-    # directory from it in the map_each callback.
+
+    # The only way to trigger path mapping is by passing a File directly to args.add() or
+    # args.add_all(). To get ahold of the path-mapped output bin directory, we have to add
+    # an output here and then derive the bin directory from it in the map_each callback.
     outputs = kwargs.pop("outputs", [])
     extra_args = ctx.actions.args()
     extra_args.add("--bazel-bindir")
