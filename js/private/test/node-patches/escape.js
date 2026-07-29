@@ -16,8 +16,8 @@
  */
 const assert = require('assert')
 const path = require('path')
-const escapeFunction = require('../../node-patches/src/fs.cjs').escapeFunction
-const isSubPath = require('../../node-patches/src/fs.cjs').isSubPath
+const escapeFunction = require('../../node-bootstrap/src/fs.cjs').escapeFunction
+const isSubPath = require('../../node-bootstrap/src/fs.cjs').isSubPath
 
 // We don't want to bring jest into this repo so we just fake the describe and it functions here
 async function describe(_, fn) {

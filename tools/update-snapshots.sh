@@ -113,8 +113,8 @@ run_target "$REPO_ROOT" "//js/private/devserver:watch_checked" "Devserver bundle
 # Worker bundle
 run_target "$REPO_ROOT" "//js/private/worker:worker_checked" "Worker bundle"
 
-# Node patches
-run_target "$REPO_ROOT" "//js/private/node-patches:checked_in_compile" "Node patches"
+# Node bootstrap
+run_target "$REPO_ROOT" "//js/private/node-bootstrap:checked_in_compile" "Node bootstrap"
 
 # Coverage bundle
 run_target "$REPO_ROOT" "//js/private/coverage:coverage_checked" "Coverage bundle"

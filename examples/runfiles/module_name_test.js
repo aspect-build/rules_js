@@ -66,7 +66,7 @@ describe('runfile resolution', () => {
 
     it('should properly resolve a runfile within a direct module dependency', () => {
         const fsPatchPath = runfiles.resolve(
-            'aspect_rules_js/js/private/node-patches/fs.cjs'
+            'aspect_rules_js/js/private/node-bootstrap/fs.cjs'
         )
 
         assert(!!fsPatchPath, `Expected to find fs patches`)

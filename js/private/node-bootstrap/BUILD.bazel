@@ -3,11 +3,11 @@ load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 write_source_files(
     name = "checked_in_compile",
     files = {
-        "fs.cjs": "//js/private/node-patches/src:fs-generated.cjs",
+        "fs.cjs": "//js/private/node-bootstrap/src:fs-generated.cjs",
     },
 )
 
 exports_files([
     "fs.cjs",
-    "register.cjs",
+    "bootstrap.cjs",
 ])
