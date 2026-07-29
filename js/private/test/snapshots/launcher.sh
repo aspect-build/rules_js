@@ -437,15 +437,6 @@ if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
     exit 1
 fi
 
-# Change directory to user specified package if set
-if [ "${JS_BINARY__CHDIR:-}" ]; then
-    logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
-    case "$JS_BINARY__CHDIR" in
-    external/*) cd "$(resolve_execroot_bin_path "$JS_BINARY__CHDIR")" ;;
-    *) cd "$JS_BINARY__CHDIR" ;;
-    esac
-fi
-
 # Gather node options
 JS_BINARY__NODE_OPTIONS=()
 JS_BINARY__NODE_OPTIONS+=("--preserve-symlinks-main")
@@ -461,14 +452,6 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     esac
 done
 
-# Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper.
-# Don't override JS_BINARY__FS_PATCH_ROOTS if already set by an outer js_binary incase a js_binary such
-# as js_run_deverser runs another js_binary tool.
-if [ -z "${JS_BINARY__FS_PATCH_ROOTS:-}" ]; then
-    JS_BINARY__FS_PATCH_ROOTS="$JS_BINARY__EXECROOT:$JS_BINARY__RUNFILES"
-fi
-export JS_BINARY__FS_PATCH_ROOTS
-
 # Enable coverage if requested
 if [ "${COVERAGE_DIR:-}" ]; then
     logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
@@ -480,13 +463,8 @@ if [ -z "${NODE_COMPILE_CACHE:-}" ] && [ -z "${NODE_DISABLE_COMPILE_CACHE:-}" ];
     export NODE_DISABLE_COMPILE_CACHE=1
 fi
 
-# Put the node wrapper directory on the path so that child processes find it first
-PATH="$(dirname "$JS_BINARY__NODE_WRAPPER"):$PATH"
-export PATH
-
 # Debug logs
 if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
-    logf_debug "PATH %s" "$PATH"
     if [ "${BAZEL_BINDIR:-}" ]; then
         logf_debug "BAZEL_BINDIR %s" "$BAZEL_BINDIR"
     fi
@@ -514,7 +492,6 @@ if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
     if [ "${BAZEL_WORKSPACE:-}" ]; then
         logf_debug "BAZEL_WORKSPACE %s" "$BAZEL_WORKSPACE"
     fi
-    logf_debug "JS_BINARY__FS_PATCH_ROOTS %s" "${JS_BINARY__FS_PATCH_ROOTS:-}"
     logf_debug "JS_BINARY__NODE_PATCHES %s" "${JS_BINARY__NODE_PATCHES:-}"
     logf_debug "JS_BINARY__NODE_OPTIONS %s" "${JS_BINARY__NODE_OPTIONS:-}"
     logf_debug "JS_BINARY__BINDIR %s" "${JS_BINARY__BINDIR:-}"
