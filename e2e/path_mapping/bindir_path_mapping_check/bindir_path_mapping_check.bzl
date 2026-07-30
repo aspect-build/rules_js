@@ -4,7 +4,7 @@
 load("@aspect_rules_js//js:libs.bzl", "js_run_binary_action")
 
 def _bindir_path_mapping_check_impl(ctx):
-    output = ctx.actions.declare_file(ctx.label.name + ".ok")
+    output = ctx.actions.declare_directory(ctx.label.name)
 
     # Baking the value of this env var (set via --action_env) into the action
     # allows test.sh to invalidate this one action without the need for a full

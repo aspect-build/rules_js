@@ -1,8 +1,9 @@
-import { writeFileSync } from 'fs'
+import { mkdirSync, writeFileSync } from 'fs'
+import { join } from 'path'
 
-const outPath = process.argv[2]
-if (!outPath) {
-    process.stderr.write('Usage: bindir_check.mjs <output-path>\n')
+const outDir = process.argv[2]
+if (!outDir) {
+    process.stderr.write('Usage: bindir_check.mjs <output-dir>\n')
     process.exit(1)
 }
 
@@ -20,4 +21,5 @@ if (leaked.length > 0) {
     process.exit(1)
 }
 
-writeFileSync(outPath, 'OK\n')
+mkdirSync(outDir, { recursive: true })
+writeFileSync(join(outDir, 'ok'), 'OK\n')
