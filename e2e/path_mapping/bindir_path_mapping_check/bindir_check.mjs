@@ -22,4 +22,5 @@ if (leaked.length > 0) {
 }
 
 mkdirSync(outDir, { recursive: true })
-writeFileSync(join(outDir, 'ok'), 'OK\n')
+writeFileSync(join(outDir, 'file1'), 'OK\n')
+writeFileSync(join(outDir, 'file2'), 'OK\n')
