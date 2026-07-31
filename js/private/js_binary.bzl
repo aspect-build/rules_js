@@ -615,7 +615,10 @@ def js_run_binary_action(ctx, **kwargs):
         fail("js_run_binary_action requires at least one output")
     extra_args = ctx.actions.args()
     extra_args.add("--bazel-bindir")
-    extra_args.add_all([outputs[0]], map_each = _bazel_bindir_arg)
+
+    # Set expand_directories = False to ensure this works correctly if
+    # outputs[0] is a directory.
+    extra_args.add_all([outputs[0]], map_each = _bazel_bindir_arg, expand_directories = False)
 
     ctx.actions.run(
         arguments = [extra_args] + (kwargs.pop("arguments", None) or []),
