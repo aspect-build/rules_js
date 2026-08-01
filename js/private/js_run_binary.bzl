@@ -54,8 +54,8 @@ def js_run_binary(
     The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
 
     * BAZEL_BINDIR: the bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
-    * BAZEL_TARGET_CPU (legacy; see `set_legacy_environment_variables`): the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
     * BAZEL_COMPILATION_MODE (legacy; see `set_legacy_environment_variables`): One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
+    * BAZEL_TARGET_CPU (legacy; see `set_legacy_environment_variables`): the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
 
     The following environment variables are made available to the Node.js runtime based on the rule context:
 
