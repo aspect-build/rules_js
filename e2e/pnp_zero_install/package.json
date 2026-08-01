@@ -1,9 +1,16 @@
 {
-  "name": "pnp_zero_install",
-  "private": true,
-  "dependencies": {
-    "is-odd": "3.0.1",
-    "left-pad": "1.3.0"
-  },
-  "packageManager": "yarn@4.12.0"
+    "name": "pnp_zero_install",
+    "private": true,
+    "dependencies": {
+        "is-odd": "3.0.1",
+        "left-pad": "1.3.0",
+        "react": "19.2.4",
+        "react-dom": "19.2.4"
+    },
+    "dependenciesMeta": {
+        "left-pad": {
+            "unplugged": true
+        }
+    },
+    "packageManager": "yarn@4.18.0"
 }

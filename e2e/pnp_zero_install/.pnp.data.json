@@ -41,6 +41,14 @@
               [
                 "pnp_zero_install",
                 "workspace:."
+              ],
+              [
+                "react",
+                "npm:19.2.4"
+              ],
+              [
+                "react-dom",
+                "virtual:310438cbe8bce78f5359a274faf64e8269c239826d47e9f2fd6c1fa51f9cd3577df13c0501c847c49fdd36b0b2091d8e573a4d49919de4a5e2794a4997f631bc#npm:19.2.4"
               ]
             ],
             "linkType": "SOFT"
@@ -94,7 +102,7 @@
         [
           "npm:1.3.0",
           {
-            "packageLocation": "./.yarn/cache/left-pad-npm-1.3.0-0382e69409-3fb59c76e2.zip/node_modules/left-pad/",
+            "packageLocation": "./.yarn/unplugged/left-pad-npm-1.3.0-0382e69409/node_modules/left-pad/",
             "packageDependencies": [
               [
                 "left-pad",
@@ -125,9 +133,100 @@
               [
                 "pnp_zero_install",
                 "workspace:."
+              ],
+              [
+                "react",
+                "npm:19.2.4"
+              ],
+              [
+                "react-dom",
+                "virtual:310438cbe8bce78f5359a274faf64e8269c239826d47e9f2fd6c1fa51f9cd3577df13c0501c847c49fdd36b0b2091d8e573a4d49919de4a5e2794a4997f631bc#npm:19.2.4"
               ]
             ],
             "linkType": "SOFT"
+          }
+        ]
+      ]
+    ],
+    [
+      "react",
+      [
+        [
+          "npm:19.2.4",
+          {
+            "packageLocation": "./.yarn/cache/react-npm-19.2.4-d29a5aac4d-cd2c9ff67a.zip/node_modules/react/",
+            "packageDependencies": [
+              [
+                "react",
+                "npm:19.2.4"
+              ]
+            ],
+            "linkType": "HARD"
+          }
+        ]
+      ]
+    ],
+    [
+      "react-dom",
+      [
+        [
+          "npm:19.2.4",
+          {
+            "packageLocation": "./.yarn/cache/react-dom-npm-19.2.4-4921ae503e-f0c63f1794.zip/node_modules/react-dom/",
+            "packageDependencies": [
+              [
+                "react-dom",
+                "npm:19.2.4"
+              ]
+            ],
+            "linkType": "SOFT"
+          }
+        ],
+        [
+          "virtual:310438cbe8bce78f5359a274faf64e8269c239826d47e9f2fd6c1fa51f9cd3577df13c0501c847c49fdd36b0b2091d8e573a4d49919de4a5e2794a4997f631bc#npm:19.2.4",
+          {
+            "packageLocation": "./.yarn/__virtual__/react-dom-virtual-473c295e1b/0/cache/react-dom-npm-19.2.4-4921ae503e-f0c63f1794.zip/node_modules/react-dom/",
+            "packageDependencies": [
+              [
+                "@types/react",
+                null
+              ],
+              [
+                "react",
+                "npm:19.2.4"
+              ],
+              [
+                "react-dom",
+                "virtual:310438cbe8bce78f5359a274faf64e8269c239826d47e9f2fd6c1fa51f9cd3577df13c0501c847c49fdd36b0b2091d8e573a4d49919de4a5e2794a4997f631bc#npm:19.2.4"
+              ],
+              [
+                "scheduler",
+                "npm:0.27.0"
+              ]
+            ],
+            "packagePeers": [
+              "@types/react",
+              "react"
+            ],
+            "linkType": "HARD"
+          }
+        ]
+      ]
+    ],
+    [
+      "scheduler",
+      [
+        [
+          "npm:0.27.0",
+          {
+            "packageLocation": "./.yarn/cache/scheduler-npm-0.27.0-772f0dd512-4f03048cb0.zip/node_modules/scheduler/",
+            "packageDependencies": [
+              [
+                "scheduler",
+                "npm:0.27.0"
+              ]
+            ],
+            "linkType": "HARD"
           }
         ]
       ]
