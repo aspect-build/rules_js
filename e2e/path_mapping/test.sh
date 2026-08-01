@@ -48,8 +48,8 @@ fi
 
 echo "PASS: action was cache-shared across -c fastbuild and -c opt"
 
-# Same proof as above, but exercising a plain js_run_binary target instead of
-# a custom rule built on js_run_binary_action.
+# Same as above, but exercising a js_run_binary target instead of a custom rule
+# built on js_run_binary_action.
 exec_log2="$scratch/exec_log2.json"
 
 bazel build -c fastbuild //js_run_binary_path_mapping_check \

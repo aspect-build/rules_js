@@ -1,9 +1,8 @@
-import { mkdirSync, writeFileSync } from 'fs'
-import { join } from 'path'
+import { writeFileSync } from 'fs'
 
-const outDir = process.argv[2]
-if (!outDir) {
-    process.stderr.write('Usage: check.mjs <output-dir>\n')
+const outFile = process.argv[2]
+if (!outFile) {
+    process.stderr.write('Usage: check.mjs <output-file>\n')
     process.exit(1)
 }
 
@@ -21,6 +20,4 @@ if (leaked.length > 0) {
     process.exit(1)
 }
 
-mkdirSync(outDir, { recursive: true })
-writeFileSync(join(outDir, 'file1'), 'OK\n')
-writeFileSync(join(outDir, 'file2'), 'OK\n')
+writeFileSync(outFile, 'OK\n')
