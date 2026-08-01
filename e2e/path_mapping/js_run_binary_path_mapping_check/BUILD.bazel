@@ -14,9 +14,9 @@ js_run_binary(
     outs = ["out.txt"],
     args = [package_name() + "/out.txt"],
     mnemonic = "JsRunBinaryPathMappingCheck",
+    set_legacy_environment_variables = False,
     tool = ":check",
     use_execroot_entry_point = False,
-    set_legacy_environment_variables = False,
 )
 
 build_test(
