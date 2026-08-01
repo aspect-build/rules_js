@@ -131,7 +131,10 @@ def _validate(pnp, lock_content):
             if checksum == None:
                 errors.append("{}: no checksum in yarn.lock".format(locator))
                 continue
-            if checksum.count("/") != 1:
+
+            # Yarn 4 prefixes checksums with the cache key (e.g. 10c0/<sha512>);
+            # Yarn 3 records the bare sha512 hex.
+            if checksum.count("/") > 1:
                 errors.append("{}: unrecognized checksum format {}".format(locator, checksum))
                 continue
             cache_zips[zip_name] = True

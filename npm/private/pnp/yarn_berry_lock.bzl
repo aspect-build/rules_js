@@ -7,8 +7,8 @@ than guessing.
 """
 
 # Lockfile format versions this parser has been validated against.
-# Version 8 is emitted by Yarn 4.x.
-_SUPPORTED_METADATA_VERSIONS = ["8"]
+# Version 6 is emitted by Yarn 3.x, version 8 by Yarn 4.x.
+_SUPPORTED_METADATA_VERSIONS = ["6", "8"]
 
 _INDENT = 2
 

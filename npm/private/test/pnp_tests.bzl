@@ -89,6 +89,66 @@ def _parse_lock_test_impl(ctx):
 
     return unittest.end(env)
 
+def _parse_yarn3_lock_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    # Yarn 3.x flavor: metadata version 6, bare sha512 checksums with no
+    # cache-key prefix, unquoted dependency ranges.
+    lock = yarn_berry_lock.parse("""\
+__metadata:
+  version: 6
+  cacheKey: 8
+
+"is-number@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "is-number@npm:6.0.0"
+  checksum: f73bfced022128b5684bf77e0266a74e5222522bbc40f81cc1e949170c774a3c14b59a208be025d2d97a9c6b79c7c45fe351ab1c2c780872464fdedde0ae067a
+  languageName: node
+  linkType: hard
+
+"is-odd@npm:3.0.1":
+  version: 3.0.1
+  resolution: "is-odd@npm:3.0.1"
+  dependencies:
+    is-number: ^6.0.0
+  checksum: 4e2b20764dd2296bafe44823d127f281c7039b37d2feaf5caffc1bf162502ef2920bcd4ad171490f371d3f15f52232c763a8ffc0b3633d4c83385fe20f3493af
+  languageName: node
+  linkType: hard
+""")
+
+    asserts.equals(env, "6", lock.metadata["version"])
+    asserts.equals(env, "8", lock.metadata["cacheKey"])
+    asserts.equals(env, {"is-number": "^6.0.0"}, lock.entries["is-odd@npm:3.0.1"]["dependencies"])
+    asserts.true(env, lock.entries["is-odd@npm:3.0.1"]["checksum"].startswith("4e2b20764d"))
+
+    # A bare (Yarn 3) checksum passes validation.
+    validated = pnp_data.validate(pnp_data.parse("""\
+{
+  "packageRegistryData": [
+    ["is-number", [["npm:6.0.0", {
+      "packageLocation": "./.yarn/cache/is-number-npm-6.0.0-30881e83e6-f73bfced02.zip/node_modules/is-number/",
+      "packageDependencies": [["is-number", "npm:6.0.0"]],
+      "linkType": "HARD"
+    }]]]
+  ]
+}
+"""), """\
+__metadata:
+  version: 6
+  cacheKey: 8
+
+"is-number@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "is-number@npm:6.0.0"
+  checksum: f73bfced022128b5684bf77e0266a74e5222522bbc40f81cc1e949170c774a3c14b59a208be025d2d97a9c6b79c7c45fe351ab1c2c780872464fdedde0ae067a
+  languageName: node
+  linkType: hard
+""")
+    asserts.equals(env, [], validated.errors)
+    asserts.equals(env, ["is-number-npm-6.0.0-30881e83e6-f73bfced02.zip"], validated.cache_zips)
+
+    return unittest.end(env)
+
 def _validate_test_impl(ctx):
     env = unittest.begin(ctx)
 
@@ -165,12 +225,14 @@ def _validate_errors_test_impl(ctx):
     return unittest.end(env)
 
 _parse_lock_test = unittest.make(_parse_lock_test_impl, attrs = {})
+_parse_yarn3_lock_test = unittest.make(_parse_yarn3_lock_test_impl, attrs = {})
 _validate_test = unittest.make(_validate_test_impl, attrs = {})
 _validate_virtual_test = unittest.make(_validate_virtual_test_impl, attrs = {})
 _validate_errors_test = unittest.make(_validate_errors_test_impl, attrs = {})
 
 TESTS = [
     _parse_lock_test,
+    _parse_yarn3_lock_test,
     _validate_test,
     _validate_virtual_test,
     _validate_errors_test,
