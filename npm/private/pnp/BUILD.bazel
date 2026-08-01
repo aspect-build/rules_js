@@ -1,8 +1,12 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("//js:defs.bzl", "js_library")
+load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 
 exports_files(
-    ["pnp_verify.mjs"],
+    [
+        "pnp_integrity.mjs",
+        "pnp_verify.mjs",
+        "pnp_verify_test.mjs",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -12,6 +16,19 @@ js_library(
     name = "pnp_verify",
     srcs = ["pnp_verify.mjs"],
     visibility = ["//visibility:public"],
+)
+
+js_binary(
+    name = "pnp_integrity",
+    data = [":pnp_verify"],
+    entry_point = "pnp_integrity.mjs",
+    visibility = ["//visibility:public"],
+)
+
+js_test(
+    name = "pnp_verify_test",
+    data = [":pnp_verify"],
+    entry_point = "pnp_verify_test.mjs",
 )
 
 bzl_library(
@@ -28,10 +45,19 @@ bzl_library(
 )
 
 bzl_library(
+    name = "pnp_integrity_bzl",
+    srcs = ["pnp_integrity.bzl"],
+    visibility = ["//npm:__subpackages__"],
+)
+
+bzl_library(
     name = "pnp_repository",
     srcs = ["pnp_repository.bzl"],
     visibility = ["//npm:__subpackages__"],
-    deps = [":pnp_data"],
+    deps = [
+        ":pnp_data",
+        ":pnp_integrity_bzl",
+    ],
 )
 
 bzl_library(

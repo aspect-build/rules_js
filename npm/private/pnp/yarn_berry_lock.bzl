@@ -7,8 +7,11 @@ than guessing.
 """
 
 # Lockfile format versions this parser has been validated against.
-# Version 6 is emitted by Yarn 3.x, version 8 by Yarn 4.x.
-_SUPPORTED_METADATA_VERSIONS = ["6", "8"]
+# Version 6 is emitted by Yarn 3.x. Yarn 4 originally emitted version 8 and
+# switched to version 10 in 4.18. Version 10 commonly keys entries by their
+# resolved locator rather than retaining every requesting descriptor, so
+# callers must not assume `descriptors` is complete for that format.
+_SUPPORTED_METADATA_VERSIONS = ["6", "8", "10"]
 
 _INDENT = 2
 
