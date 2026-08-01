@@ -1,0 +1,42 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("//js:defs.bzl", "js_library")
+
+exports_files(
+    ["pnp_verify.mjs"],
+    visibility = ["//visibility:public"],
+)
+
+# Wraps the verifier so it can be the entry_point of js_test targets in other
+# packages and repositories (see pnp_verify_test in the generated defs.bzl).
+js_library(
+    name = "pnp_verify",
+    srcs = ["pnp_verify.mjs"],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "yarn_berry_lock",
+    srcs = ["yarn_berry_lock.bzl"],
+    visibility = ["//npm:__subpackages__"],
+)
+
+bzl_library(
+    name = "pnp_data",
+    srcs = ["pnp_data.bzl"],
+    visibility = ["//npm:__subpackages__"],
+    deps = [":yarn_berry_lock"],
+)
+
+bzl_library(
+    name = "pnp_repository",
+    srcs = ["pnp_repository.bzl"],
+    visibility = ["//npm:__subpackages__"],
+    deps = [":pnp_data"],
+)
+
+bzl_library(
+    name = "pnp_extension",
+    srcs = ["pnp_extension.bzl"],
+    visibility = ["//npm:__subpackages__"],
+    deps = [":pnp_repository"],
+)

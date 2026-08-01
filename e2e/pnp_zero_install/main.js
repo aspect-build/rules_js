@@ -1,0 +1,6 @@
+const leftPad = require('left-pad')
+const isOdd = require('is-odd')
+const assert = require('node:assert')
+assert.strictEqual(leftPad('7', 3, '0'), '007')
+assert.strictEqual(isOdd(7), true)
+console.log('pnp-zero-install-ok')

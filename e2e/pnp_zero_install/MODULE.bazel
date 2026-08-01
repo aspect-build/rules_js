@@ -1,0 +1,18 @@
+bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../..",
+)
+
+pnp = use_extension(
+    "@aspect_rules_js//npm/private/pnp:pnp_extension.bzl",
+    "pnp",
+    dev_dependency = True,
+)
+pnp.install(
+    name = "pnp",
+    pnp_cjs = "//:.pnp.cjs",
+    pnp_data = "//:.pnp.data.json",
+    yarn_lock = "//:yarn.lock",
+)
+use_repo(pnp, "pnp")

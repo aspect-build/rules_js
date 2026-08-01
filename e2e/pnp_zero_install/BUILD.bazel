@@ -1,0 +1,15 @@
+load("@pnp//:defs.bzl", "pnp_js_test", "pnp_verify_test")
+
+# Runs a program whose dependencies resolve through the checked-in PnP
+# runtime, straight out of the offline cache zips. Yarn is never executed.
+pnp_js_test(
+    name = "main_test",
+    entry_point = "main.js",
+)
+
+# Recomputes the sha512 of every cache archive and compares it against
+# yarn.lock, and checks the cache and resolution graph reference exactly the
+# same archive set.
+pnp_verify_test(
+    name = "verify_cache_test",
+)
