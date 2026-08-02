@@ -114,7 +114,7 @@ jobs:
                   fi
                   # e2e/npm_translate_lock_auth requires an npm auth token not available on forks.
                   if [[ "${{ env.ASPECT_NPM_AUTH_TOKEN }}" ]]; then
-                    paths+=( e2e/npm_translate_lock_auth )
+                    paths+=( e2e/npm_translate_lock_auth e2e/npm_translate_lock_auth_token_helper )
                   fi
 
                   # Slug feeds aspect --task-key, the disk-cache key, and the job name, all
