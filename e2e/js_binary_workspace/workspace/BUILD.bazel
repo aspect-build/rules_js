@@ -16,10 +16,10 @@ js_run_binary(
     visibility = ["//visibility:public"],
 )
 
-# Verify that BAZEL_BUILD_FILE_PATH and BAZEL_TARGET, which js_run_binary now computes itself
-# instead of expanding via Make variables, are correct for a js_run_binary target that lives in
-# a module other than the main one (this "workspace" module is consumed as an external repo by
-# the root module in ../BUILD.bazel).
+# Verify that BAZEL_BUILD_FILE_PATH and BAZEL_TARGET are correct for a
+# js_run_binary target that lives in a module other than the main one (this
+# "workspace" module is consumed as an external repo by the root module in
+# ../BUILD.bazel).
 js_run_binary(
     name = "check_bazel_vars",
     log_level = "debug",
