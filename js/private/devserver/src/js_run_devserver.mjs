@@ -157,6 +157,45 @@ export function parseIBazelEvent(line) {
     return event
 }
 
+export function selectRunfilesToSync(files, event, workspaceRoot) {
+    if (!workspaceRoot || event.changes.some(({ kind }) => kind === 'graph')) {
+        return files
+    }
+
+    const changedSources = new Set()
+    for (const { path: changedPath, kind } of event.changes) {
+        if (kind !== 'source') {
+            return files
+        }
+
+        const relativePath = path.relative(workspaceRoot, changedPath)
+        if (
+            !relativePath ||
+            relativePath === '..' ||
+            relativePath.startsWith(`..${path.sep}`) ||
+            path.isAbsolute(relativePath)
+        ) {
+            return files
+        }
+        changedSources.add(path.normalize(relativePath))
+    }
+
+    return files.filter(([file, isDirectory, isSource]) => {
+        if (!isSource) {
+            return true
+        }
+
+        const normalizedFile = path.normalize(file)
+        return (
+            changedSources.has(normalizedFile) ||
+            (isDirectory &&
+                [...changedSources].some((changedSource) =>
+                    changedSource.startsWith(`${normalizedFile}${path.sep}`)
+                ))
+        )
+    })
+}
+
 export function formatRunfilesSyncEvent(
     sandbox,
     syncedFiles,
@@ -179,6 +218,46 @@ export function formatRunfilesSyncEvent(
         changes,
         trigger,
     })}\n`
+}
+
+export function createIBazelLineProcessor({
+    notifyRunfilesChanges,
+    sandbox,
+    syncBuild,
+    writeToChild,
+}) {
+    let pendingBuildCompleted = null
+
+    return async (chunk) => {
+        const chunkString = chunk.toString()
+        const ibazelEvent = parseIBazelEvent(chunkString)
+
+        if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
+            if (notifyRunfilesChanges) {
+                pendingBuildCompleted = chunkString
+                return
+            }
+            await syncBuild(null)
+        }
+
+        if (notifyRunfilesChanges && ibazelEvent?.success) {
+            const { deletedFiles, syncedFiles } = await syncBuild(ibazelEvent)
+            if (pendingBuildCompleted) {
+                await writeToChild(`${pendingBuildCompleted}\n`)
+                pendingBuildCompleted = null
+            }
+            await writeToChild(
+                formatRunfilesSyncEvent(
+                    sandbox,
+                    syncedFiles,
+                    deletedFiles,
+                    ibazelEvent
+                )
+            )
+        }
+
+        await writeToChild(`${chunk}\n`)
+    }
 }
 
 async function syncSymlink(file, src, dst, sandbox, exists, syncedFiles) {
@@ -634,86 +713,65 @@ async function runIBazelProtocol(
         // Process stdin data in order using a promise chain.
         let syncing = Promise.resolve()
         const rl = readline.createInterface({ input: process.stdin })
-        let pendingRunfilesChanges = null
-        rl.on('line', (line) => {
-            syncing = syncing.then(() => processChunk(line))
+
+        async function syncBuild(ibazelEvent) {
+            const oldFiles = config.previous_files || []
+
+            // Re-parse the config file to get the latest list of data files to copy
+            const updatedDataFiles = await fs.promises
+                .readFile(entriesPath)
+                .then(JSON.parse)
+            const filesToSync = ibazelEvent
+                ? selectRunfilesToSync(
+                      updatedDataFiles,
+                      ibazelEvent,
+                      process.env.BUILD_WORKSPACE_DIRECTORY
+                  )
+                : updatedDataFiles
+
+            const [deletedFiles, syncedFiles] = await Promise.all([
+                // Remove files that were previously synced but are no longer in the updated list of files to sync
+                deleteFiles(oldFiles, updatedDataFiles, sandbox),
+
+                // Sync changed source files and scan generated outputs for changes.
+                syncFiles(
+                    filesToSync,
+                    sandbox,
+                    config.grant_sandbox_write_permissions,
+                    syncRecursive
+                ),
+            ])
+
+            // The latest state of copied data files
+            config.previous_files = updatedDataFiles
+            return { deletedFiles, syncedFiles }
+        }
+
+        async function writeToChild(line) {
+            await new Promise((resolve) => {
+                // note: ignoring error - if this write to stdin fails,
+                // it's probably okay. Can add error handling later if needed
+                proc.stdin.write(line, resolve)
+            })
+        }
+
+        const processChunk = createIBazelLineProcessor({
+            notifyRunfilesChanges: config.notify_runfiles_changes,
+            sandbox,
+            syncBuild,
+            writeToChild,
         })
-
-        async function processChunk(chunk) {
-            try {
-                const chunkString = chunk.toString()
-                const ibazelEvent = parseIBazelEvent(chunkString)
-                if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
-                    if (JS_BINARY__LOG_DEBUG) {
-                        console.error('IBAZEL_BUILD_COMPLETED SUCCESS')
-                    }
-
-                    const oldFiles = config.previous_files || []
-
-                    // Re-parse the config file to get the latest list of data files to copy
-                    const updatedDataFiles = await fs.promises
-                        .readFile(entriesPath)
-                        .then(JSON.parse)
-
-                    // Await promises to catch any exceptions, and wait for the
-                    // sync to be complete before writing to stdin of the child
-                    // process
-                    const [deletedFiles, syncedFiles] = await Promise.all([
-                        // Remove files that were previously synced but are no longer in the updated list of files to sync
-                        deleteFiles(oldFiles, updatedDataFiles, sandbox),
-
-                        // Sync changed files
-                        syncFiles(
-                            updatedDataFiles,
-                            sandbox,
-                            config.grant_sandbox_write_permissions,
-                            syncRecursive
-                        ),
-                    ])
-
-                    // The latest state of copied data files
-                    config.previous_files = updatedDataFiles
-                    pendingRunfilesChanges = { deletedFiles, syncedFiles }
-                } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
-                    if (JS_BINARY__LOG_DEBUG) {
-                        console.error('IBAZEL_BUILD_STARTED')
-                    }
-                }
-
-                if (
-                    config.notify_runfiles_changes &&
-                    ibazelEvent?.success &&
-                    pendingRunfilesChanges
-                ) {
-                    await new Promise((resolve) => {
-                        proc.stdin.write(
-                            formatRunfilesSyncEvent(
-                                sandbox,
-                                pendingRunfilesChanges.syncedFiles,
-                                pendingRunfilesChanges.deletedFiles,
-                                ibazelEvent
-                            ),
-                            resolve
-                        )
-                    })
-                    pendingRunfilesChanges = null
-                }
-
-                // Forward stdin to the subprocess. See comment about
-                // https://github.com/aspect-build/rules_js/issues/1242 where
-                // `proc` is spawned
-                await new Promise((resolve) => {
-                    // note: ignoring error - if this write to stdin fails,
-                    // it's probably okay. Can add error handling later if needed
-                    proc.stdin.write(`${chunk}\n`, resolve)
-                })
-            } catch (e) {
+        rl.on('line', (line) => {
+            if (JS_BINARY__LOG_DEBUG && line.startsWith('IBAZEL_')) {
+                console.error(line)
+            }
+            syncing = syncing.then(() => processChunk(line)).catch((e) => {
                 console.error(
                     `An error has occurred while incrementally syncing files. Error: ${e}`
                 )
                 process.exit(1)
-            }
-        }
+            })
+        })
     })
 }
 

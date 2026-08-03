@@ -31,7 +31,8 @@ def _file_to_entry_json(f):
         if len(path_segments) <= package_name_segment or "@0.0.0" not in path_segments[package_name_segment]:
             return None
 
-    return json.encode([f.short_path, 1 if f.is_directory else 0])
+    # Source provenance lets notify_changes_v1 skip unchanged source runfiles while still scanning generated outputs.
+    return json.encode([f.short_path, 1 if f.is_directory else 0, 1 if f.is_source else 0])
 
 def _js_run_devserver_impl(ctx):
     config_file = ctx.actions.declare_file("{}_config.json".format(ctx.label.name))
@@ -239,7 +240,8 @@ def js_run_devserver(
         notify_runfiles_changes: Emit a versioned `JS_RUN_DEVSERVER_SYNCED` JSON event on the child process stdin
             after each successful iBazel build has been synchronized into the custom sandbox. The event reports
             exact added, changed, and deleted sandbox paths, and includes the triggering `IBAZEL_EVENT` from
-            iBazel's `ibazel_notify_changes_v1` protocol.
+            iBazel's `ibazel_notify_changes_v1` protocol. Source events synchronize matching source runfiles and
+            scan generated outputs. Build-graph events and source paths outside the workspace fall back to a full sync.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
