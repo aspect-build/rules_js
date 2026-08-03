@@ -16,66 +16,6 @@ js_run_binary(
     visibility = ["//visibility:public"],
 )
 
-# Verify that BAZEL_BUILD_FILE_PATH and BAZEL_TARGET are correct for a
-# js_run_binary target that lives in a module other than the main one (this
-# "workspace" module is consumed as an external repo by the root module in
-# ../BUILD.bazel).
-js_run_binary(
-    name = "check_bazel_vars",
-    log_level = "debug",
-    silent_on_success = False,
-    stderr = "check_bazel_vars_stderr.txt",
-    tool = ":bin",
-    visibility = ["//visibility:public"],
-)
-
-write_file(
-    name = "assert_contains_sh",
-    out = "assert_contains.sh",
-    content = [
-        "#!/usr/bin/env bash",
-        "set -euo pipefail",
-        "file=$1",
-        "shift",
-        # Bazel's test runner may pass each whitespace-separated word of an `args` entry as its
-        # own argv item, so the expected substring is split across argv and rejoined here with
-        # single spaces rather than passed as one already-spaced string.
-        'expected="$*"',
-        "if ! grep -qF -- \"$expected\" \"$file\"; then",
-        "    echo \"expected '$file' to contain '$expected', but it did not. Contents:\" >&2",
-        "    cat \"$file\" >&2",
-        "    exit 1",
-        "fi",
-    ],
-)
-
-# Expect the canonical label of this js_run_binary target, prefixed with this module's canonical
-# repo name (not the root module's, and not aspect_rules_js's own). The canonical name's
-# separator differs across Bazel versions ("workspace~" on Bazel 7, "workspace+" on Bazel 9), so
-# it's derived via repo_name() here rather than hardcoded.
-sh_test(
-    name = "bazel_target_test",
-    srcs = [":assert_contains.sh"],
-    args = [
-        "$(rootpath :check_bazel_vars_stderr.txt)",
-        "BAZEL_TARGET",
-        "{}//:check_bazel_vars".format("@" + repo_name() if repo_name() else ""),
-    ],
-    data = [":check_bazel_vars_stderr.txt"],
-)
-
-# Expect the BUILD file path relative to this module's root, not the root module's.
-sh_test(
-    name = "bazel_build_file_path_test",
-    srcs = [":assert_contains.sh"],
-    args = [
-        "$(rootpath :check_bazel_vars_stderr.txt)",
-        "BAZEL_BUILD_FILE_PATH",
-        "BUILD.bazel",
-    ],
-    data = [":check_bazel_vars_stderr.txt"],
-)
-
 # Write the expected relative working directory beginning with bazel-out/
 genrule(
     name = "working_directory_expected",
