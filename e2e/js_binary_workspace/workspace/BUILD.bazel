@@ -50,14 +50,16 @@ write_file(
 )
 
 # Expect the canonical label of this js_run_binary target, prefixed with this module's canonical
-# repo name (not the root module's, and not aspect_rules_js's own).
+# repo name (not the root module's, and not aspect_rules_js's own). The canonical name's
+# separator differs across Bazel versions ("workspace~" on Bazel 7, "workspace+" on Bazel 9), so
+# it's derived via repo_name() here rather than hardcoded.
 sh_test(
     name = "bazel_target_test",
     srcs = [":assert_contains.sh"],
     args = [
         "$(rootpath :check_bazel_vars_stderr.txt)",
         "BAZEL_TARGET",
-        "@workspace+//:check_bazel_vars",
+        "{}//:check_bazel_vars".format("@" + repo_name() if repo_name() else ""),
     ],
     data = [":check_bazel_vars_stderr.txt"],
 )
