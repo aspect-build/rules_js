@@ -304,7 +304,6 @@ def js_run_binary(
         )
         extra_srcs.append(":{}".format(copy_to_bin_name))
 
-    # Automatically add common and useful make variables to the environment for js_run_binary build targets
     fixed_env = {}
 
     # These environment variables are deprecated and will default to not being set in a future
