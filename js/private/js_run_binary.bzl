@@ -77,9 +77,9 @@ def js_run_binary(
 
     The following environment variables are made available to the Node.js runtime based on the rule context:
 
+    * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
     * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
     * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
-    * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
     * BAZEL_TARGET: the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
     * BAZEL_WORKSPACE: the bazel repository name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
 
