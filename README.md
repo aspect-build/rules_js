@@ -167,8 +167,8 @@ This third approach has trade-offs.
     This forces users to pass a `BAZEL_BINDIR` in the environment of every node action.
     https://github.com/bazelbuild/bazel/issues/15470 suggests a way to improve that, avoiding that imposition on users.
     `js_run_binary` sets this automatically, and custom rules that invoke a `js_binary` directly should use the
-    `js_run_binary_action` helper (see `js/libs.bzl`) instead of calling `ctx.actions.run` themselves so this detail
-    stays hidden.
+    `js_binary_lib.run_binary_action` helper (see `js/libs.bzl`) instead of calling `ctx.actions.run` themselves so
+    this detail stays hidden.
 
 # Telemetry & privacy policy
 

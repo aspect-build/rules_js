@@ -594,7 +594,7 @@ def _js_binary_impl(ctx):
 def _bazel_bindir_arg(file):
     return file.root.path
 
-def js_run_binary_action(ctx, **kwargs):
+def _run_binary_action(ctx, **kwargs):
     """Runs a `js_binary` as a tool in a custom rule's action.
 
     This helper function handles internal implementation details related to invoking a
@@ -612,7 +612,7 @@ def js_run_binary_action(ctx, **kwargs):
     # an output here and then derive the bin directory from it in the map_each callback.
     outputs = kwargs.get("outputs")
     if not outputs:
-        fail("js_run_binary_action requires at least one output")
+        fail("run_binary_action requires at least one output")
     extra_args = ctx.actions.args()
     extra_args.add("--bazel-bindir")
 
@@ -629,6 +629,7 @@ js_binary_lib = struct(
     attrs = _ATTRS,
     create_launcher = _create_launcher,
     implementation = _js_binary_impl,
+    run_binary_action = _run_binary_action,
     toolchains = [
         # Optional: only referenced on Windows
         config_common.toolchain_type("@bazel_tools//tools/sh:toolchain_type", mandatory = False),

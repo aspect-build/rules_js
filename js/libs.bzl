@@ -3,7 +3,6 @@
 load(
     "//js/private:js_binary.bzl",
     _js_binary_lib = "js_binary_lib",
-    _js_run_binary_action = "js_run_binary_action",
 )
 load(
     "//js/private:js_helpers.bzl",
@@ -23,7 +22,6 @@ load(
 
 js_binary_lib = _js_binary_lib
 js_library_lib = _js_library_lib
-js_run_binary_action = _js_run_binary_action
 
 js_lib_helpers = struct(
     envs_for_log_level = _envs_for_log_level,
