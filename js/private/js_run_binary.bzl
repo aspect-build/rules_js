@@ -17,6 +17,24 @@ load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
 load(":js_library.bzl", _js_library = "js_library")
 
+def _build_file_path():
+    """Returns the package-relative path to the current package's BUILD file.
+
+    Equivalent to `ctx.build_file_path`, but computed at macro-evaluation time since macros have
+    no `ctx`. The build file's name isn't known in advance (`BUILD` or `BUILD.bazel`), so this
+    uses `glob()` to detect it; if both are present, `BUILD.bazel` wins, matching Bazel's own
+    precedence.
+    """
+    matches = native.glob(["BUILD.bazel", "BUILD"], allow_empty = True)
+    if "BUILD.bazel" in matches:
+        build_file_name = "BUILD.bazel"
+    elif "BUILD" in matches:
+        build_file_name = "BUILD"
+    else:
+        fail("Could not find a BUILD or BUILD.bazel file in package '{}'".format(native.package_name()))
+    package = native.package_name()
+    return "{}/{}".format(package, build_file_name) if package else build_file_name
+
 def js_run_binary(
         name,
         tool,
@@ -61,9 +79,9 @@ def js_run_binary(
 
     * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
     * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
-    * BAZEL_BUILD_FILE_PATH (legacy; see `set_legacy_environment_variables`): the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
-    * BAZEL_TARGET (legacy; see `set_legacy_environment_variables`): the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
-    * BAZEL_WORKSPACE (legacy; see `set_legacy_environment_variables`): the bazel repository name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
+    * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
+    * BAZEL_TARGET: the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
+    * BAZEL_WORKSPACE: the bazel repository name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
 
     Args:
         name: Target name
@@ -254,9 +272,8 @@ def js_run_binary(
 
             Refer to https://bazel.build/rules/lib/builtins/actions#run for more details.
 
-        set_legacy_environment_variables: Whether to set the legacy `BAZEL_BUILD_FILE_PATH`,
-            `BAZEL_COMPILATION_MODE`, `BAZEL_TARGET_CPU`, `BAZEL_TARGET` and `BAZEL_WORKSPACE`
-            environment variables.
+        set_legacy_environment_variables: Whether to set the legacy `BAZEL_COMPILATION_MODE`
+            and `BAZEL_TARGET_CPU` environment variables.
 
             These variables are deprecated and setting them will default to False in a future
             release. Set this to False to opt out now.
@@ -305,19 +322,27 @@ def js_run_binary(
         extra_srcs.append(":{}".format(copy_to_bin_name))
 
     # Automatically add common and useful make variables to the environment for js_run_binary build targets
+    label = native.package_relative_label(name)
     fixed_env = {
+        "BAZEL_BUILD_FILE_PATH": _build_file_path(),
         "BAZEL_PACKAGE": native.package_name(),
         "BAZEL_TARGET_NAME": name,
+        "BAZEL_TARGET": "{}//{}:{}".format(
+            "@" + label.repo_name if label.repo_name else "",
+            label.package,
+            label.name,
+        ),
+        # This variable used to be derived from ctx.workspace_name and was the
+        # name from the WORKSPACE file, but with bzlmod it is always just
+        # "_main".
+        "BAZEL_WORKSPACE": "_main",
     }
 
     # These environment variables are deprecated and will default to not being set in a future
     # release; see the `set_legacy_environment_variables` docstring.
     if set_legacy_environment_variables:
-        fixed_env["BAZEL_BUILD_FILE_PATH"] = "$(BUILD_FILE_PATH)"
         fixed_env["BAZEL_COMPILATION_MODE"] = "$(COMPILATION_MODE)"
         fixed_env["BAZEL_TARGET_CPU"] = "$(TARGET_CPU)"
-        fixed_env["BAZEL_TARGET"] = "$(TARGET)"
-        fixed_env["BAZEL_WORKSPACE"] = "$(WORKSPACE)"
 
     # Configure working directory to `chdir` is set
     if chdir != None:
