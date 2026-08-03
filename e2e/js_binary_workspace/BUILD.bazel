@@ -45,6 +45,8 @@ build_test(
 test_suite(
     name = "external_tests",
     tests = [
+        "@workspace//:bazel_build_file_path_test",
+        "@workspace//:bazel_target_test",
         "@workspace//:js_binary_chdir_test",
         "@workspace//:js_test_chdir_test",
     ],
