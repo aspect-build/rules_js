@@ -1,12 +1,12 @@
 "A simple custom rule for testing js_binary used in a custom rule"
 
-load("@aspect_rules_js//js:libs.bzl", "js_run_binary_action")
+load("@aspect_rules_js//js:libs.bzl", "js_binary_lib")
 
 def _custom_rule_impl(ctx):
     out = ctx.actions.declare_file("{}.out".format(ctx.label.name))
     args = ctx.actions.args()
     args.add(out.short_path)
-    js_run_binary_action(
+    js_binary_lib.run_binary_action(
         ctx,
         arguments = [args],
         outputs = [out],
