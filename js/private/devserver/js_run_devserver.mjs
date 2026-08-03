@@ -392,6 +392,11 @@ function friendlyFileSize(bytes) {
 
 const IBAZEL_EVENT_PREFIX = 'IBAZEL_EVENT ';
 const RUNFILES_SYNC_EVENT_PREFIX = 'JS_RUN_DEVSERVER_SYNCED ';
+const RUNFILES_NOTIFICATION_ENV = 'JS_RUN_DEVSERVER_NOTIFY_RUNFILES_CHANGES';
+
+function runfilesNotificationEnv(env, enabled) {
+    return enabled ? { ...env, [RUNFILES_NOTIFICATION_ENV]: '1' } : env
+}
 
 function parseIBazelEvent(line) {
     if (!line.startsWith(IBAZEL_EVENT_PREFIX)) {
@@ -939,7 +944,7 @@ async function runIBazelProtocol(
     return new Promise((resolve) => {
         const proc = child_process.spawn(tool, toolArgs, {
             cwd: cwd,
-            env: env,
+            env: runfilesNotificationEnv(env, config.notify_runfiles_changes),
 
             // `.cmd` and `.bat` are always executed in a shell on windows
             // and require the flag to be set per CVE-2024-27980
@@ -1218,4 +1223,4 @@ function onProcessEnd(callback) {
     // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
 }
 
-export { createIBazelLineProcessor, formatRunfilesSyncEvent, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, parseIBazelEvent, selectRunfilesToSync };
+export { createIBazelLineProcessor, formatRunfilesSyncEvent, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, parseIBazelEvent, runfilesNotificationEnv, selectRunfilesToSync };

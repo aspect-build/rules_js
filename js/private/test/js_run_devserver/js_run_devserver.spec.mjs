@@ -7,6 +7,7 @@ import {
     is1pPackageStoreDep,
     friendlyFileSize,
     parseIBazelEvent,
+    runfilesNotificationEnv,
     selectRunfilesToSync,
 } from '../../devserver/js_run_devserver.mjs'
 
@@ -236,6 +237,21 @@ if (JSON.stringify(childInput) !== JSON.stringify(expectedChildInput)) {
 }
 if (JSON.stringify(syncTriggers) !== JSON.stringify([ibazelEvent])) {
     console.error('ERROR: expected structured event to drive sandbox sync')
+    process.exit(1)
+}
+
+const baseEnv = { EXISTING: 'value' }
+if (runfilesNotificationEnv(baseEnv, false) !== baseEnv) {
+    console.error('ERROR: expected disabled notification env to remain unchanged')
+    process.exit(1)
+}
+const notificationEnv = runfilesNotificationEnv(baseEnv, true)
+if (
+    notificationEnv === baseEnv ||
+    notificationEnv.EXISTING !== 'value' ||
+    notificationEnv.JS_RUN_DEVSERVER_NOTIFY_RUNFILES_CHANGES !== '1'
+) {
+    console.error('ERROR: expected enabled notification env to mark the child process')
     process.exit(1)
 }
 
