@@ -210,7 +210,7 @@ run in the execroot) so that build actions can change directories to always run 
 tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set \
 by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended \
 rule to use for using a js_binary as the tool of a build action. If you are invoking a js_binary directly from your own \
-custom rule implementation, use the 'js_run_binary_action' helper \
+custom rule implementation, use the 'js_binary_lib.run_binary_action' helper \
 (https://github.com/aspect-build/rules_js/blob/main/js/libs.bzl) instead of calling ctx.actions.run yourself so that \
 BAZEL_BINDIR is set correctly. If this is not a build action you can set the \
 BAZEL_BINDIR to '.' instead to supress this error. For more context on this design decision, please read the \
