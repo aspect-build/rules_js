@@ -12,6 +12,7 @@ _attrs = js_binary_lib.attrs | {
         default = True,
     ),
     "grant_sandbox_write_permissions": attr.bool(),
+    "notify_runfiles_changes": attr.bool(),
     "allow_execroot_entry_point_with_no_copy_data_to_bin": attr.bool(),
     "command": attr.string(),
 }
@@ -90,6 +91,8 @@ def _js_run_devserver_impl(ctx):
         config["command"] = ctx.attr.command
     if ctx.attr.grant_sandbox_write_permissions:
         config["grant_sandbox_write_permissions"] = "1"
+    if ctx.attr.notify_runfiles_changes:
+        config["notify_runfiles_changes"] = "1"
 
     ctx.actions.write(config_file, json.encode(config))
 
@@ -126,6 +129,7 @@ def js_run_devserver(
         tool = None,
         command = None,
         grant_sandbox_write_permissions = False,
+        notify_runfiles_changes = False,
         use_execroot_entry_point = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         **kwargs):
@@ -232,6 +236,11 @@ def js_run_devserver(
 
             See https://github.com/aspect-build/rules_js/issues/935 for more context.
 
+        notify_runfiles_changes: Emit a versioned `JS_RUN_DEVSERVER_SYNCED` JSON event on the child process stdin
+            after each successful iBazel build has been synchronized into the custom sandbox. The event reports
+            exact added, changed, and deleted sandbox paths, and includes the triggering `IBAZEL_EVENT` from
+            iBazel's `ibazel_notify_changes_v1` protocol.
+
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
 
@@ -273,10 +282,11 @@ def js_run_devserver(
             "ibazel_live_reload",
             "ibazel_notify_changes",
             "supports_incremental_build_protocol",
-        ],
+        ] + (["ibazel_notify_changes_v1"] if notify_runfiles_changes else []),
         tool = tool,
         command = command,
         grant_sandbox_write_permissions = grant_sandbox_write_permissions,
+        notify_runfiles_changes = notify_runfiles_changes,
         use_execroot_entry_point = use_execroot_entry_point,
         allow_execroot_entry_point_with_no_copy_data_to_bin = allow_execroot_entry_point_with_no_copy_data_to_bin,
         **kwargs

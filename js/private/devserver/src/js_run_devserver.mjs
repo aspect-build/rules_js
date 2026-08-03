@@ -142,7 +142,46 @@ export function friendlyFileSize(bytes) {
     )
 }
 
-async function syncSymlink(file, src, dst, sandbox, exists) {
+const IBAZEL_EVENT_PREFIX = 'IBAZEL_EVENT '
+const RUNFILES_SYNC_EVENT_PREFIX = 'JS_RUN_DEVSERVER_SYNCED '
+
+export function parseIBazelEvent(line) {
+    if (!line.startsWith(IBAZEL_EVENT_PREFIX)) {
+        return null
+    }
+
+    const event = JSON.parse(line.slice(IBAZEL_EVENT_PREFIX.length))
+    if (event.version !== 1 || event.type !== 'build_completed') {
+        return null
+    }
+    return event
+}
+
+export function formatRunfilesSyncEvent(
+    sandbox,
+    syncedFiles,
+    deletedFiles,
+    trigger
+) {
+    const changes = [
+        ...syncedFiles.map(({ file, exists }) => ({
+            path: path.join(sandbox, file),
+            kind: exists ? 'changed' : 'added',
+        })),
+        ...deletedFiles.map((file) => ({
+            path: path.join(sandbox, file),
+            kind: 'deleted',
+        })),
+    ].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
+
+    return `${RUNFILES_SYNC_EVENT_PREFIX}${JSON.stringify({
+        version: 1,
+        changes,
+        trigger,
+    })}\n`
+}
+
+async function syncSymlink(file, src, dst, sandbox, exists, syncedFiles) {
     let symlinkMeta = ''
     if (isNodeModulePath(file)) {
         let linkPath = await fs.promises.readlink(src)
@@ -180,10 +219,11 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
         mkdirpSync(path.dirname(dst))
     }
     await fs.promises.symlink(src, dst)
+    syncedFiles.push({ file, exists })
     return 1
 }
 
-async function syncDirectory(file, src, sandbox, writePerm) {
+async function syncDirectory(file, src, sandbox, writePerm, syncedFiles) {
     if (JS_BINARY__LOG_DEBUG) {
         console.error(`Syncing directory ${file}...`)
     }
@@ -196,14 +236,23 @@ async function syncDirectory(file, src, sandbox, writePerm) {
                         file + path.sep + entry,
                         undefined,
                         sandbox,
-                        writePerm
+                        writePerm,
+                        syncedFiles
                     )
             )
         )
     ).reduce((s, t) => s + t, 0)
 }
 
-async function syncFile(file, src, dst, exists, lstat, writePerm) {
+async function syncFile(
+    file,
+    src,
+    dst,
+    exists,
+    lstat,
+    writePerm,
+    syncedFiles
+) {
     if (JS_BINARY__LOG_DEBUG) {
         console.error(
             `Syncing file ${file}${
@@ -235,6 +284,7 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
         }
         await fs.promises.chmod(dst, mode)
     }
+    syncedFiles.push({ file, exists })
     return 1
 }
 
@@ -242,7 +292,7 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
 // pointing to the source symlink.
-async function syncRecursive(file, _, sandbox, writePerm) {
+async function syncRecursive(file, _, sandbox, writePerm, syncedFiles) {
     const src = RUNFILES_ROOT + path.sep + file
     const dst = sandbox + path.sep + file
 
@@ -264,9 +314,9 @@ async function syncRecursive(file, _, sandbox, writePerm) {
         const exists = syncedTime.has(file) || fs.existsSync(dst)
         syncedTime.set(file, lstat.mtimeMs)
         if (lstat.isSymbolicLink()) {
-            return syncSymlink(file, src, dst, sandbox, exists)
+            return syncSymlink(file, src, dst, sandbox, exists, syncedFiles)
         } else if (lstat.isDirectory()) {
-            return syncDirectory(file, src, sandbox, writePerm)
+            return syncDirectory(file, src, sandbox, writePerm, syncedFiles)
         } else {
             const lastChecksum = syncedChecksum.get(file)
             const checksum = await generateChecksum(src)
@@ -281,7 +331,15 @@ async function syncRecursive(file, _, sandbox, writePerm) {
             }
             syncedChecksum.set(file, checksum)
 
-            return syncFile(file, src, dst, exists, lstat, writePerm)
+            return syncFile(
+                file,
+                src,
+                dst,
+                exists,
+                lstat,
+                writePerm,
+                syncedFiles
+            )
         }
     } catch (e) {
         console.error(e)
@@ -295,6 +353,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
     const startTime = perf_hooks.performance.now()
 
     const deletions = []
+    const deletedFiles = []
 
     // Remove files that were previously synced but are no longer in the updated list of files to sync
     const updatedFilesSet = new Set()
@@ -329,6 +388,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
         deletions.push(
             fs.promises
                 .rm(rmPath, { recursive: true, force: true })
+                .then(() => deletedFiles.push(f))
                 .catch((e) =>
                     console.error(
                         `An error has occurred while deleting the synced file ${rmPath}. Error: ${e}`
@@ -349,12 +409,14 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
             } deleted in ${Math.round(endTime - startTime)} ms`
         )
     }
+    return deletedFiles
 }
 
 // Sync list of files to the sandbox
 async function syncFiles(files, sandbox, writePerm, doSync) {
     console.error(`+ Syncing ${files.length} files & folders...`)
     const startTime = perf_hooks.performance.now()
+    const syncedFiles = []
 
     // Partition files into node_modules and non-node_modules files
     const packageStore1pDeps = []
@@ -387,7 +449,13 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     let totalSynced = (
         await Promise.all(
             otherFiles.map(async ([file, isDirectory]) => {
-                return await doSync(file, isDirectory, sandbox, writePerm)
+                return await doSync(
+                    file,
+                    isDirectory,
+                    sandbox,
+                    writePerm,
+                    syncedFiles
+                )
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -403,7 +471,13 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     totalSynced += (
         await Promise.all(
             packageStore1pDeps.map(async ([file, isDirectory]) => {
-                return await doSync(file, isDirectory, sandbox, writePerm)
+                return await doSync(
+                    file,
+                    isDirectory,
+                    sandbox,
+                    writePerm,
+                    syncedFiles
+                )
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -418,7 +492,13 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     totalSynced += (
         await Promise.all(
             otherNodeModulesFiles.map(async ([file, isDirectory]) => {
-                return await doSync(file, isDirectory, sandbox, writePerm)
+                return await doSync(
+                    file,
+                    isDirectory,
+                    sandbox,
+                    writePerm,
+                    syncedFiles
+                )
             })
         )
     ).reduce((s, t) => s + t, 0)
@@ -429,6 +509,7 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
             totalSynced > 1 ? 's' : ''
         } synced in ${Math.round(endTime - startTime)} ms`
     )
+    return syncedFiles
 }
 
 function isWindowsScript(tool) {
@@ -517,12 +598,16 @@ async function runIBazelProtocol(
     toolArgs,
     env
 ) {
+    const initialFiles = await fs.promises
+        .readFile(entriesPath)
+        .then(JSON.parse)
     await syncFiles(
-        await fs.promises.readFile(entriesPath).then(JSON.parse),
+        initialFiles,
         sandbox,
         config.grant_sandbox_write_permissions,
         syncRecursive
     )
+    config.previous_files = initialFiles
 
     return new Promise((resolve) => {
         const proc = child_process.spawn(tool, toolArgs, {
@@ -549,6 +634,7 @@ async function runIBazelProtocol(
         // Process stdin data in order using a promise chain.
         let syncing = Promise.resolve()
         const rl = readline.createInterface({ input: process.stdin })
+        let pendingRunfilesChanges = null
         rl.on('line', (line) => {
             syncing = syncing.then(() => processChunk(line))
         })
@@ -556,6 +642,7 @@ async function runIBazelProtocol(
         async function processChunk(chunk) {
             try {
                 const chunkString = chunk.toString()
+                const ibazelEvent = parseIBazelEvent(chunkString)
                 if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
                     if (JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_COMPLETED SUCCESS')
@@ -571,7 +658,7 @@ async function runIBazelProtocol(
                     // Await promises to catch any exceptions, and wait for the
                     // sync to be complete before writing to stdin of the child
                     // process
-                    await Promise.all([
+                    const [deletedFiles, syncedFiles] = await Promise.all([
                         // Remove files that were previously synced but are no longer in the updated list of files to sync
                         deleteFiles(oldFiles, updatedDataFiles, sandbox),
 
@@ -586,10 +673,30 @@ async function runIBazelProtocol(
 
                     // The latest state of copied data files
                     config.previous_files = updatedDataFiles
+                    pendingRunfilesChanges = { deletedFiles, syncedFiles }
                 } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
                     if (JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_STARTED')
                     }
+                }
+
+                if (
+                    config.notify_runfiles_changes &&
+                    ibazelEvent?.success &&
+                    pendingRunfilesChanges
+                ) {
+                    await new Promise((resolve) => {
+                        proc.stdin.write(
+                            formatRunfilesSyncEvent(
+                                sandbox,
+                                pendingRunfilesChanges.syncedFiles,
+                                pendingRunfilesChanges.deletedFiles,
+                                ibazelEvent
+                            ),
+                            resolve
+                        )
+                    })
+                    pendingRunfilesChanges = null
                 }
 
                 // Forward stdin to the subprocess. See comment about
@@ -598,7 +705,7 @@ async function runIBazelProtocol(
                 await new Promise((resolve) => {
                     // note: ignoring error - if this write to stdin fails,
                     // it's probably okay. Can add error handling later if needed
-                    proc.stdin.write(chunk, resolve)
+                    proc.stdin.write(`${chunk}\n`, resolve)
                 })
             } catch (e) {
                 console.error(
@@ -710,7 +817,14 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     ])
 }
 
-async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
+async function cycleSyncRecurse(
+    cycle,
+    file,
+    isDirectory,
+    sandbox,
+    writePerm,
+    syncedFiles
+) {
     const src = RUNFILES_ROOT + path.sep + file
     const dst = sandbox + path.sep + file
 
@@ -730,13 +844,21 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     }
 
     if (srcRunfilesInfo.is_symlink) {
-        return syncSymlink(file, src, dst, sandbox, exists)
+        return syncSymlink(file, src, dst, sandbox, exists, syncedFiles)
     }
 
     if (isDirectory) {
-        return syncDirectory(file, src, sandbox, writePerm)
+        return syncDirectory(file, src, sandbox, writePerm, syncedFiles)
     } else {
-        return syncFile(file, src, dst, exists, null, writePerm)
+        return syncFile(
+            file,
+            src,
+            dst,
+            exists,
+            null,
+            writePerm,
+            syncedFiles
+        )
     }
 }
 

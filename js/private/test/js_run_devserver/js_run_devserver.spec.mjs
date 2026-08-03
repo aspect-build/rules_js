@@ -1,7 +1,11 @@
+import path from 'node:path'
+
 import {
+    formatRunfilesSyncEvent,
     isNodeModulePath,
     is1pPackageStoreDep,
     friendlyFileSize,
+    parseIBazelEvent,
 } from '../../devserver/js_run_devserver.mjs'
 
 // isNodeModulePath
@@ -77,4 +81,50 @@ for (const [k, v] of friendlyFileSize_cases) {
         )
         process.exit(1)
     }
+}
+
+// notify_changes_v1 post-sync event
+const ibazelEvent = parseIBazelEvent(
+    'IBAZEL_EVENT {"version":1,"type":"build_completed","success":true,"changes":[{"path":"/workspace/src/app.ts","kind":"source"}]}'
+)
+if (!ibazelEvent || !ibazelEvent.success) {
+    console.error('ERROR: expected a valid successful iBazel event')
+    process.exit(1)
+}
+if (parseIBazelEvent('IBAZEL_BUILD_COMPLETED SUCCESS') !== null) {
+    console.error('ERROR: expected legacy notification to be ignored')
+    process.exit(1)
+}
+
+const syncEventPrefix = 'JS_RUN_DEVSERVER_SYNCED '
+const syncEvent = formatRunfilesSyncEvent(
+    '/sandbox',
+    [
+        { file: 'b.js', exists: true },
+        { file: 'a.js', exists: false },
+    ],
+    ['c.js'],
+    ibazelEvent
+)
+if (!syncEvent.endsWith('\n')) {
+    console.error('ERROR: expected runfiles sync event to end with a newline')
+    process.exit(1)
+}
+const syncEventPayload = JSON.parse(syncEvent.slice(syncEventPrefix.length))
+const expectedChanges = [
+    { path: path.join('/sandbox', 'a.js'), kind: 'added' },
+    { path: path.join('/sandbox', 'b.js'), kind: 'changed' },
+    { path: path.join('/sandbox', 'c.js'), kind: 'deleted' },
+]
+if (JSON.stringify(syncEventPayload.changes) !== JSON.stringify(expectedChanges)) {
+    console.error(
+        `ERROR: expected runfiles changes ${JSON.stringify(
+            expectedChanges
+        )} but got ${JSON.stringify(syncEventPayload.changes)}`
+    )
+    process.exit(1)
+}
+if (JSON.stringify(syncEventPayload.trigger) !== JSON.stringify(ibazelEvent)) {
+    console.error('ERROR: expected sync event to retain the parsed iBazel event')
+    process.exit(1)
 }
