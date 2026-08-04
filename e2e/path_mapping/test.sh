@@ -47,3 +47,31 @@ if [ "$cache_hit" != "true" ]; then
 fi
 
 echo "PASS: action was cache-shared across -c fastbuild and -c opt"
+
+# Same as above, but exercising a js_run_binary target instead of a custom rule
+# built on js_run_binary_action.
+exec_log2="$scratch/exec_log2.json"
+
+bazel build -c fastbuild //js_run_binary_path_mapping_check \
+    --disk_cache="$disk_cache" \
+    --action_env="JS_RUN_BINARY_PATH_MAPPING_CHECK_INVALIDATE=$invalidate"
+
+bazel build -c opt //js_run_binary_path_mapping_check \
+    --disk_cache="$disk_cache" \
+    --action_env="JS_RUN_BINARY_PATH_MAPPING_CHECK_INVALIDATE=$invalidate" \
+    --execution_log_json_file="$exec_log2"
+
+matches2="$(jq -s '[.[] | select(.mnemonic == "JsRunBinaryPathMappingCheck")]' "$exec_log2")"
+count2="$(echo "$matches2" | jq 'length')"
+if [ "$count2" -eq 0 ]; then
+    echo "FAIL: no JsRunBinaryPathMappingCheck entry found in the -c opt execution log" >&2
+    exit 1
+fi
+
+cache_hit2="$(echo "$matches2" | jq -r '.[0].cacheHit')"
+if [ "$cache_hit2" != "true" ]; then
+    echo "FAIL: js_run_binary action was re-executed under -c opt (cacheHit=$cache_hit2); path mapping did not share the cache entry from -c fastbuild" >&2
+    exit 1
+fi
+
+echo "PASS: js_run_binary action was cache-shared across -c fastbuild and -c opt"

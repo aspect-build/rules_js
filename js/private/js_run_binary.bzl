@@ -45,19 +45,17 @@ def js_run_binary(
         patch_node_fs = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         use_default_shell_env = False,
+        set_legacy_environment_variables = True,
         **kwargs):
     """Wrapper around @bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
 
     This rule does not require Bash `native.genrule`.
 
-    The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
+    The following environment variables are made available to the Node.js runtime if set_legacy_environment_variables is enabled. They are deprecated and will be removed in a future release:
 
     * BAZEL_BINDIR: the bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
     * BAZEL_COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
     * BAZEL_TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
-
-    The following environment variables are made available to the Node.js runtime based on the rule context:
-
     * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
     * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
     * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
@@ -253,6 +251,14 @@ def js_run_binary(
 
             Refer to https://bazel.build/rules/lib/builtins/actions#run for more details.
 
+        set_legacy_environment_variables: Whether to set the legacy `BAZEL_BINDIR`,
+            `BAZEL_BUILD_FILE_PATH`, `BAZEL_COMPILATION_MODE`, `BAZEL_TARGET_CPU`,
+            `BAZEL_TARGET`, `BAZEL_WORKSPACE`, `BAZEL_PACKAGE` and `BAZEL_TARGET_NAME`
+            environment variables.
+
+            These variables are deprecated and setting them will default to False in a future
+            release. Set this to False to opt out now.
+
         **kwargs: Additional arguments
     """
 
@@ -296,17 +302,19 @@ def js_run_binary(
         )
         extra_srcs.append(":{}".format(copy_to_bin_name))
 
-    # Automatically add common and useful make variables to the environment for js_run_binary build targets
-    fixed_env = {
-        "BAZEL_BINDIR": "$(BINDIR)",
-        "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
-        "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
-        "BAZEL_PACKAGE": native.package_name(),
-        "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
-        "BAZEL_TARGET_NAME": name,
-        "BAZEL_TARGET": "$(TARGET)",
-        "BAZEL_WORKSPACE": "$(WORKSPACE)",
-    }
+    fixed_env = {}
+
+    # These environment variables are deprecated and will default to not being set in a future
+    # release; see the `set_legacy_environment_variables` docstring.
+    if set_legacy_environment_variables:
+        fixed_env["BAZEL_BINDIR"] = "$(BINDIR)"
+        fixed_env["BAZEL_BUILD_FILE_PATH"] = "$(BUILD_FILE_PATH)"
+        fixed_env["BAZEL_COMPILATION_MODE"] = "$(COMPILATION_MODE)"
+        fixed_env["BAZEL_TARGET_CPU"] = "$(TARGET_CPU)"
+        fixed_env["BAZEL_TARGET"] = "$(TARGET)"
+        fixed_env["BAZEL_WORKSPACE"] = "$(WORKSPACE)"
+        fixed_env["BAZEL_PACKAGE"] = native.package_name()
+        fixed_env["BAZEL_TARGET_NAME"] = name
 
     # Configure working directory to `chdir` is set
     if chdir != None:
@@ -422,7 +430,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         srcs = srcs + extra_srcs + execroot_extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,
-        args = args,
+        args = ["--bazel-bindir", "$(BINDIR)"] + args,
         mnemonic = mnemonic,
         progress_message = progress_message,
         execution_requirements = execution_requirements,
