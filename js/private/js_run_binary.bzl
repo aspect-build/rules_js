@@ -309,6 +309,7 @@ def js_run_binary(
     # These environment variables are deprecated and will default to not being set in a future
     # release; see the `set_legacy_environment_variables` docstring.
     if set_legacy_environment_variables:
+        fixed_env["BAZEL_BINDIR"] = "$(BINDIR)"
         fixed_env["BAZEL_BUILD_FILE_PATH"] = "$(BUILD_FILE_PATH)"
         fixed_env["BAZEL_COMPILATION_MODE"] = "$(COMPILATION_MODE)"
         fixed_env["BAZEL_TARGET_CPU"] = "$(TARGET_CPU)"
