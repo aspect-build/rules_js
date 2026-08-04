@@ -51,14 +51,11 @@ def js_run_binary(
 
     This rule does not require Bash `native.genrule`.
 
-    The following environment variables are made available to the Node.js runtime based on available Bazel [Make variables](https://bazel.build/reference/be/make-variables#predefined_variables):
+    The following environment variables are made available to the Node.js runtime if set_legacy_environment_variables is enabled. They are deprecated and will be removed in a future release:
 
     * BAZEL_BINDIR: the bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
-    * BAZEL_COMPILATION_MODE (legacy; see `set_legacy_environment_variables`): One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
-    * BAZEL_TARGET_CPU (legacy; see `set_legacy_environment_variables`): the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
-
-    The following environment variables are made available to the Node.js runtime based on the rule context (all are legacy; see `set_legacy_environment_variables`):
-
+    * BAZEL_COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
+    * BAZEL_TARGET_CPU: the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
     * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
     * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
     * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
