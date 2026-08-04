@@ -382,10 +382,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     # When use_execroot_entry_point is None, behavior is controlled by the //js:use_execroot_entry_point flag.
     execroot_extra_srcs = []
     if use_execroot_entry_point != False:
-        # Hoist the tool's entry point and data (but not its launcher/node/npm/node-patches
-        # toolchain scaffolding, which is never read from the target-platform bin directory;
-        # see the execroot_data_files output group docstring in js_binary.bzl) to srcs when
-        # running from execroot.
+        # Hoist the tool's entry point and data to srcs when running from execroot.
         js_runfiles_name = "{}_runfiles".format(name)
         native.filegroup(
             name = js_runfiles_name,
