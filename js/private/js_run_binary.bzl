@@ -57,13 +57,13 @@ def js_run_binary(
     * BAZEL_COMPILATION_MODE (legacy; see `set_legacy_environment_variables`): One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
     * BAZEL_TARGET_CPU (legacy; see `set_legacy_environment_variables`): the target cpu architecture; equivalent to `$(TARGET_CPU)` Make variable of the `js_run_binary` target
 
-    The following environment variables are made available to the Node.js runtime based on the rule context:
+    The following environment variables are made available to the Node.js runtime based on the rule context (all are legacy; see `set_legacy_environment_variables`):
 
-    * BAZEL_BUILD_FILE_PATH (legacy; see `set_legacy_environment_variables`): the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
-    * BAZEL_PACKAGE (legacy; see `set_legacy_environment_variables`): the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
-    * BAZEL_TARGET_NAME (legacy; see `set_legacy_environment_variables`): the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
-    * BAZEL_TARGET (legacy; see `set_legacy_environment_variables`): the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
-    * BAZEL_WORKSPACE (legacy; see `set_legacy_environment_variables`): the bazel repository name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
+    * BAZEL_BUILD_FILE_PATH: the path to the BUILD file of the bazel target being run; equivalent to `ctx.build_file_path` of the `js_run_binary` target's rule context
+    * BAZEL_PACKAGE: the package of the bazel target being run; equivalent to `ctx.label.package` of the `js_run_binary` target's rule context
+    * BAZEL_TARGET_NAME: the full label of the bazel target being run; a stringified version of `ctx.label` of the `js_run_binary` target's rule context
+    * BAZEL_TARGET: the name of the bazel target being run; equivalent to `ctx.label.name` of the  `js_run_binary` target's rule context
+    * BAZEL_WORKSPACE: the bazel repository name; equivalent to `ctx.workspace_name` of the `js_run_binary` target's rule context
 
     Args:
         name: Target name
