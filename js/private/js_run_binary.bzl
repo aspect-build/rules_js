@@ -251,9 +251,10 @@ def js_run_binary(
 
             Refer to https://bazel.build/rules/lib/builtins/actions#run for more details.
 
-        set_legacy_environment_variables: Whether to set the legacy `BAZEL_BUILD_FILE_PATH`,
-            `BAZEL_COMPILATION_MODE`, `BAZEL_TARGET_CPU`, `BAZEL_TARGET`, `BAZEL_WORKSPACE`,
-            `BAZEL_PACKAGE` and `BAZEL_TARGET_NAME` environment variables.
+        set_legacy_environment_variables: Whether to set the legacy `BAZEL_BINDIR`,
+            `BAZEL_BUILD_FILE_PATH`, `BAZEL_COMPILATION_MODE`, `BAZEL_TARGET_CPU`,
+            `BAZEL_TARGET`, `BAZEL_WORKSPACE`, `BAZEL_PACKAGE` and `BAZEL_TARGET_NAME`
+            environment variables.
 
             These variables are deprecated and setting them will default to False in a future
             release. Set this to False to opt out now.
