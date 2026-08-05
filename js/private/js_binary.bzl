@@ -495,12 +495,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         transitive_launcher_files = nodeinfo.npm_sources
 
     # The subset of runfiles that make up the entry point and its data, as opposed to the
-    # js_binary's own launcher/node/npm/node-patches toolchain scaffolding. This is what
-    # js_run_binary hoists into the target-platform bin directory when use_execroot_entry_point
-    # is enabled: the launcher always resolves the entry point's data from disk relative to the
-    # entry point itself (Node module resolution), but it resolves the toolchain scaffolding via
-    # $JS_BINARY__RUNFILES regardless of use_execroot_entry_point, so that scaffolding never needs
-    # a target-platform copy.
+    # launcher and its other dependencies.
     data_runfiles = gather_runfiles(
         ctx = ctx,
         data = ctx.attr.data,
@@ -601,11 +596,8 @@ def _js_binary_impl(ctx):
         ),
         OutputGroupInfo(
             # The entry point and its data, excluding the launcher/node/npm/node-patches
-            # toolchain scaffolding. Consumed by js_run_binary to hoist a js_binary tool's
-            # entry point and data into the target-platform bin directory when
-            # use_execroot_entry_point is enabled, without duplicating toolchain files that
-            # are never read from there (and whose content can differ across configurations,
-            # e.g. the generated launcher bakes in $(COMPILATION_MODE)).
+            # toolchain scaffolding. Consumed by js_run_binary when
+            # use_execroot_entry_point is enabled.
             execroot_data_files = launcher.data_runfiles.files,
         ),
     ]
