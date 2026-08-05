@@ -15,14 +15,19 @@ directories into a single one called `bazel-out/cfg/bin` during the action.
 This way, build actions for different compilation modes or even CPU platforms
 can share a cached result, provided that the actions are otherwise identical.
 
-# Enabling path mapping
+## Enabling path mapping
 
-To enable path mapping:
+Getting path mapping set up requires both enabling it via command-line flags at
+the Bazel level and then ensuring that specific targets are compatible with it.
+
+At the Bazel level:
  - Pass the `--experimental_output_paths=strip` flag to Bazel
  - Use either remote caching or `--disk_cache`. Counterintuitively, Bazel's
    default caching will otherwise not benefit from path mapping.
 
-For `js_run_binary`:
+The `js_run_binary` macro will automatically enable path mapping if it
+determines it is safe to do so, but you may need to explicitly opt in (see
+below). To set up a `js_run_binary` target for path mapping:
  - Pass `set_legacy_environment_variables = False`. This will disable the
    setting of environment variables such as `BAZEL_COMPILATION_MODE` that would
    otherwise be problematic.
