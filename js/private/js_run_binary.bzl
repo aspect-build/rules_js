@@ -44,7 +44,7 @@ def js_run_binary(
         patch_node_fs = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
         use_default_shell_env = False,
-        set_legacy_environment_variables = True,
+        set_legacy_environment_variables = None,
         **kwargs):
     """Wrapper around @bazel_lib `run_binary` that adds convenience attributes for using a `js_binary` tool.
 
@@ -255,6 +255,9 @@ def js_run_binary(
             `BAZEL_TARGET`, `BAZEL_WORKSPACE`, `BAZEL_PACKAGE` and `BAZEL_TARGET_NAME`
             environment variables.
 
+            If `None` (the default), the behavior is controlled by the
+            `//js:set_legacy_environment_variables` build flag, which defaults to `True`.
+
             These variables are deprecated and setting them will default to False in a future
             release. Set this to False to opt out now.
 
@@ -305,15 +308,27 @@ def js_run_binary(
 
     # These environment variables are deprecated and will default to not being set in a future
     # release; see the `set_legacy_environment_variables` docstring.
-    if set_legacy_environment_variables:
-        fixed_env["BAZEL_BINDIR"] = "$(BINDIR)"
-        fixed_env["BAZEL_BUILD_FILE_PATH"] = "$(BUILD_FILE_PATH)"
-        fixed_env["BAZEL_COMPILATION_MODE"] = "$(COMPILATION_MODE)"
-        fixed_env["BAZEL_TARGET_CPU"] = "$(TARGET_CPU)"
-        fixed_env["BAZEL_TARGET"] = "$(TARGET)"
-        fixed_env["BAZEL_WORKSPACE"] = "$(WORKSPACE)"
-        fixed_env["BAZEL_PACKAGE"] = native.package_name()
-        fixed_env["BAZEL_TARGET_NAME"] = name
+    # When set_legacy_environment_variables is None, behavior is controlled by the
+    # //js:set_legacy_environment_variables flag.
+    legacy_env_values = {
+        "BAZEL_BINDIR": "$(BINDIR)",
+        "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
+        "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
+        "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
+        "BAZEL_TARGET": "$(TARGET)",
+        "BAZEL_WORKSPACE": "$(WORKSPACE)",
+        "BAZEL_PACKAGE": native.package_name(),
+        "BAZEL_TARGET_NAME": name,
+    }
+    if set_legacy_environment_variables == True:
+        legacy_env = legacy_env_values
+    elif set_legacy_environment_variables == None:
+        legacy_env = select({
+            Label("//js:_set_legacy_environment_variables_true"): legacy_env_values,
+            "//conditions:default": {},
+        })
+    else:
+        legacy_env = {}
 
     # Configure working directory to `chdir` is set
     if chdir != None:
@@ -417,7 +432,7 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     _run_binary(
         name = name,
         tool = tool,
-        env = fixed_env | execroot_env | env,
+        env = fixed_env | legacy_env | execroot_env | env,
         srcs = srcs + extra_srcs + execroot_extra_srcs,
         outs = outs + extra_outs,
         out_dirs = out_dirs,

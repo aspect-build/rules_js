@@ -23,3 +23,18 @@ build_test(
     name = "js_run_binary_path_mapping_check_test",
     targets = [":js_run_binary_path_mapping_check"],
 )
+
+# Same as js_run_binary_path_mapping_check, but leaves set_legacy_environment_variables
+# unset to verify that --@aspect_rules_js//js:set_legacy_environment_variables=False achieves
+# the same path-mapping-safe behavior as setting the attribute explicitly. Tagged manual
+# since this target only builds correctly with that flag passed on the command line; see
+# test.sh, which builds it explicitly with the flag set.
+js_run_binary(
+    name = "js_run_binary_path_mapping_check_flag",
+    outs = ["out_flag.txt"],
+    args = ["out_flag.txt"],
+    chdir = package_name(),
+    mnemonic = "JsRunBinaryPathMappingCheckFlag",
+    tags = ["manual"],
+    tool = ":check",
+)
