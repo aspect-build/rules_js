@@ -197,6 +197,13 @@ npm.npm_exclude_package_contents(
 )
 ```
 
+### Path mapping
+
+Some build actions do essentially the same thing regardless of the compilation
+mode (e.g. `opt` or `dbg`), but for technical reasons Bazel will not allow
+cached results to be shared across different modes by default. See the [path
+mapping guide](./path_mapping.md) for how you can address this problem.
+
 #### Jest
 
 See [rules_jest](https://github.com/aspect-build/rules_jest) for troubleshooting.
