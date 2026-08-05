@@ -310,25 +310,23 @@ def js_run_binary(
     # release; see the `set_legacy_environment_variables` docstring.
     # When set_legacy_environment_variables is None, behavior is controlled by the
     # //js:set_legacy_environment_variables flag.
-    legacy_env_values = {
-        "BAZEL_BINDIR": "$(BINDIR)",
-        "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
-        "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
-        "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
-        "BAZEL_TARGET": "$(TARGET)",
-        "BAZEL_WORKSPACE": "$(WORKSPACE)",
-        "BAZEL_PACKAGE": native.package_name(),
-        "BAZEL_TARGET_NAME": name,
-    }
-    if set_legacy_environment_variables == True:
-        legacy_env = legacy_env_values
-    elif set_legacy_environment_variables == None:
-        legacy_env = select({
-            Label("//js:_set_legacy_environment_variables_true"): legacy_env_values,
-            "//conditions:default": {},
-        })
-    else:
-        legacy_env = {}
+    legacy_env = {}
+    if set_legacy_environment_variables != False:
+        legacy_env = {
+            "BAZEL_BINDIR": "$(BINDIR)",
+            "BAZEL_BUILD_FILE_PATH": "$(BUILD_FILE_PATH)",
+            "BAZEL_COMPILATION_MODE": "$(COMPILATION_MODE)",
+            "BAZEL_TARGET_CPU": "$(TARGET_CPU)",
+            "BAZEL_TARGET": "$(TARGET)",
+            "BAZEL_WORKSPACE": "$(WORKSPACE)",
+            "BAZEL_PACKAGE": native.package_name(),
+            "BAZEL_TARGET_NAME": name,
+        }
+        if set_legacy_environment_variables == None:
+            legacy_env = select({
+                Label("//js:_set_legacy_environment_variables_true"): legacy_env,
+                "//conditions:default": {},
+            })
 
     # Configure working directory to `chdir` is set
     if chdir != None:
