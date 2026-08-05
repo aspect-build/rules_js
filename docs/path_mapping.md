@@ -43,9 +43,10 @@ below). To set up a `js_run_binary` target for path mapping:
    active.
 
 For custom rules that invoke a `js_binary`:
- - Use the helper function `js_binary_lib.run_binary_action()`. This is a thin
-   wrapper around `ctx.actions.run()` that handles some internal implementation
-   details in a path-mapping-friendly way.
+ - Use the helper function `js_binary_lib.run_binary_action()` from
+   `@aspect_rules_js//js:libs.bzl`. This is a thin wrapper around
+   `ctx.actions.run()` that handles some internal implementation details in a
+   path-mapping-friendly way.
  - Set `execution_requirements = {"supports-path-mapping": "1"}` to opt into
    path mapping.
  - Make sure that any paths involving `bazel-out/` are mapped correctly. The
