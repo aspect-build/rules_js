@@ -2,8 +2,8 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
 # Verifies that a js_run_binary target supports path mapping. This requires
-# use_execroot_entry_point and set_legacy_environment_variables to both be
-# disabled, and args must avoid Make variable and location expansion.
+# set_legacy_environment_variables to be disabled, and args must avoid Make
+# variable and location expansion.
 js_binary(
     name = "check",
     entry_point = "check.mjs",
@@ -17,7 +17,6 @@ js_run_binary(
     mnemonic = "JsRunBinaryPathMappingCheck",
     set_legacy_environment_variables = False,
     tool = ":check",
-    use_execroot_entry_point = False,
 )
 
 build_test(

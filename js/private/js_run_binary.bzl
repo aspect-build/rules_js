@@ -15,7 +15,6 @@ load("@bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
-load(":js_library.bzl", _js_library = "js_library")
 
 def js_run_binary(
         name,
@@ -383,20 +382,12 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
     # When use_execroot_entry_point is None, behavior is controlled by the //js:use_execroot_entry_point flag.
     execroot_extra_srcs = []
     if use_execroot_entry_point != False:
-        # hoist all runfiles to srcs when running from execroot
-        js_runfiles_lib_name = "{}_runfiles_lib".format(name)
-        _js_library(
-            name = js_runfiles_lib_name,
-            srcs = [tool],
-            # Always tag the target manual since we should only build it when the final target is built.
-            tags = kwargs.get("tags", []) + ["manual"],
-            testonly = kwargs.get("testonly"),
-        )
+        # Hoist the tool's entry point and data to srcs when running from execroot.
         js_runfiles_name = "{}_runfiles".format(name)
         native.filegroup(
             name = js_runfiles_name,
-            output_group = "runfiles",
-            srcs = [":{}".format(js_runfiles_lib_name)],
+            output_group = "execroot_data_files",
+            srcs = [tool],
             # Always tag the target manual since we should only build it when the final target is built.
             tags = kwargs.get("tags", []) + ["manual"],
             testonly = kwargs.get("testonly"),
