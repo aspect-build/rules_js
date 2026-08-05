@@ -75,3 +75,35 @@ if [ "$cache_hit2" != "true" ]; then
 fi
 
 echo "PASS: js_run_binary action was cache-shared across -c fastbuild and -c opt"
+
+# Same as above, but exercising js_run_binary_path_mapping_check_flag, which does not set
+# set_legacy_environment_variables itself and instead relies on the
+# --@aspect_rules_js//js:set_legacy_environment_variables=False command-line flag to get the
+# same path-mapping-safe behavior.
+exec_log3="$scratch/exec_log3.json"
+
+bazel build -c fastbuild //js_run_binary_path_mapping_check:js_run_binary_path_mapping_check_flag \
+    --@aspect_rules_js//js:set_legacy_environment_variables=False \
+    --disk_cache="$disk_cache" \
+    --action_env="JS_RUN_BINARY_PATH_MAPPING_CHECK_FLAG_INVALIDATE=$invalidate"
+
+bazel build -c opt //js_run_binary_path_mapping_check:js_run_binary_path_mapping_check_flag \
+    --@aspect_rules_js//js:set_legacy_environment_variables=False \
+    --disk_cache="$disk_cache" \
+    --action_env="JS_RUN_BINARY_PATH_MAPPING_CHECK_FLAG_INVALIDATE=$invalidate" \
+    --execution_log_json_file="$exec_log3"
+
+matches3="$(jq -s '[.[] | select(.mnemonic == "JsRunBinaryPathMappingCheckFlag")]' "$exec_log3")"
+count3="$(echo "$matches3" | jq 'length')"
+if [ "$count3" -eq 0 ]; then
+    echo "FAIL: no JsRunBinaryPathMappingCheckFlag entry found in the -c opt execution log" >&2
+    exit 1
+fi
+
+cache_hit3="$(echo "$matches3" | jq -r '.[0].cacheHit')"
+if [ "$cache_hit3" != "true" ]; then
+    echo "FAIL: js_run_binary action (flag-controlled) was re-executed under -c opt (cacheHit=$cache_hit3); --@aspect_rules_js//js:set_legacy_environment_variables=False did not achieve the same path-mapping behavior as setting the attribute explicitly" >&2
+    exit 1
+fi
+
+echo "PASS: js_run_binary action controlled by --@aspect_rules_js//js:set_legacy_environment_variables=False was cache-shared across -c fastbuild and -c opt"

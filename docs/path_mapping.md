@@ -30,7 +30,10 @@ determines it is safe to do so, but you may need to explicitly opt in (see
 below). To set up a `js_run_binary` target for path mapping:
  - Pass `set_legacy_environment_variables = False`. This will disable the
    setting of environment variables such as `BAZEL_COMPILATION_MODE` that would
-   otherwise be problematic.
+   otherwise be problematic. Alternatively, you can change the default for all
+   targets by passing `--@aspect_rules_js//js:set_legacy_environment_variables=False`
+   on the command line; individual targets can still override this default by
+   setting the attribute explicitly.
  - Avoid using [Make
    variables](https://bazel.build/reference/be/make-variables) or expressions
    such as `$(execpath :target)`. Such variables and expressions are not

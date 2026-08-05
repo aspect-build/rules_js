@@ -20,6 +20,23 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+# This flag controls the default behavior of the set_legacy_environment_variables flag
+# on js_run_binary.
+bool_flag(
+    name = "set_legacy_environment_variables",
+    build_setting_default = True,
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "_set_legacy_environment_variables_true",
+    flag_values = {"set_legacy_environment_variables": "True"},
+    # Must be public: this is referenced by select() expressions that the js_run_binary
+    # macro expands into user packages, where visibility is checked from the use site.
+    # Without this, builds fail under --incompatible_config_setting_private_default_visibility.
+    visibility = ["//visibility:public"],
+)
+
 bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],
