@@ -46,6 +46,6 @@ For custom rules that invoke a `js_binary`:
  - Make sure that any paths involving `bazel-out/` are mapped correctly. The
    only way to do this is to call `args.add()` or `args.add_all()` on an
    [Args](https://bazel.build/rules/lib/builtins/Args) object from
-   `ctx.action.args()`. If you need to do any additional munging of the path,
+   `ctx.actions.args()`. If you need to do any additional munging of the path,
    it must be done in a `map_each` callback passed to
    [args.add_all()](https://bazel.build/rules/lib/builtins/Args#add_all).
