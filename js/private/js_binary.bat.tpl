@@ -191,12 +191,12 @@ if defined JS_BINARY__EXIT_CODE_OUTPUT_FILE (
 
 rem Detect bazel-out segment in current directory
 set "bazel_out_segment="
-echo "%CD%" | findstr /c:"\bazel-out\" >nul && set "bazel_out_segment=\bazel-out\"
+echo "%CD%" | %SYSTEMROOT%\system32\findstr.exe /c:"\bazel-out\" >nul && set "bazel_out_segment=\bazel-out\"
 if not defined bazel_out_segment (
-    echo "%CD%" | findstr /c:"\BAZEL-~1\" >nul && set "bazel_out_segment=\BAZEL-~1\"
+    echo "%CD%" | %SYSTEMROOT%\system32\findstr.exe /c:"\BAZEL-~1\" >nul && set "bazel_out_segment=\BAZEL-~1\"
 )
 if not defined bazel_out_segment (
-    echo "%CD%" | findstr /c:"\bazel-~1\" >nul && set "bazel_out_segment=\bazel-~1\"
+    echo "%CD%" | %SYSTEMROOT%\system32\findstr.exe /c:"\bazel-~1\" >nul && set "bazel_out_segment=\bazel-~1\"
 )
 
 rem Inherit JS_BINARY__EXECROOT from the parent only when BOTH
@@ -214,7 +214,7 @@ if defined bazel_out_segment (
     ) else (
         rem We in runfiles and we don't yet know the execroot
         rem Find the position of bazel_out_segment and extract execroot
-        for /f "tokens=1 delims=" %%i in ('echo "%CD%" ^| findstr /n /c:"!bazel_out_segment!"') do (
+        for /f "tokens=1 delims=" %%i in ('echo "%CD%" ^| %SYSTEMROOT%\system32\findstr.exe /n /c:"!bazel_out_segment!"') do (
             set "temp_line=%%i"
         )
         rem Extract everything before bazel-out segment
@@ -298,7 +298,7 @@ if not exist "!entry_point!" (
 
 set "node={{node}}"
 rem Check if node path is absolute (starts with drive letter)
-echo "%node%" | findstr "^[A-Za-z]:" >nul
+echo "%node%" | %SYSTEMROOT%\system32\findstr.exe "^[A-Za-z]:" >nul
 if %errorlevel% equ 0 (
     rem A user may specify an absolute path to node using target_tool_path in node_toolchain
     set "JS_BINARY__NODE_BINARY=%node%"
@@ -323,7 +323,7 @@ if %errorlevel% equ 0 (
 
 set "npm={{npm}}"
 if defined npm (
-    echo "%npm%" | findstr "^[A-Za-z]:" >nul
+    echo "%npm%" | %SYSTEMROOT%\system32\findstr.exe "^[A-Za-z]:" >nul
     if !errorlevel! equ 0 (
         rem A user may specify an absolute path to npm using npm_path in node_toolchain
         set "JS_BINARY__NPM_BINARY=%npm%"
@@ -524,7 +524,7 @@ if "%segment%"=="" (
     exit /b 0
 )
 rem Simple approach: find the segment and take everything before it
-for /f "tokens=1 delims=" %%a in ('echo "%full_path%" ^| findstr /o /c:"%segment%"') do (
+for /f "tokens=1 delims=" %%a in ('echo "%full_path%" ^| %SYSTEMROOT%\system32\findstr.exe /o /c:"%segment%"') do (
     set "pos_info=%%a"
     goto :found_segment
 )

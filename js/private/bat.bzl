@@ -53,7 +53,7 @@ if defined TEST_SRCDIR (
         set "RUNFILES=!RUNFILES:~0,-17!"
     ) else (
         rem Check if RUNFILES ends with \MANIFEST
-        echo !RUNFILES! | findstr /c:"\MANIFEST" >nul
+        echo !RUNFILES! | %SYSTEMROOT%\system32\findstr.exe /c:"\MANIFEST" >nul
         if !errorlevel! equ 0 (
             rem Older versions of Bazel put the manifest file named MANIFEST in the runfiles directory
             set "RUNFILES=!RUNFILES:\MANIFEST=!"
@@ -74,13 +74,13 @@ if defined TEST_SRCDIR (
     )
     
     rem Check if we're inside a .runfiles directory
-    echo !self! | findstr /c:".runfiles\" >nul
+    echo !self! | %SYSTEMROOT%\system32\findstr.exe /c:".runfiles\" >nul
     if !errorlevel! equ 0 (
         rem Extract the runfiles directory path
-        for /f "tokens=1 delims=" %%a in ('echo !self! ^| findstr /o /c:".runfiles\"') do set "pos_info=%%a"
+        for /f "tokens=1 delims=" %%a in ('echo !self! ^| %SYSTEMROOT%\system32\findstr.exe /o /c:".runfiles\"') do set "pos_info=%%a"
         for /f "tokens=1 delims=:" %%b in ("!pos_info!") do set "pos=%%b"
         set /a "end_pos=!pos!+9"
-        for /f %%c in ('echo !self! ^| findstr /c:".runfiles\"') do (
+        for /f %%c in ('echo !self! ^| %SYSTEMROOT%\system32\findstr.exe /c:".runfiles\"') do (
             for /f "tokens=1 delims=\" %%d in ("%%c") do (
                 set "base_part=%%d"
             )
@@ -114,7 +114,7 @@ if defined TEST_SRCDIR (
 )
 
 rem Ensure RUNFILES is an absolute path
-echo !RUNFILES! | findstr "^[A-Za-z]:" >nul
+echo !RUNFILES! | %SYSTEMROOT%\system32\findstr.exe "^[A-Za-z]:" >nul
 if !errorlevel! neq 0 (
     rem RUNFILES is not absolute, make it relative to current directory
     set "RUNFILES=%CD%\!RUNFILES!"
@@ -144,9 +144,9 @@ goto :runfiles_init_done
 :extract_runfiles_path
 set "input_path=%~1"
 rem Simple approach to find .runfiles directory in path
-for /f "tokens=*" %%a in ('echo %input_path% ^| findstr /c:".runfiles"') do (
+for /f "tokens=*" %%a in ('echo %input_path% ^| %SYSTEMROOT%\system32\findstr.exe /c:".runfiles"') do (
     set "temp=%%a"
-    for /f "tokens=1 delims=\" %%b in ('echo !temp! ^| findstr /o /c:".runfiles"') do (
+    for /f "tokens=1 delims=\" %%b in ('echo !temp! ^| %SYSTEMROOT%\system32\findstr.exe /o /c:".runfiles"') do (
         set "match_info=%%b"
         for /f "tokens=1 delims=:" %%c in ("!match_info!") do (
             set "match_pos=%%c"
