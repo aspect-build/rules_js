@@ -3,6 +3,7 @@ load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
+load(":label_capture.bzl", "label_capture")
 
 package(default_testonly = True)
 
@@ -36,6 +37,17 @@ js_run_binary(
 assert_contains(
     name = "runfiles_test",
     actual = ":runfiles_location.txt",
+    expected = "RUNFILES_ONLY",
+)
+
+label_capture(
+    name = "label_capture",
+    tool = ":find_cfg_probe",
+)
+
+assert_contains(
+    name = "label_capture_test",
+    actual = ":label_capture_stdout.txt",
     expected = "RUNFILES_ONLY",
 )
 

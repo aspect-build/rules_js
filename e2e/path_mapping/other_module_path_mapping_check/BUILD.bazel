@@ -1,0 +1,32 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+
+# Verifies the captures of @other_module//subdir:other_module_path_mapping_check
+# landed where the launcher was told to write them, and with the expected
+# content. Building them at all proves the "external/<repo>/" bin-relative
+# prefix is correct; comparing the content proves they are not empty or crossed.
+#
+# This package must not be named "external*"; bazel_skylib's diff_test matches
+# runfiles paths against the regex "^external/*", which any such name satisfies.
+diff_test(
+    name = "stdout_test",
+    file1 = "@other_module//subdir:stdout.txt",
+    file2 = "expected_stdout.txt",
+)
+
+diff_test(
+    name = "stderr_test",
+    file1 = "@other_module//subdir:stderr.txt",
+    file2 = "expected_stderr.txt",
+)
+
+diff_test(
+    name = "exit_code_test",
+    file1 = "@other_module//subdir:exit_code.txt",
+    file2 = "expected_exit_code.txt",
+)
+
+diff_test(
+    name = "out_test",
+    file1 = "@other_module//subdir:out.txt",
+    file2 = "expected_out.txt",
+)

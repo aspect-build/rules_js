@@ -45,6 +45,13 @@ below). To set up a `js_run_binary` target for path mapping:
    `bazel-out/<platform dir>`, which would be incorrect when path mapping is
    active.
 
+Note that opting in with `execution_requirements` cannot rescue a path passed
+through the action environment. Bazel only rewrites paths that reach an action
+via an [Args](https://bazel.build/rules/lib/builtins/Args) object; environment
+variables are never rewritten. An environment variable holding an
+`$(execpath)`-expanded path would still point at `bazel-out/<platform dir>/bin`
+while the action runs against `bazel-out/cfg/bin`.
+
 For custom rules that invoke a `js_binary`:
  - Use the helper function `js_binary_lib.run_binary_action()` from
    `@aspect_rules_js//js:libs.bzl`. This is a thin wrapper around
