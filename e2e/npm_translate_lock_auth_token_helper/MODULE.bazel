@@ -17,14 +17,10 @@ npm = use_extension(
     "npm",
     dev_dependency = True,
 )
-
-# test.sh rewrites the __NPMRC_AUTH_FILE__ placeholder to the absolute path of auth.npmrc,
-# since npmrc_auth_file needs an absolute path that isn't known until the test runs.
 npm.npm_translate_lock(
     name = "npm",
-    npmrc_auth_file = "__NPMRC_AUTH_FILE__",
+    npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
-    use_home_npmrc = True,
     verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "npm")

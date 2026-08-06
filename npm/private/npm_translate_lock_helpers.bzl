@@ -110,14 +110,14 @@ def _is_absolute_path(path):
     return len(path) >= 3 and path[1] == ":" and (path[2] == "/" or path[2] == "\\")
 
 def _run_token_helper(helper, npmrc_path, rctx):
-    # user-level auth files expand env vars in credential values, including tokenHelper
+    # tokenHelper values may reference env vars, same as any other credential value
     helper = utils.replace_npmrc_token_envvar(helper, npmrc_path, rctx)
 
+    # A relative helper is resolved against the directory of the `.npmrc` that declared it,
+    # so a checked-in file can point at a script next to it.
     if not _is_absolute_path(helper):
-        fail("tokenHelper in \"{npmrc}\" must be an absolute path with no arguments, got: \"{helper}\"".format(
-            npmrc = npmrc_path,
-            helper = helper,
-        ))
+        npmrc_dir = str(rctx.path(str(npmrc_path)).dirname)
+        helper = str(rctx.path(npmrc_dir + "/" + helper))
 
     result = rctx.execute([helper])
     if result.return_code != 0:
@@ -188,7 +188,8 @@ def _get_npm_auth(npmrc, npmrc_path, rctx, allow_token_helper = False):
         npmrc_path: The file path to `.npmrc`.
         rctx: the repository_ctx or module_ctx to fetch environment vars from
         allow_token_helper: whether to run `tokenHelper` executables found in `npmrc`.
-            Only True for the trusted user-level auth file; False (default) ignores them.
+            True for the live auth parse; False (default) skips execution, used by the
+            unused state.bzl parse so a helper is not run twice.
 
     Returns:
         A tuple (registries, auth).
@@ -273,8 +274,8 @@ def _get_npm_auth(npmrc, npmrc_path, rctx, allow_token_helper = False):
             registry = k.removeprefix("//").removesuffix(_NPM_TOKEN_HELPER).removesuffix(":").removesuffix("/")
             token_helpers[registry] = v
 
-    # tokenHelper runs an executable, so only honor it from a trusted user-level auth
-    # file. Run helpers last so they win over a static token for the same registry.
+    # Run token helpers last so a helper wins over a static token for the same registry.
+    # allow_token_helper guards against the (unused) state.bzl auth parse executing helpers.
     if allow_token_helper:
         for (registry, helper) in token_helpers.items():
             token = _run_token_helper(helper, npmrc_path, rctx)
