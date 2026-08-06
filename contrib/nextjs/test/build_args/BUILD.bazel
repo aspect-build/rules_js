@@ -1,0 +1,6 @@
+load("//contrib/nextjs/test:args_test.bzl", "nextjs_build_args_test")
+
+nextjs_build_args_test(
+    name = "nextjs_build_args_test",
+    args = ["--webpack"],
+)

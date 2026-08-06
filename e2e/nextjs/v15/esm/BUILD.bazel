@@ -20,9 +20,12 @@ js_library(
     ],
 )
 
+# Also covers passing additional `next build` arguments. `--webpack` (the motivating
+# use case) is a Next.js 16 flag, so a v15-supported flag is used here instead.
 nextjs_standalone_build(
     name = "standalone",
     srcs = [":lib"],
+    args = ["--no-lint"],
     config = "next.config.js",
     next_js_binary = ":next_js_binary",
 )

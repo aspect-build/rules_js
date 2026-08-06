@@ -174,7 +174,7 @@ def nextjs(
         **kwargs
     )
 
-def nextjs_build(name, config, srcs, next_js_binary, data = [], use_execroot_entry_point = True, **kwargs):
+def nextjs_build(name, config, srcs, next_js_binary, data = [], use_execroot_entry_point = True, args = [], **kwargs):
     """Build the Next.js production artifact.
 
     See https://nextjs.org/docs/pages/api-reference/cli/next#build
@@ -193,12 +193,19 @@ def nextjs_build(name, config, srcs, next_js_binary, data = [], use_execroot_ent
             See main docstring above for example usage.
 
         use_execroot_entry_point: passed directly to js_run_binary
+
+        args: Additional arguments to pass to `next build`, appended after the
+            `build` subcommand. For example `["--webpack"]` to opt out of
+            Turbopack, which cannot run under a Bazel sandbox.
+
+            The `build` subcommand itself is not overridable.
+
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
     js_run_binary(
         name = name,
         tool = next_js_binary,
-        args = ["build"],
+        args = ["build"] + args,
         srcs = srcs + data + [config],
         out_dirs = [_next_build_out],
         chdir = native.package_name(),
@@ -271,7 +278,7 @@ def nextjs_dev(name, config, srcs, data, next_js_binary, **kwargs):
 # Standalone Next.js build & server binary.
 # ---------------------------------------------------------------------------------------------
 
-def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_execroot_entry_point = True, **kwargs):
+def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_execroot_entry_point = True, args = [], **kwargs):
     """Compile a standalone Next.js application.
 
     See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files
@@ -294,6 +301,13 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         next_js_binary: the Next.js binary to use for building
         data: the data files to include in the build
         use_execroot_entry_point: passed directly to js_run_binary
+
+        args: Additional arguments to pass to `next build`, appended after the
+            `build` subcommand. For example `["--webpack"]` to opt out of
+            Turbopack, which cannot run under a Bazel sandbox.
+
+            The `build` subcommand itself is not overridable.
+
         **kwargs: Other attributes passed to all targets such as `tags`, env
     """
 
@@ -337,7 +351,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         name = "_%s.next_build" % name,
         tool = next_js_binary,
         env = env,
-        args = ["build"],
+        args = ["build"] + args,
         srcs = srcs + data + [":_%s.standalone_config_file" % name, ":_%s.original_config_file" % name],
         out_dirs = [_next_build_out],
         chdir = native.package_name(),
