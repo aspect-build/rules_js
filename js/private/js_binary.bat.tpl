@@ -387,14 +387,23 @@ rem They may contain double-quotes or parentheses so we cannot expand them
 rem inside a for-loop or a set "..." literal.
 set ARGS={{fixed_args}}
 rem Process runtime args to extract any --node_options= flags.
-for %%a in (%*) do (
-    set "ARG=%%a"
-    if "!ARG:~0,15!"=="--node_options=" (
-        set "JS_BINARY__NODE_OPTIONS=!JS_BINARY__NODE_OPTIONS! !ARG:~15!"
-    ) else (
-        set "ARGS=!ARGS! %%a"
-    )
+rem Use a shift-based loop rather than `for %%a in (%*)`: cmd's FOR set parser
+rem splits each token on '=' (and ',' ';'), which mangles a single runtime arg
+rem like `--node_options=--require=<path>` into three tokens, leaking
+rem `--node_options` and `--require` through to the program. `%1` yields each
+rem whole argument as cmd parsed it from the command line (split on spaces only,
+rem respecting quotes), so `=` inside a value is preserved.
+:process_runtime_arg
+if "%~1"=="" goto :process_runtime_args_done
+set "ARG=%~1"
+if "!ARG:~0,15!"=="--node_options=" (
+    set "JS_BINARY__NODE_OPTIONS=!JS_BINARY__NODE_OPTIONS! !ARG:~15!"
+) else (
+    set "ARGS=!ARGS! %1"
 )
+shift
+goto :process_runtime_arg
+:process_runtime_args_done
 
 rem Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper.
 rem Don't override JS_BINARY__FS_PATCH_ROOTS if already set by an outer js_binary in case a js_binary such
