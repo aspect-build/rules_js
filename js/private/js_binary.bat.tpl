@@ -387,21 +387,29 @@ rem They may contain double-quotes or parentheses so we cannot expand them
 rem inside a for-loop or a set "..." literal.
 set ARGS={{fixed_args}}
 rem Process runtime args to extract any --node_options= flags.
-rem Use a shift-based loop rather than `for %%a in (%*)`: cmd's FOR set parser
-rem splits each token on '=' (and ',' ';'), which mangles a single runtime arg
-rem like `--node_options=--require=<path>` into three tokens, leaking
-rem `--node_options` and `--require` through to the program. `%1` yields each
-rem whole argument as cmd parsed it from the command line (split on spaces only,
-rem respecting quotes), so `=` inside a value is preserved.
+rem cmd's FOR set parser (`for %%a in (%*)`) AND the batch parameters %1..%9
+rem both split each token on '=' (and ',' ';'), which mangles a single runtime
+rem arg like `--node_options=--require=<path>` into fragments, leaking
+rem `--node_options` and `--require` through to the program. The raw command
+rem line %* preserves '=', so tokenize it on spaces only via
+rem `for /f "delims= "`, which also keeps quoted values (with embedded spaces)
+rem intact. The `set "ARG="` + `if not defined ARG` guard makes the loop
+rem terminate rather than spin if `for /f` skips a token (e.g. an arg that
+rem begins with the default eol char ';').
+set "_rt_rest=%*"
 :process_runtime_arg
-if "%~1"=="" goto :process_runtime_args_done
-set "ARG=%~1"
+if not defined _rt_rest goto :process_runtime_args_done
+set "ARG="
+for /f "tokens=1* delims= " %%a in ("!_rt_rest!") do (
+    set "ARG=%%a"
+    set "_rt_rest=%%b"
+)
+if not defined ARG goto :process_runtime_args_done
 if "!ARG:~0,15!"=="--node_options=" (
     set "JS_BINARY__NODE_OPTIONS=!JS_BINARY__NODE_OPTIONS! !ARG:~15!"
 ) else (
-    set "ARGS=!ARGS! %1"
+    set "ARGS=!ARGS! !ARG!"
 )
-shift
 goto :process_runtime_arg
 :process_runtime_args_done
 
