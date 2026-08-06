@@ -16,6 +16,28 @@ load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
 
+def _bindir_relative_out(out):
+    """Path of a declared output relative to the bin directory.
+
+    `run_binary` declares `outs` with `attr.output_list`, so the label is always in the
+    current package and the path is fully computable here. Returning a literal keeps the
+    value free of `$(execpath)`, which would otherwise both disable path mapping in
+    `run_binary` and bake in a `bazel-out/<config>/bin` prefix that is wrong when path
+    mapping is active. The launcher recognizes the path as bin-relative because it does
+    not start with `bazel-out/`, and joins it with the path-mapped `--bazel-bindir`.
+    """
+
+    # `out` may be a string or a Label; str() normalizes both to a form ending in
+    # ":<name>" or, for a plain relative string, to the name itself.
+    path = str(out).split(":")[-1]
+    package = native.package_name()
+    if package:
+        path = "{}/{}".format(package, path)
+    repo = native.repo_name()
+    if repo:
+        path = "external/{}/{}".format(repo, path)
+    return path
+
 def js_run_binary(
         name,
         tool,
@@ -351,13 +373,13 @@ def js_run_binary(
     # Configure capturing stdout, stderr and/or the exit code
     extra_outs = []
     if stdout:
-        fixed_env["JS_BINARY__STDOUT_OUTPUT_FILE"] = "$(execpath {})".format(stdout)
+        fixed_env["JS_BINARY__STDOUT_OUTPUT_FILE"] = _bindir_relative_out(stdout)
         extra_outs.append(stdout)
     if stderr:
-        fixed_env["JS_BINARY__STDERR_OUTPUT_FILE"] = "$(execpath {})".format(stderr)
+        fixed_env["JS_BINARY__STDERR_OUTPUT_FILE"] = _bindir_relative_out(stderr)
         extra_outs.append(stderr)
     if exit_code_out:
-        fixed_env["JS_BINARY__EXIT_CODE_OUTPUT_FILE"] = "$(execpath {})".format(exit_code_out)
+        fixed_env["JS_BINARY__EXIT_CODE_OUTPUT_FILE"] = _bindir_relative_out(exit_code_out)
         extra_outs.append(exit_code_out)
 
     # Configure silent on success

@@ -1,9 +1,14 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 
 # Verifies that a js_run_binary target supports path mapping. This requires
 # set_legacy_environment_variables to be disabled, and args must avoid Make
 # variable and location expansion.
+#
+# stdout/stderr/exit_code_out are captured here to verify that they do not
+# defeat path mapping; their paths are passed to the launcher relative to the
+# bin directory rather than via $(execpath).
 js_binary(
     name = "check",
     entry_point = "check.mjs",
@@ -14,9 +19,32 @@ js_run_binary(
     outs = ["out.txt"],
     args = ["out.txt"],
     chdir = package_name(),
+    exit_code_out = "exit_code.txt",
     mnemonic = "JsRunBinaryPathMappingCheck",
     set_legacy_environment_variables = False,
+    stderr = "stderr.txt",
+    stdout = "stdout.txt",
     tool = ":check",
+)
+
+# Verifies the captured stdout/stderr/exit_code files actually landed where the
+# launcher was told to write them, and with the expected content.
+diff_test(
+    name = "stdout_test",
+    file1 = ":stdout.txt",
+    file2 = "expected_stdout.txt",
+)
+
+diff_test(
+    name = "stderr_test",
+    file1 = ":stderr.txt",
+    file2 = "expected_stderr.txt",
+)
+
+diff_test(
+    name = "exit_code_test",
+    file1 = ":exit_code.txt",
+    file2 = "expected_exit_code.txt",
 )
 
 build_test(

@@ -280,15 +280,25 @@ export JS_BINARY__RUNFILES
 # Prepare to run main program
 # ==============================================================================
 
-# Convert stdout, stderr and exit_code capture outputs paths to absolute paths
+# Convert stdout, stderr and exit_code capture outputs paths to absolute paths.
+# A path not starting with "bazel-out/" is relative to the bin directory; joining
+# it with BAZEL_BINDIR here (rather than baking in bazel-out/<config>/bin at
+# analysis time) keeps it correct when path mapping is active.
+function resolve_capture_path {
+    case "$1" in
+    bazel-out/*) echo "$PWD/$1" ;;
+    *) echo "$PWD/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$1" ;;
+    esac
+}
+
 if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDOUT_OUTPUT_FILE="$PWD/$JS_BINARY__STDOUT_OUTPUT_FILE"
+    JS_BINARY__STDOUT_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDOUT_OUTPUT_FILE")"
 fi
 if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDERR_OUTPUT_FILE="$PWD/$JS_BINARY__STDERR_OUTPUT_FILE"
+    JS_BINARY__STDERR_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDERR_OUTPUT_FILE")"
 fi
 if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$PWD/$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
+    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__EXIT_CODE_OUTPUT_FILE")"
 fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
