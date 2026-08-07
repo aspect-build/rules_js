@@ -121,11 +121,12 @@ def _run_token_helper(helper, npmrc_path, rctx):
 
     result = rctx.execute([helper])
     if result.return_code != 0:
-        fail("tokenHelper \"{helper}\" in \"{npmrc}\" exited with {code}:\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}".format(
+        # Deliberately omit stdout: a helper writes its token there, so echoing it on
+        # failure would leak the credential into the terminal and CI logs.
+        fail("tokenHelper \"{helper}\" in \"{npmrc}\" exited with {code}:\nSTDERR:\n{stderr}".format(
             helper = helper,
             npmrc = npmrc_path,
             code = result.return_code,
-            stdout = result.stdout,
             stderr = result.stderr,
         ))
 
@@ -319,7 +320,6 @@ def _select_npm_auth(url, npm_auth):
             npm_auth_username = auth_info.get("username")
             npm_auth_password = auth_info.get("password")
             match_len = len(auth_registry)
-            break
 
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
@@ -768,4 +768,5 @@ helpers = struct(
 helpers_testonly = struct(
     find_missing_bazel_ignores = _find_missing_bazel_ignores,
     gather_package_content_excludes = _gather_package_content_excludes,
+    select_npm_auth = _select_npm_auth,
 )

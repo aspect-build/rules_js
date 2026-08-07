@@ -4,7 +4,7 @@ See https://docs.bazel.build/versions/main/skylark/testing.html#for-testing-star
 
 load("@bazel_skylib//lib:partial.bzl", "partial")
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//npm/private:npm_translate_lock_helpers.bzl", "helpers")
+load("//npm/private:npm_translate_lock_helpers.bzl", "helpers", "helpers_testonly")
 
 def _no_npmrc_test_impl(ctx):
     env = unittest.begin(ctx)
@@ -545,6 +545,31 @@ def _pkg_scope_test_impl(ctx):
 
     return unittest.end(env)
 
+def _select_npm_auth_longest_prefix_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    # A broad registry token and a narrower one for a path below it. Selection must return
+    # the narrower match regardless of dict order, not the first one that happens to match.
+    npm_auth = {
+        "registry.corp.com": {"bearer": "BROAD"},
+        "registry.corp.com/private": {"bearer": "NARROW"},
+    }
+
+    asserts.equals(
+        env,
+        ("NARROW", None, None, None),
+        helpers_testonly.select_npm_auth("https://registry.corp.com/private/pkg/-/pkg-1.0.0.tgz", npm_auth),
+    )
+
+    # A URL that only matches the broad entry still gets the broad token.
+    asserts.equals(
+        env,
+        ("BROAD", None, None, None),
+        helpers_testonly.select_npm_auth("https://registry.corp.com/public/pkg/-/pkg-1.0.0.tgz", npm_auth),
+    )
+
+    return unittest.end(env)
+
 no_npmrc_test = unittest.make(_no_npmrc_test_impl)
 plain_basic_auth_test = unittest.make(_plain_basic_auth_test_impl)
 plain_username_password_test = unittest.make(_plain_username_password_test_impl)
@@ -558,6 +583,7 @@ token_helper_registry_test = unittest.make(_token_helper_registry_test_impl)
 token_helper_env_path_test = unittest.make(_token_helper_env_path_test_impl)
 token_helper_disallowed_test = unittest.make(_token_helper_disallowed_test_impl)
 token_helper_precedence_test = unittest.make(_token_helper_precedence_test_impl)
+select_npm_auth_longest_prefix_test = unittest.make(_select_npm_auth_longest_prefix_test_impl)
 
 def npm_auth_test_suite():
     unittest.suite(
@@ -575,4 +601,5 @@ def npm_auth_test_suite():
         partial.make(token_helper_env_path_test, timeout = "short"),
         partial.make(token_helper_disallowed_test, timeout = "short"),
         partial.make(token_helper_precedence_test, timeout = "short"),
+        partial.make(select_npm_auth_longest_prefix_test, timeout = "short"),
     )
