@@ -195,6 +195,14 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             When set, the `.npmrc` file specified is parsed and npm auth tokens and basic authentication configuration
             specified in the file are passed to the Bazel downloader for authentication with private npm registries.
 
+            A [`tokenHelper`](https://pnpm.io/npmrc#urltokenhelper) is also honored: rules_js runs the executable it
+            names and uses the token it prints on stdout. The helper path may be absolute or relative to this
+            `.npmrc` file, and may reference environment variables.
+
+            SECURITY: unlike pnpm, which only runs a `tokenHelper` from user-level config, rules_js runs one declared
+            in this `.npmrc` even when it is checked into the repository. A `tokenHelper` names an executable that
+            rules_js runs during repository setup, so only set it to a helper you trust.
+
             In a future release, pnpm settings such as public-hoist-patterns will be used.
         """),
         "package_visibility": attr.string_list_dict(doc = """

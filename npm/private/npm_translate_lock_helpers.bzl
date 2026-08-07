@@ -102,8 +102,45 @@ def _gather_values_from_matching_names(additive, keyed_lists, *names):
                 fail("expected value to be list or string")
     return (result, keys)
 
+def _is_absolute_path(path):
+    if path.startswith("/") or path.startswith("\\"):
+        return True
+
+    # Windows drive path, e.g. C:\ or C:/
+    return len(path) >= 3 and path[1] == ":" and (path[2] == "/" or path[2] == "\\")
+
+def _run_token_helper(helper, npmrc_path, rctx):
+    # tokenHelper values may reference env vars, same as any other credential value
+    helper = utils.replace_npmrc_token_envvar(helper, npmrc_path, rctx)
+
+    # A relative helper is resolved against the directory of the `.npmrc` that declared it,
+    # so a checked-in file can point at a script next to it.
+    if not _is_absolute_path(helper):
+        npmrc_dir = str(rctx.path(str(npmrc_path)).dirname)
+        helper = str(rctx.path(npmrc_dir + "/" + helper))
+
+    result = rctx.execute([helper])
+    if result.return_code != 0:
+        # Deliberately omit stdout: a helper writes its token there, so echoing it on
+        # failure would leak the credential into the terminal and CI logs.
+        fail("tokenHelper \"{helper}\" in \"{npmrc}\" exited with {code}:\nSTDERR:\n{stderr}".format(
+            helper = helper,
+            npmrc = npmrc_path,
+            code = result.return_code,
+            stderr = result.stderr,
+        ))
+
+    token = result.stdout.strip()
+    if not token:
+        fail("tokenHelper \"{helper}\" in \"{npmrc}\" produced no output".format(
+            helper = helper,
+            npmrc = npmrc_path,
+        ))
+
+    return token
+
 ################################################################################
-def _get_npm_auth(npmrc, npmrc_path, rctx):
+def _get_npm_auth(npmrc, npmrc_path, rctx, allow_token_helper = False):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
     - creates a token by registry dict: {registry: token}
@@ -151,6 +188,9 @@ def _get_npm_auth(npmrc, npmrc_path, rctx):
         npmrc: The `.npmrc` file.
         npmrc_path: The file path to `.npmrc`.
         rctx: the repository_ctx or module_ctx to fetch environment vars from
+        allow_token_helper: whether to run `tokenHelper` executables found in `npmrc`.
+            True for the live auth parse; False (default) skips execution, used by the
+            unused state.bzl parse so a helper is not run twice.
 
     Returns:
         A tuple (registries, auth).
@@ -162,9 +202,11 @@ def _get_npm_auth(npmrc, npmrc_path, rctx):
     _NPM_AUTH = "_auth"
     _NPM_USERNAME = "username"
     _NPM_PASSWORD = "_password"
+    _NPM_TOKEN_HELPER = "tokenHelper"
     _NPM_PKG_SCOPE_KEY = ":registry"
     registries = {}
     auth = {}
+    token_helpers = {}
 
     for (k, v) in npmrc.items():
         if k == _NPM_AUTH_TOKEN or k.endswith(":" + _NPM_AUTH_TOKEN):
@@ -227,6 +269,21 @@ def _get_npm_auth(npmrc, npmrc_path, rctx):
 
             auth[registry]["password"] = base64.decode(v)
 
+        if k == _NPM_TOKEN_HELPER or k.endswith(":" + _NPM_TOKEN_HELPER):
+            # //registry.corp.com/:tokenHelper=/abs/path
+            # registry: registry.corp.com
+            registry = k.removeprefix("//").removesuffix(_NPM_TOKEN_HELPER).removesuffix(":").removesuffix("/")
+            token_helpers[registry] = v
+
+    # Run token helpers last so a helper wins over a static token for the same registry.
+    # allow_token_helper guards against the (unused) state.bzl auth parse executing helpers.
+    if allow_token_helper:
+        for (registry, helper) in token_helpers.items():
+            token = _run_token_helper(helper, npmrc_path, rctx)
+            if registry not in auth:
+                auth[registry] = {}
+            auth[registry]["bearer"] = token
+
     return (registries, auth)
 
 ################################################################################
@@ -263,7 +320,6 @@ def _select_npm_auth(url, npm_auth):
             npm_auth_username = auth_info.get("username")
             npm_auth_password = auth_info.get("password")
             match_len = len(auth_registry)
-            break
 
     return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
 
@@ -700,6 +756,7 @@ helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
+    is_absolute_path = _is_absolute_path,
     link_package = _link_package,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
@@ -711,4 +768,5 @@ helpers = struct(
 helpers_testonly = struct(
     find_missing_bazel_ignores = _find_missing_bazel_ignores,
     gather_package_content_excludes = _gather_package_content_excludes,
+    select_npm_auth = _select_npm_auth,
 )
