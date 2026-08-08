@@ -113,11 +113,14 @@ def _run_token_helper(helper, npmrc_path, rctx):
     # tokenHelper values may reference env vars, same as any other credential value
     helper = utils.replace_npmrc_token_envvar(helper, npmrc_path, rctx)
 
+    # An empty value would otherwise resolve to the `.npmrc`'s own directory and be executed
+    if not helper:
+        fail("tokenHelper in \"{npmrc}\" is empty; it must name an executable".format(npmrc = npmrc_path))
+
     # A relative helper is resolved against the directory of the `.npmrc` that declared it,
     # so a checked-in file can point at a script next to it.
     if not _is_absolute_path(helper):
-        npmrc_dir = str(rctx.path(str(npmrc_path)).dirname)
-        helper = str(rctx.path(npmrc_dir + "/" + helper))
+        helper = str(rctx.path(str(npmrc_path)).dirname) + "/" + helper
 
     result = rctx.execute([helper])
     if result.return_code != 0:
@@ -140,7 +143,7 @@ def _run_token_helper(helper, npmrc_path, rctx):
     return token
 
 ################################################################################
-def _get_npm_auth(npmrc, npmrc_path, rctx, allow_token_helper = False):
+def _get_npm_auth(npmrc, npmrc_path, rctx):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
     - creates a token by registry dict: {registry: token}
@@ -184,13 +187,13 @@ def _get_npm_auth(npmrc, npmrc_path, rctx, allow_token_helper = False):
         }
         ```
 
+        A `tokenHelper` yields a `"token_helper"` entry instead of a `"bearer"` one; it is not run
+        here, but by `_select_npm_auth` the first time it picks auth for that registry.
+
     Args:
         npmrc: The `.npmrc` file.
         npmrc_path: The file path to `.npmrc`.
         rctx: the repository_ctx or module_ctx to fetch environment vars from
-        allow_token_helper: whether to run `tokenHelper` executables found in `npmrc`.
-            True for the live auth parse; False (default) skips execution, used by the
-            unused state.bzl parse so a helper is not run twice.
 
     Returns:
         A tuple (registries, auth).
@@ -275,19 +278,25 @@ def _get_npm_auth(npmrc, npmrc_path, rctx, allow_token_helper = False):
             registry = k.removeprefix("//").removesuffix(_NPM_TOKEN_HELPER).removesuffix(":").removesuffix("/")
             token_helpers[registry] = v
 
-    # Run token helpers last so a helper wins over a static token for the same registry.
-    # allow_token_helper guards against the (unused) state.bzl auth parse executing helpers.
-    if allow_token_helper:
-        for (registry, helper) in token_helpers.items():
-            token = _run_token_helper(helper, npmrc_path, rctx)
-            if registry not in auth:
-                auth[registry] = {}
-            auth[registry]["bearer"] = token
+    # Record helpers rather than running them. _select_npm_auth runs one when it picks auth for a
+    # package URL, so a helper for a registry nothing in the lockfile resolves to never runs.
+    for (registry, helper) in token_helpers.items():
+        if registry not in auth:
+            auth[registry] = {}
+
+        # A helper wins over a static token, and must not shadow its own memoized result
+        auth[registry].pop("bearer", None)
+        auth[registry]["token_helper"] = struct(command = helper, npmrc_path = npmrc_path)
 
     return (registries, auth)
 
+def _registry_matches(registry, auth_registry):
+    # A plain prefix test would send credentials to a lookalike host, since
+    # "registry.corp.company.com" starts with "registry.corp.com". Require a path boundary.
+    return registry == auth_registry or registry.startswith(auth_registry + "/")
+
 ################################################################################
-def _select_npm_auth(url, npm_auth):
+def _select_npm_auth(url, npm_auth, rctx = None):
     registry = url.split("//", 1)[-1]
 
     # Get rid of the port number
@@ -302,26 +311,32 @@ def _select_npm_auth(url, npm_auth):
         else:
             registry_no_port = base
 
-    npm_auth_bearer = None
-    npm_auth_basic = None
-    npm_auth_username = None
-    npm_auth_password = None
+    matched = None
     match_len = 0
     for auth_registry, auth_info in npm_auth.items():
-        if auth_registry == "" and match_len == 0:
+        if auth_registry == "":
             # global auth applied to all registries; will be overridden by a registry scoped auth
-            npm_auth_bearer = auth_info.get("bearer")
-            npm_auth_basic = auth_info.get("basic")
-            npm_auth_username = auth_info.get("username")
-            npm_auth_password = auth_info.get("password")
-        if (registry.startswith(auth_registry) or registry_no_port.startswith(auth_registry)) and len(auth_registry) > match_len:
-            npm_auth_bearer = auth_info.get("bearer")
-            npm_auth_basic = auth_info.get("basic")
-            npm_auth_username = auth_info.get("username")
-            npm_auth_password = auth_info.get("password")
+            if matched == None:
+                matched = auth_info
+        elif len(auth_registry) > match_len and (_registry_matches(registry, auth_registry) or _registry_matches(registry_no_port, auth_registry)):
+            # keep the longest match, not the first one the dict happens to yield
+            matched = auth_info
             match_len = len(auth_registry)
 
-    return npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password
+    if matched == None:
+        return None, None, None, None
+
+    # Memoized into the auth entry so a helper runs once per registry, not once per package
+    helper = matched.get("token_helper")
+    if helper and "bearer" not in matched:
+        matched["bearer"] = _run_token_helper(helper.command, helper.npmrc_path, rctx)
+
+    return (
+        matched.get("bearer"),
+        matched.get("basic"),
+        matched.get("username"),
+        matched.get("password"),
+    )
 
 ################################################################################
 def _lifecycle_attrs(attr):
@@ -359,7 +374,7 @@ def _lifecycle_attrs(attr):
     return all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env
 
 ################################################################################
-def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclude_package_contents_config):
+def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclude_package_contents_config, rctx = None):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
     importers = state.importers()
@@ -537,7 +552,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
         else:
             url = utils.npm_registry_download_url(name, friendly_version, registries, default_registry)
 
-        npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth)
+        npm_auth_bearer, npm_auth_basic, npm_auth_username, npm_auth_password = _select_npm_auth(url, npm_auth, rctx)
 
         deps_oss, deps_cpus = _collect_dep_constraints(packages, package_info)
 
@@ -756,7 +771,6 @@ helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
-    is_absolute_path = _is_absolute_path,
     link_package = _link_package,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
@@ -768,5 +782,6 @@ helpers = struct(
 helpers_testonly = struct(
     find_missing_bazel_ignores = _find_missing_bazel_ignores,
     gather_package_content_excludes = _gather_package_content_excludes,
+    is_absolute_path = _is_absolute_path,
     select_npm_auth = _select_npm_auth,
 )
