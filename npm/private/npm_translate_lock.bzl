@@ -197,7 +197,8 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 
             A [`tokenHelper`](https://pnpm.io/npmrc#urltokenhelper) is also honored: rules_js runs the executable it
             names and uses the token it prints on stdout. The helper path may be absolute or relative to this
-            `.npmrc` file, and may reference environment variables.
+            `.npmrc` file, and may reference environment variables. A helper runs during repository setup,
+            only for a registry a package in the lockfile resolves to, and at most once per registry.
 
             SECURITY: unlike pnpm, which only runs a `tokenHelper` from user-level config, rules_js runs one declared
             in this `.npmrc` even when it is checked into the repository. A `tokenHelper` names an executable that
