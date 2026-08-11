@@ -155,7 +155,11 @@ function _mtree_file_line(key, content) {
     const dest = vis(key)
     // Due to filesystems setting different bits depending on the os we have to opt-in
     // to use a stable mode for files.
-    return `${dest} uid={{UID}} gid={{GID}} time=0 mode={{FILE_MODE}} type=file content=${vis(
+    // nlink=1: Windows/NTFS stat() reports st_ino=0 for every file, so bsdtar's
+    // hardlink dedup (keyed on dev,ino) would false-link unrelated store files into
+    // shared content and corrupt the layer. Declaring nlink=1 keeps every regular
+    // file unshared so bsdtar skips its hardlink resolver.
+    return `${dest} uid={{UID}} gid={{GID}} time=0 mode={{FILE_MODE}} nlink=1 type=file content=${vis(
         content
     )}`
 }

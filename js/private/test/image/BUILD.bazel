@@ -1,9 +1,18 @@
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_binary")
+load("//js:defs.bzl", "js_binary", "js_test")
 load(":asserts.bzl", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
 
 npm_link_all_packages()
+
+# Regression test for the js_image_layer tar guard (js/private/js_image_layer_tar.mjs):
+# asserts its self-reference-drop and hardlink-member detection so a future edit
+# can't silently reopen the bsdtar st_ino==0 corruption on Windows/NTFS.
+js_test(
+    name = "tar_guard_test",
+    data = ["//js/private:js_image_layer_tar_lib.mjs"],
+    entry_point = "js_image_layer_tar_guard_test.mjs",
+)
 
 js_binary(
     name = "bin",

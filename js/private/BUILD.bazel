@@ -12,6 +12,8 @@ exports_files([
     "npm_wrapper.bat",
     "npm_wrapper.sh",
     "js_image_layer.mjs",
+    "js_image_layer_tar.mjs",
+    "js_image_layer_tar_lib.mjs",
 ])
 
 bzl_library(

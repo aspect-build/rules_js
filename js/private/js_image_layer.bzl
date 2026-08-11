@@ -474,6 +474,16 @@ def _js_image_layer_impl(ctx):
 
     tarinfo = ctx.toolchains[tar_lib.toolchain_type].tarinfo
 
+    # Route the tar-create through a small Node guard (js_image_layer_tar.mjs) that
+    # turns bsdtar's SILENT st_ino==0 corruption on Windows/NTFS into a hard build
+    # failure: it fails the action if tar prints "Can't add archive to itself" (a
+    # silently dropped file) or if the produced archive contains any hardlink member.
+    # Node is already a toolchain of this rule (see _run_splitter), so this stays
+    # hermetic and cross-platform. See js_image_layer_tar.mjs for the full rationale.
+    node_exec = ctx.toolchains["@rules_nodejs//nodejs:toolchain_type"].nodeinfo.node
+    tar_guard = ctx.file._tar_guard
+    tar_guard_lib = ctx.file._tar_guard_lib  # imported by tar_guard at runtime; must be an action input
+
     outputs = []
     output_groups = dict()
     compress = "" if ctx.attr.compression == "none" else ctx.attr.compression
@@ -485,6 +495,14 @@ def _js_image_layer_impl(ctx):
         outputs.append(output)
         output_groups[typ] = depset([output])
 
+        # Guard wrapper argv: `<guard.mjs> --tar <tar-bin> --output <archive> --`
+        guard_args = ctx.actions.args()
+        guard_args.add(tar_guard.path)
+        guard_args.add("--tar", tarinfo.binary)
+        guard_args.add("--output", output)
+        guard_args.add("--")
+
+        # tar-create argv, forwarded verbatim after the `--` separator.
         args = ctx.actions.args()
         args.add("--create")
         args.add("--file")
@@ -494,17 +512,18 @@ def _js_image_layer_impl(ctx):
 
         ctx.actions.run(
             inputs = depset(
-                ([repo_mapping] if repo_mapping else []) + [entries_json, launcher, mtree, unused_inputs],
+                ([repo_mapping] if repo_mapping else []) + [entries_json, launcher, mtree, unused_inputs, tar_guard, tar_guard_lib],
                 transitive = [runfiles_plus_files],
             ),
-            arguments = [args],
-            executable = tarinfo.binary,
+            arguments = [guard_args, args],
+            executable = node_exec,
+            tools = [tarinfo.binary],
             unused_inputs_list = unused_inputs,
             env = tarinfo.default_env,
             outputs = [output],
             mnemonic = "JsImageLayer",
             progress_message = "JsImageLayer " + typ + " %{label}",
-            toolchain = tar_lib.toolchain_type,
+            toolchain = "@rules_nodejs//nodejs:toolchain_type",
         )
 
     return [
@@ -535,6 +554,14 @@ js_image_layer_lib = struct(
         ),
         "_splitter": attr.label(
             default = "//js/private:js_image_layer.mjs",
+            allow_single_file = True,
+        ),
+        "_tar_guard": attr.label(
+            default = "//js/private:js_image_layer_tar.mjs",
+            allow_single_file = True,
+        ),
+        "_tar_guard_lib": attr.label(
+            default = "//js/private:js_image_layer_tar_lib.mjs",
             allow_single_file = True,
         ),
         "binary": attr.label(
