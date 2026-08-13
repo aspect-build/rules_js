@@ -392,8 +392,8 @@ if [ -z "${NODE_COMPILE_CACHE:-}" ] && [ -z "${NODE_DISABLE_COMPILE_CACHE:-}" ];
 fi
 
 # Put the node wrapper directory and optionally the npm directory on the path
-# so that child processes find them. The npm directory goes first so that npm
-# will find our patched node.
+# so that child processes can find them. Our patched node must go at the very
+# beginning so that it takes precedence.
 if [ "${npm_bin_dir:-}" ]; then
     PATH="$npm_bin_dir:$PATH"
 fi
