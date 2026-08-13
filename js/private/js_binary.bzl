@@ -223,8 +223,8 @@ _ATTRS = {
     "include_npm": attr.bool(
         doc = """When True, npm is included in the runfiles of the target.
 
-        The npm binary from the Node.js toolchain is also added on the PATH so tools can spawn
-        npm processes.
+        An npm wrapper is also added on the PATH so tools can spawn npm processes. It execs the
+        npm binary from the Node.js toolchain.
 
         A minimum of rules_nodejs version 5.7.0 is required which contains the Node.js toolchain changes
         to use npm.
@@ -244,15 +244,24 @@ _ATTRS = {
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
     ),
-    # Kept in separate directories: the launcher puts the wrapper's directory on the PATH, and
-    # under JS_BINARY__NO_RUNFILES that is the source directory in the execroot, where a shared
-    # directory would make both `node` and `node.bat` resolvable as `node`.
+    # Each wrapper gets its own directory: the launcher puts the wrapper's directory on the PATH,
+    # and under JS_BINARY__NO_RUNFILES that is the source directory in the execroot, so anything
+    # sharing the directory is on the PATH too. A shared directory would make both `node` and
+    # `node.bat` resolvable as `node`, and would expose `npm` even without include_npm.
     "_node_wrapper_sh": attr.label(
         default = Label("//js/private:node_bin/node"),
         allow_single_file = True,
     ),
     "_node_wrapper_bat": attr.label(
         default = Label("//js/private:node_bin_windows/node.bat"),
+        allow_single_file = True,
+    ),
+    "_npm_wrapper_sh": attr.label(
+        default = Label("//js/private:npm_bin/npm"),
+        allow_single_file = True,
+    ),
+    "_npm_wrapper_bat": attr.label(
+        default = Label("//js/private:npm_bin_windows/npm.bat"),
         allow_single_file = True,
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
@@ -381,8 +390,12 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     toolchain_files = [node_wrapper]
 
     npm_path = ""
+    npm_wrapper_path = ""
     if ctx.attr.include_npm:
         npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
+        npm_wrapper = ctx.file._npm_wrapper_bat if is_windows else ctx.file._npm_wrapper_sh
+        npm_wrapper_path = npm_wrapper.short_path
+        toolchain_files.append(npm_wrapper)
 
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
@@ -407,6 +420,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{node_wrapper}}": node_wrapper.short_path,
         "{{node}}": node_path,
         "{{npm}}": npm_path,
+        "{{npm_wrapper}}": npm_wrapper_path,
         "{{workspace_name}}": ctx.workspace_name,
     }
 

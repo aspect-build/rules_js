@@ -8,6 +8,8 @@ exports_files([
     "js_binary.sh.tpl",
     "node_bin/node",
     "node_bin_windows/node.bat",
+    "npm_bin/npm",
+    "npm_bin_windows/npm.bat",
     "js_image_layer.mjs",
 ])
 
