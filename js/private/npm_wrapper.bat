@@ -1,3 +1,0 @@
-@if not defined DEBUG_HELPER @ECHO OFF
-
-%JS_BINARY__NPM_BINARY% %*

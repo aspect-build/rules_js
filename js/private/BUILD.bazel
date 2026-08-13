@@ -6,10 +6,8 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files([
     "js_binary.sh.tpl",
-    "node_wrapper.bat",
-    "node_wrapper.sh",
-    "npm_wrapper.bat",
-    "npm_wrapper.sh",
+    "node_bin/node",
+    "node_bin/node.bat",
     "js_image_layer.mjs",
 ])
 

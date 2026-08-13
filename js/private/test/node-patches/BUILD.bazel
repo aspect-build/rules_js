@@ -157,3 +157,25 @@ babel_bin.babel(
         TOOLCHAINS_VERSIONS,
     )
 ]
+
+# The same spawn assertions, but with include_npm, which also puts the Node.js toolchain's bin
+# directory on the PATH. That directory holds the toolchain's own node launcher, which does not
+# apply the fs patches, so this guards that the js_binary node wrapper still wins for `node`.
+js_test(
+    name = "spawn_test_include_npm",
+    args = [
+        "$(rootpath //js/private/test/node-patches:spawn_node_path.js)",
+        "$(rootpath //js/private/test/node-patches:spawn_node_path.sh)",
+        "$(rootpath //js/private/test/node-patches:spawn_patch_depth.js)",
+        "$(rootpath //js/private/test/node-patches:spawn_patch_depth.sh)",
+    ],
+    data = [
+        "//js/private/test/node-patches:spawn_node_path.js",
+        "//js/private/test/node-patches:spawn_node_path.sh",
+        "//js/private/test/node-patches:spawn_patch_depth.js",
+        "//js/private/test/node-patches:spawn_patch_depth.sh",
+    ],
+    entry_point = "spawn.js",
+    include_npm = True,
+    patch_node_fs = True,
+)
