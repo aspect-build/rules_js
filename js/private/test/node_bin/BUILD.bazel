@@ -1,9 +1,7 @@
 load("//js:defs.bzl", "js_test")
 
-# Guards that the directory the launcher puts on the PATH holds exactly one PATH-resolvable
-# `node`. Passes wherever the wrapper comes from runfiles (only the selected wrapper is a
-# runfile); fails in the JS_BINARY__NO_RUNFILES configuration, where the PATH directory is the
-# source directory in the execroot and holds both `node` and `node.bat`.
+# Verifies that the directory the launcher puts on the PATH holds exactly one
+# PATH-resolvable node binary.
 js_test(
     name = "node_bin_path_test",
     entry_point = "node_bin_path_test.js",
