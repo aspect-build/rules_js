@@ -271,20 +271,34 @@ jobs:
     # unless the branch name contains 'macos' or 'windows'.
     # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
     smoke:
-        name: smoke (${{ matrix.workspace.path }}, ${{ matrix.os }})
+        name: smoke (${{ matrix.workspace.slug }}, ${{ matrix.os }})
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
             matrix:
                 os: [macos-latest, windows-latest]
                 workspace:
-                    - { path: ., slug: root }
-                    - { path: e2e/bzlmod, slug: bzlmod }
+                    - { path: ., slug: root, flags: "", targets: "//..." }
+                    - { path: e2e/bzlmod, slug: bzlmod, flags: "", targets: "//..." }
                 exclude:
                     # The root workspace only builds cleanly on macOS for now; Windows has broad
-                    # pre-existing failures. e2e/bzlmod still smoke-tests on both OSes.
+                    # pre-existing failures. e2e/bzlmod still smoke-tests on both OSes, and the
+                    # include below runs the launcher PATH tests from the root workspace.
                     - os: windows-latest
-                      workspace: { path: ., slug: root }
+                      workspace: { path: ., slug: root, flags: "", targets: "//..." }
+                include:
+                    # The only coverage of the JS_BINARY__NO_RUNFILES branch, where the launcher
+                    # resolves the wrappers from the source directory in the execroot rather than
+                    # from runfiles. --noenable_runfiles is the Windows default, but pass it
+                    # explicitly so the configuration under test cannot drift.
+                    - os: windows-latest
+                      workspace:
+                          {
+                              path: .,
+                              slug: root-node-bin,
+                              flags: "--noenable_runfiles",
+                              targets: "//js/private/test/node_bin:all",
+                          }
         env:
             ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
         steps:
@@ -296,43 +310,14 @@ jobs:
                   disk-cache: ${{ matrix.os }}-${{ matrix.workspace.slug }}
                   repository-cache: true
 
-            - name: bazel test //...
+            - name: bazel test ${{ matrix.workspace.targets }}
               shell: bash
               working-directory: ${{ matrix.workspace.path }}
               run: |
                   bazel test \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
-                    //...
-
-    # TEMPORARY: reproduce the Windows JS_BINARY__NO_RUNFILES node wrapper PATH ambiguity.
-    # The root workspace is excluded from the `smoke` matrix on Windows because of broad
-    # pre-existing failures, so this runs the single target instead of //... . Delete this job
-    # along with the temporary `smoke` gate removal before merging.
-    windows_node_bin_repro:
-        name: windows node_bin PATH repro
-        runs-on: windows-latest
-        env:
-            ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
-        steps:
-            - uses: actions/checkout@v6
-
-            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
-              with:
-                  bazelisk-cache: true
-                  disk-cache: windows-node-bin-repro
-                  repository-cache: true
-
-            # --noenable_runfiles forces the JS_BINARY__NO_RUNFILES branch, where the launcher
-            # resolves the wrapper from the source directory in the execroot. Now that the two
-            # wrappers live in separate directories, only one is PATH-resolvable as `node`.
-            - name: node_bin PATH test (no runfiles)
-              shell: bash
-              run: |
-                  bazel test \
-                    --noenable_runfiles \
-                    --test_output=all \
-                    //js/private/test/node_bin:node_bin_path_test
+                    ${{ matrix.workspace.flags }} ${{ matrix.workspace.targets }}
 
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
