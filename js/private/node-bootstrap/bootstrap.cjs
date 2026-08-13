@@ -48,9 +48,8 @@ if (JS_BINARY__NODE_WRAPPER) {
     }
 }
 
-// Default the fs patch roots, keeping a value set by an outer js_binary in case a
-// js_binary such as js_run_devserver runs another js_binary tool, and exporting it so
-// that nested launchers inherit it.
+// Configure the fs patch roots, and export the environment variable so that
+// they are visible to any other js_binary that this process might invoke.
 if (!JS_BINARY__FS_PATCH_ROOTS && JS_BINARY__EXECROOT && JS_BINARY__RUNFILES) {
     process.env.JS_BINARY__FS_PATCH_ROOTS =
         `${JS_BINARY__EXECROOT}:${JS_BINARY__RUNFILES}`
