@@ -244,12 +244,15 @@ _ATTRS = {
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
     ),
+    # Kept in separate directories: the launcher puts the wrapper's directory on the PATH, and
+    # under JS_BINARY__NO_RUNFILES that is the source directory in the execroot, where a shared
+    # directory would make both `node` and `node.bat` resolvable as `node`.
     "_node_wrapper_sh": attr.label(
         default = Label("//js/private:node_bin/node"),
         allow_single_file = True,
     ),
     "_node_wrapper_bat": attr.label(
-        default = Label("//js/private:node_bin/node.bat"),
+        default = Label("//js/private:node_bin_windows/node.bat"),
         allow_single_file = True,
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),

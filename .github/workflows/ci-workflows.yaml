@@ -324,25 +324,13 @@ jobs:
                   repository-cache: true
 
             # --noenable_runfiles forces the JS_BINARY__NO_RUNFILES branch, where the launcher
-            # resolves the wrapper from the source directory in the execroot. That directory holds
-            # both `node` and `node.bat`, so PATH lookup for `node` is ambiguous. Expected to FAIL
-            # until the two wrappers are split into separate directories.
+            # resolves the wrapper from the source directory in the execroot. Now that the two
+            # wrappers live in separate directories, only one is PATH-resolvable as `node`.
             - name: node_bin PATH test (no runfiles)
               shell: bash
               run: |
                   bazel test \
                     --noenable_runfiles \
-                    --test_output=all \
-                    //js/private/test/node_bin:node_bin_path_test
-
-            # The same test with runfiles enabled, where only the selected wrapper is a runfile.
-            # This one is expected to PASS, which isolates the failure above to the no-runfiles path.
-            - name: node_bin PATH test (runfiles)
-              if: always()
-              shell: bash
-              run: |
-                  bazel test \
-                    --enable_runfiles \
                     --test_output=all \
                     //js/private/test/node_bin:node_bin_path_test
 
