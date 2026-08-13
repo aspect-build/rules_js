@@ -319,11 +319,6 @@ if [ "$npm" ]; then
         logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
-    # The Node.js toolchain lays npm out next to the Node.js installation it belongs to, and the
-    # npm launcher locates that installation relative to its own path. Putting this directory on
-    # the PATH below therefore gives child processes a working `npm` without a wrapper script.
-    # NB: deliberately a local, not an exported variable: a nested js_binary with include_npm
-    # False must not pick up its parent's npm.
     npm_bin_dir="$(dirname "$JS_BINARY__NPM_BINARY")"
 fi
 
@@ -396,9 +391,9 @@ if [ -z "${NODE_COMPILE_CACHE:-}" ] && [ -z "${NODE_DISABLE_COMPILE_CACHE:-}" ];
     export NODE_DISABLE_COMPILE_CACHE=1
 fi
 
-# Put the node wrapper directory on the path so that child processes find it first. The npm
-# directory goes on first so that the node wrapper still wins for `node`: that directory also
-# holds the Node.js toolchain's own node launcher, which does not apply the fs patches.
+# Put the node wrapper directory and optionally the npm directory on the path
+# so that child processes find them. The npm directory goes first so that npm
+# will find our patched node.
 if [ "${npm_bin_dir:-}" ]; then
     PATH="$npm_bin_dir:$PATH"
 fi

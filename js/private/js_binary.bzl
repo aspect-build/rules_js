@@ -244,9 +244,6 @@ _ATTRS = {
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
     ),
-    # NB: these are consumed as source files rather than expanded per-target so that a
-    # build with many js_binary targets does not repeat an identical action for each one.
-    # They must be named exactly `node` / `node.bat` since their directory goes on the PATH.
     "_node_wrapper_sh": attr.label(
         default = Label("//js/private:node_bin/node"),
         allow_single_file = True,
