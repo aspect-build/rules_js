@@ -481,6 +481,15 @@ if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
     exit 1
 fi
 
+# Change directory to user specified package if set
+if [ "${JS_BINARY__CHDIR:-}" ]; then
+    logf_debug "changing directory to user specified package %s" "$JS_BINARY__CHDIR"
+    case "$JS_BINARY__CHDIR" in
+    external/*) cd "$(resolve_execroot_bin_path "$JS_BINARY__CHDIR")" ;;
+    *) cd "$JS_BINARY__CHDIR" ;;
+    esac
+fi
+
 # Gather node options
 JS_BINARY__NODE_OPTIONS=()
 JS_BINARY__NODE_OPTIONS+=("--preserve-symlinks-main")

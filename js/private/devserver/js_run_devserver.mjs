@@ -261,7 +261,6 @@ class AspectWatchProtocol {
 
 // Environment constants
 const {
-    BAZEL_BINDIR,
     JS_BINARY__EXECROOT,
     JS_BINARY__BINDIR,
     JS_BINARY__WORKSPACE,
@@ -270,34 +269,6 @@ const {
 } = process.env;
 
 const RUNFILES_ROOT = path.join(JS_BINARY__RUNFILES, JS_BINARY__WORKSPACE);
-
-// node-bootstrap.cjs applies JS_BINARY__CHDIR (if this target has a chdir configured) before this
-// entry_point runs, then clears it, since it's a one-time launcher concern and would otherwise be
-// wrongly re-applied by anything that forks a child process inheriting it (see node-bootstrap.cjs
-// for details). We still need that value here to apply the same chdir inside our own sandbox
-// below, so infer it by comparing our own (already chdir'd) cwd against the roots node-bootstrap
-// would have resolved it relative to: RUNFILES_ROOT (when running from within a test, sandboxed
-// or not) or BAZEL_BINDIR under the execroot (a plain `bazel run`).
-function inferJsBinaryChdir() {
-    const cwd = process.cwd();
-    const bindir = BAZEL_BINDIR || JS_BINARY__BINDIR;
-    // RUNFILES_ROOT must be checked first: a target's runfiles directory lives under its own
-    // BAZEL_BINDIR location (".../bin/PACKAGE/target.runfiles"), so in runfiles mode BAZEL_BINDIR
-    // is *also* a valid but overly shallow ancestor of cwd, giving a longer, wrong result.
-    const roots = [
-        RUNFILES_ROOT,
-        path.join(JS_BINARY__EXECROOT, bindir),
-    ];
-    for (const root of roots) {
-        const rel = path.relative(root, cwd);
-        if (rel && !rel.startsWith('..') && !path.isAbsolute(rel)) {
-            return rel
-        }
-    }
-    return undefined
-}
-
-const JS_BINARY__CHDIR = inferJsBinaryChdir();
 
 // Globals
 const syncedTime = new Map();
@@ -724,8 +695,8 @@ async function main(args, sandbox) {
 
     const config = JSON.parse(await fs.promises.readFile(configPath));
 
-    const cwd = JS_BINARY__CHDIR
-        ? path.join(sandbox, JS_BINARY__CHDIR)
+    const cwd = process.env.JS_BINARY__CHDIR
+        ? path.join(sandbox, process.env.JS_BINARY__CHDIR)
         : sandbox;
 
     const tool = config.tool
@@ -1032,7 +1003,7 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
         const sandboxMain = path.join(sandbox, JS_BINARY__WORKSPACE);
 
         // Intentionally synchronous; see comment on mkdirpSync
-        mkdirpSync(path.join(sandboxMain, JS_BINARY__CHDIR || ''));
+        mkdirpSync(path.join(sandboxMain, process.env.JS_BINARY__CHDIR || ''));
         await main(process.argv.slice(2), sandboxMain);
     } catch (e) {
         console.error(e);
