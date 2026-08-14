@@ -223,8 +223,8 @@ _ATTRS = {
     "include_npm": attr.bool(
         doc = """When True, npm is included in the runfiles of the target.
 
-        An npm wrapper is also added on the PATH so tools can spawn npm processes. It execs the
-        npm binary from the Node.js toolchain.
+        An npm binary is also added on the PATH so tools can spawn npm processes. This is a bash script
+        on Linux and MacOS and a batch script on Windows.
 
         A minimum of rules_nodejs version 5.7.0 is required which contains the Node.js toolchain changes
         to use npm.
@@ -244,10 +244,9 @@ _ATTRS = {
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
     ),
-    # Each wrapper gets its own directory: the launcher puts the wrapper's directory on the PATH,
-    # and under JS_BINARY__NO_RUNFILES that is the source directory in the execroot, so anything
-    # sharing the directory is on the PATH too. A shared directory would make both `node` and
-    # `node.bat` resolvable as `node`, and would expose `npm` even without include_npm.
+    # Windows gets its own separate directory for node and npm wrappers. This
+    # ensures that the bash scripts do not end up on the PATH when we build for
+    # Windows.
     "_node_wrapper_sh": attr.label(
         default = Label("//js/private:node_bin/node"),
         allow_single_file = True,
