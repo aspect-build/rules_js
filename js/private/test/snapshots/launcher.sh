@@ -439,13 +439,27 @@ if [ "$npm" ]; then
         logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
+    if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+        npm_wrapper=$(resolve_execroot_src_path "")
+    else
+        npm_wrapper="$JS_BINARY__RUNFILES/_main/"
+    fi
+    if [ ! -f "$npm_wrapper" ]; then
+        logf_fatal "npm wrapper '%s' not found" "$npm_wrapper"
+        exit 1
+    fi
+    if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$npm_wrapper" ]; then
+        logf_fatal "npm wrapper '%s' is not executable" "$npm_wrapper"
+        exit 1
+    fi
+    npm_bin_dir="$(dirname "$npm_wrapper")"
 fi
 
 if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_WRAPPER
-    JS_BINARY__NODE_WRAPPER=$(resolve_execroot_bin_path "js/private/test/shellcheck_launcher_node_bin/node")
+    JS_BINARY__NODE_WRAPPER=$(resolve_execroot_src_path "js/private/node_bin/node")
 else
-    export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/_main/js/private/test/shellcheck_launcher_node_bin/node"
+    export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/_main/js/private/node_bin/node"
 fi
 if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
     logf_fatal "node wrapper '%s' not found" "$JS_BINARY__NODE_WRAPPER"
@@ -510,7 +524,11 @@ if [ -z "${NODE_COMPILE_CACHE:-}" ] && [ -z "${NODE_DISABLE_COMPILE_CACHE:-}" ];
     export NODE_DISABLE_COMPILE_CACHE=1
 fi
 
-# Put the node wrapper directory on the path so that child processes find it first
+# Put the node wrapper directory and optionally the npm wrapper directory on the path so that
+# child processes can find them.
+if [ "${npm_bin_dir:-}" ]; then
+    PATH="$npm_bin_dir:$PATH"
+fi
 PATH="$(dirname "$JS_BINARY__NODE_WRAPPER"):$PATH"
 export PATH
 
