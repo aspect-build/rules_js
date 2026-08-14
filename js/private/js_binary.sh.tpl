@@ -15,8 +15,46 @@ set -o pipefail -o errexit -o nounset
 {{envs}}
 
 # ==============================================================================
+# Handle --bazel-bindir flag
+# ==============================================================================
+
+# If a --bazel-bindir <path> flag is passed it must be the first two
+# arguments. It is consumed by this launcher script and used to set
+# BAZEL_BINDIR, overriding any value already set in the environment.
+if [ $# -gt 0 ] && [ "$1" = "--bazel-bindir" ]; then
+    if [ $# -lt 2 ]; then
+        echo "ERROR: --bazel-bindir flag requires a value" >&2
+        exit 1
+    fi
+    BAZEL_BINDIR="$2"
+    export BAZEL_BINDIR
+    shift 2
+fi
+
+# ==============================================================================
 # Prepare stdout capture, stderr capture && logging
 # ==============================================================================
+
+# Convert stdout, stderr and exit_code capture outputs paths to absolute paths.
+# A path not starting with "bazel-out/" is relative to the bin directory; joining
+# it with BAZEL_BINDIR here (rather than baking in bazel-out/<config>/bin at
+# analysis time) keeps it correct when path mapping is active.
+function resolve_capture_path {
+    case "$1" in
+    bazel-out/*) echo "$PWD/$1" ;;
+    *) echo "$PWD/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$1" ;;
+    esac
+}
+
+if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__STDOUT_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDOUT_OUTPUT_FILE")"
+fi
+if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__STDERR_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDERR_OUTPUT_FILE")"
+fi
+if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__EXIT_CODE_OUTPUT_FILE")"
+fi
 
 if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
     STDOUT_CAPTURE=$(mktemp)
@@ -133,23 +171,6 @@ _exit() {
 trap _exit EXIT
 
 # ==============================================================================
-# Handle --bazel-bindir flag
-# ==============================================================================
-
-# If a --bazel-bindir <path> flag is passed it must be the first two
-# arguments. It is consumed by this launcher script and used to set
-# BAZEL_BINDIR, overriding any value already set in the environment.
-if [ $# -gt 0 ] && [ "$1" = "--bazel-bindir" ]; then
-    if [ $# -lt 2 ]; then
-        echo "ERROR: --bazel-bindir flag requires a value" >&2
-        exit 1
-    fi
-    BAZEL_BINDIR="$2"
-    export BAZEL_BINDIR
-    shift 2
-fi
-
-# ==============================================================================
 # Initialize RUNFILES environment variable
 # ==============================================================================
 {{initialize_runfiles}}
@@ -159,27 +180,6 @@ export JS_BINARY__RUNFILES
 # ==============================================================================
 # Prepare to run main program
 # ==============================================================================
-
-# Convert stdout, stderr and exit_code capture outputs paths to absolute paths.
-# A path not starting with "bazel-out/" is relative to the bin directory; joining
-# it with BAZEL_BINDIR here (rather than baking in bazel-out/<config>/bin at
-# analysis time) keeps it correct when path mapping is active.
-function resolve_capture_path {
-    case "$1" in
-    bazel-out/*) echo "$PWD/$1" ;;
-    *) echo "$PWD/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$1" ;;
-    esac
-}
-
-if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDOUT_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDOUT_OUTPUT_FILE")"
-fi
-if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDERR_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDERR_OUTPUT_FILE")"
-fi
-if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__EXIT_CODE_OUTPUT_FILE")"
-fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     bazel_out_segment="/bazel-out/"
