@@ -319,8 +319,6 @@ if [ "$npm" ]; then
         logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
         exit 1
     fi
-    # The npm wrapper's directory goes on the PATH below. It holds nothing but the wrapper, so
-    # `npm` is only on the PATH when include_npm is set, and nothing else comes along with it.
     if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
         npm_wrapper=$(resolve_execroot_src_path "{{npm_wrapper}}")
     else
@@ -407,8 +405,7 @@ if [ -z "${NODE_COMPILE_CACHE:-}" ] && [ -z "${NODE_DISABLE_COMPILE_CACHE:-}" ];
 fi
 
 # Put the node wrapper directory and optionally the npm wrapper directory on the path so that
-# child processes can find them. Each directory holds only its own wrapper, so the two cannot
-# shadow each other and both take precedence over anything already on the path.
+# child processes can find them.
 if [ "${npm_bin_dir:-}" ]; then
     PATH="$npm_bin_dir:$PATH"
 fi
