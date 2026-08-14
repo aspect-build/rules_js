@@ -26,26 +26,87 @@ if [[ -z "${JS_BINARY__LOG_FATAL:-}" ]]; then export JS_BINARY__LOG_FATAL="1"; f
 if [[ -z "${JS_BINARY__LOG_ERROR:-}" ]]; then export JS_BINARY__LOG_ERROR="1"; fi
 
 # ==============================================================================
+# Handle --bazel-bindir flag
+# ==============================================================================
+
+# If a --bazel-bindir <path> flag is passed it must be the first two
+# arguments. It is consumed by this launcher script and used to set
+# BAZEL_BINDIR, overriding any value already set in the environment.
+if [ $# -gt 0 ] && [ "$1" = "--bazel-bindir" ]; then
+    if [ $# -lt 2 ]; then
+        echo "ERROR: --bazel-bindir flag requires a value" >&2
+        exit 1
+    fi
+    BAZEL_BINDIR="$2"
+    export BAZEL_BINDIR
+    shift 2
+fi
+
+# ==============================================================================
 # Prepare stdout capture, stderr capture && logging
 # ==============================================================================
 
-if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-    STDOUT_CAPTURE=$(mktemp)
+# Convert stdout, stderr and exit_code capture outputs paths to absolute paths.
+# A path not starting with "bazel-out/" is relative to the bin directory; joining
+# it with BAZEL_BINDIR here (rather than baking in bazel-out/<config>/bin at
+# analysis time) keeps it correct when path mapping is active. This must happen
+# before any directory changes below since it resolves against $PWD.
+function resolve_capture_path {
+    case "$1" in
+    bazel-out/*) echo "$PWD/$1" ;;
+    *) echo "$PWD/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$1" ;;
+    esac
+}
+
+if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__STDOUT_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDOUT_OUTPUT_FILE")"
+fi
+if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__STDERR_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDERR_OUTPUT_FILE")"
+fi
+if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
+    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__EXIT_CODE_OUTPUT_FILE")"
 fi
 
-if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ] || [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-    STDERR_CAPTURE=$(mktemp)
+# A stream with a declared output file is written straight to that file so that
+# nothing has to run after node exits and this shell can exec node.
+#
+# A stream that is only subject to silent_on_success has no final destination, so
+# it is buffered in a temp file and replayed on failure.
+if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
+    STDOUT_CAPTURE="$JS_BINARY__STDOUT_OUTPUT_FILE"
+elif [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
+    STDOUT_CAPTURE=$(mktemp)
+    STDOUT_CAPTURE_IS_TEMP=1
 fi
+
+if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
+    STDERR_CAPTURE="$JS_BINARY__STDERR_OUTPUT_FILE"
+elif [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
+    STDERR_CAPTURE=$(mktemp)
+    STDERR_CAPTURE_IS_TEMP=1
+fi
+
+# FATAL and ERROR diagnostics from this launcher only go into the stderr capture
+# if that capture is a temp file that will get replayed on failure. Otherwise,
+# we write these straight to stderr so that they do not get lost if the action
+# fails.
+LOG_ERROR_CAPTURE="${STDERR_CAPTURE_IS_TEMP:+$STDERR_CAPTURE}"
 
 export JS_BINARY__LOG_PREFIX="aspect_rules_js[js_binary]"
 
-function logf_stderr {
-    local format_string="$1\n"
-    shift
-    if [ "${STDERR_CAPTURE:-}" ]; then
+# Emit a log line to $1, or to the real stderr when $1 is empty.
+function logf_to {
+    local capture="$1"
+    local level="$2"
+    local format_string="$3\n"
+    shift 3
+    if [ "$capture" ]; then
+        printf "%s: %s: " "$level" "$JS_BINARY__LOG_PREFIX" >>"$capture"
         # shellcheck disable=SC2059,SC2046
-        echo -e $(printf "$format_string" "$@") >>"$STDERR_CAPTURE"
+        echo -e $(printf "$format_string" "$@") >>"$capture"
     else
+        printf "%s: %s: " "$level" "$JS_BINARY__LOG_PREFIX" >&2
         # shellcheck disable=SC2059,SC2046
         echo -e $(printf "$format_string" "$@") >&2
     fi
@@ -53,45 +114,25 @@ function logf_stderr {
 
 function logf_fatal {
     if [ "${JS_BINARY__LOG_FATAL:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "FATAL: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
-        logf_stderr "$@"
+        logf_to "${LOG_ERROR_CAPTURE:-}" FATAL "$@"
     fi
 }
 
 function logf_error {
     if [ "${JS_BINARY__LOG_ERROR:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "ERROR: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "ERROR: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
-        logf_stderr "$@"
+        logf_to "${LOG_ERROR_CAPTURE:-}" ERROR "$@"
     fi
 }
 
 function logf_info {
     if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "INFO: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
-        logf_stderr "$@"
+        logf_to "${STDERR_CAPTURE:-}" INFO "$@"
     fi
 }
 
 function logf_debug {
     if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
-        if [ "${STDERR_CAPTURE:-}" ]; then
-            printf "DEBUG: %s: " "$JS_BINARY__LOG_PREFIX" >>"$STDERR_CAPTURE"
-        else
-            printf "DEBUG: %s: " "$JS_BINARY__LOG_PREFIX" >&2
-        fi
-        logf_stderr "$@"
+        logf_to "${STDERR_CAPTURE:-}" DEBUG "$@"
     fi
 }
 
@@ -116,20 +157,16 @@ function resolve_execroot_src_path {
 _exit() {
     EXIT_CODE=$?
 
-    if [ "${STDERR_CAPTURE:-}" ]; then
-        if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-            cp -f "$STDERR_CAPTURE" "$JS_BINARY__STDERR_OUTPUT_FILE"
-        fi
+    # Streams captured to a declared output file were written there directly and
+    # need no mop up. Only the temp files that back silent_on_success do.
+    if [ "${STDERR_CAPTURE_IS_TEMP:-}" ]; then
         if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
             cat "$STDERR_CAPTURE" >&2
         fi
         rm "$STDERR_CAPTURE"
     fi
 
-    if [ "${STDOUT_CAPTURE:-}" ]; then
-        if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-            cp -f "$STDOUT_CAPTURE" "$JS_BINARY__STDOUT_OUTPUT_FILE"
-        fi
+    if [ "${STDOUT_CAPTURE_IS_TEMP:-}" ]; then
         if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
             cat "$STDOUT_CAPTURE"
         fi
@@ -142,23 +179,6 @@ _exit() {
 }
 
 trap _exit EXIT
-
-# ==============================================================================
-# Handle --bazel-bindir flag
-# ==============================================================================
-
-# If a --bazel-bindir <path> flag is passed it must be the first two
-# arguments. It is consumed by this launcher script and used to set
-# BAZEL_BINDIR, overriding any value already set in the environment.
-if [ $# -gt 0 ] && [ "$1" = "--bazel-bindir" ]; then
-    if [ $# -lt 2 ]; then
-        echo "ERROR: --bazel-bindir flag requires a value" >&2
-        exit 1
-    fi
-    BAZEL_BINDIR="$2"
-    export BAZEL_BINDIR
-    shift 2
-fi
 
 # ==============================================================================
 # Initialize RUNFILES environment variable
@@ -279,27 +299,6 @@ export JS_BINARY__RUNFILES
 # ==============================================================================
 # Prepare to run main program
 # ==============================================================================
-
-# Convert stdout, stderr and exit_code capture outputs paths to absolute paths.
-# A path not starting with "bazel-out/" is relative to the bin directory; joining
-# it with BAZEL_BINDIR here (rather than baking in bazel-out/<config>/bin at
-# analysis time) keeps it correct when path mapping is active.
-function resolve_capture_path {
-    case "$1" in
-    bazel-out/*) echo "$PWD/$1" ;;
-    *) echo "$PWD/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$1" ;;
-    esac
-}
-
-if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDOUT_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDOUT_OUTPUT_FILE")"
-fi
-if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDERR_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDERR_OUTPUT_FILE")"
-fi
-if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__EXIT_CODE_OUTPUT_FILE")"
-fi
 
 if [[ "$PWD" == *"/bazel-out/"* ]]; then
     bazel_out_segment="/bazel-out/"
@@ -624,10 +623,17 @@ set +e
 # Generate the lcov report for a passing test; empty when not collecting coverage. See #2901.
 coverage_entry_point=""
 
-if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ] && [ -z "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ] && [ -z "${STDOUT_CAPTURE:-}" ] && [ -z "${STDERR_CAPTURE:-}" ] && [ -z "$coverage_entry_point" ]; then
+if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ] && [ -z "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ] &&
+    [ -z "${STDOUT_CAPTURE_IS_TEMP:-}" ] && [ -z "${STDERR_CAPTURE_IS_TEMP:-}" ] && [ -z "$coverage_entry_point" ]; then
     # Nothing must run after node exits, so replace this shell with node. Signals
     # and terminal control are then delivered directly to node instead of being
     # proxied through a backgrounded child.
+    if [ "${STDOUT_CAPTURE:-}" ]; then
+        exec 1>>"$STDOUT_CAPTURE"
+    fi
+    if [ "${STDERR_CAPTURE:-}" ]; then
+        exec 2>>"$STDERR_CAPTURE"
+    fi
     exec "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"}
     exit 127
 fi

@@ -134,6 +134,11 @@ _ATTRS = {
         of a js_run_binary when silent_on_success is True. In that case, they will be shown
         only on a build failure along with the stdout & stderr of the node tool being run.
 
+        When js_run_binary captures stderr to an output file, info and debug logs are written to
+        that file along with the stderr of the node tool being run, and are not echoed to the
+        terminal even on a build failure. Fatal and error logs are always written to the real stderr
+        in that case, since Bazel discards the output file of a failed action.
+
         Log levels: {}""".format(", ".join(LOG_LEVELS.keys())),
         values = LOG_LEVELS.keys(),
         default = "error",
