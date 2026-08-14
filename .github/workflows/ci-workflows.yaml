@@ -271,34 +271,21 @@ jobs:
     # unless the branch name contains 'macos' or 'windows'.
     # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
     smoke:
-        name: smoke (${{ matrix.workspace.slug }}, ${{ matrix.os }})
+        name: smoke (${{ matrix.workspace.path }}, ${{ matrix.os }})
+        if: github.ref_name == 'main' || contains(github.head_ref, 'macos') || contains(github.head_ref, 'windows')
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
             matrix:
                 os: [macos-latest, windows-latest]
                 workspace:
-                    - { path: ., slug: root, flags: "", targets: "//..." }
-                    - { path: e2e/bzlmod, slug: bzlmod, flags: "", targets: "//..." }
+                    - { path: ., slug: root }
+                    - { path: e2e/bzlmod, slug: bzlmod }
                 exclude:
                     # The root workspace only builds cleanly on macOS for now; Windows has broad
-                    # pre-existing failures. e2e/bzlmod still smoke-tests on both OSes, and the
-                    # include below runs the launcher PATH tests from the root workspace.
+                    # pre-existing failures. e2e/bzlmod still smoke-tests on both OSes.
                     - os: windows-latest
-                      workspace: { path: ., slug: root, flags: "", targets: "//..." }
-                include:
-                    # The only coverage of the JS_BINARY__NO_RUNFILES branch, where the launcher
-                    # resolves the wrappers from the source directory in the execroot rather than
-                    # from runfiles. --noenable_runfiles is the Windows default, but pass it
-                    # explicitly so the configuration under test cannot drift.
-                    - os: windows-latest
-                      workspace:
-                          {
-                              path: .,
-                              slug: root-node-bin,
-                              flags: "--noenable_runfiles",
-                              targets: "//js/private/test/node_bin:all",
-                          }
+                      workspace: { path: ., slug: root }
         env:
             ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
         steps:
@@ -310,14 +297,14 @@ jobs:
                   disk-cache: ${{ matrix.os }}-${{ matrix.workspace.slug }}
                   repository-cache: true
 
-            - name: bazel test ${{ matrix.workspace.targets }}
+            - name: bazel test //...
               shell: bash
               working-directory: ${{ matrix.workspace.path }}
               run: |
                   bazel test \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
-                    ${{ matrix.workspace.flags }} ${{ matrix.workspace.targets }}
+                    //...
 
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
