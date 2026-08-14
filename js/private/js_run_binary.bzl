@@ -170,6 +170,9 @@ def js_run_binary(
 
             This makes node binaries match the expected bazel paradigm.
 
+            This only applies to streams that are not captured to an output file by `stdout` or
+            `stderr`; a captured stream never reaches the terminal to begin with.
+
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
 
