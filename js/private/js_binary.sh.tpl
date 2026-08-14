@@ -385,7 +385,7 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     esac
 done
 
-# Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require in the node wrapper.
+# Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require below.
 # Don't override JS_BINARY__FS_PATCH_ROOTS if already set by an outer js_binary incase a js_binary such
 # as js_run_deverser runs another js_binary tool.
 if [ -z "${JS_BINARY__FS_PATCH_ROOTS:-}" ]; then
@@ -481,8 +481,14 @@ fi
 # Run the main program
 # ==============================================================================
 
+# Invoke node directly rather than through $JS_BINARY__NODE_WRAPPER. This way
+# we avoid spawning an extra bash process on every launch. The wrapper is
+# still put on the PATH as `node` so that child processes get the patched
+# runtime.
+node_cmd=("$JS_BINARY__NODE_BINARY" --require "$JS_BINARY__NODE_PATCHES")
+
 if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-    logf_info "$(echo -n "running" "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
+    logf_info "$(echo -n "running" "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
 # De-export capture-related vars so child processes (e.g. a nested js_binary)
@@ -502,18 +508,18 @@ if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ] && [ -z "${JS_BINARY__EXIT_CODE_O
     # Nothing must run after node exits, so replace this shell with node. Signals
     # and terminal control are then delivered directly to node instead of being
     # proxied through a backgrounded child.
-    exec "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"}
+    exec "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"}
     exit 127
 fi
 
 if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
+    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
 elif [ "${STDOUT_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
+    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
 elif [ "${STDERR_CAPTURE:-}" ]; then
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
+    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
 else
-    "$JS_BINARY__NODE_WRAPPER" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
+    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 fi
 
 # ==============================================================================
