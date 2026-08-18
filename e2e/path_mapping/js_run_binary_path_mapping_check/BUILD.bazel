@@ -22,6 +22,7 @@ js_run_binary(
     exit_code_out = "exit_code.txt",
     mnemonic = "JsRunBinaryPathMappingCheck",
     set_legacy_environment_variables = False,
+    silent_on_success = False,
     stderr = "stderr.txt",
     stdout = "stdout.txt",
     tool = ":check",
@@ -63,6 +64,7 @@ js_run_binary(
     args = ["out_flag.txt"],
     chdir = package_name(),
     mnemonic = "JsRunBinaryPathMappingCheckFlag",
+    silent_on_success = False,
     tags = ["manual"],
     tool = ":check",
 )

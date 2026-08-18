@@ -28,5 +28,6 @@ rollup_bin.rollup(
         "--file",
         "bundle.mjs",
     ],
+    silent_on_success = True,
     visibility = ["//js/private/devserver:__pkg__"],
 )

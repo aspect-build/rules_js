@@ -79,6 +79,7 @@ babel_bin.babel(
         "--out-dir",
         ".",
     ] + MJS_TESTS,
+    silent_on_success = False,
 )
 
 # Basic tests

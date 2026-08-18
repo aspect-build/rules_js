@@ -31,6 +31,7 @@ js_test(
 js_run_binary(
     name = "pnpm_version",
     args = ["--version"],
+    silent_on_success = False,
     stdout = "pnpm_version.txt",
     tool = "@pnpm",
 )
@@ -38,6 +39,7 @@ js_run_binary(
 js_run_binary(
     name = "other_pnpm_version",
     args = ["--version"],
+    silent_on_success = False,
     stdout = "other_pnpm_version.txt",
     tool = "@other_pnpm//:pnpm",
 )
@@ -54,6 +56,7 @@ js_run_binary(
         "npm",
         "--version",
     ],
+    silent_on_success = False,
     stdout = "pnpm_npm_version.txt",
     tool = "@pnpm",
 )
@@ -142,5 +145,6 @@ js_run_binary(
         "my.less",
         "other-module-my.css",
     ],
+    silent_on_success = False,
     tool = "@other_module//:lessc",  # A js_binary() tool in a different repo
 )

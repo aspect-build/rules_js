@@ -16,5 +16,6 @@ typescript_bin.tsc(
         "tsconfig.json",
     ],
     chdir = package_name(),
+    silent_on_success = False,
     visibility = ["//js/private/watch:__pkg__"],
 )

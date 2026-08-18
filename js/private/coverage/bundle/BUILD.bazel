@@ -33,5 +33,6 @@ rollup_bin.rollup(
         "--file",
         "bundle.js",
     ],
+    silent_on_success = True,
     visibility = ["//js/private/coverage:__pkg__"],
 )

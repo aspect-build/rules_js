@@ -11,6 +11,7 @@ js_binary(
 
 js_run_binary(
     name = "run_bin",
+    silent_on_success = False,
     stdout = "out_workspace.txt",
     tool = ":bin",
     visibility = ["//visibility:public"],

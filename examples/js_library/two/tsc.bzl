@@ -11,5 +11,6 @@ def tsc(name, args = ["-p", "tsconfig.json"], **kwargs):
         args = args,
         # Always run tsc with the working directory in the project folder
         chdir = native.package_name(),
+        silent_on_success = kwargs.pop("silent_on_success", False),
         **kwargs
     )

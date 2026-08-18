@@ -27,6 +27,7 @@ js_run_binary(
     args = [
         "--help",
     ],
+    silent_on_success = False,
     stdout = "less-help.log",
     tool = ":lessc",
 )

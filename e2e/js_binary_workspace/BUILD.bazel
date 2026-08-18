@@ -5,6 +5,7 @@ load("@rules_shell//shell:sh_test.bzl", "sh_test")
 js_run_binary(
     name = "run_workspace_bin",
     chdir = package_name(),
+    silent_on_success = False,
     stdout = "out.txt",
     tool = "@workspace//:bin",
 )
