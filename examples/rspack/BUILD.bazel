@@ -29,6 +29,7 @@ bin.rspack(
         "--config",
         "$$RUNFILES_DIR/$(rlocationpath :rspack_config)",
     ],
+    silent_on_success = False,
     use_execroot_entry_point = False,
 )
 

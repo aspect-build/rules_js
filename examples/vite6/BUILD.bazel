@@ -33,6 +33,7 @@ vite_bin.vite(
         "$$RUNFILES_DIR/$(rlocationpath :vite-config)",
     ],
     out_dirs = ["build"],
+    silent_on_success = False,
 )
 
 build_test(

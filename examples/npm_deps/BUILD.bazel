@@ -46,6 +46,7 @@ js_run_binary(
     srcs = [],
     outs = ["actual1"],
     args = ["npm_deps/actual1"],
+    silent_on_success = False,
     tool = ":bin1",
 )
 
@@ -158,6 +159,7 @@ diff_test(
 js_run_binary(
     name = "actual5_alt",
     args = ["--version"],
+    silent_on_success = False,
     stdout = "actual5_alt.txt",
     tool = ":rollup_bin",
 )

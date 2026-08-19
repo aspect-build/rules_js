@@ -15,6 +15,7 @@ js_binary(
 # shell toolchain.
 js_run_binary(
     name = "run_bin",
+    silent_on_success = False,
     stdout = "out.txt",
     tool = ":bin",
 )

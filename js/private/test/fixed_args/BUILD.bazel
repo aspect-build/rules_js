@@ -13,6 +13,7 @@ js_binary(
 
 js_run_binary(
     name = "run_fixed_args_binary",
+    silent_on_success = False,
     stdout = "fixed_args_out",
     tool = ":fixed_args_bin",
 )
@@ -33,6 +34,7 @@ js_binary(
 
 js_run_binary(
     name = "run_args_binary",
+    silent_on_success = False,
     stdout = "args_out",
     tool = ":args_bin",
 )
@@ -54,6 +56,7 @@ js_binary(
 
 js_run_binary(
     name = "run_locations",
+    silent_on_success = False,
     stdout = "locations_out",
     tool = ":locations_bin",
 )
@@ -76,6 +79,7 @@ js_binary(
 
 js_run_binary(
     name = "run_locations_no_expand",
+    silent_on_success = False,
     stdout = "locations_out_no_expand",
     tool = ":locations_bin_no_expand",
 )

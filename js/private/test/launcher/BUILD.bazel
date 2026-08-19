@@ -261,6 +261,7 @@ js_run_binary(
     name = "exit_plain_run",
     chdir = package_name(),
     exit_code_out = "exit_plain_code.txt",
+    silent_on_success = False,
     stderr = "exit_plain_stderr.txt",
     stdout = "exit_plain_stdout.txt",
     tool = ":exit_plain_bin",
@@ -310,6 +311,7 @@ js_binary(
 js_run_binary(
     name = "stdout_stderr_run",
     chdir = package_name(),
+    silent_on_success = False,
     stderr = "stdout_stderr_stderr.txt",
     stdout = "stdout_stderr_stdout.txt",
     tool = ":stdout_stderr_bin",

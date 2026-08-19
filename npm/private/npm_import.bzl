@@ -228,6 +228,7 @@ def npm_imported_package_store_internal(
             progress_message = "Running lifecycle hooks on npm package %s@%s}" % (package, version),
             env = lifecycle_hooks_env,
             use_default_shell_env = use_default_shell_env,
+            silent_on_success = True,
         )
 
         # post-lifecycle npm_package

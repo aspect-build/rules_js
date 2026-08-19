@@ -162,6 +162,7 @@ js_run_binary(
         "data.json",
     ],
     chdir = package_name(),
+    silent_on_success = False,
     tool = ":write-js_library-srcs",
 )
 
@@ -188,6 +189,7 @@ js_run_binary(
         "data.json",
     ],
     chdir = package_name(),
+    silent_on_success = False,
     tool = ":write-js_library-srcs",
 )
 
@@ -221,6 +223,7 @@ js_run_binary(
         "data.json",
     ],
     chdir = package_name(),
+    silent_on_success = False,
     tool = ":write-js_library-data",
 )
 
@@ -247,6 +250,7 @@ js_run_binary(
         "data-generated.json",
     ],
     chdir = package_name(),
+    silent_on_success = False,
     tool = ":write-genrule",
 )
 
@@ -273,6 +277,7 @@ js_run_binary(
         "data-copied.json",
     ],
     chdir = package_name(),
+    silent_on_success = False,
     tool = ":write-genrule-filegroup-srcs",
 )
 

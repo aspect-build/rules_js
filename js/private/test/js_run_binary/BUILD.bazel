@@ -29,6 +29,7 @@ js_binary(
 
 js_run_binary(
     name = "runfiles_location",
+    silent_on_success = False,
     stdout = "runfiles_location.txt",
     tool = ":find_cfg_probe",
     use_execroot_entry_point = False,
@@ -56,6 +57,7 @@ assert_contains(
 # directory, the same place a genrule would put its srcs.
 js_run_binary(
     name = "target_cfg_location",
+    silent_on_success = False,
     stdout = "target_cfg_location.txt",
     tool = ":find_cfg_probe",
     use_execroot_entry_point = True,
@@ -114,6 +116,7 @@ js_run_binary(
     name = "gen_target_os",
     srcs = [":os_name.txt"],
     args = ["$(rootpath :os_name.txt)"],
+    silent_on_success = False,
     stdout = "target_os.txt",
     tags = ["manual"],
     tool = ":read_file",

@@ -32,5 +32,6 @@ rollup_bin.rollup(
         "--file",
         "index.min.js",
     ],
+    silent_on_success = True,
     visibility = ["//npm/private/lifecycle:__subpackages__"],
 )

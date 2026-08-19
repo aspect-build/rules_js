@@ -13,6 +13,7 @@ def lessc(name, css, **kwargs):
             css.replace(".less", ".css"),
         ],
         chdir = kwargs.pop("chdir", "."),
+        silent_on_success = kwargs.pop("silent_on_success", False),
         **kwargs
     )
 

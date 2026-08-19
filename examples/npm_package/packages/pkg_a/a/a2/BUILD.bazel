@@ -20,6 +20,7 @@ typescript_bin.tsc(
         "tsconfig.json",
     ],
     chdir = package_name(),
+    silent_on_success = False,
 )
 
 # The sources of this js_library will be included transitively in the terminal

@@ -76,10 +76,8 @@ js_binary(
             chdir = package_name(),
             # Request that the rules_js launcher prints extra information
             log_level = "debug",
+            silent_on_success = False,
             tool = ":bin_%s" % t,
-            # Uncomment the setting below to see debug output even on a
-            # successful run of the build action.
-            # silent_on_success = False,
         ),
         diff_test(
             name = "test_js_binary_under_js_run_binary_%s" % t,
@@ -109,10 +107,8 @@ js_binary(
             },
             # Request that the rules_js launcher prints extra information
             log_level = "debug",
+            silent_on_success = False,
             tool = ":bin_%s" % t,
-            # Uncomment the setting below to see debug output even on a
-            # successful run of the build action.
-            # silent_on_success = False,
         ),
         diff_test(
             name = "test_js_binary_under_js_run_binary_local_%s" % t,
@@ -144,14 +140,12 @@ js_run_binary(
     name = "run2_no_copy_data_to_bin",
     srcs = [],
     outs = ["out2_no_copy_data_to_bin"],
-    # Uncomment the setting below to see debug output even on a
-    # successful run of the build action.
-    # silent_on_success = False,
     allow_execroot_entry_point_with_no_copy_data_to_bin = True,
     args = ["out2_no_copy_data_to_bin"],
     chdir = package_name(),
     # Request that the rules_js launcher prints extra information
     log_level = "debug",
+    silent_on_success = False,
     tool = ":bin_no_copy_data_to_bin",
 )
 
@@ -230,6 +224,7 @@ write_file(
                 },
             }),
             out_dirs = ["out4-%s-dist" % t],
+            silent_on_success = False,
             tool = ":bin4_%s" % t,
         ),
         directory_path(
@@ -256,6 +251,7 @@ write_file(
                     "NODE_ENV": "production",
                 },
             }),
+            silent_on_success = False,
             tool = ":bin4_%s" % t,
         ),
         diff_test(
@@ -315,6 +311,7 @@ write_file(
             outs = ["out5_%s" % t],
             args = ["out5_%s" % t],
             chdir = package_name(),
+            silent_on_success = False,
             tool = ":bin5_%s" % t,
         ),
         diff_test(
@@ -361,6 +358,7 @@ js_run_binary(
     name = "run6",
     outs = ["out6"],
     args = ["../../../$@"],
+    silent_on_success = False,
     tool = ":bin6",
 )
 
@@ -383,6 +381,7 @@ js_run_binary(
     name = "run6_alt",
     outs = ["out6_alt"],
     args = ["../../../$@"],
+    silent_on_success = False,
     tool = ":bin6_alt",
 )
 
@@ -416,6 +415,7 @@ js_run_binary(
     outs = [],
     chdir = package_name(),
     exit_code_out = "actual_exitcode",
+    silent_on_success = False,
     stderr = "actual_stderr",
     stdout = "actual_stdout",
     tool = ":bin7",
@@ -494,6 +494,7 @@ js_binary(
 js_run_binary(
     name = "run8",
     args = ["--help"],
+    silent_on_success = False,
     stdout = "out8",
     tool = ":acorn_bin",
 )
@@ -682,6 +683,7 @@ write_file(
             ],
             chdir = package_name(),
             out_dirs = ["out13-dist-1_%s" % t],
+            silent_on_success = False,
             tool = ":bin13_%s" % t,
         ),
         directory_path(
@@ -702,6 +704,7 @@ write_file(
             ],
             chdir = package_name(),
             out_dirs = ["out13-dist-2_%s" % t],
+            silent_on_success = False,
             tool = ":bin13_%s" % t,
         ),
         directory_path(

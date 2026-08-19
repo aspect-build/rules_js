@@ -10,6 +10,7 @@ def label_capture(name, tool):
     js_run_binary(
         name = name,
         tool = tool,
+        silent_on_success = False,
         stdout = Label(":{}_stdout.txt".format(name)),
         stderr = Label(":{}_stderr.txt".format(name)),
         exit_code_out = Label(":{}_exit_code.txt".format(name)),

@@ -13,5 +13,6 @@ less_bin.lessc(
     ],
     chdir = package_name(),
     exit_code_out = "exit_code.txt",
+    silent_on_success = False,
     visibility = ["//visibility:public"],
 )
