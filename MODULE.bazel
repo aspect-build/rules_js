@@ -75,8 +75,8 @@ use_repo(
     "yq_linux_amd64",
     "yq_linux_arm64",
     "yq_linux_ppc64le",
-    "yq_linux_s390x",
     "yq_linux_riscv64",
+    "yq_linux_s390x",
     "yq_windows_amd64",
     "yq_windows_arm64",
 )
