@@ -1,0 +1,9 @@
+{
+  "name": "pnp_zero_install_yarn3",
+  "private": true,
+  "dependencies": {
+    "is-odd": "3.0.1",
+    "left-pad": "1.3.0"
+  },
+  "packageManager": "yarn@3.8.7"
+}

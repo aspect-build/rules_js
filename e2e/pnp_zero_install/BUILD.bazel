@@ -1,0 +1,27 @@
+load("@pnp//:defs.bzl", "pnp_js_test", "pnp_verify_test")
+
+filegroup(
+    name = "pnp_cache",
+    srcs = glob([".yarn/cache/*.zip"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "pnp_unplugged",
+    srcs = glob([".yarn/unplugged/**"]),
+    visibility = ["//visibility:public"],
+)
+
+# Runs a program whose dependencies resolve through the checked-in PnP
+# runtime, straight out of integrity-bound cache/unplugged inputs. Yarn is
+# never executed by rules_js.
+pnp_js_test(
+    name = "main_test",
+    entry_point = "main.js",
+)
+
+# Verifies every resolver, graph, config, cache, and unplugged input against
+# .pnp.integrity.json and cross-checks available cache checksums with yarn.lock.
+pnp_verify_test(
+    name = "verify_cache_test",
+)
