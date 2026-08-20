@@ -7,8 +7,9 @@ load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 # variable and location expansion.
 #
 # stdout/stderr/exit_code_out are captured here to verify that they do not
-# defeat path mapping; their paths are passed to the launcher relative to the
-# bin directory rather than via $(execpath).
+# defeat path mapping. run_binary implements them, passing each path to its
+# spawn_binary wrapper as a File on an Args object, which is the only channel
+# Bazel rewrites; an $(execpath)-expanded env var would not be.
 js_binary(
     name = "check",
     entry_point = "check.mjs",

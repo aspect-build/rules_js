@@ -1,8 +1,7 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 
 # Same as //js_run_binary_path_mapping_check in the root module, but in a
-# subpackage of an external module. The capture output paths are computed
-# relative to the bin directory, which for an external repository means an
+# subpackage of an external module, where the bin-directory layout gains an
 # "external/<repo>/" prefix; getting that wrong would leave the declared outputs
 # uncreated. The assertions live in the root module, see
 # //other_module_path_mapping_check.
