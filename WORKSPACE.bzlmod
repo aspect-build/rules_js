@@ -59,14 +59,17 @@ load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
 
 llvm_toolchain(
     name = "llvm_toolchain",
-    llvm_version = "14.0.0",
+    llvm_versions = {
+        "": "14.0.0",
+        "darwin-aarch64": "15.0.7",
+    },
     sha256 = {
-        "darwin-aarch64": "1b8975db6b638b308c1ee437291f44cf8f67a2fb926eb2e6464efd180e843368",
-        "linux-x86_64": "564fcbd79c991e93fdf75f262fa7ac6553ec1dd04622f5d7db2a764c5dc7fac6",
+        "darwin-aarch64": "867c6afd41158c132ef05a8f1ddaecf476a26b91c85def8e124414f9a9ba188d",
+        "linux-x86_64": "61582215dafafb7b576ea30cc136be92c877ba1f1c31ddbbd372d6d65622fef5",
     },
     strip_prefix = {
-        "darwin-aarch64": "clang+llvm-14.0.0-arm64-apple-darwin",
-        "linux-x86_64": "clang+llvm-14.0.0-x86_64-linux-gnu",
+        "darwin-aarch64": "clang+llvm-15.0.7-arm64-apple-darwin22.0",
+        "linux-x86_64": "clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04",
     },
     sysroot = {
         "linux-aarch64": "@org_chromium_sysroot_linux_arm64//:sysroot",
@@ -75,8 +78,8 @@ llvm_toolchain(
         "darwin-x86_64": "@sysroot_darwin_universal//:sysroot",
     },
     urls = {
-        "darwin-aarch64": ["https://github.com/aspect-forks/llvm-project/releases/download/aspect-release-14.0.0/clang+llvm-14.0.0-arm64-apple-darwin.tar.xz"],
-        "linux-x86_64": ["https://github.com/aspect-forks/llvm-project/releases/download/aspect-release-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu.tar.xz"],
+        "darwin-aarch64": ["https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.7/clang+llvm-15.0.7-arm64-apple-darwin22.0.tar.xz"],
+        "linux-x86_64": ["https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"],
     },
 )
 
