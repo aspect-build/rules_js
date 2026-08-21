@@ -160,11 +160,6 @@ js_test(
 # When node exits 0 but a non-zero code was expected, the launcher must report Bazel's "tests
 # failed" sentinel (exit 3). When node exits a different non-zero code, that code is propagated.
 # When node exits exactly the expected code, the launcher reports success (exit 0).
-#
-# The launcher does the remapping and exits with the remapped code; `exit_code_out` is implemented
-# by `run_binary`, which captures that code without the launcher ever seeing
-# JS_BINARY__EXIT_CODE_OUTPUT_FILE. When the launcher handled both itself it checked
-# expected_exit_code first and exited before writing the code file, leaving the output uncreated.
 
 js_binary(
     name = "exit_zero_bin",

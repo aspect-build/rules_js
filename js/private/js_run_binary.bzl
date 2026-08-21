@@ -140,7 +140,7 @@ def js_run_binary(
         exit_code_out: Output file to capture the exit code of the binary to.
 
             This can later be used as an input to another target subject to the same semantics as `outs`. Note that
-            setting this makes the action always succeed, whatever exit code the binary reports.
+            setting this will cause the action to succeed despite a nonzero exit code.
 
             If the binary creates outputs and these are declared, they must still be created.
 
@@ -149,8 +149,7 @@ def js_run_binary(
             This makes node binaries match the expected bazel paradigm.
 
             This only applies to streams that are not captured to an output file by `stdout` or
-            `stderr`; a captured stream never reaches the terminal to begin with. Note that when
-            `exit_code_out` is set the action never fails, so buffered output is never replayed.
+            `stderr`; a captured stream never reaches the terminal to begin with.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.

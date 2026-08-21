@@ -2,12 +2,9 @@
 
 `js_run_binary` delegates stdout/stderr/exit_code_out/silent_on_success to bazel-lib's
 `run_binary`, so nothing in this repo routes the JS_BINARY__*_OUTPUT_FILE and
-JS_BINARY__SILENT_ON_SUCCESS environment variables through the launcher any more. Code outside
+JS_BINARY__SILENT_ON_SUCCESS environment variables through the launcher anymore. Code outside
 rules_js does invoke the launcher directly and set them (see #2955), so the launcher still honors
 them and this rule keeps that path covered.
-
-Both branches of the launcher's `resolve_capture_path` are exercised: a value starting with
-"bazel-out/" is execroot-relative, anything else is relative to BAZEL_BINDIR.
 """
 
 load("@aspect_rules_js//js:libs.bzl", "js_binary_lib")
@@ -25,8 +22,8 @@ def _direct_capture_impl(ctx):
         mnemonic = "DirectCapture",
         env = {
             # short_path is bin-relative and File.path is execroot-relative
-            # ("bazel-out/<cfg>/bin/..."), so using a different one per stream covers both
-            # resolve_capture_path branches in a single action.
+            # ("bazel-out/<cfg>/bin/..."), so using a different one per stream covers both in a
+            # single action.
             "JS_BINARY__STDOUT_OUTPUT_FILE": stdout.short_path,
             "JS_BINARY__STDERR_OUTPUT_FILE": stderr.path,
             "JS_BINARY__EXIT_CODE_OUTPUT_FILE": exit_code.short_path,
