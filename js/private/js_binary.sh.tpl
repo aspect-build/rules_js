@@ -47,6 +47,9 @@ function resolve_capture_path {
     esac
 }
 
+# TODO(4.0): remove support for capturing stderr, stdout, and exit code. The
+# js_run_binary macro now handles this in a way that does not require help from
+# the launcher.
 if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
     JS_BINARY__STDOUT_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDOUT_OUTPUT_FILE")"
 fi
