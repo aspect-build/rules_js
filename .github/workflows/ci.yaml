@@ -209,6 +209,7 @@ jobs:
                     # Include unit tests with bazel8
                     - bazel-version:
                           major: 8
+                          version: 8.1.1
                       bzlmod: 1
                       folder: .
                       os: ubuntu
