@@ -130,8 +130,6 @@ if (JS_BINARY__COVERAGE_REPORT && process.env.COVERAGE_DIR) {
     })
 }
 
-// Mirrors the launcher's logf_error: written to stderr, suppressed below the `error`
-// log level.
 function logError(message) {
     if (process.env.JS_BINARY__LOG_ERROR) {
         console.error(`ERROR: ${JS_BINARY__LOG_PREFIX}: ${message}`)
