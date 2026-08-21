@@ -390,7 +390,130 @@ function friendlyFileSize(bytes) {
     )
 }
 
-async function syncSymlink(file, src, dst, sandbox, exists) {
+const IBAZEL_EVENT_PREFIX = 'IBAZEL_EVENT ';
+const RUNFILES_SYNC_EVENT_PREFIX = 'JS_RUN_DEVSERVER_SYNCED ';
+const RUNFILES_NOTIFICATION_ENV = 'JS_RUN_DEVSERVER_NOTIFY_RUNFILES_CHANGES';
+
+function runfilesNotificationEnv(env, enabled) {
+    return enabled ? { ...env, [RUNFILES_NOTIFICATION_ENV]: '1' } : env
+}
+
+function parseIBazelEvent(line) {
+    if (!line.startsWith(IBAZEL_EVENT_PREFIX)) {
+        return null
+    }
+
+    const event = JSON.parse(line.slice(IBAZEL_EVENT_PREFIX.length));
+    if (event.version !== 1 || event.type !== 'build_completed') {
+        return null
+    }
+    return event
+}
+
+function selectRunfilesToSync(files, event, workspaceRoot) {
+    if (!workspaceRoot || event.changes.some(({ kind }) => kind === 'graph')) {
+        return files
+    }
+
+    const changedSources = new Set();
+    for (const { path: changedPath, kind } of event.changes) {
+        if (kind !== 'source') {
+            return files
+        }
+
+        const relativePath = path.relative(workspaceRoot, changedPath);
+        if (
+            !relativePath ||
+            relativePath === '..' ||
+            relativePath.startsWith(`..${path.sep}`) ||
+            path.isAbsolute(relativePath)
+        ) {
+            return files
+        }
+        changedSources.add(path.normalize(relativePath));
+    }
+
+    return files.filter(([file, isDirectory, isSource]) => {
+        if (!isSource) {
+            return true
+        }
+
+        const normalizedFile = path.normalize(file);
+        return (
+            changedSources.has(normalizedFile) ||
+            (isDirectory &&
+                [...changedSources].some((changedSource) =>
+                    changedSource.startsWith(`${normalizedFile}${path.sep}`)
+                ))
+        )
+    })
+}
+
+function formatRunfilesSyncEvent(
+    sandbox,
+    syncedFiles,
+    deletedFiles,
+    trigger
+) {
+    const changes = [
+        ...syncedFiles.map(({ file, exists }) => ({
+            path: path.join(sandbox, file),
+            kind: exists ? 'changed' : 'added',
+        })),
+        ...deletedFiles.map((file) => ({
+            path: path.join(sandbox, file),
+            kind: 'deleted',
+        })),
+    ].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+
+    return `${RUNFILES_SYNC_EVENT_PREFIX}${JSON.stringify({
+        version: 1,
+        changes,
+        trigger,
+    })}\n`
+}
+
+function createIBazelLineProcessor({
+    notifyRunfilesChanges,
+    sandbox,
+    syncBuild,
+    writeToChild,
+}) {
+    let pendingBuildCompleted = null;
+
+    return async (chunk) => {
+        const chunkString = chunk.toString();
+        const ibazelEvent = parseIBazelEvent(chunkString);
+
+        if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
+            if (notifyRunfilesChanges) {
+                pendingBuildCompleted = chunkString;
+                return
+            }
+            await syncBuild(null);
+        }
+
+        if (notifyRunfilesChanges && ibazelEvent?.success) {
+            const { deletedFiles, syncedFiles } = await syncBuild(ibazelEvent);
+            if (pendingBuildCompleted) {
+                await writeToChild(`${pendingBuildCompleted}\n`);
+                pendingBuildCompleted = null;
+            }
+            await writeToChild(
+                formatRunfilesSyncEvent(
+                    sandbox,
+                    syncedFiles,
+                    deletedFiles,
+                    ibazelEvent
+                )
+            );
+        }
+
+        await writeToChild(`${chunk}\n`);
+    }
+}
+
+async function syncSymlink(file, src, dst, sandbox, exists, syncedFiles) {
     let symlinkMeta = '';
     if (isNodeModulePath(file)) {
         let linkPath = await fs.promises.readlink(src);
@@ -428,10 +551,11 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
         mkdirpSync(path.dirname(dst));
     }
     await fs.promises.symlink(src, dst);
+    syncedFiles.push({ file, exists });
     return 1
 }
 
-async function syncDirectory(file, src, sandbox, writePerm) {
+async function syncDirectory(file, src, sandbox, writePerm, syncedFiles) {
     if (JS_BINARY__LOG_DEBUG) {
         console.error(`Syncing directory ${file}...`);
     }
@@ -444,14 +568,23 @@ async function syncDirectory(file, src, sandbox, writePerm) {
                         file + path.sep + entry,
                         undefined,
                         sandbox,
-                        writePerm
+                        writePerm,
+                        syncedFiles
                     )
             )
         )
     ).reduce((s, t) => s + t, 0)
 }
 
-async function syncFile(file, src, dst, exists, lstat, writePerm) {
+async function syncFile(
+    file,
+    src,
+    dst,
+    exists,
+    lstat,
+    writePerm,
+    syncedFiles
+) {
     if (JS_BINARY__LOG_DEBUG) {
         console.error(
             `Syncing file ${file}${
@@ -483,6 +616,7 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
         }
         await fs.promises.chmod(dst, mode);
     }
+    syncedFiles.push({ file, exists });
     return 1
 }
 
@@ -490,7 +624,7 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
 // pointing to the source symlink.
-async function syncRecursive(file, _, sandbox, writePerm) {
+async function syncRecursive(file, _, sandbox, writePerm, syncedFiles) {
     const src = RUNFILES_ROOT + path.sep + file;
     const dst = sandbox + path.sep + file;
 
@@ -512,9 +646,9 @@ async function syncRecursive(file, _, sandbox, writePerm) {
         const exists = syncedTime.has(file) || fs.existsSync(dst);
         syncedTime.set(file, lstat.mtimeMs);
         if (lstat.isSymbolicLink()) {
-            return syncSymlink(file, src, dst, sandbox, exists)
+            return syncSymlink(file, src, dst, sandbox, exists, syncedFiles)
         } else if (lstat.isDirectory()) {
-            return syncDirectory(file, src, sandbox, writePerm)
+            return syncDirectory(file, src, sandbox, writePerm, syncedFiles)
         } else {
             const lastChecksum = syncedChecksum.get(file);
             const checksum = await generateChecksum(src);
@@ -529,7 +663,15 @@ async function syncRecursive(file, _, sandbox, writePerm) {
             }
             syncedChecksum.set(file, checksum);
 
-            return syncFile(file, src, dst, exists, lstat, writePerm)
+            return syncFile(
+                file,
+                src,
+                dst,
+                exists,
+                lstat,
+                writePerm,
+                syncedFiles
+            )
         }
     } catch (e) {
         console.error(e);
@@ -543,6 +685,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
     const startTime = perf_hooks.performance.now();
 
     const deletions = [];
+    const deletedFiles = [];
 
     // Remove files that were previously synced but are no longer in the updated list of files to sync
     const updatedFilesSet = new Set();
@@ -577,6 +720,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
         deletions.push(
             fs.promises
                 .rm(rmPath, { recursive: true, force: true })
+                .then(() => deletedFiles.push(f))
                 .catch((e) =>
                     console.error(
                         `An error has occurred while deleting the synced file ${rmPath}. Error: ${e}`
@@ -597,12 +741,14 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
             } deleted in ${Math.round(endTime - startTime)} ms`
         );
     }
+    return deletedFiles
 }
 
 // Sync list of files to the sandbox
 async function syncFiles(files, sandbox, writePerm, doSync) {
     console.error(`+ Syncing ${files.length} files & folders...`);
     const startTime = perf_hooks.performance.now();
+    const syncedFiles = [];
 
     // Partition files into node_modules and non-node_modules files
     const packageStore1pDeps = [];
@@ -635,7 +781,13 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     let totalSynced = (
         await Promise.all(
             otherFiles.map(async ([file, isDirectory]) => {
-                return await doSync(file, isDirectory, sandbox, writePerm)
+                return await doSync(
+                    file,
+                    isDirectory,
+                    sandbox,
+                    writePerm,
+                    syncedFiles
+                )
             })
         )
     ).reduce((s, t) => s + t, 0);
@@ -651,7 +803,13 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     totalSynced += (
         await Promise.all(
             packageStore1pDeps.map(async ([file, isDirectory]) => {
-                return await doSync(file, isDirectory, sandbox, writePerm)
+                return await doSync(
+                    file,
+                    isDirectory,
+                    sandbox,
+                    writePerm,
+                    syncedFiles
+                )
             })
         )
     ).reduce((s, t) => s + t, 0);
@@ -666,7 +824,13 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     totalSynced += (
         await Promise.all(
             otherNodeModulesFiles.map(async ([file, isDirectory]) => {
-                return await doSync(file, isDirectory, sandbox, writePerm)
+                return await doSync(
+                    file,
+                    isDirectory,
+                    sandbox,
+                    writePerm,
+                    syncedFiles
+                )
             })
         )
     ).reduce((s, t) => s + t, 0);
@@ -677,6 +841,7 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
             totalSynced > 1 ? 's' : ''
         } synced in ${Math.round(endTime - startTime)} ms`
     );
+    return syncedFiles
 }
 
 function isWindowsScript(tool) {
@@ -765,17 +930,21 @@ async function runIBazelProtocol(
     toolArgs,
     env
 ) {
+    const initialFiles = await fs.promises
+        .readFile(entriesPath)
+        .then(JSON.parse);
     await syncFiles(
-        await fs.promises.readFile(entriesPath).then(JSON.parse),
+        initialFiles,
         sandbox,
         config.grant_sandbox_write_permissions,
         syncRecursive
     );
+    config.previous_files = initialFiles;
 
     return new Promise((resolve) => {
         const proc = child_process.spawn(tool, toolArgs, {
             cwd: cwd,
-            env: env,
+            env: runfilesNotificationEnv(env, config.notify_runfiles_changes),
 
             // `.cmd` and `.bat` are always executed in a shell on windows
             // and require the flag to be set per CVE-2024-27980
@@ -797,64 +966,65 @@ async function runIBazelProtocol(
         // Process stdin data in order using a promise chain.
         let syncing = Promise.resolve();
         const rl = readline.createInterface({ input: process.stdin });
-        rl.on('line', (line) => {
-            syncing = syncing.then(() => processChunk(line));
+
+        async function syncBuild(ibazelEvent) {
+            const oldFiles = config.previous_files || [];
+
+            // Re-parse the config file to get the latest list of data files to copy
+            const updatedDataFiles = await fs.promises
+                .readFile(entriesPath)
+                .then(JSON.parse);
+            const filesToSync = ibazelEvent
+                ? selectRunfilesToSync(
+                      updatedDataFiles,
+                      ibazelEvent,
+                      process.env.BUILD_WORKSPACE_DIRECTORY
+                  )
+                : updatedDataFiles;
+
+            const [deletedFiles, syncedFiles] = await Promise.all([
+                // Remove files that were previously synced but are no longer in the updated list of files to sync
+                deleteFiles(oldFiles, updatedDataFiles, sandbox),
+
+                // Sync changed source files and scan generated outputs for changes.
+                syncFiles(
+                    filesToSync,
+                    sandbox,
+                    config.grant_sandbox_write_permissions,
+                    syncRecursive
+                ),
+            ]);
+
+            // The latest state of copied data files
+            config.previous_files = updatedDataFiles;
+            return { deletedFiles, syncedFiles }
+        }
+
+        async function writeToChild(line) {
+            await new Promise((resolve) => {
+                // note: ignoring error - if this write to stdin fails,
+                // it's probably okay. Can add error handling later if needed
+                proc.stdin.write(line, resolve);
+            });
+        }
+
+        const processChunk = createIBazelLineProcessor({
+            notifyRunfilesChanges: config.notify_runfiles_changes,
+            sandbox,
+            syncBuild,
+            writeToChild,
         });
-
-        async function processChunk(chunk) {
-            try {
-                const chunkString = chunk.toString();
-                if (chunkString.includes('IBAZEL_BUILD_COMPLETED SUCCESS')) {
-                    if (JS_BINARY__LOG_DEBUG) {
-                        console.error('IBAZEL_BUILD_COMPLETED SUCCESS');
-                    }
-
-                    const oldFiles = config.previous_files || [];
-
-                    // Re-parse the config file to get the latest list of data files to copy
-                    const updatedDataFiles = await fs.promises
-                        .readFile(entriesPath)
-                        .then(JSON.parse);
-
-                    // Await promises to catch any exceptions, and wait for the
-                    // sync to be complete before writing to stdin of the child
-                    // process
-                    await Promise.all([
-                        // Remove files that were previously synced but are no longer in the updated list of files to sync
-                        deleteFiles(oldFiles, updatedDataFiles, sandbox),
-
-                        // Sync changed files
-                        syncFiles(
-                            updatedDataFiles,
-                            sandbox,
-                            config.grant_sandbox_write_permissions,
-                            syncRecursive
-                        ),
-                    ]);
-
-                    // The latest state of copied data files
-                    config.previous_files = updatedDataFiles;
-                } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
-                    if (JS_BINARY__LOG_DEBUG) {
-                        console.error('IBAZEL_BUILD_STARTED');
-                    }
-                }
-
-                // Forward stdin to the subprocess. See comment about
-                // https://github.com/aspect-build/rules_js/issues/1242 where
-                // `proc` is spawned
-                await new Promise((resolve) => {
-                    // note: ignoring error - if this write to stdin fails,
-                    // it's probably okay. Can add error handling later if needed
-                    proc.stdin.write(chunk, resolve);
-                });
-            } catch (e) {
+        rl.on('line', (line) => {
+            if (JS_BINARY__LOG_DEBUG && line.startsWith('IBAZEL_')) {
+                console.error(line);
+            }
+            syncing = syncing.then(() => processChunk(line)).catch((e) => {
                 console.error(
                     `An error has occurred while incrementally syncing files. Error: ${e}`
                 );
                 process.exit(1);
-            }
-        }
+            });
+        });
     })
 }
 
@@ -958,7 +1128,14 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     ]);
 }
 
-async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
+async function cycleSyncRecurse(
+    cycle,
+    file,
+    isDirectory,
+    sandbox,
+    writePerm,
+    syncedFiles
+) {
     const src = RUNFILES_ROOT + path.sep + file;
     const dst = sandbox + path.sep + file;
 
@@ -978,13 +1155,21 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     }
 
     if (srcRunfilesInfo.is_symlink) {
-        return syncSymlink(file, src, dst, sandbox, exists)
+        return syncSymlink(file, src, dst, sandbox, exists, syncedFiles)
     }
 
     if (isDirectory) {
-        return syncDirectory(file, src, sandbox, writePerm)
+        return syncDirectory(file, src, sandbox, writePerm, syncedFiles)
     } else {
-        return syncFile(file, src, dst, exists, null, writePerm)
+        return syncFile(
+            file,
+            src,
+            dst,
+            exists,
+            null,
+            writePerm,
+            syncedFiles
+        )
     }
 }
 (async () => {
@@ -1038,4 +1223,4 @@ function onProcessEnd(callback) {
     // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
 }
 
-export { friendlyFileSize, is1pPackageStoreDep, isNodeModulePath };
+export { createIBazelLineProcessor, formatRunfilesSyncEvent, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, parseIBazelEvent, runfilesNotificationEnv, selectRunfilesToSync };
