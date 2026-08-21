@@ -1,0 +1,12 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load(":genjs_rule.bzl", "genjs_rule")
+
+genjs_rule(
+    name = "output",
+)
+
+js_test(
+    name = "test_entry",
+    data = [":output"],
+    entry_point = ":output.js",
+)
