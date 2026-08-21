@@ -82,10 +82,9 @@ coverage_pass_test(
     entry_point = "lib.js",
 )
 
-# A passing test that exits non-zero: the exit hook must compare against
-# expected_exit_code rather than zero. pass_merger's assertions all hold, and this also
-# keeps the launcher's fork path (which expected_exit_code still forces) covered under
-# `bazel coverage`.
+# A test that exits non-zero but still passes since the exit code matches
+# expected_exit_code. pass_merger's assertions all hold, and this also keeps the
+# launcher's fork path (which expected_exit_code forces) covered under `bazel coverage`.
 coverage_pass_test(
     name = "expected_exit",
     data = ["expected_exit.js"],
