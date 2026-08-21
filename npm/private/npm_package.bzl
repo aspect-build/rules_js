@@ -483,6 +483,7 @@ def npm_package(
             tags = kwargs.get("tags", []) + ["manual"],
             testonly = kwargs.get("testonly"),
             visibility = kwargs.get("visibility", None),
+            silent_on_success = False,
         )
 
     _npm_package(
