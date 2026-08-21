@@ -18,9 +18,14 @@ if (!process.env.JS_BINARY__NODE_PATCHES_DEPTH) {
 }
 
 // subprocess patch
+//
+// Only when a wrapper was supplied: the bash launcher always sets this, but a
+// launcher that invokes node directly has no wrapper to point at. Assigning an
+// unset value here would leave process.execPath undefined, which breaks anything
+// that re-spawns itself through it.
 if (process.platform == 'win32') {
     // FIXME: need to make an exe, or run in a shell so we can use .bat
-} else {
+} else if (JS_BINARY__NODE_WRAPPER) {
     if (JS_BINARY__LOG_DEBUG) {
         console.error(
             `DEBUG: ${JS_BINARY__LOG_PREFIX}: overriding process.execPath to node wrapper path ${JS_BINARY__NODE_WRAPPER}`

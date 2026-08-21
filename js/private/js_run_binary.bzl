@@ -13,8 +13,64 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 load("@bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
+load(":hermetic_tool.bzl", _hermetic_tool = "hermetic_tool")
 load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
+
+def _hermetic_launcher_usable(args, tool):
+    """Whether this js_run_binary could use the tool's hermetic launcher.
+
+    Only about what is visible here; whether the tool actually has a launcher is
+    decided when it is analyzed, and hermetic_tool falls back if it does not.
+
+    Anything it looks at that may be a `select()` is treated as disqualifying rather
+    than guessed at, since a macro cannot see through one.
+    """
+
+    # `log_level` is deliberately absent. It only selects how much diagnostic output is
+    # printed, and js_run_binary passes JS_BINARY__LOG_* through the action environment,
+    # so the preload and bootstrap.cjs honour it either way. See the matching note in
+    # _hermetic_launcher_blockers.
+
+    # `env` is deliberately not inspected. A few JS_BINARY__* variables select launcher
+    # script behaviour that this launcher cannot reproduce -- the output captures, the
+    # exit code file, silent_on_success -- but setting one of those by hand means going
+    # out of the way to ask for something js_run_binary already has an attribute for, and
+    # launcher.cjs refuses to run at all when it sees one, naming the variable. A loud
+    # error for something nobody does is worth more than keeping every target that
+    # mentions JS_BINARY__* on the slow path. The variables the launcher does honour --
+    # JS_BINARY__CHDIR, JS_BINARY__NO_CD_BINDIR, JS_BINARY__LOG_* and
+    # JS_BINARY__USE_EXECROOT_ENTRY_POINT -- work either way.
+
+    # The launcher script turns these into node CLI flags; nothing can do that once
+    # node has started, so they would both fail to apply and leak into argv.
+    if type(args) != "list":
+        return False
+    for arg in args:
+        if type(arg) != "string" or arg.startswith("--node_options="):
+            return False
+
+    # The wrapper has to name the tool, so the tool cannot itself be a select().
+    return type(tool) in ["string", "Label"]
+
+def _hermetic_tool_for(tool, testonly):
+    """Declares, once per package, a hermetic_tool wrapping `tool`.
+
+    Shared across every js_run_binary in the package that uses the same tool, because
+    each wrapper gets its own runfiles tree and a tool with a large node_modules is
+    exactly the kind that many targets share.
+    """
+    sanitized = "".join([c if c.isalnum() else "_" for c in str(tool).elems()])
+    name = "_hermetic_tool_{}{}".format(sanitized, "_testonly" if testonly else "")
+    if native.existing_rule(name) == None:
+        _hermetic_tool(
+            name = name,
+            binary = tool,
+            testonly = testonly,
+            # Only build it when a target that uses it is built.
+            tags = ["manual"],
+        )
+    return ":{}".format(name)
 
 def js_run_binary(
         name,
@@ -414,9 +470,33 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         "//conditions:default": {},
     }) if use_execroot_entry_point == None else {}
 
+    # Run through the tool's hermetic launcher where that is known to behave the same,
+    # skipping the shell and the path resolution the launcher script does per action.
+    # hermetic_tool falls back to the bash launcher for a tool that has no hermetic
+    # launcher, so this only has to decide what is knowable here.
+    #
+    # One launcher serves both entry point modes. It resolves the execroot entry point at
+    # startup from JS_BINARY__USE_EXECROOT_ENTRY_POINT, which is in the action environment
+    # either way -- fixed_env above for True, the execroot_env select for None -- so
+    # use_execroot_entry_point no longer has to be knowable here.
+    run_binary_tool = tool
+    if _hermetic_launcher_usable(args, tool):
+        run_binary_tool = _hermetic_tool_for(tool, kwargs.get("testonly"))
+
+    # stdout, stderr, exit_code_out and silent_on_success are forwarded to run_binary,
+    # which captures through its spawn_binary wrapper, rather than being turned into
+    # JS_BINARY__* variables for the launcher script to act on. The wrapper outlives the
+    # program, so it can do the post-exit work the hermetic launcher cannot -- which is
+    # what lets these four stop disqualifying it. It costs no process either: the script
+    # only forks rather than execs because of this work, so the wrapper's fork replaces
+    # the script's. The capture files are declared by run_binary's own attributes and so
+    # must not also appear in `outs`.
+    #
+    # The script keeps its implementation of all four, for anything that invokes a
+    # js_binary directly and sets those variables itself.
     _run_binary(
         name = name,
-        tool = tool,
+        tool = run_binary_tool,
         env = fixed_env | legacy_env | execroot_env | env,
         srcs = srcs + extra_srcs + execroot_extra_srcs,
         outs = outs,

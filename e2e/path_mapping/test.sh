@@ -107,3 +107,33 @@ if [ "$cache_hit3" != "true" ]; then
 fi
 
 echo "PASS: js_run_binary action controlled by --@aspect_rules_js//js:set_legacy_environment_variables=False was cache-shared across -c fastbuild and -c opt"
+
+# Same as above for js_run_binary_path_mapping_check_hermetic, which is configured so
+# that js_run_binary selects the hermetic launcher. There the --bazel-bindir flag is
+# consumed by the launcher.cjs preload rather than by the launcher script, so this is
+# what proves that path is path-mapping-safe too.
+exec_log4="$scratch/exec_log4.json"
+
+bazel build -c fastbuild //js_run_binary_path_mapping_check:js_run_binary_path_mapping_check_hermetic \
+    --disk_cache="$disk_cache" \
+    --action_env="JS_RUN_BINARY_PATH_MAPPING_CHECK_HERMETIC_INVALIDATE=$invalidate"
+
+bazel build -c opt //js_run_binary_path_mapping_check:js_run_binary_path_mapping_check_hermetic \
+    --disk_cache="$disk_cache" \
+    --action_env="JS_RUN_BINARY_PATH_MAPPING_CHECK_HERMETIC_INVALIDATE=$invalidate" \
+    --execution_log_json_file="$exec_log4"
+
+matches4="$(jq -s '[.[] | select(.mnemonic == "JsRunBinaryPathMappingCheckHermetic")]' "$exec_log4")"
+count4="$(echo "$matches4" | jq 'length')"
+if [ "$count4" -eq 0 ]; then
+    echo "FAIL: no JsRunBinaryPathMappingCheckHermetic entry found in the -c opt execution log" >&2
+    exit 1
+fi
+
+cache_hit4="$(echo "$matches4" | jq -r '.[0].cacheHit')"
+if [ "$cache_hit4" != "true" ]; then
+    echo "FAIL: hermetic launcher js_run_binary action was re-executed under -c opt (cacheHit=$cache_hit4); path mapping did not share the cache entry from -c fastbuild" >&2
+    exit 1
+fi
+
+echo "PASS: js_run_binary action using the hermetic launcher was cache-shared across -c fastbuild and -c opt"

@@ -3,7 +3,9 @@
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
+load("@bazel_lib//lib:paths.bzl", "to_rlocation_path")
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
+load("@hermetic_launcher//launcher:lib.bzl", "launcher")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
 
@@ -277,6 +279,10 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
+    "_hermetic_bootstrap": attr.label(
+        allow_single_file = True,
+        default = Label("@aspect_rules_js//js/private/node-bootstrap:launcher.cjs"),
+    ),
 }
 
 _ENV_SET = """export {var}={quoted_value}"""
@@ -296,6 +302,286 @@ def _generates_coverage_report(ctx):
     return (hasattr(ctx.file, "_coverage_report") and
             ctx.attr.testonly and
             ctx.configuration.coverage_enabled)
+
+# Resolved here as Labels rather than used as the bare strings hermetic_launcher
+# exposes: under --incompatible_auto_exec_groups a string toolchain type is resolved
+# against the repository mapping of whichever module is being built, so a consumer
+# that does not itself depend on hermetic_launcher cannot resolve the name. A Label
+# is resolved against this file's own mapping at load time instead.
+_FINALIZER_TOOLCHAIN_TYPE = Label(launcher.finalizer_toolchain_type)
+_TEMPLATE_TOOLCHAIN_TYPE = Label(launcher.template_toolchain_type)
+
+# Limits of the prebuilt stub hermetic_launcher patches: arg0..arg9, 256 bytes each.
+_MAX_EMBEDDED_ARGS = 10
+_MAX_EMBEDDED_ARG_LENGTH = 256
+
+def _compile_stub(ctx, embedded_args, transformed_args, output_file):
+    """Stamps a launcher binary from the prebuilt template stub.
+
+    This is `launcher.compile_stub` reimplemented so the finalizer toolchain can be
+    named by Label; see the comment on _FINALIZER_TOOLCHAIN_TYPE. Drop this in favour
+    of the upstream helper once it takes Labels.
+    """
+    template = ctx.toolchains[_TEMPLATE_TOOLCHAIN_TYPE].templatetoolchaininfo.template_exe
+    args = ctx.actions.args()
+    args.add("--template", template)
+    args.add("-o", output_file)
+    args.add_joined("--transform", transformed_args, join_with = ",")
+    args.add("--")
+    args.add_all(embedded_args)
+    ctx.actions.run(
+        outputs = [output_file],
+        executable = ctx.toolchains[_FINALIZER_TOOLCHAIN_TYPE].finalizer_info.finalizer,
+        arguments = [args],
+        inputs = [template],
+        toolchain = _FINALIZER_TOOLCHAIN_TYPE,
+        mnemonic = "JsLauncher",
+        progress_message = "Stamping launcher %{output}",
+    )
+
+# The two spellings of the runfiles-root reference that the bash launcher expands in
+# `fixed_args`, and that the stub can resolve instead. See _classify_fixed_args.
+_RUNFILES_DIR_PREFIXES = ["$RUNFILES_DIR/", "${RUNFILES_DIR}/"]
+
+def _classify_fixed_args(fixed_args):
+    """Splits expanded `fixed_args` into stub arguments, or reports that it cannot.
+
+    The bash launcher inlines `fixed_args` into the script, so the shell expands them.
+    The stub has no shell, but it can resolve an argument through runfiles, which is
+    exactly what the documented `"$$RUNFILES_DIR/$(rlocationpath :config)"` idiom needs:
+    `$(rlocationpath ...)` is already expanded by the time we get here, so what is left
+    is a runfiles-root reference followed by an rlocation path.
+
+    Returns a `(specs, blockers)` tuple. Each spec is a `(kind, value)` pair, where kind
+    is "embedded" for a verbatim argument or "runfile" for one the launcher resolves
+    against its runfiles at startup. Anything else needs a shell and is a blocker.
+    """
+    specs = []
+    for arg in fixed_args:
+        prefix = None
+        for candidate in _RUNFILES_DIR_PREFIXES:
+            if arg.startswith(candidate):
+                prefix = candidate
+        if prefix:
+            rlocation = arg[len(prefix):]
+
+            # Only a bare rlocation path can be resolved; anything else in there is
+            # more shell than the stub can do.
+            if "$" in rlocation or not rlocation:
+                return [], ["JS_BINARY_FIXED_ARGS"]
+            specs.append(("runfile", rlocation))
+            continue
+
+        # Any other `$` is a shell expansion, a make variable that expand_args was not
+        # asked to substitute, or a runfiles reference in a form not handled above.
+        if "$" in arg:
+            return [], ["JS_BINARY_FIXED_ARGS"]
+
+        # js_run_binary passes `--bazel-bindir <path>` after the embedded arguments, and
+        # launcher.cjs consumes the first occurrence. A fixed arg spelled the same way
+        # would be consumed instead.
+        if arg == "--bazel-bindir":
+            return [], ["JS_BINARY_FIXED_ARGS"]
+        specs.append(("embedded", arg))
+
+    return specs, []
+
+def _hermetic_launcher_blockers(ctx, fixed_arg_blockers, fixed_env, is_windows):
+    """Why this target cannot use the hermetic launcher, as a list of reason codes.
+
+    An allowlist rather than a denylist: everything the bash launcher does has to be
+    either reproduced by launcher.cjs or named here, so an attribute added to
+    js_binary later makes targets ineligible rather than silently losing behaviour.
+    """
+    blockers = []
+
+    # Baked into the launcher script, so the stub can never see them. `env` and
+    # `chdir` are also delivered by js_run_binary as action env, which launcher.cjs
+    # does honour; it is only the js_binary-level values that have no channel.
+    if ctx.attr.chdir:
+        blockers.append("JS_BINARY_CHDIR")
+    if ctx.attr.env or fixed_env:
+        blockers.append("JS_BINARY_ENV")
+
+    # `fixed_args` are baked into the launcher script too, but the stub can carry them
+    # as embedded arguments, so only the ones needing a shell are a blocker.
+    blockers.extend(fixed_arg_blockers)
+
+    # node parses its options before any preload runs, so these can only be embedded
+    # arguments; only --preserve-symlinks-main is, so far.
+    if ctx.attr.node_options:
+        blockers.append("JS_BINARY_NODE_OPTIONS")
+
+    # Needs work after the program exits, and the stub execve's.
+    if ctx.attr.expected_exit_code:
+        blockers.append("JS_BINARY_EXPECTED_EXIT_CODE")
+
+    # Needs JS_BINARY__NPM_BINARY and the npm wrapper directory on the PATH.
+    if ctx.attr.include_npm:
+        blockers.append("JS_BINARY_INCLUDE_NPM")
+
+    # The launcher script refuses to run the execroot entry point without this, since
+    # nothing would have put the entry point in the bindir (js_binary.sh.tpl). The check
+    # cannot be ported: it reads JS_BINARY__COPY_DATA_TO_BIN, a per-target constant the
+    # stub has no way to carry, and js_run_binary's
+    # allow_execroot_entry_point_with_no_copy_data_to_bin escape hatch is not visible from
+    # here either. Defaults to True, so this blocks almost nothing.
+    if not ctx.attr.copy_data_to_bin:
+        blockers.append("JS_BINARY_COPY_DATA_TO_BIN")
+
+    # `patch_node_fs` is deliberately not a blocker: js_run_binary always passes
+    # JS_BINARY__PATCH_NODE_FS through the action environment, and the launcher script
+    # only sets it if it is not already set, so the caller's value wins either way.
+
+    # `log_level` is deliberately not a blocker. The launcher script's info and debug
+    # output is diagnostic only -- it dumps PATH, the BAZEL_* and JS_BINARY__* values it
+    # computed, and the node command line -- so losing it changes what is printed and
+    # nothing else. launcher.cjs logs the steps it performs, and js_run_binary passes
+    # JS_BINARY__LOG_* through the action environment, so a log level set there still
+    # reaches the preload and bootstrap.cjs. Only a level set on the js_binary itself has
+    # no channel to the stub, and is silently not applied.
+
+    # The fs patches are force-disabled on Windows (#1137), and the stub there spawns
+    # and waits rather than execve'ing.
+    #
+    # This subsumes `enable_runfiles`, which switches every path to execroot
+    # resolution: the launcher script only consults it on Windows, and its
+    # config_setting matches only when --enable_runfiles is passed explicitly, so it
+    # reads False on a normal Linux build where runfiles are in fact enabled.
+    if is_windows:
+        blockers.append("WINDOWS")
+
+    # NODE_V8_COVERAGE has to be set before node starts, and the report generator has
+    # to run after it exits.
+    if _generates_coverage_report(ctx):
+        blockers.append("COVERAGE")
+
+    return blockers
+
+def _hermetic_launcher(ctx, nodeinfo, entry_point_rlocation, fixed_arg_specs, blockers, is_windows):
+    """Stamps a launcher binary that runs the entry point on node with the fs patches applied.
+
+    This is an alternative to the bash launcher: everything it needs is baked into the
+    binary, so running it with no arguments runs the js_binary's program with no shell
+    involved. It is independent of the bash launcher, which is still what `bazel run`
+    executes, and is exposed only through the `hermetic_launcher` output group so that
+    the stamping action does not run unless something asks for it.
+
+    The stub can only execve, so the environment setup the bash launcher does in shell
+    is done by the launcher.cjs preload instead, in node, before the entry point loads.
+    What neither of them can do is named by _hermetic_launcher_blockers; a target with
+    any blocker gets no launcher at all and its consumers keep using the bash one.
+
+    Returns None when there is a blocker, or when hermetic_launcher publishes no stub
+    for the target platform (e.g. linux ppc64le, windows arm64).
+    """
+    if not ctx.toolchains[_TEMPLATE_TOOLCHAIN_TYPE] or not ctx.toolchains[_FINALIZER_TOOLCHAIN_TYPE]:
+        return None
+    if blockers:
+        return None
+
+    # Each entry is either a File, resolved through runfiles when the launcher runs, or
+    # a string, embedded verbatim.
+    #
+    # There is no `--` before the entry point. It would only be needed if the entry
+    # point could look like a node option, and it cannot: the launcher resolves a
+    # transformed argument by prefixing the runfiles root, which is absolute, so what
+    # node sees always begins with a path separator. Spending a tenth of the argument
+    # budget to guard an impossible case is worse than not having the guard.
+    #
+    # The preload is launcher.cjs rather than the fs patches directly: it reconstructs
+    # what the bash launcher's environment setup would have done and then requires the
+    # patches itself. --preserve-symlinks-main has to be here because it is a node CLI
+    # flag, so no preload can apply it.
+    #
+    # `--require` and its value stay two arguments. The launcher cannot resolve
+    # `--require=<path>` as one, because the transform prepends the runfiles root to the
+    # whole argument rather than to a path inside it: the result is
+    # `<runfiles>/--require=<path>`, and node reports the module as missing.
+    args = []
+    if ctx.attr.preserve_symlinks_main:
+        args.append("--preserve-symlinks-main")
+    args.extend(["--require", ctx.file._hermetic_bootstrap])
+
+    if nodeinfo.node:
+        embedded_args, transformed_args = launcher.args_from_entrypoint(nodeinfo.node)
+    elif nodeinfo.node_path.startswith("/"):
+        # A node_toolchain may name a non-hermetic node by absolute path rather than
+        # provide a File. The launcher passes absolute paths through untouched, so
+        # there is nothing for it to resolve.
+        embedded_args, transformed_args = [nodeinfo.node_path], []
+    else:
+        # A relative node_path is relative to this workspace within the runfiles tree,
+        # matching how the launcher script resolves it.
+        embedded_args, transformed_args = ["{}/{}".format(ctx.workspace_name, nodeinfo.node_path)], [0]
+
+    for arg in args:
+        if type(arg) == "File":
+            embedded_args, transformed_args = launcher.append_runfile(
+                file = arg,
+                embedded_args = embedded_args,
+                transformed_args = transformed_args,
+            )
+        else:
+            embedded_args, transformed_args = launcher.append_embedded_arg(
+                arg = arg,
+                embedded_args = embedded_args,
+                transformed_args = transformed_args,
+            )
+
+    # A runfiles path we already hold as a string rather than a File, since the entry
+    # point may be a file inside a directory artifact.
+    embedded_args, transformed_args = launcher.append_raw_transformed_arg(
+        arg = entry_point_rlocation,
+        embedded_args = embedded_args,
+        transformed_args = transformed_args,
+    )
+
+    # After the entry point and before the arguments the caller passes at run time,
+    # which is where the launcher script puts them. A "runfile" spec is resolved by the
+    # launcher at startup, the same absolute path the script gets from expanding
+    # `$RUNFILES_DIR`; see _classify_fixed_args.
+    for (kind, value) in fixed_arg_specs:
+        if kind == "runfile":
+            embedded_args, transformed_args = launcher.append_raw_transformed_arg(
+                arg = value,
+                embedded_args = embedded_args,
+                transformed_args = transformed_args,
+            )
+        else:
+            embedded_args, transformed_args = launcher.append_embedded_arg(
+                arg = value,
+                embedded_args = embedded_args,
+                transformed_args = transformed_args,
+            )
+
+    # The stub holds 10 embedded arguments of at most 256 bytes each. Exceeding either
+    # is a build failure inside the finalizer, so degrade to the bash launcher instead:
+    # a deeply nested external repository can produce an rlocation path that long.
+    if len(embedded_args) > _MAX_EMBEDDED_ARGS:
+        return None
+    for arg in embedded_args:
+        if len(arg) > _MAX_EMBEDDED_ARG_LENGTH:
+            return None
+
+    # Declared only now that it is certain to be written: a file declared on a path that
+    # returns None above would have no generating action, which fails analysis rather
+    # than degrading to the bash launcher.
+    #
+    # Windows needs the .exe suffix for this to be executable at all. It gets a
+    # directory to itself so that its basename can be the target's own name, which is
+    # what a reader of `ps` output sees.
+    #
+    # NB: a js_binary named `hermetic` cannot work, since the bash launcher would be
+    # the file `hermetic_/hermetic` and this the directory `hermetic_/hermetic/`.
+    output = ctx.actions.declare_file("{}_/hermetic/{}{}".format(
+        ctx.label.name,
+        ctx.label.name,
+        ".exe" if is_windows else "",
+    ))
+
+    _compile_stub(ctx, embedded_args, transformed_args, output)
+    return output
 
 def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
@@ -387,9 +673,6 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if ctx.attr.preserve_symlinks_main and "--preserve-symlinks-main" not in node_options:
         node_options.append(_NODE_OPTION.format(value = "--preserve-symlinks-main"))
 
-    if ctx.attr.expand_args:
-        fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
-
     node_wrapper = ctx.file._node_wrapper_bat if is_windows else ctx.file._node_wrapper_sh
     toolchain_files = [node_wrapper]
 
@@ -421,6 +704,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join(node_options),
         "{{node_patches}}": ctx.file._node_patches.short_path,
+        "{{node_patches_rlocation}}": to_rlocation_path(ctx, ctx.file._node_patches),
         "{{node_wrapper}}": node_wrapper.short_path,
         "{{node}}": node_path,
         "{{npm}}": npm_path,
@@ -455,11 +739,21 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
             ctx.attr.entry_point[DirectoryPathInfo].directory.short_path,
             ctx.attr.entry_point[DirectoryPathInfo].path,
         ])
+        entry_point_rlocation = "/".join([
+            to_rlocation_path(ctx, entry_point),
+            ctx.attr.entry_point[DirectoryPathInfo].path,
+        ])
     else:
         if len(ctx.files.entry_point) != 1:
             fail("entry_point must be a single file or a target that provides a DirectoryPathInfo")
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
+        entry_point_rlocation = to_rlocation_path(ctx, entry_point)
+
+    # Expanded here rather than in _bash_launcher so that the hermetic launcher embeds
+    # the same arguments the script would have run with, not the unexpanded spelling.
+    if ctx.attr.expand_args:
+        fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
 
     bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
@@ -470,6 +764,17 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         launcher_files.append(nodeinfo.node)
 
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
+
+    # Neither the hermetic launcher nor its preload goes into runfiles: the launcher is
+    # not built unless its output group is requested, and whoever requests it is
+    # responsible for putting launcher.cjs in the runfiles the launcher will resolve
+    # against. Carrying the preload here instead would put it in every js_binary's
+    # runfiles, and into every container image built from one, for the benefit of the
+    # few that use it.
+    fixed_arg_specs, fixed_arg_blockers = _classify_fixed_args(fixed_args)
+    blockers = _hermetic_launcher_blockers(ctx, fixed_arg_blockers, fixed_env, is_windows)
+    hermetic_launcher = _hermetic_launcher(ctx, nodeinfo, entry_point_rlocation, fixed_arg_specs, blockers, is_windows)
+
     transitive_launcher_files = None
     if ctx.attr.include_npm:
         transitive_launcher_files = nodeinfo.npm_sources
@@ -502,7 +807,25 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         executable = launcher,
         runfiles = runfiles,
         data_runfiles = data_runfiles,
+        # Deliberately not in runfiles: nothing builds this unless it is requested
+        # through the output group of the same name.
+        hermetic_launcher = hermetic_launcher,
+        hermetic_launcher_blockers = blockers,
     )
+
+def _hermetic_launcher_report(ctx, launcher):
+    """A one-line verdict on this target's hermetic launcher, for the output group."""
+    if launcher.hermetic_launcher:
+        verdict = "eligible"
+    elif launcher.hermetic_launcher_blockers:
+        verdict = "blocked: {}".format(",".join(launcher.hermetic_launcher_blockers))
+    else:
+        # No blocker but no launcher either: hermetic_launcher publishes no stub for
+        # this platform, or an embedded argument was too long for one.
+        verdict = "unavailable"
+    report = ctx.actions.declare_file("{}_/hermetic_launcher_report.txt".format(ctx.label.name))
+    ctx.actions.write(report, "{} {}\n".format(ctx.label, verdict))
+    return report
 
 def _js_binary_impl(ctx):
     launcher = _create_launcher(
@@ -579,6 +902,17 @@ def _js_binary_impl(ctx):
             # toolchain scaffolding. Consumed by js_run_binary when
             # use_execroot_entry_point is enabled.
             execroot_data_files = launcher.data_runfiles.files,
+            # A launcher binary that runs the entry point on a patched node, in place of
+            # the bash launcher script. Not used by `bazel run` and not in runfiles, so
+            # it only gets stamped when explicitly requested. Empty on platforms
+            # hermetic_launcher publishes no stub for.
+            hermetic_launcher = depset(
+                [launcher.hermetic_launcher] if launcher.hermetic_launcher else [],
+            ),
+            # Why this target has no hermetic launcher, for
+            # `bazel build --output_groups=hermetic_launcher_report //...` to collect
+            # into a picture of what is blocking adoption. Written only on request.
+            hermetic_launcher_report = depset([_hermetic_launcher_report(ctx, launcher)]),
         ),
     ]
 
@@ -625,6 +959,12 @@ js_binary_lib = struct(
         # Optional: only referenced on Windows
         config_common.toolchain_type("@bazel_tools//tools/sh:toolchain_type", mandatory = False),
         "@rules_nodejs//nodejs:runtime_toolchain_type",
+        # Optional: only needed to stamp the hermetic_launcher output group, and
+        # hermetic_launcher publishes no stub for some platforms rules_js supports
+        # (linux ppc64le, windows arm64). Requiring these would stop js_binary from
+        # building there at all.
+        config_common.toolchain_type(_FINALIZER_TOOLCHAIN_TYPE, mandatory = False),
+        config_common.toolchain_type(_TEMPLATE_TOOLCHAIN_TYPE, mandatory = False),
     ] + COPY_FILE_TO_BIN_TOOLCHAINS,
 )
 

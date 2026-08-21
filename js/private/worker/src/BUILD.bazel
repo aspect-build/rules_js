@@ -27,16 +27,21 @@ rollup_bin.rollup(
         ":node_modules/google-protobuf",
     ],
     outs = ["bundle.js"],
+    # Only the config path needs `$RUNFILES_DIR` expanded; the rest are ordinary `args`,
+    # which follow `fixed_args`, so rollup sees the same command line either way and the
+    # hermetic launcher's embedded argument budget is not spent on them.
+    args = [
+        "--format",
+        "cjs",
+        "--file",
+        "bundle.js",
+    ],
     chdir = package_name(),
     data = [":config"],
     fixed_args = [
         "index.ts",
         "--config",
         "$$RUNFILES_DIR/$(rlocationpath :config)",
-        "--format",
-        "cjs",
-        "--file",
-        "bundle.js",
     ],
     silent_on_success = False,
     visibility = ["//js/private/worker:__pkg__"],
