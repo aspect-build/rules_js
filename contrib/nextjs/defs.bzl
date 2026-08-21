@@ -212,7 +212,6 @@ def nextjs_build(name, config, srcs, next_js_binary, data = [], use_execroot_ent
         mnemonic = "NextJs",
         progress_message = "Compile Next.js app %{label}",
         use_execroot_entry_point = use_execroot_entry_point,
-        silent_on_success = kwargs.pop("silent_on_success", True),
         **kwargs
     )
 
@@ -362,7 +361,6 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
         tags = tags + ["manual"],
         testonly = testonly,
         visibility = ["//visibility:private"],
-        silent_on_success = kwargs.pop("silent_on_success", True),
         **kwargs
     )
 

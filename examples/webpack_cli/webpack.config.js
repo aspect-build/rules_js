@@ -6,9 +6,8 @@ const out_path = path.resolve(process.cwd(), 'dist')
 
 module.exports = {
     entry: path.join(process.cwd(), 'index.js'),
-    stats: 'verbose',
     mode: 'development',
-    stats: 'detailed',
+    stats: 'errors-warnings',
     resolve: {
         extensions: ['.js', '.ts'],
     },
