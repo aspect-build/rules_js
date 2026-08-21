@@ -67,16 +67,13 @@ if (JS_BINARY__COVERAGE_REPORT && process.env.COVERAGE_DIR) {
     // NODE_V8_COVERAGE is blanked so the reporter writes no profile of its own
     // alongside the ones it reads. It has to be emptied rather than deleted:
     // child_process always propagates NODE_V8_COVERAGE from the parent, and only skips
-    // doing so when the env passed to it has the key as an own property.
+    // doing so when the env passed to it has the key as a property.
     const env = {
         ...process.env,
         JS_COVERAGE__RUNFILES: process.env.JS_BINARY__RUNFILES,
         NODE_V8_COVERAGE: '',
     }
     const cwd = process.cwd()
-    const expectedExitCode = Number(
-        process.env.JS_BINARY__EXPECTED_EXIT_CODE || 0
-    )
     // Not process.execPath, which was patched above to the node wrapper; that would
     // re-apply this bootstrap in the reporter process.
     const nodeBinary = process.env.JS_BINARY__NODE_BINARY
@@ -92,7 +89,6 @@ if (JS_BINARY__COVERAGE_REPORT && process.env.COVERAGE_DIR) {
     // the program's own report, except under split post-processing where bazel discards
     // it and ours is published instead.
     process.on('exit', (code) => {
-        if (code !== expectedExitCode) return
         // A test reporting its own coverage owns it, except in split mode where bazel
         // drops it.
         if (

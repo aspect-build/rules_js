@@ -404,9 +404,6 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
     if _generates_coverage_report(ctx):
-        # Read by node-bootstrap/bootstrap.cjs, which generates the lcov report when the
-        # test program exits. An env var rather than a launcher substitution so that it
-        # keeps working once the launcher script goes away. See #2901.
         envs.append(_ENV_SET.format(
             var = "JS_BINARY__COVERAGE_REPORT",
             quoted_value = _bash_quote("/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])),
