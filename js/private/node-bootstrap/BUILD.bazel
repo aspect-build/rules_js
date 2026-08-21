@@ -11,4 +11,5 @@ exports_files([
     "fs.cjs",
     "bootstrap.cjs",
     "coverage.cjs",
+    "launcher.cjs",
 ])

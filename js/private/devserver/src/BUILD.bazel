@@ -17,16 +17,21 @@ rollup_bin.rollup(
         "//js/private/watch",
     ],
     outs = ["bundle.mjs"],
+    # Only the config path needs `$RUNFILES_DIR` expanded; the rest are ordinary `args`,
+    # which follow `fixed_args`, so rollup sees the same command line either way and the
+    # hermetic launcher's embedded argument budget is not spent on them.
+    args = [
+        "--format",
+        "es",
+        "--file",
+        "bundle.mjs",
+    ],
     chdir = package_name(),
     data = [":config"],
     fixed_args = [
         "js_run_devserver.mjs",
         "--config",
         "$$RUNFILES_DIR/$(rlocationpath :config)",
-        "--format",
-        "es",
-        "--file",
-        "bundle.mjs",
     ],
     silent_on_success = False,
     visibility = ["//js/private/devserver:__pkg__"],

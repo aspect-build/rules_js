@@ -21,16 +21,21 @@ rollup_bin.rollup(
         "//npm/private/lifecycle:node_modules/@pnpm/read-package-json",
     ],
     outs = ["index.min.js"],
+    # Only the config path needs `$RUNFILES_DIR` expanded; the rest are ordinary `args`,
+    # which follow `fixed_args`, so rollup sees the same command line either way and the
+    # hermetic launcher's embedded argument budget is not spent on them.
+    args = [
+        "--format",
+        "cjs",
+        "--file",
+        "index.min.js",
+    ],
     chdir = package_name(),
     data = ["//npm/private/lifecycle:rollup_config"],
     fixed_args = [
         "lifecycle-hooks.js",
         "--config",
         "$$RUNFILES_DIR/$(rlocationpath //npm/private/lifecycle:rollup_config)",
-        "--format",
-        "cjs",
-        "--file",
-        "index.min.js",
     ],
     silent_on_success = False,
     visibility = ["//npm/private/lifecycle:__subpackages__"],
