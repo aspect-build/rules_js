@@ -272,7 +272,6 @@ jobs:
     # https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes
     smoke:
         name: smoke (${{ matrix.workspace.path }}, ${{ matrix.os }})
-        if: github.ref_name == 'main' || contains(github.head_ref, 'macos') || contains(github.head_ref, 'windows')
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false

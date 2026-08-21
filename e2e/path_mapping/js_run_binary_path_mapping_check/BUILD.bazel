@@ -67,3 +67,25 @@ js_run_binary(
     tags = ["manual"],
     tool = ":check",
 )
+
+# Same again, but configured so the js_run_binary gate selects the hermetic launcher:
+# silent_on_success off, and the entry point resolved through runfiles. check.mjs's two
+# assertions -- that BAZEL_BINDIR is the path-mapped bindir, and that --bazel-bindir did
+# not leak into argv -- are exactly what launcher.cjs has to get right in place of the
+# launcher script, and `chdir` exercises the one JS_BINARY__* variable it honours.
+js_run_binary(
+    name = "js_run_binary_path_mapping_check_hermetic",
+    outs = ["out_hermetic.txt"],
+    args = ["out_hermetic.txt"],
+    chdir = package_name(),
+    mnemonic = "JsRunBinaryPathMappingCheckHermetic",
+    set_legacy_environment_variables = False,
+    silent_on_success = False,
+    tool = ":check",
+    use_execroot_entry_point = False,
+)
+
+build_test(
+    name = "js_run_binary_path_mapping_check_hermetic_test",
+    targets = [":js_run_binary_path_mapping_check_hermetic"],
+)

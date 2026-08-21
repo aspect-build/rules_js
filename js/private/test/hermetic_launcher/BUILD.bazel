@@ -1,0 +1,638 @@
+load("@bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+# The hermetic launcher is not part of any js_binary's runfiles and nothing builds it
+# by default, so it needs a target of its own to be covered at all.
+
+package(default_testonly = True)
+
+# Holds one arm of a differential pair to the launcher script. The js_run_binary gate
+# cannot see through a select(), so a select()-valued `args` declines the hermetic
+# launcher, while the empty list it resolves to leaves the command line the program sees
+# unchanged. An empty `env` wrapped the same way used to serve for this, until the gate
+# stopped looking at `env` at all.
+_BASH_LAUNCHER = select({"//conditions:default": []})
+
+js_binary(
+    name = "bin",
+    entry_point = "probe.js",
+)
+
+# Pulls the launcher binary out of the output group. This is also the worked
+# example of how a caller opts into it.
+filegroup(
+    name = "launcher",
+    srcs = [":bin"],
+    output_group = "hermetic_launcher",
+)
+
+# `bin` is in data so that node, bootstrap.cjs, fs.cjs and probe.js land in this test's
+# runfiles at the rlocation paths the launcher has baked in. launcher.cjs is not part
+# of a js_binary's runfiles, so whoever asks for the launcher supplies it -- this is
+# the worked example of that too.
+sh_test(
+    name = "launcher_test",
+    srcs = ["launcher_test.sh"],
+    args = ["$(rootpath :launcher)"],
+    data = [
+        ":bin",
+        ":launcher",
+        "//js/private/node-bootstrap:launcher.cjs",
+    ],
+    # The launcher is untested on Windows, where it must resolve runfiles through
+    # RUNFILES_MANIFEST_FILE rather than a materialized tree.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# Differential test: one js_binary, run as a js_run_binary tool twice. The two reports
+# must be byte-identical -- any field that has to be normalized away to make that true
+# is a difference in launcher behaviour that belongs in the gate.
+#
+# Both targets go through the ordinary js_run_binary gate rather than naming a launcher,
+# so this exercises the real selection path. The bash arm is held to the script by
+# _BASH_LAUNCHER, which leaves the command line -- and everything else the probe reports
+# -- identical to the hermetic arm's. launcher_choice_test is what stops this from
+# silently becoming a comparison of the hermetic launcher with itself if the gate ever
+# changes.
+#
+# silent_on_success is off on both arms so that neither goes through run_binary's capture
+# wrapper, keeping this a comparison of the two launchers and nothing else.
+
+js_binary(
+    name = "action_bin",
+    entry_point = "action_probe.js",
+)
+
+[
+    js_run_binary(
+        name = "report_{}".format(launcher),
+        srcs = ["action_probe.js"],
+        outs = [
+            "report_{}.json".format(launcher),
+            "launcher_{}.txt".format(launcher),
+        ],
+        args = ["$(rootpath report_{}.json)".format(launcher)] + pin,
+        log_level = log_level,
+        silent_on_success = False,
+        tool = ":action_bin",
+        # The hermetic launcher resolves its entry point through runfiles, which is
+        # what use_execroot_entry_point = False means.
+        use_execroot_entry_point = False,
+    )
+    for (launcher, pin, log_level) in [
+        ("bash", _BASH_LAUNCHER, None),
+        ("hermetic", [], None),
+        # A raised log level is not a blocker: it only selects how much diagnostic
+        # output is printed. This is the target that says so.
+        ("debug", [], "debug"),
+    ]
+]
+
+# Differential test for `fixed_args`, which the bash launcher expands with a shell and
+# the hermetic launcher carries as embedded arguments -- resolving the runfiles one
+# itself. Same structure as above: one js_binary, two js_run_binary targets, and the two
+# reports must be byte-identical.
+
+js_binary(
+    name = "fixed_args_bin",
+    data = ["fixed_args_data.json"],
+    entry_point = "fixed_args_probe.js",
+    # The documented idiom. `$$` keeps Bazel from expanding `$RUNFILES_DIR` at analysis
+    # time; `$(rlocationpath ...)` is expanded then, leaving the launcher a runfiles
+    # path to resolve at startup.
+    fixed_args = [
+        "--literal",
+        "no-expansion-needed",
+        "--data",
+        "$$RUNFILES_DIR/$(rlocationpath fixed_args_data.json)",
+    ],
+)
+
+[
+    js_run_binary(
+        name = "fixed_args_report_{}".format(launcher),
+        srcs = ["fixed_args_probe.js"],
+        outs = [
+            "fixed_args_report_{}.json".format(launcher),
+            "fixed_args_launcher_{}.txt".format(launcher),
+        ],
+        args = ["$(rootpath fixed_args_report_{}.json)".format(launcher)] + pin,
+        silent_on_success = False,
+        tool = ":fixed_args_bin",
+        use_execroot_entry_point = False,
+    )
+    for (launcher, pin) in [
+        ("bash", _BASH_LAUNCHER),
+        ("hermetic", []),
+    ]
+]
+
+diff_test(
+    name = "fixed_args_differential_test",
+    file1 = "fixed_args_report_bash.json",
+    file2 = "fixed_args_report_hermetic.json",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+sh_test(
+    name = "fixed_args_launcher_choice_test",
+    srcs = ["launcher_pair_test.sh"],
+    args = [
+        "fixed_args_report",
+        "$(rootpath fixed_args_launcher_bash.txt)",
+        "$(rootpath fixed_args_launcher_hermetic.txt)",
+    ],
+    data = [
+        "fixed_args_launcher_bash.txt",
+        "fixed_args_launcher_hermetic.txt",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# The classifier's negative cases. A `fixed_arg` the launcher cannot reproduce has to
+# make the target ineligible; the failure mode if it does not is an argument reaching
+# the program with `$RUNFILES_DIR` or the like still in it.
+[
+    js_binary(
+        name = "{}_fixed_args_bin".format(name),
+        entry_point = "probe.js",
+        fixed_args = fixed_args,
+    )
+    for (name, fixed_args) in [
+        # A shell expansion that is not the runfiles root.
+        (
+            "shell",
+            ["$$HOME/config.json"],
+        ),
+        # A runfiles reference with more shell inside it.
+        (
+            "nested",
+            ["$$RUNFILES_DIR/$$HOME/config.json"],
+        ),
+        # Would be consumed by launcher.cjs in place of the real flag.
+        (
+            "bindir_flag",
+            ["--bazel-bindir"],
+        ),
+        # Over the launcher's ten embedded argument slots, five of which are spoken for.
+        (
+            "too_many",
+            ["--flag-{}".format(i) for i in range(8)],
+        ),
+    ]
+]
+
+[
+    filegroup(
+        name = "{}_verdict".format(name),
+        srcs = [":{}".format(name)],
+        output_group = "hermetic_launcher_report",
+    )
+    for name in [
+        "fixed_args_bin",
+        "shell_fixed_args_bin",
+        "nested_fixed_args_bin",
+        "bindir_flag_fixed_args_bin",
+        "too_many_fixed_args_bin",
+    ]
+]
+
+sh_test(
+    name = "fixed_args_verdict_test",
+    srcs = ["fixed_args_verdict_test.sh"],
+    args = [
+        "$(rootpath :fixed_args_bin_verdict)",
+        "eligible",
+        "$(rootpath :shell_fixed_args_bin_verdict)",
+        "blocked:JS_BINARY_FIXED_ARGS",
+        "$(rootpath :nested_fixed_args_bin_verdict)",
+        "blocked:JS_BINARY_FIXED_ARGS",
+        "$(rootpath :bindir_flag_fixed_args_bin_verdict)",
+        "blocked:JS_BINARY_FIXED_ARGS",
+        # Not "blocked": the arguments are all supportable, there are just too many of
+        # them for the stub to hold, which is the same degradation as an unsupported
+        # platform.
+        "$(rootpath :too_many_fixed_args_bin_verdict)",
+        "unavailable",
+    ],
+    data = [
+        ":bindir_flag_fixed_args_bin_verdict",
+        ":fixed_args_bin_verdict",
+        ":nested_fixed_args_bin_verdict",
+        ":shell_fixed_args_bin_verdict",
+        ":too_many_fixed_args_bin_verdict",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# Differential test for a node worker thread. Worker threads inherit execArgv, so the
+# preload runs again in the worker -- a second realm, with its own fs to patch and no
+# ability to change directory, since process.chdir throws there. Nothing else here
+# exercises a second realm, and rollup running terser is a real target that does.
+
+js_binary(
+    name = "worker_bin",
+    data = ["worker_child.js"],
+    entry_point = "worker_probe.js",
+)
+
+[
+    js_run_binary(
+        name = "worker_report_{}".format(launcher),
+        srcs = [
+            "worker_child.js",
+            "worker_probe.js",
+        ],
+        outs = [
+            "worker_report_{}.json".format(launcher),
+            "worker_launcher_{}.txt".format(launcher),
+        ],
+        # Bare filenames, because chdir has already put the working directory where the
+        # declared outputs are. chdir is also what makes the worker's inherited cwd
+        # worth asserting: it is the value the worker cannot set for itself.
+        args = ["worker_report_{}.json".format(launcher)] + pin,
+        chdir = package_name(),
+        silent_on_success = False,
+        tool = ":worker_bin",
+        use_execroot_entry_point = False,
+    )
+    for (launcher, pin) in [
+        ("bash", _BASH_LAUNCHER),
+        ("hermetic", []),
+    ]
+]
+
+diff_test(
+    name = "worker_differential_test",
+    file1 = "worker_report_bash.json",
+    file2 = "worker_report_hermetic.json",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+sh_test(
+    name = "worker_launcher_choice_test",
+    srcs = ["launcher_pair_test.sh"],
+    args = [
+        "worker_report",
+        "$(rootpath worker_launcher_bash.txt)",
+        "$(rootpath worker_launcher_hermetic.txt)",
+    ],
+    data = [
+        "worker_launcher_bash.txt",
+        "worker_launcher_hermetic.txt",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+diff_test(
+    name = "differential_test",
+    file1 = "report_bash.json",
+    file2 = "report_hermetic.json",
+    # Same reason as the launcher test above.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# Raising the log level adds diagnostic output on stderr and changes nothing the
+# program can observe, which is why it does not disqualify a target.
+diff_test(
+    name = "log_level_test",
+    file1 = "report_hermetic.json",
+    file2 = "report_debug.json",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+sh_test(
+    name = "launcher_choice_test",
+    srcs = ["launcher_choice_test.sh"],
+    args = [
+        "$(rootpath launcher_bash.txt)",
+        "$(rootpath launcher_hermetic.txt)",
+        "$(rootpath launcher_debug.txt)",
+    ],
+    data = [
+        "launcher_bash.txt",
+        "launcher_debug.txt",
+        "launcher_hermetic.txt",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# Differential test for the output capture that run_binary performs: stdout, stderr and
+# the exit code all go through its spawn_binary wrapper, which forks the launcher and
+# does the post-exit work the hermetic stub cannot do for itself. That wrapper is what
+# lets these attributes stop disqualifying the hermetic launcher, so the three captured
+# files have to come out the same whichever launcher it forked.
+#
+# silent_on_success is on here, unlike the pairs above, because this pair is about the
+# capture path rather than about the launchers in isolation. With both streams captured
+# to files it changes nothing they contain; what it does prove is that the combination
+# is legal and still reaches the program.
+
+js_binary(
+    name = "capture_bin",
+    entry_point = "capture_probe.js",
+)
+
+[
+    js_run_binary(
+        name = "capture_report_{}".format(launcher),
+        srcs = ["capture_probe.js"],
+        outs = ["capture_launcher_{}.txt".format(launcher)],
+        args = ["$(rootpath capture_launcher_{}.txt)".format(launcher)] + pin,
+        exit_code_out = "capture_exit_code_{}.txt".format(launcher),
+        silent_on_success = True,
+        stderr = "capture_stderr_{}.txt".format(launcher),
+        stdout = "capture_stdout_{}.txt".format(launcher),
+        tool = ":capture_bin",
+        use_execroot_entry_point = False,
+    )
+    for (launcher, pin) in [
+        ("bash", _BASH_LAUNCHER),
+        ("hermetic", []),
+    ]
+]
+
+[
+    diff_test(
+        name = "capture_{}_differential_test".format(stream),
+        file1 = "capture_{}_bash.txt".format(stream),
+        file2 = "capture_{}_hermetic.txt".format(stream),
+        target_compatible_with = select({
+            "@platforms//os:windows": ["@platforms//:incompatible"],
+            "//conditions:default": [],
+        }),
+    )
+    for stream in [
+        "stdout",
+        "stderr",
+        "exit_code",
+    ]
+]
+
+# Identical across the two launchers is necessary but not sufficient: both could be
+# wrong the same way. This says the code recorded is the one the program chose, and that
+# a non-zero exit did not fail the action.
+assert_contains(
+    name = "capture_exit_code_test",
+    actual = "capture_exit_code_hermetic.txt",
+    expected = "42",
+)
+
+# Streams must not be crossed, which identical files alone would not catch either.
+assert_contains(
+    name = "capture_stdout_test",
+    actual = "capture_stdout_hermetic.txt",
+    expected = "capture: second line on stdout",
+)
+
+assert_contains(
+    name = "capture_stderr_test",
+    actual = "capture_stderr_hermetic.txt",
+    expected = "capture: second line on stderr",
+)
+
+sh_test(
+    name = "capture_launcher_choice_test",
+    srcs = ["launcher_pair_test.sh"],
+    args = [
+        "capture_report",
+        "$(rootpath capture_launcher_bash.txt)",
+        "$(rootpath capture_launcher_hermetic.txt)",
+    ],
+    data = [
+        "capture_launcher_bash.txt",
+        "capture_launcher_hermetic.txt",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# Differential test for the execroot entry point. use_execroot_entry_point = True runs the
+# bindir copy of the entry point rather than the runfiles one, and the launcher binary
+# cannot express that: it bakes a runfiles rlocation, and its one argument transformation
+# resolves against the runfiles root. launcher.cjs composes the bindir path at startup and
+# redirects node's main to it, so this pair is what says the composed path and the redirect
+# together land where the launcher script lands.
+
+[
+    js_run_binary(
+        name = "execroot_report_{}".format(launcher),
+        srcs = ["action_probe.js"],
+        outs = [
+            "execroot_report_{}.json".format(launcher),
+            "execroot_launcher_{}.txt".format(launcher),
+        ],
+        args = ["$(rootpath execroot_report_{}.json)".format(launcher)] + pin,
+        silent_on_success = False,
+        tool = ":action_bin",
+        use_execroot_entry_point = True,
+    )
+    for (launcher, pin) in [
+        ("bash", _BASH_LAUNCHER),
+        ("hermetic", []),
+    ]
+]
+
+diff_test(
+    name = "execroot_differential_test",
+    file1 = "execroot_report_bash.json",
+    file2 = "execroot_report_hermetic.json",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+sh_test(
+    name = "execroot_launcher_choice_test",
+    srcs = ["launcher_pair_test.sh"],
+    args = [
+        "execroot_report",
+        "$(rootpath execroot_launcher_bash.txt)",
+        "$(rootpath execroot_launcher_hermetic.txt)",
+    ],
+    data = [
+        "execroot_launcher_bash.txt",
+        "execroot_launcher_hermetic.txt",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# Agreeing with the bash launcher is necessary but not sufficient -- both could be reading
+# the runfiles copy. These name the tree the entry point came from, which is the only
+# observable difference between the two modes and the reason the mode exists: node walks up
+# from the main module's directory to resolve the program's own requires.
+assert_contains(
+    name = "execroot_search_root_test",
+    actual = "execroot_report_hermetic.json",
+    expected = "\"module_search_root\": \"<bindir>/js/private/test/hermetic_launcher/node_modules\"",
+)
+
+assert_contains(
+    name = "runfiles_search_root_test",
+    actual = "report_hermetic.json",
+    expected = "\"module_search_root\": \"<runfiles>/_main/js/private/test/hermetic_launcher/node_modules\"",
+)
+
+# Differential test for an ESM entry point in execroot mode. node resolves an ESM main
+# through the ESM loader, which never reaches the CJS hook, so this is a second redirect
+# path rather than a variation on the one above.
+
+js_binary(
+    name = "esm_bin",
+    entry_point = "esm_probe.mjs",
+)
+
+[
+    js_run_binary(
+        name = "esm_report_{}".format(launcher),
+        srcs = ["esm_probe.mjs"],
+        outs = [
+            "esm_report_{}.json".format(launcher),
+            "esm_launcher_{}.txt".format(launcher),
+        ],
+        args = ["$(rootpath esm_report_{}.json)".format(launcher)] + pin,
+        silent_on_success = False,
+        tool = ":esm_bin",
+        use_execroot_entry_point = True,
+    )
+    for (launcher, pin) in [
+        ("bash", _BASH_LAUNCHER),
+        ("hermetic", []),
+    ]
+]
+
+diff_test(
+    name = "esm_differential_test",
+    file1 = "esm_report_bash.json",
+    file2 = "esm_report_hermetic.json",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+sh_test(
+    name = "esm_launcher_choice_test",
+    srcs = ["launcher_pair_test.sh"],
+    args = [
+        "esm_report",
+        "$(rootpath esm_launcher_bash.txt)",
+        "$(rootpath esm_launcher_hermetic.txt)",
+    ],
+    data = [
+        "esm_launcher_bash.txt",
+        "esm_launcher_hermetic.txt",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+assert_contains(
+    name = "esm_search_root_test",
+    actual = "esm_report_hermetic.json",
+    expected = "\"import_meta_path\": \"<bindir>/js/private/test/hermetic_launcher/esm_probe.mjs\"",
+)
+
+# copy_data_to_bin is what puts the entry point in the bindir at all, so without it the
+# execroot entry point cannot be found. The launcher script says so at runtime, from a
+# per-target constant the stub cannot carry, so this has to be decided at analysis time.
+js_binary(
+    name = "no_copy_data_bin",
+    copy_data_to_bin = False,
+    entry_point = "probe.js",
+)
+
+filegroup(
+    name = "no_copy_data_verdict",
+    srcs = [":no_copy_data_bin"],
+    output_group = "hermetic_launcher_report",
+)
+
+sh_test(
+    name = "no_copy_data_verdict_test",
+    srcs = ["fixed_args_verdict_test.sh"],
+    args = [
+        "$(rootpath :no_copy_data_verdict)",
+        "blocked:JS_BINARY_COPY_DATA_TO_BIN",
+    ],
+    data = [":no_copy_data_verdict"],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+# `env` is not part of the gate at all: a JS_BINARY__* key in it does not disqualify the
+# hermetic launcher, and neither does a select() the macro cannot see through. Both are
+# in play here.
+#
+# What the variable asks for is real rather than inert. This target opts out of the
+# execroot entry point through the attribute and then asks for it back through `env`, so
+# the only thing that can put the bindir copy in argv[1] is launcher.cjs having honoured
+# the variable -- which is what the report assertion below reads. The entry point is in
+# `srcs`, so its bindir copy exists without the hoisting that the attribute would have
+# done.
+js_run_binary(
+    name = "env_report_hermetic",
+    srcs = ["action_probe.js"],
+    outs = [
+        "env_launcher_hermetic.txt",
+        "env_report_hermetic.json",
+    ],
+    args = ["$(rootpath env_report_hermetic.json)"],
+    env = select({
+        "//conditions:default": {"JS_BINARY__USE_EXECROOT_ENTRY_POINT": "1"},
+    }),
+    silent_on_success = False,
+    tool = ":action_bin",
+    use_execroot_entry_point = False,
+)
+
+assert_contains(
+    name = "env_launcher_test",
+    actual = "env_launcher_hermetic.txt",
+    expected = "launcher.cjs",
+)
+
+assert_contains(
+    name = "env_execroot_entry_point_test",
+    actual = "env_report_hermetic.json",
+    expected = "\"entry_point\": \"<bindir>/js/private/test/hermetic_launcher/action_probe.js\"",
+)
