@@ -237,12 +237,13 @@ tests, etc.) at extraction time; see
 
 ## Code coverage
 
-Under `bazel coverage`, `js_test` produces its lcov report while the test runs,
-where the V8 coverage data and the instrumented sources are both available.
+Under `bazel coverage`, `js_test` produces its lcov report as the test program
+exits, where the V8 coverage data and the instrumented sources are both available.
+The `_lcov_merger` step only publishes that report.
 
 ### Coverage runs count against the test's timeout
 
-Because the report is produced while the test runs, generating it consumes the
+Because the report is produced by the test itself, generating it consumes the
 target's own `timeout`/`size` budget. Converting V8 coverage to lcov takes time
 proportional to the number of instrumented files, so a test that sits near its
 timeout under `bazel test` may need a larger `size` or `timeout` to pass under
