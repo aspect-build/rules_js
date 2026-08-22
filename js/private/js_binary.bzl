@@ -292,7 +292,7 @@ def _bash_quote(value):
     return json.encode(value)
 
 def _generates_coverage_report(ctx):
-    """Whether the launcher generates the lcov report in the test action. See #2901."""
+    """Whether bootstrap.cjs generates the lcov report in the test action. See #2901."""
     return (hasattr(ctx.file, "_coverage_report") and
             ctx.attr.testonly and
             ctx.configuration.coverage_enabled)
@@ -404,12 +404,12 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
     if _generates_coverage_report(ctx):
-        coverage_entry_point = "/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])
-    else:
-        coverage_entry_point = ""
+        envs.append(_ENV_SET.format(
+            var = "JS_BINARY__COVERAGE_REPORT",
+            quoted_value = _bash_quote("/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])),
+        ))
 
     launcher_subst = {
-        "{{coverage_entry_point}}": coverage_entry_point,
         "{{target_label}}": str(ctx.label),
         "{{template_label}}": str(ctx.attr._launcher_template.label),
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
@@ -544,8 +544,8 @@ def _js_binary_impl(ctx):
         if hasattr(ctx.attr, "_lcov_merger"):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
 
-        # The launcher runs coverage.js after the test to generate the report, so
-        # it must be in the test's runfiles. See #2901.
+        # bootstrap.cjs runs coverage.js when the test program exits to generate the
+        # report, so it must be in the test's runfiles. See #2901.
         if _generates_coverage_report(ctx):
             runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
 
@@ -649,9 +649,9 @@ js_test = rule(
             default = Label("//js/private/coverage:merger"),
             cfg = "exec",
         ),
-        # Run by the launcher in the test action to generate the lcov report, which
-        # _lcov_merger above then publishes. A test rule built on js_binary_lib needs
-        # both halves. See #2901.
+        # Run by node-bootstrap/bootstrap.cjs in the test action to generate the lcov
+        # report, which _lcov_merger above then publishes. A test rule built on
+        # js_binary_lib needs both halves. See #2901.
         "_coverage_report": attr.label(
             default = Label("//js/private/coverage:coverage.js"),
             allow_single_file = [".js"],

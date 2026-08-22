@@ -26,4 +26,5 @@ def _coverage_test(merger, coverage_report = True):
 
 coverage_preexisting_test = _coverage_test("preexisting_merger")
 coverage_pass_test = _coverage_test("pass_merger")
+coverage_child_test = _coverage_test("child_merger")
 coverage_no_report_test = _coverage_test("no_report_merger", coverage_report = False)
