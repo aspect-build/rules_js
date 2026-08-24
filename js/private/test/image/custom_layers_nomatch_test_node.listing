@@ -8,7 +8,7 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-bootstrap/
--r-xr-xr-x  0 0      0        5886 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-bootstrap/bootstrap.cjs
+-r-xr-xr-x  0 0      0        1713 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-bootstrap/bootstrap.cjs
 -r-xr-xr-x  0 0      0       37120 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/_main/js/private/node-bootstrap/fs.cjs
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/rules_nodejs++node+nodejs_linux_amd64/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/bin.runfiles/rules_nodejs++node+nodejs_linux_amd64/bin/

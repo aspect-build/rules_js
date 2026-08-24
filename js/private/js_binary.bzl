@@ -277,6 +277,12 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
+    # Required by bootstrap.cjs only when generating a coverage report, so it is added to
+    # the runfiles conditionally rather than to _node_patches_files. See #2901.
+    "_coverage_bootstrap": attr.label(
+        allow_single_file = True,
+        default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
+    ),
 }
 
 _ENV_SET = """export {var}={quoted_value}"""
@@ -292,7 +298,7 @@ def _bash_quote(value):
     return json.encode(value)
 
 def _generates_coverage_report(ctx):
-    """Whether bootstrap.cjs generates the lcov report in the test action. See #2901."""
+    """Whether coverage.cjs generates the lcov report in the test action. See #2901."""
     return (hasattr(ctx.file, "_coverage_report") and
             ctx.attr.testonly and
             ctx.configuration.coverage_enabled)
@@ -544,10 +550,13 @@ def _js_binary_impl(ctx):
         if hasattr(ctx.attr, "_lcov_merger"):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
 
-        # bootstrap.cjs runs coverage.js when the test program exits to generate the
-        # report, so it must be in the test's runfiles. See #2901.
+        # coverage.cjs runs coverage.js when the test program exits to generate the
+        # report, so both must be in the test's runfiles. See #2901.
         if _generates_coverage_report(ctx):
-            runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
+            runfiles = runfiles.merge(ctx.runfiles(files = [
+                ctx.file._coverage_bootstrap,
+                ctx.file._coverage_report,
+            ]))
 
         providers.append(
             coverage_common.instrumented_files_info(
@@ -649,7 +658,7 @@ js_test = rule(
             default = Label("//js/private/coverage:merger"),
             cfg = "exec",
         ),
-        # Run by node-bootstrap/bootstrap.cjs in the test action to generate the lcov
+        # Run by node-bootstrap/coverage.cjs in the test action to generate the lcov
         # report, which _lcov_merger above then publishes. A test rule built on
         # js_binary_lib needs both halves. See #2901.
         "_coverage_report": attr.label(

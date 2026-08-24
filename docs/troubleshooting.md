@@ -253,6 +253,14 @@ For the same reason the report is produced by the target's own `node_toolchain`,
 not by the one used for build actions. A test pinned to an old Node version runs
 the coverage reporter under that version too.
 
+### Code run from the program's own `exit` listeners is not covered
+
+The reporter is registered by a `--require` preload, so it necessarily runs before any
+`process.on('exit', ...)` listener the test program itself registers. The V8 profile is
+snapshotted at that point, which means code executed from the program's own `exit`
+listeners — a test framework's teardown, for instance — is reported as uncovered. A
+preload cannot register last, so this is inherent to producing the report in-process.
+
 ### Coverage requires a runfiles tree
 
 The reporter maps V8 coverage data back onto sources through the test's runfiles,

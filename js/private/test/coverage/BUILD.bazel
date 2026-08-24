@@ -60,7 +60,7 @@ grep -q '^SF:js/private/test/coverage/' "$COVERAGE_OUTPUT_FILE" || { echo "expec
 grep -Eq '^DA:[0-9]+,[1-9]' "$COVERAGE_OUTPUT_FILE" || { echo "expected an executed line" >&2; exit 1; }
 grep -Eq '^DA:[0-9]+,0' "$COVERAGE_OUTPUT_FILE" || { echo "expected an unexecuted line" >&2; exit 1; }
 
-# The coverage hook in bootstrap.cjs runs coverage.js with an emptied
+# The coverage hook in coverage.cjs runs coverage.js with an emptied
 # NODE_V8_COVERAGE, so coverage.js must not have written its own profile alongside
 # the ones it just read.
 if grep -l 'js/private/coverage/coverage.js' "$COVERAGE_DIR"/coverage-*.json >/dev/null 2>&1; then
@@ -129,8 +129,10 @@ coverage_child_test(
         "//conditions:default": False,
     }),
     entry_point = "child.js",
-    # child.js spawns process.execPath, which bootstrap.cjs only patches to the node
-    # wrapper off Windows.
+    # child.js re-enters bootstrap.cjs by spawning process.execPath, which bootstrap.cjs
+    # points at the node wrapper. It only does so off Windows, where patching execPath is
+    # still a FIXME, so on Windows the child would be bare node with no --require and the
+    # assertions in child_lib.js would hold vacuously. Drop this once that FIXME is fixed.
     target_compatible_with = select({
         "@platforms//os:windows": ["@platforms//:incompatible"],
         "//conditions:default": [],
