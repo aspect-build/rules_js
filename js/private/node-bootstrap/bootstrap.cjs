@@ -59,8 +59,7 @@ if (JS_BINARY__COVERAGE_REPORT) {
     // Child node processes re-enter this bootstrap with an inherited environment. Only
     // the root process reports, once every child has exited and written its profile.
     delete process.env.JS_BINARY__COVERAGE_REPORT
-}
-if (JS_BINARY__COVERAGE_REPORT && process.env.COVERAGE_DIR) {
+
     // Snapshot the environment and cwd now: the program under test may mutate either
     // before it exits, and the reporter must see what the launcher set up.
     //
