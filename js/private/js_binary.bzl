@@ -277,12 +277,6 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
-    # Required by bootstrap.cjs only when generating a coverage report, so it is added to
-    # the runfiles conditionally rather than to _node_patches_files. See #2901.
-    "_coverage_bootstrap": attr.label(
-        allow_single_file = True,
-        default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
-    ),
 }
 
 _ENV_SET = """export {var}={quoted_value}"""
@@ -298,7 +292,7 @@ def _bash_quote(value):
     return json.encode(value)
 
 def _generates_coverage_report(ctx):
-    """Whether coverage.cjs generates the lcov report in the test action. See #2901."""
+    """Whether the launcher generates the lcov report in the test action. See #2901."""
     return (hasattr(ctx.file, "_coverage_report") and
             ctx.attr.testonly and
             ctx.configuration.coverage_enabled)
@@ -658,9 +652,14 @@ js_test = rule(
             default = Label("//js/private/coverage:merger"),
             cfg = "exec",
         ),
-        # Run by node-bootstrap/coverage.cjs in the test action to generate the lcov
-        # report, which _lcov_merger above then publishes. A test rule built on
-        # js_binary_lib needs both halves. See #2901.
+        # Required by bootstrap.cjs only when generating a coverage report
+        "_coverage_bootstrap": attr.label(
+            allow_single_file = True,
+            default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
+        ),
+        # Run by the launcher in the test action to generate the lcov report, which
+        # _lcov_merger above then publishes. A test rule built on js_binary_lib needs
+        # both halves. See #2901.
         "_coverage_report": attr.label(
             default = Label("//js/private/coverage:coverage.js"),
             allow_single_file = [".js"],

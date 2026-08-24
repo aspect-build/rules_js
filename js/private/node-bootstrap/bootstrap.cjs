@@ -44,8 +44,6 @@ if (
     patchfs(roots)
 }
 
-// Coverage reporting lives in its own module so it costs nothing for the targets that
-// never report; js_binary.bzl puts it in the runfiles next to coverage.js. See #2901.
 if (process.env.JS_BINARY__COVERAGE_REPORT) {
     require('./coverage.cjs')
 }

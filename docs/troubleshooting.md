@@ -255,11 +255,11 @@ the coverage reporter under that version too.
 
 ### Code run from the program's own `exit` listeners is not covered
 
-The reporter is registered by a `--require` preload, so it necessarily runs before any
-`process.on('exit', ...)` listener the test program itself registers. The V8 profile is
-snapshotted at that point, which means code executed from the program's own `exit`
-listeners — a test framework's teardown, for instance — is reported as uncovered. A
-preload cannot register last, so this is inherent to producing the report in-process.
+The reporter is registered by a `--require` preload, so it necessarily runs
+before any `process.on('exit', ...)` listener the test program itself registers.
+The V8 profile is snapshotted at that point, which means code executed from the
+program's own `exit` listeners is reported as uncovered. A preload cannot
+register last, so this is inherent to producing the report in-process.
 
 ### Coverage requires a runfiles tree
 
