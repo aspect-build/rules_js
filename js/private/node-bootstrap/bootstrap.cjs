@@ -86,19 +86,22 @@ if (JS_BINARY__COVERAGE_REPORT) {
     // report to COVERAGE_OUTPUT_FILE from an 'exit' listener therefore also gets a
     // report generated here. What ends up published is unchanged: the merger prefers
     // the program's own report, except under split post-processing where bazel discards
-    // it and ours is published instead.
-    process.on('exit', (code) => {
-        // A test reporting its own coverage owns it, except in split mode where bazel drops it.
-        if (
-            env.SPLIT_COVERAGE_POST_PROCESSING !== '1' &&
-            env.COVERAGE_OUTPUT_FILE
-        ) {
-            const stat = require('fs').statSync(env.COVERAGE_OUTPUT_FILE, {
-                throwIfNoEntry: false,
-            })
-            if (stat && stat.size > 0) return
-        }
+    // it and ours is published instead. For the same reason the profile is snapshotted
+    // before those listeners run, so code a program executes from its own 'exit'
+    // listener is reported as uncovered.
+    process.on('exit', () => {
         try {
+            // A test reporting its own coverage owns it, except in split mode where
+            // bazel drops it.
+            if (
+                env.SPLIT_COVERAGE_POST_PROCESSING !== '1' &&
+                env.COVERAGE_OUTPUT_FILE
+            ) {
+                const stat = require('fs').statSync(env.COVERAGE_OUTPUT_FILE, {
+                    throwIfNoEntry: false,
+                })
+                if (stat && stat.size > 0) return
+            }
             if (!require('fs').existsSync(report)) {
                 // Report empty coverage rather than fail an otherwise passing test.
                 logError(
