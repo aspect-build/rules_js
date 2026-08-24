@@ -89,8 +89,7 @@ if (JS_BINARY__COVERAGE_REPORT && process.env.COVERAGE_DIR) {
     // the program's own report, except under split post-processing where bazel discards
     // it and ours is published instead.
     process.on('exit', (code) => {
-        // A test reporting its own coverage owns it, except in split mode where bazel
-        // drops it.
+        // A test reporting its own coverage owns it, except in split mode where bazel drops it.
         if (
             env.SPLIT_COVERAGE_POST_PROCESSING !== '1' &&
             env.COVERAGE_OUTPUT_FILE
