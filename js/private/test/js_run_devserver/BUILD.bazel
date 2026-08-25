@@ -32,6 +32,67 @@ js_run_devserver_test(
     tool = ":jasmine",
 )
 
+# Checks that with package_store_mode = "sandbox" the package store is materialized in the custom
+# sandbox so that realpath() of every node_modules entry stays under the sandbox root, which
+# bundlers such as Turbopack require.
+js_run_devserver_test(
+    name = "node_modules_in_sandbox_test",
+    args = ["node_modules_in_sandbox.test.mjs"],
+    chdir = "js/private/test/js_run_devserver",
+    data = [
+        "node_modules_in_sandbox.test.mjs",
+        ":node_modules/@types/node",
+        ":node_modules/jasmine",
+    ],
+    package_store_mode = "sandbox",
+    tags = [
+        # devserver is meant to be `bazel run` locally.
+        # See https://github.com/aspect-build/rules_js/pull/1233
+        "no-remote-exec",
+    ],
+    tool = ":jasmine",
+)
+
+# Checks that granting write permissions in the sandbox never mutates the permissions of the
+# original files in the execroot.
+js_run_devserver_test(
+    name = "sandbox_write_permissions_test",
+    args = ["sandbox_write_permissions.test.mjs"],
+    chdir = "js/private/test/js_run_devserver",
+    data = [
+        "sandbox_write_permissions.test.mjs",
+        ":node_modules/@types/node",
+        ":node_modules/jasmine",
+    ],
+    grant_sandbox_write_permissions = True,
+    package_store_mode = "sandbox",
+    tags = [
+        # devserver is meant to be `bazel run` locally.
+        # See https://github.com/aspect-build/rules_js/pull/1233
+        "no-remote-exec",
+    ],
+    tool = ":jasmine",
+)
+
+# A devserver runs as the owner of read-only Bazel outputs and can chmod them before writing. Check
+# that package-store files are independent copies even when write permissions are not pre-granted.
+js_run_devserver_test(
+    name = "sandbox_write_isolation_test",
+    args = ["sandbox_write_isolation.test.mjs"],
+    chdir = "js/private/test/js_run_devserver",
+    data = [
+        "sandbox_write_isolation.test.mjs",
+        ":node_modules/jasmine",
+    ],
+    package_store_mode = "sandbox",
+    tags = [
+        # devserver is meant to be `bazel run` locally.
+        # See https://github.com/aspect-build/rules_js/pull/1233
+        "no-remote-exec",
+    ],
+    tool = ":jasmine",
+)
+
 jasmine_bin.jasmine_binary(
     name = "jasmine",
 )
