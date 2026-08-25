@@ -23,6 +23,11 @@ bazel_dep(name = "rules_nodejs", version = "6.7.3")
 # 3.7.0: https://github.com/bazel-contrib/bazel-lib/commit/e5c0630270f70dd2c7b50471bb9c872781a55282
 bazel_dep(name = "bazel_lib", version = "3.7.0")
 
+# The native js_binary launcher. 0.0.15 is the first release with the linux s390x
+# stub. Note there is no stub for linux ppc64le or windows arm64, so js_binary does
+# not resolve a toolchain on those platforms.
+bazel_dep(name = "hermetic_launcher", version = "0.0.15")
+
 # NB: LOWER BOUND on earliest BCR release of protobuf module, to avoid upgrading the root module by accident
 bazel_dep(name = "protobuf", version = "3.19.6")
 

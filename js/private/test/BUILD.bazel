@@ -7,45 +7,35 @@ load(":js_library_test.bzl", "js_library_test_suite")
 load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
 
 ####################################################################################################
-# Write a js_binary launcher to the source tree so it is shell checked on commit
+# Snapshot the generated js_binary launcher into the source tree so that changes to
+# it are reviewable. The executable itself is a native binary stamped by
+# hermetic_launcher; the JavaScript launcher beside it holds all of the logic.
 
 write_file(
-    name = "shellcheck_js",
-    out = "shellcheck.js",
+    name = "snapshot_js",
+    out = "snapshot.js",
 )
 
 js_binary(
-    name = "shellcheck_launcher",
-    entry_point = "shellcheck.js",
+    name = "snapshot_launcher",
+    entry_point = "snapshot.js",
     fixed_args = ["--my_arg"],
+)
+
+filegroup(
+    name = "snapshot_launcher_js",
+    srcs = [":snapshot_launcher"],
+    output_group = "launcher_js",
 )
 
 # Make sed replacements for consistency on different platform / Bazel version.
 # The trailing sed pipeline normalizes bzlmod canonical repo separators ~~/~
 # (Bazel 7) to ++/+ (Bazel 8+) so the snapshot matches across versions.
 genrule(
-    name = "shell_launcher_sed",
-    srcs = [":shellcheck_launcher"],
-    outs = ["shellcheck_launcher_sed.sh"],
-    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#JS_BINARY__TARGET_CPU=\\\"$(TARGET_CPU)\\\"#JS_BINARY__TARGET_CPU=\\\"k8\\\"#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" | sed -E -e 's/~~/++/g' -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g' -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g' > $@" % (
-        host.platform,
-        host.os,
-    ),
-)
-
-# The JavaScript launcher, which is where all of the launcher logic lives. The
-# bash launcher above only resolves node and this file out of the runfiles.
-filegroup(
-    name = "shellcheck_launcher_js",
-    srcs = [":shellcheck_launcher"],
-    output_group = "launcher_js",
-)
-
-genrule(
     name = "js_launcher_sed",
-    srcs = [":shellcheck_launcher_js"],
-    outs = ["shellcheck_launcher_sed.cjs"],
-    cmd = "cat $(execpath :shellcheck_launcher_js) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#setEnv(\\\"JS_BINARY__TARGET_CPU\\\", \\\"$(TARGET_CPU)\\\")#setEnv(\\\"JS_BINARY__TARGET_CPU\\\", \\\"k8\\\")#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" | sed -E -e 's/~~/++/g' -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g' -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g' > $@" % (
+    srcs = [":snapshot_launcher_js"],
+    outs = ["snapshot_launcher_sed.cjs"],
+    cmd = "cat $(execpath :snapshot_launcher_js) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#setEnv(\\\"JS_BINARY__TARGET_CPU\\\", \\\"$(TARGET_CPU)\\\")#setEnv(\\\"JS_BINARY__TARGET_CPU\\\", \\\"k8\\\")#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" | sed -E -e 's/~~/++/g' -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g' -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g' > $@" % (
         host.platform,
         host.os,
     ),
@@ -54,7 +44,6 @@ genrule(
 write_source_files(
     name = "write_launcher",
     files = {
-        "snapshots/launcher.sh": ":shell_launcher_sed",
         "snapshots/launcher.cjs": ":js_launcher_sed",
     },
 )

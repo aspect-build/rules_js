@@ -299,12 +299,43 @@ function reraiseSignal(signal, exitCode) {
 // Initialize RUNFILES environment variable
 // ==============================================================================
 
-// RUNFILES was resolved by the bash launcher that exec'd this file; it had to
-// locate node and this launcher in the runfiles tree to get here at all. It is
-// dropped from the environment again since the bash launcher kept it as a plain
-// shell variable, so programs only ever saw JS_BINARY__RUNFILES/RUNFILES_DIR.
-process.env.JS_BINARY__RUNFILES = process.env.RUNFILES || ''
-delete process.env.RUNFILES
+// Port of the runfiles resolution the bash launcher used to do, minus the cases
+// that cannot arise here: the native launcher that exec'd this file had to find
+// node and this launcher in the runfiles to get here at all, and it exports the
+// one source it settled on -- RUNFILES_DIR when it picked a materialized tree,
+// RUNFILES_MANIFEST_FILE otherwise. So there is no $0 walk to do.
+let runfiles = process.env.TEST_SRCDIR || process.env.RUNFILES_DIR
+if (!runfiles && process.env.RUNFILES_MANIFEST_FILE) {
+    const manifest = process.env.RUNFILES_MANIFEST_FILE
+    if (manifest.endsWith('.runfiles_manifest')) {
+        // Bazel puts the manifest besides the runfiles with the suffix
+        // .runfiles_manifest. For example, the runfiles directory is named
+        // my_binary.runfiles then the manifest is beside the runfiles directory
+        // and named my_binary.runfiles_manifest
+        runfiles = manifest.slice(0, -'_manifest'.length)
+    } else if (manifest.endsWith('/MANIFEST')) {
+        // Bazel for windows puts the manifest file named MANIFEST in the
+        // runfiles directory
+        runfiles = manifest.slice(0, -'/MANIFEST'.length)
+    } else {
+        logfFatal(`Unexpected RUNFILES_MANIFEST_FILE value ${manifest}`)
+        exitWith(1)
+    }
+}
+if (!runfiles) {
+    logfFatal('RUNFILES_DIR environment variable is not set')
+    exitWith(1)
+}
+runfiles = normalizePath(runfiles)
+if (!runfiles.startsWith('/')) {
+    // Must be absolute: the runfiles path may be relative to the cwd, and we may
+    // be about to change directory.
+    runfiles = path.join(process.cwd(), runfiles)
+}
+process.env.JS_BINARY__RUNFILES = runfiles
+// Set RUNFILES_DIR if not already set so that tools such as @bazel/runfiles can
+// locate runfiles.
+process.env.RUNFILES_DIR = process.env.RUNFILES_DIR || runfiles
 
 // ==============================================================================
 // Prepare to run main program

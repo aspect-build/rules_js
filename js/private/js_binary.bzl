@@ -3,8 +3,7 @@
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
-load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
-load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
+load("@hermetic_launcher//launcher:lib.bzl", hermetic_launcher = "launcher")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
 
 _ATTRS = {
@@ -245,10 +244,6 @@ _ATTRS = {
         for more information.
         """,
     ),
-    "_launcher_template": attr.label(
-        default = Label("//js/private:js_binary.sh.tpl"),
-        allow_single_file = True,
-    ),
     "_launcher_js_template": attr.label(
         default = Label("//js/private:js_binary.cjs.tpl"),
         allow_single_file = True,
@@ -351,61 +346,39 @@ def _generates_coverage_report(ctx):
             ctx.attr.testonly and
             ctx.configuration.coverage_enabled)
 
-_BINDIR_PRELUDE = """# Without a runfiles tree the JavaScript launcher has to be read out of the
-# bindir, and when path mapping is active only the --bazel-bindir flag knows
-# where that is. Peek at the flag here without consuming it; the JavaScript
-# launcher is the one that consumes it.
-if [ $# -gt 1 ] && [ "$1" = "--bazel-bindir" ]; then
-    BAZEL_BINDIR="$2"
-fi
-BAZEL_BINDIR="${{BAZEL_BINDIR:-{bindir}}}"
+_FINALIZER_TOOLCHAIN_TYPE = Label(hermetic_launcher.finalizer_toolchain_type)
+_TEMPLATE_TOOLCHAIN_TYPE = Label(hermetic_launcher.template_toolchain_type)
+
+# Stands in for the launcher on target platforms hermetic_launcher has no stub
+# for. Not a launcher: it only exists so that building such a target succeeds and
+# running it says why it cannot.
+_NO_LAUNCHER_PLACEHOLDER = """#!/bin/sh
+echo "ERROR: {target}: no hermetic_launcher stub is registered for this target platform, so this js_binary has no launcher and cannot run. See https://github.com/hermeticbuild/hermetic-launcher for the supported platforms." >&2
+exit 1
 """
 
-def _execroot_relative(short_path):
-    """Rewrites a short_path the way the launcher's resolve_execroot_*_path helpers do."""
-    if short_path.startswith("../"):
-        return "external/" + short_path[3:]
-    return short_path
-
-def _stub_path_subst(ctx, node_path, launcher_js, is_windows):
-    """Shell expressions the trivial bash launcher uses to find node and the JavaScript launcher.
-
-    Whether a runfiles tree exists is an analysis time fact, so the resolution is
-    picked here instead of being branched on in the shell.
-
-    Args:
-        ctx: the rule context
-        node_path: short_path of the node binary, or an absolute target_tool_path
-        launcher_js: the generated JavaScript launcher File
-        is_windows: whether the target platform is Windows
-
-    Returns:
-        the substitutions for the bash launcher template
-    """
-    no_runfiles = is_windows and not ctx.attr.enable_runfiles
-
-    if node_path.startswith("/"):
-        # A user may specify an absolute path to node using target_tool_path in node_toolchain
-        node_bin_expr = "$(_normalize_path \"{}\")".format(node_path)
-    elif no_runfiles:
-        node_bin_expr = "$PWD/" + _execroot_relative(node_path)
-    else:
-        node_bin_expr = "$RUNFILES/{}/{}".format(ctx.workspace_name, node_path)
-
-    bindir_prelude = ""
-    if no_runfiles:
-        bindir_prelude = _BINDIR_PRELUDE.format(
-            bindir = ctx.expand_make_variables("env", "$(BINDIR)", {}),
-        )
-        launcher_js_expr = "$PWD/$BAZEL_BINDIR/" + _execroot_relative(launcher_js.short_path)
-    else:
-        launcher_js_expr = "$RUNFILES/{}/{}".format(ctx.workspace_name, launcher_js.short_path)
-
-    return {
-        "{{bindir_prelude}}": bindir_prelude,
-        "{{launcher_js_expr}}": launcher_js_expr,
-        "{{node_bin_expr}}": node_bin_expr,
-    }
+# Drop this in favour of the upstream launcher.compile_stub helper once it takes
+# Labels. It names the toolchain types with string labels, which are resolved
+# against the repo mapping of whatever repo the js_binary is instantiated in --
+# and a user repo has no visibility on @hermetic_launcher. That also breaks
+# --incompatible_auto_exec_groups, which needs the Label to key the exec group.
+def _compile_stub(ctx, embedded_args, transformed_args, output_file):
+    template = ctx.toolchains[_TEMPLATE_TOOLCHAIN_TYPE].templatetoolchaininfo.template_exe
+    args = ctx.actions.args()
+    args.add("--template", template)
+    args.add("-o", output_file)
+    args.add_joined("--transform", transformed_args, join_with = ",")
+    args.add("--")
+    args.add_all(embedded_args)
+    ctx.actions.run(
+        outputs = [output_file],
+        executable = ctx.toolchains[_FINALIZER_TOOLCHAIN_TYPE].finalizer_info.finalizer,
+        arguments = [args],
+        inputs = [template],
+        toolchain = _FINALIZER_TOOLCHAIN_TYPE,
+        mnemonic = "JsLauncher",
+        progress_message = "Stamping launcher %{output}",
+    )
 
 def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
@@ -528,7 +501,11 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
     # The '_' avoids collisions with another file matching the label name.
     # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
     # https://github.com/bazelbuild/rules_go/blob/f3cc8a2d670c7ccd5f45434ab226b25a76d44de1/go/private/context.bzl#L144
-    launcher = ctx.actions.declare_file("{}_/{}".format(ctx.label.name, ctx.label.name))
+    launcher = ctx.actions.declare_file("{}_/{}{}".format(
+        ctx.label.name,
+        ctx.label.name,
+        ".exe" if is_windows else "",
+    ))
     launcher_js = ctx.actions.declare_file("{}_/{}.cjs".format(ctx.label.name, ctx.label.name))
 
     ctx.actions.expand_template(
@@ -553,22 +530,48 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
         },
     )
 
-    ctx.actions.expand_template(
-        template = ctx.file._launcher_template,
-        output = launcher,
-        substitutions = dict(
-            _stub_path_subst(ctx, node_path, launcher_js, is_windows),
-            **{
-                "{{target_label}}": str(ctx.label),
-                "{{template_label}}": str(ctx.attr._launcher_template.label),
-                "{{entry_point_label}}": str(ctx.attr.entry_point.label),
-                "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
-                "{{log_prefix_rule_set}}": log_prefix_rule_set,
-                "{{log_prefix_rule}}": log_prefix_rule,
-            }
-        ),
-        is_executable = True,
+    if ctx.toolchains[_TEMPLATE_TOOLCHAIN_TYPE] == None:
+        # hermetic_launcher has no stub for this target platform. Rather than fail
+        # analysis, stand in a placeholder that reports the problem when run: a
+        # js_binary is routinely *built* for a platform it can never run on (an
+        # Apple platform, say, where there is no Node.js at all), and
+        # `bazel build //...` should keep working there. See #2347.
+        ctx.actions.write(
+            output = launcher,
+            is_executable = True,
+            content = _NO_LAUNCHER_PLACEHOLDER.format(target = ctx.label),
+        )
+        return launcher, launcher_js, toolchain_files
+
+    # The native launcher only has to resolve node and the JavaScript launcher out
+    # of the runfiles and exec them; everything else is baked into the .cjs above.
+    # Both are marked for runfiles resolution by the stub at startup, so their
+    # rlocation paths -- which carry no output tree configuration segment -- are
+    # what gets embedded, keeping the launcher safe under path mapping.
+    if nodeinfo.node:
+        embedded_args, transformed_args = hermetic_launcher.args_from_entrypoint(nodeinfo.node)
+    elif node_path.startswith("/"):
+        # A user may specify an absolute path to node using target_tool_path in
+        # node_toolchain. The stub passes absolute paths through unresolved.
+        embedded_args, transformed_args = hermetic_launcher.append_embedded_arg(
+            arg = node_path,
+            embedded_args = [],
+            transformed_args = [],
+        )
+    else:
+        embedded_args, transformed_args = hermetic_launcher.append_raw_transformed_arg(
+            arg = "{}/{}".format(ctx.workspace_name, node_path),
+            embedded_args = [],
+            transformed_args = [],
+        )
+
+    embedded_args, transformed_args = hermetic_launcher.append_runfile(
+        file = launcher_js,
+        embedded_args = embedded_args,
+        transformed_args = transformed_args,
     )
+
+    _compile_stub(ctx, embedded_args, transformed_args, launcher)
 
     return launcher, launcher_js, toolchain_files
 
@@ -592,10 +595,9 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, launcher_js, toolchain_files = _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
-    launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
+    launcher, launcher_js, toolchain_files = _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
 
-    launcher_files = [bash_launcher, launcher_js]
+    launcher_files = [launcher, launcher_js]
     launcher_files.extend(toolchain_files)
     if nodeinfo.node:
         launcher_files.append(nodeinfo.node)
@@ -760,8 +762,11 @@ js_binary_lib = struct(
     implementation = _js_binary_impl,
     run_binary_action = _run_binary_action,
     toolchains = [
-        # Optional: only referenced on Windows
-        config_common.toolchain_type("@bazel_tools//tools/sh:toolchain_type", mandatory = False),
+        _FINALIZER_TOOLCHAIN_TYPE,
+        # Optional: a target platform with no launcher stub gets a placeholder
+        # instead, so that a js_binary built for a platform it can never run on
+        # does not fail analysis. See #2347.
+        config_common.toolchain_type(_TEMPLATE_TOOLCHAIN_TYPE, mandatory = False),
         "@rules_nodejs//nodejs:runtime_toolchain_type",
     ] + COPY_FILE_TO_BIN_TOOLCHAINS,
 )
