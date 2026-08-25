@@ -10,8 +10,9 @@ SKIP_ON_WINDOWS = select({
     "//conditions:default": [],
 })
 
-# js_binary launcher scripts have unstable sizes across Bazel versions.
-_UNSTABLE_SIZE_BASENAMES = ["bin", "bin2"]
+# js_binary launcher scripts have unstable sizes across Bazel versions. Both the
+# bash launcher and the JavaScript launcher beside it are generated per target.
+_UNSTABLE_SIZE_BASENAMES = ["bin", "bin2", "bin\\.cjs", "bin2\\.cjs"]
 
 # buildifier: disable=function-docstring
 def assert_tar_listing(name, actual, expected):

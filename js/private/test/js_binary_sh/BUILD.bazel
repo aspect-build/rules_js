@@ -196,10 +196,18 @@ assert_contains(
     expected = "[\"twx\"]",
 )
 
+# The env values are set by the generated JavaScript launcher, not by the trivial
+# bash launcher that execs it.
+filegroup(
+    name = "env_json_launcher_js",
+    srcs = [":env_json"],
+    output_group = "launcher_js",
+)
+
 assert_contains(
     name = "env_json_launcher_escaped",
-    actual = ":env_json",
-    expected = "export JSON_ENV=\"[\\\"twx\\\"]\"",
+    actual = ":env_json_launcher_js",
+    expected = "setEnv(\"JSON_ENV\", \"[\\\"twx\\\"]\")",
 )
 
 assert_contains(
@@ -222,20 +230,20 @@ assert_contains(
 
 assert_contains(
     name = "env_json_obj_launcher_escaped",
-    actual = ":env_json",
-    expected = """ export JSON_OBJ="{\\\"allow\\\": [\\\"twx\\\"], \\\"deny\\\": []}" """.strip(),
+    actual = ":env_json_launcher_js",
+    expected = """ setEnv("JSON_OBJ", "{\\\"allow\\\": [\\\"twx\\\"], \\\"deny\\\": []}") """.strip(),
 )
 
 assert_contains(
     name = "env_json_str_launcher_escaped",
-    actual = ":env_json",
-    expected = """ export JSON_STR="{\\\"note\\\": \\\"he said \\\\\\\"hi\\\\\\\"\\\"}" """.strip(),
+    actual = ":env_json_launcher_js",
+    expected = """ setEnv("JSON_STR", "{\\\"note\\\": \\\"he said \\\\\\\"hi\\\\\\\"\\\"}") """.strip(),
 )
 
 assert_contains(
     name = "env_json_encode_launcher_escaped",
-    actual = ":env_json",
-    expected = "export JSON_ENCODE=\"[\\\"twx\\\"]\"",
+    actual = ":env_json_launcher_js",
+    expected = "setEnv(\"JSON_ENCODE\", \"[\\\"twx\\\"]\")",
 )
 
 ####################################################################################################

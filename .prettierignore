@@ -5,6 +5,7 @@ examples/**/*_pb.d.ts
 js/private/coverage/coverage.js
 js/private/devserver/js_run_devserver.mjs
 js/private/node-bootstrap/fs.cjs
+js/private/test/snapshots/launcher.cjs
 js/private/watch/aspect_watch_protocol.mjs
 js/private/watch/aspect_watch_protocol.d.mts
 min/

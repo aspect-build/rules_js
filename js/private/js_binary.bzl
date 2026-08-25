@@ -249,6 +249,10 @@ _ATTRS = {
         default = Label("//js/private:js_binary.sh.tpl"),
         allow_single_file = True,
     ),
+    "_launcher_js_template": attr.label(
+        default = Label("//js/private:js_binary.cjs.tpl"),
+        allow_single_file = True,
+    ),
     # Windows gets its own separate directory for node and npm wrappers. This
     # ensures that the bash scripts do not end up on the PATH when we build for
     # Windows.
@@ -284,17 +288,62 @@ _ATTRS = {
     ),
 }
 
-_ENV_SET = """export {var}={quoted_value}"""
-_ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
-_NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
+_ENV_SET = """setEnv({quoted_var}, {quoted_value})"""
+_ENV_SET_IFF_NOT_SET = """setEnvIfUnset({quoted_var}, {quoted_value})"""
+_NODE_OPTION = """addNodeOption({quoted_value})"""
 
 def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
 
-def _bash_quote(value):
+# json.encode produces a valid JavaScript string literal, which is what the
+# launcher's env values, node options and fixed args are spliced into.
+def _quote(value):
     return json.encode(value)
+
+def _shell_tokenize(value):
+    """Splits a fixed_arg the way bash did when it was spliced into an array literal.
+
+    The bash launcher built `ALL_ARGS=({{fixed_args}} "$@")`, so each fixed_arg
+    was subject to word splitting and quote removal. `$(rootpaths ...)` expanding
+    to several paths relies on the splitting and a `'...'`-wrapped arg relies on
+    the quote removal; both are covered by //js/private/test/fixed_args.
+
+    Backslash escapes are deliberately not interpreted (bash would have), so a
+    Windows-style path in a fixed_arg survives intact. Runtime `$VAR` expansion
+    is done by the launcher, not here.
+
+    Args:
+        value: the fixed_arg to split
+
+    Returns:
+        the list of argv entries it produces
+    """
+    tokens = []
+    current = ""
+    has_token = False
+    quote = None
+    for ch in value.elems():
+        if quote:
+            if ch == quote:
+                quote = None
+            else:
+                current += ch
+        elif ch == "'" or ch == "\"":
+            quote = ch
+            has_token = True
+        elif ch == " " or ch == "\t" or ch == "\n" or ch == "\r":
+            if has_token:
+                tokens.append(current)
+                current = ""
+                has_token = False
+        else:
+            current += ch
+            has_token = True
+    if has_token:
+        tokens.append(current)
+    return tokens
 
 def _generates_coverage_report(ctx):
     """Whether the launcher generates the lcov report in the test action. See #2901."""
@@ -302,17 +351,73 @@ def _generates_coverage_report(ctx):
             ctx.attr.testonly and
             ctx.configuration.coverage_enabled)
 
-def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
+_BINDIR_PRELUDE = """# Without a runfiles tree the JavaScript launcher has to be read out of the
+# bindir, and when path mapping is active only the --bazel-bindir flag knows
+# where that is. Peek at the flag here without consuming it; the JavaScript
+# launcher is the one that consumes it.
+if [ $# -gt 1 ] && [ "$1" = "--bazel-bindir" ]; then
+    BAZEL_BINDIR="$2"
+fi
+BAZEL_BINDIR="${{BAZEL_BINDIR:-{bindir}}}"
+"""
+
+def _execroot_relative(short_path):
+    """Rewrites a short_path the way the launcher's resolve_execroot_*_path helpers do."""
+    if short_path.startswith("../"):
+        return "external/" + short_path[3:]
+    return short_path
+
+def _stub_path_subst(ctx, node_path, launcher_js, is_windows):
+    """Shell expressions the trivial bash launcher uses to find node and the JavaScript launcher.
+
+    Whether a runfiles tree exists is an analysis time fact, so the resolution is
+    picked here instead of being branched on in the shell.
+
+    Args:
+        ctx: the rule context
+        node_path: short_path of the node binary, or an absolute target_tool_path
+        launcher_js: the generated JavaScript launcher File
+        is_windows: whether the target platform is Windows
+
+    Returns:
+        the substitutions for the bash launcher template
+    """
+    no_runfiles = is_windows and not ctx.attr.enable_runfiles
+
+    if node_path.startswith("/"):
+        # A user may specify an absolute path to node using target_tool_path in node_toolchain
+        node_bin_expr = "$(_normalize_path \"{}\")".format(node_path)
+    elif no_runfiles:
+        node_bin_expr = "$PWD/" + _execroot_relative(node_path)
+    else:
+        node_bin_expr = "$RUNFILES/{}/{}".format(ctx.workspace_name, node_path)
+
+    bindir_prelude = ""
+    if no_runfiles:
+        bindir_prelude = _BINDIR_PRELUDE.format(
+            bindir = ctx.expand_make_variables("env", "$(BINDIR)", {}),
+        )
+        launcher_js_expr = "$PWD/$BAZEL_BINDIR/" + _execroot_relative(launcher_js.short_path)
+    else:
+        launcher_js_expr = "$RUNFILES/{}/{}".format(ctx.workspace_name, launcher_js.short_path)
+
+    return {
+        "{{bindir_prelude}}": bindir_prelude,
+        "{{launcher_js_expr}}": launcher_js_expr,
+        "{{node_bin_expr}}": node_bin_expr,
+    }
+
+def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
     if is_windows:
         fixed_env = dict(fixed_env, **{"JS_BINARY__PATCH_NODE_FS": "0"})
 
     envs = [
-        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
+        _ENV_SET.format(quoted_var = _quote(key), quoted_value = _quote(_expand_env_if_needed(ctx, value)))
         for key, value in fixed_env.items()
     ] + [
-        _ENV_SET.format(var = key, quoted_value = _bash_quote(_expand_env_if_needed(ctx, value)))
+        _ENV_SET.format(quoted_var = _quote(key), quoted_value = _quote(_expand_env_if_needed(ctx, value)))
         for key, value in ctx.attr.env.items()
     ]
 
@@ -324,8 +429,8 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     }
     for (key, value) in makevars.items():
         envs.append(_ENV_SET.format(
-            var = key,
-            quoted_value = _bash_quote(ctx.expand_make_variables("env", value, {})),
+            quoted_var = _quote(key),
+            quoted_value = _quote(ctx.expand_make_variables("env", value, {})),
         ))
 
     # Add rule context variables to the environment
@@ -343,24 +448,24 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     if is_windows and not ctx.attr.enable_runfiles:
         builtins["JS_BINARY__NO_RUNFILES"] = "1"
     for (key, value) in builtins.items():
-        envs.append(_ENV_SET.format(var = key, quoted_value = _bash_quote(value)))
+        envs.append(_ENV_SET.format(quoted_var = _quote(key), quoted_value = _quote(value)))
 
     if ctx.attr.patch_node_fs:
         # Set patch node fs API env if not already set to allow js_run_binary to override
         envs.append(_ENV_SET_IFF_NOT_SET.format(
-            var = "JS_BINARY__PATCH_NODE_FS",
-            quoted_value = _bash_quote("1"),
+            quoted_var = _quote("JS_BINARY__PATCH_NODE_FS"),
+            quoted_value = _quote("1"),
         ))
 
     if ctx.attr.expected_exit_code:
         envs.append(_ENV_SET.format(
-            var = "JS_BINARY__EXPECTED_EXIT_CODE",
-            quoted_value = _bash_quote(str(ctx.attr.expected_exit_code)),
+            quoted_var = _quote("JS_BINARY__EXPECTED_EXIT_CODE"),
+            quoted_value = _quote(str(ctx.attr.expected_exit_code)),
         ))
 
     if ctx.attr.copy_data_to_bin:
         # Set an environment variable to flag that we have copied js_binary data to bin
-        envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _bash_quote("1")))
+        envs.append(_ENV_SET.format(quoted_var = _quote("JS_BINARY__COPY_DATA_TO_BIN"), quoted_value = _quote("1")))
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
@@ -380,17 +485,17 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         else:
             normalized_chdir = chdir_value
 
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", quoted_value = _bash_quote(normalized_chdir)))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(quoted_var = _quote("JS_BINARY__CHDIR"), quoted_value = _quote(normalized_chdir)))
 
     # Set log envs iff not already set to allow js_run_binary to override
     for env in envs_for_log_level(ctx.attr.log_level):
-        envs.append(_ENV_SET_IFF_NOT_SET.format(var = env, quoted_value = _bash_quote("1")))
+        envs.append(_ENV_SET_IFF_NOT_SET.format(quoted_var = _quote(env), quoted_value = _quote("1")))
 
     node_options = []
     for node_option in ctx.attr.node_options:
-        node_options.append(_NODE_OPTION.format(value = _expand_env_if_needed(ctx, node_option)))
+        node_options.append(_NODE_OPTION.format(quoted_value = _quote(_expand_env_if_needed(ctx, node_option))))
     if ctx.attr.preserve_symlinks_main and "--preserve-symlinks-main" not in node_options:
-        node_options.append(_NODE_OPTION.format(value = "--preserve-symlinks-main"))
+        node_options.append(_NODE_OPTION.format(quoted_value = _quote("--preserve-symlinks-main")))
 
     if ctx.attr.expand_args:
         fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
@@ -410,41 +515,62 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     if _generates_coverage_report(ctx):
         envs.append(_ENV_SET.format(
-            var = "JS_BINARY__COVERAGE_REPORT",
-            quoted_value = _bash_quote("/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])),
+            quoted_var = _quote("JS_BINARY__COVERAGE_REPORT"),
+            quoted_value = _quote("/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])),
         ))
 
-    launcher_subst = {
-        "{{target_label}}": str(ctx.label),
-        "{{template_label}}": str(ctx.attr._launcher_template.label),
-        "{{entry_point_label}}": str(ctx.attr.entry_point.label),
-        "{{entry_point_path}}": entry_point_path,
-        "{{envs}}": "\n".join(envs),
-        "{{fixed_args}}": " ".join(fixed_args),
-        "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
-        "{{log_prefix_rule_set}}": log_prefix_rule_set,
-        "{{log_prefix_rule}}": log_prefix_rule,
-        "{{node_options}}": "\n".join(node_options),
-        "{{node_patches}}": ctx.file._node_patches.short_path,
-        "{{node_wrapper}}": node_wrapper.short_path,
-        "{{node}}": node_path,
-        "{{npm}}": npm_path,
-        "{{npm_wrapper}}": npm_wrapper_path,
-        "{{workspace_name}}": ctx.workspace_name,
-    }
+    # Tokenize fixed_args here rather than relying on the shell to do it, since
+    # the launcher they are passed to is JavaScript now.
+    fixed_args_tokens = []
+    for fixed_arg in fixed_args:
+        fixed_args_tokens.extend(_shell_tokenize(fixed_arg))
 
     # The '_' avoids collisions with another file matching the label name.
     # For example, test and test/my.spec.ts. This naming scheme is borrowed from rules_go:
     # https://github.com/bazelbuild/rules_go/blob/f3cc8a2d670c7ccd5f45434ab226b25a76d44de1/go/private/context.bzl#L144
     launcher = ctx.actions.declare_file("{}_/{}".format(ctx.label.name, ctx.label.name))
+    launcher_js = ctx.actions.declare_file("{}_/{}.cjs".format(ctx.label.name, ctx.label.name))
+
+    ctx.actions.expand_template(
+        template = ctx.file._launcher_js_template,
+        output = launcher_js,
+        substitutions = {
+            "{{target_label}}": str(ctx.label),
+            "{{template_label}}": str(ctx.attr._launcher_js_template.label),
+            "{{entry_point_label}}": str(ctx.attr.entry_point.label),
+            "{{entry_point_path}}": entry_point_path,
+            "{{envs}}": "\n".join(envs),
+            "{{fixed_args}}": json.encode(fixed_args_tokens),
+            "{{log_prefix_rule_set}}": log_prefix_rule_set,
+            "{{log_prefix_rule}}": log_prefix_rule,
+            "{{node_options}}": "\n".join(node_options),
+            "{{node_patches}}": ctx.file._node_patches.short_path,
+            "{{node_wrapper}}": node_wrapper.short_path,
+            "{{node}}": node_path,
+            "{{npm}}": npm_path,
+            "{{npm_wrapper}}": npm_wrapper_path,
+            "{{workspace_name}}": ctx.workspace_name,
+        },
+    )
+
     ctx.actions.expand_template(
         template = ctx.file._launcher_template,
         output = launcher,
-        substitutions = launcher_subst,
+        substitutions = dict(
+            _stub_path_subst(ctx, node_path, launcher_js, is_windows),
+            **{
+                "{{target_label}}": str(ctx.label),
+                "{{template_label}}": str(ctx.attr._launcher_template.label),
+                "{{entry_point_label}}": str(ctx.attr.entry_point.label),
+                "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
+                "{{log_prefix_rule_set}}": log_prefix_rule_set,
+                "{{log_prefix_rule}}": log_prefix_rule,
+            }
+        ),
         is_executable = True,
     )
 
-    return launcher, toolchain_files
+    return launcher, launcher_js, toolchain_files
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -466,10 +592,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
+    bash_launcher, launcher_js, toolchain_files = _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
-    launcher_files = [bash_launcher]
+    launcher_files = [bash_launcher, launcher_js]
     launcher_files.extend(toolchain_files)
     if nodeinfo.node:
         launcher_files.append(nodeinfo.node)
@@ -505,6 +631,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 
     return struct(
         executable = launcher,
+        launcher_js = launcher_js,
         runfiles = runfiles,
         data_runfiles = data_runfiles,
     )
@@ -587,6 +714,9 @@ def _js_binary_impl(ctx):
             # toolchain scaffolding. Consumed by js_run_binary when
             # use_execroot_entry_point is enabled.
             execroot_data_files = launcher.data_runfiles.files,
+            # The generated JavaScript launcher, so that tests can assert on it
+            # and snapshot it.
+            launcher_js = depset([launcher.launcher_js]),
         ),
     ]
 

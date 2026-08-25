@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Proves that the --bazel-bindir launcher flag (js/private/js_binary.sh.tpl),
+# Proves that the --bazel-bindir launcher flag (js/private/js_binary.cjs.tpl),
 # combined with an argument derived from a File added to an Args object
 # (bindir_path_mapping_check.bzl), lets Bazel's path mapping share a
 # single cached action between two builds that differ only in compilation

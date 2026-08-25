@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files([
     "js_binary.sh.tpl",
+    "js_binary.cjs.tpl",
     "node_bin/node",
     "node_bin_windows/node.bat",
     "npm_bin/npm",
