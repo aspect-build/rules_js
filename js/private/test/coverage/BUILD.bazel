@@ -1,6 +1,6 @@
 load("//js/private/coverage:merger.bzl", "coverage_merger")
 load(":merger_test.bzl", "merger_test_suite")
-load(":test.bzl", "coverage_no_report_test", "coverage_pass_test", "coverage_preexisting_test")
+load(":test.bzl", "coverage_child_test", "coverage_no_report_test", "coverage_pass_test", "coverage_preexisting_test")
 
 package(default_testonly = True)
 
@@ -60,8 +60,9 @@ grep -q '^SF:js/private/test/coverage/' "$COVERAGE_OUTPUT_FILE" || { echo "expec
 grep -Eq '^DA:[0-9]+,[1-9]' "$COVERAGE_OUTPUT_FILE" || { echo "expected an executed line" >&2; exit 1; }
 grep -Eq '^DA:[0-9]+,0' "$COVERAGE_OUTPUT_FILE" || { echo "expected an unexecuted line" >&2; exit 1; }
 
-# The launcher clears NODE_V8_COVERAGE before running coverage.js, so coverage.js
-# must not have written its own profile alongside the ones it just read.
+# The coverage hook in coverage.cjs runs coverage.js with an emptied
+# NODE_V8_COVERAGE, so coverage.js must not have written its own profile alongside
+# the ones it just read.
 if grep -l 'js/private/coverage/coverage.js' "$COVERAGE_DIR"/coverage-*.json >/dev/null 2>&1; then
     echo "coverage.js wrote its own V8 profile into COVERAGE_DIR:" >&2
     grep -l 'js/private/coverage/coverage.js' "$COVERAGE_DIR"/coverage-*.json >&2
@@ -79,6 +80,55 @@ coverage_pass_test(
         "//conditions:default": False,
     }),
     entry_point = "lib.js",
+)
+
+# A test that exits non-zero but still passes since the exit code matches
+# expected_exit_code. pass_merger's assertions all hold, and this also keeps the
+# launcher's fork path (which expected_exit_code forces) covered under `bazel coverage`.
+coverage_pass_test(
+    name = "expected_exit",
+    data = ["expected_exit.js"],
+    enable_runfiles = select({
+        "@bazel_lib//lib:enable_runfiles": True,
+        "//conditions:default": False,
+    }),
+    entry_point = "expected_exit.js",
+    expected_exit_code = 42,
+)
+
+# Only the root node process generates the report; a child that re-enters bootstrap.cjs
+# must not generate a second one (child_lib.js asserts that), and the child's own V8
+# profile must still be in the report the root process generates.
+coverage_merger(
+    name = "child_merger",
+    merge_assertions = """\
+grep -q '^SF:js/private/test/coverage/child_lib.js$' "$COVERAGE_OUTPUT_FILE" || {
+    echo "expected an entry for the child's source, got:" >&2
+    cat "$COVERAGE_OUTPUT_FILE" >&2
+    exit 1
+}
+grep -q '^FNDA:1,childCovered$' "$COVERAGE_OUTPUT_FILE" || {
+    echo "the child process's V8 profile was not merged into the report:" >&2
+    cat "$COVERAGE_OUTPUT_FILE" >&2
+    exit 1
+}
+grep -q '^FNDA:0,childUncovered$' "$COVERAGE_OUTPUT_FILE" || { echo "expected an unexecuted function in the child" >&2; exit 1; }
+grep -q '^SF:js/private/test/coverage/child.js$' "$COVERAGE_OUTPUT_FILE" || { echo "the root process's own profile was not merged" >&2; exit 1; }
+""",
+    visibility = ["//visibility:public"],
+)
+
+coverage_child_test(
+    name = "child",
+    data = [
+        "child.js",
+        "child_lib.js",
+    ],
+    enable_runfiles = select({
+        "@bazel_lib//lib:enable_runfiles": True,
+        "//conditions:default": False,
+    }),
+    entry_point = "child.js",
 )
 
 # coverage_no_report_test has no _coverage_report, so the test action stashes nothing

@@ -277,6 +277,11 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
+    # Required by bootstrap.cjs only when generating a coverage report
+    "_coverage_bootstrap": attr.label(
+        allow_single_file = True,
+        default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
+    ),
 }
 
 _ENV_SET = """export {var}={quoted_value}"""
@@ -404,12 +409,12 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
     node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path
 
     if _generates_coverage_report(ctx):
-        coverage_entry_point = "/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])
-    else:
-        coverage_entry_point = ""
+        envs.append(_ENV_SET.format(
+            var = "JS_BINARY__COVERAGE_REPORT",
+            quoted_value = _bash_quote("/".join([ctx.workspace_name, ctx.file._coverage_report.short_path])),
+        ))
 
     launcher_subst = {
-        "{{coverage_entry_point}}": coverage_entry_point,
         "{{target_label}}": str(ctx.label),
         "{{template_label}}": str(ctx.attr._launcher_template.label),
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
@@ -544,10 +549,13 @@ def _js_binary_impl(ctx):
         if hasattr(ctx.attr, "_lcov_merger"):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
 
-        # The launcher runs coverage.js after the test to generate the report, so
-        # it must be in the test's runfiles. See #2901.
+        # coverage.cjs runs coverage.js when the test program exits to generate the
+        # report, so both must be in the test's runfiles. See #2901.
         if _generates_coverage_report(ctx):
-            runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
+            runfiles = runfiles.merge(ctx.runfiles(files = [
+                ctx.file._coverage_bootstrap,
+                ctx.file._coverage_report,
+            ]))
 
         providers.append(
             coverage_common.instrumented_files_info(

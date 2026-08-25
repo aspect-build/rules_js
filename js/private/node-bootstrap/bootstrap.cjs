@@ -43,3 +43,7 @@ if (
     }
     patchfs(roots)
 }
+
+if (process.env.JS_BINARY__COVERAGE_REPORT) {
+    require('./coverage.cjs')
+}

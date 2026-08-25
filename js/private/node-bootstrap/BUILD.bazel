@@ -10,4 +10,5 @@ write_source_files(
 exports_files([
     "fs.cjs",
     "bootstrap.cjs",
+    "coverage.cjs",
 ])

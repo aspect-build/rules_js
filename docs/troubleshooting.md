@@ -237,12 +237,13 @@ tests, etc.) at extraction time; see
 
 ## Code coverage
 
-Under `bazel coverage`, `js_test` produces its lcov report while the test runs,
-where the V8 coverage data and the instrumented sources are both available.
+Under `bazel coverage`, `js_test` produces its lcov report as the test program
+exits, where the V8 coverage data and the instrumented sources are both available.
+The `_lcov_merger` step only publishes that report.
 
 ### Coverage runs count against the test's timeout
 
-Because the report is produced while the test runs, generating it consumes the
+Because the report is produced by the test itself, generating it consumes the
 target's own `timeout`/`size` budget. Converting V8 coverage to lcov takes time
 proportional to the number of instrumented files, so a test that sits near its
 timeout under `bazel test` may need a larger `size` or `timeout` to pass under
@@ -251,6 +252,14 @@ timeout under `bazel test` may need a larger `size` or `timeout` to pass under
 For the same reason the report is produced by the target's own `node_toolchain`,
 not by the one used for build actions. A test pinned to an old Node version runs
 the coverage reporter under that version too.
+
+### Code run from the program's own `exit` listeners is not covered
+
+The reporter is registered by a `--require` preload, so it necessarily runs
+before any `process.on('exit', ...)` listener the test program itself registers.
+The V8 profile is snapshotted at that point, which means code executed from the
+program's own `exit` listeners is reported as uncovered. A preload cannot
+register last, so this is inherent to producing the report in-process.
 
 ### Coverage requires a runfiles tree
 
