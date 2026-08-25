@@ -45,15 +45,21 @@ const report = require('node:path').resolve(
 // executes from its own 'exit' listener is reported as uncovered.
 process.on('exit', function onExitCoverageReport() {
     try {
+        // Required here rather than at module scope so that loading this module, which
+        // every node process under `bazel coverage` does, stays cheap.
+        const fs = require('node:fs')
+        const v8 = require('node:v8')
+        const { spawnSync } = require('node:child_process')
+
         // A test reporting its own coverage owns it, except under split
         // post-processing, where bazel drops what the test wrote.
         if (env.SPLIT_COVERAGE_POST_PROCESSING !== '1' && env.COVERAGE_OUTPUT_FILE) {
-            const stat = require('node:fs').statSync(env.COVERAGE_OUTPUT_FILE, {
+            const stat = fs.statSync(env.COVERAGE_OUTPUT_FILE, {
                 throwIfNoEntry: false,
             })
             if (stat && stat.size > 0) return
         }
-        if (!require('node:fs').existsSync(report)) {
+        if (!fs.existsSync(report)) {
             // Report empty coverage rather than fail an otherwise passing test.
             logError(
                 `coverage report generator '${report}' not found; code coverage requires a runfiles tree`
@@ -63,12 +69,12 @@ process.on('exit', function onExitCoverageReport() {
         // node writes this process's own profile during teardown, which happens after
         // this handler runs, so flush it here. Deliberately no v8.stopCoverage(): node's
         // teardown asks V8 for coverage regardless, and errors out once it has stopped.
-        require('node:v8').takeCoverage()
-        const { status, error } = require('node:child_process').spawnSync(
-            nodeBinary,
-            [report],
-            { cwd, env, stdio: 'inherit' }
-        )
+        v8.takeCoverage()
+        const { status, error } = spawnSync(nodeBinary, [report], {
+            cwd,
+            env,
+            stdio: 'inherit',
+        })
         if (error || status !== 0) {
             throw error || new Error(`exit code ${status}`)
         }
