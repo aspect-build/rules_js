@@ -476,6 +476,11 @@ if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_PATCHES
     JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "js/private/node-bootstrap/bootstrap.cjs")
 else
+    # Spelled as a runfiles-root-relative path rather than via
+    # "_main/../", so that this is byte-for-byte the path the node
+    # launcher binary passes to --require. A child process inherits this one in
+    # execArgv and gets the launcher's as well; if the two spellings differ, node
+    # loads the patches twice and the second application fails.
     export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/_main/js/private/node-bootstrap/bootstrap.cjs"
 fi
 if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then

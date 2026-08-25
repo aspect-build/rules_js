@@ -14,8 +14,16 @@ js_binary(
     entry_point = "one.js",
 )
 
+# The assertions below are on the launcher script's own diagnostics, including the
+# per-target constants it bakes in, so this target has to run the script. Wrapping the
+# empty `args` in a select() is what holds it there: the js_run_binary macro cannot see
+# through one, so it declines the hermetic launcher, while the command line the select
+# resolves to is still empty. Without this the target would take the hermetic launcher
+# whenever --//js:use_execroot_entry_point is False, and that launcher prints none of
+# this -- JS_BINARY__WORKSPACE and the rest are documented as unreachable from it.
 js_run_binary(
     name = "capture_stderr",
+    args = select({"//conditions:default": []}),
     log_level = "debug",
     silent_on_success = False,
     stderr = "stderr",

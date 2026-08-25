@@ -67,11 +67,10 @@ babel_bin.babel(
     name = "babel_mjs2js",
     srcs = MJS_TESTS,
     outs = CJS_TESTS,
-    chdir = package_name(),
-    data = [":babel_config"],
-    fixed_args = [
-        "--config-file",
-        "$$RUNFILES_DIR/$(rlocationpath :babel_config)",
+    # Only the config path needs `$RUNFILES_DIR` expanded; the rest are ordinary `args`,
+    # which follow `fixed_args`, so babel sees the same command line either way and the
+    # hermetic launcher's embedded argument budget is not spent on them.
+    args = [
         "--extensions",
         ".mjs",
         "--out-file-extension",
@@ -79,6 +78,12 @@ babel_bin.babel(
         "--out-dir",
         ".",
     ] + MJS_TESTS,
+    chdir = package_name(),
+    data = [":babel_config"],
+    fixed_args = [
+        "--config-file",
+        "$$RUNFILES_DIR/$(rlocationpath :babel_config)",
+    ],
     silent_on_success = False,
 )
 

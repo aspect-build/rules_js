@@ -50,7 +50,13 @@ bzl_library(
         "@bazel_lib//lib:windows_utils",
         "@bazel_skylib//lib:dicts",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
+        "@hermetic_launcher//launcher:lib_bzl",
     ],
+)
+
+bzl_library(
+    name = "hermetic_tool",
+    srcs = ["hermetic_tool.bzl"],
 )
 
 bzl_library(
@@ -80,6 +86,7 @@ bzl_library(
     name = "js_run_binary",
     srcs = ["js_run_binary.bzl"],
     deps = [
+        ":hermetic_tool",
         ":js_helpers",
         ":js_info_files",
         ":js_library",

@@ -356,7 +356,12 @@ if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     export JS_BINARY__NODE_PATCHES
     JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "{{node_patches}}")
 else
-    export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_patches}}"
+    # Spelled as a runfiles-root-relative path rather than via
+    # "{{workspace_name}}/../", so that this is byte-for-byte the path the node
+    # launcher binary passes to --require. A child process inherits this one in
+    # execArgv and gets the launcher's as well; if the two spellings differ, node
+    # loads the patches twice and the second application fails.
+    export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/{{node_patches_rlocation}}"
 fi
 if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
     logf_fatal "node patches '%s' not found" "$JS_BINARY__NODE_PATCHES"

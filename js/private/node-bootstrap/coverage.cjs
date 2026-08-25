@@ -7,8 +7,9 @@
 // execution in this process's V8 profile. See #2901.
 //
 // bootstrap.cjs requires this module only when JS_BINARY__COVERAGE_REPORT is set, which
-// js_binary.bzl does for a test target under `bazel coverage` only; the variable holds
-// coverage.js's runfiles-relative path.
+// happens for a test target under `bazel coverage` only; the variable holds coverage.js's
+// path -- runfiles-relative when js_binary.bzl baked it into the launcher script, absolute
+// when launcher.cjs derived it from its own path instead.
 
 // Child node processes re-enter bootstrap.cjs with an inherited environment. Only the root
 // process reports, once every child has exited and written its profile.
