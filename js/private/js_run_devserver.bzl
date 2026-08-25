@@ -3,6 +3,14 @@
 load(":js_binary.bzl", "js_binary_lib")
 load(":js_helpers.bzl", _gather_files_from_js_infos = "gather_files_from_js_infos")
 
+_PACKAGE_STORE_MODES = [
+    # node_modules symlinks in the custom sandbox point back at the package store in the execroot.
+    "execroot",
+    # The package store is materialized inside the custom sandbox and node_modules symlinks point
+    # at it, so that realpath() of any node_modules entry stays under the sandbox root.
+    "sandbox",
+]
+
 _attrs = js_binary_lib.attrs | {
     "tool": attr.label(
         executable = True,
@@ -14,6 +22,10 @@ _attrs = js_binary_lib.attrs | {
     "grant_sandbox_write_permissions": attr.bool(),
     "allow_execroot_entry_point_with_no_copy_data_to_bin": attr.bool(),
     "command": attr.string(),
+    "package_store_mode": attr.string(
+        default = "execroot",
+        values = _PACKAGE_STORE_MODES,
+    ),
 }
 
 def _file_to_entry_json(f):
@@ -30,6 +42,11 @@ def _file_to_entry_json(f):
         if len(path_segments) <= package_name_segment or "@0.0.0" not in path_segments[package_name_segment]:
             return None
 
+    return json.encode([f.short_path, 1 if f.is_directory else 0])
+
+def _file_to_entry_json_unfiltered(f):
+    # Used when package_store_mode is "sandbox"; third party package store deps must be synced into
+    # the custom sandbox so that node_modules symlinks can point at them there.
     return json.encode([f.short_path, 1 if f.is_directory else 0])
 
 def _js_run_devserver_impl(ctx):
@@ -61,6 +78,12 @@ def _js_run_devserver_impl(ctx):
 
     default_data_runfiles = [target[DefaultInfo].default_runfiles.files for target in ctx.attr.data]
 
+    # Third party package store deps are only synced into the custom sandbox when the package store
+    # lives there; otherwise the node_modules symlinks resolve them in the execroot.
+    file_to_entry_json = _file_to_entry_json
+    if ctx.attr.package_store_mode == "sandbox":
+        file_to_entry_json = _file_to_entry_json_unfiltered
+
     # Build the list of data files to copy to the custom sandbox using ctx.actions.args()
     entries = ctx.actions.args()
     entries.set_param_file_format("multiline")
@@ -68,7 +91,7 @@ def _js_run_devserver_impl(ctx):
     entries.add_joined(
         depset(transitive = transitive_runfiles + [dep.files for dep in ctx.attr.data] + default_data_runfiles),
         expand_directories = False,
-        map_each = _file_to_entry_json,
+        map_each = file_to_entry_json,
         join_with = ",",
     )
     entries.add("]")
@@ -92,6 +115,8 @@ def _js_run_devserver_impl(ctx):
         config["grant_sandbox_write_permissions"] = "1"
     if launcher.chdir:
         config["chdir"] = launcher.chdir
+    if ctx.attr.package_store_mode != "execroot":
+        config["package_store_mode"] = ctx.attr.package_store_mode
 
     ctx.actions.write(config_file, json.encode(config))
 
@@ -130,6 +155,7 @@ def js_run_devserver(
         grant_sandbox_write_permissions = False,
         use_execroot_entry_point = True,
         allow_execroot_entry_point_with_no_copy_data_to_bin = False,
+        package_store_mode = "execroot",
         **kwargs):
     """Runs a devserver via binary target or command.
 
@@ -204,6 +230,10 @@ def js_run_devserver(
     tree, they are recreated as symlinks in the custom sandbox and do not incur a full copy of the
     underlying npm packages.
 
+    Bundlers that resolve modules through `realpath()` and enforce a project root boundary, such as
+    Next.js with Turbopack, reject that layout since the packages physically live outside the
+    sandbox. See `package_store_mode` for syncing the package store into the sandbox instead.
+
     Supports running with [ibazel](https://github.com/bazelbuild/bazel-watcher).
     Only `data` files that change on incremental builds are synchronized when running with ibazel.
 
@@ -233,6 +263,26 @@ def js_run_devserver(
             circumstances, try to modify files when running.
 
             See https://github.com/aspect-build/rules_js/issues/935 for more context.
+
+        package_store_mode: Where the npm package store that the sandbox `node_modules` symlinks point at lives.
+
+            `"execroot"` (the default) points the symlinks back at the package store in the execroot
+            output tree. Only first-party package store deps are copied into the sandbox; third party
+            packages are resolved through the symlinks without being copied, which keeps the sandbox
+            cheap to populate.
+
+            `"sandbox"` instead materializes the whole package store inside the custom sandbox and
+            points the symlinks there. This is needed by bundlers that resolve modules through
+            `realpath()` and then refuse to compile anything outside the project root — Next.js with
+            Turbopack, for example, fails with "files outside of the project directory will not be
+            compiled" under the default mode, since every third party package physically lives in
+            the execroot.
+
+            Package store files use copy-on-write filesystem clones where possible, with a regular
+            copy fallback. Both strategies keep sandbox writes isolated from Bazel outputs. Set the
+            `JS_RUN_DEVSERVER_SANDBOX_DIR` environment variable to place the sandbox on the same
+            filesystem as the execroot and increase the chance that copy-on-write cloning is
+            available.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
@@ -279,6 +329,7 @@ def js_run_devserver(
         tool = tool,
         command = command,
         grant_sandbox_write_permissions = grant_sandbox_write_permissions,
+        package_store_mode = package_store_mode,
         use_execroot_entry_point = use_execroot_entry_point,
         allow_execroot_entry_point_with_no_copy_data_to_bin = allow_execroot_entry_point_with_no_copy_data_to_bin,
         **kwargs

@@ -138,6 +138,45 @@ eslint_bin.eslint_test(
 > NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
 > For now, you must emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute shown above.
 
+## Devserver bundler refuses to compile files "outside of the project directory"
+
+`js_run_devserver` runs the devserver in a custom sandbox under the OS temp directory. By default the
+`node_modules` symlinks in that sandbox point back at the npm package store in the Bazel execroot, so
+third-party packages are resolved without being copied into the sandbox.
+
+Bundlers that resolve modules through `realpath()` and then enforce a project root boundary reject
+that layout, because every third party package physically lives outside the sandbox. Next.js with
+Turbopack (the default since Next.js 16) fails like this:
+
+```
+Error: Next.js inferred your workspace root, but it may not be correct.
+    We couldn't find the Next.js package (next/package.json) from the project directory: ...
+    Note: For security and performance reasons, files outside of the project directory
+    will not be compiled.
+```
+
+Setting `turbopack.root` does not help: no directory contains both the sandbox and the execroot.
+
+The fix is to materialize the package store inside the sandbox so that `realpath()` of every
+`node_modules` entry stays under the sandbox root:
+
+```python
+js_run_devserver(
+    name = "dev",
+    args = ["dev"],
+    chdir = package_name(),
+    data = [...],
+    package_store_mode = "sandbox",
+    tool = ":next_js_binary",
+)
+```
+
+Package store files use copy-on-write filesystem clones where possible, with a regular copy
+fallback. This keeps devserver writes isolated from Bazel outputs while avoiding duplicate disk
+usage on filesystems that support cloning. Set the `JS_RUN_DEVSERVER_SANDBOX_DIR` environment
+variable to place the sandbox alongside the execroot and increase the chance that cloning is
+available.
+
 ## Ugly stack traces
 
 Bazel's sandboxing and runfiles directory layouts can make stack traces and logs hard to read. This issue is common in many
