@@ -129,14 +129,6 @@ coverage_child_test(
         "//conditions:default": False,
     }),
     entry_point = "child.js",
-    # child.js re-enters bootstrap.cjs by spawning process.execPath, which bootstrap.cjs
-    # points at the node wrapper. It only does so off Windows, where patching execPath is
-    # still a FIXME, so on Windows the child would be bare node with no --require and the
-    # assertions in child_lib.js would hold vacuously. Drop this once that FIXME is fixed.
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )
 
 # coverage_no_report_test has no _coverage_report, so the test action stashes nothing
