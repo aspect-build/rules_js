@@ -8,8 +8,8 @@
 // The template used to generate this launcher is
 //     @@//js/private:js_binary.cjs.tpl
 //
-// It is exec'd by the trivial bash launcher that sits beside it, whose only job
-// is to resolve node and this file out of the runfiles tree.
+// It is exec'd by the native launcher that sits beside it, whose only job is to
+// resolve node and this file out of the runfiles tree.
 
 'use strict'
 
