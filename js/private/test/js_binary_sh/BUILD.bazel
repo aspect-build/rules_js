@@ -64,6 +64,20 @@ assert_contains(
     expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_WORKSPACE _main",
 )
 
+# The native launcher passes the entry point to node as its main module, so the
+# launcher runs as a --require preload of a process already set up to run it.
+assert_contains(
+    name = "native_launcher_entry_point_test",
+    actual = ":stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: native launcher entry point /",
+)
+
+assert_contains(
+    name = "native_launcher_entry_point_runfiles_test",
+    actual = ":stderr",
+    expected = "one_/one.runfiles/_main/js/private/test/js_binary_sh/one.js",
+)
+
 assert_contains(
     name = "JS_BINARY__BINDIR_test",
     actual = ":stderr",
