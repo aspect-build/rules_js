@@ -48,9 +48,9 @@ reads one of those will see `undefined`.
 Both the `js_binary` and the `js_run_binary` have to qualify.
 
 A `js_binary` is disqualified by `chdir`, `env`, `node_options`,
-`expected_exit_code` or `include_npm`, by targeting Windows, by being a
-coverage-enabled test, or by setting `copy_data_to_bin = False` -- without that the entry
-point is never copied to the bindir, and the execroot mode below has nothing to run.
+`expected_exit_code` or `include_npm`, by targeting Windows, or by setting
+`copy_data_to_bin = False` -- without that the entry point is never copied to the
+bindir, and the execroot mode below has nothing to run.
 `patch_node_fs` is not a disqualifier: `js_run_binary` always passes it through the
 action environment.
 
@@ -89,6 +89,17 @@ unchanged. What differs is the detail: the launcher script's info and debug outp
 dumps the `PATH`, the `BAZEL_*` and `JS_BINARY__*` values it computed and the node
 command line, and none of that is printed when the script does not run. A `log_level`
 set on the `js_binary` itself has no channel to the stub and is not applied at all.
+
+A coverage-enabled test is not a disqualifier either. The lcov report is generated from a
+node exit hook rather than by the launcher script after node is gone, so nothing is left
+that needs a process outliving the program. What remains is `NODE_V8_COVERAGE`, which node
+reads once as it opens its V8 coverage connection during startup -- before any `--require`
+preload runs, so `launcher.cjs` cannot turn coverage on for the process it is in. It
+starts node again with the variable set instead, in place through `process.execve` where
+node has it. Only the first node in the tree does that; every child inherits the variable
+and opens its own connection. The path of the report generator has no channel from the
+rule either, so `launcher.cjs` derives it from its own path in the runfiles, the same way
+it finds the node wrapper.
 
 `use_execroot_entry_point` is not a disqualifier either, though it is the one place where
 the launcher has to do real work the stub cannot express. The two modes differ in which

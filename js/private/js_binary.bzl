@@ -446,6 +446,12 @@ def _hermetic_launcher_blockers(ctx, fixed_arg_blockers, fixed_env, is_windows):
     # reaches the preload and bootstrap.cjs. Only a level set on the js_binary itself has
     # no channel to the stub, and is silently not applied.
 
+    # Coverage is deliberately not a blocker. Neither half of it needs the launcher
+    # script any more: coverage.cjs generates the lcov report from a node exit hook rather
+    # than the script running it once node is gone (#2984), and launcher.cjs starts node
+    # over with NODE_V8_COVERAGE set, which is the one thing a preload cannot do to the
+    # process it is already running in.
+
     # The fs patches are force-disabled on Windows (#1137), and the stub there spawns
     # and waits rather than execve'ing.
     #
@@ -455,11 +461,6 @@ def _hermetic_launcher_blockers(ctx, fixed_arg_blockers, fixed_env, is_windows):
     # reads False on a normal Linux build where runfiles are in fact enabled.
     if is_windows:
         blockers.append("WINDOWS")
-
-    # NODE_V8_COVERAGE has to be set before node starts, and the report generator has
-    # to run after it exits.
-    if _generates_coverage_report(ctx):
-        blockers.append("COVERAGE")
 
     return blockers
 

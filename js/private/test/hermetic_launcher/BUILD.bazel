@@ -636,3 +636,39 @@ assert_contains(
     actual = "env_report_hermetic.json",
     expected = "\"entry_point\": \"<bindir>/js/private/test/hermetic_launcher/action_probe.js\"",
 )
+
+# Coverage, end to end and with no bash launcher in it: the launcher binary is run the way
+# a coverage-enabled test action would run it, and the lcov report that comes out is the
+# one the merger would publish.
+#
+# coverage.js and coverage.cjs are in a js_binary's runfiles only when it is a test being
+# built under `bazel coverage`, which this target is not, so this test supplies them at
+# the same rlocation paths -- the same arrangement it already makes for launcher.cjs.
+js_binary(
+    name = "coverage_bin",
+    data = ["coverage_child.js"],
+    entry_point = "coverage_probe.js",
+)
+
+filegroup(
+    name = "coverage_launcher",
+    srcs = [":coverage_bin"],
+    output_group = "hermetic_launcher",
+)
+
+sh_test(
+    name = "coverage_test",
+    srcs = ["coverage_test.sh"],
+    args = ["$(rootpath :coverage_launcher)"],
+    data = [
+        ":coverage_bin",
+        ":coverage_launcher",
+        "//js/private/coverage:coverage.js",
+        "//js/private/node-bootstrap:coverage.cjs",
+        "//js/private/node-bootstrap:launcher.cjs",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)

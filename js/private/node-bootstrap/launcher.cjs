@@ -25,13 +25,16 @@ const { pathToFileURL } = require('url')
 const GUARD = Symbol.for('aspect_rules_js.hermetic_launcher')
 
 // Node worker threads inherit execArgv, so this preload runs in every one of them, and
-// two of the things it does belong to the main thread alone:
+// three of the things it does belong to the main thread alone:
 //
 //   - Changing directory. process.chdir throws ERR_WORKER_UNSUPPORTED_OPERATION in a
 //     worker, which does not need it anyway: it inherits the cwd the main thread
 //     already moved to.
 //   - Redirecting the main module. A worker's main is the script it was started with
 //     rather than the js_binary entry point, and process.argv[1] is not even set there.
+//   - Turning COVERAGE_DIR into NODE_V8_COVERAGE, which takes a fresh node. A worker
+//     inherits an environment that already has the variable, and replacing the process
+//     out from under the main thread is not something it could survive anyway.
 //
 // Everything else here still has to happen in a worker, because the fs patches apply per
 // realm.
@@ -192,6 +195,14 @@ function resolveExecroot(startCwd) {
     return execroot
 }
 
+// The path this file was preloaded from. Not __dirname, which node has already resolved
+// through the runfiles symlink back to the source tree; the files beside this one have to
+// be reached inside the runfiles tree the launcher binary resolved against.
+function preloadPath() {
+    const at = process.execArgv.indexOf('--require')
+    return at !== -1 && process.execArgv[at + 1] ? process.execArgv[at + 1] : __filename
+}
+
 // Every child process that re-enters node has to be able to find a patched one.
 function setUpNode() {
     // Read before bootstrap.cjs overwrites process.execPath with the wrapper.
@@ -201,16 +212,9 @@ function setUpNode() {
     // the string the launcher passed. A child that inherits execArgv and also picks
     // this up from the node wrapper would otherwise load two spellings of the same
     // module and fs.cjs would throw on the second patch.
-    const requireIndex = process.execArgv.indexOf('--require')
-    const preload =
-        requireIndex !== -1 && process.execArgv[requireIndex + 1]
-            ? process.execArgv[requireIndex + 1]
-            : __filename
+    const preload = preloadPath()
     process.env.JS_BINARY__NODE_PATCHES = preload
 
-    // Derived from the preload's own runfiles path rather than from __dirname, which
-    // node has already resolved through the runfiles symlink back to the source tree.
-    // The wrapper has to stay inside the runfiles tree the launcher resolved against.
     const wrapper = path.join(path.dirname(preload), '..', 'node_bin', 'node')
     if (!fs.existsSync(wrapper)) {
         fatal(`node wrapper '${wrapper}' not found`)
@@ -250,27 +254,67 @@ function isEsmMain(file) {
     }
 }
 
-// A node old enough to lack module.registerHooks gives a preload no way to redirect an
-// ESM main, so run a second node on the right file rather than let this one load the
-// runfiles copy and resolve the program's imports against the wrong tree. Costs a node
-// startup, and only for an ESM entry point on node < 22.15.
-function reExecOnEntryPoint(entryPoint) {
-    const { spawnSync } = require('child_process')
-    debug(`re-executing node on ${entryPoint}: this node cannot redirect an ESM main`)
-    // The child's argv carries no --bazel-bindir -- takeBazelBindir already removed it --
-    // so this file will not try to redirect its main a second time.
-    const result = spawnSync(
-        process.execPath,
-        [...process.execArgv, entryPoint, ...process.argv.slice(2)],
-        { stdio: 'inherit' }
-    )
+// Starts node over again on `mainScript`, with the same options and the same arguments,
+// and does not return. The two things a preload cannot do to the node it is already
+// running in both end up here.
+//
+// process.execve replaces this process rather than adding one, which is what the launcher
+// script's `exec` did and costs the same nothing. A node too old to have it forks and
+// waits instead -- and that is the same vintage of node that makes the ESM caller below
+// necessary at all.
+function reExec(mainScript, env, reason) {
+    debug(`re-executing node on ${mainScript}: ${reason}`)
+    const argv = [...process.execArgv, mainScript, ...process.argv.slice(2)]
+    if (typeof process.execve === 'function') {
+        process.execve(process.execPath, [process.execPath, ...argv], env)
+    }
+    const result = require('child_process').spawnSync(process.execPath, argv, {
+        env,
+        stdio: 'inherit',
+    })
     if (result.error) {
-        fatal(`could not re-execute node on '${entryPoint}': ${result.error.message}`)
+        fatal(`could not re-execute node on '${mainScript}': ${result.error.message}`)
     }
     if (result.signal) {
         process.kill(process.pid, result.signal)
     }
     process.exit(result.status === null ? 1 : result.status)
+}
+
+// Port of the coverage block in js_binary.sh.tpl, plus the JS_BINARY__COVERAGE_REPORT
+// that js_binary bakes into the script next to it.
+//
+// node reads NODE_V8_COVERAGE once, when it opens its V8 coverage connection during
+// startup, so a preload cannot turn coverage on for the process it is running in: by the
+// time this file loads the decision has been made. Handing the variable to a fresh node
+// is the only way to honour COVERAGE_DIR.
+//
+// Only the first node in the tree does that, and finding NODE_V8_COVERAGE already set is
+// what says a process is not it: the one started below runs straight through, and so does
+// every child, each of which node gives a coverage connection of its own at its own
+// startup. A child must not claim the report a second time either, which is why
+// coverage.cjs deletes JS_BINARY__COVERAGE_REPORT as soon as it has taken it.
+function setUpCoverage() {
+    if (!process.env.COVERAGE_DIR || process.env.NODE_V8_COVERAGE || !IS_MAIN_THREAD) {
+        return
+    }
+    // Absolute for the same reason the runfiles root is. node resolves the coverage
+    // directory against the cwd of whichever process it starts in, and this launcher
+    // changes directory before the program gets to spawn anything.
+    const dir = path.resolve(process.env.COVERAGE_DIR)
+    const env = { ...process.env, NODE_V8_COVERAGE: dir }
+
+    // The report generator that coverage.cjs runs when the program exits. The launcher
+    // script has its path baked in by js_binary; here it is derived from the preload's
+    // own path, the way setUpNode derives the node wrapper. js_binary puts it in the
+    // runfiles exactly when it decided this target reports coverage, so whether it is
+    // there is the same answer to the same question.
+    const report = path.join(path.dirname(preloadPath()), '..', 'coverage', 'coverage.js')
+    if (fs.existsSync(report)) {
+        env.JS_BINARY__COVERAGE_REPORT = report
+    }
+
+    reExec(process.argv[1], env, `v8 coverage support needs NODE_V8_COVERAGE=${dir}`)
 }
 
 // Port of the entry point selection in js_binary.sh.tpl. The launcher binary can only
@@ -331,8 +375,13 @@ function redirectMainToExecroot(runfiles, execroot) {
     // has its own. Both are installed rather than choosing between them, so that neither
     // this file nor js_binary has to work out which loader node will pick.
     if (typeof Module.registerHooks !== 'function') {
+        // A node old enough to lack module.registerHooks gives a preload no way to
+        // redirect an ESM main, so run a second node on the right file rather than let
+        // this one load the runfiles copy and resolve the program's imports against the
+        // wrong tree. The child's argv carries no --bazel-bindir -- takeBazelBindir
+        // already removed it -- so it will not redirect its main a second time.
         if (isEsmMain(entryPoint)) {
-            reExecOnEntryPoint(entryPoint)
+            reExec(entryPoint, process.env, 'this node cannot redirect an ESM main')
         }
         return
     }
@@ -354,6 +403,10 @@ function main() {
             fatal(`${name} is set, which this launcher does not implement`)
         }
     }
+
+    // Before anything below touches process.argv or the cwd, because this may replace
+    // the process rather than return.
+    setUpCoverage()
 
     // Everything below is computed against the directory we started in, which
     // resolveExecroot may change.
