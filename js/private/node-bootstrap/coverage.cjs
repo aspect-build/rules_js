@@ -36,17 +36,12 @@ const report = require('node:path').resolve(
     JS_BINARY__COVERAGE_REPORT
 )
 
-// NB: this runs before any 'exit' listener the program registers, whereas the launcher used
-// to run after the process was gone. A program that writes its own report to
-// COVERAGE_OUTPUT_FILE from an 'exit' listener therefore also gets a report generated here.
-// What ends up published is unchanged: the merger prefers the program's own report, except
-// under split post-processing where bazel discards it and ours is published instead. For
-// the same reason the profile is snapshotted before those listeners run, so code a program
-// executes from its own 'exit' listener is reported as uncovered.
+// This listener is registered by a --require preload, so it runs before any
+// 'exit' listener the program itself registers.  takeCoverage() below
+// therefore snapshots the profile before those listeners run, and code the
+// program executes from one of them is reported as uncovered.
 process.on('exit', function onExitCoverageReport() {
     try {
-        // Required here rather than at module scope so that loading this module, which
-        // every node process under `bazel coverage` does, stays cheap.
         const fs = require('node:fs')
         const v8 = require('node:v8')
         const { spawnSync } = require('node:child_process')
