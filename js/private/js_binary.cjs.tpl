@@ -8,14 +8,12 @@
 // The template used to generate this launcher is
 //     {{template_label}}
 //
-// The native launcher that sits beside it resolves node, this file and the entry
-// point out of the runfiles tree and runs
-//     node --require <this file> -- <entry point> [args...]
-// so this file is a --require preload of a node process that is already set up to
-// run the entry point as its main module. Today it always execs node a second time
-// with the arguments it computes below; the point of the preload shape is that it
-// will be able to stop doing so for simple targets, leaving one node process per
-// launch instead of two.
+// It is exec'd by the native launcher that sits beside it, whose only job is to
+// resolve node and this file out of the runfiles tree. So this file is node's main
+// module, and today it always execs node a second time on the entry point with the
+// arguments it computes below. For simple targets it will instead be able to run
+// the entry point in this process, leaving one node process per launch instead of
+// two; see the launch site at the bottom of the file.
 
 'use strict'
 
@@ -23,29 +21,6 @@ const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 const { spawn } = require('node:child_process')
-
-// The entry point the native launcher resolved out of the runfiles and handed to
-// node as its main module. The launcher resolves the entry point itself further
-// down; this is kept to log the two side by side.
-const STUB_ENTRY_POINT = process.argv[1]
-
-// Stops node from running the entry point as its main module once this preload
-// returns. Node fixes which file it will run as main before any preload executes,
-// and assigning to process.argv[1] only changes what the program reads out of
-// argv, so the one way out is to not return: throwing skips node's main entirely.
-// The handler swallows this one sentinel and leaves the event loop running, so
-// anything already scheduled -- a spawned child and its exit handler -- still runs.
-const SUPPRESS_ENTRY_POINT = new Error(
-    'js_binary launcher: sentinel used to suppress the node entry point'
-)
-function suppressEntryPoint() {
-    process.once('uncaughtException', (err) => {
-        if (err !== SUPPRESS_ENTRY_POINT) {
-            throw err
-        }
-    })
-    throw SUPPRESS_ENTRY_POINT
-}
 
 // ==============================================================================
 // Helpers
@@ -683,7 +658,6 @@ if (process.env.JS_BINARY__LOG_DEBUG) {
     logfDebug(`JS_BINARY__TARGET_NAME ${process.env.JS_BINARY__TARGET_NAME || ''}`)
     logfDebug(`JS_BINARY__WORKSPACE ${process.env.JS_BINARY__WORKSPACE || ''}`)
     logfDebug(`js_binary entry point ${entryPoint}`)
-    logfDebug(`native launcher entry point ${STUB_ENTRY_POINT}`)
     if (process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT) {
         logfDebug(
             `JS_BINARY__USE_EXECROOT_ENTRY_POINT ${process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT}`
@@ -711,27 +685,31 @@ if (process.env.JS_BINARY__LOG_INFO) {
 // still put on the PATH as `node` so that child processes get the patched
 // runtime.
 //
-// This is the second node startup of the launch, and the one to eliminate. Running
-// the entry point in this process instead means returning from this preload rather
-// than exec'ing, which is only correct when all of:
+// This is the second node startup of the launch, and the one to eliminate. Instead
+// of exec'ing, this process can run the entry point itself:
+//
+//     process.argv = [process.argv[0], entryPoint, ...args]
+//     process.execArgv = ['--require', nodePatches, ...nodeOptions]
+//     require(process.env.JS_BINARY__NODE_PATCHES)
+//     require('node:module').runMain()
+//
+// runMain is what node's own startup calls for the file it was given, so the entry
+// point becomes the real main module -- `require.main === module` holds, and an ESM
+// entry point is detected the same way. process.execArgv is set for the benefit of
+// fork() and worker threads, which read it to build the child's command line.
+//
+// That is only correct when all of:
 //
 //   - `nodeOptions` matches what this process was actually started with, i.e.
-//     process.execArgv minus this file's own --require pair. Node CLI options
-//     cannot be applied from a preload, so the ones known at analysis time have to
-//     be embedded in the native launcher's argv for this to hold.
+//     process.execArgv. Node CLI options cannot be applied once node is running, so
+//     the ones known at analysis time have to be embedded in the native launcher's
+//     argv for this to hold.
 //   - There is no stdout, stderr or exit code capture and no expected exit code:
 //     each needs work after the program exits, and the stream captures need an fd
 //     redirect that has no JavaScript equivalent.
 //   - COVERAGE_DIR is unset. NODE_V8_COVERAGE is read at node startup.
 //   - The environment set up above changed nothing else node reads at startup
 //     (NODE_OPTIONS, NODE_PATH, NODE_COMPILE_CACHE, NODE_EXTRA_CA_CERTS, ...).
-//   - STUB_ENTRY_POINT resolves to `entryPoint`, which is not the case for an
-//     execroot entry point or a DirectoryPathInfo one.
-//
-// The in-process path would then set process.argv and process.execArgv to what node
-// would have been started with (so that fork() and worker threads do not inherit
-// --require of this file), require the node patches that are passed as --require
-// below, and return -- letting node run the entry point it already has queued up.
 const nodeArgs = [
     '--require',
     process.env.JS_BINARY__NODE_PATCHES,
@@ -770,7 +748,8 @@ if (!expectedExitCode && !exitCodeOutputFile && !stdoutCapture && !stderrCapture
 // Reached when this launcher has to outlive the program: a capture with a declared
 // output file needs an fd redirect that has no JavaScript equivalent, an expected
 // exit code or an exit code capture needs work once the program is done, and Node
-// before 22.15 has no process.execve at all.
+// before 22.15 has no process.execve at all. These are the paths that will keep
+// spawning a second node process even once the in-process path above exists.
 const child = spawn(process.env.JS_BINARY__NODE_BINARY, nodeArgs, {
     stdio: [
         'inherit',
@@ -847,7 +826,3 @@ child.on('exit', (code, signal) => {
         exitWith(result)
     }
 })
-
-// The child is running the entry point, so node must not also run it here when this
-// preload returns.
-suppressEntryPoint()

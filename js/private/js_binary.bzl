@@ -349,10 +349,6 @@ def _generates_coverage_report(ctx):
 _FINALIZER_TOOLCHAIN_TYPE = Label(hermetic_launcher.finalizer_toolchain_type)
 _TEMPLATE_TOOLCHAIN_TYPE = Label(hermetic_launcher.template_toolchain_type)
 
-# The stub template has ten fixed-width slots for the argv it embeds. An arg that
-# does not fit cannot be stamped in.
-_STUB_ARG_SLOT_BYTES = 256
-
 # Stands in for the launcher on target platforms hermetic_launcher has no stub
 # for. Not a launcher: it only exists so that building such a target succeeds and
 # running it says why it cannot.
@@ -384,7 +380,7 @@ def _compile_stub(ctx, embedded_args, transformed_args, output_file):
         progress_message = "Stamping launcher %{output}",
     )
 
-def _launcher(ctx, nodeinfo, entry_point, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
+def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows):
     # Explicitly disable node fs patches on Windows:
     # https://github.com/aspect-build/rules_js/issues/1137
     if is_windows:
@@ -547,17 +543,22 @@ def _launcher(ctx, nodeinfo, entry_point, entry_point_path, log_prefix_rule_set,
         )
         return launcher, launcher_js, toolchain_files
 
-    # The native launcher resolves node, the JavaScript launcher and the entry point
-    # out of the runfiles and execs `node --require <launcher.cjs> -- <entry_point>`;
-    # everything else is baked into the .cjs above. The three files are marked for
-    # runfiles resolution by the stub at startup, so their rlocation paths -- which
-    # carry no output tree configuration segment -- are what gets embedded, keeping
-    # the launcher safe under path mapping.
+    # The native launcher only has to resolve node and the JavaScript launcher out
+    # of the runfiles and exec them; everything else is baked into the .cjs above.
+    # Both are marked for runfiles resolution by the stub at startup, so their
+    # rlocation paths -- which carry no output tree configuration segment -- are
+    # what gets embedded, keeping the launcher safe under path mapping.
     #
-    # The .cjs is therefore a --require preload of the node process that would go on
-    # to run the entry point as its main module. It still execs node a second time,
-    # but having the entry point already in place is what will let it stop doing so
-    # for simple targets, leaving a single node process per launch.
+    # The entry point is deliberately not embedded here. Handing it to node as its
+    # main module -- `node --require <launcher.cjs> -- <entry point>` -- would let
+    # the launcher run as a preload and simply return instead of exec'ing node a
+    # second time, but the stub resolves a runfile to <runfiles dir>/<rlocation>
+    # and the runfiles dir is relative whenever the caller's is (an sh_binary
+    # running a js_binary, for one). Node resolves a --require value that is
+    # neither absolute nor ./-prefixed as a bare package specifier, so such a
+    # launcher fails to load before any of it runs. The .cjs stays node's main
+    # module and hands off to the entry point in process instead; see the launch
+    # site in the template.
     if nodeinfo.node:
         embedded_args, transformed_args = hermetic_launcher.args_from_entrypoint(nodeinfo.node)
     elif node_path.startswith("/"):
@@ -575,46 +576,11 @@ def _launcher(ctx, nodeinfo, entry_point, entry_point_path, log_prefix_rule_set,
             transformed_args = [],
         )
 
-    # The entry point is passed as the File rather than as entry_point_path: for a
-    # DirectoryPathInfo entry point the latter reaches into the directory, and only
-    # the directory itself is a runfiles manifest key the stub can resolve. The
-    # launcher never reads argv[1] -- it resolves the entry point itself -- so this
-    # only has to resolve, not to name the exact file.
-    #
-    # append_runfile records the index it transforms, so appending in argv order is
-    # all that is needed. The lists are copied because it appends to them in place
-    # and the fallback below starts over from `[node]`.
-    stub_args, stub_transformed = hermetic_launcher.append_embedded_arg(
-        arg = "--require",
-        embedded_args = list(embedded_args),
-        transformed_args = list(transformed_args),
-    )
-    stub_args, stub_transformed = hermetic_launcher.append_runfile(
+    embedded_args, transformed_args = hermetic_launcher.append_runfile(
         file = launcher_js,
-        embedded_args = stub_args,
-        transformed_args = stub_transformed,
+        embedded_args = embedded_args,
+        transformed_args = transformed_args,
     )
-    stub_args, stub_transformed = hermetic_launcher.append_embedded_arg(
-        arg = "--",
-        embedded_args = stub_args,
-        transformed_args = stub_transformed,
-    )
-    stub_args, stub_transformed = hermetic_launcher.append_runfile(
-        file = entry_point,
-        embedded_args = stub_args,
-        transformed_args = stub_transformed,
-    )
-
-    if max([len(arg) for arg in stub_args]) < _STUB_ARG_SLOT_BYTES:
-        embedded_args, transformed_args = stub_args, stub_transformed
-    else:
-        # A path too long for a stub arg slot. Fall back to `node <launcher.cjs>`,
-        # which is correct but can never skip the second exec.
-        embedded_args, transformed_args = hermetic_launcher.append_runfile(
-            file = launcher_js,
-            embedded_args = embedded_args,
-            transformed_args = transformed_args,
-        )
 
     _compile_stub(ctx, embedded_args, transformed_args, launcher)
 
@@ -640,7 +606,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    launcher, launcher_js, toolchain_files = _launcher(ctx, nodeinfo, entry_point, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
+    launcher, launcher_js, toolchain_files = _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
 
     launcher_files = [launcher, launcher_js]
     launcher_files.extend(toolchain_files)
