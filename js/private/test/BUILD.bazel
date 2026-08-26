@@ -8,8 +8,7 @@ load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
 
 ####################################################################################################
 # Snapshot the generated js_binary launcher into the source tree so that changes to
-# it are reviewable. The executable itself is a native binary stamped by
-# hermetic_launcher; the JavaScript launcher beside it holds all of the logic.
+# it are reviewable.
 
 write_file(
     name = "snapshot_js",

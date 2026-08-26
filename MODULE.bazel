@@ -16,17 +16,13 @@ bazel_dep(name = "bazel_features", version = "1.41.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_nodejs", version = "6.7.3")
+bazel_dep(name = "hermetic_launcher", version = "0.0.15")
 
 # Changes ensured by rules_js:
 # 3.2.2: https://github.com/bazel-contrib/bazel-lib/commit/cac2d7855949d1b222fa26888892fbbe1d31015d
 # 3.5.0: support for stdout/stderr/exit_code_out/silent_on_success in run_binary
 # 3.7.0: https://github.com/bazel-contrib/bazel-lib/commit/e5c0630270f70dd2c7b50471bb9c872781a55282
 bazel_dep(name = "bazel_lib", version = "3.7.0")
-
-# The native js_binary launcher. 0.0.15 is the first release with the linux s390x
-# stub. Note there is no stub for linux ppc64le or windows arm64, so js_binary does
-# not resolve a toolchain on those platforms.
-bazel_dep(name = "hermetic_launcher", version = "0.0.15")
 
 # NB: LOWER BOUND on earliest BCR release of protobuf module, to avoid upgrading the root module by accident
 bazel_dep(name = "protobuf", version = "3.19.6")

@@ -7,13 +7,6 @@
 //
 // The template used to generate this launcher is
 //     {{template_label}}
-//
-// It is exec'd by the native launcher that sits beside it, whose only job is to
-// resolve node and this file out of the runfiles tree. So this file is node's main
-// module, and today it always execs node a second time on the entry point with the
-// arguments it computes below. For simple targets it will instead be able to run
-// the entry point in this process, leaving one node process per launch instead of
-// two; see the launch site at the bottom of the file.
 
 'use strict'
 
@@ -26,8 +19,6 @@ const { spawn } = require('node:child_process')
 // Helpers
 // ==============================================================================
 
-// The bash launcher only counted real Windows shells (Cygwin/MinGW/MSYS) as
-// Windows and treated WSL as Unix; process.platform draws the same line.
 const IS_WINDOWS = process.platform === 'win32'
 
 // Normalizes paths when running on Windows.
@@ -254,18 +245,16 @@ function resolveExecrootSrcPath(shortPath) {
     return `${process.env.JS_BINARY__EXECROOT}/${shortPath}`
 }
 
-// Stands in for the bash launcher's EXIT trap. Streams captured to a declared
-// output file were written there directly and need no mop up. Only the temp
-// files that back silent_on_success do.
+// Streams captured to a declared output file were written there directly and
+// need no mop up. Only the temp files that back silent_on_success do.
 function mopUp(exitCode) {
     if (stderrCaptureIsTemp) {
         if (exitCode !== 0 || !silentOnSuccess) {
             fs.writeSync(2, fs.readFileSync(stderrCapture))
         }
         fs.unlinkSync(stderrCapture)
-        // Unlike the bash launcher, stop pointing the loggers at the file that
-        // was just deleted; the logfDebug below would otherwise recreate and
-        // leak it.
+        // Stop pointing the loggers at the file that was just deleted; the
+        // logfDebug below would otherwise recreate and leak it.
         stderrCapture = undefined
         logErrorCapture = undefined
     }
@@ -371,7 +360,7 @@ if (
             `inheriting JS_BINARY__EXECROOT ${process.env.JS_BINARY__EXECROOT} from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set`
         )
     } else {
-        // We in runfiles and we don't yet know the execroot; strip from the last "bazel-out" segment
+        // We are in runfiles and we don't yet know the execroot; strip from the last "bazel-out" segment
         const index = process.cwd().lastIndexOf(bazelOutSegment)
         if (index < 0) {
             fs.writeSync(
@@ -568,9 +557,8 @@ function addNodeOption(value) {
 }
 {{node_options}}
 
-// fixed_args were tokenized at analysis time the way bash tokenized them when
-// they were spliced into `ALL_ARGS=({{fixed_args}} "$@")`. Runtime $VAR
-// expansion still happens here.
+// fixed_args were tokenized at analysis time. Runtime $VAR expansion still
+// happens here.
 const FIXED_ARGS = {{fixed_args}}
 
 const args = []
@@ -762,11 +750,9 @@ const child = spawn(process.env.JS_BINARY__NODE_BINARY, nodeArgs, {
 // Wait for program to finish
 // ==============================================================================
 
-// Node does not forward termination signals to any child process, and bash did
-// not either when running in docker, so the signals are trapped and forwarded
-// manually. The handlers are removed on the first signal so that a second one
-// terminates this launcher, matching the bash `trap - SIGTERM SIGINT` after the
-// first wait returned.
+// Node does not forward termination signals to any child process, so the
+// signals are trapped and forwarded manually. The handlers are removed on the
+// first signal so that a second one terminates this launcher.
 function forwardSignal(signal) {
     return () => {
         process.removeAllListeners('SIGTERM')
@@ -789,7 +775,6 @@ child.on('error', (err) => {
 })
 
 child.on('exit', (code, signal) => {
-    // Matches what `wait` reported to bash for a signal-terminated child.
     const result =
         signal !== null && signal !== undefined
             ? 128 + (os.constants.signals[signal] || 0)
