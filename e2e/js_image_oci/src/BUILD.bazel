@@ -64,7 +64,6 @@ oci_image(
     name = "image",
     base = "@debian",
     # This is `/[js_image_layer 'root']/[package name of js_image_layer 'binary' target]/[name of js_image_layer 'binary' target]`
-    # The js_binary launcher is a native executable, so it is the entrypoint directly.
     entrypoint = ["/app/src/bin"],
     tars = [
         ":layers",

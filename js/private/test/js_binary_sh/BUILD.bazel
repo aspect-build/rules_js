@@ -196,8 +196,6 @@ assert_contains(
     expected = "[\"twx\"]",
 )
 
-# The env values are set by the generated JavaScript launcher, not by the trivial
-# bash launcher that execs it.
 filegroup(
     name = "env_json_launcher_js",
     srcs = [":env_json"],
