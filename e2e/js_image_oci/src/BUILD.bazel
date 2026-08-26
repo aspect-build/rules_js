@@ -42,6 +42,9 @@ js_binary(
         "@repo//:sources",
     ],
     entry_point = "main.js",
+    # js_image_layer has to set BAZEL_BINDIR before the env block runs, since
+    # setEnv expands these references as it goes. Asserted on in test.yaml.
+    env = {"BINDIR_REF": "$${BAZEL_BINDIR}/marker"},
 )
 
 # FIXME: due to bzlmod Node.js toolchain issuehttps://github.com/aspect-build/rules_js/issues/1530,

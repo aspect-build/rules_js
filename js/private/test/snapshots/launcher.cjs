@@ -169,8 +169,12 @@ delete process.env.JS_BINARY__SILENT_ON_SUCCESS
 //
 // A stream that is only subject to silent_on_success has no final destination, so
 // it is buffered in a temp file and replayed on failure.
+let tempDir
 function mktemp(name) {
-    const p = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'js_binary-')), name)
+    if (!tempDir) {
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'js_binary-'))
+    }
+    const p = path.join(tempDir, name)
     fs.writeFileSync(p, '')
     return p
 }
@@ -277,6 +281,14 @@ function mopUp(exitCode) {
         fs.unlinkSync(stdoutCapture)
     }
 
+    // The files above are the only things ever put in it, so the directory they
+    // were made in goes too. Nothing else cleans it up: bash `mktemp` made a bare
+    // file, but the only race-free equivalent here makes a directory to put it in.
+    if (tempDir) {
+        fs.rmSync(tempDir, { recursive: true, force: true })
+        tempDir = undefined
+    }
+
     logfDebug(`exit code: ${exitCode}`)
 }
 
@@ -284,6 +296,25 @@ function exitWith(exitCode) {
     mopUp(exitCode)
     process.exit(exitCode)
 }
+
+// The bash launcher this replaced ran under `set -o errexit` with `trap _exit
+// EXIT`, so a failure anywhere below still replayed the captured streams and
+// removed the temp files. Nothing in JavaScript does that by default: an
+// uncaught throw -- process.chdir() on a directory that does not exist, say --
+// would print a raw stack trace, discard the buffered stderr holding this
+// launcher's own diagnostics, and leak the temp files. Installed here because
+// mopUp reads the capture state set up above.
+//
+// Whatever comes to run the entry point in this process rather than exec'ing
+// has to remove this handler first, or it will report the program's own
+// uncaught exceptions as launcher failures.
+process.on('uncaughtException', (err) => {
+    // The message alone: logTo collapses whitespace, so a stack trace comes out as
+    // one unreadable line. It is still worth having when debugging the launcher.
+    logfFatal(String((err && err.message) || err))
+    logfDebug(String((err && err.stack) || err))
+    exitWith(1)
+})
 
 // Ends this process the way node ended, so that callers see a signal-terminated
 // process rather than an interposed 128+N exit code. That is what they would

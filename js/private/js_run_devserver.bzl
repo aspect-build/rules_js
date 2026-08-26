@@ -106,6 +106,11 @@ def _js_run_devserver_impl(ctx):
             executable = launcher.executable,
             runfiles = runfiles,
         ),
+        OutputGroupInfo(
+            # The generated JavaScript launcher, so that js_image_layer can sanitize
+            # it the same way it does for a js_binary.
+            launcher_js = depset([launcher.launcher_js]),
+        ),
     ]
 
 js_run_devserver_lib = struct(

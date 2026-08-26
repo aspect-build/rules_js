@@ -47,6 +47,11 @@ console.log(
     space,
     chalk.cyanBright(process.env.JS_BINARY__RUNFILES)
 )
+console.log(
+    chalk.bold.bgYellow(' BINDIR REF '),
+    space,
+    chalk.yellowBright(process.env.BINDIR_REF)
+)
 console.log('')
 
 const pkgA = require('@mycorp/pkg-a')
