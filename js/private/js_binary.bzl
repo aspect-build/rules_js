@@ -548,17 +548,6 @@ def _launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_r
     # Both are marked for runfiles resolution by the stub at startup, so their
     # rlocation paths -- which carry no output tree configuration segment -- are
     # what gets embedded, keeping the launcher safe under path mapping.
-    #
-    # The entry point is deliberately not embedded here. Handing it to node as its
-    # main module -- `node --require <launcher.cjs> -- <entry point>` -- would let
-    # the launcher run as a preload and simply return instead of exec'ing node a
-    # second time, but the stub resolves a runfile to <runfiles dir>/<rlocation>
-    # and the runfiles dir is relative whenever the caller's is (an sh_binary
-    # running a js_binary, for one). Node resolves a --require value that is
-    # neither absolute nor ./-prefixed as a bare package specifier, so such a
-    # launcher fails to load before any of it runs. The .cjs stays node's main
-    # module and hands off to the entry point in process instead; see the launch
-    # site in the template.
     if nodeinfo.node:
         embedded_args, transformed_args = hermetic_launcher.args_from_entrypoint(nodeinfo.node)
     elif node_path.startswith("/"):
