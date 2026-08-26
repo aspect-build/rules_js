@@ -668,36 +668,11 @@ if (process.env.JS_BINARY__LOG_INFO) {
 // Run the main program
 // ==============================================================================
 
-// Invoke node directly rather than through JS_BINARY__NODE_WRAPPER. This way
-// we avoid spawning an extra bash process on every launch. The wrapper is
+// We invoke node directly rather than through JS_BINARY__NODE_WRAPPER. This
+// way we avoid spawning an extra bash process on every launch. The wrapper is
 // still put on the PATH as `node` so that child processes get the patched
 // runtime.
-//
-// This is the second node startup of the launch, and the one to eliminate. Instead
-// of exec'ing, this process can run the entry point itself:
-//
-//     process.argv = [process.argv[0], entryPoint, ...args]
-//     process.execArgv = ['--require', nodePatches, ...nodeOptions]
-//     require(process.env.JS_BINARY__NODE_PATCHES)
-//     require('node:module').runMain()
-//
-// runMain is what node's own startup calls for the file it was given, so the entry
-// point becomes the real main module -- `require.main === module` holds, and an ESM
-// entry point is detected the same way. process.execArgv is set for the benefit of
-// fork() and worker threads, which read it to build the child's command line.
-//
-// That is only correct when all of:
-//
-//   - `nodeOptions` matches what this process was actually started with, i.e.
-//     process.execArgv. Node CLI options cannot be applied once node is running, so
-//     the ones known at analysis time have to be embedded in the native launcher's
-//     argv for this to hold.
-//   - There is no stdout, stderr or exit code capture and no expected exit code:
-//     each needs work after the program exits, and the stream captures need an fd
-//     redirect that has no JavaScript equivalent.
-//   - COVERAGE_DIR is unset. NODE_V8_COVERAGE is read at node startup.
-//   - The environment set up above changed nothing else node reads at startup
-//     (NODE_OPTIONS, NODE_PATH, NODE_COMPILE_CACHE, NODE_EXTRA_CA_CERTS, ...).
+
 const nodeArgs = [
     '--require',
     process.env.JS_BINARY__NODE_PATCHES,
