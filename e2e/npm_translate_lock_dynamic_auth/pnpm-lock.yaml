@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@aspect-test/a':
+        specifier: 5.0.0
+        version: 5.0.0
+
+packages:
+
+  '@aspect-test/a@5.0.0':
+    resolution: {integrity: sha512-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=, tarball: https://registry.npmjs.org/@aspect-test/a/-/a-5.0.0.tgz}
+    engines: {node: '>=16.0.0'}
+
+snapshots:
+
+  '@aspect-test/a@5.0.0': {}
