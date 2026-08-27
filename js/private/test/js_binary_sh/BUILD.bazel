@@ -239,15 +239,15 @@ assert_contains(
 )
 
 ####################################################################################################
-# Node module compile cache: disabled under ephemeral sandbox paths, left enabled otherwise.
+# Node module compile cache: off by default, re-enabled by node-bootstrap/bootstrap.cjs when
+# NODE_COMPILE_CACHE is set.
 # https://github.com/aspect-build/rules_js/issues/2937
 
 write_file(
     name = "write_compile_cache",
     out = "compile_cache.js",
-    # Ask Node to enable the cache (into a sandbox-relative dir so nothing leaks out)
-    # and report the resulting status. It comes back DISABLED only when the launcher
-    # exported NODE_DISABLE_COMPILE_CACHE.
+    # Ask Node to enable the cache (into a sandbox-relative dir so nothing leaks out) and
+    # report the resulting status. It comes back DISABLED unless NODE_COMPILE_CACHE was set.
     content = ["""
         const { enableCompileCache, constants } = require("node:module");
         const { status } = enableCompileCache("node-compile-cache");
@@ -318,10 +318,10 @@ assert_contains(
     expected = "COMPILE_CACHE_DISABLED=yes",
 )
 
-# An explicit NODE_DISABLE_COMPILE_CACHE is respected even when a cache dir is
-# also set, matching Node's own precedence (disable wins).
+# Node gives NODE_DISABLE_COMPILE_CACHE precedence over NODE_COMPILE_CACHE, but we do the
+# opposite.
 js_binary(
-    name = "compile_cache_explicit_disable",
+    name = "compile_cache_dir_wins_over_disable",
     entry_point = "compile_cache.js",
     env = {
         "NODE_COMPILE_CACHE": "node-compile-cache",
@@ -330,14 +330,14 @@ js_binary(
 )
 
 js_run_binary(
-    name = "_compile_cache_explicit_disable",
+    name = "_compile_cache_dir_wins_over_disable",
     silent_on_success = False,
-    stdout = "compile-cache-explicit-disable-stdout",
-    tool = ":compile_cache_explicit_disable",
+    stdout = "compile-cache-dir-wins-over-disable-stdout",
+    tool = ":compile_cache_dir_wins_over_disable",
 )
 
 assert_contains(
-    name = "compile_cache_explicit_disable_test",
-    actual = ":compile-cache-explicit-disable-stdout",
-    expected = "COMPILE_CACHE_DISABLED=yes",
+    name = "compile_cache_dir_wins_over_disable_test",
+    actual = ":compile-cache-dir-wins-over-disable-stdout",
+    expected = "COMPILE_CACHE_DISABLED=no",
 )
