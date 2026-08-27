@@ -4,6 +4,7 @@ local_path_override(
     path = "../..",
 )
 
+bazel_dep(name = "bazel_skylib", version = "1.5.0", dev_dependency = True)
 bazel_dep(name = "rules_nodejs", version = "6.7.3", dev_dependency = True)
 bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
 
@@ -53,10 +54,24 @@ pnpm.pnpm(
     pnpm_version = "11.0.4",
     pnpm_version_integrity = "sha512-CjlxZQB6AU7VKRmmHl9GxIubyohATDA+yuzGP2Le9WOJjTxril1epYEes5jP4DqwXaGlzpY/Em1erUwC+TuDww==",
 )
+
+# pnpm 12+ is a native binary; the wrapper package integrity is given here
+# while the platform binary integrities come from the mirrored versions.bzl.
+pnpm.pnpm(
+    name = "pnpm_v12",
+    pnpm_version = "12.0.0",
+    pnpm_version_integrity = "sha512-ni49w5EZlYaNyUuBdcIXwn6VQI+gO0oidJd48rNPdzt3zdOznt6BcbIvzVO+ajU0Lp+smUimjvWN9kiM6Jp+Zw==",
+)
 pnpm.pnpm(
     name = "pnpm_patched",
     patches = ["//:patches/pnpm_hello.patch"],
     pnpm_version = "9.15.9",
     pnpm_version_integrity = "sha512-aARhQYk8ZvrQHAeSMRKOmvuJ74fiaR1p5NQO7iKJiClf1GghgbrlW1hBjDolO95lpQXsfF+UA+zlzDzTfc8lMQ==",
 )
-use_repo(pnpm, "pnpm", "pnpm_patched", "pnpm_v10", "pnpm_v11")
+pnpm.pnpm(
+    name = "pnpm_patched_v12",
+    patches = ["//:patches/pnpm_hello.patch"],
+    pnpm_version = "12.0.0",
+    pnpm_version_integrity = "sha512-ni49w5EZlYaNyUuBdcIXwn6VQI+gO0oidJd48rNPdzt3zdOznt6BcbIvzVO+ajU0Lp+smUimjvWN9kiM6Jp+Zw==",
+)
+use_repo(pnpm, "pnpm", "pnpm_patched", "pnpm_patched_v12", "pnpm_v10", "pnpm_v11", "pnpm_v12", "pnpm_v12__links")

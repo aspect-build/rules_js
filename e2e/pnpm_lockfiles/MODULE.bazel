@@ -9,6 +9,7 @@ PNPM_LOCK_VERSIONS = [
     "v90",
     "v101",
     "v110",
+    "v120",
 ]
 
 # Lockfiles with unique test cases

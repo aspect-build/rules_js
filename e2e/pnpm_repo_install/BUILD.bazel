@@ -1,4 +1,20 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@pnpm_v12__links//:defs.bzl", npm_link_pnpm_v12 = "npm_link_imported_package")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+# Same pattern as the rules_js root BUILD: link an imported pnpm package
+# into node_modules alongside the lockfile packages.
+npm_link_all_packages(
+    imported_links = [
+        npm_link_pnpm_v12,
+    ],
+)
+
+build_test(
+    name = "pnpm_v12_link_test",
+    targets = [":node_modules/pnpm"],
+)
 
 sh_test(
     name = "pnpm_install_test",
@@ -22,10 +38,27 @@ sh_test(
 )
 
 sh_test(
+    name = "pnpm_install_test_v12",
+    srcs = ["pnpm_install_test.sh"],
+    args = ["$(location @pnpm_v12//:pnpm)"],
+    data = ["@pnpm_v12//:pnpm"],
+)
+
+sh_test(
     name = "pnpm_patch_test",
     srcs = ["pnpm_patch_test.sh"],
     data = [
         "@bazel_tools//tools/bash/runfiles",
         "@pnpm_patched//:pnpm",
+    ],
+)
+
+sh_test(
+    name = "pnpm_patch_test_v12",
+    srcs = ["pnpm_patch_test.sh"],
+    args = ["pnpm_patched_v12"],
+    data = [
+        "@bazel_tools//tools/bash/runfiles",
+        "@pnpm_patched_v12//:pnpm",
     ],
 )

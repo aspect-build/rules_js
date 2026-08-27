@@ -13,14 +13,18 @@ if (
     throw new Error(`alias-project-a should be alias of @scoped/a`)
 }
 
-// Various other aliases with odd scoping
-for (const pkg of [
+// Various other aliases with odd scoping. Aliases containing path separators
+// or bare @scope names are rejected by pnpm 12+ and only exist in older
+// lockfiles.
+const oddAliases = [
     '@aspect-test/a2',
     'aspect-test-a-no-scope',
-    'aspect-test-a/no-at',
-    '@aspect-test-a-bad-scope',
     '@aspect-test-custom-scope/a',
-]) {
+]
+if (!process.argv.includes('--no-invalid-aliases')) {
+    oddAliases.push('aspect-test-a/no-at', '@aspect-test-a-bad-scope')
+}
+for (const pkg of oddAliases) {
     if (require('@aspect-test/a') !== require(pkg)) {
         throw new Error(`${pkg} should be alias of @aspect-test/a`)
     }
