@@ -4,6 +4,7 @@ load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 load(":label_capture.bzl", "label_capture")
+load(":silent_on_success_test.bzl", "silent_on_success_test_suite")
 
 package(default_testonly = True)
 
@@ -157,4 +158,9 @@ assert_contains(
     name = "windows_target_platform_test",
     actual = ":target_os_windows",
     expected = "windows",
+)
+
+silent_on_success_test_suite(
+    name = "silent_on_success_tests",
+    tool = ":find_cfg_probe",
 )

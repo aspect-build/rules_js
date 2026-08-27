@@ -28,7 +28,7 @@ def js_run_binary(
         stdout = None,
         stderr = None,
         exit_code_out = None,
-        silent_on_success = True,
+        silent_on_success = None,
         use_execroot_entry_point = None,
         copy_srcs_to_bin = True,
         include_sources = True,
@@ -150,6 +150,13 @@ def js_run_binary(
 
             This only applies to streams that are not captured to an output file by `stdout` or
             `stderr`; a captured stream never reaches the terminal to begin with.
+
+            If `None` (the default), the behavior is controlled by the `//js:silent_on_success`
+            build flag, which defaults to `True`.
+
+            Enabling this has a cost: the action must run the program under a wrapper process that
+            buffers both streams so they can be replayed if the program fails, rather than simply
+            `exec`ing Node.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
@@ -413,6 +420,13 @@ See https://github.com/aspect-build/rules_js/tree/main/docs#using-binaries-publi
         Label("//js:_use_execroot_entry_point_true"): {"JS_BINARY__USE_EXECROOT_ENTRY_POINT": "1"},
         "//conditions:default": {},
     }) if use_execroot_entry_point == None else {}
+
+    # When silent_on_success is None, behavior is controlled by the //js:silent_on_success flag.
+    if silent_on_success == None:
+        silent_on_success = select({
+            Label("//js:_silent_on_success_true"): True,
+            "//conditions:default": False,
+        })
 
     _run_binary(
         name = name,
