@@ -37,6 +37,20 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+# This flag controls the default behavior of the silent_on_success flag
+# on js_run_binary.
+bool_flag(
+    name = "silent_on_success",
+    build_setting_default = True,
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "_silent_on_success_true",
+    flag_values = {"silent_on_success": "True"},
+    visibility = ["//visibility:public"],
+)
+
 bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],
