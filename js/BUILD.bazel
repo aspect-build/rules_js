@@ -48,9 +48,6 @@ bool_flag(
 config_setting(
     name = "_silent_on_success_true",
     flag_values = {"silent_on_success": "True"},
-    # Must be public: this is referenced by select() expressions that the js_run_binary
-    # macro expands into user packages, where visibility is checked from the use site.
-    # Without this, builds fail under --incompatible_config_setting_private_default_visibility.
     visibility = ["//visibility:public"],
 )
 

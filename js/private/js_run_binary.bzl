@@ -154,10 +154,6 @@ def js_run_binary(
             If `None` (the default), the behavior is controlled by the `//js:silent_on_success`
             build flag, which defaults to `True`.
 
-            Enabling this has a cost: the action must run the program under a wrapper process that
-            buffers both streams so they can be replayed if the program fails, rather than simply
-            `exec`ing Node.
-
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
 
