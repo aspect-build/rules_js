@@ -91,9 +91,6 @@ def _js_run_devserver_impl(ctx):
     if ctx.attr.grant_sandbox_write_permissions:
         config["grant_sandbox_write_permissions"] = "1"
     if launcher.chdir:
-        # The devserver runs the tool in a sandbox that mirrors the runfiles tree, so it has to
-        # reproduce the working directory there itself. It cannot read JS_BINARY__CHDIR at
-        # runtime: bootstrap.cjs consumes that variable when it applies the chdir.
         config["chdir"] = launcher.chdir
 
     ctx.actions.write(config_file, json.encode(config))

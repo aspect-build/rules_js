@@ -362,9 +362,6 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         # Set an environment variable to flag that we have copied js_binary data to bin
         envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _bash_quote("1")))
 
-    # The working directory the program runs in, as bootstrap.cjs receives it. Returned to the
-    # caller so that a rule such as js_run_devserver, which has to mirror it elsewhere, does not
-    # have to recompute the normalization below.
     normalized_chdir = ""
 
     if ctx.attr.chdir:
