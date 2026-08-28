@@ -1,0 +1,55 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+
+# The chdir is applied by bootstrap.cjs rather than the launcher, so it has to hold for
+# every process that preloads it. cwd.mjs checks the cwd itself, a spawned node child and a
+# worker thread; the two rules below cover the two directories a chdir can be relative to:
+# the runfiles tree for a js_test and the bin directory for a build action.
+
+js_test(
+    name = "cwd_test",
+    chdir = package_name(),
+    entry_point = "cwd.mjs",
+)
+
+js_binary(
+    name = "cwd_bin",
+    chdir = package_name(),
+    entry_point = "cwd.mjs",
+)
+
+js_run_binary(
+    name = "cwd_run",
+    chdir = package_name(),
+    silent_on_success = False,
+    stdout = "cwd-stdout",
+    tool = ":cwd_bin",
+)
+
+assert_contains(
+    name = "cwd_run_test",
+    actual = ":cwd-stdout",
+    expected = "cwd: ",
+)
+
+assert_contains(
+    name = "cwd_run_package_test",
+    actual = ":cwd-stdout",
+    expected = "/bin/js/private/test/chdir",
+)
+
+# The debug line moved from the launcher to bootstrap.cjs along with the chdir itself.
+js_run_binary(
+    name = "cwd_debug",
+    chdir = package_name(),
+    log_level = "debug",
+    silent_on_success = False,
+    stderr = "cwd-stderr",
+    tool = ":cwd_bin",
+)
+
+assert_contains(
+    name = "cwd_debug_test",
+    actual = ":cwd-stderr",
+    expected = "DEBUG: aspect_rules_js[js_binary]: changing directory to user specified package js/private/test/chdir",
+)
