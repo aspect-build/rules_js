@@ -5,7 +5,7 @@ load("@bazel_lib//lib:directory_path.bzl", "DirectoryPathInfo")
 load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variables")
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
-load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles")
+load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles", "normalize_chdir")
 
 _ATTRS = {
     "chdir": attr.string(
@@ -366,22 +366,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
 
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
-        chdir_value = _expand_env_if_needed(ctx, ctx.attr.chdir)
-
-        # Normalize workspace-relative chdir for external repositories to avoid requiring
-        # callers to manually prefix with "external/<repo>/".
-        if (
-            ctx.label.repo_name and
-            not (chdir_value.startswith("external/") or chdir_value.startswith("/")) and
-            not chdir_value.startswith("@")
-        ):
-            if chdir_value == ".":
-                normalized_chdir = "external/{}".format(ctx.label.repo_name)
-            else:
-                normalized_chdir = "external/{}/{}".format(ctx.label.repo_name, chdir_value)
-        else:
-            normalized_chdir = chdir_value
-
+        normalized_chdir = normalize_chdir(_expand_env_if_needed(ctx, ctx.attr.chdir), ctx.label.repo_name)
         envs.append(_ENV_SET_IFF_NOT_SET.format(var = "JS_BINARY__CHDIR", quoted_value = _bash_quote(normalized_chdir)))
 
     # Set log envs iff not already set to allow js_run_binary to override

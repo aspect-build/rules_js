@@ -2,6 +2,7 @@ import {
     isNodeModulePath,
     is1pPackageStoreDep,
     friendlyFileSize,
+    sandboxRelativeChdir,
 } from '../../devserver/js_run_devserver.mjs'
 
 // isNodeModulePath
@@ -74,6 +75,25 @@ for (const [k, v] of friendlyFileSize_cases) {
     if (a !== v) {
         console.error(
             `Expected friendlyFileSize(${k}) to be '${v}' but got '${a}'`
+        )
+        process.exit(1)
+    }
+}
+
+// sandboxRelativeChdir
+const sandboxRelativeChdir_cases = new Map()
+sandboxRelativeChdir_cases.set(undefined, '')
+sandboxRelativeChdir_cases.set('', '')
+sandboxRelativeChdir_cases.set('.', '.')
+sandboxRelativeChdir_cases.set('foo/bar', 'foo/bar')
+// The sandbox has no external/ directory; a repository sits beside the main one
+sandboxRelativeChdir_cases.set('external/myrepo', '../myrepo')
+sandboxRelativeChdir_cases.set('external/myrepo/foo/bar', '../myrepo/foo/bar')
+for (const [k, v] of sandboxRelativeChdir_cases) {
+    const a = sandboxRelativeChdir(k)
+    if (a !== v) {
+        console.error(
+            `Expected sandboxRelativeChdir(${k}) to be '${v}' but got '${a}'`
         )
         process.exit(1)
     }

@@ -13,7 +13,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
 load("@bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@bazel_lib//lib:run_binary.bzl", _run_binary = "run_binary")
 load("@bazel_lib//lib:utils.bzl", bazel_lib_utils = "utils")
-load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level")
+load(":js_helpers.bzl", _envs_for_log_level = "envs_for_log_level", _normalize_chdir = "normalize_chdir")
 load(":js_info_files.bzl", _js_info_files = "js_info_files")
 
 def js_run_binary(
@@ -336,23 +336,7 @@ def js_run_binary(
 
     # Configure working directory to `chdir` is set
     if chdir != None:
-        normalized_chdir = "." if chdir == "" else chdir
-        repo = native.repo_name()
-
-        # Normalize workspace-relative chdir for external repositories so callers can pass
-        # native.package_name() without worrying about external/ prefixing.
-        # - Leave absolute paths and already-external paths untouched.
-        # - For external repos, prefix with "external/<repo>/".
-        if (
-            repo and
-            not (chdir.startswith("external/") or chdir.startswith("/")) and
-            not chdir.startswith("@")
-        ):
-            if chdir == ".":
-                normalized_chdir = "external/{}".format(repo)
-            else:
-                normalized_chdir = "external/{}/{}".format(repo, chdir)
-        fixed_env["JS_BINARY__CHDIR"] = normalized_chdir
+        fixed_env["JS_BINARY__CHDIR"] = _normalize_chdir(chdir, native.repo_name())
 
     # Disable node patches if requested
     if patch_node_fs:

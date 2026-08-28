@@ -4,7 +4,10 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load(":js_library_test.bzl", "js_library_test_suite")
+load(":normalize_chdir_test.bzl", "normalize_chdir_tests")
 load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
+
+normalize_chdir_tests(name = "test_normalize_chdir")
 
 ####################################################################################################
 # Write a js_binary launcher to the source tree so it is shell checked on commit

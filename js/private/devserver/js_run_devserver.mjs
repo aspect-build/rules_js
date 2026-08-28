@@ -373,6 +373,19 @@ async function generateChecksum(p) {
     )
 }
 
+// Converts a chdir value, which names a path in the output tree, to one relative to the root of
+// the custom sandbox. The sandbox mirrors the runfiles tree, where an external repository is a
+// top-level directory beside the main one rather than under "external/". bootstrap.cjs makes the
+// same adjustment for js_binary. See #2827.
+function sandboxRelativeChdir(chdir) {
+    if (!chdir) {
+        return ''
+    }
+    return chdir.startsWith('external/')
+        ? '../' + chdir.slice('external/'.length)
+        : chdir
+}
+
 // Converts a size in bytes to a human readable friendly number such as "24 KiB"
 function friendlyFileSize(bytes) {
     if (!bytes) {
@@ -692,7 +705,7 @@ async function main(args, sandbox, config) {
 
     const entriesPath = path.join(RUNFILES_ROOT, args[1]);
 
-    const cwd = config.chdir ? path.join(sandbox, config.chdir) : sandbox;
+    const cwd = path.join(sandbox, sandboxRelativeChdir(config.chdir));
 
     const tool = config.tool
         ? path.join(RUNFILES_ROOT, config.tool)
@@ -1003,7 +1016,7 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
         );
 
         // Intentionally synchronous; see comment on mkdirpSync
-        mkdirpSync(path.join(sandboxMain, config.chdir || ''));
+        mkdirpSync(path.join(sandboxMain, sandboxRelativeChdir(config.chdir)));
         await main(args, sandboxMain, config);
     } catch (e) {
         console.error(e);
@@ -1038,4 +1051,4 @@ function onProcessEnd(callback) {
     // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
 }
 
-export { friendlyFileSize, is1pPackageStoreDep, isNodeModulePath };
+export { friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, sandboxRelativeChdir };

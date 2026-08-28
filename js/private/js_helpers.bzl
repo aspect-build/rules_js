@@ -265,3 +265,25 @@ def gather_files_from_js_infos(
                 files_depsets.append(js_info.npm_sources)
 
     return depset(transitive = files_depsets)
+
+def normalize_chdir(chdir, repo):
+    """Normalizes a chdir value to a path relative to the root of the output tree.
+
+    Args:
+        chdir: the `chdir` attribute value, which is workspace-relative; an empty string means
+            the root package
+        repo: canonical name of the repository the target is in, empty for the main repository
+
+    Returns:
+        the normalized chdir value
+    """
+    chdir = "." if chdir == "" else chdir
+
+    # Callers pass a workspace-relative path such as package_name(), so an external repository
+    # needs the "external/<repo>/" prefix its packages have in the output tree. Absolute paths and
+    # paths that already name a repository are left alone.
+    if not repo or chdir.startswith("external/") or chdir.startswith("/") or chdir.startswith("@"):
+        return chdir
+    if chdir == ".":
+        return "external/{}".format(repo)
+    return "external/{}/{}".format(repo, chdir)
