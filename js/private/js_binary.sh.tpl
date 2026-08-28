@@ -150,6 +150,12 @@ trap _exit EXIT
 export RUNFILES
 JS_BINARY__RUNFILES="$RUNFILES"
 export JS_BINARY__RUNFILES
+# Set RUNFILES_DIR for compatibility with languages obeying the design laid out in
+# https://github.com/bazelbuild/bazel/issues/4460
+if [ -z "${RUNFILES_DIR:-}" ]; then
+    RUNFILES_DIR="$RUNFILES"
+fi
+export RUNFILES_DIR
 
 # ==============================================================================
 # Prepare to run main program
