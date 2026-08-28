@@ -11,4 +11,7 @@ Since rules_js users download this whole repo, our larger examples are in
 
 -   Angular 14: https://github.com/aspect-build/bazel-examples/tree/main/angular
 -   Vue 3.x with Vite: https://github.com/aspect-build/bazel-examples/tree/main/vue
--   Protobuf and gRPC: https://github.com/aspect-build/bazel-examples/tree/main/protobufjs
+
+Examples in rules_ts
+
+-   Protobuf and gRPC: https://github.com/aspect-build/rules_ts/tree/main/examples/proto_grpc
