@@ -18,18 +18,10 @@ const {
     JS_BINARY__PATCH_NODE_FS,
 } = process.env
 
-// working directory
-//
-// js_binary(chdir) / js_run_binary(chdir). The launcher leaves us in the root of the output
-// tree (or in the runfiles tree for a js_test) and hands the requested directory over in
-// JS_BINARY__CHDIR; the move itself happens here so that it does not depend on the launcher
-// being a shell script.
-//
-// Nothing in this process may observe the old cwd, so this runs before the fs patches and
-// before coverage.cjs, which snapshots process.cwd() for the reporter it later spawns.
+// Change directory as indicated by the chdir option on js_binary or js_run_binary.
 if (JS_BINARY__CHDIR) {
     // An "external/<repo>" chdir names a path in the bin directory rather than one relative to
-    // the cwd we were given, which for a js_test is the runfiles tree. See #2827.
+    // the cwd we were given, which for a js_test is the runfiles tree.
     const dir = JS_BINARY__CHDIR.startsWith('external/')
         ? require('node:path').join(
               JS_BINARY__EXECROOT,
@@ -50,13 +42,9 @@ if (JS_BINARY__CHDIR) {
         )
         process.exit(1)
     }
-    // process.chdir() does not maintain PWD, which bash cd did and which some tools read.
+    // process.chdir() does not maintain PWD, so let's update it here.
     process.env.PWD = process.cwd()
-    // The variable is an instruction to this process, and it has now been carried out, so
-    // consume it. A child node process re-enters this bootstrap through the node wrapper's
-    // --require, and a worker thread gets a copy of this environment; both already start in
-    // the directory we just moved to, and applying a relative chdir on top of it would
-    // compound (in a worker, process.chdir() throws outright).
+    // Prevent child processes and worker threads from attempting to cd a second time.
     delete process.env.JS_BINARY__CHDIR
 }
 
