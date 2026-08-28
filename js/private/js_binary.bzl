@@ -362,6 +362,8 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         # Set an environment variable to flag that we have copied js_binary data to bin
         envs.append(_ENV_SET.format(var = "JS_BINARY__COPY_DATA_TO_BIN", quoted_value = _bash_quote("1")))
 
+    normalized_chdir = ""
+
     if ctx.attr.chdir:
         # Set chdir env if not already set to allow js_run_binary to override
         chdir_value = _expand_env_if_needed(ctx, ctx.attr.chdir)
@@ -444,7 +446,7 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         is_executable = True,
     )
 
-    return launcher, toolchain_files
+    return launcher, toolchain_files, normalized_chdir
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
@@ -466,7 +468,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    bash_launcher, toolchain_files = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
+    bash_launcher, toolchain_files, chdir = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
     launcher_files = [bash_launcher]
@@ -507,6 +509,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         executable = launcher,
         runfiles = runfiles,
         data_runfiles = data_runfiles,
+        chdir = chdir,
     )
 
 def _js_binary_impl(ctx):

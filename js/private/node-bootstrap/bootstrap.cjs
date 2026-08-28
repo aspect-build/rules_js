@@ -7,12 +7,41 @@ if (process.env.NODE_COMPILE_CACHE) {
 
 const patchfs = require('./fs.cjs').patcher
 const {
+    BAZEL_BINDIR,
+    JS_BINARY__BINDIR,
+    JS_BINARY__CHDIR,
+    JS_BINARY__EXECROOT,
     JS_BINARY__FS_PATCH_ROOTS,
     JS_BINARY__LOG_DEBUG,
     JS_BINARY__LOG_PREFIX,
     JS_BINARY__NODE_WRAPPER,
     JS_BINARY__PATCH_NODE_FS,
 } = process.env
+
+// Change directory as indicated by the chdir option on js_binary or js_run_binary.
+if (JS_BINARY__CHDIR) {
+    // An "external/<repo>" chdir names a path in the bin directory rather than one relative to
+    // the cwd we were given, which for a js_test is the runfiles tree.
+    const dir = JS_BINARY__CHDIR.startsWith('external/')
+        ? require('node:path').join(
+              JS_BINARY__EXECROOT,
+              BAZEL_BINDIR || JS_BINARY__BINDIR,
+              JS_BINARY__CHDIR
+          )
+        : JS_BINARY__CHDIR
+    try {
+        process.chdir(dir)
+    } catch (e) {
+        console.error(
+            `FATAL: ${JS_BINARY__LOG_PREFIX}: could not change directory to '${dir}': ${e.message}`
+        )
+        process.exit(1)
+    }
+    // process.chdir() does not maintain PWD, so let's update it here.
+    process.env.PWD = process.cwd()
+    // Prevent child processes and worker threads from attempting to cd a second time.
+    delete process.env.JS_BINARY__CHDIR
+}
 
 // Keep a count of how many times these patches are applied; this should reflect the depth
 // of child processes in the default case where a child process inherits process.env since

@@ -90,6 +90,8 @@ def _js_run_devserver_impl(ctx):
         config["command"] = ctx.attr.command
     if ctx.attr.grant_sandbox_write_permissions:
         config["grant_sandbox_write_permissions"] = "1"
+    if launcher.chdir:
+        config["chdir"] = launcher.chdir
 
     ctx.actions.write(config_file, json.encode(config))
 

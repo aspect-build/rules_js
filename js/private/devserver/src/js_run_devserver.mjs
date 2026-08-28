@@ -437,19 +437,14 @@ function isWindowsScript(tool) {
     return isScriptFile && os.platform() === 'win32'
 }
 
-async function main(args, sandbox) {
+async function main(args, sandbox, config) {
     console.error(
         `\n\nStarting js_run_devserver ${process.env.JS_BINARY__TARGET}`
     )
 
-    const configPath = path.join(RUNFILES_ROOT, args[0])
     const entriesPath = path.join(RUNFILES_ROOT, args[1])
 
-    const config = JSON.parse(await fs.promises.readFile(configPath))
-
-    const cwd = process.env.JS_BINARY__CHDIR
-        ? path.join(sandbox, process.env.JS_BINARY__CHDIR)
-        : sandbox
+    const cwd = config.chdir ? path.join(sandbox, config.chdir) : sandbox
 
     const tool = config.tool
         ? path.join(RUNFILES_ROOT, config.tool)
@@ -462,7 +457,6 @@ async function main(args, sandbox) {
     const env = {
         ...process.env,
         BAZEL_BINDIR: '.', // no load bearing but it may be depended on by users
-        JS_BINARY__CHDIR: '',
         JS_BINARY__NO_CD_BINDIR: '1',
     }
 
@@ -755,9 +749,15 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
         )
         const sandboxMain = path.join(sandbox, JS_BINARY__WORKSPACE)
 
+        // Read before the first mkdirp below, which needs config.chdir.
+        const args = process.argv.slice(2)
+        const config = JSON.parse(
+            await fs.promises.readFile(path.join(RUNFILES_ROOT, args[0]))
+        )
+
         // Intentionally synchronous; see comment on mkdirpSync
-        mkdirpSync(path.join(sandboxMain, process.env.JS_BINARY__CHDIR || ''))
-        await main(process.argv.slice(2), sandboxMain)
+        mkdirpSync(path.join(sandboxMain, config.chdir || ''))
+        await main(args, sandboxMain, config)
     } catch (e) {
         console.error(e)
         process.exit(1)
