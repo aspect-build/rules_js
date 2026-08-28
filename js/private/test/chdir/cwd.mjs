@@ -21,12 +21,9 @@ if (!cwd.endsWith(expectedSuffix)) {
     process.exitCode = 1
 }
 
-// The launcher used to `cd`, which keeps the exported PWD in step with the working
-// directory. process.chdir() does not, so bootstrap.cjs has to.
 check('process.env.PWD', process.env.PWD, cwd)
 
-// bootstrap.cjs consumes JS_BINARY__CHDIR when it applies it. That is what keeps the child
-// process and the worker thread below from moving a second time, so assert it directly.
+// bootstrap.cjs consumes JS_BINARY__CHDIR when it applies it.
 check('process.env.JS_BINARY__CHDIR', process.env.JS_BINARY__CHDIR, undefined)
 
 // A child node process re-enters bootstrap.cjs through the node wrapper's --require. It
