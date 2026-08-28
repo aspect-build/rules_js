@@ -2,13 +2,31 @@ load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 
 # The chdir is applied by bootstrap.cjs, so it has to hold for every process that preloads it.
-# cwd.mjs checks the cwd itself, a spawned node child and a worker thread; the two rules below
-# cover the two directories a chdir can be relative to: the runfiles tree for a js_test and the
-# bin directory for a build action.
+# cwd.mjs checks the cwd itself, a spawned node child and a worker thread; the rules below cover
+# the two directories a chdir can be relative to -- the runfiles tree for a js_test and the bin
+# directory for a build action -- and the shapes a chdir value can take.
 
 js_test(
     name = "cwd_test",
+    args = [package_name()],
     chdir = package_name(),
+    entry_point = "cwd.mjs",
+)
+
+# A "." chdir does not move us, but it must still leave PWD and the JS_BINARY__CHDIR handoff in
+# the same state as any other chdir.
+js_test(
+    name = "cwd_dot_test",
+    chdir = ".",
+    entry_point = "cwd.mjs",
+)
+
+# ".." segments are resolved by the OS like in any other path, so a chdir may round-trip through
+# a parent directory.
+js_test(
+    name = "cwd_parent_test",
+    args = [package_name()],
+    chdir = package_name() + "/../chdir",
     entry_point = "cwd.mjs",
 )
 
@@ -20,6 +38,7 @@ js_binary(
 
 js_run_binary(
     name = "cwd_run",
+    args = [package_name()],
     chdir = package_name(),
     silent_on_success = False,
     stdout = "cwd-stdout",
@@ -30,4 +49,42 @@ assert_contains(
     name = "cwd_run_package_test",
     actual = ":cwd-stdout",
     expected = "/bin/js/private/test/chdir",
+)
+
+js_run_binary(
+    name = "cwd_parent_run",
+    args = [package_name()],
+    chdir = package_name() + "/../chdir",
+    silent_on_success = False,
+    stdout = "cwd-parent-stdout",
+    tool = ":cwd_bin",
+)
+
+assert_contains(
+    name = "cwd_parent_run_package_test",
+    actual = ":cwd-parent-stdout",
+    expected = "/bin/js/private/test/chdir",
+)
+
+# A chdir naming a directory that does not exist must fail loudly rather than silently leaving the
+# program in the wrong place. exit_code_out keeps the action itself successful so that the exit
+# code and message can be asserted on.
+js_run_binary(
+    name = "cwd_missing",
+    chdir = "does-not-exist",
+    exit_code_out = "cwd-missing-exit-code",
+    stderr = "cwd-missing-stderr",
+    tool = ":cwd_bin",
+)
+
+assert_contains(
+    name = "cwd_missing_exit_code_test",
+    actual = ":cwd-missing-exit-code",
+    expected = "1",
+)
+
+assert_contains(
+    name = "cwd_missing_stderr_test",
+    actual = ":cwd-missing-stderr",
+    expected = "could not change directory to 'does-not-exist'",
 )

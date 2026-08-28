@@ -15,8 +15,10 @@ function check(what, actual, expected) {
     }
 }
 
-const expectedSuffix = path.join('js', 'private', 'test', 'chdir')
-if (!cwd.endsWith(expectedSuffix)) {
+// argv[2], when given, is a slash-separated path that the cwd must end with. It is omitted
+// when the chdir does not move us anywhere in particular, such as chdir = ".".
+const expectedSuffix = process.argv[2]?.split('/').join(path.sep)
+if (expectedSuffix && !cwd.endsWith(expectedSuffix)) {
     console.error(`FAIL: cwd '${cwd}' does not end with '${expectedSuffix}'`)
     process.exitCode = 1
 }
