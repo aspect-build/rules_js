@@ -29,11 +29,6 @@ if (JS_BINARY__CHDIR) {
               JS_BINARY__CHDIR
           )
         : JS_BINARY__CHDIR
-    if (JS_BINARY__LOG_DEBUG) {
-        console.error(
-            `DEBUG: ${JS_BINARY__LOG_PREFIX}: changing directory to user specified package ${dir}`
-        )
-    }
     try {
         process.chdir(dir)
     } catch (e) {

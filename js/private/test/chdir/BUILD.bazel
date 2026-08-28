@@ -31,18 +31,3 @@ assert_contains(
     actual = ":cwd-stdout",
     expected = "/bin/js/private/test/chdir",
 )
-
-js_run_binary(
-    name = "cwd_debug",
-    chdir = package_name(),
-    log_level = "debug",
-    silent_on_success = False,
-    stderr = "cwd-stderr",
-    tool = ":cwd_bin",
-)
-
-assert_contains(
-    name = "cwd_debug_test",
-    actual = ":cwd-stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: changing directory to user specified package js/private/test/chdir",
-)
