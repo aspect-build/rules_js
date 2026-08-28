@@ -1,3 +1,10 @@
+// The launcher exports NODE_DISABLE_COMPILE_CACHE unconditionally, and then we re-enable
+// the cache here if necessary.
+if (process.env.NODE_COMPILE_CACHE) {
+    delete process.env.NODE_DISABLE_COMPILE_CACHE
+    require('node:module').enableCompileCache?.(process.env.NODE_COMPILE_CACHE)
+}
+
 const patchfs = require('./fs.cjs').patcher
 const {
     JS_BINARY__FS_PATCH_ROOTS,
