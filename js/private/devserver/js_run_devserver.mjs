@@ -375,8 +375,7 @@ async function generateChecksum(p) {
 
 // Converts a chdir value, which names a path in the output tree, to one relative to the root of
 // the custom sandbox. The sandbox mirrors the runfiles tree, where an external repository is a
-// top-level directory beside the main one rather than under "external/". bootstrap.cjs makes the
-// same adjustment for js_binary. See #2827.
+// top-level directory beside the main one rather than under "external/".
 function sandboxRelativeChdir(chdir) {
     if (!chdir) {
         return ''
