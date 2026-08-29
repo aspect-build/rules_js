@@ -20,11 +20,11 @@ const {
 // Change directory as indicated by the chdir option on js_binary or js_run_binary.
 if (JS_BINARY__CHDIR) {
     let dir = JS_BINARY__CHDIR
-    // chdir is relative to the root of the output tree, where an external repository's package
-    // sits under "external/<repo>". The runfiles tree instead gives every repository a top-level
-    // directory beside our own, so re-point the path there rather than leaving the tree. Bazel
-    // sets TEST_SRCDIR for a test and BUILD_WORKSPACE_DIRECTORY for `bazel run`; a build action,
-    // which the launcher leaves at the root of the output tree, gets neither. See #2827.
+    // chdir is relative to the root of the output tree, where an external repository's package sits
+    // under "external/<repo>". The runfiles tree instead gives every repository a top-level
+    // directory beside our own, so re-point the path there rather than leaving the tree. Bazel sets
+    // TEST_SRCDIR for a test and BUILD_WORKSPACE_DIRECTORY for `bazel run`, and these are the two
+    // situations where we will be in the runfiles tree.
     if ((TEST_SRCDIR || BUILD_WORKSPACE_DIRECTORY) && dir.startsWith('external/')) {
         dir = '../' + dir.slice('external/'.length)
     }
