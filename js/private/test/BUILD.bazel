@@ -38,6 +38,13 @@ write_source_files(
     files = {
         "snapshots/launcher.sh": ":shell_launcher_sed",
     },
+    # The snapshot is a POSIX launcher: the sed pipeline above only normalizes the host bits that
+    # vary between POSIX hosts, and on Windows the launcher itself differs (a node.bat wrapper, no
+    # runfiles tree) in ways a single snapshot cannot cover.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 # Drives the merger's branches directly. //js/private/test/coverage covers them

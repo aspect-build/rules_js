@@ -3,6 +3,14 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
+# These assertions read the generated bash launcher out of a js_binary target's default output. On
+# Windows that output is a native .bat launcher that wraps the bash script rather than the script
+# itself.
+_POSIX_ONLY = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 write_file(
     name = "write_one",
     out = "one.js",
@@ -114,6 +122,14 @@ js_binary(
     entry_point = "regexy.js",
 )
 
+# The Windows native launcher that wraps the bash launcher interpolates the argument list into a
+# `bash -c` command line unquoted (see create_windows_native_launcher_script in bazel-lib), so an
+# argument holding shell metacharacters like these does not survive the trip.
+_POSIX_ONLY_ARGS = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 js_run_binary(
     name = "_regexy-args",
     args = [
@@ -123,11 +139,13 @@ js_run_binary(
     log_level = "debug",
     silent_on_success = False,
     stdout = "regexy-stdout",
+    target_compatible_with = _POSIX_ONLY_ARGS,
     tool = ":regexy",
 )
 
 build_test(
     name = "regexy-args",
+    target_compatible_with = _POSIX_ONLY_ARGS,
     targets = [":_regexy-args"],
 )
 
@@ -135,12 +153,14 @@ assert_contains(
     name = "regexy-args-1",
     actual = ":regexy-stdout",
     expected = "--arg1=/{{[{]?(.*?)[}]?}}/",
+    target_compatible_with = _POSIX_ONLY_ARGS,
 )
 
 assert_contains(
     name = "regexy-args-2",
     actual = ":regexy-stdout",
     expected = "--arg2=/{%(.*?)%}/",
+    target_compatible_with = _POSIX_ONLY_ARGS,
 )
 
 write_file(
@@ -200,6 +220,7 @@ assert_contains(
     name = "env_json_launcher_escaped",
     actual = ":env_json",
     expected = "export JSON_ENV=\"[\\\"twx\\\"]\"",
+    target_compatible_with = _POSIX_ONLY,
 )
 
 assert_contains(
@@ -224,18 +245,21 @@ assert_contains(
     name = "env_json_obj_launcher_escaped",
     actual = ":env_json",
     expected = """ export JSON_OBJ="{\\\"allow\\\": [\\\"twx\\\"], \\\"deny\\\": []}" """.strip(),
+    target_compatible_with = _POSIX_ONLY,
 )
 
 assert_contains(
     name = "env_json_str_launcher_escaped",
     actual = ":env_json",
     expected = """ export JSON_STR="{\\\"note\\\": \\\"he said \\\\\\\"hi\\\\\\\"\\\"}" """.strip(),
+    target_compatible_with = _POSIX_ONLY,
 )
 
 assert_contains(
     name = "env_json_encode_launcher_escaped",
     actual = ":env_json",
     expected = "export JSON_ENCODE=\"[\\\"twx\\\"]\"",
+    target_compatible_with = _POSIX_ONLY,
 )
 
 ####################################################################################################

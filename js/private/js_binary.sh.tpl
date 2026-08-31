@@ -211,6 +211,15 @@ if [[ "${bazel_out_segment:-}" && ( -z "${BAZEL_BINDIR:-}" || ! -d "$PWD/$BAZEL_
         fi
         JS_BINARY__EXECROOT="${PWD:0:$index}"
     fi
+
+    # With no runfiles tree there is nothing under the runfiles directory we were launched in: the
+    # program's files are only in the output tree, where copy_data_to_bin put them. Move to the bin
+    # directory so that a chdir value and data paths relative to the workspace root resolve there,
+    # the same way they resolve in the runfiles tree when there is one.
+    if [ "${JS_BINARY__NO_RUNFILES:-}" ] && [ -z "${JS_BINARY__NO_CD_BINDIR:-}" ]; then
+        logf_debug "changing directory to the bin directory %s as there is no runfiles tree" "$JS_BINARY__BINDIR"
+        cd "$JS_BINARY__EXECROOT/$JS_BINARY__BINDIR"
+    fi
 else
     if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
         logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"

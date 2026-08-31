@@ -6,7 +6,7 @@ well as strings, so a wrapper macro is free to pass Label(":out").
 
 load("//js:defs.bzl", "js_run_binary")
 
-def label_capture(name, tool):
+def label_capture(name, tool, **kwargs):
     js_run_binary(
         name = name,
         tool = tool,
@@ -15,4 +15,5 @@ def label_capture(name, tool):
         stderr = Label(":{}_stderr.txt".format(name)),
         exit_code_out = Label(":{}_exit_code.txt".format(name)),
         use_execroot_entry_point = False,
+        **kwargs
     )

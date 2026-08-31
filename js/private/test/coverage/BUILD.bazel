@@ -129,6 +129,13 @@ coverage_child_test(
         "//conditions:default": False,
     }),
     entry_point = "child.js",
+    # child_lib.js asserts that the child process re-entered bootstrap.cjs, which spawns it through
+    # the node wrapper. bootstrap.cjs does not patch child processes on win32 (see the FIXME there),
+    # so no nested bootstrap happens on Windows.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 # coverage_no_report_test has no _coverage_report, so the test action stashes nothing

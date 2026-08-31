@@ -38,12 +38,13 @@ sh_test(
     name = "test",
     srcs = ["test.sh"],
     args = [
-        "$(locations :pkg_a.publish)",
-        "$(locations :pkg_b.publish)",
+        "$(rlocationpaths :pkg_a.publish)",
+        "$(rlocationpaths :pkg_b.publish)",
     ],
     data = [
         ":pkg_a.publish",
         ":pkg_b.publish",
+        "@bazel_tools//tools/bash/runfiles",
     ],
     tags = [
         "no-remote-exec",
@@ -55,11 +56,12 @@ sh_test(
     name = "pack_test",
     srcs = ["pack_test.sh"],
     args = [
-        "$(rootpath :pkg_a.pack)",
-        "$(rootpath :pkg_nested.pack)",
+        "$(rlocationpath :pkg_a.pack)",
+        "$(rlocationpath :pkg_nested.pack)",
     ],
     data = [
         ":pkg_a.pack",
         ":pkg_nested.pack",
+        "@bazel_tools//tools/bash/runfiles",
     ],
 )

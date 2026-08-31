@@ -69,11 +69,14 @@ async function makeBins(nodeModulesPath, scope, segmentsUp) {
                     let binExec
                     if (isWindows()) {
                         binEntryPath += '.cmd'
+                        // %* already keeps each argument quoted as it was given. Quoting it as a
+                        // whole instead both collapses the arguments into one and, when there are
+                        // none, passes an empty argument the program then tries to make sense of.
                         binExec = `node "${path.join(
                             ...segmentsUp,
                             packageName,
                             binPath
-                        )}" "%*"`
+                        )}" %*`
                     } else {
                         binExec = `#!/usr/bin/env bash\nexec node "${path.join(
                             ...segmentsUp,

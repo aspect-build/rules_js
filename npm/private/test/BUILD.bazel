@@ -122,6 +122,12 @@ sh_test(
         "@nodejs_linux_amd64//:node_files",
         "@nodejs_linux_arm64//:node_files",
     ],
+    # bin_test.sh puts node on the PATH itself and runs the node_modules/.bin entries as shell
+    # scripts, neither of which carries over to Windows.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     toolchains = ["@rules_nodejs//nodejs:current_node_runtime"],
 )
 

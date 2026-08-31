@@ -62,4 +62,6 @@ const workerCwd = await new Promise((resolve, reject) => {
 })
 check('worker cwd', workerCwd, cwd)
 
-console.log(`cwd: ${cwd}`)
+// Printed with forward slashes so that the assertions on this line read the same on Windows,
+// where the cwd itself comes back with backslashes.
+console.log(`cwd: ${cwd.split(path.sep).join('/')}`)

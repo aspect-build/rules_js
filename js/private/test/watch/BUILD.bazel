@@ -2,10 +2,17 @@ load("//js:defs.bzl", "js_test")
 
 package(default_testonly = True)
 
+# The watch protocol is carried over a unix domain socket, which these two tests serve themselves.
+_POSIX_ONLY = select({
+    "@platforms//os:windows": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 js_test(
     name = "aspect_watch_protocol_test",
     data = ["//js/private/watch"],
     entry_point = "aspect_watch_protocol.test.mjs",
+    target_compatible_with = _POSIX_ONLY,
 )
 
 js_test(
@@ -18,4 +25,5 @@ js_test(
     name = "exit_shutdown_test",
     data = ["//js/private/watch"],
     entry_point = "exit_shutdown.test.mjs",
+    target_compatible_with = _POSIX_ONLY,
 )

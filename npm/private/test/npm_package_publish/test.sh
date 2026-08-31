@@ -1,7 +1,30 @@
 #!/usr/bin/env bash
 
-readonly PUBLISH_A="$1"
-readonly PUBLISH_B="$2"
+# --- begin runfiles.bash initialization v3 ---
+# Copy-pasted from the Bazel Bash runfiles library v3. Without a runfiles tree, which is the
+# default on Windows, a runfiles path only means something to rlocation.
+set -uo pipefail
+set +e
+f=bazel_tools/tools/bash/runfiles/runfiles.bash
+# shellcheck disable=SC1090
+source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null ||
+    source "$(grep -sm1 "^$f " "${RUNFILES_MANIFEST_FILE:-/dev/null}" | cut -f2- -d' ')" 2>/dev/null ||
+    source "$0.runfiles/$f" 2>/dev/null ||
+    source "$(grep -sm1 "^$f " "$0.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null ||
+    source "$(grep -sm1 "^$f " "$0.exe.runfiles_manifest" | cut -f2- -d' ')" 2>/dev/null ||
+    {
+        echo >&2 "ERROR: cannot find $f"
+        exit 1
+    }
+f=
+set -e
+# --- end runfiles.bash initialization v3 ---
+
+# Both publish commands below are expected to fail; the assertions are on what they logged.
+set +e
+
+readonly PUBLISH_A="$(rlocation "$1")"
+readonly PUBLISH_B="$(rlocation "$2")"
 
 # assert that it prints package name from package.json to stderr,
 # to ensure package directory is properly passed and npm can read it.
