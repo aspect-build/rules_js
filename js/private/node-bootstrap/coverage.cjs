@@ -106,13 +106,23 @@ function startCollection() {
     const path = require('node:path')
     const { mkdirSync, writeFileSync } = require('node:fs')
 
-    const session = new (require('node:inspector').Session)()
-    session.connect()
-    session.post('Profiler.enable')
-    session.post('Profiler.startPreciseCoverage', {
-        callCount: true,
-        detailed: true,
-    })
+    // A node without inspector support, or a program that already holds the session,
+    // makes this throw. Report empty coverage rather than take down a program that would
+    // otherwise have run: this preload is in every js_binary under `bazel coverage`, so a
+    // throw here fails the target before its own code starts.
+    let session
+    try {
+        session = new (require('node:inspector').Session)()
+        session.connect()
+        session.post('Profiler.enable')
+        session.post('Profiler.startPreciseCoverage', {
+            callCount: true,
+            detailed: true,
+        })
+    } catch (e) {
+        logError(`v8 coverage collection unavailable: ${e.message}`)
+        return false
+    }
 
     // Resolve now: bootstrap.cjs may chdir this process later, and node itself resolves
     // NODE_V8_COVERAGE against the directory it started in.
