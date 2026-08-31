@@ -23,8 +23,18 @@ set -e
 # Both publish commands below are expected to fail; the assertions are on what they logged.
 set +e
 
-readonly PUBLISH_A="$(rlocation "$1")"
-readonly PUBLISH_B="$(rlocation "$2")"
+# rlocation gives back a Windows path on Windows, which tar reads as a host:path remote spec and
+# bash cannot exec through its backslashes.
+to_local_path() {
+    if command -v cygpath >/dev/null 2>&1; then
+        cygpath -u "$1"
+    else
+        echo "$1"
+    fi
+}
+
+readonly PUBLISH_A="$(to_local_path "$(rlocation "$1")")"
+readonly PUBLISH_B="$(to_local_path "$(rlocation "$2")")"
 
 # assert that it prints package name from package.json to stderr,
 # to ensure package directory is properly passed and npm can read it.

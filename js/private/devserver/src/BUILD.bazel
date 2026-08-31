@@ -14,15 +14,15 @@ rollup_bin.rollup(
     name = "js_run_devserver_bundle",
     srcs = [
         "js_run_devserver.mjs",
+        ":config",
         "//js/private/watch",
     ],
     outs = ["bundle.mjs"],
     chdir = package_name(),
-    data = [":config"],
     fixed_args = [
         "js_run_devserver.mjs",
         "--config",
-        "$$JS_BINARY__EXECROOT/$$BAZEL_BINDIR/$(rootpath :config)",
+        "rollup.config.mjs",
         "--format",
         "es",
         "--file",

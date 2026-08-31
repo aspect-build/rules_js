@@ -20,7 +20,13 @@ const {
     JS_BINARY__LOG_DEBUG,
 } = process.env
 
-const RUNFILES_ROOT = path.join(JS_BINARY__RUNFILES, JS_BINARY__WORKSPACE)
+// The root the config, the entries file, the tool and every file synced into the devserver sandbox
+// are named relative to. With no runfiles tree, which is the default on Windows, nothing is laid out
+// under the runfiles directory and those files are only in the output tree, where copy_data_to_bin
+// put them; the launcher puts us in the bin directory in that case for the same reason.
+const FILES_ROOT = process.env.JS_BINARY__NO_RUNFILES
+    ? path.join(JS_BINARY__EXECROOT, JS_BINARY__BINDIR)
+    : path.join(JS_BINARY__RUNFILES, JS_BINARY__WORKSPACE)
 
 // Globals
 const syncedTime = new Map()
@@ -243,7 +249,7 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
 // pointing to the source symlink.
 async function syncRecursive(file, _, sandbox, writePerm) {
-    const src = RUNFILES_ROOT + path.sep + file
+    const src = FILES_ROOT + path.sep + file
     const dst = sandbox + path.sep + file
 
     try {
@@ -442,12 +448,12 @@ async function main(args, sandbox, config) {
         `\n\nStarting js_run_devserver ${process.env.JS_BINARY__TARGET}`
     )
 
-    const entriesPath = path.join(RUNFILES_ROOT, args[1])
+    const entriesPath = path.join(FILES_ROOT, args[1])
 
     const cwd = config.chdir ? path.join(sandbox, config.chdir) : sandbox
 
     const tool = config.tool
-        ? path.join(RUNFILES_ROOT, config.tool)
+        ? path.join(FILES_ROOT, config.tool)
         : config.command
 
     const toolArgs = args.slice(2)
@@ -705,7 +711,7 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
 }
 
 async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
-    const src = RUNFILES_ROOT + path.sep + file
+    const src = FILES_ROOT + path.sep + file
     const dst = sandbox + path.sep + file
 
     // Assume it exists if it has been synced before.
@@ -752,7 +758,7 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
         // Read before the first mkdirp below, which needs config.chdir.
         const args = process.argv.slice(2)
         const config = JSON.parse(
-            await fs.promises.readFile(path.join(RUNFILES_ROOT, args[0]))
+            await fs.promises.readFile(path.join(FILES_ROOT, args[0]))
         )
 
         // Intentionally synchronous; see comment on mkdirpSync

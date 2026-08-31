@@ -19,15 +19,15 @@ rollup_bin.rollup(
     srcs = [
         "c8.js",
         "package.json",
+        ":config",
         ":node_modules/c8",
     ],
     outs = ["bundle.js"],
     chdir = package_name(),
-    data = [":config"],
     fixed_args = [
         "c8.js",
         "--config",
-        "$$JS_BINARY__EXECROOT/$$BAZEL_BINDIR/$(rootpath :config)",
+        "rollup.config.mjs",
         "--format",
         "cjs",
         "--file",

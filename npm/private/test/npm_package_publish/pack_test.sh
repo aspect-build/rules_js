@@ -21,9 +21,19 @@ f=
 set -e
 # --- end runfiles.bash initialization v3 ---
 
+# rlocation gives back a Windows path on Windows, which tar reads as a host:path remote spec and
+# bash cannot exec through its backslashes.
+to_local_path() {
+    if command -v cygpath >/dev/null 2>&1; then
+        cygpath -u "$1"
+    else
+        echo "$1"
+    fi
+}
+
 # Each argument is the runfiles path of a .tgz artifact produced by a `packable` npm_package.
 for arg in "$@"; do
-    tarball=$(rlocation "$arg")
+    tarball=$(to_local_path "$(rlocation "$arg")")
     if [ ! -f "$tarball" ]; then
         echo "FAIL: expected tarball at $arg"
         exit 1
