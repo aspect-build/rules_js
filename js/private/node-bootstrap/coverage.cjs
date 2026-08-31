@@ -116,8 +116,12 @@ function startCollection() {
         detailed: true,
     })
 
+    // Resolve now: bootstrap.cjs may chdir this process later, and node itself resolves
+    // NODE_V8_COVERAGE against the directory it started in.
+    const dir = path.resolve(process.env.COVERAGE_DIR)
+
     // Enable coverage for all child processes.
-    process.env.NODE_V8_COVERAGE = path.resolve(process.env.COVERAGE_DIR)
+    process.env.NODE_V8_COVERAGE = dir
 
     let written = false
     function flush() {
