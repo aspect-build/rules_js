@@ -1,12 +1,13 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { realpathSync } from 'fs';
+import { dirname, join } from 'path';
 
 const runfiles = process.env.JS_BINARY__RUNFILES;
-const expectedFile = join(runfiles, process.argv[2]);
-const expected = readFileSync(expectedFile, 'utf8').trim();
-const cwd = process.cwd();
 
-if (!cwd.endsWith(expected)) {
-    process.stderr.write(`Expected cwd to end with:\n  ${expected}\nActual cwd:\n  ${cwd}\n`);
+// Compare resolved physical paths since JS_BINARY__RUNFILES may contain symlinks.
+const expected = realpathSync(join(runfiles, dirname(process.argv[2])));
+const cwd = realpathSync(process.cwd());
+
+if (cwd !== expected) {
+    process.stderr.write(`Expected cwd:\n  ${expected}\nActual cwd:\n  ${cwd}\n`);
     process.exit(1);
 }

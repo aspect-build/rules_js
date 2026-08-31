@@ -43,7 +43,7 @@ fi
 function resolve_capture_path {
     case "$1" in
     bazel-out/*) echo "$PWD/$1" ;;
-    *) echo "$PWD/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$1" ;;
+    *) echo "$PWD/$BAZEL_BINDIR/$1" ;;
     esac
 }
 
@@ -131,9 +131,9 @@ function logf_debug {
 function resolve_execroot_bin_path {
     local short_path="$1"
     if [[ "$short_path" == ../* ]]; then
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/external/${short_path:3}"
+        echo "$JS_BINARY__EXECROOT/$BAZEL_BINDIR/external/${short_path:3}"
     else
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$short_path"
+        echo "$JS_BINARY__EXECROOT/$BAZEL_BINDIR/$short_path"
     fi
 }
 
