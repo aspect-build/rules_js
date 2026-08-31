@@ -128,12 +128,16 @@ function logf_debug {
     fi
 }
 
+# Resolves a bin-relative path (a File.short_path) to an absolute path under a bin directory in
+# the execroot. The bin directory defaults to BAZEL_BINDIR, which in a build action is the bin
+# directory the action writes its outputs to; pass $2 to resolve against a different one.
 function resolve_execroot_bin_path {
     local short_path="$1"
+    local bindir="${2:-${BAZEL_BINDIR:-$JS_BINARY__BINDIR}}"
     if [[ "$short_path" == ../* ]]; then
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/external/${short_path:3}"
+        echo "$JS_BINARY__EXECROOT/$bindir/external/${short_path:3}"
     else
-        echo "$JS_BINARY__EXECROOT/${BAZEL_BINDIR:-$JS_BINARY__BINDIR}/$short_path"
+        echo "$JS_BINARY__EXECROOT/$bindir/$short_path"
     fi
 }
 
@@ -262,6 +266,20 @@ fi
 
 if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     entry_point=$(resolve_execroot_bin_path "{{entry_point_path}}")
+
+    # BAZEL_BINDIR is the bin directory of the action that runs this js_binary, which is in the
+    # target configuration. js_run_binary copies the tool's entry point and data there, but a
+    # custom rule running a js_binary tool of its own (see js_binary_lib.run_binary_action) does
+    # not, and then the entry point is only found in this js_binary's own bin directory, which is
+    # the exec configuration one. Falling back keeps that case working without giving up the
+    # path-mapping-friendly BAZEL_BINDIR when the copies are there.
+    if [ ! -f "$entry_point" ]; then
+        entry_point_own_bindir=$(resolve_execroot_bin_path "{{entry_point_path}}" "$JS_BINARY__BINDIR")
+        if [ -f "$entry_point_own_bindir" ]; then
+            logf_debug "entry_point not found under BAZEL_BINDIR; falling back to JS_BINARY__BINDIR %s" "$JS_BINARY__BINDIR"
+            entry_point="$entry_point_own_bindir"
+        fi
+    fi
 else
     entry_point="$JS_BINARY__RUNFILES/{{workspace_name}}/{{entry_point_path}}"
 fi

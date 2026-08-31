@@ -15,12 +15,26 @@ def _direct_capture_impl(ctx):
     exit_code = ctx.outputs.exit_code_out
     outputs = [stdout, stderr, exit_code]
 
+    no_runfiles_env = {}
+    execution_requirements = {}
+    if ctx.attr.no_runfiles:
+        no_runfiles_env["JS_BINARY__NO_RUNFILES"] = "1"
+
+        # Resolving the entry point in the output tree only finds it when the tool's files are laid
+        # out at their real paths, which is the case for a local unsandboxed action; a sandboxed or
+        # remotely executed one stages them inside the tool's runfiles tree instead. That is no
+        # constraint on Windows, the platform that turns JS_BINARY__NO_RUNFILES on, since it has no
+        # sandbox, but this action has to ask for those conditions on the platforms that do.
+        execution_requirements["no-sandbox"] = "1"
+        execution_requirements["no-remote-exec"] = "1"
+
     js_binary_lib.run_binary_action(
         ctx = ctx,
         executable = ctx.executable.tool,
         outputs = outputs,
         mnemonic = "DirectCapture",
-        env = {
+        execution_requirements = execution_requirements,
+        env = no_runfiles_env | {
             # short_path is bin-relative and File.path is execroot-relative
             # ("bazel-out/<cfg>/bin/..."), so using a different one per stream covers both in a
             # single action.
@@ -49,6 +63,11 @@ _direct_capture = rule(
         "stdout": attr.output(mandatory = True),
         "stderr": attr.output(mandatory = True),
         "exit_code_out": attr.output(mandatory = True),
+        "no_runfiles": attr.bool(
+            doc = """Set JS_BINARY__NO_RUNFILES on the action, as the launcher itself does on
+Windows when runfiles are disabled. The launcher then resolves its entry point in the output tree
+rather than the runfiles tree, which is only exercised on Windows otherwise.""",
+        ),
     },
 )
 

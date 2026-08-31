@@ -383,6 +383,37 @@ diff_test(
     file2 = ":direct_capture_exit_exit_code.txt",
 )
 
+# ==================================================================================================
+# Case 8: a js_binary run as a custom rule's tool finds its entry point with runfiles disabled.
+#
+# On Windows without --enable_runfiles the launcher sets JS_BINARY__NO_RUNFILES for itself and
+# resolves its entry point in the output tree rather than the runfiles tree. The tool of an action
+# is built in the exec configuration, so unlike js_run_binary, which copies the tool's files into
+# the action's bin directory, a custom rule leaves the entry point in the exec configuration bin
+# directory only. Setting the variable here covers that resolution on every platform.
+#
+# The tool is tagged manual and has an entry point of its own so that nothing builds it in the
+# target configuration: a target configuration copy of the entry point would let the launcher find
+# it under --bazel-bindir and the exec configuration lookup would go untested.
+
+js_binary(
+    name = "no_runfiles_bin",
+    entry_point = "no_runfiles.mjs",
+    tags = ["manual"],
+)
+
+direct_capture(
+    name = "direct_capture_no_runfiles",
+    no_runfiles = True,
+    tool = ":no_runfiles_bin",
+)
+
+assert_contains(
+    name = "direct_capture_no_runfiles_stdout_test",
+    actual = ":direct_capture_no_runfiles_stdout.txt",
+    expected = "NO_RUNFILES_ENTRY_POINT",
+)
+
 # JS_BINARY__SILENT_ON_SUCCESS with no capture file for either stream should result in nothing
 # written to stdout or stderr.
 genrule(
