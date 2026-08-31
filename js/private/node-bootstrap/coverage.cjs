@@ -90,8 +90,7 @@ function reportOnExit(reportPath) {
             }
         } catch (e) {
             // Throwing here would skip every later 'exit' listener, including the program's own.
-            logError(`coverage report generation failed: ${e.message}`)
-            process.exitCode = 1
+            logErrorAndFail(`coverage report generation failed: ${e.message}`)
         }
     })
 }
@@ -156,8 +155,7 @@ function startCollection() {
                     })
                 )
             } catch (e) {
-                logError(`v8 coverage collection failed: ${e.message}`)
-                process.exitCode = 1
+                logErrorAndFail(`v8 coverage collection failed: ${e.message}`)
             }
         })
         session.disconnect()
@@ -174,5 +172,14 @@ function startCollection() {
 function logError(message) {
     if (JS_BINARY__LOG_ERROR) {
         console.error(`ERROR: ${JS_BINARY__LOG_PREFIX}: ${message}`)
+    }
+}
+
+// Fail the target, without masking an exit code the program has already chosen. node keeps
+// process.exitCode up to date as it exits, and leaves it unset only on a clean exit.
+function logErrorAndFail(message) {
+    logError(message)
+    if (!process.exitCode) {
+        process.exitCode = 1
     }
 }
