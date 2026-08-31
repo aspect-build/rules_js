@@ -277,7 +277,7 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
-    # Required by bootstrap.cjs only when generating a coverage report
+    # Required by bootstrap.cjs only under `bazel coverage`
     "_coverage_bootstrap": attr.label(
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
@@ -525,6 +525,13 @@ def _js_binary_impl(ctx):
     if run_env_info_kwargs:
         providers.append(RunEnvironmentInfo(**run_env_info_kwargs))
 
+    # bootstrap.cjs requires coverage.cjs when it finds COVERAGE_DIR or
+    # JS_BINARY__COVERAGE_REPORT in the environment, so the module has to be in the runfiles
+    # of every js_binary whose configuration collects coverage -- not only the tests that
+    # report it, since a test's coverage-enabled child needs it too. See #2901.
+    if ctx.configuration.coverage_enabled:
+        runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_bootstrap]))
+
     if ctx.attr.testonly and ctx.configuration.coverage_enabled:
         # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
         # See: https://github.com/bazelbuild/bazel/issues/4033
@@ -538,12 +545,9 @@ def _js_binary_impl(ctx):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
 
         # coverage.cjs runs coverage.js when the test program exits to generate the
-        # report, so both must be in the test's runfiles. See #2901.
+        # report, so the generator has to be in the test's runfiles as well. See #2901.
         if _generates_coverage_report(ctx):
-            runfiles = runfiles.merge(ctx.runfiles(files = [
-                ctx.file._coverage_bootstrap,
-                ctx.file._coverage_report,
-            ]))
+            runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
 
         providers.append(
             coverage_common.instrumented_files_info(

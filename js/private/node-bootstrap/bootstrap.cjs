@@ -1,3 +1,13 @@
+// Code coverage. We load this before anything else here, so that the coverage session
+// sees as much of this process compiled under it as possible. We require coverage.cjs
+// conditionally to cut down on code size for non-test targets.
+if (
+    process.env.JS_BINARY__COVERAGE_REPORT ||
+    (process.env.COVERAGE_DIR && !process.env.NODE_V8_COVERAGE)
+) {
+    require('./coverage.cjs')
+}
+
 // The launcher exports NODE_DISABLE_COMPILE_CACHE unconditionally, and then we re-enable
 // the cache here if necessary.
 if (process.env.NODE_COMPILE_CACHE) {
@@ -77,8 +87,4 @@ if (
         )
     }
     patchfs(roots)
-}
-
-if (process.env.JS_BINARY__COVERAGE_REPORT) {
-    require('./coverage.cjs')
 }
