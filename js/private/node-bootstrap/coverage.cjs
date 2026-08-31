@@ -1,14 +1,18 @@
 // Code coverage
 //
-// Generate the lcov report when this process exits. The test action is the only place the
-// V8 coverage data and the instrumented sources are both present, and this hook is the
-// only thing that runs there once the launcher script `exec`s node. coverage.js is run in
-// its own process: it is async, it chdir()s, and running it here would land its own
-// execution in this process's V8 profile. See #2901.
+// Collects this process's V8 coverage, and, for a test that reports, runs coverage.js on
+// exit to turn the collected profiles into an lcov report. bootstrap.cjs requires this
+// module when JS_BINARY__COVERAGE_REPORT is set, or when COVERAGE_DIR is set and node is
+// not already collecting. js_binary.bzl sets the former for a reporting test under
+// `bazel coverage` only; it holds coverage.js's runfiles-relative path.
 //
-// bootstrap.cjs requires this module only when JS_BINARY__COVERAGE_REPORT is set, which
-// js_binary.bzl does for a test target under `bazel coverage` only; the variable holds
-// coverage.js's runfiles-relative path.
+// Collection drives the inspector rather than setting NODE_V8_COVERAGE, which node reads
+// as it starts up: only a process running before node could set it, and the launcher must
+// not have to be one.
+//
+// The report is generated here because the test action is the only place the profiles and
+// the instrumented sources are both present, and in its own process because coverage.js is
+// async, chdir()s, and would otherwise land in this process's own profile. See #2901.
 const { JS_BINARY__LOG_ERROR, JS_BINARY__LOG_PREFIX } = process.env
 
 const collecting = startCollection()
