@@ -7,9 +7,10 @@ js_test(
     data = ["//js/private/test/no_copy_to_bin/subpkg:42.js"],
     entry_point = "test_no_copy_to_bin.js",
     no_copy_to_bin = ["//js/private/test/no_copy_to_bin/subpkg:42.js"],
-    # A file kept out of the bin directory is only laid out next to the program in the runfiles
-    # tree, so there is nowhere for the program to require it from on Windows, which does not build
-    # one by default.
+    # The program requires this file by a path relative to itself, which node resolves against the
+    # entry point's own directory. A file kept out of the bin directory only sits next to the entry
+    # point in the runfiles tree, and Windows does not build one by default; a runfiles manifest is
+    # no help here since require() does not consult one.
     target_compatible_with = select({
         "@platforms//os:windows": ["@platforms//:incompatible"],
         "//conditions:default": [],

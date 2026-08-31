@@ -300,6 +300,20 @@ fi
 # can locate runfiles without requiring RUNFILES to be exported.
 export RUNFILES_DIR="${RUNFILES_DIR:-$RUNFILES}"
 
+# Where runfiles trees are not built, which is the default on Windows, RUNFILES_DIR names a
+# directory holding nothing but the manifest and a runfiles library has to read that manifest
+# instead. Bazel does not put RUNFILES_MANIFEST_FILE in a build action's environment
+# (https://github.com/bazelbuild/bazel/issues/7994), so point at the manifest here when the tree
+# was not laid out. Only ever when the file is really there: a library that finds neither a tree
+# nor a manifest reports that better than one sent to a path that does not exist.
+if [ -z "${RUNFILES_MANIFEST_FILE:-}" ] && [ ! -d "$RUNFILES/$JS_BINARY__WORKSPACE" ]; then
+    if [ -f "$RUNFILES/MANIFEST" ]; then
+        export RUNFILES_MANIFEST_FILE="$RUNFILES/MANIFEST"
+    elif [ -f "${RUNFILES}_manifest" ]; then
+        export RUNFILES_MANIFEST_FILE="${RUNFILES}_manifest"
+    fi
+fi
+
 JS_BINARY__RUNFILES="$RUNFILES"
 export JS_BINARY__RUNFILES
 

@@ -8,11 +8,12 @@ load(":silent_on_success_test.bzl", "silent_on_success_test_suite")
 
 package(default_testonly = True)
 
-# find_cfg_probe.mjs locates its probe file with the @bazel/runfiles library, so these cases need a
-# runfiles tree, which Windows does not build by default. Bazel does not set the runfiles
-# environment variables for the tool of a build action either, so without a tree the library has
-# nothing to resolve against.
-_REQUIRES_RUNFILES = select({
+# The RUNFILES_ONLY cases below assert that cfg_probe.txt is *absent* from the target bin directory,
+# which only holds for an action that cannot see files it did not declare -- a sandboxed one. Other
+# targets in this package do build cfg_probe.txt in the target configuration, so on Windows, which
+# has no sandbox, the probe finds that copy sitting in the execroot. What the launcher resolves
+# through the runfiles manifest is not the issue; target_cfg_test below runs on Windows.
+_REQUIRES_SANDBOX = select({
     "@platforms//os:windows": ["@platforms//:incompatible"],
     "//conditions:default": [],
 })
@@ -41,7 +42,7 @@ js_run_binary(
     name = "runfiles_location",
     silent_on_success = False,
     stdout = "runfiles_location.txt",
-    target_compatible_with = _REQUIRES_RUNFILES,
+    target_compatible_with = _REQUIRES_SANDBOX,
     tool = ":find_cfg_probe",
     use_execroot_entry_point = False,
 )
@@ -50,12 +51,12 @@ assert_contains(
     name = "runfiles_test",
     actual = ":runfiles_location.txt",
     expected = "RUNFILES_ONLY",
-    target_compatible_with = _REQUIRES_RUNFILES,
+    target_compatible_with = _REQUIRES_SANDBOX,
 )
 
 label_capture(
     name = "label_capture",
-    target_compatible_with = _REQUIRES_RUNFILES,
+    target_compatible_with = _REQUIRES_SANDBOX,
     tool = ":find_cfg_probe",
 )
 
@@ -63,7 +64,7 @@ assert_contains(
     name = "label_capture_test",
     actual = ":label_capture_stdout.txt",
     expected = "RUNFILES_ONLY",
-    target_compatible_with = _REQUIRES_RUNFILES,
+    target_compatible_with = _REQUIRES_SANDBOX,
 )
 
 # With use_execroot_entry_point = True, the tool's data dependencies are built
@@ -73,7 +74,6 @@ js_run_binary(
     name = "target_cfg_location",
     silent_on_success = False,
     stdout = "target_cfg_location.txt",
-    target_compatible_with = _REQUIRES_RUNFILES,
     tool = ":find_cfg_probe",
     use_execroot_entry_point = True,
 )
@@ -89,7 +89,6 @@ diff_test(
     name = "target_cfg_test",
     file1 = ":target_cfg_location.txt",
     file2 = ":expected_target_cfg_location.txt",
-    target_compatible_with = _REQUIRES_RUNFILES,
 )
 
 # Verify that dependencies passed via the srcs parameter are always built for
