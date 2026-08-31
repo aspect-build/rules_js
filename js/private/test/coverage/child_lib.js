@@ -12,10 +12,7 @@ assert.ok(
     `expected a nested bootstrap, got depth '${process.env.JS_BINARY__NODE_PATCHES_DEPTH}'`
 )
 
-// Nothing sets NODE_V8_COVERAGE before node starts any more; the root process's
-// coverage.cjs puts it in the environment so that node collects this child's coverage the
-// way it always did. child_merger asserts the profile that produces reaches the report.
-// Under plain `bazel test` there is no coverage and neither variable is set.
+// If this is a coverage-enabled run, then the root process should have set NODE_V8_COVERAGE.
 if (process.env.COVERAGE_DIR) {
     assert.match(
         process.env.NODE_V8_COVERAGE || '',
