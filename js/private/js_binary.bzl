@@ -525,8 +525,10 @@ def _js_binary_impl(ctx):
     if run_env_info_kwargs:
         providers.append(RunEnvironmentInfo(**run_env_info_kwargs))
 
-    # If coverage is enabled, we need to include the coverage bootstrap code. Even if this target is
-    # not a test, it could get invoked as a child process.
+    # The coverage bootstrap code is required in the root node process, which will enable
+    # coverage for child processes by setting NODE_V8_COVERAGE. Any js_binary could in
+    # principle be the root node process (for example if it is invoked by an sh_test), so we
+    # need to include the coverage bootstrap for every js_binary target.
     if ctx.configuration.coverage_enabled:
         runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_bootstrap]))
 
