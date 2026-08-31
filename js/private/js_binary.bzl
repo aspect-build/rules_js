@@ -525,10 +525,8 @@ def _js_binary_impl(ctx):
     if run_env_info_kwargs:
         providers.append(RunEnvironmentInfo(**run_env_info_kwargs))
 
-    # bootstrap.cjs requires coverage.cjs when it finds COVERAGE_DIR or
-    # JS_BINARY__COVERAGE_REPORT in the environment, so the module has to be in the runfiles
-    # of every js_binary whose configuration collects coverage -- not only the tests that
-    # report it, since a test's coverage-enabled child needs it too. See #2901.
+    # If coverage is enabled, we need to include the coverage bootstrap code. Even if this target is
+    # not a test, it could get invoked as a child process.
     if ctx.configuration.coverage_enabled:
         runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_bootstrap]))
 
@@ -545,7 +543,7 @@ def _js_binary_impl(ctx):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
 
         # coverage.cjs runs coverage.js when the test program exits to generate the
-        # report, so the generator has to be in the test's runfiles as well. See #2901.
+        # report, so the generator must be included in the test's runfiles. See #2901.
         if _generates_coverage_report(ctx):
             runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
 
