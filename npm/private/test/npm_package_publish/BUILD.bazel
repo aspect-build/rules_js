@@ -50,6 +50,12 @@ sh_test(
         "no-remote-exec",
         "no-sandbox",
     ],
+    # npm_publish.mjs spawns `npm`, which on the PATH is the launcher's npm.bat wrapper. Node
+    # refuses to spawn a .bat without a shell, so `npm publish` does not run on Windows at all.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 sh_test(
