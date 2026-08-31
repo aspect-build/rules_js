@@ -11,7 +11,7 @@
 // coverage.js's runfiles-relative path.
 const { JS_BINARY__LOG_ERROR, JS_BINARY__LOG_PREFIX } = process.env
 
-const flushCoverage = startCollection()
+const collecting = startCollection()
 
 // Child node processes re-enter bootstrap.cjs with an inherited environment. Only the root
 // process reports, once every child has exited and written its profile.
@@ -72,14 +72,12 @@ function reportOnExit(reportPath) {
                 )
                 return
             }
-            // This process's own profile is not on disk yet: whoever is collecting writes it
-            // during teardown, which happens after this handler runs. Flush it here so that
-            // the report includes it.
-            if (flushCoverage) {
-                flushCoverage()
-            } else {
-                // node is collecting. Deliberately no v8.stopCoverage(): node's teardown
-                // asks V8 for coverage regardless, and errors out once it has stopped.
+            // When we collect, our own profile is already on disk: startCollection
+            // registered its exit listener before this one. node instead writes it during
+            // teardown, after this handler, so ask for it here. Deliberately no
+            // v8.stopCoverage(): node's teardown asks V8 for coverage regardless, and
+            // errors out once it has stopped.
+            if (!collecting) {
                 require('node:v8').takeCoverage()
             }
             const { status, error } = spawnSync(nodeBinary, [report], {
@@ -99,10 +97,10 @@ function reportOnExit(reportPath) {
 }
 
 // Starts a V8 precise coverage session for this process, unless node is already collecting.
-// Returns a function that writes the profile early, or undefined when node is collecting.
+// Returns whether we are the collector.
 function startCollection() {
     if (!process.env.COVERAGE_DIR || process.env.NODE_V8_COVERAGE) {
-        return undefined
+        return false
     }
 
     const path = require('node:path')
@@ -160,7 +158,7 @@ function startCollection() {
     globalThis[Symbol.for('aspect_rules_js.v8_coverage')] = flush
 
     process.on('exit', flush)
-    return flush
+    return true
 }
 
 function logError(message) {
