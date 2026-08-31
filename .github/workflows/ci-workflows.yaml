@@ -297,6 +297,7 @@ jobs:
               working-directory: ${{ matrix.workspace.path }}
               run: |
                   bazel test \
+                    --keep_going \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
                     //...

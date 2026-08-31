@@ -30,14 +30,23 @@ check('process.env.JS_BINARY__CHDIR', process.env.JS_BINARY__CHDIR, undefined)
 
 // A child node process re-enters bootstrap.cjs through the node wrapper's --require. It
 // already inherits this cwd, so a relative chdir must not be applied a second time.
-const child = spawnSync('node', ['-e', 'console.log(process.cwd())'], {
-    encoding: 'utf8',
-})
-if (child.status !== 0) {
-    console.error(`FAIL: child exited ${child.status}: ${child.stderr}`)
-    process.exitCode = 1
+//
+// Not on Windows: the wrapper there is node.bat, which node will not spawn without a shell, and
+// bootstrap.cjs does not reach child processes on win32 anyway (see the FIXME there), so there is
+// no second chdir for this to guard against.
+if (process.platform !== 'win32') {
+    const child = spawnSync('node', ['-e', 'console.log(process.cwd())'], {
+        encoding: 'utf8',
+    })
+    if (child.status === 0) {
+        check('child cwd', child.stdout.trim(), cwd)
+    } else {
+        console.error(
+            `FAIL: child exited ${child.status}: ${child.error ?? child.stderr}`
+        )
+        process.exitCode = 1
+    }
 }
-check('child cwd', child.stdout.trim(), cwd)
 
 // Preloads run in worker threads too, where process.chdir() throws outright.
 const workerCwd = await new Promise((resolve, reject) => {
