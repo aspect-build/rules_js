@@ -267,19 +267,10 @@ jobs:
                   fi
 
     # Bazel's hermetic Linux sandbox mounts only an action's declared inputs, so it catches
-    # host leakage the ordinary sandbox hides. Root workspace only: the `hermetic-sandbox`
-    # config lives in this workspace's .bazelrc, and the e2e workspaces have not been vetted
-    # under it. Its own job rather than a step in `test` so it gets a runner, and therefore an
-    # output base, of its own.
-    #
-    # Sandbox flags are not part of the action key, so any cache hit satisfies an action and
-    # this job would replay the ordinary legs' outputs without ever entering the hermetic
-    # sandbox. A fresh runner only empties the local action cache; the remote cache is shared
-    # with every other leg, hence --noremote_accept_cached, and --disk_cache= because that flag
-    # does not cover a disk cache (measured on Bazel 7.7.1). Together they make this a cold
-    # build of //..., which is the cost of the check actually running.
-    # --noremote_upload_local_results keeps its outputs out of the shared cache, so a
-    # strategy-dependent action can never poison the other legs.
+    # host leakage that the ordinary sandbox hides. This run needs its own job so that it does
+    # not share an action cache with other test runs. Otherwise we could end up reusing cached
+    # results from there instead of exercising the hermetic sandbox. We also set the necessary
+    # flags to ensure we do not use the local disk cache or the remote cache.
     hermetic-sandbox:
         runs-on: ubuntu-latest
         permissions:
