@@ -56,7 +56,7 @@ _ATTRS = {
         This must be a target that provides a single file or a `DirectoryPathInfo`
         from `@bazel_lib//lib::directory_path.bzl`.
         
-        See https://registry.bazel.build/docs/bazel_lib#provider-directorypathinfo
+        See https://registry.bazel.build/modules/bazel_lib/latest/docs/lib/directory_path.bzl/DirectoryPathInfo
         for more info on creating a target that provides a `DirectoryPathInfo`.
         """,
         mandatory = True,

@@ -38,7 +38,7 @@ rules_js is just a part Aspect's monorepo developer platform:
     -   [rules_jasmine](https://github.com/aspect-build/rules_jasmine) - Bazel rules to run tests using [Jasmine](https://jasmine.github.io/)
     -   [rules_terser](https://github.com/aspect-build/rules_terser) - Bazel rules for [Terser](https://terser.org) - a JavaScript minifier
     -   [rules_cypress](https://github.com/aspect-build/rules_cypress) - Bazel rules to run tests using [Cypress](https://www.cypress.io)
-    -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://registry.bazel.build/docs/aspect_rules_lint#lint-eslint-bzl).
+    -   [rules_lint](https://github.com/aspect-build/rules_lint) includes [eslint support](https://registry.bazel.build/modules/aspect_rules_lint/latest/docs/lint/eslint.bzl).
 
 ## Known issues
 
@@ -51,7 +51,7 @@ Follow instructions from the release you wish to use:
 
 ## Usage
 
-See the documentation in the [docs](docs/) folder and generated API docs at https://registry.bazel.build/docs/aspect_rules_js.
+See the documentation in the [docs](docs/) folder and generated API docs at https://registry.bazel.build/modules/aspect_rules_js/latest/docs
 
 ## Examples
 
