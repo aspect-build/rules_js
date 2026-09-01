@@ -272,7 +272,14 @@ jobs:
     # results from there instead of exercising the hermetic sandbox. We also set the necessary
     # flags to ensure we do not use the local disk cache or the remote cache.
     hermetic-sandbox:
-        runs-on: ubuntu-latest
+        # Not ubuntu-latest: 24.04 sets kernel.apparmor_restrict_unprivileged_userns=1, which
+        # blocks the CLONE_NEWUSER linux-sandbox needs. Bazel's support probe then fails and it
+        # falls back to processwrapper-sandbox *silently*, which makes
+        # --experimental_use_hermetic_linux_sandbox a no-op and this job green no matter what.
+        # 22.04 predates that restriction. Measured on one commit: this job on 24.04 reported
+        # "2895 processwrapper-sandbox" where the root `test` leg, on the runner below, reported
+        # "2895 linux-sandbox" for the very same spawns.
+        runs-on: ubuntu-22.04-32core
         permissions:
             contents: read
             id-token: write
@@ -283,25 +290,16 @@ jobs:
             - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
                   aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
-            # ubuntu-24.04 ships kernel.apparmor_restrict_unprivileged_userns=1, which blocks
-            # the CLONE_NEWUSER that linux-sandbox needs. Bazel's support probe then fails and
-            # it falls back to processwrapper-sandbox *silently*, which makes
-            # --experimental_use_hermetic_linux_sandbox a no-op and this whole job green no
-            # matter what. Turn the restriction off, then prove linux-sandbox really runs --
-            # a fallback must break the job, not quietly pass it.
-            - name: Allow unprivileged user namespaces
-              run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-            - name: Verify linux-sandbox is usable
-              run: '"$(bazel info install_base)/linux-sandbox" -- /bin/true'
             - name: Test
               run: |
                   set -o pipefail
                   aspect test --task-key=hermetic-sandbox --bazel-flag=--test_tag_filters=-skip-on-bazel8 --bazel-flag=--config=hermetic-sandbox --bazel-flag=--noremote_accept_cached --bazel-flag=--noremote_upload_local_results --bazel-flag=--disk_cache= --bazel-flag=--nocache_test_results -- //... 2>&1 | tee /tmp/hermetic-sandbox.log
 
-                  # The probe above says linux-sandbox *can* run; this says Bazel actually used
-                  # it. Anything Bazel declines to run in linux-sandbox lands in
-                  # processwrapper-sandbox, so a single such spawn means part of this job never
-                  # entered the hermetic sandbox and its green is not worth anything.
+                  # Pinning the image is not a guarantee, so check what actually happened:
+                  # anything Bazel declines to run in linux-sandbox lands in
+                  # processwrapper-sandbox. A single such spawn means part of this job never
+                  # entered the hermetic sandbox and its green is not worth anything. Keeps an
+                  # image change loud instead of quietly turning this job into a rubber stamp.
                   if grep -q processwrapper-sandbox /tmp/hermetic-sandbox.log; then
                     echo "::error::spawns ran in processwrapper-sandbox -- Bazel fell back and the hermetic sandbox was not exercised"
                     exit 1
