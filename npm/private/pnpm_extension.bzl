@@ -1,8 +1,8 @@
 """pnpm extension logic (the extension itself is in npm/extensions.bzl)."""
 
-load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
+load(":pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION", "PNPM_EXE_PLATFORMS", "is_native_pnpm_version")
 load(":utils.bzl", "utils")
-load(":versions.bzl", "PNPM_VERSIONS")
+load(":versions.bzl", "PNPM_EXE_VERSIONS", "PNPM_VERSIONS")
 
 DEFAULT_PNPM_REPO_NAME = "pnpm"
 
@@ -140,13 +140,18 @@ def resolve_pnpm_repositories(mctx):
             "patch_args": patch_args_by_repo.get(name, ["-p1"]),
         }
 
+        # pnpm 12+ also needs the integrity of the platform binary packages.
+        if is_native_pnpm_version(selected["version"]):
+            selected["exe_integrity"] = PNPM_EXE_VERSIONS.get(selected["version"], None)
+
         repositories[name] = selected
 
     # If any repositories have no known integrity, try to fetch them from the npm registry and persist
     # them as Facts for future use.
     fetched_facts = None
     used_facts = None
-    if hasattr(mctx, "facts") and len([v for v in repositories.values() if not v["integrity"]]) > 0:
+    missing_integrity = len([v for v in repositories.values() if not v["integrity"] or v.get("exe_integrity", True) == None]) > 0
+    if hasattr(mctx, "facts") and missing_integrity:
         used_facts = {}
         for pnpm in repositories.values():
             if not pnpm["integrity"]:
@@ -162,11 +167,54 @@ def resolve_pnpm_repositories(mctx):
                     pnpm["integrity"] = integrity
                     used_facts[pnpm["version"]] = integrity
 
+            if pnpm.get("exe_integrity", True) == None:
+                # pnpm 12+ platform binaries of a version not mirrored in versions.bzl.
+                exe_fact_key = "exe:" + pnpm["version"]
+                exe_integrity = mctx.facts.get(exe_fact_key, None)
+                if exe_integrity:
+                    exe_integrity = json.decode(exe_integrity)
+                else:
+                    exe_integrity = _fetch_pnpm_exe_integrity(mctx, pnpm["version"])
+
+                if exe_integrity:
+                    pnpm["exe_integrity"] = exe_integrity
+                    used_facts[exe_fact_key] = json.encode(exe_integrity)
+
     return struct(
         repositories = repositories,
         notes = notes,
         facts = used_facts,
     )
+
+def _fetch_pnpm_exe_integrity(module_ctx, version):
+    """Fetches the integrity of each @pnpm/exe.* platform binary of a pnpm version.
+
+    Returns:
+        A dict mapping platform (e.g. "darwin-arm64") to integrity, or None on failure.
+    """
+    exe_integrity = {}
+    for platform in PNPM_EXE_PLATFORMS:
+        out = "pnpm_exe_{}.json".format(platform)
+        result = module_ctx.download(
+            url = ["https://registry.npmjs.org/@pnpm/exe.{}/{}".format(platform, version)],
+            output = out,
+        )
+        if not result.success:
+            # buildifier: disable=print
+            print("ERROR: failed to fetch @pnpm/exe.{}@{} metadata from npm registry: {}".format(platform, version, result))
+            return None
+
+        data = module_ctx.read(out)
+        if not data or data[0] != "{":
+            # buildifier: disable=print
+            print("ERROR: failed to read @pnpm/exe.{}@{} metadata fetched from npm registry: {}".format(platform, version, data))
+            return None
+
+        integrity = json.decode(data).get("dist", {}).get("integrity", None)
+        if not integrity:
+            return None
+        exe_integrity[platform] = integrity
+    return exe_integrity
 
 def _fetch_pnpm_versions(module_ctx):
     """Fetches pnpm versions and their integrity hashes from the npm registry.

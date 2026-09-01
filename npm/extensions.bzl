@@ -371,6 +371,7 @@ def _pnpm_extension_impl(module_ctx):
             include_npm = pnpm["include_npm"],
             patches = pnpm.get("patches", []),
             patch_args = pnpm.get("patch_args", ["-p1"]),
+            exe_integrity = pnpm.get("exe_integrity", None),
         )
 
     kwargs = {}

@@ -3,8 +3,8 @@
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load("//npm/private:pnpm.bzl", "pnpm")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
-load("//npm/private:pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION")
-load("//npm/private:versions.bzl", "PNPM_VERSIONS")
+load("//npm/private:pnpm_repository.bzl", "DEFAULT_PNPM_VERSION", "LATEST_PNPM_VERSION", "PNPM_EXE_PLATFORMS", "pnpm_repository_internal")
+load("//npm/private:versions.bzl", "PNPM_EXE_VERSIONS", "PNPM_VERSIONS")
 
 # NB: version defaults to the empty sentinel, mirroring the real tag attribute, so a
 # bare _fake_pnpm_tag() is equivalent to the default registration from rules_js itself.
@@ -25,16 +25,25 @@ def _fake_mod(is_root, *pnpm_tags):
         tags = struct(pnpm = pnpm_tags),
     )
 
-def _resolve_test(ctx, repositories = [], notes = [], modules = [], package_json_content = None):
+def _resolve_test(ctx, repositories = [], notes = [], modules = [], package_json_content = None, facts = None, expected_facts = None):
     env = unittest.begin(ctx)
 
     expected = struct(
         repositories = repositories,
         notes = notes,
-        facts = None,
+        facts = expected_facts,
     )
 
-    result = resolve_pnpm_repositories(struct(modules = modules, read = lambda f: package_json_content))
+    if facts == None:
+        mctx = struct(modules = modules, read = lambda f: package_json_content)
+    else:
+        mctx = struct(
+            modules = modules,
+            read = lambda f: package_json_content,
+            facts = struct(get = lambda k, default = None: facts.get(k, default)),
+        )
+
+    result = resolve_pnpm_repositories(mctx)
 
     asserts.equals(env, expected, result)
     return unittest.end(env)
@@ -109,9 +118,12 @@ def _latest(ctx):
     # Otherwise we'd have to either:
     # - Use regexes to check notes.
     # - Accept a brittle test.
+    expected = {"version": LATEST_PNPM_VERSION, "integrity": PNPM_VERSIONS[LATEST_PNPM_VERSION], "include_npm": False, "patches": [], "patch_args": ["-p1"]}
+    if pnpm_repository_internal.is_native_pnpm_version(LATEST_PNPM_VERSION):
+        expected["exe_integrity"] = PNPM_EXE_VERSIONS[LATEST_PNPM_VERSION]
     return _resolve_test(
         ctx,
-        repositories = {"pnpm": {"version": LATEST_PNPM_VERSION, "integrity": PNPM_VERSIONS[LATEST_PNPM_VERSION], "include_npm": False, "patches": [], "patch_args": ["-p1"]}},
+        repositories = {"pnpm": expected},
         modules = [
             _fake_mod(True, _fake_pnpm_tag(version = "latest")),
         ],
@@ -287,6 +299,112 @@ def _default_version(ctx):
     asserts.equals(env, "10", DEFAULT_PNPM_VERSION.split(".")[0])
     return unittest.end(env)
 
+def _native_version_resolve(ctx):
+    # A native (12+) version mirrored in versions.bzl resolves with the
+    # platform binary integrities alongside the wrapper integrity.
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {
+            "version": "12.0.0",
+            "integrity": PNPM_VERSIONS["12.0.0"],
+            "include_npm": False,
+            "patches": [],
+            "patch_args": ["-p1"],
+            "exe_integrity": PNPM_EXE_VERSIONS["12.0.0"],
+        }},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(version = "12.0.0")),
+        ],
+    )
+
+def _native_version_exe_facts(ctx):
+    # A native (12+) version NOT mirrored in versions.bzl gets its platform
+    # binary integrities from persisted Facts (or the registry) rather than
+    # downloading unverified binaries.
+    exe_integrity = {p: "%s-integrity" % p for p in PNPM_EXE_PLATFORMS}
+    exe_fact = json.encode(exe_integrity)
+    return _resolve_test(
+        ctx,
+        repositories = {"pnpm": {
+            "version": "12.99.0",
+            "integrity": "wrapper-integrity",
+            "include_npm": False,
+            "patches": [],
+            "patch_args": ["-p1"],
+            "exe_integrity": exe_integrity,
+        }},
+        modules = [
+            _fake_mod(True, _fake_pnpm_tag(version = "12.99.0", integrity = "wrapper-integrity")),
+        ],
+        facts = {"exe:12.99.0": exe_fact},
+        expected_facts = {"exe:12.99.0": exe_fact},
+    )
+
+def _native_pnpm_version(ctx):
+    # pnpm 12+ is distributed as a native binary; older versions are pure Node.js.
+    env = unittest.begin(ctx)
+    asserts.false(env, pnpm_repository_internal.is_native_pnpm_version("9.15.9"))
+    asserts.false(env, pnpm_repository_internal.is_native_pnpm_version("10.34.5"))
+    asserts.false(env, pnpm_repository_internal.is_native_pnpm_version("11.24.0"))
+    asserts.true(env, pnpm_repository_internal.is_native_pnpm_version("12.0.0"))
+    asserts.true(env, pnpm_repository_internal.is_native_pnpm_version("13.1.2"))
+    return unittest.end(env)
+
+def _js_entry_point(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(env, "package/dist/pnpm.cjs", pnpm_repository_internal.js_entry_point("9.15.9"))
+    asserts.equals(env, "package/dist/pnpm.cjs", pnpm_repository_internal.js_entry_point("10.34.5"))
+    asserts.equals(env, "package/dist/pnpm.mjs", pnpm_repository_internal.js_entry_point("11.24.0"))
+
+    # pnpm 12+ only bundles the corepack wrapper entry, which spawns the native binary.
+    asserts.equals(env, "package/bin/pnpm.mjs", pnpm_repository_internal.js_entry_point("12.0.0"))
+    return unittest.end(env)
+
+def _exe_platform(ctx):
+    # Mapping of repository_ctx.os (name, arch) values to @pnpm/exe.* platforms.
+    env = unittest.begin(ctx)
+    asserts.equals(env, "darwin-arm64", pnpm_repository_internal.exe_platform("mac os x", "aarch64", False))
+    asserts.equals(env, "darwin-x64", pnpm_repository_internal.exe_platform("mac os x", "x86_64", False))
+    asserts.equals(env, "linux-arm64", pnpm_repository_internal.exe_platform("linux", "aarch64", False))
+    asserts.equals(env, "linux-x64", pnpm_repository_internal.exe_platform("linux", "amd64", False))
+    asserts.equals(env, "linux-x64-musl", pnpm_repository_internal.exe_platform("linux", "amd64", True))
+    asserts.equals(env, "linux-arm64-musl", pnpm_repository_internal.exe_platform("linux", "arm64", True))
+    asserts.equals(env, "win32-x64", pnpm_repository_internal.exe_platform("windows 10", "amd64", False))
+    asserts.equals(env, "win32-arm64", pnpm_repository_internal.exe_platform("windows server 2022", "aarch64", False))
+
+    # musl only applies to linux
+    asserts.equals(env, "darwin-arm64", pnpm_repository_internal.exe_platform("mac os x", "arm64", True))
+
+    # every mapped platform has a published @pnpm/exe.* package
+    for os_name, os_arch in [("mac os x", "aarch64"), ("mac os x", "amd64"), ("linux", "aarch64"), ("linux", "amd64"), ("windows 10", "amd64"), ("windows 10", "aarch64")]:
+        asserts.true(env, pnpm_repository_internal.exe_platform(os_name, os_arch, False) in PNPM_EXE_PLATFORMS)
+        asserts.true(env, pnpm_repository_internal.exe_platform(os_name, os_arch, True) in PNPM_EXE_PLATFORMS)
+    return unittest.end(env)
+
+def _exe_versions_mirrored(ctx):
+    # The mirrored PNPM_VERSIONS and PNPM_EXE_VERSIONS must stay in sync: every
+    # native (12+) pnpm version needs an integrity for every platform binary.
+    env = unittest.begin(ctx)
+    for version in PNPM_VERSIONS.keys():
+        if pnpm_repository_internal.is_native_pnpm_version(version):
+            asserts.true(env, version in PNPM_EXE_VERSIONS, "PNPM_EXE_VERSIONS is missing pnpm version " + version)
+    for version, platforms in PNPM_EXE_VERSIONS.items():
+        asserts.true(env, version in PNPM_VERSIONS, "PNPM_VERSIONS is missing pnpm version " + version)
+        asserts.equals(env, PNPM_EXE_PLATFORMS, sorted(platforms.keys()), "platform integrities for pnpm " + version)
+        for integrity in platforms.values():
+            asserts.true(env, integrity.startswith("sha512-"))
+    return unittest.end(env)
+
+def _latest_version_known(ctx):
+    # "latest" must resolve to a version that pnpm_repository can actually
+    # import: for a native (12+) latest, the platform binary integrities must
+    # be mirrored as well.
+    env = unittest.begin(ctx)
+    asserts.true(env, LATEST_PNPM_VERSION in PNPM_VERSIONS)
+    if pnpm_repository_internal.is_native_pnpm_version(LATEST_PNPM_VERSION):
+        asserts.true(env, LATEST_PNPM_VERSION in PNPM_EXE_VERSIONS)
+    return unittest.end(env)
+
 def _cpu_constraints(ctx):
     env = unittest.begin(ctx)
     asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64"], pnpm.to_bazel_cpu_constraints(["arm64"]))
@@ -338,6 +456,13 @@ from_package_json_simple_test = unittest.make(_from_package_json_simple)
 from_package_json_with_hash_test = unittest.make(_from_package_json_with_hash)
 patch_args_empty_test = unittest.make(_patch_args_empty)
 default_version_test = unittest.make(_default_version)
+native_version_resolve_test = unittest.make(_native_version_resolve)
+native_version_exe_facts_test = unittest.make(_native_version_exe_facts)
+native_pnpm_version_test = unittest.make(_native_pnpm_version)
+js_entry_point_test = unittest.make(_js_entry_point)
+exe_platform_test = unittest.make(_exe_platform)
+exe_versions_mirrored_test = unittest.make(_exe_versions_mirrored)
+latest_version_known_test = unittest.make(_latest_version_known)
 cpu_constraints_test = unittest.make(_cpu_constraints)
 os_constraints_test = unittest.make(_os_constraints)
 os_cpu_constraints_test = unittest.make(_os_cpu_constraints)
@@ -361,6 +486,13 @@ def pnpm_tests(name):
         from_package_json_with_hash_test,
         patch_args_empty_test,
         default_version_test,
+        native_version_resolve_test,
+        native_version_exe_facts_test,
+        native_pnpm_version_test,
+        js_entry_point_test,
+        exe_platform_test,
+        exe_versions_mirrored_test,
+        latest_version_known_test,
         cpu_constraints_test,
         os_constraints_test,
         os_cpu_constraints_test,

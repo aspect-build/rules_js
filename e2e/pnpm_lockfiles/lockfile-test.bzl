@@ -47,6 +47,10 @@ def lockfile_test(npm_link_all_packages, name = None):
     lock_version = name if name else native.package_name()
     lock_repo = "lock-%s" % lock_version
 
+    # pnpm 12 rejects dependency aliases containing path separators or bare
+    # @scope names, so those aliases only exist in older lockfiles.
+    has_invalid_aliases = lock_version in ["v90", "v101", "v110"]
+
     npm_link_all_packages()
 
     # Copy each test to this lockfile dir
@@ -67,12 +71,14 @@ def lockfile_test(npm_link_all_packages, name = None):
 
     js_test(
         name = "aliases-test",
-        data = [
+        args = [] if has_invalid_aliases else ["--no-invalid-aliases"],
+        data = ([
+            ":node_modules/aspect-test-a/no-at",
+            ":node_modules/@aspect-test-a-bad-scope",
+        ] if has_invalid_aliases else []) + [
             ":node_modules/@aspect-test/a",
             ":node_modules/@aspect-test/a2",
             ":node_modules/aspect-test-a-no-scope",
-            ":node_modules/aspect-test-a/no-at",
-            ":node_modules/@aspect-test-a-bad-scope",
             ":node_modules/@aspect-test-custom-scope/a",
             ":node_modules/@scoped/a",
             ":node_modules/@types/node",
@@ -94,7 +100,14 @@ def lockfile_test(npm_link_all_packages, name = None):
 
     build_test(
         name = "targets",
-        targets = [
+        targets = ([
+            # npm: alias adding/removing or odd @scopes
+            ":node_modules/aspect-test-a/no-at",
+            ":node_modules/@aspect-test-a-bad-scope",
+
+            # link: with an odd scope-like name
+            ":node_modules/scoped/bad",
+        ] if has_invalid_aliases else []) + [
             # The full node_modules target
             ":node_modules",
 
@@ -142,7 +155,6 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
-            ":node_modules/scoped/bad",
             ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
             ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
             # Workaround for peer suffixes changing in pnpm 11. We may want to
@@ -178,9 +190,7 @@ def lockfile_test(npm_link_all_packages, name = None):
             # npm: alias to registry-scoped packages
             ":node_modules/alias-types-node",
             # npm: alias adding/removing or odd @scopes
-            ":node_modules/aspect-test-a/no-at",
             ":node_modules/aspect-test-a-no-scope",
-            ":node_modules/@aspect-test-a-bad-scope",
             ":node_modules/@aspect-test-custom-scope",  # target for the scope
             ":node_modules/@aspect-test-custom-scope/a",
 
