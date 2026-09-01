@@ -193,7 +193,7 @@ def _npm_package_store_impl(ctx):
 
     package_store_prefix_len = _PACKAGE_STORE_PREFIX_LEN
     if ctx.label.package:
-        package_store_prefix_len += len(ctx.label.package)
+        package_store_prefix_len += len(ctx.label.package) + 1  # +1 for / after package
     if ctx.label.repo_name:
         package_store_prefix_len += len(ctx.label.repo_name) + 4  # +3 for ../ and +1 for / after repo name
 
