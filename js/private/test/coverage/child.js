@@ -6,11 +6,7 @@
 const assert = require('node:assert')
 const path = require('node:path')
 
-// The report below is only evidence of anything if coverage.cjs collected what went into
-// it. Nothing sets NODE_V8_COVERAGE before node starts any more, so seeing it here means
-// coverage.cjs started a session; without one the report would be empty rather than
-// collected some other way. This target also runs under plain `bazel test`, where there is
-// no coverage to collect.
+// If this is a coverage-enabled run, then this process should have set NODE_V8_COVERAGE.
 if (process.env.COVERAGE_DIR) {
     assert.match(
         process.env.NODE_V8_COVERAGE || '',
