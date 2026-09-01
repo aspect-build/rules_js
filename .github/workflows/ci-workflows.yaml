@@ -283,8 +283,29 @@ jobs:
             - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
               with:
                   aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+            # ubuntu-24.04 ships kernel.apparmor_restrict_unprivileged_userns=1, which blocks
+            # the CLONE_NEWUSER that linux-sandbox needs. Bazel's support probe then fails and
+            # it falls back to processwrapper-sandbox *silently*, which makes
+            # --experimental_use_hermetic_linux_sandbox a no-op and this whole job green no
+            # matter what. Turn the restriction off, then prove linux-sandbox really runs --
+            # a fallback must break the job, not quietly pass it.
+            - name: Allow unprivileged user namespaces
+              run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+            - name: Verify linux-sandbox is usable
+              run: '"$(bazel info install_base)/linux-sandbox" -- /bin/true'
             - name: Test
-              run: aspect test --task-key=hermetic-sandbox --bazel-flag=--test_tag_filters=-skip-on-bazel8 --bazel-flag=--config=hermetic-sandbox --bazel-flag=--noremote_accept_cached --bazel-flag=--noremote_upload_local_results --bazel-flag=--disk_cache= --bazel-flag=--nocache_test_results -- //...
+              run: |
+                  set -o pipefail
+                  aspect test --task-key=hermetic-sandbox --bazel-flag=--test_tag_filters=-skip-on-bazel8 --bazel-flag=--config=hermetic-sandbox --bazel-flag=--noremote_accept_cached --bazel-flag=--noremote_upload_local_results --bazel-flag=--disk_cache= --bazel-flag=--nocache_test_results -- //... 2>&1 | tee /tmp/hermetic-sandbox.log
+
+                  # The probe above says linux-sandbox *can* run; this says Bazel actually used
+                  # it. Anything Bazel declines to run in linux-sandbox lands in
+                  # processwrapper-sandbox, so a single such spawn means part of this job never
+                  # entered the hermetic sandbox and its green is not worth anything.
+                  if grep -q processwrapper-sandbox /tmp/hermetic-sandbox.log; then
+                    echo "::error::spawns ran in processwrapper-sandbox -- Bazel fell back and the hermetic sandbox was not exercised"
+                    exit 1
+                  fi
 
     # Mac/Windows smoke tests for the root workspace and e2e/bzlmod.
     # Only run on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
