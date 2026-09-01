@@ -286,9 +286,7 @@ jobs:
               with:
                   aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Test
-              run: |
-                  set -o pipefail
-                  aspect test --task-key=hermetic-sandbox --bazel-flag=--test_tag_filters=-skip-on-bazel8 --bazel-flag=--config=hermetic-sandbox --bazel-flag=--noremote_accept_cached --bazel-flag=--noremote_upload_local_results --bazel-flag=--disk_cache= --bazel-flag=--nocache_test_results -- //... 2>&1 | tee /tmp/hermetic-sandbox.log
+              run: aspect test --task-key=hermetic-sandbox --bazel-flag=--test_tag_filters=-skip-on-bazel8 --bazel-flag=--config=hermetic-sandbox --bazel-flag=--noremote_accept_cached --bazel-flag=--noremote_upload_local_results --bazel-flag=--disk_cache= --bazel-flag=--nocache_test_results -- //...
 
     # Mac/Windows smoke tests for the root workspace and e2e/bzlmod.
     # Only run on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
