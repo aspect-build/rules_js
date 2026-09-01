@@ -39,6 +39,11 @@ common:ci --lockfile_mode=off
 # Run everything under Bazel's hermetic Linux sandbox, which mounts only the declared
 # inputs of an action. Each mount below is necessary, primarily for things like shebang
 # lines in shell scripts and libraries for dynamically linked node binaries.
+#
+# Note that adding this config does not by itself re-run anything: sandbox flags are not
+# part of the action key, so cached results from an ordinary build satisfy every action.
+# To actually exercise it on a warm output base you need `bazel clean` -- no flag disables
+# the local action cache -- plus `--disk_cache=` and `--noremote_accept_cached`.
 build:hermetic-sandbox --experimental_use_hermetic_linux_sandbox
 build:hermetic-sandbox --sandbox_add_mount_pair=/bin
 build:hermetic-sandbox --sandbox_add_mount_pair=/usr

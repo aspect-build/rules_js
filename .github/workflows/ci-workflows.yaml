@@ -251,14 +251,6 @@ jobs:
               if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-7'
               run: aspect test --task-key=coverage-split-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results --bazel-flag=--experimental_split_coverage_postprocessing --bazel-flag=--experimental_fetch_all_coverage_outputs -- //js/private/test/coverage/...
 
-            # Smoke test for the hermetic Linux sandbox. See the `hermetic-sandbox` config in
-            # .bazelrc for the system mounts it still requires. --noremote_accept_cached is
-            # load-bearing: sandbox flags are not part of the action key, so without it this
-            # leg would just replay the other legs' cached outputs.
-            - name: Hermetic sandbox
-              if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-8'
-              run: aspect test --task-key=hermetic-sandbox-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--config=hermetic-sandbox --bazel-flag=--noremote_accept_cached --bazel-flag=--nocache_test_results -- //...
-
             # Skipped on the no-execroot-entry-point variant: test.sh scripts invoke plain
             # `bazel` without matrix.bazel.flags, so that leg wouldn't exercise the flag —
             # it would only duplicate the bazel-9 run.
@@ -273,6 +265,35 @@ jobs:
                   else
                     echo "No test.sh in ${PWD}; skipping"
                   fi
+
+    # Bazel's hermetic Linux sandbox mounts only an action's declared inputs, so it catches
+    # host leakage the ordinary sandbox hides. Root workspace only: the `hermetic-sandbox`
+    # config lives in this workspace's .bazelrc, and the e2e workspaces have not been vetted
+    # under it. Its own job rather than a step in `test` so it gets a runner, and therefore an
+    # output base, of its own.
+    #
+    # Sandbox flags are not part of the action key, so any cache hit satisfies an action and
+    # this job would replay the ordinary legs' outputs without ever entering the hermetic
+    # sandbox. A fresh runner only empties the local action cache; the remote cache is shared
+    # with every other leg, hence --noremote_accept_cached, and --disk_cache= because that flag
+    # does not cover a disk cache (measured on Bazel 7.7.1). Together they make this a cold
+    # build of //..., which is the cost of the check actually running.
+    # --noremote_upload_local_results keeps its outputs out of the shared cache, so a
+    # strategy-dependent action can never poison the other legs.
+    hermetic-sandbox:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
+        env:
+            USE_BAZEL_VERSION: 8.x
+        steps:
+            - uses: actions/checkout@v6
+            - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
+              with:
+                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+            - name: Test
+              run: aspect test --task-key=hermetic-sandbox --bazel-flag=--test_tag_filters=-skip-on-bazel8 --bazel-flag=--config=hermetic-sandbox --bazel-flag=--noremote_accept_cached --bazel-flag=--noremote_upload_local_results --bazel-flag=--disk_cache= --bazel-flag=--nocache_test_results -- //...
 
     # Mac/Windows smoke tests for the root workspace and e2e/bzlmod.
     # Only run on main branch (not PRs) to minimize minutes (billed at 10X and 2X respectively)
@@ -317,7 +338,7 @@ jobs:
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
     conclusion:
-        needs: [format, buildifier, test, smoke]
+        needs: [format, buildifier, test, hermetic-sandbox, smoke]
         runs-on: ubuntu-latest
         if: always()
         steps:
@@ -325,6 +346,7 @@ jobs:
                   if [[ "${{ needs.format.result }}" == "success" \
                      && "${{ needs.buildifier.result }}" == "success" \
                      && "${{ needs.test.result }}" == "success" \
+                     && "${{ needs.hermetic-sandbox.result }}" == "success" \
                      && ("${{ needs.smoke.result }}" == "success" || "${{ needs.smoke.result }}" == "skipped") ]]; then
                     exit 0
                   else
