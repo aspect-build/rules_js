@@ -382,6 +382,18 @@ def _hex_to_base64(hex_string):
 
     return "".join(output)
 
+_PACKAGE_STORE_ROOT = ".aspect_rules_js"
+_PACKAGE_STORE_PREFIX = "node_modules/{}/".format(_PACKAGE_STORE_ROOT)
+
+def _package_store_prefix(repo_name, package):
+    """Path of the package store of a repository package, relative to the main repository."""
+    prefix = _PACKAGE_STORE_PREFIX
+    if package:
+        prefix = "{}/{}".format(package, prefix)
+    if repo_name:
+        prefix = "../{}/{}".format(repo_name, prefix)
+    return prefix
+
 utils = struct(
     sorted_map = _sorted_map,
     friendly_name = _friendly_name,
@@ -389,9 +401,10 @@ utils = struct(
     importer_to_link = _importer_to_link,
     package_repo_name = _package_repo_name,
     package_store_name = _package_store_name,
+    package_store_prefix = _package_store_prefix,
     make_directory_symlink = _make_directory_symlink,
     # Symlinked node_modules structure package store path under node_modules
-    package_store_root = ".aspect_rules_js",
+    package_store_root = _PACKAGE_STORE_ROOT,
     # Suffix for npm_import links repository
     links_repo_suffix = "__links",
     # Output group name for the package directory of a linked npm package
