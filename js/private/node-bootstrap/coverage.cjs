@@ -134,12 +134,7 @@ function startCollection() {
     // Enable coverage for all child processes.
     process.env.NODE_V8_COVERAGE = dir
 
-    let written = false
     function flush() {
-        if (written) {
-            return
-        }
-        written = true
         // The callback is synchronous, which is what makes this usable from an exit listener.
         session.post('Profiler.takePreciseCoverage', (err, coverage) => {
             try {
@@ -164,10 +159,6 @@ function startCollection() {
         })
         session.disconnect()
     }
-
-    // The handle a program can use to write the profile before an exit that runs no 'exit'
-    // listener.
-    globalThis[Symbol.for('aspect_rules_js.v8_coverage')] = flush
 
     process.on('exit', flush)
     return true

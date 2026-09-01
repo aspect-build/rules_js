@@ -6,11 +6,16 @@
 const assert = require('node:assert')
 const path = require('node:path')
 
+// The report below is only evidence of anything if coverage.cjs collected what went into
+// it. Nothing sets NODE_V8_COVERAGE before node starts any more, so seeing it here means
+// coverage.cjs started a session; without one the report would be empty rather than
+// collected some other way. This target also runs under plain `bazel test`, where there is
+// no coverage to collect.
 if (process.env.COVERAGE_DIR) {
-    assert.strictEqual(
-        typeof globalThis[Symbol.for('aspect_rules_js.v8_coverage')],
-        'function',
-        'expected coverage.cjs to have started a v8 coverage session'
+    assert.match(
+        process.env.NODE_V8_COVERAGE || '',
+        /^\//,
+        `expected coverage.cjs to have started a v8 coverage session, got NODE_V8_COVERAGE '${process.env.NODE_V8_COVERAGE}'`
     )
 }
 
