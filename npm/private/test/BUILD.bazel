@@ -2,6 +2,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm__meaning-of-life__1.0.0__links//:defs.bzl", "npm_link_imported_package")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_failure_test_suite", "npm_auth_test_suite")
@@ -14,6 +15,15 @@ load(":translate_lock_helpers_tests.bzl", "translate_lock_helpers_tests")
 load(":utils_tests.bzl", "utils_tests")
 
 npm_link_all_packages()
+
+# Links the /MODULE npm_import() of meaning-of-life, patched with a custom `patch_tool`
+npm_link_imported_package()
+
+js_test(
+    name = "patch_tool_test",
+    data = [":node_modules/meaning-of-life"],
+    entry_point = "patch_tool_test.js",
+)
 
 # Unit tests
 utils_tests(name = "test_utils")
