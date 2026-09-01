@@ -117,8 +117,19 @@ function startCollection() {
     try {
         session = new (require('node:inspector').Session)()
         session.connect()
-        session.post('Profiler.enable')
-        session.post('Profiler.startPreciseCoverage', {
+        // post() reports a command failure through its callback and drops it entirely
+        // without one. The callback is synchronous, so this rethrows into the catch below.
+        const post = (method, params) => {
+            let failure
+            session.post(method, params, (err) => {
+                failure = err
+            })
+            if (failure) {
+                throw failure
+            }
+        }
+        post('Profiler.enable')
+        post('Profiler.startPreciseCoverage', {
             callCount: true,
             detailed: true,
         })
