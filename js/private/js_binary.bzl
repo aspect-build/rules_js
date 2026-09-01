@@ -462,6 +462,16 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         launcher_files.append(nodeinfo.node)
 
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
+
+    # The coverage bootstrap code is required in the root node process, which will enable
+    # coverage for child processes by setting NODE_V8_COVERAGE. Any js_binary could in
+    # principle be the root node process (for example if it is invoked by an sh_test), so we
+    # need to include the coverage bootstrap for every js_binary target. It ships with the
+    # launcher rather than from _js_binary_impl so that rules assembling their own runfiles
+    # around create_launcher, such as js_run_devserver, get it as well.
+    if ctx.configuration.coverage_enabled and hasattr(ctx.file, "_coverage_bootstrap"):
+        launcher_files.append(ctx.file._coverage_bootstrap)
+
     transitive_launcher_files = None
     if ctx.attr.include_npm:
         transitive_launcher_files = nodeinfo.npm_sources
@@ -524,13 +534,6 @@ def _js_binary_impl(ctx):
     # Only create provider if we have something to provide
     if run_env_info_kwargs:
         providers.append(RunEnvironmentInfo(**run_env_info_kwargs))
-
-    # The coverage bootstrap code is required in the root node process, which will enable
-    # coverage for child processes by setting NODE_V8_COVERAGE. Any js_binary could in
-    # principle be the root node process (for example if it is invoked by an sh_test), so we
-    # need to include the coverage bootstrap for every js_binary target.
-    if ctx.configuration.coverage_enabled:
-        runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_bootstrap]))
 
     if ctx.attr.testonly and ctx.configuration.coverage_enabled:
         # We have to propagate _lcov_merger runfiles since bazel does not treat _lcov_merger as a proper tool.
