@@ -134,6 +134,9 @@ build_test(
 
         # js_run_binary() running a binary in @other_repo
         ":run_other_module_binary_test",
+
+        # js_run_binary() running a binary linked in a sub-package of @other_repo
+        ":run_other_module_subpackage_binary_test",
     ],
 )
 
@@ -147,4 +150,15 @@ js_run_binary(
     ],
     silent_on_success = False,
     tool = "@other_module//:lessc",  # A js_binary() tool in a different repo
+)
+
+js_run_binary(
+    name = "run_other_module_subpackage_binary_test",
+    srcs = ["my.less"],
+    outs = ["other-module-subpackage-my.css"],
+    args = [
+        "my.less",
+        "other-module-subpackage-my.css",
+    ],
+    tool = "@other_module//frontend:lessc",  # A js_binary() tool linked in a sub-package of a different repo
 )

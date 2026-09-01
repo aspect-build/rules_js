@@ -219,6 +219,21 @@ def test_hex_to_base64(ctx):
         )
     return unittest.end(env)
 
+# buildifier: disable=function-docstring
+def test_package_store_prefix(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(env, "node_modules/.aspect_rules_js/", utils.package_store_prefix("", ""))
+    asserts.equals(env, "frontend/node_modules/.aspect_rules_js/", utils.package_store_prefix("", "frontend"))
+    asserts.equals(env, "../other_module+/node_modules/.aspect_rules_js/", utils.package_store_prefix("other_module+", ""))
+    asserts.equals(env, "../other_module+/frontend/node_modules/.aspect_rules_js/", utils.package_store_prefix("other_module+", "frontend"))
+
+    # the prefix is stripped from a dependency's package store short_path to form the relative symlink target
+    short_path = "../other_module+/frontend/node_modules/.aspect_rules_js/less@4.1.3/node_modules/less"
+    asserts.equals(env, "less@4.1.3/node_modules/less", short_path[len(utils.package_store_prefix("other_module+", "frontend")):])
+
+    return unittest.end(env)
+
 t2_test = unittest.make(test_package_store_and_target_name)
 t3_test = unittest.make(test_friendly_name)
 t6_test = unittest.make(test_parse_package_name)
@@ -226,6 +241,7 @@ t7_test = unittest.make(test_npm_registry_download_url)
 t8_test = unittest.make(test_npm_registry_url)
 t9_test = unittest.make(test_package_store_name_link_versions)
 t10_test = unittest.make(test_hex_to_base64)
+t11_test = unittest.make(test_package_store_prefix)
 
 def utils_tests(name):
     unittest.suite(
@@ -237,4 +253,5 @@ def utils_tests(name):
         t8_test,
         t9_test,
         t10_test,
+        t11_test,
     )

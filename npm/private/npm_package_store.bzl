@@ -12,8 +12,6 @@ load(":utils.bzl", "utils")
 
 _SUPPORTS_SYMLINK_TARGET_TYPE = bazel_features.rules.symlink_action_has_target_type
 
-_PACKAGE_STORE_PREFIX_LEN = len("node_modules/{}/".format(utils.package_store_root))
-
 _EXTRACT_EXECUTION_REQUIREMENTS = {
     "supports-path-mapping": "1",
 }
@@ -191,11 +189,8 @@ def _npm_package_store_impl(ctx):
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
 
-    package_store_prefix_len = _PACKAGE_STORE_PREFIX_LEN
-    if ctx.label.package:
-        package_store_prefix_len += len(ctx.label.package)
-    if ctx.label.repo_name:
-        package_store_prefix_len += len(ctx.label.repo_name) + 3  # +3 for ../
+    package_store_prefix = utils.package_store_prefix(ctx.label.repo_name, ctx.label.package)
+    package_store_prefix_len = len(package_store_prefix)
 
     package_key = "{}@{}".format(package, version)
     package_store_name = utils.package_store_name(package_key)
@@ -225,14 +220,7 @@ def _npm_package_store_impl(ctx):
         npm_pkg_info = ctx.attr.src[NpmPackageInfo]
 
         # output the package as a TreeArtifact to its package store location
-        if ctx.label.repo_name and ctx.label.package:
-            expected_short_path = "../{}/{}/{}".format(ctx.label.repo_name, ctx.label.package, package_store_directory_path)
-        elif ctx.label.repo_name:
-            expected_short_path = "../{}/{}".format(ctx.label.repo_name, package_store_directory_path)
-        elif ctx.label.package:
-            expected_short_path = "{}/{}".format(ctx.label.package, package_store_directory_path)
-        else:
-            expected_short_path = package_store_directory_path
+        expected_short_path = "{}{}/node_modules/{}".format(package_store_prefix, package_store_name, package)
 
         src = npm_pkg_info.src
         if src.short_path == expected_short_path:
