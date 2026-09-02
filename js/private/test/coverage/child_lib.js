@@ -12,6 +12,15 @@ assert.ok(
     `expected a nested bootstrap, got depth '${process.env.JS_BINARY__NODE_PATCHES_DEPTH}'`
 )
 
+// If this is a coverage-enabled run, then the root process should have set NODE_V8_COVERAGE.
+if (process.env.COVERAGE_DIR) {
+    assert.match(
+        process.env.NODE_V8_COVERAGE || '',
+        /^\//,
+        `expected an absolute NODE_V8_COVERAGE, got '${process.env.NODE_V8_COVERAGE}'`
+    )
+}
+
 if (true) {
     childCovered()
 } else {

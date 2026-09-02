@@ -6,6 +6,15 @@
 const assert = require('node:assert')
 const path = require('node:path')
 
+// If this is a coverage-enabled run, then this process should have set NODE_V8_COVERAGE.
+if (process.env.COVERAGE_DIR) {
+    assert.match(
+        process.env.NODE_V8_COVERAGE || '',
+        /^\//,
+        `expected coverage.cjs to have started a v8 coverage session, got NODE_V8_COVERAGE '${process.env.NODE_V8_COVERAGE}'`
+    )
+}
+
 // bootstrap.cjs patched process.execPath to the node wrapper, so this is the same
 // `node` a program would pick up off the PATH.
 const { status, error } = require('node:child_process').spawnSync(

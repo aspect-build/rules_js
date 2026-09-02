@@ -386,12 +386,6 @@ if [ -z "${JS_BINARY__FS_PATCH_ROOTS:-}" ]; then
 fi
 export JS_BINARY__FS_PATCH_ROOTS
 
-# Enable coverage if requested
-if [ "${COVERAGE_DIR:-}" ]; then
-    logf_debug "enabling v8 coverage support ${COVERAGE_DIR}"
-    export NODE_V8_COVERAGE=${COVERAGE_DIR}
-fi
-
 # Disable Node's module compile cache by default (aspect-build/rules_js#2937).
 # We will re-enable it at runtime if NODE_COMPILE_CACHE is set.
 export NODE_DISABLE_COMPILE_CACHE=1

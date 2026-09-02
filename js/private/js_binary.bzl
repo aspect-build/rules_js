@@ -277,7 +277,7 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
-    # Required by bootstrap.cjs only when generating a coverage report
+    # Required by bootstrap.cjs only under `bazel coverage`
     "_coverage_bootstrap": attr.label(
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
@@ -462,6 +462,15 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         launcher_files.append(nodeinfo.node)
 
     launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
+
+    # The coverage bootstrap code is required in the root node process, which will enable
+    # coverage for child processes by setting NODE_V8_COVERAGE. Any js_binary could in
+    # principle be the root node process (for example if it is invoked by an sh_test), so we
+    # need to include the coverage bootstrap for every js_binary target. It ships with the
+    # launcher so that rules such as js_run_devserver get it as well.
+    if ctx.configuration.coverage_enabled:
+        launcher_files.append(ctx.file._coverage_bootstrap)
+
     transitive_launcher_files = None
     if ctx.attr.include_npm:
         transitive_launcher_files = nodeinfo.npm_sources
@@ -538,12 +547,9 @@ def _js_binary_impl(ctx):
             runfiles = runfiles.merge(ctx.attr._lcov_merger[DefaultInfo].default_runfiles)
 
         # coverage.cjs runs coverage.js when the test program exits to generate the
-        # report, so both must be in the test's runfiles. See #2901.
+        # report, so the generator must be included in the test's runfiles. See #2901.
         if _generates_coverage_report(ctx):
-            runfiles = runfiles.merge(ctx.runfiles(files = [
-                ctx.file._coverage_bootstrap,
-                ctx.file._coverage_report,
-            ]))
+            runfiles = runfiles.merge(ctx.runfiles(files = [ctx.file._coverage_report]))
 
         providers.append(
             coverage_common.instrumented_files_info(

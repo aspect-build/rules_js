@@ -1,8 +1,13 @@
 load("//js/private/coverage:merger.bzl", "coverage_merger")
 load(":merger_test.bzl", "merger_test_suite")
-load(":test.bzl", "coverage_child_test", "coverage_no_report_test", "coverage_pass_test", "coverage_preexisting_test")
+load(":test.bzl", "coverage_child_test", "coverage_no_report_test", "coverage_pass_test", "coverage_preexisting_test", "coverage_transpiled_test")
 
 package(default_testonly = True)
+
+_ENABLE_RUNFILES = select({
+    "@bazel_lib//lib:enable_runfiles": True,
+    "//conditions:default": False,
+})
 
 merger_test_suite(name = "merger_test")
 
@@ -43,10 +48,7 @@ fi
 coverage_preexisting_test(
     name = "preexisting",
     data = ["preexisting.js"],
-    enable_runfiles = select({
-        "@bazel_lib//lib:enable_runfiles": True,
-        "//conditions:default": False,
-    }),
+    enable_runfiles = _ENABLE_RUNFILES,
     entry_point = "preexisting.js",
 )
 
@@ -75,10 +77,7 @@ fi
 coverage_pass_test(
     name = "pass",
     data = ["lib.js"],
-    enable_runfiles = select({
-        "@bazel_lib//lib:enable_runfiles": True,
-        "//conditions:default": False,
-    }),
+    enable_runfiles = _ENABLE_RUNFILES,
     entry_point = "lib.js",
 )
 
@@ -88,12 +87,42 @@ coverage_pass_test(
 coverage_pass_test(
     name = "expected_exit",
     data = ["expected_exit.js"],
-    enable_runfiles = select({
-        "@bazel_lib//lib:enable_runfiles": True,
-        "//conditions:default": False,
-    }),
+    enable_runfiles = _ENABLE_RUNFILES,
     entry_point = "expected_exit.js",
     expected_exit_code = 42,
+)
+
+# transpiled.js explains what it emulates. Dropping the source map from the profile does
+# not empty the report, it shifts it: transpiled.js puts the generated code one line lower,
+# turning these into FN:2, DA:5,1 and DA:8,0.
+coverage_merger(
+    name = "transpiled_merger",
+    merge_assertions = """\
+record="$(awk -v sf='SF:js/private/test/coverage/transpiled_lib.js' '$0 == sf { p = 1 } p { print } p && $0 == "end_of_record" { exit }' "$COVERAGE_OUTPUT_FILE")"
+if [ -z "$record" ]; then
+    echo "no coverage record for transpiled_lib.js, got:" >&2
+    cat "$COVERAGE_OUTPUT_FILE" >&2
+    exit 1
+fi
+for expected in "FN:1,transpiledCovered" "FNDA:1,transpiledCovered" "FNDA:0,transpiledUncovered" "DA:5,0" "DA:8,1"; do
+    echo "$record" | grep -qxF "$expected" || {
+        echo "expected '$expected' in the report for transpiled_lib.js:" >&2
+        echo "$record" >&2
+        exit 1
+    }
+done
+""",
+    visibility = ["//visibility:public"],
+)
+
+coverage_transpiled_test(
+    name = "transpiled",
+    data = [
+        "transpiled.js",
+        "transpiled_lib.js",
+    ],
+    enable_runfiles = _ENABLE_RUNFILES,
+    entry_point = "transpiled.js",
 )
 
 # Only the root node process generates the report; a child that re-enters bootstrap.cjs
@@ -124,10 +153,7 @@ coverage_child_test(
         "child.js",
         "child_lib.js",
     ],
-    enable_runfiles = select({
-        "@bazel_lib//lib:enable_runfiles": True,
-        "//conditions:default": False,
-    }),
+    enable_runfiles = _ENABLE_RUNFILES,
     entry_point = "child.js",
 )
 
@@ -148,9 +174,6 @@ fi
 coverage_no_report_test(
     name = "no_report",
     data = ["lib.js"],
-    enable_runfiles = select({
-        "@bazel_lib//lib:enable_runfiles": True,
-        "//conditions:default": False,
-    }),
+    enable_runfiles = _ENABLE_RUNFILES,
     entry_point = "lib.js",
 )
