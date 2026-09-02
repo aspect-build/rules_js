@@ -4,8 +4,6 @@ load(":test.bzl", "coverage_child_test", "coverage_no_report_test", "coverage_pa
 
 package(default_testonly = True)
 
-# Every fixture here needs the same answer; a coverage report is only generated from a
-# runfiles tree.
 _ENABLE_RUNFILES = select({
     "@bazel_lib//lib:enable_runfiles": True,
     "//conditions:default": False,
@@ -96,7 +94,7 @@ coverage_pass_test(
 
 # transpiled.js explains what it emulates. Dropping the source map from the profile does
 # not empty the report, it shifts it: transpiled.js puts the generated code one line lower,
-# turning these into FN:2, DA:5,1 and DA:8,0. Hence asserting lines, not just non-emptiness.
+# turning these into FN:2, DA:5,1 and DA:8,0.
 coverage_merger(
     name = "transpiled_merger",
     merge_assertions = """\
