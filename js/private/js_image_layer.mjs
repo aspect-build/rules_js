@@ -143,7 +143,14 @@ function _mtree_file_line(key, content) {
     const dest = vis(key)
     // Due to filesystems setting different bits depending on the os we have to opt-in
     // to use a stable mode for files.
-    return `${dest} uid={{UID}} gid={{GID}} time=0 mode={{FILE_MODE}} type=file content=${vis(
+    //
+    // nlink=1 keeps the archive independent of how the sandbox materializes our inputs.
+    // Two entries may share a `content` file (the js_binary launcher appears both as the
+    // image entrypoint and inside the runfiles tree); bsdtar collapses such a pair into a
+    // hard link, but only when the source file's st_nlink > 1. The standard linux sandbox
+    // symlinks inputs (nlink 1) while the hermetic one hard links them (nlink 2), so
+    // without this the tar bytes would differ by spawn strategy.
+    return `${dest} uid={{UID}} gid={{GID}} time=0 mode={{FILE_MODE}} nlink=1 type=file content=${vis(
         content
     )}`
 }

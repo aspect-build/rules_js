@@ -35,3 +35,15 @@ common:ci --nobuild_runfile_links
 # Override the preset's `--lockfile_mode=error` on CI since we don't
 # yet commit MODULE.bazel.lock — see .gitignore.
 common:ci --lockfile_mode=off
+
+# Run everything under Bazel's hermetic Linux sandbox, which mounts only the declared
+# inputs of an action. Each mount below is necessary, primarily for things like shebang
+# lines in shell scripts and libraries for dynamically linked node binaries.
+build:hermetic-sandbox --strategy=linux-sandbox
+build:hermetic-sandbox --experimental_use_hermetic_linux_sandbox
+build:hermetic-sandbox --sandbox_add_mount_pair=/bin
+build:hermetic-sandbox --sandbox_add_mount_pair=/usr
+build:hermetic-sandbox --sandbox_add_mount_pair=/lib
+build:hermetic-sandbox --sandbox_add_mount_pair=/lib64
+build:hermetic-sandbox --sandbox_add_mount_pair=/etc
+build:hermetic-sandbox --sandbox_add_mount_pair=/proc
