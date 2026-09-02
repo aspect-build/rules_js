@@ -97,10 +97,10 @@ coverage_pass_test(
 )
 
 # A runtime transpiler compiles from memory, so nothing on disk carries the generated code
-# or a //# sourceMappingURL for the reporter to find; the source map node recorded, which
+# or a //# sourceMappingURL for the reporter to find. The source map node recorded, which
 # coverage.cjs writes into the profile, is the only way back to the real lines. Without it
-# the reporter does not report nothing, it reports the wrong lines: transpiled.js shifts the
-# generated code down by one, which turns these into FN:2, DA:5,1 and DA:8,0.
+# the reporter reports the wrong lines: transpiled.js shifts the generated code down by
+# one, which turns these into FN:2, DA:5,1 and DA:8,0.
 coverage_merger(
     name = "transpiled_merger",
     merge_assertions = """\

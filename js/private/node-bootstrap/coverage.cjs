@@ -177,13 +177,10 @@ function startCollection() {
 // alongside its own: {<script url>: {data, lineLengths}}. The reporter needs them to map V8
 // offsets in generated code back to the original source. It re-reads a //# sourceMappingURL
 // from disk on its own, so this only matters for a runtime transpiler such as ts-node, which
-// compiles from memory and leaves nothing on disk to read; there the map is unrecoverable
-// without this, and the reporter silently attributes execution to the wrong lines rather
-// than reporting none.
+// compiles from memory and leaves nothing on disk to read.
 //
 // node populates this cache as it compiles each module, gated on NODE_V8_COVERAGE, which
-// startCollection sets above before any of the program is compiled. That is the same gate
-// node's own writer relies on, and it does not turn on source-mapped stack traces.
+// startCollection sets above before any of the program is compiled.
 function sourceMapCache(result) {
     const { findSourceMap } = require('node:module')
     const cache = {}
