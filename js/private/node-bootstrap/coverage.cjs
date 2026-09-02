@@ -1,14 +1,11 @@
 // Code coverage
 //
 // Collects this process's V8 coverage, and, for a test that reports, runs coverage.js on
-// exit to turn the collected profiles into an lcov report. bootstrap.cjs requires this
-// module when JS_BINARY__COVERAGE_REPORT is set, or when COVERAGE_DIR is set and node is
-// not already collecting. js_binary.bzl sets the former for a reporting test under
-// `bazel coverage` only; it holds coverage.js's runfiles-relative path.
+// exit to turn the collected profiles into an lcov report.
 //
-// Collection drives the inspector rather than setting NODE_V8_COVERAGE, which node reads
-// as it starts up: only a process running before node could set it, and the launcher must
-// not have to be one.
+// We enable collection via the inspector rather than by setting the NODE_V8_COVERAGE
+// environment variable. This allows us to start collection in-process without relying on any
+// shell script logic to run beforehand.
 //
 // The report is generated here because the test action is the only place the profiles and
 // the instrumented sources are both present, and in its own process because coverage.js is
@@ -181,8 +178,7 @@ function logError(message) {
     }
 }
 
-// Fail the target, without masking an exit code the program has already chosen. node keeps
-// process.exitCode up to date as it exits, and leaves it unset only on a clean exit.
+// Fail the target, without masking an exit code the program has already chosen.
 function logErrorAndFail(message) {
     logError(message)
     if (!process.exitCode) {
