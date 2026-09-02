@@ -18,13 +18,10 @@ const collecting = startCollection()
 // process reports, once every child has exited and written its profile.
 const { JS_BINARY__COVERAGE_REPORT } = process.env
 delete process.env.JS_BINARY__COVERAGE_REPORT
-if (JS_BINARY__COVERAGE_REPORT) {
-    reportOnExit(JS_BINARY__COVERAGE_REPORT)
-}
 
-// Registers the exit hook that runs coverage.js, the executable that turns the V8 profiles in
-// COVERAGE_DIR into the lcov report the _lcov_merger publishes.
-function reportOnExit(reportPath) {
+// The exit hook runs coverage.js, the executable that turns the V8 profiles in COVERAGE_DIR
+// into the lcov report the _lcov_merger publishes.
+if (JS_BINARY__COVERAGE_REPORT) {
     // Snapshot the environment and cwd now: the program under test may mutate either before it
     // exits, and the reporter must see what the launcher set up.
     //
@@ -43,7 +40,7 @@ function reportOnExit(reportPath) {
     const nodeBinary = process.env.JS_BINARY__NODE_BINARY
     const report = require('node:path').resolve(
         process.env.JS_BINARY__RUNFILES,
-        reportPath
+        JS_BINARY__COVERAGE_REPORT
     )
 
     // This listener is registered by a --require preload, so it runs before any
