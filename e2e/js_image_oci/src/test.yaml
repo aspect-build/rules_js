@@ -2,8 +2,7 @@ schemaVersion: 2.0.0
 
 commandTests:
     - name: 'smoke'
-      command: '/usr/bin/bash'
-      args: ['/app/src/bin']
+      command: '/app/src/bin'
       expectedOutput:
           [
               'OS',
@@ -23,8 +22,7 @@ commandTests:
               ' REPO NPM CHECK    true',
           ]
     - name: 'smoke2'
-      command: '/usr/bin/bash'
-      args: ['/app/src/bin']
+      command: '/app/src/bin'
       expectedOutput:
           [
               'OS',

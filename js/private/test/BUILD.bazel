@@ -9,6 +9,18 @@ load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
 
 normalize_chdir_tests(name = "test_normalize_chdir")
 
+# Only one launcher is generated per target, so each launcher snapshot below is written
+# and checked only under the flag setting that produces it.
+_BASH_LAUNCHER_ONLY = select({
+    "//js:_hermetic_launcher_true": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
+_HERMETIC_LAUNCHER_ONLY = select({
+    "//js:_hermetic_launcher_true": [],
+    "//conditions:default": ["@platforms//:incompatible"],
+})
+
 ####################################################################################################
 # Write a js_binary launcher to the source tree so it is shell checked on commit
 
@@ -34,12 +46,47 @@ genrule(
         host.platform,
         host.os,
     ),
+    target_compatible_with = _BASH_LAUNCHER_ONLY,
 )
 
 write_source_files(
     name = "write_launcher",
     files = {
         "snapshots/launcher.sh": ":shell_launcher_sed",
+    },
+)
+
+####################################################################################################
+# The same for the JavaScript launcher, which is what the js_binary runs when the hermetic
+# launcher is selected with --@aspect_rules_js//js:hermetic_launcher. It is not shell
+# checked -- it is not a shell script -- but the snapshot makes changes to it reviewable,
+# and reviewable against snapshots/launcher.sh, which it is a translation of.
+#
+# Only one of the two launchers is generated for a target, so each snapshot is written and
+# checked only under the flag setting that produces it.
+
+filegroup(
+    name = "shellcheck_launcher_js",
+    srcs = [":shellcheck_launcher"],
+    output_group = "launcher_js",
+    target_compatible_with = _HERMETIC_LAUNCHER_ONLY,
+)
+
+genrule(
+    name = "js_launcher_sed",
+    srcs = [":shellcheck_launcher_js"],
+    outs = ["shellcheck_launcher_sed.cjs"],
+    cmd = "cat $(execpath :shellcheck_launcher_js) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#setEnv(\\\"JS_BINARY__TARGET_CPU\\\", \\\"$(TARGET_CPU)\\\")#setEnv(\\\"JS_BINARY__TARGET_CPU\\\", \\\"k8\\\")#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" | sed -E -e 's/~~/++/g' -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g' -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g' > $@" % (
+        host.platform,
+        host.os,
+    ),
+    target_compatible_with = _HERMETIC_LAUNCHER_ONLY,
+)
+
+write_source_files(
+    name = "write_launcher_js",
+    files = {
+        "snapshots/launcher.cjs": ":js_launcher_sed",
     },
 )
 

@@ -3,6 +3,19 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
+# The two launchers spell the generated environment differently -- `export VAR="..."` in
+# the bash script, `setEnv("VAR", "...")` in the JavaScript one -- so the escaping asserts
+# below come in a pair, one of which is skipped. See docs/hermetic_launcher.md.
+_BASH_LAUNCHER_ONLY = select({
+    "//js:_hermetic_launcher_true": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
+_HERMETIC_LAUNCHER_ONLY = select({
+    "//js:_hermetic_launcher_true": [],
+    "//conditions:default": ["@platforms//:incompatible"],
+})
+
 write_file(
     name = "write_one",
     out = "one.js",
@@ -196,10 +209,27 @@ assert_contains(
     expected = "[\"twx\"]",
 )
 
+# The generated JavaScript launcher, which is not a default output of the js_binary the
+# way the bash launcher is.
+filegroup(
+    name = "env_json_launcher_js",
+    srcs = [":env_json"],
+    output_group = "launcher_js",
+    target_compatible_with = _HERMETIC_LAUNCHER_ONLY,
+)
+
 assert_contains(
     name = "env_json_launcher_escaped",
     actual = ":env_json",
     expected = "export JSON_ENV=\"[\\\"twx\\\"]\"",
+    target_compatible_with = _BASH_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "env_json_launcher_js_escaped",
+    actual = ":env_json_launcher_js",
+    expected = "setEnv(\"JSON_ENV\", \"[\\\"twx\\\"]\")",
+    target_compatible_with = _HERMETIC_LAUNCHER_ONLY,
 )
 
 assert_contains(
@@ -224,18 +254,42 @@ assert_contains(
     name = "env_json_obj_launcher_escaped",
     actual = ":env_json",
     expected = """ export JSON_OBJ="{\\\"allow\\\": [\\\"twx\\\"], \\\"deny\\\": []}" """.strip(),
+    target_compatible_with = _BASH_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "env_json_obj_launcher_js_escaped",
+    actual = ":env_json_launcher_js",
+    expected = """ setEnv("JSON_OBJ", "{\\\"allow\\\": [\\\"twx\\\"], \\\"deny\\\": []}") """.strip(),
+    target_compatible_with = _HERMETIC_LAUNCHER_ONLY,
 )
 
 assert_contains(
     name = "env_json_str_launcher_escaped",
     actual = ":env_json",
     expected = """ export JSON_STR="{\\\"note\\\": \\\"he said \\\\\\\"hi\\\\\\\"\\\"}" """.strip(),
+    target_compatible_with = _BASH_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "env_json_str_launcher_js_escaped",
+    actual = ":env_json_launcher_js",
+    expected = """ setEnv("JSON_STR", "{\\\"note\\\": \\\"he said \\\\\\\"hi\\\\\\\"\\\"}") """.strip(),
+    target_compatible_with = _HERMETIC_LAUNCHER_ONLY,
 )
 
 assert_contains(
     name = "env_json_encode_launcher_escaped",
     actual = ":env_json",
     expected = "export JSON_ENCODE=\"[\\\"twx\\\"]\"",
+    target_compatible_with = _BASH_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "env_json_encode_launcher_js_escaped",
+    actual = ":env_json_launcher_js",
+    expected = "setEnv(\"JSON_ENCODE\", \"[\\\"twx\\\"]\")",
+    target_compatible_with = _HERMETIC_LAUNCHER_ONLY,
 )
 
 ####################################################################################################

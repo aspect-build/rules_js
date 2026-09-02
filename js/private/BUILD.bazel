@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files([
     "js_binary.sh.tpl",
+    "js_binary.cjs.tpl",
     "node_bin/node",
     "node_bin_windows/node.bat",
     "npm_bin/npm",
@@ -49,7 +50,9 @@ bzl_library(
         "@bazel_lib//lib:paths",
         "@bazel_lib//lib:windows_utils",
         "@bazel_skylib//lib:dicts",
+        "@bazel_skylib//rules:common_settings",
         "@bazel_tools//tools/build_defs/repo:cache.bzl",
+        "@hermetic_launcher//launcher:lib_bzl",
     ],
 )
 
