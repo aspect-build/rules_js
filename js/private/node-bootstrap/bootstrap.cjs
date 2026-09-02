@@ -1,10 +1,8 @@
 // Code coverage. We load this before anything else here, so that the coverage session
-// sees as much of this process compiled under it as possible. We require coverage.cjs
-// conditionally to cut down on code size for non-test targets.
-if (
-    process.env.JS_BINARY__COVERAGE_REPORT ||
-    (process.env.COVERAGE_DIR && !process.env.NODE_V8_COVERAGE)
-) {
+// sees as much of this process compiled under it as possible, and only when there is
+// something to collect or report, to keep the module out of every other process.
+// coverage.cjs decides which of the two applies.
+if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
     require('./coverage.cjs')
 }
 

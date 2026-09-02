@@ -468,7 +468,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     # principle be the root node process (for example if it is invoked by an sh_test), so we
     # need to include the coverage bootstrap for every js_binary target. It ships with the
     # launcher so that rules such as js_run_devserver get it as well.
-    if ctx.configuration.coverage_enabled and hasattr(ctx.file, "_coverage_bootstrap"):
+    if ctx.configuration.coverage_enabled:
         launcher_files.append(ctx.file._coverage_bootstrap)
 
     transitive_launcher_files = None

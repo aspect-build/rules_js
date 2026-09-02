@@ -106,25 +106,30 @@ function startCollection() {
     const path = require('node:path')
     const { mkdirSync, writeFileSync } = require('node:fs')
 
+    let session
+
+    // session.post() reports a command failure through its callback and drops it entirely
+    // without one. The callback is synchronous, which is both why this can rethrow and why
+    // flush() below can run from an exit listener.
+    const post = (method, params) => {
+        let failure, result
+        session.post(method, params, (err, res) => {
+            failure = err
+            result = res
+        })
+        if (failure) {
+            throw failure
+        }
+        return result
+    }
+
     // A node without inspector support, or a program that already holds the session,
     // makes this throw. Report empty coverage rather than take down a program that would
     // otherwise have run: this preload is in every js_binary under `bazel coverage`, so a
     // throw here fails the target before its own code starts.
-    let session
     try {
         session = new (require('node:inspector').Session)()
         session.connect()
-        // post() reports a command failure through its callback and drops it entirely
-        // without one. The callback is synchronous, so this rethrows into the catch below.
-        const post = (method, params) => {
-            let failure
-            session.post(method, params, (err) => {
-                failure = err
-            })
-            if (failure) {
-                throw failure
-            }
-        }
         post('Profiler.enable')
         post('Profiler.startPreciseCoverage', {
             callCount: true,
@@ -143,29 +148,24 @@ function startCollection() {
     process.env.NODE_V8_COVERAGE = dir
 
     function flush() {
-        // The callback is synchronous, which is what makes this usable from an exit listener.
-        session.post('Profiler.takePreciseCoverage', (err, coverage) => {
-            try {
-                if (err) {
-                    throw err
-                }
-                mkdirSync(dir, { recursive: true })
-                // The name node itself uses: pid, timestamp, thread id. Only one collector
-                // ever runs in a thread, so no two can pick the same name.
-                const { threadId } = require('node:worker_threads')
-                const name = `coverage-${process.pid}-${Date.now()}-${threadId}.json`
-                writeFileSync(
-                    path.join(dir, name),
-                    JSON.stringify({
-                        result: coverage.result,
-                        timestamp: Date.now(),
-                        'source-map-cache': sourceMapCache(coverage.result),
-                    })
-                )
-            } catch (e) {
-                logErrorAndFail(`v8 coverage collection failed: ${e.message}`)
-            }
-        })
+        try {
+            const { result } = post('Profiler.takePreciseCoverage')
+            // The name node itself uses: pid, timestamp, thread id. Only one collector
+            // ever runs in a thread, so no two can pick the same name.
+            const { threadId } = require('node:worker_threads')
+            const now = Date.now()
+            mkdirSync(dir, { recursive: true })
+            writeFileSync(
+                path.join(dir, `coverage-${process.pid}-${now}-${threadId}.json`),
+                JSON.stringify({
+                    result,
+                    timestamp: now,
+                    'source-map-cache': sourceMapCache(result),
+                })
+            )
+        } catch (e) {
+            logErrorAndFail(`v8 coverage collection failed: ${e.message}`)
+        }
         session.disconnect()
     }
 
@@ -186,7 +186,7 @@ function sourceMapCache(result) {
     const cache = {}
     for (const { url } of result) {
         // Skip node's own builtins, and anything not compiled from a file.
-        if (!url || !url.startsWith('file://')) {
+        if (!url?.startsWith('file://')) {
             continue
         }
         try {

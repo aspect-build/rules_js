@@ -29,8 +29,6 @@ const generated =
     '\n'
 
 const lib = new Module(filename, module)
-lib.filename = filename
-lib.paths = Module._nodeModulePaths(path.dirname(filename))
 lib._compile(generated, filename)
 
 lib.exports.transpiledCovered()
