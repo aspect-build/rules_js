@@ -65,10 +65,6 @@ oci_image(
     # Since js_binary depends on bash we have to bring in a base image that has bash
     base = "@debian",
     # This is `/[js_image_layer 'root']/[package name of js_image_layer 'binary' target]/[name of js_image_layer 'binary' target]`
-    #
-    # Run the launcher directly rather than handing it to bash: the bash launcher has a
-    # shebang, and with --@aspect_rules_js//js:hermetic_launcher the launcher is a native
-    # binary that bash cannot execute at all.
     entrypoint = ["/app/src/bin"],
     tars = [
         ":layers",
