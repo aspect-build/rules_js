@@ -7,7 +7,7 @@ transition below does.
 
 The comparison is relative -- it asserts the two launchers agree, not that either matches a
 recorded golden -- so it is unaffected by the Bazel version, the platform, the output base, or
-the other flags the CI matrix flips, and it fails on every CI leg rather than just one.
+the other flags the CI matrix flips.
 """
 
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
@@ -33,9 +33,9 @@ def _dump_launcher_state_impl(ctx):
     # launcher was selected.
     launcher_js = ctx.attr.tool[OutputGroupInfo].launcher_js.to_list()
     if ctx.attr.hermetic_launcher and not launcher_js:
-        fail("{} was built without the hermetic launcher, so this test would have compared the bash launcher against itself. The //js:hermetic_launcher transition did not reach the tool.".format(ctx.attr.tool.label))
+        fail("{} was unexpectedly built without the hermetic launcher.".format(ctx.attr.tool.label))
     if not ctx.attr.hermetic_launcher and launcher_js:
-        fail("{} was built with the hermetic launcher but the bash launcher was requested.".format(ctx.attr.tool.label))
+        fail("{} was built with the hermetic launcher, but the bash launcher was requested.".format(ctx.attr.tool.label))
 
     out = ctx.actions.declare_file("{}.txt".format(ctx.label.name))
 

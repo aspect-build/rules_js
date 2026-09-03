@@ -12,9 +12,7 @@ _POSIX_ONLY = select({
     "//conditions:default": [],
 })
 
-# Only the bash launcher implements stdout/stderr/exit code capture and silent_on_success;
-# the hermetic launcher deliberately ignores those variables, since js_run_binary delegates
-# all four to run_binary's spawn wrapper. See docs/hermetic_launcher.md.
+# Only the bash launcher implements stdout/stderr/exit code capture and silent_on_success.
 _BASH_LAUNCHER_ONLY = select({
     "//js:_hermetic_launcher_true": ["@platforms//:incompatible"],
     "//conditions:default": [],

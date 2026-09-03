@@ -90,9 +90,8 @@ assert_contains(
     expected = "$(rootpaths :test.txt)",
 )
 
-# Quote removal happens at analysis time but $VAR expansion happens at run time, so the
-# single quotes that told bash not to expand have to survive the tokenizer as a per-segment
-# flag. Without one the JavaScript launcher expands what the bash launcher passes through.
+# Quote removal happens at analysis time, but the presence of single quotes should still
+# prevent $VAR expansion from happening at run time.
 js_binary(
     name = "single_quoted_var_bin",
     entry_point = "fixed_args.mjs",
@@ -115,7 +114,7 @@ assert_contains(
     expected = "$JS_BINARY__WORKSPACE/x",
 )
 
-# The other half of the same rule: outside single quotes the expansion does happen.
+# Without single quotes, the $VAR expansion does happen.
 js_binary(
     name = "unquoted_var_bin",
     entry_point = "fixed_args.mjs",

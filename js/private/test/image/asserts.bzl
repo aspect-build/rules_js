@@ -27,11 +27,9 @@ def assert_tar_listing(name, actual, expected):
         " -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g'"
     )
 
-    # The generated JavaScript launcher, present only when the hermetic launcher is
-    # selected with --@aspect_rules_js//js:hermetic_launcher. Dropped so that one golden
-    # listing covers both launchers: these tests are about which files land in which
-    # layer, and the .cjs lands beside the executable either way. That it is shipped at
-    # all, and works, is covered by e2e/js_image_oci, which runs the image.
+    # The generated JavaScript launcher is present only with
+    # --@aspect_rules_js//js:hermetic_launcher. Let's drop it so that one golden
+    # listing covers both launchers.
     launcher_js_drop = "sed -E '/\\/({})\\.cjs$$/d'".format(launcher_alt)
 
     sanitize_cmd = "{} | {} | {}".format(size_sanitize, launcher_js_drop, repo_sep_normalize)

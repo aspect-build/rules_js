@@ -58,12 +58,7 @@ write_source_files(
 
 ####################################################################################################
 # The same for the JavaScript launcher, which is what the js_binary runs when the hermetic
-# launcher is selected with --@aspect_rules_js//js:hermetic_launcher. It is not shell
-# checked -- it is not a shell script -- but the snapshot makes changes to it reviewable,
-# and reviewable against snapshots/launcher.sh, which it is a translation of.
-#
-# Only one of the two launchers is generated for a target, so each snapshot is written and
-# checked only under the flag setting that produces it.
+# launcher is selected with --@aspect_rules_js//js:hermetic_launcher.
 
 filegroup(
     name = "shellcheck_launcher_js",

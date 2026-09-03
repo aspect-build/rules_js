@@ -3,9 +3,6 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
-# The two launchers spell the generated environment differently -- `export VAR="..."` in
-# the bash script, `setEnv("VAR", "...")` in the JavaScript one -- so the escaping asserts
-# below come in a pair, one of which is skipped. See docs/hermetic_launcher.md.
 _BASH_LAUNCHER_ONLY = select({
     "//js:_hermetic_launcher_true": ["@platforms//:incompatible"],
     "//conditions:default": [],
@@ -209,8 +206,7 @@ assert_contains(
     expected = "[\"twx\"]",
 )
 
-# The generated JavaScript launcher, which is not a default output of the js_binary the
-# way the bash launcher is.
+# The generated JavaScript launcher, which is not a default output of the js_binary.
 filegroup(
     name = "env_json_launcher_js",
     srcs = [":env_json"],

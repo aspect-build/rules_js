@@ -1,6 +1,6 @@
 // Dumps the state a js_binary launcher leaves node in, so that the bash launcher
 // (js/private/js_binary.sh.tpl) and the JavaScript one (js/private/js_binary.cjs.tpl) can be
-// compared directly. See BUILD.bazel in this package.
+// compared directly.
 //
 // This runs after js/private/node-bootstrap/bootstrap.cjs, which is deliberate: bootstrap is
 // common to both launchers, so what it does is the same on both sides, and what this prints is
@@ -10,7 +10,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 // Dropped before comparison. Everything not listed here has to match, so keep this list short
-// and say why for each entry -- every one of them is a place this test stops looking.
+// and say why for each entry.
 const DROPPED = new Set([
     // Bash bookkeeping. The bash launcher is a bash process and the hermetic one is a native
     // stub that execve()s node, so these are artifacts of the shell rather than launcher output.
@@ -44,10 +44,6 @@ function normalize(value) {
             .replace(/\\/g, '/')
             .split(execroot)
             .join('<EXECROOT>')
-            // The whole configuration segment goes, not just the `-ST-<hash>` fragment the
-            // transitioned variant gets: its exact spelling is a Bazel implementation detail
-            // that has changed across releases, and neither launcher computes it -- both are
-            // handed it by Bazel.
             .replace(/bazel-out\/[^/]+\//g, 'bazel-out/<CFG>/')
     )
 }

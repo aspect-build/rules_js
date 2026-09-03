@@ -313,9 +313,7 @@ _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
 _FINALIZER_TOOLCHAIN_TYPE = Label(hermetic_launcher.finalizer_toolchain_type)
 _TEMPLATE_TOOLCHAIN_TYPE = Label(hermetic_launcher.template_toolchain_type)
 
-# Stands in for the launcher on target platforms hermetic_launcher publishes no stub for
-# (e.g. linux ppc64le). Not a launcher: it exists only so that `bazel build //...` for
-# such a platform succeeds and running the result says why it cannot. See #2347.
+# Stands in for the launcher on target platforms where hermetic_launcher is not supported.
 _NO_LAUNCHER_PLACEHOLDER = """#!/bin/sh
 echo "ERROR: {target}: no hermetic_launcher stub is registered for this target platform, so this js_binary has no launcher and cannot run. See https://github.com/hermeticbuild/hermetic-launcher for the supported platforms." >&2
 exit 1
