@@ -252,7 +252,9 @@ function reraiseSignal(signal, exitCode) {
 // RUNFILES_MANIFEST_FILE otherwise. So there is no $0 walk to do.
 let runfiles = process.env.TEST_SRCDIR || process.env.RUNFILES_DIR
 if (!runfiles && process.env.RUNFILES_MANIFEST_FILE) {
-    const manifest = process.env.RUNFILES_MANIFEST_FILE
+    // Normalized before the suffix tests because on Windows Bazel hands out a
+    // backslash-separated path, which would not match '/MANIFEST'.
+    const manifest = normalizePath(process.env.RUNFILES_MANIFEST_FILE)
     if (manifest.endsWith('.runfiles_manifest')) {
         // Bazel puts the manifest besides the runfiles with the suffix
         // .runfiles_manifest. For example, the runfiles directory is named
@@ -518,12 +520,6 @@ for (const arg of [...FIXED_ARGS.map(expandEnvRefs), ...argv]) {
 // as js_run_deverser runs another js_binary tool.
 if (!process.env.JS_BINARY__FS_PATCH_ROOTS) {
     process.env.JS_BINARY__FS_PATCH_ROOTS = `${process.env.JS_BINARY__EXECROOT}:${process.env.JS_BINARY__RUNFILES}`
-}
-
-// Enable coverage if requested
-if (process.env.COVERAGE_DIR) {
-    logfDebug(`enabling v8 coverage support ${process.env.COVERAGE_DIR}`)
-    process.env.NODE_V8_COVERAGE = process.env.COVERAGE_DIR
 }
 
 // Disable Node's module compile cache by default (aspect-build/rules_js#2937).

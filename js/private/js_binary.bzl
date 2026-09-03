@@ -569,6 +569,19 @@ def _compile_stub(ctx, embedded_args, transformed_args, output_file):
         progress_message = "Stamping launcher %{output}",
     )
 
+def _is_absolute_path(path):
+    """Whether a node_toolchain's target_tool_path names an absolute path.
+
+    Mirrors the launcher's own path.isAbsolute() test, which on Windows also accepts a
+    drive-letter prefix. Getting this wrong would embed a path like `_main/C:/nodejs/node.exe`
+    in the stub, which resolves through the runfiles to nothing.
+    """
+    if path.startswith("/") or path.startswith("\\"):
+        return True
+
+    # A drive letter, e.g. `C:\nodejs\node.exe` or `C:/nodejs/node.exe`.
+    return len(path) > 2 and path[1] == ":" and path[2] in ["/", "\\"]
+
 def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, envs, node_options, paths, is_windows):
     """The hermetic launcher: a native stub that execs node on a generated JavaScript launcher.
 
@@ -634,7 +647,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
         embedded_args, transformed_args = hermetic_launcher.args_from_entrypoint(
             executable_file = nodeinfo.node,
         )
-    elif paths.node_path.startswith("/"):
+    elif _is_absolute_path(paths.node_path):
         # A node_toolchain may name a non-hermetic node by absolute path rather than
         # provide a File. The stub passes absolute paths through untouched, so there is
         # nothing for it to resolve.
