@@ -206,9 +206,22 @@ process.env.BAZEL_BINDIR = '.'"""
 def _launcher_js(binary):
     """The generated JavaScript launcher of a js_binary, or None when it uses the bash launcher."""
     if OutputGroupInfo not in binary or not hasattr(binary[OutputGroupInfo], "launcher_js"):
-        # A binary that is not built on js_binary_lib.create_launcher. Nothing to sanitize
-        # beyond what _write_laucher does to its executable.
-        return None
+        # The group is what tells the two launchers apart, and which file has to be
+        # rewritten for hermeticity depends on which one is in use. Guessing wrong means
+        # rewriting the hermetic launcher's native stub as if it were a shell script,
+        # which corrupts it with no diagnostic, so refuse to guess. Every rule built on
+        # js_binary_lib.create_launcher publishes the group -- empty under the bash
+        # launcher -- so its absence means this is not one of those binaries.
+        fail("""{}: not a js_binary.
+
+The binary attribute of js_image_layer takes a js_binary, or a custom rule built on
+js_binary_lib.create_launcher that republishes its launcher_js in an output group:
+
+    OutputGroupInfo(
+        launcher_js = depset([launcher.launcher_js] if launcher.launcher_js else []),
+    )
+
+See js/private/test/create_launcher/custom_test.bzl.""".format(binary.label))
     launchers = binary[OutputGroupInfo].launcher_js.to_list()
     if not launchers:
         # The bash launcher is in use, which is the js_binary's executable.
@@ -576,7 +589,12 @@ js_image_layer_lib = struct(
             mandatory = True,
             cfg = _js_image_layer_transition,
             executable = True,
-            doc = "Label to an js_binary target",
+            doc = """Label to a js_binary target.
+
+            A custom rule built on `js_binary_lib.create_launcher` works too, as long as
+            it republishes `launcher_js` in an output group the way `js_binary` does;
+            that is how this rule tells the two js_binary launchers apart. Anything else
+            fails at analysis.""",
         ),
         "root": attr.string(
             doc = "Path where the files from js_binary will reside in. eg: /apps/app1 or /app",

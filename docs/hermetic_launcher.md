@@ -80,6 +80,13 @@ fork-and-wait path.
     environment as it is built up; command substitution is not reproduced, and the
     result is not re-split on whitespace. A single-quoted segment of a `fixed_arg`
     is left alone, as bash would have left it.
+-   **A custom rule built on `js_binary_lib.create_launcher` must republish
+    `launcher_js`.** That output group is how `js_image_layer` tells a
+    hermetic-launcher binary from a bash-launcher one: the two keep the values
+    that have to be rewritten for hermeticity in different files. A binary that
+    does not publish it is rejected at analysis rather than guessed at, since
+    guessing wrong means rewriting a native stub as if it were a shell script.
+    See `js/private/test/create_launcher/custom_test.bzl`.
 -   **No stub, no launcher.** hermetic_launcher publishes prebuilt stubs for
     linux, macOS and Windows on x86_64 and arm64, plus linux s390x. For a target
     platform it has no stub for, `js_binary` writes a placeholder that fails with

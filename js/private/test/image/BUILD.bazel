@@ -1,7 +1,8 @@
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_binary")
+load("//js:defs.bzl", "js_binary", "js_image_layer")
 load(":asserts.bzl", "SKIP_ON_WINDOWS", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
+load(":not_js_binary_test.bzl", "fake_binary", "not_js_binary_test")
 
 package(default_testonly = True)
 
@@ -140,4 +141,21 @@ platform_transition_filegroup(
     srcs = [":js_image_layer_untransitioned"],
     target_compatible_with = SKIP_ON_WINDOWS,
     target_platform = ":linux_arm64",
+)
+
+fake_binary(
+    name = "not_js",
+    tags = ["manual"],
+)
+
+js_image_layer(
+    name = "not_js_layer",
+    binary = ":not_js",
+    root = "/app",
+    tags = ["manual"],
+)
+
+not_js_binary_test(
+    name = "not_js_binary_test",
+    target_under_test = ":not_js_layer",
 )
