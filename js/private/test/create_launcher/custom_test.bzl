@@ -38,11 +38,7 @@ def _custom_test_impl(ctx):
             runfiles = runfiles,
         ),
         OutputGroupInfo(
-            # Republished so that js_image_layer can find the generated JavaScript
-            # launcher and rewrite it for hermeticity. Without this the layer rule cannot
-            # tell a hermetic-launcher binary from a bash-launcher one and sanitizes the
-            # native stub as if it were a shell script, silently corrupting it. Empty
-            # unless --@aspect_rules_js//js:hermetic_launcher is set.
+            # Republished so that js_image_layer can find the generated JavaScript launcher.
             launcher_js = depset([launcher.launcher_js] if launcher.launcher_js else []),
         ),
     ]
