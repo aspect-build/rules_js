@@ -72,11 +72,14 @@ fork-and-wait path.
     them into `ALL_ARGS=(... "$@")`, so the shell word-split them and removed
     quotes. `_shell_tokenize` in `js/private/js_binary.bzl` reproduces that
     splitting; backslash escapes are deliberately not interpreted, so a
-    Windows-style path survives intact.
+    Windows-style path survives intact. That last point shows in one place: bash
+    passes `\$VAR` through literally where this launcher expands it. Use
+    `'$VAR'` for a literal `$`.
 -   **`$VAR` expansion in `env`, `node_options` and `fixed_args` is done by the
     launcher, not a shell.** `$VAR` and `${VAR}` are expanded against the
     environment as it is built up; command substitution is not reproduced, and the
-    result is not re-split on whitespace.
+    result is not re-split on whitespace. A single-quoted segment of a `fixed_arg`
+    is left alone, as bash would have left it.
 -   **No stub, no launcher.** hermetic_launcher publishes prebuilt stubs for
     linux, macOS and Windows on x86_64 and arm64, plus linux s390x. For a target
     platform it has no stub for, `js_binary` writes a placeholder that fails with

@@ -334,6 +334,12 @@ def _quote(value):
     """
     return json.encode(value)
 
+def _append_segment(segments, text, expand):
+    """Appends a non-empty (text, expand) segment to a fixed_arg token."""
+    if text:
+        return segments + [[text, expand]]
+    return segments
+
 def _shell_tokenize(value):
     """Splits a fixed_arg the way bash does when it is spliced into an array literal.
 
@@ -343,39 +349,57 @@ def _shell_tokenize(value):
     both are covered by //js/private/test/fixed_args. The JavaScript launcher has no
     shell, so the same splitting is done here.
 
+    Quote removal alone would lose the one thing the quotes were there to say: bash
+    expands `$VAR` inside double quotes and outside quotes, but not inside single quotes,
+    and that decision has to survive to the launcher, which does the expansion at run
+    time. So each token is emitted as a list of (text, expand) segments rather than as a
+    plain string.
+
     Backslash escapes are deliberately not interpreted (bash would have), so a
-    Windows-style path in a fixed_arg survives intact. Runtime `$VAR` expansion is done
-    by the launcher, not here.
+    Windows-style path in a fixed_arg survives intact. The one place that still shows is
+    `\\$VAR`, which bash passes through literally and this launcher expands; quote it
+    instead if you want a literal `$`.
 
     Args:
         value: the fixed_arg to split
 
     Returns:
-        the list of argv entries it produces
+        a list of argv entries, each a list of [text, expand] segments to concatenate
     """
     tokens = []
+    segments = []
     current = ""
+    expand = True
     has_token = False
     quote = None
+
     for ch in value.elems():
         if quote:
             if ch == quote:
+                segments = _append_segment(segments, current, expand)
+                current = ""
+                expand = True
                 quote = None
             else:
                 current += ch
         elif ch == "'" or ch == "\"":
+            segments = _append_segment(segments, current, expand)
+            current = ""
             quote = ch
+            expand = ch == "\""
             has_token = True
         elif ch == " " or ch == "\t" or ch == "\n" or ch == "\r":
             if has_token:
-                tokens.append(current)
+                tokens.append(_append_segment(segments, current, expand))
+                segments = []
                 current = ""
+                expand = True
                 has_token = False
         else:
             current += ch
             has_token = True
     if has_token:
-        tokens.append(current)
+        tokens.append(_append_segment(segments, current, expand))
     return tokens
 
 def _generates_coverage_report(ctx):
@@ -601,7 +625,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
             "{{target_label}}": str(ctx.label),
             "{{template_label}}": str(ctx.attr._launcher_js_template.label),
             "{{entry_point_label}}": str(ctx.attr.entry_point.label),
-            "{{entry_point_path}}": entry_point_path,
+            "{{entry_point_path}}": _quote(entry_point_path),
             "{{envs}}": "\n".join([
                 (_ENV_SET_IFF_NOT_SET_JS if iff_not_set else _ENV_SET_JS).format(
                     quoted_var = _quote(var),
@@ -616,18 +640,18 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
                 for fixed_arg in fixed_args
                 for token in _shell_tokenize(fixed_arg)
             ]),
-            "{{log_prefix_rule_set}}": log_prefix_rule_set,
-            "{{log_prefix_rule}}": log_prefix_rule,
+            "{{log_prefix_rule_set}}": _quote(log_prefix_rule_set),
+            "{{log_prefix_rule}}": _quote(log_prefix_rule),
             "{{node_options}}": "\n".join([
                 _NODE_OPTION_JS.format(quoted_value = _quote(value))
                 for value in node_options
             ]),
-            "{{node_patches}}": ctx.file._node_patches.short_path,
-            "{{node_wrapper}}": paths.node_wrapper_path,
-            "{{node}}": paths.node_path,
-            "{{npm}}": paths.npm_path,
-            "{{npm_wrapper}}": paths.npm_wrapper_path,
-            "{{workspace_name}}": ctx.workspace_name,
+            "{{node_patches}}": _quote(ctx.file._node_patches.short_path),
+            "{{node_wrapper}}": _quote(paths.node_wrapper_path),
+            "{{node}}": _quote(paths.node_path),
+            "{{npm}}": _quote(paths.npm_path),
+            "{{npm_wrapper}}": _quote(paths.npm_wrapper_path),
+            "{{workspace_name}}": _quote(ctx.workspace_name),
         },
     )
 
@@ -766,8 +790,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         data_runfiles = data_runfiles,
         chdir = chdir,
         # The generated JavaScript launcher, or None when the bash launcher is in use.
-        # js_image_layer rewrites it for hermeticity; see also the launcher_js output
-        # group on js_binary.
+        # A rule built on create_launcher should republish this in a `launcher_js` output
+        # group the way js_binary does: that is how js_image_layer tells the two launchers
+        # apart, and a binary that does not publish it is taken for a bash-launcher one
+        # and has its native stub rewritten as if it were a shell script.
         launcher_js = launcher_js,
     )
 

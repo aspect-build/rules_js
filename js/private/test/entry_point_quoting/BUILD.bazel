@@ -1,0 +1,28 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+package(default_testonly = True)
+
+# The paths baked into a launcher (entry point, node, npm, the wrappers, node-patches)
+# are substituted as JSON literals rather than spliced into string literals, so that a
+# quote or a backslash in one cannot end the literal or be read as an escape. The bash
+# launcher spliced them into double quotes, where neither character is special, so only
+# the JavaScript launcher needs the escaping -- and only a file name can carry such a
+# character into these substitutions, which is why this test is a file name.
+js_binary(
+    name = "quoted_bin",
+    entry_point = "it's ok.mjs",
+)
+
+js_run_binary(
+    name = "run_quoted",
+    silent_on_success = False,
+    stdout = "quoted_out",
+    tool = ":quoted_bin",
+)
+
+assert_contains(
+    name = "quoted_test",
+    actual = "quoted_out",
+    expected = "entry point with an apostrophe ran",
+)

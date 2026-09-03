@@ -16,6 +16,26 @@ const path = require('node:path')
 const { spawn } = require('node:child_process')
 
 // ==============================================================================
+// Values baked in at analysis time
+// ==============================================================================
+
+// Each is substituted as a JSON literal rather than spliced into a string literal
+// here, so a value containing a quote or a backslash arrives intact. Both matter:
+// a Bazel label may contain an apostrophe, and a node_toolchain target_tool_path
+// on Windows is a backslash-separated path whose \n would otherwise be read as a
+// newline escape. The bash launcher spliced these into double quotes, where
+// neither character is special, so nothing had to be escaped there.
+const WORKSPACE_NAME = "_main"
+const ENTRY_POINT_PATH = "js/private/test/shellcheck.js"
+const NODE_PATH = "../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node"
+const NPM_PATH = ""
+const NPM_WRAPPER_PATH = ""
+const NODE_WRAPPER_PATH = "js/private/node_bin/node"
+const NODE_PATCHES_PATH = "js/private/node-bootstrap/bootstrap.cjs"
+const LOG_PREFIX_RULE_SET = "aspect_rules_js"
+const LOG_PREFIX_RULE = "js_binary"
+
+// ==============================================================================
 // Helpers
 // ==============================================================================
 
@@ -147,7 +167,7 @@ if (argv.length > 0 && argv[0] === '--bazel-bindir') {
 // it is a js_binary attribute with no other home. It costs the exec fast path
 // below.
 
-process.env.JS_BINARY__LOG_PREFIX = 'aspect_rules_js[js_binary]'
+process.env.JS_BINARY__LOG_PREFIX = `${LOG_PREFIX_RULE_SET}[${LOG_PREFIX_RULE}]`
 
 // Emit a log line to stderr.
 //
@@ -408,23 +428,23 @@ if (
     process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT ||
     process.env.JS_BINARY__NO_RUNFILES
 ) {
-    entryPoint = resolveExecrootBinPath('js/private/test/shellcheck.js')
+    entryPoint = resolveExecrootBinPath(ENTRY_POINT_PATH)
 } else {
-    entryPoint = `${process.env.JS_BINARY__RUNFILES}/_main/js/private/test/shellcheck.js`
+    entryPoint = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${ENTRY_POINT_PATH}`
 }
 if (!isFile(entryPoint)) {
     logfFatal(`the entry_point '${entryPoint}' not found`)
     exitWith(1)
 }
 
-const node = normalizePath('../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node')
+const node = normalizePath(NODE_PATH)
 if (path.isAbsolute(node)) {
     // A user may specify an absolute path to node using target_tool_path in node_toolchain
     process.env.JS_BINARY__NODE_BINARY = node
 } else if (process.env.JS_BINARY__NO_RUNFILES) {
-    process.env.JS_BINARY__NODE_BINARY = resolveExecrootSrcPath('../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node')
+    process.env.JS_BINARY__NODE_BINARY = resolveExecrootSrcPath(NODE_PATH)
 } else {
-    process.env.JS_BINARY__NODE_BINARY = `${process.env.JS_BINARY__RUNFILES}/_main/../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node`
+    process.env.JS_BINARY__NODE_BINARY = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NODE_PATH}`
 }
 if (!isFile(process.env.JS_BINARY__NODE_BINARY)) {
     logfFatal(`node binary '${process.env.JS_BINARY__NODE_BINARY}' not found`)
@@ -436,16 +456,16 @@ if (!IS_WINDOWS && !isExecutable(process.env.JS_BINARY__NODE_BINARY)) {
 }
 
 let npmBinDir
-const npm = ''
+const npm = NPM_PATH
 if (npm) {
     const npmPath = normalizePath(npm)
     if (path.isAbsolute(npmPath)) {
         // A user may specify an absolute path to npm using npm_path in node_toolchain
         process.env.JS_BINARY__NPM_BINARY = npmPath
     } else if (process.env.JS_BINARY__NO_RUNFILES) {
-        process.env.JS_BINARY__NPM_BINARY = resolveExecrootSrcPath('')
+        process.env.JS_BINARY__NPM_BINARY = resolveExecrootSrcPath(NPM_PATH)
     } else {
-        process.env.JS_BINARY__NPM_BINARY = `${process.env.JS_BINARY__RUNFILES}/_main/`
+        process.env.JS_BINARY__NPM_BINARY = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NPM_PATH}`
     }
     if (!isFile(process.env.JS_BINARY__NPM_BINARY)) {
         logfFatal(`npm binary '${process.env.JS_BINARY__NPM_BINARY}' not found`)
@@ -458,9 +478,9 @@ if (npm) {
 
     let npmWrapper
     if (process.env.JS_BINARY__NO_RUNFILES) {
-        npmWrapper = resolveExecrootSrcPath('')
+        npmWrapper = resolveExecrootSrcPath(NPM_WRAPPER_PATH)
     } else {
-        npmWrapper = `${process.env.JS_BINARY__RUNFILES}/_main/`
+        npmWrapper = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NPM_WRAPPER_PATH}`
     }
     if (!isFile(npmWrapper)) {
         logfFatal(`npm wrapper '${npmWrapper}' not found`)
@@ -474,9 +494,9 @@ if (npm) {
 }
 
 if (process.env.JS_BINARY__NO_RUNFILES) {
-    process.env.JS_BINARY__NODE_WRAPPER = resolveExecrootSrcPath('js/private/node_bin/node')
+    process.env.JS_BINARY__NODE_WRAPPER = resolveExecrootSrcPath(NODE_WRAPPER_PATH)
 } else {
-    process.env.JS_BINARY__NODE_WRAPPER = `${process.env.JS_BINARY__RUNFILES}/_main/js/private/node_bin/node`
+    process.env.JS_BINARY__NODE_WRAPPER = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NODE_WRAPPER_PATH}`
 }
 if (!isFile(process.env.JS_BINARY__NODE_WRAPPER)) {
     logfFatal(`node wrapper '${process.env.JS_BINARY__NODE_WRAPPER}' not found`)
@@ -488,9 +508,9 @@ if (!IS_WINDOWS && !isExecutable(process.env.JS_BINARY__NODE_WRAPPER)) {
 }
 
 if (process.env.JS_BINARY__NO_RUNFILES) {
-    process.env.JS_BINARY__NODE_PATCHES = resolveExecrootSrcPath('js/private/node-bootstrap/bootstrap.cjs')
+    process.env.JS_BINARY__NODE_PATCHES = resolveExecrootSrcPath(NODE_PATCHES_PATH)
 } else {
-    process.env.JS_BINARY__NODE_PATCHES = `${process.env.JS_BINARY__RUNFILES}/_main/js/private/node-bootstrap/bootstrap.cjs`
+    process.env.JS_BINARY__NODE_PATCHES = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NODE_PATCHES_PATH}`
 }
 if (!isFile(process.env.JS_BINARY__NODE_PATCHES)) {
     logfFatal(`node patches '${process.env.JS_BINARY__NODE_PATCHES}' not found`)
@@ -504,12 +524,16 @@ function addNodeOption(value) {
 }
 addNodeOption("--preserve-symlinks-main")
 
-// fixed_args were tokenized at analysis time. Runtime $VAR expansion still
-// happens here.
-const FIXED_ARGS = ["--my_arg"]
+// fixed_args were tokenized at analysis time, each token as a list of
+// [text, expand] segments: bash removed the quotes but this launcher still has to
+// know which of them were single quotes, since those are the ones whose $VAR the
+// shell would not have expanded. Expansion itself happens now, at run time.
+const FIXED_ARGS = [[["--my_arg",true]]].map((segments) =>
+    segments.map(([text, expand]) => (expand ? expandEnvRefs(text) : text)).join('')
+)
 
 const args = []
-for (const arg of [...FIXED_ARGS.map(expandEnvRefs), ...argv]) {
+for (const arg of [...FIXED_ARGS, ...argv]) {
     if (arg.startsWith('--node_options=')) {
         // Let users pass through arguments to node itself
         nodeOptions.push(arg.slice('--node_options='.length))
