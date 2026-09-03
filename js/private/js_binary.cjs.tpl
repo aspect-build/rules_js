@@ -177,7 +177,7 @@ function logfDebug(message) {
 }
 
 function resolveExecrootBinPath(shortPath) {
-    const bindir = process.env.BAZEL_BINDIR || process.env.JS_BINARY__BINDIR
+    const bindir = process.env.BAZEL_BINDIR
     if (shortPath.startsWith('../')) {
         return `${process.env.JS_BINARY__EXECROOT}/${bindir}/external/${shortPath.slice(3)}`
     }
@@ -512,9 +512,8 @@ if (!process.env.JS_BINARY__FS_PATCH_ROOTS) {
 }
 
 // Disable Node's module compile cache by default (aspect-build/rules_js#2937).
-if (!process.env.NODE_COMPILE_CACHE && !process.env.NODE_DISABLE_COMPILE_CACHE) {
-    process.env.NODE_DISABLE_COMPILE_CACHE = '1'
-}
+// We will re-enable it at runtime if NODE_COMPILE_CACHE is set.
+process.env.NODE_DISABLE_COMPILE_CACHE = '1'
 
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
 // child processes can find them.
