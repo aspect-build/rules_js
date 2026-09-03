@@ -1,0 +1,35 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("//js:defs.bzl", "js_binary")
+load(":launcher_sync.bzl", "launcher_sync_test")
+
+# The JavaScript launcher is a transliteration of the bash one and has to stay that way until it
+# replaces it. The rest of the suite cannot check that: a target gets one launcher per
+# configuration, so every other both-launcher test skips one side and CI covers the other by
+# running the whole suite again with the flag on. That catches breakage but not drift -- a
+# bash-launcher change that was never ported leaves both launchers passing every test.
+#
+# This runs the same js_binary under both launchers in one build and diffs the state node ends
+# up in. What is deliberately not compared is listed in dump_state.mjs.
+
+package(default_testonly = True)
+
+# A js_binary with nothing set, so the dump is dominated by launcher behavior rather than by
+# fixture configuration. The attributes each launcher formats for itself -- env, node_options
+# and fixed_args -- are worth a second fixture here if this one earns its keep.
+js_binary(
+    name = "state_bin",
+    entry_point = "dump_state.mjs",
+)
+
+launcher_sync_test(
+    name = "state_test",
+    tool = ":state_bin",
+)
+
+# A diff_test over two files passes just as happily when both are empty or when a filter has
+# scrubbed them to nothing, so pin one line that has to be there.
+assert_contains(
+    name = "state_dump_not_empty_test",
+    actual = ":state_test_bash",
+    expected = "env[JS_BINARY__RUNFILES]=",
+)

@@ -364,6 +364,10 @@ aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9
             `changing directory to BAZEL_BINDIR (root of Bazel output tree) ${process.env.BAZEL_BINDIR}`
         )
         process.chdir(process.env.BAZEL_BINDIR)
+        // The bash launcher changed directory with `cd`, which maintains the exported PWD.
+        // process.chdir() does not, so update it here -- the same fixup bootstrap.cjs does
+        // after its own chdir. Programs and the child processes they spawn read PWD.
+        process.env.PWD = process.cwd()
     }
 }
 
@@ -528,8 +532,12 @@ process.env.NODE_DISABLE_COMPILE_CACHE = '1'
 
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
 // child processes can find them.
+// `${undefined}` would interpolate the literal string "undefined" and put a bogus directory of
+// that name on the path. Bash never hits this -- it always has a PATH of its own -- so an empty
+// string is what the bash launcher's "$PATH" would have expanded to.
+const currentPath = process.env.PATH || ''
 if (npmBinDir) {
-    process.env.PATH = `${npmBinDir}${path.delimiter}${process.env.PATH}`
+    process.env.PATH = `${npmBinDir}${path.delimiter}${currentPath}`
 }
 process.env.PATH = `${path.dirname(process.env.JS_BINARY__NODE_WRAPPER)}${path.delimiter}${process.env.PATH}`
 

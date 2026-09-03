@@ -83,6 +83,31 @@ fork-and-wait path.
     an explanatory message when run, so that `bazel build //...` still succeeds
     (#2347).
 
+## Keeping the two launchers in sync
+
+The JavaScript launcher is a transliteration of the bash one and has to stay that
+way until it replaces it. The rest of the suite cannot check that: a target gets
+one launcher per configuration, so every other both-launcher test skips one side
+and CI covers the other by running the whole suite again with the flag on. That
+catches breakage but not drift -- a bash-launcher change that was never ported
+leaves both launchers passing every test.
+
+`//js/private/test/launcher_sync` closes that gap. A configuration transition
+builds one `js_binary` twice, once with the flag off and once with it on, runs
+both, and diffs the state node ends up in: `process.env`, the cwd, `argv` and
+`execArgv`. Because it compares the two launchers against each other rather than
+against a recorded golden, it needs no snapshot to regenerate and it fails on
+every CI leg rather than just the one with the flag on.
+
+`dump_state.mjs` holds the short list of things it deliberately does not compare
+-- bash's own `_`, `SHLVL` and `OLDPWD`, the `JAVA_RUNFILES` the stub exports,
+and the per-action `TMPDIR` -- each with the reason. Sandbox paths and the
+output-tree configuration segment are normalized away; everything else has to
+match.
+
+The four capture variables need no entry there: the bash launcher `export -n`s
+them and this launcher never sets them, so neither reaches the program.
+
 ## Status
 
 Windows is wired up -- the stub gets its `.exe` suffix and the `.bat` node
