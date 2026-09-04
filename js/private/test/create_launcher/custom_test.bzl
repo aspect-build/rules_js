@@ -39,7 +39,7 @@ def _custom_test_impl(ctx):
         ),
         OutputGroupInfo(
             # Republished so that js_image_layer can find the generated JavaScript launcher.
-            launcher_js = depset([launcher.launcher_js] if launcher.launcher_js else []),
+            launcher_js = launcher.launcher_js,
         ),
     ]
 

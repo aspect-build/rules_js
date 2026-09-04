@@ -63,9 +63,7 @@ bool_flag(
 config_setting(
     name = "_hermetic_launcher_true",
     flag_values = {"hermetic_launcher": "True"},
-    # Must be public: this is referenced by select() expressions in test packages,
-    # where visibility is checked from the use site.
-    visibility = ["//visibility:public"],
+    visibility = ["//js/private/test:__subpackages__"],
 )
 
 bzl_library(

@@ -13,7 +13,6 @@
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
-const { spawn } = require('node:child_process')
 
 // ==============================================================================
 // Values baked in at analysis time
@@ -394,9 +393,8 @@ if (!IS_WINDOWS && !isExecutable(process.env.JS_BINARY__NODE_BINARY)) {
 }
 
 let npmBinDir
-const npm = NPM_PATH
-if (npm) {
-    const npmPath = normalizePath(npm)
+if (NPM_PATH) {
+    const npmPath = normalizePath(NPM_PATH)
     if (path.isAbsolute(npmPath)) {
         // A user may specify an absolute path to npm using npm_path in node_toolchain
         process.env.JS_BINARY__NPM_BINARY = npmPath
@@ -585,7 +583,9 @@ const nodeArgs = [
     ...args,
 ]
 
-logfInfo(['running', process.env.JS_BINARY__NODE_BINARY, ...nodeArgs].join(' '))
+if (process.env.JS_BINARY__LOG_INFO) {
+    logfInfo(['running', process.env.JS_BINARY__NODE_BINARY, ...nodeArgs].join(' '))
+}
 
 const expectedExitCode = process.env.JS_BINARY__EXPECTED_EXIT_CODE
 
@@ -613,6 +613,7 @@ if (!expectedExitCode) {
 // Reached when this launcher has to outlive the program: an expected exit code has to be
 // compared against once the program is done, and a Node before 22.15, or any Node on
 // Windows, has no process.execve to replace this process with.
+const { spawn } = require('node:child_process')
 const child = spawn(process.env.JS_BINARY__NODE_BINARY, nodeArgs, {
     stdio: 'inherit',
 })

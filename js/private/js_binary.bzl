@@ -781,10 +781,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         runfiles = runfiles,
         data_runfiles = data_runfiles,
         chdir = chdir,
-        # The generated JavaScript launcher, or None when the bash launcher is in use. A rule
-        # built on create_launcher should republish this in a `launcher_js` output group the
-        # way js_binary does: that is how js_image_layer tells the two launchers apart.
-        launcher_js = launcher_js,
+        # The generated JavaScript launcher, empty when the bash launcher is in use. Shaped
+        # as a depset so that a rule built on create_launcher can republish it verbatim in a
+        # `launcher_js` output group, which is how js_image_layer tells the launchers apart.
+        launcher_js = depset([launcher_js] if launcher_js else []),
     )
 
 def _js_binary_impl(ctx):
@@ -865,7 +865,7 @@ def _js_binary_impl(ctx):
             # The generated JavaScript launcher, empty unless the hermetic launcher is
             # selected. Consumed by js_image_layer, which has to rewrite it, and by the
             # launcher snapshot test.
-            launcher_js = depset([launcher.launcher_js] if launcher.launcher_js else []),
+            launcher_js = launcher.launcher_js,
         ),
     ]
 

@@ -208,9 +208,7 @@ def _launcher_js(binary):
 The binary attribute of js_image_layer takes a js_binary, or a custom rule built on
 js_binary_lib.create_launcher that republishes its launcher_js in an output group:
 
-    OutputGroupInfo(
-        launcher_js = depset([launcher.launcher_js] if launcher.launcher_js else []),
-    )""".format(binary.label))
+    OutputGroupInfo(launcher_js = launcher.launcher_js)""".format(binary.label))
     launchers = binary[OutputGroupInfo].launcher_js.to_list()
     if not launchers:
         # The bash launcher is in use, which is the js_binary's executable.

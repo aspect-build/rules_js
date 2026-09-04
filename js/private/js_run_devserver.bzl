@@ -111,7 +111,7 @@ def _js_run_devserver_impl(ctx):
         OutputGroupInfo(
             # The generated JavaScript launcher, empty unless the hermetic launcher is
             # selected. js_image_layer needs this on anything built on create_launcher.
-            launcher_js = depset([launcher.launcher_js] if launcher.launcher_js else []),
+            launcher_js = launcher.launcher_js,
         ),
     ]
 
