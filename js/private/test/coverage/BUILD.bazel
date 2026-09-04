@@ -190,6 +190,11 @@ grep -q '^SF:js/private/test/coverage/extensions/lib.js$' "$COVERAGE_OUTPUT_FILE
 }
 grep -q '^FNDA:1,extCovered$' "$COVERAGE_OUTPUT_FILE" || { echo "expected an executed function" >&2; exit 1; }
 grep -q '^FNDA:0,extUncovered$' "$COVERAGE_OUTPUT_FILE" || { echo "expected an unexecuted function" >&2; exit 1; }
+grep -q '^SF:js/private/test/coverage/extensions/lib.mts$' "$COVERAGE_OUTPUT_FILE" || {
+    echo "expected a record for the .mts source; c8's default extension list omits .mts" >&2
+    cat "$COVERAGE_OUTPUT_FILE" >&2
+    exit 1
+}
 ! grep -q 'asset.json' "$COVERAGE_OUTPUT_FILE" || {
     echo "a non-instrumentable src was reported:" >&2
     grep 'asset.json' "$COVERAGE_OUTPUT_FILE" >&2
