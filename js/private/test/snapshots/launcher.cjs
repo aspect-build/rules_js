@@ -19,12 +19,6 @@ const { spawn } = require('node:child_process')
 // Values baked in at analysis time
 // ==============================================================================
 
-// Each is substituted as a JSON literal rather than spliced into a string literal
-// here, so a value containing a quote or a backslash arrives intact. Both matter:
-// a Bazel label may contain an apostrophe, and a node_toolchain target_tool_path
-// on Windows is a backslash-separated path whose \n would otherwise be read as a
-// newline escape. The bash launcher spliced these into double quotes, where
-// neither character is special, so nothing had to be escaped there.
 const WORKSPACE_NAME = "_main"
 const ENTRY_POINT_PATH = "js/private/test/shellcheck.js"
 const NODE_PATH = "../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node"
@@ -46,12 +40,8 @@ const IS_WINDOWS = process.platform === 'win32'
 // Example:
 // C:\Users\XUser\_bazel_XUser\7q7kkv32\execroot\A\b\C -> C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
 //
-// Only the separator changes. The bash launcher this replaced also rewrote the
-// drive letter (C:\... -> /c/...) because that is the only form MSYS bash, which
-// ran it, understands. Node is not MSYS: it reads /c/... as \c\... on the current
-// drive, so every path built from one would miss. Node does accept forward
-// slashes on Windows, so the separator rewrite is all that is needed and the
-// comparisons below can stay written with '/'.
+// Only the separator changes. Node accepts forward slashes on Windows, so the separator
+// rewrite is all that is needed and the comparisons below can stay written with '/'.
 function normalizePath(p) {
     if (!IS_WINDOWS) {
         return p
@@ -61,15 +51,15 @@ function normalizePath(p) {
 
 // process.cwd() reports the native separator on Windows, so it has to be
 // normalized everywhere it is compared against or spliced into a path built with
-// '/'. Not hoisted into a constant: the launcher chdir()s further down.
+// '/'. Not hoisted into a constant, because the launcher chdir()s further down.
 function cwd() {
     return normalizePath(process.cwd())
 }
 
-// The env values, node options and fixed args below were spliced into
+// The env values, node options, and fixed args below were spliced into
 // double-quoted bash strings before this launcher was ported to JavaScript, so
 // shell parameter expansion happened at launch time and users depend on it. For
-// example examples/stack_traces passes
+// example, examples/stack_traces passes
 // node_options = ["--require", "$$JS_BINARY__RUNFILES/$$JS_BINARY__WORKSPACE/..."].
 // Only $VAR / ${VAR} expansion is reproduced here; command substitution is not,
 // and the result is not re-split on whitespace the way bash would have.
@@ -84,7 +74,6 @@ function setEnv(name, value) {
     process.env[name] = expandEnvRefs(value)
 }
 
-// Matches bash `if [[ -z "${name:-}" ]]`, which is true when unset *or* empty.
 function setEnvIfUnset(name, value) {
     if (!process.env[name]) {
         process.env[name] = expandEnvRefs(value)
@@ -154,29 +143,11 @@ if (argv.length > 0 && argv[0] === '--bazel-bindir') {
 // Prepare logging
 // ==============================================================================
 
-// Unlike the bash launcher this one implements neither stdout, stderr nor exit
-// code capture, and neither silent_on_success. All four need work after the
-// program has exited, and js_run_binary already delegates all four to
-// run_binary's spawn wrapper -- a process that outlives the program and can do
-// that work (aspect-build/rules_js#2955). So JS_BINARY__STDOUT_OUTPUT_FILE,
-// JS_BINARY__STDERR_OUTPUT_FILE, JS_BINARY__EXIT_CODE_OUTPUT_FILE and
-// JS_BINARY__SILENT_ON_SUCCESS are ignored here rather than honoured; see
-// docs/hermetic_launcher.md.
-//
-// expected_exit_code is the one thing in that family that is implemented, since
-// it is a js_binary attribute with no other home. It costs the exec fast path
-// below.
-
 process.env.JS_BINARY__LOG_PREFIX = `${LOG_PREFIX_RULE_SET}[${LOG_PREFIX_RULE}]`
 
 // Emit a log line to stderr.
 //
-// The bash launcher formatted these with `echo -e $(printf ...)`, whose unquoted
-// command substitution collapsed every run of whitespace in the message to a
-// single space. The multi-line diagnostics below rely on that to render on one
-// line, so the collapsing is reproduced here.
-//
-// fs.writeSync rather than console.error, so that the line is flushed before the
+// We use fs.writeSync rather than console.error, so that the line is flushed before the
 // execve() at the bottom replaces this process.
 function logTo(level, message) {
     const collapsed = message.trim().replace(/\s+/g, ' ')
@@ -222,26 +193,12 @@ function resolveExecrootSrcPath(shortPath) {
     return `${process.env.JS_BINARY__EXECROOT}/${shortPath}`
 }
 
-// The tail of the bash launcher's `_exit` trap, which is all that is left of it
-// now that there are no captured streams to replay and no temp files to remove.
 function exitWith(exitCode) {
     logfDebug(`exit code: ${exitCode}`)
     process.exit(exitCode)
 }
 
-// The bash launcher this replaced ran under `set -o errexit` with `trap _exit
-// EXIT`, so a failure anywhere below still logged the exit code on its way out.
-// Nothing in JavaScript does that by default: an uncaught throw --
-// process.chdir() on a directory that does not exist, say -- would print a raw
-// stack trace instead of this launcher's own diagnostics.
-//
-// Whatever comes to run the entry point in this process rather than exec'ing has
-// to remove this handler first, or it will report the program's own uncaught
-// exceptions as launcher failures.
 process.on('uncaughtException', (err) => {
-    // The message alone: logTo collapses whitespace, so a stack trace comes out
-    // as one unreadable line. It is still worth having when debugging the
-    // launcher.
     logfFatal(String((err && err.message) || err))
     logfDebug(String((err && err.stack) || err))
     exitWith(1)
@@ -265,11 +222,6 @@ function reraiseSignal(signal, exitCode) {
 // Initialize RUNFILES environment variable
 // ==============================================================================
 
-// Port of the runfiles resolution the bash launcher used to do, minus the cases
-// that cannot arise here: the native launcher that exec'd this file had to find
-// node and this launcher in the runfiles to get here at all, and it exports the
-// one source it settled on -- RUNFILES_DIR when it picked a materialized tree,
-// RUNFILES_MANIFEST_FILE otherwise. So there is no $0 walk to do.
 let runfiles = process.env.TEST_SRCDIR || process.env.RUNFILES_DIR
 if (!runfiles && process.env.RUNFILES_MANIFEST_FILE) {
     // Normalized before the suffix tests because on Windows Bazel hands out a
@@ -377,16 +329,13 @@ aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9
         }
 
         // Since the process was launched in the execroot, we automatically change directory into the root of the
-        // output tree (which we expect to be set in BAZEL_BIN). See
+        // output tree (which we expect to be set in BAZEL_BINDIR). See
         // https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
         // for more context on why we do this.
         logfDebug(
             `changing directory to BAZEL_BINDIR (root of Bazel output tree) ${process.env.BAZEL_BINDIR}`
         )
         process.chdir(process.env.BAZEL_BINDIR)
-        // The bash launcher changed directory with `cd`, which maintains the exported PWD.
-        // process.chdir() does not, so update it here -- the same fixup bootstrap.cjs does
-        // after its own chdir. Programs and the child processes they spawn read PWD.
         process.env.PWD = process.cwd()
     }
 }
@@ -556,9 +505,6 @@ process.env.NODE_DISABLE_COMPILE_CACHE = '1'
 
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
 // child processes can find them.
-// `${undefined}` would interpolate the literal string "undefined" and put a bogus directory of
-// that name on the path. Bash never hits this -- it always has a PATH of its own -- so an empty
-// string is what the bash launcher's "$PATH" would have expanded to.
 const currentPath = process.env.PATH || ''
 if (npmBinDir) {
     process.env.PATH = `${npmBinDir}${path.delimiter}${currentPath}`
@@ -658,8 +604,7 @@ if (!expectedExitCode) {
     // Nothing must run after node exits, so replace this process with node.
     // Signals and terminal control are then delivered directly to node instead
     // of being proxied through a child process, and no launcher process is left
-    // behind -- which is why this is the only path the bash launcher's `exec`
-    // had, and why it is the one almost every js_binary takes.
+    // behind.
     //
     // process.execve is POSIX-only and was added in Node 22.15; when it is
     // unavailable we fall through to spawning node below.
@@ -676,10 +621,9 @@ if (!expectedExitCode) {
     }
 }
 
-// Reached when this launcher has to outlive the program: an expected exit code
-// has to be compared against once the program is done, and a Node before 22.15
-// -- or any Node on Windows -- has no process.execve to replace this process
-// with. This is the bash launcher's fork-and-wait path.
+// Reached when this launcher has to outlive the program: an expected exit code has to be
+// compared against once the program is done, and a Node before 22.15, or any Node on
+// Windows, has no process.execve to replace this process with.
 const child = spawn(process.env.JS_BINARY__NODE_BINARY, nodeArgs, {
     stdio: 'inherit',
 })

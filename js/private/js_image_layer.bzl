@@ -193,10 +193,7 @@ export BAZEL_BINDIR="."
 # patched by js_image_layer for hermeticity
 """
 
-# The JavaScript launcher's equivalent. Replaces the `'use strict'` at the top of the file
-# rather than a shebang -- and it has to be the top, above the generated setEnv() calls,
-# since those expand $VAR references as they go: an `env = {"FOO": "$BAZEL_BINDIR/x"}` set
-# on the js_binary would otherwise expand against an empty BAZEL_BINDIR.
+# The JavaScript launcher's equivalent.
 _JS_LAUNCHER_PREAMBLE = """\
 'use strict'
 
@@ -206,12 +203,6 @@ process.env.BAZEL_BINDIR = '.'"""
 def _launcher_js(binary):
     """The generated JavaScript launcher of a js_binary, or None when it uses the bash launcher."""
     if OutputGroupInfo not in binary or not hasattr(binary[OutputGroupInfo], "launcher_js"):
-        # The group is what tells the two launchers apart, and which file has to be
-        # rewritten for hermeticity depends on which one is in use. Guessing wrong means
-        # rewriting the hermetic launcher's native stub as if it were a shell script,
-        # which corrupts it with no diagnostic, so refuse to guess. Every rule built on
-        # js_binary_lib.create_launcher publishes the group -- empty under the bash
-        # launcher -- so its absence means this is not one of those binaries.
         fail("""{}: not a js_binary.
 
 The binary attribute of js_image_layer takes a js_binary, or a custom rule built on
@@ -219,9 +210,7 @@ js_binary_lib.create_launcher that republishes its launcher_js in an output grou
 
     OutputGroupInfo(
         launcher_js = depset([launcher.launcher_js] if launcher.launcher_js else []),
-    )
-
-See js/private/test/create_launcher/custom_test.bzl.""".format(binary.label))
+    )""".format(binary.label))
     launchers = binary[OutputGroupInfo].launcher_js.to_list()
     if not launchers:
         # The bash launcher is in use, which is the js_binary's executable.
@@ -231,7 +220,7 @@ See js/private/test/create_launcher/custom_test.bzl.""".format(binary.label))
     return launchers[0]
 
 def _write_js_launcher(ctx, launcher_js):
-    "Sanitizes the JavaScript launcher the hermetic launcher runs, the way _write_laucher does the bash one."
+    "Sanitizes the JavaScript launcher the way _write_launcher does the bash one."
     launcher = ctx.actions.declare_file("%s_launcher.cjs" % ctx.label.name)
 
     substitutions = {
@@ -249,7 +238,7 @@ def _write_js_launcher(ctx, launcher_js):
     )
     return launcher
 
-def _write_laucher(ctx, real_binary):
+def _write_launcher(ctx, real_binary):
     "Creates a call-through shell entrypoint which sets BAZEL_BINDIR to '.' then immediately invokes the original entrypoint."
     launcher = ctx.actions.declare_file("%s_launcher" % ctx.label.name)
 
@@ -406,7 +395,7 @@ def _js_image_layer_impl(ctx):
         sanitized_original = launcher_js
         entry_point_file = binary_default_info.files_to_run.executable
     else:
-        launcher = _write_laucher(ctx, binary_default_info.files_to_run.executable)
+        launcher = _write_launcher(ctx, binary_default_info.files_to_run.executable)
         sanitized_original = binary_default_info.files_to_run.executable
         entry_point_file = launcher
 
@@ -592,9 +581,7 @@ js_image_layer_lib = struct(
             doc = """Label to a js_binary target.
 
             A custom rule built on `js_binary_lib.create_launcher` works too, as long as
-            it republishes `launcher_js` in an output group the way `js_binary` does;
-            that is how this rule tells the two js_binary launchers apart. Anything else
-            fails at analysis.""",
+            it republishes `launcher_js` in an output group the way `js_binary` does.""",
         ),
         "root": attr.string(
             doc = "Path where the files from js_binary will reside in. eg: /apps/app1 or /app",

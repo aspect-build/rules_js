@@ -343,7 +343,7 @@ def _shell_tokenize(value):
 
     The bash launcher builds `ALL_ARGS=({{fixed_args}} "$@")`, so each fixed_arg is
     subject to word splitting and quote removal. `$(rootpaths ...)` expanding to several
-    paths relies on the splitting and a `'...'`-wrapped arg relies on the quote removal;
+    paths relies on the splitting and a single-quoted arg relies on the quote removal;
     both are covered by //js/private/test/fixed_args. The JavaScript launcher has no
     shell, so the same splitting is done here.
 
@@ -493,12 +493,7 @@ def _launcher_envs(ctx, fixed_env, is_windows):
     return envs, normalized_chdir
 
 def _launcher_node_options(ctx):
-    """The node CLI options the launcher passes, in order.
-
-    `--preserve-symlinks-main` is appended unconditionally when the attribute is set,
-    which is what the launcher has always done: the de-duplication check this replaced
-    compared the flag against already-formatted shell statements and so never matched.
-    """
+    """The node CLI options the launcher passes, in order."""
     node_options = [_expand_env_if_needed(ctx, node_option) for node_option in ctx.attr.node_options]
     if ctx.attr.preserve_symlinks_main:
         node_options.append("--preserve-symlinks-main")
@@ -722,8 +717,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         entry_point = ctx.files.entry_point[0]
         entry_point_path = entry_point.short_path
 
-    # Expanded here rather than in either launcher so that both bake in the same
-    # arguments.
+    # Expanded here rather than in either launcher, so that both bake in the same arguments.
     if ctx.attr.expand_args:
         fixed_args = [expand_variables(ctx, expand_locations(ctx, fixed_arg, ctx.attr.data)) for fixed_arg in fixed_args]
 
@@ -787,11 +781,9 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         runfiles = runfiles,
         data_runfiles = data_runfiles,
         chdir = chdir,
-        # The generated JavaScript launcher, or None when the bash launcher is in use.
-        # A rule built on create_launcher should republish this in a `launcher_js` output
-        # group the way js_binary does: that is how js_image_layer tells the two launchers
-        # apart, and a binary that does not publish it is taken for a bash-launcher one
-        # and has its native stub rewritten as if it were a shell script.
+        # The generated JavaScript launcher, or None when the bash launcher is in use. A rule
+        # built on create_launcher should republish this in a `launcher_js` output group the
+        # way js_binary does: that is how js_image_layer tells the two launchers apart.
         launcher_js = launcher_js,
     )
 
