@@ -1,0 +1,15 @@
+load("//js:defs.bzl", "js_library")
+
+package(default_testonly = True)
+
+# A library whose srcs mix an instrumentable source with one that is not. js_library
+# filters srcs by COVERAGE_EXTENSIONS, so only lib.js should reach a dependent test's
+# COVERAGE_MANIFEST.
+js_library(
+    name = "lib",
+    srcs = [
+        "asset.json",
+        "lib.js",
+    ],
+    visibility = ["//js/private/test/coverage:__pkg__"],
+)

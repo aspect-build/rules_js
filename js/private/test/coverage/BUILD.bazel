@@ -1,6 +1,6 @@
 load("//js/private/coverage:merger.bzl", "coverage_merger")
 load(":merger_test.bzl", "merger_test_suite")
-load(":test.bzl", "coverage_child_test", "coverage_no_report_test", "coverage_pass_test", "coverage_preexisting_test", "coverage_transpiled_test")
+load(":test.bzl", "coverage_child_test", "coverage_extensions_test", "coverage_no_report_test", "coverage_pass_test", "coverage_preexisting_test", "coverage_transpiled_test")
 
 package(default_testonly = True)
 
@@ -176,4 +176,35 @@ coverage_no_report_test(
     data = ["lib.js"],
     enable_runfiles = _ENABLE_RUNFILES,
     entry_point = "lib.js",
+)
+
+# js_library filters its srcs by COVERAGE_EXTENSIONS, so a non-JS src must not reach the
+# manifest and must not be reported.
+coverage_merger(
+    name = "extensions_merger",
+    merge_assertions = """\
+grep -q '^SF:js/private/test/coverage/extensions/lib.js$' "$COVERAGE_OUTPUT_FILE" || {
+    echo "expected the js_library source to be reported, got:" >&2
+    cat "$COVERAGE_OUTPUT_FILE" >&2
+    exit 1
+}
+grep -q '^FNDA:1,extCovered$' "$COVERAGE_OUTPUT_FILE" || { echo "expected an executed function" >&2; exit 1; }
+grep -q '^FNDA:0,extUncovered$' "$COVERAGE_OUTPUT_FILE" || { echo "expected an unexecuted function" >&2; exit 1; }
+! grep -q 'asset.json' "$COVERAGE_OUTPUT_FILE" || {
+    echo "a non-instrumentable src was reported:" >&2
+    grep 'asset.json' "$COVERAGE_OUTPUT_FILE" >&2
+    exit 1
+}
+""",
+    visibility = ["//visibility:public"],
+)
+
+coverage_extensions_test(
+    name = "extensions",
+    data = [
+        "extensions.js",
+        "//js/private/test/coverage/extensions:lib",
+    ],
+    enable_runfiles = _ENABLE_RUNFILES,
+    entry_point = "extensions.js",
 )
