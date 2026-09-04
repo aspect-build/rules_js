@@ -2,14 +2,17 @@ load("//js:defs.bzl", "js_library")
 
 package(default_testonly = True)
 
-# A library whose srcs mix an instrumentable source with one that is not. js_library
-# filters srcs by COVERAGE_EXTENSIONS, so only lib.js should reach a dependent test's
-# COVERAGE_MANIFEST.
+# A library whose srcs mix instrumentable sources with one that is not. js_library filters
+# srcs by COVERAGE_EXTENSIONS, so asset.json must not reach a dependent test's
+# COVERAGE_MANIFEST. lib.mts is never executed: it is here so the report's `all` pass has
+# to emit a record for it, pinning that the reporter's extension list covers .mts. c8's
+# own default list does not, so without an explicit list it is silently dropped.
 js_library(
     name = "lib",
     srcs = [
         "asset.json",
         "lib.js",
+        "lib.mts",
     ],
     visibility = ["//js/private/test/coverage:__pkg__"],
 )

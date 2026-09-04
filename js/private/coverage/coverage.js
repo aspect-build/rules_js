@@ -1,19 +1,19 @@
 'use strict';
 
-var require$$0$2 = require('path');
+var path = require('path');
 var require$$2$1 = require('node:url');
 var require$$1$1 = require('node:path');
-var require$$0$1 = require('fs');
+var fs = require('fs');
 var require$$4 = require('node:fs');
 var require$$5 = require('node:fs/promises');
 var require$$0 = require('node:events');
 var require$$1 = require('node:stream');
 var require$$2 = require('node:string_decoder');
 var require$$2$2 = require('util');
-var require$$0$3 = require('os');
+var require$$0$1 = require('os');
 var require$$1$2 = require('tty');
 var require$$1$3 = require('url');
-var require$$0$4 = require('assert');
+var require$$0$2 = require('assert');
 var require$$12 = require('module');
 
 var c8 = {};
@@ -4808,7 +4808,7 @@ function requireCommonjs$1 () {
 	const lru_cache_1 = /*@__PURE__*/ requireCommonjs$3();
 	const node_path_1 = require$$1$1;
 	const node_url_1 = require$$2$1;
-	const fs_1 = require$$0$1;
+	const fs_1 = fs;
 	const actualFS = __importStar(require$$4);
 	const realpathSync = fs_1.realpathSync.native;
 	// TODO: test perf of fs/promises realpath vs realpathCB,
@@ -8756,13 +8756,13 @@ function requireIsOutsideDirWin32 () {
 	if (hasRequiredIsOutsideDirWin32) return isOutsideDirWin32;
 	hasRequiredIsOutsideDirWin32 = 1;
 
-	const path = require$$0$2;
+	const path$1 = path;
 	const { minimatch } = requireCommonjs$4();
 
 	const dot = { dot: true, windowsPathsNoEscape: true };
 
 	isOutsideDirWin32 = function(dir, filename) {
-	    return !minimatch(path.resolve(dir, filename), path.join(dir, '**'), dot);
+	    return !minimatch(path$1.resolve(dir, filename), path$1.join(dir, '**'), dot);
 	};
 	return isOutsideDirWin32;
 }
@@ -8774,10 +8774,10 @@ function requireIsOutsideDirPosix () {
 	if (hasRequiredIsOutsideDirPosix) return isOutsideDirPosix;
 	hasRequiredIsOutsideDirPosix = 1;
 
-	const path = require$$0$2;
+	const path$1 = path;
 
 	isOutsideDirPosix = function(dir, filename) {
-	    return /^\.\./.test(path.relative(dir, filename));
+	    return /^\.\./.test(path$1.relative(dir, filename));
 	};
 	return isOutsideDirPosix;
 }
@@ -8803,7 +8803,7 @@ function requireTestExclude () {
 	if (hasRequiredTestExclude) return testExclude;
 	hasRequiredTestExclude = 1;
 
-	const path = require$$0$2;
+	const path$1 = path;
 	const { glob } = requireCommonjs();
 	const { minimatch } = requireCommonjs$4();
 	const { defaults } = requireSchema();
@@ -8887,7 +8887,7 @@ function requireTestExclude () {
 	        let pathToCheck = filename;
 
 	        if (this.relativePath) {
-	            relFile = relFile || path.relative(this.cwd, filename);
+	            relFile = relFile || path$1.relative(this.cwd, filename);
 
 	            // Don't instrument files that are outside of the current working directory.
 	            if (isOutsideDir(this.cwd, filename)) {
@@ -8916,7 +8916,7 @@ function requireTestExclude () {
 
 	        return glob
 	            .sync(globPatterns, globOptions)
-	            .filter(file => this.shouldInstrument(path.resolve(cwd, file)));
+	            .filter(file => this.shouldInstrument(path$1.resolve(cwd, file)));
 	    }
 
 	    async glob(cwd = this.cwd) {
@@ -8929,7 +8929,7 @@ function requireTestExclude () {
 	        }
 
 	        const list = await glob(globPatterns, globOptions);
-	        return list.filter(file => this.shouldInstrument(path.resolve(cwd, file)));
+	        return list.filter(file => this.shouldInstrument(path$1.resolve(cwd, file)));
 	    }
 	}
 
@@ -10535,8 +10535,8 @@ var hasRequiredMakeDir;
 function requireMakeDir () {
 	if (hasRequiredMakeDir) return makeDir.exports;
 	hasRequiredMakeDir = 1;
-	const fs = require$$0$1;
-	const path = require$$0$2;
+	const fs$1 = fs;
+	const path$1 = path;
 	const {promisify} = require$$2$2;
 	const semverGte = requireGte();
 
@@ -10546,7 +10546,7 @@ function requireMakeDir () {
 	// https://github.com/libuv/libuv/pull/1088
 	const checkPath = pth => {
 		if (process.platform === 'win32') {
-			const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path.parse(pth).root, ''));
+			const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path$1.parse(pth).root, ''));
 
 			if (pathHasInvalidWinCharacters) {
 				const error = new Error(`Path contains invalid characters: ${pth}`);
@@ -10559,7 +10559,7 @@ function requireMakeDir () {
 	const processOptions = options => {
 		const defaults = {
 			mode: 0o777,
-			fs
+			fs: fs$1
 		};
 
 		return {
@@ -10586,8 +10586,8 @@ function requireMakeDir () {
 		const mkdir = promisify(options.fs.mkdir);
 		const stat = promisify(options.fs.stat);
 
-		if (useNativeRecursiveOption && options.fs.mkdir === fs.mkdir) {
-			const pth = path.resolve(input);
+		if (useNativeRecursiveOption && options.fs.mkdir === fs$1.mkdir) {
+			const pth = path$1.resolve(input);
 
 			await mkdir(pth, {
 				mode: options.mode,
@@ -10608,7 +10608,7 @@ function requireMakeDir () {
 				}
 
 				if (error.code === 'ENOENT') {
-					if (path.dirname(pth) === pth) {
+					if (path$1.dirname(pth) === pth) {
 						throw permissionError(pth);
 					}
 
@@ -10616,7 +10616,7 @@ function requireMakeDir () {
 						throw error;
 					}
 
-					await make(path.dirname(pth));
+					await make(path$1.dirname(pth));
 
 					return make(pth);
 				}
@@ -10634,7 +10634,7 @@ function requireMakeDir () {
 			}
 		};
 
-		return make(path.resolve(input));
+		return make(path$1.resolve(input));
 	};
 
 	makeDir.exports = makeDir$1;
@@ -10643,10 +10643,10 @@ function requireMakeDir () {
 		checkPath(input);
 		options = processOptions(options);
 
-		if (useNativeRecursiveOption && options.fs.mkdirSync === fs.mkdirSync) {
-			const pth = path.resolve(input);
+		if (useNativeRecursiveOption && options.fs.mkdirSync === fs$1.mkdirSync) {
+			const pth = path$1.resolve(input);
 
-			fs.mkdirSync(pth, {
+			fs$1.mkdirSync(pth, {
 				mode: options.mode,
 				recursive: true
 			});
@@ -10663,7 +10663,7 @@ function requireMakeDir () {
 				}
 
 				if (error.code === 'ENOENT') {
-					if (path.dirname(pth) === pth) {
+					if (path$1.dirname(pth) === pth) {
 						throw permissionError(pth);
 					}
 
@@ -10671,7 +10671,7 @@ function requireMakeDir () {
 						throw error;
 					}
 
-					make(path.dirname(pth));
+					make(path$1.dirname(pth));
 					return make(pth);
 				}
 
@@ -10687,7 +10687,7 @@ function requireMakeDir () {
 			return pth;
 		};
 
-		return make(path.resolve(input));
+		return make(path$1.resolve(input));
 	};
 	return makeDir.exports;
 }
@@ -10714,7 +10714,7 @@ var hasRequiredSupportsColor;
 function requireSupportsColor () {
 	if (hasRequiredSupportsColor) return supportsColor_1;
 	hasRequiredSupportsColor = 1;
-	const os = require$$0$3;
+	const os = require$$0$1;
 	const tty = require$$1$2;
 	const hasFlag = requireHasFlag();
 
@@ -10861,8 +10861,8 @@ function requireFileWriter () {
 	 Copyright 2012-2015, Yahoo Inc.
 	 Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 	 */
-	const path = require$$0$2;
-	const fs = require$$0$1;
+	const path$1 = path;
+	const fs$1 = fs;
 	const mkdirp = requireMakeDir();
 	const supportsColor = requireSupportsColor();
 
@@ -10913,11 +10913,11 @@ function requireFileWriter () {
 	    }
 
 	    write(str) {
-	        fs.writeSync(this.fd, str);
+	        fs$1.writeSync(this.fd, str);
 	    }
 
 	    close() {
-	        fs.closeSync(this.fd);
+	        fs$1.closeSync(this.fd);
 	    }
 	}
 
@@ -10995,7 +10995,7 @@ function requireFileWriter () {
 	     * @returns {FileWriter}
 	     */
 	    writerForDir(subdir) {
-	        if (path.isAbsolute(subdir)) {
+	        if (path$1.isAbsolute(subdir)) {
 	            throw new Error(
 	                `Cannot create subdir writer for absolute path: ${subdir}`
 	            );
@@ -11011,18 +11011,18 @@ function requireFileWriter () {
 	     *  (e.g., an "this file is autogenerated" comment, copyright notice, etc.)
 	     */
 	    copyFile(source, dest, header) {
-	        if (path.isAbsolute(dest)) {
+	        if (path$1.isAbsolute(dest)) {
 	            throw new Error(`Cannot write to absolute path: ${dest}`);
 	        }
-	        dest = path.resolve(this.baseDir, dest);
-	        mkdirp.sync(path.dirname(dest));
+	        dest = path$1.resolve(this.baseDir, dest);
+	        mkdirp.sync(path$1.dirname(dest));
 	        let contents;
 	        if (header) {
-	            contents = header + fs.readFileSync(source, 'utf8');
+	            contents = header + fs$1.readFileSync(source, 'utf8');
 	        } else {
-	            contents = fs.readFileSync(source);
+	            contents = fs$1.readFileSync(source);
 	        }
-	        fs.writeFileSync(dest, contents);
+	        fs$1.writeFileSync(dest, contents);
 	    }
 
 	    /**
@@ -11035,12 +11035,12 @@ function requireFileWriter () {
 	        if (file === null || file === '-') {
 	            return new ConsoleWriter();
 	        }
-	        if (path.isAbsolute(file)) {
+	        if (path$1.isAbsolute(file)) {
 	            throw new Error(`Cannot write to absolute path: ${file}`);
 	        }
-	        file = path.resolve(this.baseDir, file);
-	        mkdirp.sync(path.dirname(file));
-	        return new FileContentWriter(fs.openSync(file, 'w'));
+	        file = path$1.resolve(this.baseDir, file);
+	        mkdirp.sync(path$1.dirname(file));
+	        return new FileContentWriter(fs$1.openSync(file, 'w'));
 	    }
 	}
 
@@ -11327,9 +11327,9 @@ function requirePath () {
 	if (hasRequiredPath) return path_1;
 	hasRequiredPath = 1;
 
-	const path = require$$0$2;
-	let parsePath = path.parse;
-	let SEP = path.sep;
+	const path$1 = path;
+	let parsePath = path$1.parse;
+	let SEP = path$1.sep;
 	const origParser = parsePath;
 	const origSep = SEP;
 
@@ -11796,7 +11796,7 @@ function requireContext () {
 	 Copyright 2012-2015, Yahoo Inc.
 	 Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 	 */
-	const fs = require$$0$1;
+	const fs$1 = fs;
 	const FileWriter = requireFileWriter();
 	const XMLWriter = requireXmlWriter();
 	const tree = requireTree();
@@ -11805,7 +11805,7 @@ function requireContext () {
 
 	function defaultSourceLookup(path) {
 	    try {
-	        return fs.readFileSync(path, 'utf8');
+	        return fs$1.readFileSync(path, 'utf8');
 	    } catch (ex) {
 	        throw new Error(`Unable to lookup source: ${path} (${ex.message})`);
 	    }
@@ -12038,10 +12038,10 @@ function requireLcovonly () {
 	        const branches = fc.b;
 	        const branchMap = fc.branchMap;
 	        const summary = node.getCoverageSummary();
-	        const path = require$$0$2;
+	        const path$1 = path;
 
 	        writer.println('TN:');
-	        const fileName = path.relative(this.projectRoot, fc.path);
+	        const fileName = path$1.relative(this.projectRoot, fc.path);
 	        writer.println('SF:' + fileName);
 
 	        Object.values(functionMap).forEach(meta => {
@@ -12149,7 +12149,7 @@ function requireSourceMapFromFile () {
 	// https://github.com/nodejs/node/blob/master/lib/internal/source_map/source_map_cache.js
 	// we should to upstream and downstream fixes.
 
-	const { readFileSync } = require$$0$1;
+	const { readFileSync } = fs;
 	const { fileURLToPath, pathToFileURL } = require$$1$3;
 	const util = require$$2$2;
 	const debuglog = util.debuglog('c8');
@@ -14189,18 +14189,18 @@ var hasRequiredV8ToIstanbul$1;
 function requireV8ToIstanbul$1 () {
 	if (hasRequiredV8ToIstanbul$1) return v8ToIstanbul$1;
 	hasRequiredV8ToIstanbul$1 = 1;
-	const assert = require$$0$4;
+	const assert = require$$0$2;
 	const convertSourceMap = requireConvertSourceMap();
 	const util = require$$2$2;
 	const debuglog = util.debuglog('c8');
-	const { dirname, isAbsolute, join, resolve } = require$$0$2;
+	const { dirname, isAbsolute, join, resolve } = path;
 	const { fileURLToPath } = require$$1$3;
 	const CovBranch = requireBranch();
 	const CovFunction = require_function();
 	const CovSource = requireSource();
 	const { sliceRange } = requireRange();
 	const compatError = Error(`requires Node.js ${require$$9.engines.node}`);
-	const { readFileSync } = require$$0$1;
+	const { readFileSync } = fs;
 	let readFile = () => { throw compatError };
 	try {
 	  readFile = require('fs').promises.readFile;
@@ -15505,11 +15505,11 @@ function requireLib () {
 	return lib;
 }
 
-var report;
+var report$1;
 var hasRequiredReport;
 
 function requireReport () {
-	if (hasRequiredReport) return report;
+	if (hasRequiredReport) return report$1;
 	hasRequiredReport = 1;
 	const Exclude = requireTestExclude();
 	const libCoverage = requireIstanbulLibCoverage();
@@ -15519,10 +15519,10 @@ function requireReport () {
 	try {
 	  ;({ readFile } = require('fs/promises'));
 	} catch (err) {
-({ readFile } = require$$0$1.promises);
+({ readFile } = fs.promises);
 	}
-	const { readdirSync, readFileSync, statSync } = require$$0$1;
-	const { isAbsolute, resolve, extname } = require$$0$2;
+	const { readdirSync, readFileSync, statSync } = fs;
+	const { isAbsolute, resolve, extname } = path;
 	const { pathToFileURL, fileURLToPath } = require$$1$3;
 	const getSourceMapFromFile = requireSourceMapFromFile();
 	// TODO: switch back to @c88/v8-coverage once patch is landed.
@@ -16050,10 +16050,10 @@ function requireReport () {
 	  }
 	}
 
-	report = function (opts) {
+	report$1 = function (opts) {
 	  return new Report(opts)
 	};
-	return report;
+	return report$1;
 }
 
 var hasRequiredC8;
@@ -16067,11 +16067,34 @@ function requireC8 () {
 
 var c8Exports = requireC8();
 
-// Runs in the test action, the only place the V8 data and instrumented sources are
+// Runs in the test action, the only place the V8 data and the instrumented sources are
 // both present. coverage.sh.tpl reads back this exact filename; keep them in sync.
-const stash = require$$0$2.join(process.env.COVERAGE_DIR, '_rules_js_report.lcov');
+const stash = path.join(process.env.COVERAGE_DIR, '_rules_js_report.lcov');
 
-const include = require$$0$1
+const debug = !!process.env.JS_BINARY__LOG_DEBUG;
+const timings = [];
+
+// Report generation is charged against the test's own timeout, so when something is slow
+// this is the only place that says which part.
+function logDebug(message) {
+    if (debug) {
+        console.error(`DEBUG: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}`);
+    }
+}
+
+function timed(label, fn) {
+    if (!debug) return fn()
+    const start = process.hrtime.bigint();
+    const value = fn();
+    timings.push(
+        `${label}=${(Number(process.hrtime.bigint() - start) / 1e6).toFixed(0)}ms`
+    );
+    return value
+}
+
+const started = process.hrtime.bigint();
+
+const include = fs
     .readFileSync(process.env.COVERAGE_MANIFEST)
     .toString('utf8')
     .split('\n')
@@ -16079,25 +16102,128 @@ const include = require$$0$1
 
 // TODO: can or should we instrument files from other repositories as well?
 // if so then the path.join call below will yield invalid paths since files will have external/wksp as their prefix.
-const pwd = require$$0$2.join(
+const pwd = path.join(
     process.env.JS_COVERAGE__RUNFILES,
     process.env.TEST_WORKSPACE
 );
 process.chdir(pwd);
 
-new c8Exports.Report({
-    include: include,
-    exclude: include.length === 0 ? ['**'] : [],
+// Same list as COVERAGE_EXTENSIONS in js/private/coverage/extensions.bzl, which is what
+// decides the contents of COVERAGE_MANIFEST. c8 drops a manifest entry whose extension is
+// not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
+const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx']);
+
+// Bazel already computed the exact set of instrumented files and handed it to us in
+// COVERAGE_MANIFEST. Left to itself c8 rediscovers that set by globbing the whole runfiles
+// tree and minimatching every hit against every manifest entry, which is
+// O(files in runfiles x manifest entries) in each test action. Rather than override the
+// discovery, the code below hands c8 only the coverage data that belongs in the report and
+// turns the discovery off (`all: false`), so nothing has to be patched.
+const instrumented = new Set(include.map((f) => path.resolve(pwd, f)));
+
+// Must not be inside COVERAGE_DIR: c8 reads every file in the directory it is given, and
+// the reporter must not leave a profile of its own in COVERAGE_DIR either.
+const scratch = fs.mkdtempSync(
+    path.join(process.env.TEST_TMPDIR || require$$0$1.tmpdir(), 'rules_js_coverage-')
+);
+
+// The profiles node and coverage.cjs wrote, restricted to the instrumented set. c8 accepts
+// any file that parses as `{result: [...]}`, so a prepared directory is ordinary input
+// rather than a patch, and everything downstream -- cross-process merging, the
+// source-map cache, v8-to-istanbul, the lcov writer -- stays c8's.
+const covered = new Set();
+const kept = timed('filter_profiles', () => {
+    let n = 0;
+    for (const entry of fs.readdirSync(process.env.COVERAGE_DIR)) {
+        let profile;
+        try {
+            profile = JSON.parse(
+                fs.readFileSync(path.join(process.env.COVERAGE_DIR, entry), 'utf8')
+            );
+        } catch {
+            // Not a V8 profile. The previous run's lcov stash lives in here too.
+            continue
+        }
+        if (!profile || !Array.isArray(profile.result)) continue
+        const result = profile.result.filter((script) => {
+            if (typeof script.url !== 'string' || !script.url.startsWith('file://')) {
+                return false
+            }
+            const file = require$$1$3.fileURLToPath(script.url);
+            if (!instrumented.has(file)) return false
+            covered.add(file);
+            return true
+        });
+        // Spread so `source-map-cache` and `timestamp` carry through untouched: the
+        // transpiled test's line mapping depends on them.
+        fs.writeFileSync(
+            path.join(scratch, entry),
+            JSON.stringify({ ...profile, result })
+        );
+        n += result.length;
+    }
+    return n
+});
+
+// What `all: true` used to produce by globbing. The files no test executed are exactly the
+// manifest entries no profile mentioned, so they can be synthesized directly. Entries that
+// are not on disk must be skipped: a manifest entry need not be in this test's runfiles --
+// a `.d.ts` in a js_library's srcs reaches the manifest but is routed to types, not runfiles.
+const uncovered = timed('uncovered_scan', () => {
+    const result = [];
+    for (const f of include) {
+        const file = path.resolve(pwd, f);
+        if (covered.has(file)) continue
+        const stat = fs.statSync(file, { throwIfNoEntry: false });
+        if (!stat) continue
+        result.push({
+            scriptId: 0,
+            url: require$$1$3.pathToFileURL(file).href,
+            functions: [
+                {
+                    functionName: '(empty-report)',
+                    ranges: [{ startOffset: 0, endOffset: stat.size, count: 0 }],
+                    isBlockCoverage: true,
+                },
+            ],
+        });
+    }
+    fs.writeFileSync(
+        path.join(scratch, 'coverage-uncovered.json'),
+        JSON.stringify({ result })
+    );
+    return result.length
+});
+
+const report = new c8Exports.Report({
+    tempDirectory: scratch,
     reportsDirectory: process.env.COVERAGE_DIR,
-    tempDirectory: process.env.COVERAGE_DIR,
     resolve: '',
-    src: pwd,
-    all: true,
+    extension: [...extensions],
+    // Bazel already decided what is instrumented, so neither of c8's own filters may
+    // narrow it further: `exclude` would otherwise default to globs that drop `**/test/**`
+    // and `**/*.d.ts`, and node_modules is where a first-party library linked with
+    // npm_link_package lives.
+    exclude: [],
+    excludeNodeModules: false,
+    // No glob: `all` is the only caller of the directory walk this replaces.
+    all: false,
     reporter: ['lcovonly'],
-})
+});
+
+logDebug(
+    `coverage manifest ${process.env.COVERAGE_MANIFEST}: ${include.length} entries, ${kept} covered scripts, ${uncovered} uncovered`
+);
+
+report
     .run()
     .then(() => {
-        require$$0$1.renameSync(require$$0$2.join(process.env.COVERAGE_DIR, 'lcov.info'), stash);
+        fs.renameSync(path.join(process.env.COVERAGE_DIR, 'lcov.info'), stash);
+        fs.rmSync(scratch, { recursive: true, force: true });
+        const total = (Number(process.hrtime.bigint() - started) / 1e6).toFixed(0);
+        logDebug(
+            `coverage report generated in ${total}ms${timings.length ? ` (${timings.join(' ')})` : ''}`
+        );
     })
     .catch((err) => {
         console.error(err);
