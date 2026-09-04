@@ -51,6 +51,21 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+# This flag selects the experimental hermetic launcher: a native launcher binary
+# stamped by hermetic_launcher which execs node on a generated JavaScript launcher,
+# in place of the generated bash launcher script. See docs/hermetic_launcher.md.
+bool_flag(
+    name = "hermetic_launcher",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "_hermetic_launcher_true",
+    flag_values = {"hermetic_launcher": "True"},
+    visibility = ["//js/private/test:__subpackages__"],
+)
+
 bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],

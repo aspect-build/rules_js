@@ -2,6 +2,7 @@ load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("//js/private/test:launcher_flags.bzl", "BASH_LAUNCHER_ONLY")
 load(":direct_capture.bzl", "direct_capture")
 
 package(default_testonly = True)
@@ -337,6 +338,7 @@ assert_contains(
 # A tool that writes to both streams and exits 0: the captures must land in the declared files.
 direct_capture(
     name = "direct_capture_streams",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
     tool = ":stdout_stderr_bin",
 )
 
@@ -368,6 +370,7 @@ diff_test(
 # still succeeds and all three declared outputs appear.
 direct_capture(
     name = "direct_capture_exit",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
     tool = ":exit_plain_bin",
 )
 
@@ -389,6 +392,7 @@ genrule(
     name = "direct_silent_run",
     outs = ["direct_silent_out.txt"],
     cmd = "JS_BINARY__SILENT_ON_SUCCESS=1 BAZEL_BINDIR=$(BINDIR) $(execpath :stdout_stderr_bin) > $@ 2>&1",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
     tools = [":stdout_stderr_bin"],
 )
 

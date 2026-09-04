@@ -2,6 +2,7 @@
 
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_file", "write_source_files")
 load("//js:defs.bzl", "js_image_layer")
+load("//js/private/test:normalize.bzl", "REPO_SEPARATOR_NORMALIZE")
 
 # These fixtures build Linux OCI layers from non-portable inputs (non-ASCII filenames, bsdtar
 # listings) that don't resolve on a Windows host, so skip the whole image test tree on Windows.
@@ -10,23 +11,21 @@ SKIP_ON_WINDOWS = select({
     "//conditions:default": [],
 })
 
-# js_binary launcher scripts have unstable sizes across Bazel versions.
-_UNSTABLE_SIZE_BASENAMES = ["bin", "bin2"]
+# The js_binary targets these listings are taken over. Both adjustments below key off
+# their launcher names, so a new fixture has to be added here too.
+_JS_BINARY_BASENAMES = ["bin", "bin2"]
 
 # buildifier: disable=function-docstring
 def assert_tar_listing(name, actual, expected):
-    launcher_alt = "|".join(_UNSTABLE_SIZE_BASENAMES)
+    launcher_alt = "|".join(_JS_BINARY_BASENAMES)
 
+    # A launcher's size moves across Bazel versions, and the generated JavaScript launcher
+    # is present only with --@aspect_rules_js//js:hermetic_launcher; dropping it lets one
+    # golden listing cover both launchers.
     # `$$` escapes `$` for Bazel genrule cmd Make-variable expansion.
-    size_sanitize = "sed -E '/\\/({})$$/ s/[0-9]+ Jan/xxxxx Jan/'".format(launcher_alt)
+    launcher_sanitize = "sed -E -e '/\\/({0})$$/ s/[0-9]+ Jan/xxxxx Jan/' -e '/\\/({0})\\.cjs$$/d'".format(launcher_alt)
 
-    # Normalize bzlmod canonical repo separators: ~~/~ (Bazel 7) -> ++/+ (Bazel 8+).
-    repo_sep_normalize = (
-        "sed -E -e 's/~~/++/g'" +
-        " -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g'" +
-        " -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g'"
-    )
-    sanitize_cmd = "{} | {}".format(size_sanitize, repo_sep_normalize)
+    sanitize_cmd = "{} | {}".format(launcher_sanitize, REPO_SEPARATOR_NORMALIZE)
 
     actual_listing = "_{}_listing".format(name)
     native.genrule(

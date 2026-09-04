@@ -108,6 +108,11 @@ def _js_run_devserver_impl(ctx):
             executable = launcher.executable,
             runfiles = runfiles,
         ),
+        OutputGroupInfo(
+            # The generated JavaScript launcher, empty unless the hermetic launcher is
+            # selected. js_image_layer needs this on anything built on create_launcher.
+            launcher_js = launcher.launcher_js,
+        ),
     ]
 
 js_run_devserver_lib = struct(

@@ -1,0 +1,26 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("//js:defs.bzl", "js_binary")
+load(":launcher_sync.bzl", "launcher_sync_test")
+
+# Here we run the same js_binary under both the bash and JS launchers in one build, and diff
+# the state node ends up in. This helps us ensure that the two launchers remain aligned.
+
+package(default_testonly = True)
+
+js_binary(
+    name = "state_bin",
+    entry_point = "dump_state.mjs",
+)
+
+launcher_sync_test(
+    name = "state_test",
+    tool = ":state_bin",
+)
+
+# A diff_test over two files passes just as happily when both are empty or when a filter has
+# scrubbed them to nothing, so let's pin one line that has to be there.
+assert_contains(
+    name = "state_dump_not_empty_test",
+    actual = ":state_test_bash",
+    expected = "env[JS_BINARY__RUNFILES]=",
+)

@@ -1,9 +1,9 @@
-load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@bazel_lib_host//:defs.bzl", "host")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load(":js_library_test.bzl", "js_library_test_suite")
+load(":launcher_flags.bzl", "BASH_LAUNCHER_ONLY", "HERMETIC_LAUNCHER_ONLY")
+load(":launcher_snapshot.bzl", "launcher_snapshot")
 load(":normalize_chdir_test.bzl", "normalize_chdir_tests")
 load(":run_environment_info_test.bzl", "run_environment_info_test_suite")
 
@@ -23,24 +23,31 @@ js_binary(
     fixed_args = ["--my_arg"],
 )
 
-# Make sed replacements for consistency on different platform / Bazel version.
-# The trailing sed pipeline normalizes bzlmod canonical repo separators ~~/~
-# (Bazel 7) to ++/+ (Bazel 8+) so the snapshot matches across versions.
-genrule(
-    name = "shell_launcher_sed",
-    srcs = [":shellcheck_launcher"],
-    outs = ["shellcheck_launcher_sed.sh"],
-    cmd = "cat $(execpath :shellcheck_launcher) | sed \"s#$(BINDIR)#bazel-out/k8-fastbuild/bin#\" | sed \"s#JS_BINARY__TARGET_CPU=\\\"$(TARGET_CPU)\\\"#JS_BINARY__TARGET_CPU=\\\"k8\\\"#\" | sed \"s#%s#linux_amd64#\" | sed \"s#\\\"%s\\\"#\\\"k8\\\"#\" | sed -E -e 's/~~/++/g' -e 's|([+][+][^/~]+)~([^/~]+)~([^/~]+)|\\1+\\2+\\3|g' -e 's|([+][+][^/~]+)~([^/~]+)|\\1+\\2|g' > $@" % (
-        host.platform,
-        host.os,
-    ),
+launcher_snapshot(
+    name = "write_launcher",
+    src = ":shellcheck_launcher",
+    out = "snapshots/launcher.sh",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
+    target_cpu_format = "JS_BINARY__TARGET_CPU=\\\"{}\\\"",
 )
 
-write_source_files(
-    name = "write_launcher",
-    files = {
-        "snapshots/launcher.sh": ":shell_launcher_sed",
-    },
+####################################################################################################
+# The same for the JavaScript launcher, which is what the js_binary runs when the hermetic
+# launcher is selected with --@aspect_rules_js//js:hermetic_launcher.
+
+filegroup(
+    name = "shellcheck_launcher_js",
+    srcs = [":shellcheck_launcher"],
+    output_group = "launcher_js",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+launcher_snapshot(
+    name = "write_launcher_js",
+    src = ":shellcheck_launcher_js",
+    out = "snapshots/launcher.cjs",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+    target_cpu_format = "setEnv(\\\"JS_BINARY__TARGET_CPU\\\", \\\"{}\\\")",
 )
 
 # Drives the merger's branches directly. //js/private/test/coverage covers them

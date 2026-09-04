@@ -65,13 +65,12 @@ oci_image(
     # Since js_binary depends on bash we have to bring in a base image that has bash
     base = "@debian",
     # This is `/[js_image_layer 'root']/[package name of js_image_layer 'binary' target]/[name of js_image_layer 'binary' target]`
-    cmd = ["/app/src/bin"],
-    entrypoint = ["/usr/bin/bash"],
+    entrypoint = ["/app/src/bin"],
     tars = [
         ":layers",
     ],
     visibility = ["//visibility:public"],
-    # This is `cmd` + `.runfiles/[workspace name]`
+    # This is `entrypoint` + `.runfiles/[workspace name]`
     workdir = "/app/src/bin.runfiles/_main",
 )
 

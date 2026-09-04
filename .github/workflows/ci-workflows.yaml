@@ -179,6 +179,11 @@ jobs:
                           version: '9.x',
                           flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_execroot_entry_point=False',
                       }
+                    - {
+                          id: 'bazel-9-hermetic-launcher',
+                          version: '9.x',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:hermetic_launcher=True',
+                      }
                 exclude:
                     # e2e/js_image_oci pulls in the `llvm` module, whose hermetic toolchain requires Bazel 8+.
                     - {
@@ -198,11 +203,20 @@ jobs:
                           workspace: { slug: 'e2e-patch_from_repo' },
                           bazel: { id: 'bazel-9-no-execroot-entry-point' },
                       }
+                    - {
+                          workspace: { slug: 'e2e-patch_from_repo' },
+                          bazel: { id: 'bazel-9-hermetic-launcher' },
+                      }
                     # e2e/repo_mapping renames aspect_rules_js, so a flag beginning with
-                    # --@aspect_rules_js// (as used by the no-execroot-entry-point variant) doesn't resolve.
+                    # --@aspect_rules_js// (as used by the no-execroot-entry-point and
+                    # hermetic-launcher variants) doesn't resolve.
                     - {
                           workspace: { slug: 'e2e-repo_mapping' },
                           bazel: { id: 'bazel-9-no-execroot-entry-point' },
+                      }
+                    - {
+                          workspace: { slug: 'e2e-repo_mapping' },
+                          bazel: { id: 'bazel-9-hermetic-launcher' },
                       }
         env:
             USE_BAZEL_VERSION: ${{ matrix.bazel.version }}
@@ -251,11 +265,11 @@ jobs:
               if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-7'
               run: aspect test --task-key=coverage-split-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results --bazel-flag=--experimental_split_coverage_postprocessing --bazel-flag=--experimental_fetch_all_coverage_outputs -- //js/private/test/coverage/...
 
-            # Skipped on the no-execroot-entry-point variant: test.sh scripts invoke plain
-            # `bazel` without matrix.bazel.flags, so that leg wouldn't exercise the flag —
-            # it would only duplicate the bazel-9 run.
+            # Skipped on the flag-flip variants: test.sh scripts invoke plain `bazel`
+            # without matrix.bazel.flags, so those legs wouldn't exercise the flag — they
+            # would only duplicate the bazel-9 run.
             - name: Optional ./test.sh
-              if: matrix.bazel.id != 'bazel-9-no-execroot-entry-point'
+              if: matrix.bazel.id != 'bazel-9-no-execroot-entry-point' && matrix.bazel.id != 'bazel-9-hermetic-launcher'
               working-directory: ${{ matrix.workspace.path }}
               env:
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
