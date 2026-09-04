@@ -253,54 +253,6 @@ For the same reason the report is produced by the target's own `node_toolchain`,
 not by the one used for build actions. A test pinned to an old Node version runs
 the coverage reporter under that version too.
 
-To see where a slow report spends its time, run the test with
-`--test_env=JS_BINARY__LOG_DEBUG=1 --test_output=all`. The reporter logs the
-manifest size and its own phase timings.
-
-### Why `bazel coverage` is slower than `bazel test`
-
-Coverage mode does not invalidate build artifacts: with a warm action cache the
-build graph is byte-identical, and build tools are never instrumented because
-`js_run_binary` runs them in the exec configuration, where coverage is off. What
-`bazel coverage` adds is work per test, plus some fixed setup. Four costs are
-worth knowing about, and three of them are yours to control.
-
-**Runfiles trees are materialized.** rules_js recommends
-`--nobuild_runfile_links`, and `tools/preset.bazelrc` sets it — but it also sets
-`coverage --build_runfile_links`, because the reporter maps coverage data back
-onto sources through the runfiles tree
-([bazelbuild/bazel#20577](https://github.com/bazelbuild/bazel/issues/20577)).
-Coverage therefore materializes a runfiles tree for every `js_binary` and
-`js_test` in the build, which `bazel test` skips entirely. For rules_js those
-trees are node_modules-sized, so scope coverage runs to the targets you actually
-want a report for rather than `//...`.
-
-**Toggling coverage discards the analysis cache.** `--collect_code_coverage` is
-part of the build configuration, so alternating `bazel test` and `bazel coverage`
-in one output base re-analyses the graph each time. Coverage mode also pulls in
-the Java, C++ and Python coverage tooling — `@remote_coverage_tools//:Main` and
-its toolchains — which a JS-only repo otherwise never builds or fetches, and
-which rules_js does not use since it supplies its own `_lcov_merger`. Give
-coverage its own output base:
-
-```sh
-bazel --output_base=$(bazel info output_base)-coverage coverage //...
-```
-
-`--output_base` is a startup flag, so it cannot be scoped with a `coverage:` line
-in `.bazelrc`; use a wrapper script or a shell alias.
-
-**Instrumentation is broader than you probably want.** The default
-`--instrumentation_filter` covers essentially everything, which grows every
-test's `COVERAGE_MANIFEST` and adds a `BaselineCoverage` action per instrumented
-target. Narrow it to the packages you want reported:
-
-```sh
-bazel coverage --instrumentation_filter='^//src[/:]' //...
-```
-
-**Report generation is proportional to the manifest.** See the section above.
-
 ### Code run from the program's own `exit` listeners is not covered
 
 The reporter is registered by a `--require` preload, so it necessarily runs
