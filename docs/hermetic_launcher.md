@@ -34,9 +34,9 @@ either is reviewed.
 The JavaScript launcher does not implement stdout capture, stderr capture, exit
 code capture or `silent_on_success`. It ignores `JS_BINARY__STDOUT_OUTPUT_FILE`,
 `JS_BINARY__STDERR_OUTPUT_FILE`, `JS_BINARY__EXIT_CODE_OUTPUT_FILE` and
-`JS_BINARY__SILENT_ON_SUCCESS` rather than honouring them.
+`JS_BINARY__SILENT_ON_SUCCESS` rather than honoring them.
 
-Nothing in rules_js asks the launcher for those any more: `js_run_binary`
+Nothing in rules_js asks the launcher for those anymore: `js_run_binary`
 forwards `stdout`, `stderr`, `exit_code_out` and `silent_on_success` to
 bazel-lib's `run_binary`, which captures through its own spawn wrapper -- a
 process that outlives the program and can do the work they need once it has
@@ -55,7 +55,7 @@ constants, signal forwarding, and the debug and info logging.
 
 ## How many processes it costs
 
-When there is no `expected_exit_code` -- almost always -- the launcher replaces
+When there is no `expected_exit_code` (almost always) the launcher replaces
 itself with node through `process.execve`, exactly as the bash launcher's `exec`
 did, so no launcher process survives. It is still one more node startup than the
 bash launcher paid, which is the price of this step; collapsing it is the point
@@ -83,15 +83,7 @@ fork-and-wait path.
 -   **A custom rule built on `js_binary_lib.create_launcher` must republish
     `launcher_js`.** That output group is how `js_image_layer` tells a
     hermetic-launcher binary from a bash-launcher one: the two keep the values
-    that have to be rewritten for hermeticity in different files. A binary that
-    does not publish it is rejected at analysis rather than guessed at, since
-    guessing wrong means rewriting a native stub as if it were a shell script.
-    See `js/private/test/create_launcher/custom_test.bzl`.
--   **No stub, no launcher.** hermetic_launcher publishes prebuilt stubs for
-    linux, macOS and Windows on x86_64 and arm64, plus linux s390x. For a target
-    platform it has no stub for, `js_binary` writes a placeholder that fails with
-    an explanatory message when run, so that `bazel build //...` still succeeds
-    (#2347).
+    that have to be rewritten for hermeticity in different files.
 
 ## Keeping the two launchers in sync
 
@@ -100,29 +92,18 @@ way until it replaces it. The rest of the suite cannot check that: a target gets
 one launcher per configuration, so every other both-launcher test skips one side
 and CI covers the other by running the whole suite again with the flag on. That
 catches breakage but not drift -- a bash-launcher change that was never ported
-leaves both launchers passing every test.
+can potentially leave both launchers passing every test.
 
 `//js/private/test/launcher_sync` closes that gap. A configuration transition
 builds one `js_binary` twice, once with the flag off and once with it on, runs
-both, and diffs the state node ends up in: `process.env`, the cwd, `argv` and
-`execArgv`. Because it compares the two launchers against each other rather than
-against a recorded golden, it needs no snapshot to regenerate and it fails on
-every CI leg rather than just the one with the flag on.
-
-`dump_state.mjs` holds the short list of things it deliberately does not compare
--- bash's own `_`, `SHLVL` and `OLDPWD`, the `JAVA_RUNFILES` the stub exports,
-and the per-action `TMPDIR` -- each with the reason. Sandbox paths and the
-output-tree configuration segment are normalized away; everything else has to
-match.
-
-The four capture variables need no entry there: the bash launcher `export -n`s
-them and this launcher never sets them, so neither reaches the program.
+both, and diffs the state node ends up in: `process.env`, the working directory,
+`argv` and `execArgv`. Because it compares the two launchers against each other
+rather than against a recorded golden, it needs no snapshot to regenerate and it
+fails on every CI leg rather than just the one with the flag on.
 
 ## Status
 
-Windows is wired up -- the stub gets its `.exe` suffix and the `.bat` node
-wrapper is used -- but is untested: the repo's Windows smoke job only runs on
-`main`.
+Windows is wired up untested: the repo's Windows smoke job only runs on `main`.
 
 CI runs the whole test suite against the flag on the `bazel-9-hermetic-launcher`
 matrix leg.
