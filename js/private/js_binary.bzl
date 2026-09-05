@@ -6,7 +6,8 @@ load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variabl
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("//js/private/coverage:extensions.bzl", "COVERAGE_EXTENSIONS")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
-load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles", "normalize_chdir")
+load(":js_helpers.bzl", "LOG_LEVELS", "copy_js_data_files", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles", "normalize_chdir")
+load(":js_runfiles_groups.bzl", "js_runfiles_groups")
 
 _ATTRS = {
     "chdir": attr.string(
@@ -283,7 +284,7 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
     ),
-}
+} | js_runfiles_groups.RULE_ATTRS
 
 _ENV_SET = """export {var}={quoted_value}"""
 _ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
@@ -457,6 +458,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     bash_launcher, toolchain_files, chdir = _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, fixed_env, is_windows)
     launcher = create_windows_native_launcher_script(ctx, bash_launcher) if is_windows else bash_launcher
 
+    node_wrapper = toolchain_files[0]
+    npm_wrapper_files = toolchain_files[1:]
+    runtime_support_files = [node_wrapper] + ctx.files._node_patches_files + [ctx.file._node_patches]
+
     launcher_files = [bash_launcher]
     launcher_files.extend(toolchain_files)
     if nodeinfo.node:
@@ -476,13 +481,21 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     if ctx.attr.include_npm:
         transitive_launcher_files = nodeinfo.npm_sources
 
+    data_originals = [entry_point] + ctx.files.data
+    copied_data_files = copy_js_data_files(
+        ctx,
+        data_originals,
+        ctx.attr.copy_data_to_bin,
+        ctx.files.no_copy_to_bin,
+    )
+
     # The subset of runfiles that make up the entry point and its data, as opposed to the
     # launcher and its other dependencies.
     data_runfiles = gather_runfiles(
         ctx = ctx,
         data = ctx.attr.data,
-        data_files = [entry_point] + ctx.files.data,
-        copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+        data_files = copied_data_files,
+        copy_data_files_to_bin = False,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
     ).merge(ctx.runfiles(
         transitive_files = gather_files_from_js_infos(
@@ -505,6 +518,16 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         runfiles = runfiles,
         data_runfiles = data_runfiles,
         chdir = chdir,
+        bash_launcher = bash_launcher,
+        node_file = nodeinfo.node,
+        runtime_support_files = runtime_support_files,
+        npm_wrapper_files = npm_wrapper_files,
+        npm_sources = transitive_launcher_files,
+        copied_data_files = copied_data_files,
+        copied_originals = data_originals,
+        entry_point_file = copied_data_files[0],
+        entry_point_was_copied = entry_point.is_source and ctx.attr.copy_data_to_bin and entry_point not in ctx.files.no_copy_to_bin,
+        coverage_bootstrap = ctx.file._coverage_bootstrap if ctx.configuration.coverage_enabled else None,
     )
 
 def _js_binary_impl(ctx):
@@ -560,6 +583,38 @@ def _js_binary_impl(ctx):
                 extensions = COVERAGE_EXTENSIONS,
             ),
         )
+
+    if js_runfiles_groups.is_enabled(ctx):
+        coverage_report = ctx.file._coverage_report if _generates_coverage_report(ctx) else None
+        lcov_merger = None
+        if ctx.attr.testonly and ctx.configuration.coverage_enabled and hasattr(ctx.attr, "_lcov_merger"):
+            lcov_merger = ctx.attr._lcov_merger
+        rgi, companion = js_runfiles_groups.binary_groups(
+            ctx,
+            executable = launcher.executable,
+            bash_launcher = launcher.bash_launcher,
+            copied_files = launcher.copied_data_files,
+            copied_originals = launcher.copied_originals,
+            node_file = launcher.node_file,
+            runtime_support_files = launcher.runtime_support_files,
+            npm_wrapper_files = launcher.npm_wrapper_files,
+            npm_sources = launcher.npm_sources,
+            include_npm = ctx.attr.include_npm,
+            coverage_bootstrap = launcher.coverage_bootstrap,
+            coverage_report = coverage_report,
+            lcov_merger = lcov_merger,
+            data = ctx.attr.data,
+            include_sources = ctx.attr.include_sources,
+            include_types = ctx.attr.include_types,
+            include_transitive_sources = ctx.attr.include_transitive_sources,
+            include_transitive_types = ctx.attr.include_transitive_types,
+            include_npm_sources = ctx.attr.include_npm_sources,
+            entry_point_file = launcher.entry_point_file,
+            entry_point_target = ctx.attr.entry_point,
+            entry_point_was_copied = launcher.entry_point_was_copied,
+        )
+        providers.append(rgi)
+        providers.append(companion)
 
     return providers + [
         DefaultInfo(

@@ -26,6 +26,9 @@ bazel_dep(name = "bazel_lib", version = "3.7.0")
 # NB: LOWER BOUND on earliest BCR release of protobuf module, to avoid upgrading the root module by accident
 bazel_dep(name = "protobuf", version = "3.19.6")
 
+# Optional RunfilesGroupInfo emission for js_binary / js_library / npm producers.
+bazel_dep(name = "rules_runfiles_group", version = "0.1.0")
+
 # Ensure any version of aspect_bazel_lib used includes:
 # https://github.com/bazel-contrib/bazel-lib/commit/371362199e5e5bde58aeb15b54ea6cfb164af337
 # https://github.com/bazel-contrib/bazel-lib/commit/ceaff54210291292f35d03bd4bbc0b6ceb40e77a

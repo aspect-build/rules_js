@@ -17,6 +17,7 @@ load(
     "gather_transitive_sources",
     "gather_transitive_types",
 )
+load(":js_runfiles_groups.bzl", "js_runfiles_groups")
 load(":proto_common.bzl", "proto_common")
 
 LANG_PROTO_TOOLCHAIN = Label("//js/toolchains:protoc_plugin")
@@ -75,7 +76,7 @@ def _js_proto_aspect_impl(target, ctx):
         additional_args = rewrite_args,
     )
 
-    return [
+    providers = [
         js_info(
             target = ctx.label,
             sources = depset(js_outputs),
@@ -86,6 +87,30 @@ def _js_proto_aspect_impl(target, ctx):
             npm_package_store_infos = gather_npm_package_store_infos([proto_lang_toolchain_info.runtime]),
         ),
     ]
+    if js_runfiles_groups.is_enabled(ctx):
+        own_src = js_runfiles_groups.maybe_files_entry(ctx.label, js_outputs, "first_party", js_runfiles_groups.RANK_EXECUTABLE)
+        own_types = js_runfiles_groups.maybe_files_entry(ctx.label, dts_outputs, "first_party", js_runfiles_groups.RANK_EXECUTABLE)
+        src_direct = [own_src] if own_src else []
+        type_direct = [own_types] if own_types else []
+        runtime = [proto_lang_toolchain_info.runtime] if proto_lang_toolchain_info.runtime else []
+        providers.append(js_runfiles_groups.JsRunfilesGroupsInfo(
+            sources = js_runfiles_groups.entries(direct = src_direct),
+            types = js_runfiles_groups.entries(direct = type_direct),
+            transitive_sources = js_runfiles_groups.channel_entries_from_targets(
+                ctx.rule.attr.deps,
+                "transitive_sources",
+                "transitive_sources",
+                own = src_direct,
+            ),
+            transitive_types = js_runfiles_groups.channel_entries_from_targets(
+                ctx.rule.attr.deps,
+                "transitive_types",
+                "transitive_types",
+                own = type_direct,
+            ),
+            npm_sources = js_runfiles_groups.channel_entries_from_targets(runtime, "npm_sources", "npm_sources"),
+        ))
+    return providers
 
 js_proto_aspect = aspect(
     implementation = _js_proto_aspect_impl,
@@ -95,6 +120,7 @@ js_proto_aspect = aspect(
     required_providers = [ProtoInfo],
     # Be a valid dependency of a ts_project rule
     provides = [JsInfo],
+    attrs = js_runfiles_groups.RULE_ATTRS,
     toolchains = [
         LANG_PROTO_TOOLCHAIN,
         PROTOC_TOOLCHAIN,

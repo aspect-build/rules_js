@@ -125,3 +125,12 @@ bzl_library(
         "//js/private:js_info",
     ],
 )
+
+bzl_library(
+    name = "runfiles_groups",
+    srcs = ["runfiles_groups.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//js/private:js_runfiles_groups",
+    ],
+)

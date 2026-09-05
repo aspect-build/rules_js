@@ -1,0 +1,694 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("//js:defs.bzl", "js_binary", "js_library", "js_test")
+load("//npm:defs.bzl", "npm_link_package", "npm_package")
+load(":consumer.bzl", "consumer_tests")
+load(":custom_analysis.bzl", "custom_analysis_tests")
+load(
+    ":fixtures.bzl",
+    "custom_grouped_binary",
+    "custom_grouped_test",
+    "directory_entry_point",
+    "empty_jsinfo_fixture",
+    "foreign_dup_names",
+    "foreign_entry_overlap",
+    "foreign_files_order",
+    "foreign_protected",
+    "foreign_rgi_data",
+    "foreign_rgi_mixed",
+    "foreign_rgi_named_outputs",
+    "foreign_symlinks",
+    "node_path_toolchain",
+    "opaque_jsinfo",
+)
+load(":tests.bzl", "runfiles_group_tests")
+
+package(default_testonly = True)
+
+js_binary(
+    name = "minimal",
+    copy_data_to_bin = True,
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "minimal_npm",
+    copy_data_to_bin = True,
+    entry_point = "main.js",
+    include_npm = True,
+)
+
+js_binary(
+    name = "minimal_no_copy",
+    copy_data_to_bin = False,
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+write_file(
+    name = "a_data",
+    out = "a_data.txt",
+    content = ["a"],
+)
+
+js_binary(
+    name = "z_app",
+    data = [":a_data"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+write_file(
+    name = "generated_entry",
+    out = "generated_main.js",
+    content = ["console.log('generated');"],
+)
+
+js_binary(
+    name = "generated_entry_bin",
+    entry_point = ":generated_entry",
+    include_npm = False,
+)
+
+js_binary(
+    name = "entry_and_data",
+    copy_data_to_bin = True,
+    data = ["main.js"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_library(
+    name = "leaf",
+    srcs = ["main.js"],
+)
+
+js_library(
+    name = "mid_a",
+    srcs = ["main.js"],
+    deps = [":leaf"],
+)
+
+js_library(
+    name = "mid_b",
+    srcs = ["main.js"],
+    deps = [":leaf"],
+)
+
+js_library(
+    name = "diamond",
+    deps = [
+        ":mid_a",
+        ":mid_b",
+    ],
+)
+
+js_binary(
+    name = "library_bin",
+    data = [":diamond"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "library_bin_no_jsinfo",
+    data = [":diamond"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_npm_sources = False,
+    include_sources = False,
+    include_transitive_sources = False,
+    include_transitive_types = False,
+    include_types = False,
+)
+
+js_test(
+    name = "minimal_test_bin",
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+empty_jsinfo_fixture(name = "isolated_jsinfo")
+
+js_binary(
+    name = "isolated_default",
+    data = [":isolated_jsinfo"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "isolated_none",
+    data = [":isolated_jsinfo"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_npm_sources = False,
+    include_sources = False,
+    include_transitive_sources = False,
+    include_transitive_types = False,
+    include_types = False,
+)
+
+directory_entry_point(name = "dir_entry")
+
+js_binary(
+    name = "dir_entry_bin",
+    entry_point = ":dir_entry",
+    include_npm = False,
+)
+
+genrule(
+    name = "multi_out",
+    outs = [
+        "multi_a.txt",
+        "multi_b.txt",
+    ],
+    cmd = "echo a > $(location multi_a.txt) && echo b > $(location multi_b.txt)",
+)
+
+js_binary(
+    name = "multi_out_bin",
+    data = [":multi_out"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_rgi_data(name = "foreign_rgi")
+
+js_binary(
+    name = "foreign_rgi_bin",
+    data = [":foreign_rgi"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "nested_inner",
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "nested_outer",
+    data = [":nested_inner"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+[js_binary(
+    name = "isolated_combo_{}".format(i),
+    data = [":isolated_jsinfo"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_npm_sources = bool(i & 16),
+    include_sources = bool(i & 1),
+    include_transitive_sources = bool(i & 4),
+    include_transitive_types = bool(i & 8),
+    include_types = bool(i & 2),
+) for i in range(32)]
+
+js_binary(
+    name = "npm_pkg_bin",
+    data = ["//:node_modules/pnpm"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+alias(
+    name = "leaf_alias",
+    actual = ":leaf",
+)
+
+js_binary(
+    name = "alias_bin",
+    data = [":leaf_alias"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "entry_and_data_no_copy",
+    copy_data_to_bin = False,
+    data = ["main.js"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "entry_and_data_exempt",
+    copy_data_to_bin = True,
+    data = ["main.js"],
+    entry_point = "main.js",
+    include_npm = False,
+    no_copy_to_bin = ["main.js"],
+)
+
+js_binary(
+    name = "source_and_generated_data",
+    data = [
+        "data.txt",
+        ":a_data",
+    ],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "external_no_copy",
+    data = ["@nodejs_linux_amd64//:node"],
+    entry_point = "main.js",
+    include_npm = False,
+    no_copy_to_bin = ["@nodejs_linux_amd64//:node"],
+)
+
+write_file(
+    name = "exec_data",
+    out = "exec_data.sh",
+    content = ["#!/bin/sh"],
+    is_executable = True,
+)
+
+js_binary(
+    name = "exec_data_bin",
+    data = [":exec_data"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_library(
+    name = "typed_lib",
+    srcs = [
+        "lib.d.cts",
+        "lib.d.mts",
+        "lib.d.ts",
+        "lib.d.ts.map",
+        "lib.js",
+    ],
+)
+
+js_binary(
+    name = "typed_bin",
+    data = [":typed_lib"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_npm_sources = False,
+    include_sources = False,
+    include_transitive_sources = False,
+    include_transitive_types = True,
+    include_types = True,
+)
+
+directory_entry_point(name = "tree_dir")
+
+js_library(
+    name = "json_tree",
+    srcs = [
+        "pkg.json",
+        ":tree_dir",
+    ],
+)
+
+js_binary(
+    name = "json_tree_bin",
+    data = [":json_tree"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_transitive_types = True,
+    include_types = True,
+)
+
+js_library(
+    name = "edge_lib",
+    srcs = ["src_only.js"],
+    data = [":a_data"],
+    deps = [":leaf"],
+    types = ["type_only.d.ts"],
+)
+
+js_binary(
+    name = "edge_bin",
+    data = [":edge_lib"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+write_file(
+    name = "g15_proto_src",
+    out = "g15.proto",
+    content = [
+        'syntax = "proto3";',
+        "message G15 {}",
+    ],
+    tags = ["manual"],
+)
+
+proto_library(
+    name = "g15_proto",
+    srcs = [":g15_proto_src"],
+    tags = ["manual"],
+)
+
+js_library(
+    name = "g15_lib",
+    tags = ["manual"],
+    deps = [":g15_proto"],
+)
+
+js_binary(
+    name = "g15_bin",
+    data = [":g15_lib"],
+    entry_point = "main.js",
+    include_npm = False,
+    tags = ["manual"],
+)
+
+js_binary(
+    name = "npm_versions_bin",
+    data = [
+        "//:node_modules/@types/node",
+        "//:node_modules/chalk",
+        "//:node_modules/circles",
+        "//:node_modules/pnpm",
+    ],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "npm_cycle_bin",
+    data = ["//:node_modules/circles"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_library(
+    name = "local_lib",
+    srcs = [
+        "local_index.js",
+        "package.json",
+    ],
+)
+
+npm_package(
+    name = "local_npm_pkg",
+    srcs = [":local_lib"],
+    package = "@test/local",
+    version = "1.0.0",
+)
+
+npm_link_package(
+    name = "node_modules/@test/local",
+    src = ":local_npm_pkg",
+    tags = ["manual"],
+)
+
+js_binary(
+    name = "local_npm_bin",
+    data = [":node_modules/@test/local"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "dev_link_bin",
+    data = ["//:node_modules/chalk"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "npm_link_no_sources",
+    data = ["//:node_modules/chalk"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_npm_sources = False,
+)
+
+js_binary(
+    name = "npm_cli_and_sources",
+    data = ["//:node_modules/chalk"],
+    entry_point = "main.js",
+    include_npm = True,
+    include_npm_sources = True,
+)
+
+js_binary(
+    name = "npm_cli_only",
+    data = ["//:node_modules/chalk"],
+    entry_point = "main.js",
+    include_npm = True,
+    include_npm_sources = False,
+)
+
+js_binary(
+    name = "npm_sources_only",
+    data = ["//:node_modules/chalk"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_npm_sources = True,
+)
+
+js_binary(
+    name = "nested_inner_npm",
+    data = ["//:node_modules/chalk"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "nested_outer_npm",
+    data = [
+        ":nested_inner_npm",
+        "//:node_modules/chalk",
+    ],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+alias(
+    name = "npm_alias",
+    actual = "//:node_modules/chalk",
+)
+
+alias(
+    name = "nested_alias",
+    actual = ":nested_inner",
+)
+
+js_binary(
+    name = "alias_npm_bin",
+    data = [":npm_alias"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "alias_nested_bin",
+    data = [":nested_alias"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+filegroup(
+    name = "wrapped_leaf",
+    srcs = [":leaf"],
+)
+
+js_binary(
+    name = "filegroup_bin",
+    data = [":wrapped_leaf"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_symlinks(name = "foreign_symlinks")
+
+js_binary(
+    name = "foreign_symlinks_bin",
+    data = [":foreign_symlinks"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_files_order(
+    name = "foreign_preorder",
+    order = "preorder",
+)
+
+foreign_files_order(
+    name = "foreign_topo",
+    order = "topological",
+)
+
+js_binary(
+    name = "foreign_preorder_bin",
+    data = [":foreign_preorder"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "foreign_topo_bin",
+    data = [":foreign_topo"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_rgi_mixed(name = "foreign_mixed")
+
+js_binary(
+    name = "foreign_mixed_bin",
+    data = [":foreign_mixed"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_dup_names(name = "foreign_dup")
+
+js_binary(
+    name = "dup_names_bin",
+    data = [":foreign_dup"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_protected(name = "foreign_prot")
+
+js_binary(
+    name = "protected_bin",
+    data = [":foreign_prot"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "testonly_bin",
+    testonly = True,
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+node_path_toolchain(name = "node_path_tc")
+
+js_binary(
+    name = "node_path_bin",
+    entry_point = "main.js",
+    include_npm = False,
+    node_toolchain = ":node_path_tc",
+)
+
+js_binary(
+    name = "toolchain_override_bin",
+    entry_point = "main.js",
+    include_npm = False,
+    node_toolchain = "@nodejs_linux_amd64//:node_toolchain",
+)
+
+custom_grouped_binary(
+    name = "custom_grouped",
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+custom_grouped_test(
+    name = "custom_grouped_test",
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+empty_jsinfo_fixture(
+    name = "isolated_jsinfo_nocomp",
+    emit_companion = False,
+)
+
+js_binary(
+    name = "isolated_types",
+    data = [":isolated_jsinfo"],
+    entry_point = "main.js",
+    include_npm = False,
+    include_npm_sources = False,
+    include_sources = False,
+    include_transitive_sources = False,
+    include_transitive_types = True,
+    include_types = True,
+)
+
+js_binary(
+    name = "isolated_nocomp_default",
+    data = [":isolated_jsinfo_nocomp"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+opaque_jsinfo(
+    name = "opaque_a",
+    shared = "shared.js",
+)
+
+opaque_jsinfo(
+    name = "opaque_b",
+    shared = "shared.js",
+)
+
+js_binary(
+    name = "opaque_diamond_bin",
+    data = [
+        ":opaque_a",
+        ":opaque_b",
+    ],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_rgi_named_outputs(name = "foreign_named_outs")
+
+js_binary(
+    name = "w02_bin",
+    data = [":foreign_named_outs"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+foreign_entry_overlap(name = "foreign_entry")
+
+js_binary(
+    name = "w03_bin",
+    data = [":foreign_entry"],
+    entry_point = ":foreign_entry",
+    include_npm = False,
+)
+
+platform(
+    name = "windows_x86_64",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:windows",
+    ],
+)
+
+platform(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:linux",
+    ],
+)
+
+js_test(
+    name = "runtime_smoke_test",
+    chdir = package_name(),
+    data = [
+        ":a_data",
+        "//:node_modules/chalk",
+        "//:node_modules/circles",
+    ],
+    entry_point = "runtime.js",
+    include_npm = False,
+)
+
+runfiles_group_tests()
+
+custom_analysis_tests()
+
+consumer_tests()
