@@ -60,11 +60,10 @@ const report = new Report({
 })
 
 // Bazel already computed the exact set of instrumented files and handed it to us in
-// COVERAGE_MANIFEST, so membership is a lookup. c8 otherwise answers the same question by
-// globbing the whole runfiles tree under `src` and minimatching every hit against every
-// manifest entry -- and TestExclude expands each entry into two patterns -- which is
-// O(files in runfiles x manifest entries) in each test action. Both hooks below replace
-// that with the set Bazel already knows.
+// COVERAGE_MANIFEST, so membership is a lookup. c8 would otherwise answer the same
+// question by globbing the whole runfiles tree and matching every hit against every
+// manifest entry, which is O(files in runfiles x manifest entries) in each test action.
+// Both hooks below replace that with the set Bazel already knows.
 const instrumented = new Set(include.map((f) => path.resolve(pwd, f)))
 
 report.exclude.shouldInstrument = function shouldInstrument(filename) {
@@ -72,11 +71,6 @@ report.exclude.shouldInstrument = function shouldInstrument(filename) {
     return extensions.has(path.extname(resolved)) && instrumented.has(resolved)
 }
 
-// `all: true` reports files no test executed. Those are exactly the manifest entries no
-// V8 profile mentioned, so the directory walk this replaces could only ever have found a
-// subset of them. Non-existent entries must be filtered out here rather than left to
-// c8: it stats each returned path without guarding, where the glob simply never yielded
-// a path that was not on disk.
 report.exclude.globSync = function globSync() {
     return timed('uncovered_scan', () =>
         include.filter((f) => fs.existsSync(path.resolve(pwd, f)))
