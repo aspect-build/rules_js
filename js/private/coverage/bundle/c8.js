@@ -6,23 +6,14 @@ import path from 'path'
 // both present. coverage.sh.tpl reads back this exact filename; keep them in sync.
 const stash = path.join(process.env.COVERAGE_DIR, '_rules_js_report.lcov')
 
-const debug = !!process.env.JS_BINARY__LOG_DEBUG
-const timings = []
+const LOG_DEBUG = !!process.env.JS_BINARY__LOG_DEBUG
 
 // Report generation is charged against the test's own timeout, so when something is slow
-// this is the only place that says which part.
+// this is the only place that says so.
 function logDebug(message) {
-    if (debug) {
+    if (LOG_DEBUG) {
         console.error(`DEBUG: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}`)
     }
-}
-
-function timed(label, fn) {
-    if (!debug) return fn()
-    const start = process.hrtime.bigint()
-    const value = fn()
-    timings.push(`${label}=${(Number(process.hrtime.bigint() - start) / 1e6).toFixed(0)}ms`)
-    return value
 }
 
 const started = process.hrtime.bigint()
@@ -48,7 +39,6 @@ const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx'
 
 const report = new Report({
     include: include,
-    extension: extensions,
     exclude: include.length === 0 ? ['**'] : [],
     extension: [...extensions],
     reportsDirectory: process.env.COVERAGE_DIR,
@@ -63,18 +53,50 @@ const report = new Report({
 // COVERAGE_MANIFEST, so membership is a lookup. c8 would otherwise answer the same
 // question by globbing the whole runfiles tree and matching every hit against every
 // manifest entry, which is O(files in runfiles x manifest entries) in each test action.
-// Both hooks below replace that with the set Bazel already knows.
+// The three hooks below replace that with the set Bazel already knows.
+//
+// They are methods of TestExclude, which c8 constructs from the Report options above:
+// https://github.com/istanbuljs/test-exclude/blob/3a37faa17cc4f0f602a7c1ec23ef0b0fcf44ab37/index.js
 const instrumented = new Set(include.map((f) => path.resolve(pwd, f)))
 
+// Replaces shouldInstrument (index.js#L76), which minimatches the filename against
+// every include pattern -- and prepGlobPatterns expands each manifest entry into
+// several. c8 asks this of every executed script, so the cost is manifest size times
+// scripts loaded, in every test action.
 report.exclude.shouldInstrument = function shouldInstrument(filename) {
-    const resolved = path.resolve(pwd, filename)
-    return extensions.has(path.extname(resolved)) && instrumented.has(resolved)
+    if (!extensions.has(path.extname(filename))) return false
+    return instrumented.has(path.resolve(pwd, filename))
 }
 
-report.exclude.globSync = function globSync() {
-    return timed('uncovered_scan', () =>
-        include.filter((f) => fs.existsSync(path.resolve(pwd, f)))
-    )
+// Replaces globSync (index.js#L105), which walks cwd for files matching the extension
+// pattern and filters them through shouldInstrument. c8 calls it from
+// _includeUncoveredFiles, the `all: true` pass that reports files no test executed.
+// Those files are exactly the manifest entries no V8 profile mentioned, so the walk
+// could only ever have found a subset of them.
+//
+// Non-existent entries must be filtered out here rather than left to c8: it stats each
+// returned path without guarding, where the real glob simply never yielded a path that
+// was not on disk. A manifest entry need not be in this test's runfiles -- a first-party
+// library repackaged by npm_package reaches the manifest at its source path but reaches
+// runfiles only as a copy inside the node_modules store.
+report.exclude.globSync = function globSync(cwd = pwd) {
+    // c8 passes an entry of `src`, and we give it exactly one. Manifest entries are
+    // relative to that directory, so another cwd cannot be answered from the manifest
+    // and silently reporting the wrong paths would be worse than failing.
+    if (cwd !== pwd) {
+        throw new Error(
+            `coverage report requested for ${cwd}, but the manifest describes ${pwd}`
+        )
+    }
+    return include.filter((f) => fs.existsSync(path.resolve(pwd, f)))
+}
+
+// TestExclude pairs glob (index.js#L119) with globSync the way fs does. Report only
+// calls the sync one today, so this override is unreachable -- but overriding one and
+// not the other would leave a silent path back to the tree walk if that ever changed.
+// Nothing here is async, so it just defers to the sync implementation.
+report.exclude.glob = async function glob(cwd = pwd) {
+    return report.exclude.globSync(cwd)
 }
 
 logDebug(
@@ -86,9 +108,7 @@ report
     .then(() => {
         fs.renameSync(path.join(process.env.COVERAGE_DIR, 'lcov.info'), stash)
         const total = (Number(process.hrtime.bigint() - started) / 1e6).toFixed(0)
-        logDebug(
-            `coverage report generated in ${total}ms${timings.length ? ` (${timings.join(' ')})` : ''}`
-        )
+        logDebug(`coverage report generated in ${total}ms`)
     })
     .catch((err) => {
         console.error(err)
