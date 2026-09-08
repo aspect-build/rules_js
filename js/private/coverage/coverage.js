@@ -16085,8 +16085,14 @@ const pwd = require$$0$2.join(
 );
 process.chdir(pwd);
 
+// Same list as COVERAGE_EXTENSIONS in js/private/coverage/extensions.bzl, which is what
+// decides the contents of COVERAGE_MANIFEST. c8 drops a manifest entry whose extension is
+// not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
+const extensions = ['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx'];
+
 new c8Exports.Report({
     include: include,
+    extension: extensions,
     exclude: include.length === 0 ? ['**'] : [],
     reportsDirectory: process.env.COVERAGE_DIR,
     tempDirectory: process.env.COVERAGE_DIR,
