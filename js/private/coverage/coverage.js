@@ -16102,10 +16102,72 @@ process.chdir(pwd);
 // not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
 const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx']);
 
+// c8's Report asks its `exclude` object three questions: which executed scripts belong
+// in the report, which unexecuted files belong in it, and which extensions are
+// instrumentable at all. Bazel already answered all three in COVERAGE_MANIFEST.
+//
+// test-exclude answers them by globbing the whole runfiles tree and minimatching every
+// hit against every manifest entry -- and prepGlobPatterns expands each entry into
+// several patterns -- which is O(files in runfiles x manifest entries) in each test
+// action, charged against the test's own timeout. This replaces it with lookups against
+// the set Bazel handed us.
+//
+// It replaces the object rather than patching methods on it, so a method c8 starts
+// calling that we have not implemented fails loudly instead of silently falling back to
+// the tree walk. Standing in for, pinned to the version c8 10.1.3 resolves:
+// https://github.com/istanbuljs/test-exclude/blob/3a37faa17cc4f0f602a7c1ec23ef0b0fcf44ab37/index.js
+class ManifestExclude {
+    constructor(root, files, extensions) {
+        this.root = root;
+        this.files = files;
+        this.extensions = extensions;
+        this.instrumented = new Set(files.map((f) => path.resolve(root, f)));
+        // _includeUncoveredFiles reads this directly and drops any path whose extension
+        // is not in it before stat'ing the rest.
+        this.extension = [...extensions];
+    }
+
+    // index.js#L76. c8 asks this of every executed script, so the original costs manifest
+    // size times scripts loaded. extname does not care whether a path is resolved, so
+    // reject on extension first and skip the resolve for anything uninstrumentable.
+    shouldInstrument(filename) {
+        if (!this.extensions.has(path.extname(filename))) return false
+        return this.instrumented.has(path.resolve(this.root, filename))
+    }
+
+    // index.js#L105. c8 calls this from _includeUncoveredFiles, the `all: true` pass that
+    // reports files no test executed. Those are exactly the manifest entries no V8 profile
+    // mentioned, so the walk it replaces could only ever have found a subset of them.
+    //
+    // Entries not on disk must be dropped here rather than left to c8: it stats each
+    // returned path without guarding, where a real glob never yields a path that is not
+    // there. A manifest entry need not be in this test's runfiles -- a first-party library
+    // repackaged by npm_package reaches the manifest at its source path but reaches
+    // runfiles only as a copy inside the node_modules store.
+    globSync(cwd = this.root) {
+        // c8 passes an entry of `src`, and we give it exactly one. Manifest entries are
+        // relative to that directory, so another root cannot be answered from the manifest
+        // and silently reporting the wrong paths would be worse than failing.
+        if (cwd !== this.root) {
+            throw new Error(
+                `coverage report requested for ${cwd}, but the manifest describes ${this.root}`
+            )
+        }
+        return this.files.filter((f) => require$$0$1.existsSync(path.resolve(this.root, f)))
+    }
+
+    // index.js#L119. test-exclude pairs glob with globSync the way fs does. Report only
+    // calls the sync one today, but implementing one and not the other would leave a
+    // silent path back to the tree walk if that changed. Nothing here is async.
+    async glob(cwd = this.root) {
+        return this.globSync(cwd)
+    }
+}
+
+// `include`, `exclude`, `extension`, `excludeNodeModules` and `allowExternal` are omitted:
+// Report forwards them to the test-exclude instance it builds in its constructor, and we
+// replace that instance outright.
 const report = new c8Exports.Report({
-    include: include,
-    exclude: include.length === 0 ? ['**'] : [],
-    extension: [...extensions],
     reportsDirectory: process.env.COVERAGE_DIR,
     tempDirectory: process.env.COVERAGE_DIR,
     resolve: '',
@@ -16114,55 +16176,7 @@ const report = new c8Exports.Report({
     reporter: ['lcovonly'],
 });
 
-// Bazel already computed the exact set of instrumented files and handed it to us in
-// COVERAGE_MANIFEST, so membership is a lookup. c8 would otherwise answer the same
-// question by globbing the whole runfiles tree and matching every hit against every
-// manifest entry, which is O(files in runfiles x manifest entries) in each test action.
-// The three hooks below replace that with the set Bazel already knows.
-//
-// They are methods of TestExclude, which c8 constructs from the Report options above:
-// https://github.com/istanbuljs/test-exclude/blob/3a37faa17cc4f0f602a7c1ec23ef0b0fcf44ab37/index.js
-const instrumented = new Set(include.map((f) => path.resolve(pwd, f)));
-
-// Replaces shouldInstrument (index.js#L76), which minimatches the filename against
-// every include pattern -- and prepGlobPatterns expands each manifest entry into
-// several. c8 asks this of every executed script, so the cost is manifest size times
-// scripts loaded, in every test action.
-report.exclude.shouldInstrument = function shouldInstrument(filename) {
-    if (!extensions.has(path.extname(filename))) return false
-    return instrumented.has(path.resolve(pwd, filename))
-};
-
-// Replaces globSync (index.js#L105), which walks cwd for files matching the extension
-// pattern and filters them through shouldInstrument. c8 calls it from
-// _includeUncoveredFiles, the `all: true` pass that reports files no test executed.
-// Those files are exactly the manifest entries no V8 profile mentioned, so the walk
-// could only ever have found a subset of them.
-//
-// Non-existent entries must be filtered out here rather than left to c8: it stats each
-// returned path without guarding, where the real glob simply never yielded a path that
-// was not on disk. A manifest entry need not be in this test's runfiles -- a first-party
-// library repackaged by npm_package reaches the manifest at its source path but reaches
-// runfiles only as a copy inside the node_modules store.
-report.exclude.globSync = function globSync(cwd = pwd) {
-    // c8 passes an entry of `src`, and we give it exactly one. Manifest entries are
-    // relative to that directory, so another cwd cannot be answered from the manifest
-    // and silently reporting the wrong paths would be worse than failing.
-    if (cwd !== pwd) {
-        throw new Error(
-            `coverage report requested for ${cwd}, but the manifest describes ${pwd}`
-        )
-    }
-    return include.filter((f) => require$$0$1.existsSync(path.resolve(pwd, f)))
-};
-
-// TestExclude pairs glob (index.js#L119) with globSync the way fs does. Report only
-// calls the sync one today, so this override is unreachable -- but overriding one and
-// not the other would leave a silent path back to the tree walk if that ever changed.
-// Nothing here is async, so it just defers to the sync implementation.
-report.exclude.glob = async function glob(cwd = pwd) {
-    return report.exclude.globSync(cwd)
-};
+report.exclude = new ManifestExclude(pwd, include, extensions);
 
 logDebug(
     `coverage manifest ${process.env.COVERAGE_MANIFEST}: ${include.length} entries`
