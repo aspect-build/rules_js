@@ -10,7 +10,7 @@ const debug = !!process.env.JS_BINARY__LOG_DEBUG
 const timings = []
 
 // Report generation is charged against the test's own timeout, so when something is slow
-// this is the only place that says which part. See docs/troubleshooting.md.
+// this is the only place that says which part.
 function logDebug(message) {
     if (debug) {
         console.error(`DEBUG: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}`)
