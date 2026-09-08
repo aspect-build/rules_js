@@ -41,9 +41,15 @@ const pwd = path.join(
 )
 process.chdir(pwd)
 
+// Same list as COVERAGE_EXTENSIONS in js/private/coverage/extensions.bzl, which is what
+// decides the contents of COVERAGE_MANIFEST. c8 drops a manifest entry whose extension is
+// not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
+const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx'])
+
 const report = new Report({
     include: include,
     exclude: include.length === 0 ? ['**'] : [],
+    extension: [...extensions],
     reportsDirectory: process.env.COVERAGE_DIR,
     tempDirectory: process.env.COVERAGE_DIR,
     resolve: '',
@@ -51,15 +57,6 @@ const report = new Report({
     all: true,
     reporter: ['lcovonly'],
 })
-
-// js_binary's instrumentation lists .mts and .cts, so they reach COVERAGE_MANIFEST, but
-// c8's default extension list has neither and would drop them from the report.
-for (const ext of ['.mts', '.cts']) {
-    if (!report.exclude.extension.includes(ext)) {
-        report.exclude.extension.push(ext)
-    }
-}
-const extensions = new Set(report.exclude.extension)
 
 // Bazel already computed the exact set of instrumented files and handed it to us in
 // COVERAGE_MANIFEST, so membership is a lookup. c8 otherwise answers the same question by
