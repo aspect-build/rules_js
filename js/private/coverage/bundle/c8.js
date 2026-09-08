@@ -48,6 +48,7 @@ const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx'
 
 const report = new Report({
     include: include,
+    extension: extensions,
     exclude: include.length === 0 ? ['**'] : [],
     extension: [...extensions],
     reportsDirectory: process.env.COVERAGE_DIR,
