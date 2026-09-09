@@ -89,3 +89,50 @@ assert_contains(
     actual = "locations_out_no_expand",
     expected = "$(rootpaths :test.txt)",
 )
+
+# Quote removal happens at analysis time, but the presence of single quotes should still
+# prevent $VAR expansion from happening at run time.
+js_binary(
+    name = "single_quoted_var_bin",
+    entry_point = "fixed_args.mjs",
+    expand_args = False,
+    fixed_args = [
+        "'$JS_BINARY__WORKSPACE/x'",
+    ],
+)
+
+js_run_binary(
+    name = "run_single_quoted_var",
+    silent_on_success = False,
+    stdout = "single_quoted_var_out",
+    tool = ":single_quoted_var_bin",
+)
+
+assert_contains(
+    name = "single_quoted_var_test",
+    actual = "single_quoted_var_out",
+    expected = "$JS_BINARY__WORKSPACE/x",
+)
+
+# Without single quotes, the $VAR expansion does happen.
+js_binary(
+    name = "unquoted_var_bin",
+    entry_point = "fixed_args.mjs",
+    expand_args = False,
+    fixed_args = [
+        "$JS_BINARY__WORKSPACE/x",
+    ],
+)
+
+js_run_binary(
+    name = "run_unquoted_var",
+    silent_on_success = False,
+    stdout = "unquoted_var_out",
+    tool = ":unquoted_var_bin",
+)
+
+assert_contains(
+    name = "unquoted_var_test",
+    actual = "unquoted_var_out",
+    expected = "_main/x",
+)
