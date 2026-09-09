@@ -181,9 +181,7 @@ The default layer groups are as follows and always created.
 """
 
 # The line both launcher templates carry for js_image_layer to replace, minus its comment
-# marker. A dedicated patch point rather than a rewrite of `#!/usr/bin/env bash` or
-# `'use strict'`, because expand_template replaces every occurrence of a key: with those
-# anchors an env value or fixed_arg that happened to contain one got patched too.
+# marker.
 _PATCH_POINT = "This line is replaced by js_image_layer to make the launcher hermetic."
 
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
