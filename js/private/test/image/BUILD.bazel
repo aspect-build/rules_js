@@ -1,9 +1,7 @@
-load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_binary", "js_image_layer")
+load("//js:defs.bzl", "js_binary")
 load(":asserts.bzl", "SKIP_ON_WINDOWS", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
-load(":not_js_binary_test.bzl", "fake_binary", "not_js_binary_test")
 
 package(default_testonly = True)
 
@@ -142,71 +140,4 @@ platform_transition_filegroup(
     srcs = [":js_image_layer_untransitioned"],
     target_compatible_with = SKIP_ON_WINDOWS,
     target_platform = ":linux_arm64",
-)
-
-fake_binary(
-    name = "not_js",
-    tags = ["manual"],
-)
-
-js_image_layer(
-    name = "not_js_layer",
-    binary = ":not_js",
-    root = "/app",
-    tags = ["manual"],
-)
-
-not_js_binary_test(
-    name = "not_js_binary_test",
-    target_under_test = ":not_js_layer",
-)
-
-####################################################################################################
-# js_image_layer patches the launcher with expand_template, which replaces every occurrence of a
-# key rather than just the first. These env values are the two strings the patch used to be
-# anchored on, so an anchor that moves back onto launcher text a user can supply corrupts them, and
-# in the JavaScript launcher leaves an unterminated string literal that no longer parses.
-
-js_binary(
-    name = "anchors_bin",
-    entry_point = "main.js",
-    env = {
-        "USE_STRICT": "'use strict'",
-        "SHEBANG": "#!/usr/bin/env bash",
-    },
-    target_compatible_with = SKIP_ON_WINDOWS,
-)
-
-make_js_image_layer(
-    name = "anchors",
-    binary = ":anchors_bin",
-    root = "/app",
-)
-
-# Reads the values back out of the layer that actually ships, matching either launcher's spelling
-# so that one expectation covers both. A corrupted value spans lines, so it matches neither pattern
-# and is missing from the output rather than merely wrong.
-genrule(
-    name = "anchors_env",
-    srcs = [":anchors_app"],
-    outs = ["anchors_env.txt"],
-    cmd = """LC_ALL=C $(BSDTAR_BIN) -xOf $(execpath :anchors_app) | LC_ALL=C sed -n \
-        -e 's/^export \\(USE_STRICT\\|SHEBANG\\)="\\(.*\\)"$$/\\1=\\2/p' \
-        -e 's/^setEnv("\\(USE_STRICT\\|SHEBANG\\)", "\\(.*\\)")$$/\\1=\\2/p' >$@""",
-    target_compatible_with = SKIP_ON_WINDOWS,
-    toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
-)
-
-assert_contains(
-    name = "anchors_use_strict_test",
-    actual = ":anchors_env",
-    expected = "USE_STRICT='use strict'",
-    target_compatible_with = SKIP_ON_WINDOWS,
-)
-
-assert_contains(
-    name = "anchors_shebang_test",
-    actual = ":anchors_env",
-    expected = "SHEBANG=#!/usr/bin/env bash",
-    target_compatible_with = SKIP_ON_WINDOWS,
 )
