@@ -8,8 +8,6 @@ const stash = path.join(process.env.COVERAGE_DIR, '_rules_js_report.lcov')
 
 const LOG_DEBUG = !!process.env.JS_BINARY__LOG_DEBUG
 
-// Report generation is charged against the test's own timeout, so when something is slow
-// this is the only place that says so.
 function logDebug(message) {
     if (LOG_DEBUG) {
         console.error(`DEBUG: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}`)
@@ -37,20 +35,16 @@ process.chdir(pwd)
 // not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
 const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx'])
 
-// c8's Report asks its `exclude` object three questions: which executed scripts belong
-// in the report, which unexecuted files belong in it, and which extensions are
-// instrumentable at all. Bazel already answered all three in COVERAGE_MANIFEST.
-//
-// test-exclude answers them by globbing the whole runfiles tree and minimatching every
-// hit against every manifest entry -- and prepGlobPatterns expands each entry into
-// several patterns -- which is O(files in runfiles x manifest entries) in each test
-// action, charged against the test's own timeout. This replaces it with lookups against
-// the set Bazel handed us.
-//
-// It replaces the object rather than patching methods on it, so a method c8 starts
-// calling that we have not implemented fails loudly instead of silently falling back to
-// the tree walk. Standing in for, pinned to the version c8 10.1.3 resolves:
+// We provide our own implementation of the TestExclude class from here:
 // https://github.com/istanbuljs/test-exclude/blob/3a37faa17cc4f0f602a7c1ec23ef0b0fcf44ab37/index.js
+// The upstream TestExclude is inefficient for our use case, because it globs the whole
+// runfiles tree and matches every result individually against every entry in the coverage
+// manifest. This is O(number of runfiles * number of coverage manifest entries), or quadratic
+// in the number of runfiles if you assume that those two quantities are proportional to each
+// other. Our implementation is careful to avoid this quadratic scaling.
+//
+// We do not implement every method from the original class, only the ones that Report calls.
+// If Report changes then this may break, but it should fail in a loud way that we can address.
 class ManifestExclude {
     constructor(root, files, extensions) {
         this.root = root
@@ -62,40 +56,20 @@ class ManifestExclude {
         this.extension = [...extensions]
     }
 
-    // index.js#L76. c8 asks this of every executed script, so the original costs manifest
-    // size times scripts loaded. extname does not care whether a path is resolved, so
-    // reject on extension first and skip the resolve for anything uninstrumentable.
     shouldInstrument(filename) {
         if (!this.extensions.has(path.extname(filename))) return false
         return this.instrumented.has(path.resolve(this.root, filename))
     }
 
-    // index.js#L105. c8 calls this from _includeUncoveredFiles, the `all: true` pass that
-    // reports files no test executed. Those are exactly the manifest entries no V8 profile
-    // mentioned, so the walk it replaces could only ever have found a subset of them.
-    //
-    // Entries not on disk must be dropped here rather than left to c8: it stats each
-    // returned path without guarding, where a real glob never yields a path that is not
-    // there. A manifest entry need not be in this test's runfiles -- a first-party library
-    // repackaged by npm_package reaches the manifest at its source path but reaches
-    // runfiles only as a copy inside the node_modules store.
     globSync(cwd = this.root) {
-        // c8 passes an entry of `src`, and we give it exactly one. Manifest entries are
-        // relative to that directory, so another root cannot be answered from the manifest
-        // and silently reporting the wrong paths would be worse than failing.
+        // The only directory we know about is this.root, so if we are asked about a different
+        // one then we should return an error rather than a wrong answer.
         if (cwd !== this.root) {
             throw new Error(
                 `coverage report requested for ${cwd}, but the manifest describes ${this.root}`
             )
         }
         return this.files.filter((f) => fs.existsSync(path.resolve(this.root, f)))
-    }
-
-    // index.js#L119. test-exclude pairs glob with globSync the way fs does. Report only
-    // calls the sync one today, but implementing one and not the other would leave a
-    // silent path back to the tree walk if that changed. Nothing here is async.
-    async glob(cwd = this.root) {
-        return this.globSync(cwd)
     }
 }
 
