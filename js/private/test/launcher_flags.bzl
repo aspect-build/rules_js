@@ -6,11 +6,11 @@ docs/hermetic_launcher.md.
 """
 
 BASH_LAUNCHER_ONLY = select({
-    Label("//js:_hermetic_launcher_true"): ["@platforms//:incompatible"],
+    Label("//js:_use_hermetic_launcher_true"): ["@platforms//:incompatible"],
     "//conditions:default": [],
 })
 
 HERMETIC_LAUNCHER_ONLY = select({
-    Label("//js:_hermetic_launcher_true"): [],
+    Label("//js:_use_hermetic_launcher_true"): [],
     "//conditions:default": ["@platforms//:incompatible"],
 })

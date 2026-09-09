@@ -2,8 +2,8 @@
 
 js_binary emits exactly one launcher per configuration (see `_create_launcher` in
 js/private/js_binary.bzl), so the only way to get both into one `bazel test` is to build the
-same target twice in two configurations that differ in //js:hermetic_launcher. That is what the
-transition below does.
+same target twice in two configurations that differ in //js:use_hermetic_launcher. That is
+what the transition below does.
 
 The comparison is relative -- it asserts the two launchers agree, not that either matches a
 recorded golden -- so it is unaffected by the Bazel version, the platform, the output base, or
@@ -13,15 +13,15 @@ the other flags the CI matrix flips.
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("//js:libs.bzl", "js_binary_lib")
 
-def _hermetic_launcher_transition_impl(settings, attr):
+def _use_hermetic_launcher_transition_impl(settings, attr):
     # buildifier: disable=unused-variable
     _ignore = (settings)
-    return {"//js:hermetic_launcher": attr.hermetic_launcher}
+    return {"//js:use_hermetic_launcher": attr.use_hermetic_launcher}
 
-_hermetic_launcher_transition = transition(
-    implementation = _hermetic_launcher_transition_impl,
+_use_hermetic_launcher_transition = transition(
+    implementation = _use_hermetic_launcher_transition_impl,
     inputs = [],
-    outputs = ["//js:hermetic_launcher"],
+    outputs = ["//js:use_hermetic_launcher"],
 )
 
 def _dump_launcher_state_impl(ctx):
@@ -32,9 +32,9 @@ def _dump_launcher_state_impl(ctx):
     # assume: js_binary's launcher_js output group is non-empty exactly when the hermetic
     # launcher was selected.
     launcher_js = ctx.attr.tool[OutputGroupInfo].launcher_js.to_list()
-    if ctx.attr.hermetic_launcher and not launcher_js:
+    if ctx.attr.use_hermetic_launcher and not launcher_js:
         fail("{} was unexpectedly built without the hermetic launcher.".format(ctx.attr.tool.label))
-    if not ctx.attr.hermetic_launcher and launcher_js:
+    if not ctx.attr.use_hermetic_launcher and launcher_js:
         fail("{} was built with the hermetic launcher, but the bash launcher was requested.".format(ctx.attr.tool.label))
 
     out = ctx.actions.declare_file("{}.txt".format(ctx.label.name))
@@ -56,9 +56,9 @@ def _dump_launcher_state_impl(ctx):
 _dump_launcher_state = rule(
     doc = "Runs a js_binary under a chosen launcher and captures the state node starts in.",
     implementation = _dump_launcher_state_impl,
-    cfg = _hermetic_launcher_transition,
+    cfg = _use_hermetic_launcher_transition,
     attrs = {
-        "hermetic_launcher": attr.bool(
+        "use_hermetic_launcher": attr.bool(
             doc = "Which launcher to build the tool with.",
             mandatory = True,
         ),
@@ -86,12 +86,12 @@ def launcher_sync_test(name, tool, **kwargs):
     _dump_launcher_state(
         name = "{}_bash".format(name),
         tool = tool,
-        hermetic_launcher = False,
+        use_hermetic_launcher = False,
     )
     _dump_launcher_state(
         name = "{}_hermetic".format(name),
         tool = tool,
-        hermetic_launcher = True,
+        use_hermetic_launcher = True,
     )
     diff_test(
         name = name,

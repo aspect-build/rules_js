@@ -55,14 +55,14 @@ config_setting(
 # stamped by hermetic_launcher which execs node on a generated JavaScript launcher,
 # in place of the generated bash launcher script. See docs/hermetic_launcher.md.
 bool_flag(
-    name = "hermetic_launcher",
+    name = "use_hermetic_launcher",
     build_setting_default = False,
     visibility = ["//visibility:public"],
 )
 
 config_setting(
-    name = "_hermetic_launcher_true",
-    flag_values = {"hermetic_launcher": "True"},
+    name = "_use_hermetic_launcher_true",
+    flag_values = {"use_hermetic_launcher": "True"},
     visibility = ["//js/private/test:__subpackages__"],
 )
 

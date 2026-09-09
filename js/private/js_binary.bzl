@@ -257,8 +257,8 @@ _ATTRS = {
         allow_single_file = True,
     ),
     # Selects the hermetic launcher over the bash launcher. See docs/hermetic_launcher.md.
-    "_hermetic_launcher": attr.label(
-        default = Label("//js:hermetic_launcher"),
+    "_use_hermetic_launcher": attr.label(
+        default = Label("//js:use_hermetic_launcher"),
         providers = [BuildSettingInfo],
     ),
     # Windows gets its own separate directory for node and npm wrappers. This
@@ -727,7 +727,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     paths = _launcher_paths(ctx, nodeinfo, is_windows)
 
     launcher_js = None
-    if ctx.attr._hermetic_launcher[BuildSettingInfo].value:
+    if ctx.attr._use_hermetic_launcher[BuildSettingInfo].value:
         launcher, launcher_js = _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefix_rule, fixed_args, envs, node_options, paths, is_windows)
         launcher_files = [launcher, launcher_js]
     else:

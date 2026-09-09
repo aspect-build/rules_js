@@ -92,7 +92,7 @@ run_target "$REPO_ROOT" "//npm/private/test:write_npm_translate_lock" "npm/priva
 # when the hermetic launcher is selected, so its snapshot needs the flag.
 run_target "$REPO_ROOT" "//js/private/test:write_launcher" "js/private/test (bash launcher)"
 run_target "$REPO_ROOT" "//js/private/test:write_launcher_js" "js/private/test (JS launcher)" \
-    "--@aspect_rules_js//js:hermetic_launcher=True"
+    "--@aspect_rules_js//js:use_hermetic_launcher=True"
 
 # js/private/test/image - js_image_layer test snapshots
 run_target "$REPO_ROOT" "//js/private/test/image:checksum_test_test" "js/private/test/image checksum"

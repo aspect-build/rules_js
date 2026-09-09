@@ -182,7 +182,7 @@ jobs:
                     - {
                           id: 'bazel-9-hermetic-launcher',
                           version: '9.x',
-                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:hermetic_launcher=True',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_hermetic_launcher=True',
                       }
                 exclude:
                     # e2e/js_image_oci pulls in the `llvm` module, whose hermetic toolchain requires Bazel 8+.

@@ -20,7 +20,7 @@ def assert_tar_listing(name, actual, expected):
     launcher_alt = "|".join(_JS_BINARY_BASENAMES)
 
     # A launcher's size moves across Bazel versions, and the generated JavaScript launcher
-    # is present only with --@aspect_rules_js//js:hermetic_launcher; dropping it lets one
+    # is present only with --@aspect_rules_js//js:use_hermetic_launcher; dropping it lets one
     # golden listing cover both launchers.
     # `$$` escapes `$` for Bazel genrule cmd Make-variable expansion.
     launcher_sanitize = "sed -E -e '/\\/({0})$$/ s/[0-9]+ Jan/xxxxx Jan/' -e '/\\/({0})\\.cjs$$/d'".format(launcher_alt)
