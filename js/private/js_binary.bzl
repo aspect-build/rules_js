@@ -6,6 +6,7 @@ load("@bazel_lib//lib:expand_make_vars.bzl", "expand_locations", "expand_variabl
 load("@bazel_lib//lib:windows_utils.bzl", "create_windows_native_launcher_script")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@hermetic_launcher//launcher:lib.bzl", hermetic_launcher = "launcher")
+load("//js/private/coverage:extensions.bzl", "COVERAGE_EXTENSIONS")
 load(":bash.bzl", "BASH_INITIALIZE_RUNFILES")
 load(":js_helpers.bzl", "LOG_LEVELS", "envs_for_log_level", "gather_files_from_js_infos", "gather_runfiles", "normalize_chdir")
 
@@ -837,18 +838,7 @@ def _js_binary_impl(ctx):
                 ctx,
                 source_attributes = ["data"],
                 dependency_attributes = ["data"],
-                # TODO: check if there is more extensions
-                # TODO: .ts should not be here since we ought to only instrument transpiled files?
-                extensions = [
-                    "mjs",
-                    "mts",
-                    "cjs",
-                    "cts",
-                    "ts",
-                    "js",
-                    "jsx",
-                    "tsx",
-                ],
+                extensions = COVERAGE_EXTENSIONS,
             ),
         )
 

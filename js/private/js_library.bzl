@@ -24,6 +24,7 @@ js_library(
 """
 
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
+load("//js/private/coverage:extensions.bzl", "COVERAGE_EXTENSIONS")
 load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_runfiles")
 load(":js_info.bzl", "JsInfo", "js_info")
 load(":proto.bzl", "js_proto_aspect")
@@ -254,6 +255,7 @@ def _js_library_impl(ctx):
             ctx,
             dependency_attributes = ["deps"],
             source_attributes = ["srcs"],
+            extensions = COVERAGE_EXTENSIONS,
         ),
         js_info(
             target = ctx.label,
