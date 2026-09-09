@@ -64,7 +64,6 @@ oci_image(
     name = "image",
     # Since js_binary depends on bash we have to bring in a base image that has bash
     base = "@debian",
-    cmd = [],
     # This is `/[js_image_layer 'root']/[package name of js_image_layer 'binary' target]/[name of js_image_layer 'binary' target]`
     entrypoint = ["/app/src/bin"],
     tars = [

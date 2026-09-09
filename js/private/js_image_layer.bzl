@@ -29,12 +29,12 @@ _DOC = """Create container image layers from js_binary targets.
 By design, js_image_layer doesn't have any preference over which rule assembles the container image.
 This means the downstream rule (`oci_image` from [rules_oci](https://github.com/bazel-contrib/rules_oci)
 or `container_image` from [rules_docker](https://github.com/bazelbuild/rules_docker)) must
-set a proper `workdir` and `cmd` to for the container work.
+set a proper `workdir` and `entrypoint` to for the container work.
 
-A proper `cmd` usually looks like /`[ js_image_layer 'root' ]`/`[ package name of js_image_layer 'binary' target ]/[ name of js_image_layer 'binary' target ]`,
+A proper `entrypoint` usually looks like /`[ js_image_layer 'root' ]`/`[ package name of js_image_layer 'binary' target ]/[ name of js_image_layer 'binary' target ]`,
 unless you have a custom launcher script that invokes the entry_point of the `js_binary` in a different path.
 
-On the other hand, `workdir` has to be set to the "runfiles tree root" which would be exactly `cmd` **but with `.runfiles/[ name of the workspace ]` suffix**.
+On the other hand, `workdir` has to be set to the "runfiles tree root" which would be exactly `entrypoint` **but with `.runfiles/[ name of the workspace ]` suffix**.
 When using bzlmod then name of the local workspace is always `_main`. If `workdir` is not set correctly, some attributes such as `chdir` might not work properly.
 
 js_image_layer creates up to 5 layers depending on what files are included in the runfiles of the provided
@@ -102,8 +102,7 @@ js_image_layer(
 
 oci_image(
     name = "image",
-    cmd = ["/app/bin"],
-    entrypoint = ["bash"],
+    entrypoint = ["/app/bin"],
     tars = [
         ":layers"
     ],
@@ -140,8 +139,7 @@ js_binary(
 
     oci_image(
         name = "{}_image".format(arch),
-        cmd = ["/app/bin"],
-        entrypoint = ["bash"],
+        entrypoint = ["/app/bin"],
         tars = [
             ":{}_layers".format(arch)
         ],
