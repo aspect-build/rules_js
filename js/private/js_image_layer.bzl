@@ -29,7 +29,7 @@ _DOC = """Create container image layers from js_binary targets.
 By design, js_image_layer doesn't have any preference over which rule assembles the container image.
 This means the downstream rule (`oci_image` from [rules_oci](https://github.com/bazel-contrib/rules_oci)
 or `container_image` from [rules_docker](https://github.com/bazelbuild/rules_docker)) must
-set a proper `workdir` and `entrypoint` to for the container work.
+set a proper `workdir` and `entrypoint` for the container to work.
 
 A proper `entrypoint` usually looks like /`[ js_image_layer 'root' ]`/`[ package name of js_image_layer 'binary' target ]/[ name of js_image_layer 'binary' target ]`,
 unless you have a custom launcher script that invokes the entry_point of the `js_binary` in a different path.
