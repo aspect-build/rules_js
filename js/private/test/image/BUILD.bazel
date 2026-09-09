@@ -193,8 +193,8 @@ genrule(
     cmd = """LC_ALL=C $(BSDTAR_BIN) -xOf $(execpath :anchors_app) | LC_ALL=C sed -n \
         -e 's/^export \\(USE_STRICT\\|SHEBANG\\)="\\(.*\\)"$$/\\1=\\2/p' \
         -e 's/^setEnv("\\(USE_STRICT\\|SHEBANG\\)", "\\(.*\\)")$$/\\1=\\2/p' >$@""",
-    toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
     target_compatible_with = SKIP_ON_WINDOWS,
+    toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
 )
 
 assert_contains(
