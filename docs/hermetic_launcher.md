@@ -16,11 +16,11 @@ bazel build //... --@aspect_rules_js//js:use_hermetic_launcher
 With the flag on, a `js_binary`'s executable is a small native binary stamped by
 [hermetic_launcher](https://github.com/hermeticbuild/hermetic-launcher) which
 does nothing but resolve its runfiles and `execve` node on a generated
-JavaScript launcher, `<name>_/<name>.cjs`.
+JavaScript file, `<name>_/<name>.cjs`.
 
 ## Unsupported deprecated features
 
-The JavaScript launcher does not implement stdout capture, stderr capture, exit
+The hermetic launcher does not implement stdout capture, stderr capture, exit
 code capture, or `silent_on_success`. It ignores `JS_BINARY__STDOUT_OUTPUT_FILE`,
 `JS_BINARY__STDERR_OUTPUT_FILE`, `JS_BINARY__EXIT_CODE_OUTPUT_FILE` and
 `JS_BINARY__SILENT_ON_SUCCESS`.
