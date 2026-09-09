@@ -1,6 +1,6 @@
 'use strict';
 
-var require$$0$2 = require('path');
+var path = require('path');
 var require$$2$1 = require('node:url');
 var require$$1$1 = require('node:path');
 var require$$0$1 = require('fs');
@@ -10,10 +10,10 @@ var require$$0 = require('node:events');
 var require$$1 = require('node:stream');
 var require$$2 = require('node:string_decoder');
 var require$$2$2 = require('util');
-var require$$0$3 = require('os');
+var require$$0$2 = require('os');
 var require$$1$2 = require('tty');
 var require$$1$3 = require('url');
-var require$$0$4 = require('assert');
+var require$$0$3 = require('assert');
 var require$$12 = require('module');
 
 var c8 = {};
@@ -8756,13 +8756,13 @@ function requireIsOutsideDirWin32 () {
 	if (hasRequiredIsOutsideDirWin32) return isOutsideDirWin32;
 	hasRequiredIsOutsideDirWin32 = 1;
 
-	const path = require$$0$2;
+	const path$1 = path;
 	const { minimatch } = requireCommonjs$4();
 
 	const dot = { dot: true, windowsPathsNoEscape: true };
 
 	isOutsideDirWin32 = function(dir, filename) {
-	    return !minimatch(path.resolve(dir, filename), path.join(dir, '**'), dot);
+	    return !minimatch(path$1.resolve(dir, filename), path$1.join(dir, '**'), dot);
 	};
 	return isOutsideDirWin32;
 }
@@ -8774,10 +8774,10 @@ function requireIsOutsideDirPosix () {
 	if (hasRequiredIsOutsideDirPosix) return isOutsideDirPosix;
 	hasRequiredIsOutsideDirPosix = 1;
 
-	const path = require$$0$2;
+	const path$1 = path;
 
 	isOutsideDirPosix = function(dir, filename) {
-	    return /^\.\./.test(path.relative(dir, filename));
+	    return /^\.\./.test(path$1.relative(dir, filename));
 	};
 	return isOutsideDirPosix;
 }
@@ -8803,7 +8803,7 @@ function requireTestExclude () {
 	if (hasRequiredTestExclude) return testExclude;
 	hasRequiredTestExclude = 1;
 
-	const path = require$$0$2;
+	const path$1 = path;
 	const { glob } = requireCommonjs();
 	const { minimatch } = requireCommonjs$4();
 	const { defaults } = requireSchema();
@@ -8887,7 +8887,7 @@ function requireTestExclude () {
 	        let pathToCheck = filename;
 
 	        if (this.relativePath) {
-	            relFile = relFile || path.relative(this.cwd, filename);
+	            relFile = relFile || path$1.relative(this.cwd, filename);
 
 	            // Don't instrument files that are outside of the current working directory.
 	            if (isOutsideDir(this.cwd, filename)) {
@@ -8916,7 +8916,7 @@ function requireTestExclude () {
 
 	        return glob
 	            .sync(globPatterns, globOptions)
-	            .filter(file => this.shouldInstrument(path.resolve(cwd, file)));
+	            .filter(file => this.shouldInstrument(path$1.resolve(cwd, file)));
 	    }
 
 	    async glob(cwd = this.cwd) {
@@ -8929,7 +8929,7 @@ function requireTestExclude () {
 	        }
 
 	        const list = await glob(globPatterns, globOptions);
-	        return list.filter(file => this.shouldInstrument(path.resolve(cwd, file)));
+	        return list.filter(file => this.shouldInstrument(path$1.resolve(cwd, file)));
 	    }
 	}
 
@@ -10536,7 +10536,7 @@ function requireMakeDir () {
 	if (hasRequiredMakeDir) return makeDir.exports;
 	hasRequiredMakeDir = 1;
 	const fs = require$$0$1;
-	const path = require$$0$2;
+	const path$1 = path;
 	const {promisify} = require$$2$2;
 	const semverGte = requireGte();
 
@@ -10546,7 +10546,7 @@ function requireMakeDir () {
 	// https://github.com/libuv/libuv/pull/1088
 	const checkPath = pth => {
 		if (process.platform === 'win32') {
-			const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path.parse(pth).root, ''));
+			const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path$1.parse(pth).root, ''));
 
 			if (pathHasInvalidWinCharacters) {
 				const error = new Error(`Path contains invalid characters: ${pth}`);
@@ -10587,7 +10587,7 @@ function requireMakeDir () {
 		const stat = promisify(options.fs.stat);
 
 		if (useNativeRecursiveOption && options.fs.mkdir === fs.mkdir) {
-			const pth = path.resolve(input);
+			const pth = path$1.resolve(input);
 
 			await mkdir(pth, {
 				mode: options.mode,
@@ -10608,7 +10608,7 @@ function requireMakeDir () {
 				}
 
 				if (error.code === 'ENOENT') {
-					if (path.dirname(pth) === pth) {
+					if (path$1.dirname(pth) === pth) {
 						throw permissionError(pth);
 					}
 
@@ -10616,7 +10616,7 @@ function requireMakeDir () {
 						throw error;
 					}
 
-					await make(path.dirname(pth));
+					await make(path$1.dirname(pth));
 
 					return make(pth);
 				}
@@ -10634,7 +10634,7 @@ function requireMakeDir () {
 			}
 		};
 
-		return make(path.resolve(input));
+		return make(path$1.resolve(input));
 	};
 
 	makeDir.exports = makeDir$1;
@@ -10644,7 +10644,7 @@ function requireMakeDir () {
 		options = processOptions(options);
 
 		if (useNativeRecursiveOption && options.fs.mkdirSync === fs.mkdirSync) {
-			const pth = path.resolve(input);
+			const pth = path$1.resolve(input);
 
 			fs.mkdirSync(pth, {
 				mode: options.mode,
@@ -10663,7 +10663,7 @@ function requireMakeDir () {
 				}
 
 				if (error.code === 'ENOENT') {
-					if (path.dirname(pth) === pth) {
+					if (path$1.dirname(pth) === pth) {
 						throw permissionError(pth);
 					}
 
@@ -10671,7 +10671,7 @@ function requireMakeDir () {
 						throw error;
 					}
 
-					make(path.dirname(pth));
+					make(path$1.dirname(pth));
 					return make(pth);
 				}
 
@@ -10687,7 +10687,7 @@ function requireMakeDir () {
 			return pth;
 		};
 
-		return make(path.resolve(input));
+		return make(path$1.resolve(input));
 	};
 	return makeDir.exports;
 }
@@ -10714,7 +10714,7 @@ var hasRequiredSupportsColor;
 function requireSupportsColor () {
 	if (hasRequiredSupportsColor) return supportsColor_1;
 	hasRequiredSupportsColor = 1;
-	const os = require$$0$3;
+	const os = require$$0$2;
 	const tty = require$$1$2;
 	const hasFlag = requireHasFlag();
 
@@ -10861,7 +10861,7 @@ function requireFileWriter () {
 	 Copyright 2012-2015, Yahoo Inc.
 	 Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 	 */
-	const path = require$$0$2;
+	const path$1 = path;
 	const fs = require$$0$1;
 	const mkdirp = requireMakeDir();
 	const supportsColor = requireSupportsColor();
@@ -10995,7 +10995,7 @@ function requireFileWriter () {
 	     * @returns {FileWriter}
 	     */
 	    writerForDir(subdir) {
-	        if (path.isAbsolute(subdir)) {
+	        if (path$1.isAbsolute(subdir)) {
 	            throw new Error(
 	                `Cannot create subdir writer for absolute path: ${subdir}`
 	            );
@@ -11011,11 +11011,11 @@ function requireFileWriter () {
 	     *  (e.g., an "this file is autogenerated" comment, copyright notice, etc.)
 	     */
 	    copyFile(source, dest, header) {
-	        if (path.isAbsolute(dest)) {
+	        if (path$1.isAbsolute(dest)) {
 	            throw new Error(`Cannot write to absolute path: ${dest}`);
 	        }
-	        dest = path.resolve(this.baseDir, dest);
-	        mkdirp.sync(path.dirname(dest));
+	        dest = path$1.resolve(this.baseDir, dest);
+	        mkdirp.sync(path$1.dirname(dest));
 	        let contents;
 	        if (header) {
 	            contents = header + fs.readFileSync(source, 'utf8');
@@ -11035,11 +11035,11 @@ function requireFileWriter () {
 	        if (file === null || file === '-') {
 	            return new ConsoleWriter();
 	        }
-	        if (path.isAbsolute(file)) {
+	        if (path$1.isAbsolute(file)) {
 	            throw new Error(`Cannot write to absolute path: ${file}`);
 	        }
-	        file = path.resolve(this.baseDir, file);
-	        mkdirp.sync(path.dirname(file));
+	        file = path$1.resolve(this.baseDir, file);
+	        mkdirp.sync(path$1.dirname(file));
 	        return new FileContentWriter(fs.openSync(file, 'w'));
 	    }
 	}
@@ -11327,9 +11327,9 @@ function requirePath () {
 	if (hasRequiredPath) return path_1;
 	hasRequiredPath = 1;
 
-	const path = require$$0$2;
-	let parsePath = path.parse;
-	let SEP = path.sep;
+	const path$1 = path;
+	let parsePath = path$1.parse;
+	let SEP = path$1.sep;
 	const origParser = parsePath;
 	const origSep = SEP;
 
@@ -12038,10 +12038,10 @@ function requireLcovonly () {
 	        const branches = fc.b;
 	        const branchMap = fc.branchMap;
 	        const summary = node.getCoverageSummary();
-	        const path = require$$0$2;
+	        const path$1 = path;
 
 	        writer.println('TN:');
-	        const fileName = path.relative(this.projectRoot, fc.path);
+	        const fileName = path$1.relative(this.projectRoot, fc.path);
 	        writer.println('SF:' + fileName);
 
 	        Object.values(functionMap).forEach(meta => {
@@ -14189,11 +14189,11 @@ var hasRequiredV8ToIstanbul$1;
 function requireV8ToIstanbul$1 () {
 	if (hasRequiredV8ToIstanbul$1) return v8ToIstanbul$1;
 	hasRequiredV8ToIstanbul$1 = 1;
-	const assert = require$$0$4;
+	const assert = require$$0$3;
 	const convertSourceMap = requireConvertSourceMap();
 	const util = require$$2$2;
 	const debuglog = util.debuglog('c8');
-	const { dirname, isAbsolute, join, resolve } = require$$0$2;
+	const { dirname, isAbsolute, join, resolve } = path;
 	const { fileURLToPath } = require$$1$3;
 	const CovBranch = requireBranch();
 	const CovFunction = require_function();
@@ -15505,11 +15505,11 @@ function requireLib () {
 	return lib;
 }
 
-var report;
+var report$1;
 var hasRequiredReport;
 
 function requireReport () {
-	if (hasRequiredReport) return report;
+	if (hasRequiredReport) return report$1;
 	hasRequiredReport = 1;
 	const Exclude = requireTestExclude();
 	const libCoverage = requireIstanbulLibCoverage();
@@ -15522,7 +15522,7 @@ function requireReport () {
 ({ readFile } = require$$0$1.promises);
 	}
 	const { readdirSync, readFileSync, statSync } = require$$0$1;
-	const { isAbsolute, resolve, extname } = require$$0$2;
+	const { isAbsolute, resolve, extname } = path;
 	const { pathToFileURL, fileURLToPath } = require$$1$3;
 	const getSourceMapFromFile = requireSourceMapFromFile();
 	// TODO: switch back to @c88/v8-coverage once patch is landed.
@@ -16050,10 +16050,10 @@ function requireReport () {
 	  }
 	}
 
-	report = function (opts) {
+	report$1 = function (opts) {
 	  return new Report(opts)
 	};
-	return report;
+	return report$1;
 }
 
 var hasRequiredC8;
@@ -16067,9 +16067,19 @@ function requireC8 () {
 
 var c8Exports = requireC8();
 
-// Runs in the test action, the only place the V8 data and instrumented sources are
+// Runs in the test action, the only place the V8 data and the instrumented sources are
 // both present. coverage.sh.tpl reads back this exact filename; keep them in sync.
-const stash = require$$0$2.join(process.env.COVERAGE_DIR, '_rules_js_report.lcov');
+const stash = path.join(process.env.COVERAGE_DIR, '_rules_js_report.lcov');
+
+const LOG_DEBUG = !!process.env.JS_BINARY__LOG_DEBUG;
+
+function logDebug(message) {
+    if (LOG_DEBUG) {
+        console.error(`DEBUG: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}`);
+    }
+}
+
+const started = process.hrtime.bigint();
 
 const include = require$$0$1
     .readFileSync(process.env.COVERAGE_MANIFEST)
@@ -16079,7 +16089,7 @@ const include = require$$0$1
 
 // TODO: can or should we instrument files from other repositories as well?
 // if so then the path.join call below will yield invalid paths since files will have external/wksp as their prefix.
-const pwd = require$$0$2.join(
+const pwd = path.join(
     process.env.JS_COVERAGE__RUNFILES,
     process.env.TEST_WORKSPACE
 );
@@ -16088,22 +16098,70 @@ process.chdir(pwd);
 // Same list as COVERAGE_EXTENSIONS in js/private/coverage/extensions.bzl, which is what
 // decides the contents of COVERAGE_MANIFEST. c8 drops a manifest entry whose extension is
 // not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
-const extensions = ['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx'];
+const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx']);
 
-new c8Exports.Report({
-    include: include,
-    extension: extensions,
-    exclude: include.length === 0 ? ['**'] : [],
+// We provide our own implementation of the TestExclude class from here:
+// https://github.com/istanbuljs/test-exclude/blob/3a37faa17cc4f0f602a7c1ec23ef0b0fcf44ab37/index.js
+// The upstream TestExclude is inefficient for our use case, because it globs the whole
+// runfiles tree and matches every result individually against every entry in the coverage
+// manifest. This is O(number of runfiles * number of coverage manifest entries), or quadratic
+// in the number of runfiles if you assume that those two quantities are proportional to each
+// other. Our implementation is careful to avoid this quadratic scaling.
+//
+// We do not implement every method from the original class, only the ones that Report calls.
+// If Report changes then this may break, but it should fail in a loud way that we can address.
+class ManifestExclude {
+    constructor(root, files, extensions) {
+        this.root = root;
+        this.files = files;
+        this.extensions = extensions;
+        this.instrumented = new Set(files.map((f) => path.resolve(root, f)));
+        // _includeUncoveredFiles reads this directly and drops any path whose extension
+        // is not in it before stat'ing the rest.
+        this.extension = [...extensions];
+    }
+
+    shouldInstrument(filename) {
+        if (!this.extensions.has(path.extname(filename))) return false
+        return this.instrumented.has(path.resolve(this.root, filename))
+    }
+
+    globSync(cwd = this.root) {
+        // The only directory we know about is this.root, so if we are asked about a different
+        // one then we should return an error rather than a wrong answer.
+        if (cwd !== this.root) {
+            throw new Error(
+                `coverage report requested for ${cwd}, but the manifest describes ${this.root}`
+            )
+        }
+        return this.files.filter((f) => require$$0$1.existsSync(path.resolve(this.root, f)))
+    }
+}
+
+// `include`, `exclude`, `extension`, `excludeNodeModules` and `allowExternal` are omitted:
+// Report forwards them to the test-exclude instance it builds in its constructor, and we
+// replace that instance outright.
+const report = new c8Exports.Report({
     reportsDirectory: process.env.COVERAGE_DIR,
     tempDirectory: process.env.COVERAGE_DIR,
     resolve: '',
     src: pwd,
     all: true,
     reporter: ['lcovonly'],
-})
+});
+
+report.exclude = new ManifestExclude(pwd, include, extensions);
+
+logDebug(
+    `coverage manifest ${process.env.COVERAGE_MANIFEST}: ${include.length} entries`
+);
+
+report
     .run()
     .then(() => {
-        require$$0$1.renameSync(require$$0$2.join(process.env.COVERAGE_DIR, 'lcov.info'), stash);
+        require$$0$1.renameSync(path.join(process.env.COVERAGE_DIR, 'lcov.info'), stash);
+        const total = (Number(process.hrtime.bigint() - started) / 1e6).toFixed(0);
+        logDebug(`coverage report generated in ${total}ms`);
     })
     .catch((err) => {
         console.error(err);
