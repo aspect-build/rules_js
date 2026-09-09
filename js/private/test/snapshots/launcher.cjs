@@ -181,6 +181,12 @@ function logfDebug(message) {
 
 function resolveExecrootBinPath(shortPath) {
     const bindir = process.env.BAZEL_BINDIR
+    if (!bindir) {
+        logfFatal(
+            'BAZEL_BINDIR must be set in the environment to the makevar $(BINDIR) to resolve a path in the Bazel output tree'
+        )
+        exitWith(1)
+    }
     if (shortPath.startsWith('../')) {
         return `${process.env.JS_BINARY__EXECROOT}/${bindir}/external/${shortPath.slice(3)}`
     }
@@ -505,11 +511,11 @@ process.env.NODE_DISABLE_COMPILE_CACHE = '1'
 
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
 // child processes can find them.
-const currentPath = process.env.PATH || ''
+let currentPath = process.env.PATH || ''
 if (npmBinDir) {
-    process.env.PATH = `${npmBinDir}${path.delimiter}${currentPath}`
+    currentPath = `${npmBinDir}${path.delimiter}${currentPath}`
 }
-process.env.PATH = `${path.dirname(process.env.JS_BINARY__NODE_WRAPPER)}${path.delimiter}${process.env.PATH}`
+process.env.PATH = `${path.dirname(process.env.JS_BINARY__NODE_WRAPPER)}${path.delimiter}${currentPath}`
 
 // Debug logs
 if (process.env.JS_BINARY__LOG_DEBUG) {
