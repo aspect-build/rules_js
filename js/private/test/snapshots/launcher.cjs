@@ -10,6 +10,8 @@
 
 'use strict'
 
+// This line is replaced by js_image_layer to make the launcher hermetic.
+
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')

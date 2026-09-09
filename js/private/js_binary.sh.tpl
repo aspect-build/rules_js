@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# This line is replaced by js_image_layer to make the launcher hermetic.
+
 # This bash script is a wrapper around the NodeJS JavaScript file
 # entry point with the following bazel label:
 #     {{entry_point_label}}

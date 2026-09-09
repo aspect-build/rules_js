@@ -182,23 +182,19 @@ The default layer groups are as follows and always created.
 
 """
 
+# The line both launcher templates carry for js_image_layer to replace, minus its comment
+# marker. A dedicated patch point rather than a rewrite of `#!/usr/bin/env bash` or
+# `'use strict'`, because expand_template replaces every occurrence of a key: with those
+# anchors an env value or fixed_arg that happened to contain one got patched too.
+_PATCH_POINT = "This line is replaced by js_image_layer to make the launcher hermetic."
+
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
 # See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
 # for why this is needed.
-_LAUNCHER_PREABMLE = """\
-#!/usr/bin/env bash
-
-export BAZEL_BINDIR="."
-
-# patched by js_image_layer for hermeticity
-"""
+_LAUNCHER_PREAMBLE = '# patched by js_image_layer for hermeticity\nexport BAZEL_BINDIR="."'
 
 # The JavaScript launcher's equivalent.
-_JS_LAUNCHER_PREAMBLE = """\
-'use strict'
-
-// patched by js_image_layer for hermeticity
-process.env.BAZEL_BINDIR = '.'"""
+_JS_LAUNCHER_PREAMBLE = "// patched by js_image_layer for hermeticity\nprocess.env.BAZEL_BINDIR = '.'"
 
 def _launcher_js(binary):
     """The generated JavaScript launcher of a js_binary, or None when it uses the bash launcher."""
@@ -222,7 +218,7 @@ def _write_js_launcher(ctx, launcher_js):
     launcher = ctx.actions.declare_file("%s_launcher.cjs" % ctx.label.name)
 
     substitutions = {
-        "'use strict'": _JS_LAUNCHER_PREAMBLE,
+        "// " + _PATCH_POINT: _JS_LAUNCHER_PREAMBLE,
         'setEnv("JS_BINARY__BINDIR", "%s")' % launcher_js.root.path: 'setEnv("JS_BINARY__BINDIR", process.cwd())',
         'setEnv("JS_BINARY__TARGET_CPU", "%s")' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'setEnv("JS_BINARY__TARGET_CPU", os.machine())',
     }
@@ -241,7 +237,7 @@ def _write_launcher(ctx, real_binary):
     launcher = ctx.actions.declare_file("%s_launcher" % ctx.label.name)
 
     substitutions = {
-        "#!/usr/bin/env bash": _LAUNCHER_PREABMLE,
+        "# " + _PATCH_POINT: _LAUNCHER_PREAMBLE,
         'export JS_BINARY__BINDIR="%s"' % real_binary.root.path: 'export JS_BINARY__BINDIR="$(pwd)"',
         'export JS_BINARY__TARGET_CPU="%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'export JS_BINARY__TARGET_CPU="$(uname -m)"',
     }

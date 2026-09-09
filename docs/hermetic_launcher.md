@@ -84,6 +84,11 @@ fork-and-wait path.
     `launcher_js`.** That output group is how `js_image_layer` tells a
     hermetic-launcher binary from a bash-launcher one: the two keep the values
     that have to be rewritten for hermeticity in different files.
+-   **Both templates carry a line reserved for `js_image_layer`,** which replaces
+    it to set `BAZEL_BINDIR` inside the container. It is a dedicated marker rather
+    than the shebang or `'use strict'` because `expand_template` replaces every
+    occurrence of a key, so an anchor that a user could also put in `env` or
+    `fixed_args` would corrupt that value too.
 
 ## Keeping the two launchers in sync
 
