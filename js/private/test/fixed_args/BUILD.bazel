@@ -90,8 +90,7 @@ assert_contains(
     expected = "$(rootpaths :test.txt)",
 )
 
-# Quote removal happens at analysis time, but the presence of single quotes should still
-# prevent $VAR expansion from happening at run time.
+# The presence of single quotes should prevent $VAR expansion from happening at run time.
 js_binary(
     name = "single_quoted_var_bin",
     entry_point = "fixed_args.mjs",
