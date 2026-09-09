@@ -1,0 +1,22 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("//js:defs.bzl", "js_binary", "js_run_binary")
+
+package(default_testonly = True)
+
+js_binary(
+    name = "quoted_bin",
+    entry_point = "it's ok.mjs",
+)
+
+js_run_binary(
+    name = "run_quoted",
+    silent_on_success = False,
+    stdout = "quoted_out",
+    tool = ":quoted_bin",
+)
+
+assert_contains(
+    name = "quoted_test",
+    actual = "quoted_out",
+    expected = "entry point with an apostrophe ran",
+)
