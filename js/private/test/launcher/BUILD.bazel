@@ -2,7 +2,7 @@ load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
-load("//js/private/test:launcher_flags.bzl", "BASH_LAUNCHER_ONLY")
+load("//js/private/test:launcher_flags.bzl", "BASH_LAUNCHER_ONLY", "HERMETIC_LAUNCHER_ONLY")
 load(":direct_capture.bzl", "direct_capture")
 
 package(default_testonly = True)
@@ -427,4 +427,83 @@ assert_contains(
     name = "direct_not_silent_stderr_test",
     actual = ":direct_noisy_out.txt",
     expected = "ON_STDERR",
+)
+
+# ==================================================================================================
+# Case 8: with nothing but the node options the stub already applied, the hermetic launcher runs the
+# program in its own node process instead of starting a second one.
+
+js_binary(
+    name = "in_process_probe_bin",
+    entry_point = "in_process_probe.cjs",
+)
+
+genrule(
+    name = "in_process_run",
+    outs = ["in_process_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_bin) > $@",
+    tools = [":in_process_probe_bin"],
+)
+
+assert_contains(
+    name = "runs_in_launcher_process_test",
+    actual = ":in_process_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=yes",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# Ungated: both launchers owe the program main-module status. A CommonJS entry point guarded by
+# `require.main === module` would otherwise run nothing while still exiting 0.
+assert_contains(
+    name = "entry_point_is_main_module_test",
+    actual = ":in_process_out.txt",
+    expected = "IS_MAIN_MODULE=yes",
+)
+
+# node_options cannot be applied to a node that is already running, so a target carrying one has to
+# fall back to starting node again.
+
+js_binary(
+    name = "in_process_probe_opts_bin",
+    entry_point = "in_process_probe_opts.cjs",
+    node_options = ["--title=probe"],
+)
+
+genrule(
+    name = "in_process_opts_run",
+    outs = ["in_process_opts_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_opts_bin) > $@",
+    tools = [":in_process_probe_opts_bin"],
+)
+
+assert_contains(
+    name = "node_options_start_a_second_node_test",
+    actual = ":in_process_opts_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=no",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# ==================================================================================================
+# Case 9: an uncaught exception is reported by node itself, with the program's own stack.
+#
+# Ungated: neither launcher may interpose on this. The hermetic launcher installs an
+# uncaughtException handler for its own failures, and has to hand it back before running the
+# program in its process, or the stack below is replaced by a one-line FATAL.
+
+js_binary(
+    name = "throw_deep_bin",
+    entry_point = "throw_deep.cjs",
+)
+
+genrule(
+    name = "throw_deep_run",
+    outs = ["throw_deep_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :throw_deep_bin) > $@ 2>&1 || true",
+    tools = [":throw_deep_bin"],
+)
+
+assert_contains(
+    name = "uncaught_exception_keeps_program_stack_test",
+    actual = ":throw_deep_out.txt",
+    expected = "at inner",
 )

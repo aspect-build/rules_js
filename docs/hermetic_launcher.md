@@ -18,6 +18,31 @@ With the flag on, a `js_binary`'s executable is a small native binary stamped by
 does nothing but resolve its runfiles and `execve` node on a generated
 JavaScript file, `<name>_/<name>.cjs`.
 
+## One node process
+
+The stub starts node with the options that have to be in place before it boots --
+`--preserve-symlinks-main`, when `preserve_symlinks_main` is set. node is then
+already configured the way the program needs it, so the launcher requires the
+node patches and runs the entry point as the main module in that same process,
+rather than starting a second node. That saves a whole node runtime bootstrap,
+which is most of what a short `js_binary` invocation costs.
+
+The program cannot tell the difference: it is the main module, so
+`require.main === module` holds; `process.argv` and `process.execArgv` read as
+they do under the bash launcher; and node reports an uncaught exception itself,
+with the program's own stack.
+
+The launcher falls back to starting node a second time when it has to, which is
+when either:
+
+-   the target sets `node_options`, or a `--node_options=` is passed at run time.
+    Those cannot be applied to a node that is already running, and they are not
+    baked into the stub: an entry may name a `--require` that has to run after
+    the launcher has set up the environment, or reference a variable only known
+    at run time.
+-   `expected_exit_code` is set, so the launcher has to outlive the program to
+    compare against its status.
+
 ## Unsupported deprecated features
 
 The hermetic launcher does not implement stdout capture, stderr capture, exit
