@@ -238,21 +238,22 @@ assert_contains(
     expected = "export JSON_ENCODE=\"[\\\"twx\\\"]\"",
 )
 
-####################################################################################################
-# Node module compile cache: off by default, re-enabled by node-bootstrap/bootstrap.cjs when
-# NODE_COMPILE_CACHE is set.
+##############################################################################################
+# Node module compile cache: off by default, but can be enabled by setting NODE_COMPILE_CACHE.
 # https://github.com/aspect-build/rules_js/issues/2937
 
 write_file(
     name = "write_compile_cache",
     out = "compile_cache.js",
     # Ask Node to enable the cache (into a sandbox-relative dir so nothing leaks out) and
-    # report the resulting status. It comes back DISABLED unless NODE_COMPILE_CACHE was set.
+    # report the exact status constant it returns.
     content = ["""
         const { enableCompileCache, constants } = require("node:module");
         const { status } = enableCompileCache("node-compile-cache");
-        const disabled = status === constants.compileCacheStatus.DISABLED;
-        console.log("COMPILE_CACHE_DISABLED=" + (disabled ? "yes" : "no"));
+        const name = Object.keys(constants.compileCacheStatus).find(
+            (key) => constants.compileCacheStatus[key] === status
+        );
+        console.log("COMPILE_CACHE_STATUS=" + name);
     """],
 )
 
@@ -273,11 +274,12 @@ js_run_binary(
 assert_contains(
     name = "compile_cache_disabled_by_default_test",
     actual = ":compile-cache-default-stdout",
-    expected = "COMPILE_CACHE_DISABLED=yes",
+    expected = "COMPILE_CACHE_STATUS=DISABLED",
 )
 
-# Opt-in: an explicit NODE_COMPILE_CACHE (relative, so it stays inside the sandbox)
-# means the cache should be left enabled. Prepares for #2938.
+# Opt-in: an explicit NODE_COMPILE_CACHE (relative, so it stays inside the sandbox) means
+# the cache should be enabled. Prepares for #2938. This variable will cause node to enable
+# the cache at startup, so we will get a status of ALREADY_ENABLED.
 js_binary(
     name = "compile_cache_optin",
     entry_point = "compile_cache.js",
@@ -294,7 +296,7 @@ js_run_binary(
 assert_contains(
     name = "compile_cache_optin_test",
     actual = ":compile-cache-optin-stdout",
-    expected = "COMPILE_CACHE_DISABLED=no",
+    expected = "COMPILE_CACHE_STATUS=ALREADY_ENABLED",
 )
 
 # bazel run: the cache is disabled here too for now (simulated via the env attribute);
@@ -315,13 +317,13 @@ js_run_binary(
 assert_contains(
     name = "compile_cache_bazel_run_test",
     actual = ":compile-cache-bazel-run-stdout",
-    expected = "COMPILE_CACHE_DISABLED=yes",
+    expected = "COMPILE_CACHE_STATUS=DISABLED",
 )
 
-# Node gives NODE_DISABLE_COMPILE_CACHE precedence over NODE_COMPILE_CACHE, but we do the
-# opposite.
+# If both variables are set, then NODE_DISABLE_COMPILE_CACHE wins, following node's
+# behavior.
 js_binary(
-    name = "compile_cache_dir_wins_over_disable",
+    name = "compile_cache_disable_wins_over_dir",
     entry_point = "compile_cache.js",
     env = {
         "NODE_COMPILE_CACHE": "node-compile-cache",
@@ -330,14 +332,14 @@ js_binary(
 )
 
 js_run_binary(
-    name = "_compile_cache_dir_wins_over_disable",
+    name = "_compile_cache_disable_wins_over_dir",
     silent_on_success = False,
-    stdout = "compile-cache-dir-wins-over-disable-stdout",
-    tool = ":compile_cache_dir_wins_over_disable",
+    stdout = "compile-cache-disable-wins-over-dir-stdout",
+    tool = ":compile_cache_disable_wins_over_dir",
 )
 
 assert_contains(
-    name = "compile_cache_dir_wins_over_disable_test",
-    actual = ":compile-cache-dir-wins-over-disable-stdout",
-    expected = "COMPILE_CACHE_DISABLED=no",
+    name = "compile_cache_disable_wins_over_dir_test",
+    actual = ":compile-cache-disable-wins-over-dir-stdout",
+    expected = "COMPILE_CACHE_STATUS=DISABLED",
 )
