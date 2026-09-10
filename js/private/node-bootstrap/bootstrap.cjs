@@ -1,9 +1,16 @@
 // Disable Node's module compile cache unless the user explicitly opted in
-// (aspect-build/rules_js#2937). Note that setting NODE_DISABLE_COMPILE_CACHE
-// at runtime has no effect unless module.enableCompileCache() is subsequently
-// called, in which case it will prevent the cache from being enabled.
-if (!process.env.NODE_COMPILE_CACHE && !process.env.NODE_DISABLE_COMPILE_CACHE) {
-    process.env.NODE_DISABLE_COMPILE_CACHE = 1
+// (aspect-build/rules_js#2937). Node applies this policy from its own environment as it
+// starts, but a launcher sets the target's env after that, so we apply it here. Disabling
+// only needs the variable, which any later module.enableCompileCache() call reads, but
+// enabling has to make that call ourselves.
+if (!process.env.NODE_DISABLE_COMPILE_CACHE) {
+    if (process.env.NODE_COMPILE_CACHE) {
+        require('node:module').enableCompileCache?.(
+            process.env.NODE_COMPILE_CACHE
+        )
+    } else {
+        process.env.NODE_DISABLE_COMPILE_CACHE = 1
+    }
 }
 
 // Code coverage. We load this early on so that the coverage session sees as much of this
