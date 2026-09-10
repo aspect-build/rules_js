@@ -140,7 +140,44 @@ def _run_token_helper(helper, npmrc_path, rctx):
             npmrc = npmrc_path,
         ))
 
-    return token
+    # pnpm uses the output as the Authorization header value, so a helper written for it
+    # prefixes the scheme; a bare token is taken as a bearer token.
+    if token.startswith("Basic "):
+        return ("basic", token[len("Basic "):].strip())
+    return ("bearer", token.removeprefix("Bearer ").strip())
+
+def _npmrc_setting_is(key, name):
+    return key == name or key.endswith(":" + name)
+
+def _resolve_npmrc_credentials(content, npmrc_path, rctx):
+    """Rewrites a project `.npmrc` so its credentials survive being read by pnpm.
+
+    pnpm only honors a `tokenHelper` from the user-level `.npmrc`, and does not expand environment
+    variables in credentials that come from a project-level one. Replace both with the values
+    rules_js resolves for its own downloads, so `pnpm install` authenticates the same way.
+
+    Args:
+        content: The `.npmrc` content.
+        npmrc_path: The path of the `.npmrc` the content was read from, used to resolve a relative
+            `tokenHelper` and in diagnostics.
+        rctx: The repository_ctx or module_ctx.
+
+    Returns:
+        The rewritten content.
+    """
+    lines = []
+    for line in content.splitlines():
+        key, _, value = line.split(";", 1)[0].split("#", 1)[0].partition("=")
+        key = key.strip()
+        value = value.strip()
+        if _npmrc_setting_is(key, "tokenHelper"):
+            kind, credential = _run_token_helper(value, npmrc_path, rctx)
+            setting = "_authToken" if kind == "bearer" else "_auth"
+            line = key.removesuffix("tokenHelper") + setting + "=" + credential
+        elif value.startswith("$") and (_npmrc_setting_is(key, "_authToken") or _npmrc_setting_is(key, "_auth")):
+            line = key + "=" + utils.replace_npmrc_token_envvar(value, npmrc_path, rctx)
+        lines.append(line)
+    return "\n".join(lines) + "\n"
 
 ################################################################################
 def _get_npm_auth(npmrc, npmrc_path, rctx):
@@ -284,8 +321,9 @@ def _get_npm_auth(npmrc, npmrc_path, rctx):
         if registry not in auth:
             auth[registry] = {}
 
-        # A helper wins over a static token, and must not shadow its own memoized result
+        # A helper wins over a static credential
         auth[registry].pop("bearer", None)
+        auth[registry].pop("basic", None)
         auth[registry]["token_helper"] = struct(command = helper, npmrc_path = npmrc_path)
 
     return (registries, auth)
@@ -327,9 +365,10 @@ def _select_npm_auth(url, npm_auth, rctx = None):
         return None, None, None, None
 
     # Memoized into the auth entry so a helper runs once per registry, not once per package
-    helper = matched.get("token_helper")
-    if helper and "bearer" not in matched:
-        matched["bearer"] = _run_token_helper(helper.command, helper.npmrc_path, rctx)
+    helper = matched.pop("token_helper", None)
+    if helper:
+        kind, credential = _run_token_helper(helper.command, helper.npmrc_path, rctx)
+        matched[kind] = credential
 
     return (
         matched.get("bearer"),
@@ -772,6 +811,7 @@ helpers = struct(
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
     link_package = _link_package,
+    resolve_npmrc_credentials = _resolve_npmrc_credentials,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
     verify_lifecycle_hooks_specified = _verify_lifecycle_hooks_specified,

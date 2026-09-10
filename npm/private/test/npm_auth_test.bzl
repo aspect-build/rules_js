@@ -331,6 +331,109 @@ def _token_helper_precedence_test_impl(ctx):
 
     return unittest.end(env)
 
+def _token_helper_header_prefix_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    # pnpm helpers print the Authorization header value rather than a bare token
+    asserts.equals(
+        env,
+        "HELPER_TOKEN",
+        _bearer_for(
+            {"//registry1/:tokenHelper": "/abs/token-helper"},
+            "https://registry1/pkg/-/pkg-1.0.0.tgz",
+            _fake_auth_rctx(stdout = "Bearer HELPER_TOKEN\n"),
+        ),
+    )
+
+    executed = []
+    rctx = _fake_auth_rctx(stdout = "Basic dXNlcjpwYXNz\n", executed = executed)
+    (_, auth) = helpers.get_npm_auth(
+        {
+            "//registry1/:_authToken": "STATIC",
+            "//registry1/:tokenHelper": "/abs/token-helper",
+        },
+        "/work/.npmrc",
+        rctx,
+    )
+    for _ in range(2):
+        asserts.equals(
+            env,
+            (None, "dXNlcjpwYXNz", None, None),
+            helpers_testonly.select_npm_auth("https://registry1/pkg/-/pkg-1.0.0.tgz", auth, rctx),
+        )
+    asserts.equals(env, 1, len(executed))
+
+    return unittest.end(env)
+
+_NPMRC_FOR_PNPM = """# pnpm settings
+hoist=false
+; //registry1/:tokenHelper=ignored-in-a-comment
+@myorg:registry=https://registry1/
+//registry1/:tokenHelper=token-helper.sh
+_authToken=${NPM_TOKEN}
+//registry2/:_auth=$BASIC
+//registry3/:_authToken=STATIC
+//registry3/:username=someone
+"""
+
+def _resolve_npmrc_credentials_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    executed = []
+    rctx = _fake_auth_rctx(
+        env = {"NPM_TOKEN": "SECRET", "BASIC": "dXNlcjpwYXNz"},
+        executed = executed,
+    )
+
+    asserts.equals(
+        env,
+        """# pnpm settings
+hoist=false
+; //registry1/:tokenHelper=ignored-in-a-comment
+@myorg:registry=https://registry1/
+//registry1/:_authToken=HELPER_TOKEN
+_authToken=SECRET
+//registry2/:_auth=dXNlcjpwYXNz
+//registry3/:_authToken=STATIC
+//registry3/:username=someone
+""",
+        helpers.resolve_npmrc_credentials(_NPMRC_FOR_PNPM, "/work/nested/.npmrc", rctx),
+    )
+
+    # A relative helper resolves against the directory of the declaring `.npmrc`
+    asserts.equals(env, [["/work/nested/token-helper.sh"]], executed)
+
+    return unittest.end(env)
+
+def _resolve_npmrc_credentials_basic_helper_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        "//registry1/:_auth=dXNlcjpwYXNz\n",
+        helpers.resolve_npmrc_credentials(
+            "//registry1/:tokenHelper=/abs/token-helper\n",
+            "/work/.npmrc",
+            _fake_auth_rctx(stdout = "Basic dXNlcjpwYXNz\n"),
+        ),
+    )
+
+    return unittest.end(env)
+
+def _resolve_npmrc_credentials_unchanged_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    executed = []
+    static = "hoist=false\n//registry1/:_authToken=STATIC\n"
+    asserts.equals(
+        env,
+        static,
+        helpers.resolve_npmrc_credentials(static, "/work/.npmrc", _fake_auth_rctx(executed = executed)),
+    )
+    asserts.equals(env, [], executed)
+
+    return unittest.end(env)
+
 def _env_var_token_test_impl(ctx):
     env = unittest.begin(ctx)
 
@@ -634,6 +737,10 @@ token_helper_memoized_test = unittest.make(_token_helper_memoized_test_impl)
 token_helper_precedence_test = unittest.make(_token_helper_precedence_test_impl)
 select_npm_auth_longest_prefix_test = unittest.make(_select_npm_auth_longest_prefix_test_impl)
 select_npm_auth_boundary_test = unittest.make(_select_npm_auth_boundary_test_impl)
+token_helper_header_prefix_test = unittest.make(_token_helper_header_prefix_test_impl)
+resolve_npmrc_credentials_test = unittest.make(_resolve_npmrc_credentials_test_impl)
+resolve_npmrc_credentials_basic_helper_test = unittest.make(_resolve_npmrc_credentials_basic_helper_test_impl)
+resolve_npmrc_credentials_unchanged_test = unittest.make(_resolve_npmrc_credentials_unchanged_test_impl)
 
 def npm_auth_test_suite():
     unittest.suite(
@@ -655,6 +762,10 @@ def npm_auth_test_suite():
         partial.make(token_helper_precedence_test, timeout = "short"),
         partial.make(select_npm_auth_longest_prefix_test, timeout = "short"),
         partial.make(select_npm_auth_boundary_test, timeout = "short"),
+        partial.make(token_helper_header_prefix_test, timeout = "short"),
+        partial.make(resolve_npmrc_credentials_test, timeout = "short"),
+        partial.make(resolve_npmrc_credentials_basic_helper_test, timeout = "short"),
+        partial.make(resolve_npmrc_credentials_unchanged_test, timeout = "short"),
     )
 
 # A failing tokenHelper aborts analysis, which unittest.make cannot observe, so these drive the

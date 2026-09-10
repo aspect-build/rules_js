@@ -196,9 +196,15 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             specified in the file are passed to the Bazel downloader for authentication with private npm registries.
 
             A [`tokenHelper`](https://pnpm.io/npmrc#urltokenhelper) is also honored: rules_js runs the executable it
-            names and uses the token it prints on stdout. The helper path may be absolute or relative to this
+            names and uses what it prints on stdout as the token, with a leading `Bearer ` stripped or a leading
+            `Basic ` selecting basic authentication. The helper path may be absolute or relative to this
             `.npmrc` file, and may reference environment variables. A helper runs during repository setup,
             only for a registry a package in the lockfile resolves to, and at most once per registry.
+
+            When `update_pnpm_lock` is enabled, the copy of this file that `pnpm install` reads has each
+            `tokenHelper` and environment variable credential replaced with its resolved value, since pnpm only
+            honors those from the user-level `.npmrc`. The copy lives in the external repository; the source
+            file is not modified.
 
             SECURITY: unlike pnpm, which only runs a `tokenHelper` from user-level config, rules_js runs one declared
             in this `.npmrc` even when it is checked into the repository. A `tokenHelper` names an executable that
@@ -462,7 +468,19 @@ STDERR:
             fail(msg)
 
 ################################################################################
+def _resolve_npmrc_credentials(rctx, attr):
+    if not attr.npmrc:
+        return
+
+    npmrc = paths.join(attr.npmrc.package, attr.npmrc.name)
+    content = rctx.read(npmrc)
+    resolved = helpers.resolve_npmrc_credentials(content, rctx.path(attr.npmrc), rctx)
+    if resolved != content:
+        rctx.file(npmrc, resolved)
+
+################################################################################
 def _update_pnpm_lock(rctx, attr, state):
+    _resolve_npmrc_credentials(rctx, attr)
     _execute_preupdate_scripts(rctx, attr, state)
 
     pnpm_lock_label = state.pnpm_lock_label()
