@@ -494,10 +494,6 @@ if (!process.env.JS_BINARY__FS_PATCH_ROOTS) {
     process.env.JS_BINARY__FS_PATCH_ROOTS = `${process.env.JS_BINARY__EXECROOT}:${process.env.JS_BINARY__RUNFILES}`
 }
 
-// Disable Node's module compile cache by default (aspect-build/rules_js#2937).
-// We will re-enable it at runtime if NODE_COMPILE_CACHE is set.
-process.env.NODE_DISABLE_COMPILE_CACHE = '1'
-
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
 // child processes can find them.
 let currentPath = process.env.PATH || ''

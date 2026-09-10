@@ -1,15 +1,23 @@
-// Code coverage. We load this before anything else here, so that the coverage session
-// sees as much of this process compiled under it as possible. We require coverage.cjs
-// conditionally to cut down on code size for non-test targets.
-if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
-    require('./coverage.cjs')
-}
-
-// The launcher exports NODE_DISABLE_COMPILE_CACHE unconditionally, and then we re-enable
-// the cache here if necessary.
+// Disable Node's module compile cache by default (aspect-build/rules_js#2937): a program that
+// calls module.enableCompileCache() itself -- corepack's npm/pnpm/yarn shims do, with no
+// argument -- would otherwise write to Node's default directory, outside the sandbox. An
+// explicit NODE_COMPILE_CACHE opts back in; Node gives the disable var precedence over it, and
+// we deliberately do the opposite.
+//
+// Must stay above the coverage require below, which snapshots process.env for the reporter
+// subprocess; that runs without this preload and has nothing else to disable the cache.
 if (process.env.NODE_COMPILE_CACHE) {
     delete process.env.NODE_DISABLE_COMPILE_CACHE
     require('node:module').enableCompileCache?.(process.env.NODE_COMPILE_CACHE)
+} else {
+    process.env.NODE_DISABLE_COMPILE_CACHE = '1'
+}
+
+// Code coverage. We load this before anything else that runs in this process, so that the
+// coverage session sees as much of it compiled under it as possible. We require coverage.cjs
+// conditionally to cut down on code size for non-test targets.
+if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
+    require('./coverage.cjs')
 }
 
 const patchfs = require('./fs.cjs').patcher
