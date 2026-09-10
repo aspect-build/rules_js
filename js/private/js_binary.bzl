@@ -688,6 +688,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
             embedded_args = [],
             transformed_args = [],
         )
+
     # node's own flags, so that the launcher can run the program in this very process rather
     # than starting a second node to apply them. Everything here is a literal, never an
     # rlocation path, so none of it is runfiles-transformed.
