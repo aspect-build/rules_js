@@ -29,6 +29,8 @@ const NODE_WRAPPER_PATH = "js/private/node_bin/node"
 const NODE_PATCHES_PATH = "js/private/node-bootstrap/bootstrap.cjs"
 const LOG_PREFIX_RULE_SET = "aspect_rules_js"
 const LOG_PREFIX_RULE = "js_binary"
+// The node options the launcher's own process was already started with, by the native stub.
+const STUB_NODE_OPTIONS = ["--preserve-symlinks-main"]
 
 // ==============================================================================
 // Helpers
@@ -505,10 +507,6 @@ if (!process.env.JS_BINARY__FS_PATCH_ROOTS) {
     process.env.JS_BINARY__FS_PATCH_ROOTS = `${process.env.JS_BINARY__EXECROOT}:${process.env.JS_BINARY__RUNFILES}`
 }
 
-// Disable Node's module compile cache by default (aspect-build/rules_js#2937).
-// We will re-enable it at runtime if NODE_COMPILE_CACHE is set.
-process.env.NODE_DISABLE_COMPILE_CACHE = '1'
-
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
 // child processes can find them.
 let currentPath = process.env.PATH || ''
@@ -588,113 +586,150 @@ if (process.env.JS_BINARY__LOG_INFO) {
 // Run the main program
 // ==============================================================================
 
-// We invoke node directly rather than through JS_BINARY__NODE_WRAPPER. This
-// way we avoid spawning an extra bash process on every launch. The wrapper is
-// still put on the PATH as `node` so that child processes get the patched
-// runtime.
-
-const nodeArgs = [
-    '--require',
-    process.env.JS_BINARY__NODE_PATCHES,
-    ...nodeOptions,
-    '--',
-    entryPoint,
-    ...args,
-]
-
-if (process.env.JS_BINARY__LOG_INFO) {
-    logfInfo(['running', process.env.JS_BINARY__NODE_BINARY, ...nodeArgs].join(' '))
-}
-
 const expectedExitCode = process.env.JS_BINARY__EXPECTED_EXIT_CODE
 
-if (!expectedExitCode) {
-    // Nothing must run after node exits, so replace this process with node.
-    // Signals and terminal control are then delivered directly to node instead
-    // of being proxied through a child process, and no launcher process is left
-    // behind.
-    //
-    // process.execve is POSIX-only and was added in Node 22.15; when it is
-    // unavailable we fall through to spawning node below.
-    if (typeof process.execve === 'function') {
-        try {
-            process.execve(
-                process.env.JS_BINARY__NODE_BINARY,
-                [process.env.JS_BINARY__NODE_BINARY, ...nodeArgs],
-                { ...process.env }
-            )
-        } catch (e) {
-            logfDebug(`process.execve failed (${e.message}); falling back to spawn`)
-        }
+// The stub already started this node process with STUB_NODE_OPTIONS applied. When that is the
+// whole set the program asked for, node is configured the way the program needs it and the
+// program can run right here, saving a second node runtime bootstrap. Anything else -- a
+// node_options entry on the target, a --node_options= passed at run time -- can only be applied
+// by starting node again. An expected exit code also keeps the child, since this launcher has
+// to outlive the program to remap its status.
+const runInProcess =
+    !expectedExitCode &&
+    nodeOptions.length === STUB_NODE_OPTIONS.length &&
+    nodeOptions.every((option, i) => option === STUB_NODE_OPTIONS[i])
+
+if (runInProcess) {
+    if (process.env.JS_BINARY__LOG_INFO) {
+        logfInfo(['running in this process', entryPoint, ...args].join(' '))
     }
-}
 
-// Reached when this launcher has to outlive the program: an expected exit code has to be
-// compared against once the program is done, and a Node before 22.15, or any Node on
-// Windows, has no process.execve to replace this process with.
-const { spawn } = require('node:child_process')
-const child = spawn(process.env.JS_BINARY__NODE_BINARY, nodeArgs, {
-    stdio: 'inherit',
-})
+    // Give the program node's own uncaught-exception reporting back. The handler installed
+    // above is for failures in this launcher; left in place it would replace the program's
+    // stack trace with a one-line FATAL.
+    process.removeAllListeners('uncaughtException')
 
-// ==============================================================================
-// Wait for program to finish
-// ==============================================================================
+    process.argv = [process.argv[0], entryPoint, ...args]
 
-// Node does not forward termination signals to any child process, so the
-// signals are trapped and forwarded manually. The handlers are removed on the
-// first signal so that a second one terminates this launcher.
-function forwardSignal(signal) {
-    return () => {
-        process.removeAllListeners('SIGTERM')
-        process.removeAllListeners('SIGINT')
-        try {
-            child.kill(signal)
-        } catch {
-            // the child already exited
-        }
+    // node itself was only given STUB_NODE_OPTIONS, because the patches are required below
+    // rather than preloaded. Report the arguments the exec path would have used, so that a
+    // tool forwarding execArgv to a worker still reproduces the patched runtime.
+    process.execArgv = ['--require', process.env.JS_BINARY__NODE_PATCHES, ...nodeOptions]
+
+    // Required here rather than baked into the stub as a --require: the patches read
+    // JS_BINARY__ variables that only exist once the launcher above has run.
+    require(process.env.JS_BINARY__NODE_PATCHES)
+
+    // Runs the entry point as the main module, so that `require.main === module` holds for it
+    // and --preserve-symlinks-main applies to it. An ESM entry point takes the same call.
+    require('node:module').runMain()
+} else {
+    // We invoke node directly rather than through JS_BINARY__NODE_WRAPPER. This
+    // way we avoid spawning an extra bash process on every launch. The wrapper is
+    // still put on the PATH as `node` so that child processes get the patched
+    // runtime.
+
+    const nodeArgs = [
+        '--require',
+        process.env.JS_BINARY__NODE_PATCHES,
+        ...nodeOptions,
+        '--',
+        entryPoint,
+        ...args,
+    ]
+
+    if (process.env.JS_BINARY__LOG_INFO) {
+        logfInfo(['running', process.env.JS_BINARY__NODE_BINARY, ...nodeArgs].join(' '))
     }
-}
-process.on('SIGTERM', forwardSignal('SIGTERM'))
-process.on('SIGINT', forwardSignal('SIGINT'))
 
-child.on('error', (err) => {
-    logfFatal(
-        `failed to spawn node binary '${process.env.JS_BINARY__NODE_BINARY}': ${err.message}`
-    )
-    exitWith(127)
-})
-
-child.on('exit', (code, signal) => {
-    const result =
-        signal !== null && signal !== undefined
-            ? 128 + (os.constants.signals[signal] || 0)
-            : code
-
-    // ==============================================================================
-    // Mop up after main program
-    // ==============================================================================
-
-    if (expectedExitCode) {
-        if (String(result) !== String(expectedExitCode)) {
-            logfError(
-                `expected exit code to be '${expectedExitCode}', but got '${result}'`
-            )
-            if (result === 0) {
-                // This exit code is handled specially by Bazel:
-                // https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
-                const BAZEL_EXIT_TESTS_FAILED = 3
-                exitWith(BAZEL_EXIT_TESTS_FAILED)
+    if (!expectedExitCode) {
+        // Nothing must run after node exits, so replace this process with node.
+        // Signals and terminal control are then delivered directly to node instead
+        // of being proxied through a child process, and no launcher process is left
+        // behind.
+        //
+        // process.execve is POSIX-only and was added in Node 22.15; when it is
+        // unavailable we fall through to spawning node below.
+        if (typeof process.execve === 'function') {
+            try {
+                process.execve(
+                    process.env.JS_BINARY__NODE_BINARY,
+                    [process.env.JS_BINARY__NODE_BINARY, ...nodeArgs],
+                    { ...process.env }
+                )
+            } catch (e) {
+                logfDebug(`process.execve failed (${e.message}); falling back to spawn`)
             }
-            exitWith(result)
-        } else {
-            exitWith(0)
         }
     }
 
-    if (signal) {
-        reraiseSignal(signal, result)
-    } else {
-        exitWith(result)
+    // Reached when this launcher has to outlive the program: an expected exit code has to be
+    // compared against once the program is done, and a Node before 22.15, or any Node on
+    // Windows, has no process.execve to replace this process with.
+    const { spawn } = require('node:child_process')
+    const child = spawn(process.env.JS_BINARY__NODE_BINARY, nodeArgs, {
+        stdio: 'inherit',
+    })
+
+    // ==============================================================================
+    // Wait for program to finish
+    // ==============================================================================
+
+    // Node does not forward termination signals to any child process, so the
+    // signals are trapped and forwarded manually. The handlers are removed on the
+    // first signal so that a second one terminates this launcher.
+    function forwardSignal(signal) {
+        return () => {
+            process.removeAllListeners('SIGTERM')
+            process.removeAllListeners('SIGINT')
+            try {
+                child.kill(signal)
+            } catch {
+                // the child already exited
+            }
+        }
     }
-})
+    process.on('SIGTERM', forwardSignal('SIGTERM'))
+    process.on('SIGINT', forwardSignal('SIGINT'))
+
+    child.on('error', (err) => {
+        logfFatal(
+            `failed to spawn node binary '${process.env.JS_BINARY__NODE_BINARY}': ${err.message}`
+        )
+        exitWith(127)
+    })
+
+    child.on('exit', (code, signal) => {
+        const result =
+            signal !== null && signal !== undefined
+                ? 128 + (os.constants.signals[signal] || 0)
+                : code
+
+        // ==============================================================================
+        // Mop up after main program
+        // ==============================================================================
+
+        if (expectedExitCode) {
+            if (String(result) !== String(expectedExitCode)) {
+                logfError(
+                    `expected exit code to be '${expectedExitCode}', but got '${result}'`
+                )
+                if (result === 0) {
+                    // This exit code is handled specially by Bazel:
+                    // https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
+                    const BAZEL_EXIT_TESTS_FAILED = 3
+                    exitWith(BAZEL_EXIT_TESTS_FAILED)
+                }
+                exitWith(result)
+            } else {
+                exitWith(0)
+            }
+        }
+
+        if (signal) {
+            reraiseSignal(signal, result)
+        } else {
+            exitWith(result)
+        }
+    })
+}

@@ -494,11 +494,20 @@ def _launcher_envs(ctx, fixed_env, is_windows):
     return envs, normalized_chdir
 
 def _launcher_node_options(ctx):
-    """The node CLI options the launcher passes, in order."""
-    node_options = [_expand_env_if_needed(ctx, node_option) for node_option in ctx.attr.node_options]
-    if ctx.attr.preserve_symlinks_main:
-        node_options.append("--preserve-symlinks-main")
-    return node_options
+    """The node CLI options the launcher passes, in order.
+
+    Returns:
+        a struct with `all`, every option in the order node receives them, and `stub`, the
+        subset the hermetic launcher's native stub can pass to node itself. Only options that
+        are safe to apply to the launcher's own node process can be baked in: a user
+        node_options entry may name a --require that has to run after the launcher has set up
+        the environment, and may reference an env var only known at run time.
+    """
+    stub_node_options = ["--preserve-symlinks-main"] if ctx.attr.preserve_symlinks_main else []
+    return struct(
+        all = [_expand_env_if_needed(ctx, node_option) for node_option in ctx.attr.node_options] + stub_node_options,
+        stub = stub_node_options,
+    )
 
 def _launcher_paths(ctx, nodeinfo, is_windows):
     """The toolchain paths both launchers bake in, and the files that back them."""
@@ -540,7 +549,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{log_prefix_rule}}": log_prefix_rule,
         "{{node_options}}": "\n".join([
             _NODE_OPTION.format(value = value)
-            for value in node_options
+            for value in node_options.all
         ]),
         "{{node_patches}}": ctx.file._node_patches.short_path,
         "{{node_wrapper}}": paths.node_wrapper_path,
@@ -638,8 +647,9 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
             "{{log_prefix_rule}}": _quote(log_prefix_rule),
             "{{node_options}}": "\n".join([
                 _NODE_OPTION_JS.format(quoted_value = _quote(value))
-                for value in node_options
+                for value in node_options.all
             ]),
+            "{{stub_node_options}}": json.encode(node_options.stub),
             "{{node_patches}}": _quote(ctx.file._node_patches.short_path),
             "{{node_wrapper}}": _quote(paths.node_wrapper_path),
             "{{node}}": _quote(paths.node_path),
@@ -678,6 +688,17 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
             embedded_args = [],
             transformed_args = [],
         )
+
+    # node's own flags, so that the launcher can run the program in this very process rather
+    # than starting a second node to apply them. Everything here is a literal, never an
+    # rlocation path, so none of it is runfiles-transformed.
+    for stub_node_option in node_options.stub:
+        embedded_args, transformed_args = hermetic_launcher.append_embedded_arg(
+            arg = stub_node_option,
+            embedded_args = embedded_args,
+            transformed_args = transformed_args,
+        )
+
     embedded_args, transformed_args = hermetic_launcher.append_runfile(
         file = launcher_js,
         embedded_args = embedded_args,
