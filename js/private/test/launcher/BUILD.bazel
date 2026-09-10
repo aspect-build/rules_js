@@ -483,6 +483,37 @@ assert_contains(
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
 )
 
+# Neither can a variable node only reads as it starts, such as NODE_OPTIONS, which a target may
+# set through env rather than node_options (see examples/js_binary use case 6).
+
+js_binary(
+    name = "in_process_probe_env_bin",
+    entry_point = "in_process_probe_env.cjs",
+    env = {"NODE_OPTIONS": "--title=probe-env"},
+)
+
+genrule(
+    name = "in_process_env_run",
+    outs = ["in_process_env_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_env_bin) > $@",
+    tools = [":in_process_probe_env_bin"],
+)
+
+assert_contains(
+    name = "node_env_starts_a_second_node_test",
+    actual = ":in_process_env_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=no",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# Ungated: the option has to reach node under either launcher. This is the user-visible half, and
+# the reason the fall back above exists.
+assert_contains(
+    name = "node_options_from_env_apply_test",
+    actual = ":in_process_env_out.txt",
+    expected = "TITLE=probe-env",
+)
+
 # ==================================================================================================
 # Case 9: an uncaught exception is reported by node itself, with the program's own stack.
 #
