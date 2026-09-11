@@ -514,6 +514,78 @@ assert_contains(
     expected = "TITLE=probe-env",
 )
 
+# NODE_ENV is not such a variable: node reads nothing from it, so the program keeps the launcher's
+# process. Worth pinning because it is by far the most common js_binary env entry, and treating it
+# as a node variable would quietly cost the fast path almost everywhere.
+
+js_binary(
+    name = "in_process_probe_node_env_bin",
+    entry_point = "in_process_probe_node_env.cjs",
+    env = {"NODE_ENV": "production"},
+)
+
+genrule(
+    name = "in_process_node_env_run",
+    outs = ["in_process_node_env_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_node_env_bin) > $@",
+    tools = [":in_process_probe_node_env_bin"],
+)
+
+assert_contains(
+    name = "node_env_keeps_one_process_test",
+    actual = ":in_process_node_env_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=yes",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# Ungated: exempting the variable is only sound while it still reaches the program.
+assert_contains(
+    name = "node_env_reaches_the_program_test",
+    actual = ":in_process_node_env_out.txt",
+    expected = "NODE_ENV=production",
+)
+
+# The condition is decided at analysis time and baked into the generated launcher, so it can be
+# read straight out of it without running anything. The false case is pinned by the launcher
+# snapshot in //js/private/test/snapshots.
+
+filegroup(
+    name = "in_process_probe_env_launcher_js",
+    srcs = [":in_process_probe_env_bin"],
+    output_group = "launcher_js",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "node_options_env_configures_startup_test",
+    actual = ":in_process_probe_env_launcher_js",
+    expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# A startup variable without the NODE_ prefix counts too. Nothing else covers that half of the
+# list, which node documents under "Environment variables:" alongside the prefixed ones.
+
+js_binary(
+    name = "tz_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"TZ": "UTC"},
+)
+
+filegroup(
+    name = "tz_env_launcher_js",
+    srcs = [":tz_env_bin"],
+    output_group = "launcher_js",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "tz_env_configures_startup_test",
+    actual = ":tz_env_launcher_js",
+    expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
 # ==================================================================================================
 # Case 9: an uncaught exception is reported by node itself, with the program's own stack.
 #

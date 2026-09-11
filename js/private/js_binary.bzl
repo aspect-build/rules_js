@@ -306,6 +306,25 @@ _ENV_SET_JS = """setEnv({quoted_var}, {quoted_value})"""
 _ENV_SET_IFF_NOT_SET_JS = """setEnvIfUnset({quoted_var}, {quoted_value})"""
 _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
 
+# Variables node reads as it starts. The hermetic launcher runs in a node the stub has already
+# started, so a target that sets one of these has to have node started a second time for it to
+# take effect; see the in-process path in js_binary.cjs.tpl. `node --help` lists them under
+# "Environment variables:" -- the NODE_ prefix tested below covers the rest of that list, and is
+# the fail-safe default for any a later node adds.
+_NODE_STARTUP_ENV = ["FORCE_COLOR", "NO_COLOR", "TZ", "UV_THREADPOOL_SIZE"]
+
+# NODE_-prefixed names that are nonetheless safe to set after node has started.
+_NOT_NODE_STARTUP_ENV = [
+    # Not a node variable at all -- node reads nothing from it, and the programs that do read it
+    # do so at run time. Named because it is a common env entry, and treating it as a node one
+    # would give up the in-process path for nothing.
+    "NODE_ENV",
+    # js/private/node-bootstrap/bootstrap.cjs applies the compile cache policy itself, at run
+    # time, so node does not need to have seen these as it started.
+    "NODE_COMPILE_CACHE",
+    "NODE_DISABLE_COMPILE_CACHE",
+]
+
 # Toolchains of the hermetic launcher, resolved here as Labels rather than used as the
 # bare strings hermetic_launcher exposes: under --incompatible_auto_exec_groups a string
 # toolchain type is resolved against the repository mapping of whichever module is being
@@ -324,6 +343,20 @@ def _expand_env_if_needed(ctx, value):
     if ctx.attr.expand_env:
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
+
+def _env_configures_node_startup(envs):
+    """Whether the launcher's environment names a variable node only reads as it starts.
+
+    Args:
+        envs: the (var, value, iff_not_set) triples the launcher will set
+
+    Returns:
+        True if node has to be started again for the environment to take effect
+    """
+    return any([
+        (var.startswith("NODE_") or var in _NODE_STARTUP_ENV) and var not in _NOT_NODE_STARTUP_ENV
+        for (var, _, _) in envs
+    ])
 
 def _quote(value):
     """Quotes a string for either launcher.
@@ -650,6 +683,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
                 for value in node_options.all
             ]),
             "{{stub_node_options}}": json.encode(node_options.stub),
+            "{{env_configures_node_startup}}": json.encode(_env_configures_node_startup(envs)),
             "{{node_patches}}": _quote(ctx.file._node_patches.short_path),
             "{{node_wrapper}}": _quote(paths.node_wrapper_path),
             "{{node}}": _quote(paths.node_path),

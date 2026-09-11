@@ -32,6 +32,11 @@ const LOG_PREFIX_RULE = "js_binary"
 // The node options the launcher's own process was already started with, by the native stub.
 const STUB_NODE_OPTIONS = ["--preserve-symlinks-main"]
 
+// Whether the env applied below names a variable node only reads as it starts, such as
+// NODE_OPTIONS. Worked out at analysis time; see _env_configures_node_startup in
+// js/private/js_binary.bzl for which names count and why.
+const ENV_CONFIGURES_NODE_STARTUP = false
+
 // ==============================================================================
 // Helpers
 // ==============================================================================
@@ -83,27 +88,6 @@ function setEnvIfUnset(name, value) {
     }
 }
 
-// The NODE_* variables, as one comparable string. Node reads NODE_OPTIONS, NODE_PATH and the
-// like once, as it starts, so a target that sets one of them through `env` has to have node
-// started again for it to take effect; the in-process check at the bottom of this file compares
-// a snapshot taken before this launcher touches the environment against the environment the
-// program will actually see.
-//
-// The compile cache pair is left out because js/private/node-bootstrap/bootstrap.cjs applies
-// that policy itself, at run time, and so does not need node to have seen it at startup.
-function nodeStartupEnv() {
-    return Object.keys(process.env)
-        .filter(
-            (name) =>
-                name.startsWith('NODE_') &&
-                name !== 'NODE_COMPILE_CACHE' &&
-                name !== 'NODE_DISABLE_COMPILE_CACHE'
-        )
-        .sort()
-        .map((name) => `${name}=${process.env[name]}`)
-        .join('\n')
-}
-
 function isFile(p) {
     try {
         return fs.statSync(p).isFile()
@@ -132,10 +116,6 @@ function isExecutable(p) {
 // ==============================================================================
 // Environment
 // ==============================================================================
-
-// Taken before the target's own env is applied below, so that it still reflects what node
-// parsed for itself as it started.
-const STARTUP_NODE_ENV = nodeStartupEnv()
 
 setEnv("JS_BINARY__BINDIR", "bazel-out/k8-fastbuild/bin")
 setEnv("JS_BINARY__COMPILATION_MODE", "fastbuild")
@@ -614,17 +594,17 @@ if (process.env.JS_BINARY__LOG_INFO) {
 const expectedExitCode = process.env.JS_BINARY__EXPECTED_EXIT_CODE
 
 // The stub already started this node process with STUB_NODE_OPTIONS applied, and with whatever
-// NODE_* variables it inherited. When those are what the program asked for, node is already
-// configured the way the program needs it and the program can run right here, saving a second
-// node runtime bootstrap. Anything else -- a node_options entry on the target, a --node_options=
-// passed at run time, an env entry naming a variable node only reads as it starts -- can only be
-// applied by starting node again. An expected exit code also keeps the child, since this
-// launcher has to outlive the program to remap its status.
+// environment it inherited. When that is what the program asked for, node is already configured
+// the way the program needs it and the program can run right here, saving a second node runtime
+// bootstrap. Anything else -- a node_options entry on the target, a --node_options= passed at
+// run time, an env entry naming a variable node only reads as it starts -- can only be applied
+// by starting node again. An expected exit code also keeps the child, since this launcher has to
+// outlive the program to remap its status.
 const runInProcess =
+    !ENV_CONFIGURES_NODE_STARTUP &&
     !expectedExitCode &&
     nodeOptions.length === STUB_NODE_OPTIONS.length &&
-    nodeOptions.every((option, i) => option === STUB_NODE_OPTIONS[i]) &&
-    nodeStartupEnv() === STARTUP_NODE_ENV
+    nodeOptions.every((option, i) => option === STUB_NODE_OPTIONS[i])
 
 if (runInProcess) {
     if (process.env.JS_BINARY__LOG_INFO) {
