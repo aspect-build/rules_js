@@ -465,7 +465,7 @@ assert_contains(
 
 js_binary(
     name = "in_process_probe_opts_bin",
-    entry_point = "in_process_probe_opts.cjs",
+    entry_point = "in_process_probe.cjs",
     node_options = ["--title=probe"],
 )
 
@@ -488,7 +488,7 @@ assert_contains(
 
 js_binary(
     name = "in_process_probe_env_bin",
-    entry_point = "in_process_probe_env.cjs",
+    entry_point = "in_process_probe.cjs",
     env = {"NODE_OPTIONS": "--title=probe-env"},
 )
 
@@ -515,12 +515,12 @@ assert_contains(
 )
 
 # NODE_ENV is not such a variable: node reads nothing from it, so the program keeps the launcher's
-# process. Worth pinning because it is by far the most common js_binary env entry, and treating it
-# as a node variable would quietly cost the fast path almost everywhere.
+# process. Worth pinning because it is a common env entry, and treating it as a node variable
+# would give up the fast path for nothing.
 
 js_binary(
     name = "in_process_probe_node_env_bin",
-    entry_point = "in_process_probe_node_env.cjs",
+    entry_point = "in_process_probe.cjs",
     env = {"NODE_ENV": "production"},
 )
 
@@ -546,25 +546,57 @@ assert_contains(
 )
 
 # The condition is decided at analysis time and baked into the generated launcher, so it can be
-# read straight out of it without running anything. The false case is pinned by the launcher
-# snapshot in //js/private/test/snapshots.
+# read straight out of it without running anything. Only the cases with no run-time counterpart
+# need this: a target setting NODE_OPTIONS is already covered end to end above, because it could
+# not report IN_LAUNCHER_PROCESS=no unless the constant were true.
+
+# OPENSSL_CONF stands for the families that carry no NODE_ prefix. Nothing else covers them, and
+# they are the half where getting it wrong drops the variable silently.
+js_binary(
+    name = "openssl_conf_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"OPENSSL_CONF": "openssl.cnf"},
+)
 
 filegroup(
-    name = "in_process_probe_env_launcher_js",
-    srcs = [":in_process_probe_env_bin"],
+    name = "openssl_conf_env_launcher_js",
+    srcs = [":openssl_conf_env_bin"],
     output_group = "launcher_js",
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
 )
 
 assert_contains(
-    name = "node_options_env_configures_startup_test",
-    actual = ":in_process_probe_env_launcher_js",
+    name = "openssl_conf_configures_startup_test",
+    actual = ":openssl_conf_env_launcher_js",
     expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
 )
 
-# A startup variable without the NODE_ prefix counts too. Nothing else covers that half of the
-# list, which node documents under "Environment variables:" alongside the prefixed ones.
+# The inverse, for a name that does match a family but is exempt because bootstrap.cjs applies it
+# at run time. Dropping that exemption would otherwise show up only as a silent slowdown.
+js_binary(
+    name = "compile_cache_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"NODE_COMPILE_CACHE": "node-compile-cache"},
+)
+
+filegroup(
+    name = "compile_cache_env_launcher_js",
+    srcs = [":compile_cache_env_bin"],
+    output_group = "launcher_js",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "compile_cache_keeps_startup_unconfigured_test",
+    actual = ":compile_cache_env_launcher_js",
+    expected = "const ENV_CONFIGURES_NODE_STARTUP = false",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# TZ is not a startup variable either, despite looking like one: node re-reads it when it is
+# assigned. Asserted through behavior rather than through the constant, because what has to hold
+# is that the timezone actually reaches the program without a second node.
 
 js_binary(
     name = "tz_env_bin",
@@ -572,18 +604,25 @@ js_binary(
     env = {"TZ": "UTC"},
 )
 
-filegroup(
-    name = "tz_env_launcher_js",
-    srcs = [":tz_env_bin"],
-    output_group = "launcher_js",
-    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+genrule(
+    name = "tz_env_run",
+    outs = ["tz_env_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :tz_env_bin) > $@",
+    tools = [":tz_env_bin"],
 )
 
 assert_contains(
-    name = "tz_env_configures_startup_test",
-    actual = ":tz_env_launcher_js",
-    expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
+    name = "tz_env_keeps_one_process_test",
+    actual = ":tz_env_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=yes",
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# Ungated, and the one that matters: the exemption is only sound while the timezone still applies.
+assert_contains(
+    name = "tz_env_applies_test",
+    actual = ":tz_env_out.txt",
+    expected = "TZ_OFFSET=0",
 )
 
 # ==================================================================================================

@@ -306,14 +306,23 @@ _ENV_SET_JS = """setEnv({quoted_var}, {quoted_value})"""
 _ENV_SET_IFF_NOT_SET_JS = """setEnvIfUnset({quoted_var}, {quoted_value})"""
 _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
 
-# Variables node reads as it starts. The hermetic launcher runs in a node the stub has already
-# started, so a target that sets one of these has to have node started a second time for it to
-# take effect; see the in-process path in js_binary.cjs.tpl. `node --help` lists them under
-# "Environment variables:" -- the NODE_ prefix tested below covers the rest of that list, and is
-# the fail-safe default for any a later node adds.
-_NODE_STARTUP_ENV = ["FORCE_COLOR", "NO_COLOR", "TZ", "UV_THREADPOOL_SIZE"]
+# Families whose members node reads as it starts. The hermetic launcher runs in a node the stub
+# has already started, so a target that sets one of these has to have node started a second time
+# for it to take effect; see the in-process path in js_binary.cjs.tpl.
+#
+# Prefixes rather than individual names, deliberately: `node --help` under-reports what node
+# reads (it omits NODE_OPTIONS, OPENSSL_CONF and SSL_CERT_*), so an unanticipated variable should
+# cost one extra node boot rather than being silently dropped.
+#
+# The real fix is upstream. hermetic_launcher has no way for the stub to set environment
+# variables before it execve()s node -- its whole API is args and runfiles -- so the launcher
+# cannot run until after node has booted. If it grows one, this and ENV_CONFIGURES_NODE_STARTUP
+# both delete.
+_NODE_STARTUP_ENV_PREFIXES = ["NODE_", "UV_", "V8_", "OPENSSL_", "SSL_CERT_"]
 
-# NODE_-prefixed names that are nonetheless safe to set after node has started.
+# Names matching a family above that node nonetheless does not need to have seen as it started.
+# TZ and the colour variables are absent because they are not in a family at all: node re-reads
+# TZ when it is assigned, and tty.getColorDepth reads FORCE_COLOR/NO_COLOR at call time.
 _NOT_NODE_STARTUP_ENV = [
     # Not a node variable at all -- node reads nothing from it, and the programs that do read it
     # do so at run time. Named because it is a common env entry, and treating it as a node one
@@ -344,19 +353,20 @@ def _expand_env_if_needed(ctx, value):
         return " ".join([expand_variables(ctx, exp, attribute_name = "env") for exp in expand_locations(ctx, value, ctx.attr.data).split(" ")])
     return value
 
+def _is_node_startup_env(var):
+    if var in _NOT_NODE_STARTUP_ENV:
+        return False
+    return any([var.startswith(prefix) for prefix in _NODE_STARTUP_ENV_PREFIXES])
+
 def _env_configures_node_startup(envs):
-    """Whether the launcher's environment names a variable node only reads as it starts.
+    """Whether the launcher's env names a variable node only reads as it starts.
 
-    Args:
-        envs: the (var, value, iff_not_set) triples the launcher will set
-
-    Returns:
-        True if node has to be started again for the environment to take effect
+    Conservative for an iff_not_set entry, whose answer is really a run-time one: if the
+    variable is already in the environment the launcher does not write it, so node saw it as it
+    started and nothing has to be restarted. No entry the rule sets that way is a node variable
+    today -- they are all JS_BINARY__* -- so this costs nothing yet.
     """
-    return any([
-        (var.startswith("NODE_") or var in _NODE_STARTUP_ENV) and var not in _NOT_NODE_STARTUP_ENV
-        for (var, _, _) in envs
-    ])
+    return any([_is_node_startup_env(var) for (var, _, _) in envs])
 
 def _quote(value):
     """Quotes a string for either launcher.

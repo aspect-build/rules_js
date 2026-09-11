@@ -31,10 +31,7 @@ const LOG_PREFIX_RULE_SET = {{log_prefix_rule_set}}
 const LOG_PREFIX_RULE = {{log_prefix_rule}}
 // The node options the launcher's own process was already started with, by the native stub.
 const STUB_NODE_OPTIONS = {{stub_node_options}}
-
-// Whether the env applied below names a variable node only reads as it starts, such as
-// NODE_OPTIONS. Worked out at analysis time; see _env_configures_node_startup in
-// js/private/js_binary.bzl for which names count and why.
+// Worked out at analysis time; see _env_configures_node_startup in js/private/js_binary.bzl.
 const ENV_CONFIGURES_NODE_STARTUP = {{env_configures_node_startup}}
 
 // ==============================================================================
@@ -586,9 +583,10 @@ const expectedExitCode = process.env.JS_BINARY__EXPECTED_EXIT_CODE
 // environment it inherited. When that is what the program asked for, node is already configured
 // the way the program needs it and the program can run right here, saving a second node runtime
 // bootstrap. Anything else -- a node_options entry on the target, a --node_options= passed at
-// run time, an env entry naming a variable node only reads as it starts -- can only be applied
-// by starting node again. An expected exit code also keeps the child, since this launcher has to
-// outlive the program to remap its status.
+// run time, an env entry that configures node startup -- can only be applied by starting node
+// again. An expected exit code also keeps the child, since this launcher has to outlive the
+// program to remap its status. It stays a run-time read because an outer js_run_binary can set
+// it in the action environment, which is what the bash launcher honors too.
 const runInProcess =
     !ENV_CONFIGURES_NODE_STARTUP &&
     !expectedExitCode &&
