@@ -85,7 +85,11 @@ def _grouped_source_impl(ctx):
         DefaultInfo(files = depset([src]), runfiles = runfiles),
         RunfilesGroupInfo(
             entries = runfiles_groups.entries(direct = [
-                runfiles_groups.entry(name = ctx.label, content = runfiles),
+                runfiles_groups.entry(
+                    name = ctx.label,
+                    content = runfiles,
+                    do_not_merge = True,
+                ),
             ]),
             executable_group = None,
         ),

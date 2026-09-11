@@ -49,10 +49,7 @@ Files are equivalent packages.
 
 ## Downstream producers
 
-Merge `js_runfiles_groups.RULE_ATTRS`, gate on `js_runfiles_groups.is_enabled(ctx)`,
-and emit `RunfilesGroupInfo` whose entries equal admitted default runfiles. Do
-not add another grouping provider. A derivative that changes default runfiles
-after `js_binary_lib.implementation` must rebuild `RunfilesGroupInfo`.
-
-`js_image_layer` is unchanged. Packaging, relocation, and byte-dedup are consumer
-work, not part of this producer.
+`RunfilesGroupInfo` is the only grouping provider. A derivative that changes
+default runfiles after `js_binary_lib.implementation` must rebuild
+`RunfilesGroupInfo`. `js_image_layer` is unchanged. Packaging, relocation, and
+byte-dedup are consumer work, not part of this producer.

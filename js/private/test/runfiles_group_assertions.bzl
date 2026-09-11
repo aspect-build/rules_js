@@ -108,24 +108,24 @@ def assert_allowed_overlaps(env, resolved, allowed):
             "unexpected overlap of {} on {}".format(names, f.path),
         )
 
-def related_admitted(runfiles_files, original):
-    """Admitted Files matching original by identity, copy association, or unique basename.
+def unique_admitted(runfiles_files, basename):
+    """Same-configuration Files from this target's runfiles with an exact basename."""
+    return [f for f in runfiles_files if f.basename == basename]
 
-    Extra analysistest File attrs are not in the target's configuration. Identity
-    works for source Files; generated Files fall back to a unique basename in
-    this target's runfiles. Two unrelated Files that share a basename (two
-    `shared.js` roots) match by identity only.
+def related_admitted(runfiles_files, original):
+    """Admitted Files matching original by identity, plus copies of that File.
+
+    Extra analysistest File attrs are not in the target's configuration. Use
+    this only with source Files (same configuration) or with Files already taken
+    from the target under test. Do not match unrelated same-basename Files.
     """
     related = [f for f in runfiles_files if f == original]
-    same = [f for f in runfiles_files if f.basename == original.basename]
-    if related:
-        for f in same:
-            if f not in related and f.is_source != original.is_source:
-                related.append(f)
-        return related
-    if len(same) == 1:
-        return same
-    return []
+    if not related:
+        return []
+    for f in runfiles_files:
+        if f not in related and f.basename == original.basename and f.is_source != original.is_source:
+            related.append(f)
+    return related
 
 def runfiles_files(target):
     rf = target[DefaultInfo].default_runfiles

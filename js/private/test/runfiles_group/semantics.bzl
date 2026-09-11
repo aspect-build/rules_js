@@ -7,8 +7,7 @@ Does not reimplement grouping to compute expected membership.
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
 load("@rules_runfiles_group//runfiles_group:lib.bzl", "runfiles_groups")
 load("@rules_runfiles_group//runfiles_group:providers.bzl", "RunfilesGroupInfo")
-load("//js:providers.bzl", "JsInfo")
-load("//js:runfiles_groups.bzl", "js_runfiles_groups")
+load("//js/private:js_runfiles_groups.bzl", "js_runfiles_groups")
 load(
     "//js/private/test:runfiles_group_assertions.bzl",
     "DISABLED_CONFIG",
@@ -16,6 +15,7 @@ load(
     "assert_contains_files",
     "assert_empty_files",
     "assert_excludes_files",
+    "assert_files_exact",
     "assert_group_metadata",
     "assert_has_rgi",
     "assert_name_absent",
@@ -27,14 +27,18 @@ load(
     "resolve_target",
     "runfiles_files",
     "semantics_test",
+    "unique_admitted",
 )
 
 # Coverage execution is unchanged; grouping does not expose a coverage group.
 _COVERAGE_GROUP = "aspect_rules_js#coverage"
 
 def _assert_role(env, found, rf_files, original, expected_name, forbidden_names):
-    related = related_admitted(rf_files, original)
-    asserts.true(env, related, "no admitted file matching {}".format(original.basename))
+    if type(original) == "string":
+        related = unique_admitted(rf_files, original)
+    else:
+        related = related_admitted(rf_files, original)
+    asserts.true(env, related, "no admitted file matching {}".format(original if type(original) == "string" else original.basename))
     expected = found.get(expected_name)
     asserts.true(env, expected != None, "missing group {}".format(expected_name))
     assert_contains_files(env, expected, related)
@@ -95,19 +99,51 @@ def _p1_rebuilt_disabled_impl(ctx):
 
 p1_rebuilt_disabled_test = analysistest.make(_p1_rebuilt_disabled_impl, config_settings = DISABLED_CONFIG)
 
+def _grouped_files(resolved):
+    grouped = {}
+    if resolved == None:
+        return grouped
+    for g in resolved.groups:
+        for f in runfiles_groups.files(g).to_list():
+            grouped[f] = True
+    return grouped
+
+def _p1_library_outputs_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_has_rgi(env, target)
+    rf_files = runfiles_files(target)
+    grouped = _grouped_files(resolve_target(ctx, target))
+    for basename in ["p1_inner_dep.js", "p1_inner_asset.json"]:
+        related = unique_admitted(rf_files, basename)
+        asserts.true(env, related, "missing admitted {}".format(basename))
+        for f in related:
+            asserts.true(env, f in grouped, "{} missing from outer RGI".format(f.path))
+    return analysistest.end(env)
+
+# A library must group a data dep's default outputs even when those outputs
+# are outside the dep's own default runfiles.
+p1_library_outputs_test = semantics_test(_p1_library_outputs_impl)
+
+def _p1_opaque_deps_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_has_rgi(env, target)
+    rf_files = runfiles_files(target)
+    grouped = _grouped_files(resolve_target(ctx, target))
+    for basename in ["p1_opaque_own.js", "p1_opaque_shared.js", "p1_opaque_asset.json"]:
+        related = unique_admitted(rf_files, basename)
+        asserts.true(env, related, "missing admitted {}".format(basename))
+        for f in related:
+            asserts.true(env, f in grouped, "{} missing from library RGI".format(f.path))
+    return analysistest.end(env)
+
+# Ungrouped JsInfo deps with File-only runfiles are relayed onto library RGI.
+p1_opaque_deps_test = semantics_test(_p1_opaque_deps_impl)
+
 # Launcher, entry point, and raw data sources are the protected application
 # group. JsInfo sources (direct, transitive, types) are first_party. Binaries
 # do not emit #npm or #coverage.
-_P2_ATTRS = {
-    "entry": attr.label(allow_single_file = True, mandatory = True),
-    "raw_data": attr.label(allow_single_file = True, mandatory = True),
-    "generated": attr.label(allow_single_file = True, mandatory = True),
-    "immediate_src": attr.label(allow_single_file = True, mandatory = True),
-    "immediate_types": attr.label(allow_single_file = True, mandatory = True),
-    "transitive_src": attr.label(allow_single_file = True, mandatory = True),
-    "opaque_src": attr.label(allow_single_file = True, mandatory = True),
-}
-
 def _p2_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
@@ -195,13 +231,13 @@ def _p2_impl(ctx):
         other = found.get(name)
         if other:
             assert_excludes_files(env, other, [exe])
-    _assert_role(env, found, rf_files, ctx.file.entry, app_name, others_from_app)
-    _assert_role(env, found, rf_files, ctx.file.raw_data, app_name, others_from_app)
-    _assert_role(env, found, rf_files, ctx.file.generated, js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
-    _assert_role(env, found, rf_files, ctx.file.immediate_src, js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
-    _assert_role(env, found, rf_files, ctx.file.immediate_types, js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
-    _assert_role(env, found, rf_files, ctx.file.transitive_src, js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
-    _assert_role(env, found, rf_files, ctx.file.opaque_src, js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "main.js", app_name, others_from_app)
+    _assert_role(env, found, rf_files, "p2_raw.txt", app_name, others_from_app)
+    _assert_role(env, found, rf_files, "p2_generated.txt", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "lib.js", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "lib.d.ts", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "src_only.js", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "p2_custom.js", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
 
     assert_name_absent(env, found, js_runfiles_groups.NPM_GROUP)
     assert_name_absent(env, found, js_runfiles_groups.NPM_TOOLCHAIN_GROUP)
@@ -209,7 +245,7 @@ def _p2_impl(ctx):
     assert_allowed_overlaps(env, resolved, [])
     return analysistest.end(env)
 
-p2_semantics_test = semantics_test(_p2_impl, attrs = _P2_ATTRS)
+p2_semantics_test = semantics_test(_p2_impl)
 
 # first_party Files must not also appear in third_party.
 def _swap_must_fail_helper(ctx):
@@ -225,21 +261,15 @@ def _swap_must_fail_helper(ctx):
         env,
         found,
         runfiles_files(target),
-        ctx.file.immediate_src,
+        "lib.js",
         js_runfiles_groups.FIRST_PARTY_GROUP,
         [js_runfiles_groups.THIRD_PARTY_GROUP],
     )
     return analysistest.end(env)
 
-p2_swap_guard_test = semantics_test(_swap_must_fail_helper, attrs = {
-    "immediate_src": attr.label(allow_single_file = True, mandatory = True),
-})
+p2_swap_guard_test = semantics_test(_swap_must_fail_helper)
 
 _P3_ATTRS = {
-    "owned_by_a": attr.label(allow_single_file = True, mandatory = True),
-    "owned_by_b": attr.label(allow_single_file = True, mandatory = True),
-    "owned_by_both": attr.label(allow_single_file = True, mandatory = True),
-    "shared_dep": attr.label(allow_single_file = True, mandatory = True),
     "bin_a": attr.label(mandatory = True),
     "bin_b": attr.label(mandatory = True),
 }
@@ -267,14 +297,30 @@ def _p3_limit_impl(ctx):
     asserts.equals(env, 7, len(resolved.groups))
 
     rf_files = runfiles_files(target)
-    _assert_role(env, found, rf_files, ctx.file.owned_by_a, name_a, [name_b, js_runfiles_groups.FIRST_PARTY_GROUP])
-    _assert_role(env, found, rf_files, ctx.file.owned_by_b, name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
-    _assert_role(env, found, rf_files, ctx.file.shared_dep, js_runfiles_groups.FIRST_PARTY_GROUP, [name_a, name_b])
-    both = ctx.file.owned_by_both
-    asserts.true(env, both in rf_files, "shared application File not admitted")
-    assert_contains_files(env, found[name_a], [both])
-    assert_contains_files(env, found[name_b], [both])
-    assert_allowed_overlaps(env, resolved, [sorted([name_a, name_b])])
+
+    def _some_in(group, files, msg):
+        have = file_set(files_list(group))
+        asserts.true(env, any([f in have for f in files]), msg)
+
+    def _none_in(group, files, msg):
+        have = file_set(files_list(group))
+        asserts.false(env, any([f in have for f in files]), msg)
+
+    a_files = unique_admitted(rf_files, "p3_a_only.txt")
+    asserts.true(env, a_files, "p3_a_only.txt not admitted")
+    _some_in(found[name_a], a_files, "A-owned File missing from A's application group")
+    _some_in(found[js_runfiles_groups.FIRST_PARTY_GROUP], a_files, "A-owned File missing from first_party via B")
+    _none_in(found[name_b], a_files, "A-owned File must not enter B's application group")
+    _assert_role(env, found, rf_files, "p3_b_only.txt", name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "shared.js", js_runfiles_groups.FIRST_PARTY_GROUP, [name_a, name_b])
+    both = unique_admitted(rf_files, "p3_both.txt")
+    asserts.true(env, both, "p3_both.txt not admitted")
+    _some_in(found[name_a], both, "shared application File missing from A")
+    _some_in(found[name_b], both, "shared application File missing from B")
+    assert_allowed_overlaps(env, resolved, [
+        sorted([name_a, name_b]),
+        sorted([name_a, js_runfiles_groups.FIRST_PARTY_GROUP]),
+    ])
 
     limited = runfiles_groups.limit(ctx, resolved, max_groups = 1)
     asserts.equals(env, 7, limited.group_count)
@@ -289,8 +335,10 @@ def _p3_limit_impl(ctx):
         js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
     ]:
         asserts.equals(env, False, limited_found[name].do_not_merge)
-    _assert_role(env, limited_found, rf_files, ctx.file.owned_by_a, name_a, [name_b, js_runfiles_groups.FIRST_PARTY_GROUP])
-    _assert_role(env, limited_found, rf_files, ctx.file.owned_by_b, name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
+    _some_in(limited_found[name_a], a_files, "A-owned File dropped from A's group after limit()")
+    _some_in(limited_found[js_runfiles_groups.FIRST_PARTY_GROUP], a_files, "A-owned File dropped from first_party after limit()")
+    _none_in(limited_found[name_b], a_files, "A-owned File entered B's group after limit()")
+    _assert_role(env, limited_found, rf_files, "p3_b_only.txt", name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
     return analysistest.end(env)
 
 # Shared mergeable groups fold by name; protected application groups stay distinct.
@@ -339,21 +387,18 @@ def _p5_custom_npm_impl(ctx):
     found = group_by_name(resolve_target(ctx, target))
     third = found.get(js_runfiles_groups.THIRD_PARTY_GROUP)
     asserts.true(env, third != None, "missing third_party; groups={}".format(sorted(found.keys())))
-    pkg = ctx.file.custom_pkg
     _assert_role(
         env,
         found,
         runfiles_files(target),
-        pkg,
+        "p5_custom_npm_pkg.js",
         js_runfiles_groups.THIRD_PARTY_GROUP,
         [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP],
     )
     return analysistest.end(env)
 
 # NpmPackageInfo.src on data is third_party, even without going through npm_link_package.
-p5_custom_npm_semantics_test = semantics_test(_p5_custom_npm_impl, attrs = {
-    "custom_pkg": attr.label(allow_single_file = True, mandatory = True),
-})
+p5_custom_npm_semantics_test = semantics_test(_p5_custom_npm_impl)
 
 def _p5_external_impl(ctx):
     env = analysistest.begin(ctx)
@@ -388,23 +433,23 @@ def _p5_link_as_src_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     found = group_by_name(resolve_target(ctx, target))
-    asserts.true(env, js_runfiles_groups.THIRD_PARTY_GROUP in found or js_runfiles_groups.NPM_LINKS_GROUP in found)
-    admitted = [f for f in runfiles_files(target) if "/.aspect_rules_js/" in f.path]
-    asserts.true(env, admitted, "expected admitted npm store/link payload")
+    third = found.get(js_runfiles_groups.THIRD_PARTY_GROUP)
+    links = found.get(js_runfiles_groups.NPM_LINKS_GROUP)
+    asserts.true(env, third != None and files_list(third), "missing third_party store payload")
+    asserts.true(env, links != None and files_list(links), "missing npm_links routing")
+    store = [f for f in runfiles_files(target) if "/.aspect_rules_js/" in f.path]
+    asserts.true(env, store, "expected admitted npm store files")
     first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
     if first:
-        assert_excludes_files(env, first, admitted)
-    owned = False
-    for name in [js_runfiles_groups.THIRD_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP]:
-        group = found.get(name)
-        if not group:
-            continue
-        have = file_set(files_list(group))
-        for f in admitted:
-            if f in have:
-                owned = True
-                break
-    asserts.true(env, owned, "admitted npm payload missing from third_party/npm_links")
+        assert_excludes_files(env, first, store)
+    third_set = file_set(files_list(third))
+    link_set = file_set(files_list(links))
+    in_third = [f for f in store if f in third_set]
+    asserts.true(env, in_third, "store payload missing from third_party")
+    for f in in_third:
+        asserts.false(env, f in link_set, "store payload also in npm_links: {}".format(f.path))
+    routing_only = [f for f in files_list(links) if f not in third_set]
+    asserts.true(env, routing_only, "npm_links must contain routing files distinct from third_party")
     return analysistest.end(env)
 
 # js_library(srcs = [npm_link_package]) still classifies the package tree as npm, not first_party.
@@ -531,16 +576,6 @@ def _p6_copied_node_impl(ctx):
 # A copied Node executable File is classified as #node.
 p6_copied_node_semantics_test = semantics_test(_p6_copied_node_impl)
 
-_P4_JSINFO_ATTRS = {
-    "jsinfo": attr.label(mandatory = True, providers = [JsInfo]),
-}
-
-def _jsinfo_named(jsinfo, suffix):
-    for f in jsinfo.transitive_sources.to_list() + jsinfo.transitive_types.to_list() + jsinfo.npm_sources.to_list():
-        if f.basename.endswith(suffix):
-            return f
-    fail("no JsInfo file ending with {}".format(suffix))
-
 def _p4_none_impl(ctx):
     env = analysistest.begin(ctx)
     found = group_by_name(resolve_target(ctx, analysistest.target_under_test(env)))
@@ -560,43 +595,39 @@ def _p4_direct_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     found = group_by_name(resolve_target(ctx, target))
-    jsinfo = ctx.attr.jsinfo[JsInfo]
     rf_files = runfiles_files(target)
-    _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_s_direct.js"), js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
-    _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_t_direct.d.ts"), js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
-    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
-    assert_excludes_files(env, first, [_jsinfo_named(jsinfo, "_s_transitive.js")])
+    _assert_role(env, found, rf_files, "p4_jsinfo_s_direct.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "p4_jsinfo_t_direct.d.ts", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    asserts.equals(env, [], unique_admitted(rf_files, "p4_jsinfo_s_transitive.js"))
     return analysistest.end(env)
 
 # include_sources / include_types admit direct JsInfo files as first_party.
-p4_direct_semantics_test = semantics_test(_p4_direct_impl, attrs = _P4_JSINFO_ATTRS)
+p4_direct_semantics_test = semantics_test(_p4_direct_impl)
 
 def _p4_trans_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     found = group_by_name(resolve_target(ctx, target))
-    jsinfo = ctx.attr.jsinfo[JsInfo]
     rf_files = runfiles_files(target)
-    _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_s_transitive.js"), js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
-    _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_t_transitive.d.ts"), js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "p4_jsinfo_s_transitive.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "p4_jsinfo_t_transitive.d.ts", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
     return analysistest.end(env)
 
 # include_transitive_sources / include_transitive_types admit transitive JsInfo files.
-p4_trans_semantics_test = semantics_test(_p4_trans_impl, attrs = _P4_JSINFO_ATTRS)
+p4_trans_semantics_test = semantics_test(_p4_trans_impl)
 
 def _p4_both_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     found = group_by_name(resolve_target(ctx, target))
-    jsinfo = ctx.attr.jsinfo[JsInfo]
     rf_files = runfiles_files(target)
-    _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_s_direct.js"), js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
-    _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_s_transitive.js"), js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
-    _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_npm.js"), js_runfiles_groups.THIRD_PARTY_GROUP, [js_runfiles_groups.FIRST_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "p4_jsinfo_s_direct.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "p4_jsinfo_s_transitive.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "p4_jsinfo_npm.js", js_runfiles_groups.THIRD_PARTY_GROUP, [js_runfiles_groups.FIRST_PARTY_GROUP])
     return analysistest.end(env)
 
 # Direct sources are first_party; npm_sources from JsInfo are third_party.
-p4_both_semantics_test = semantics_test(_p4_both_impl, attrs = _P4_JSINFO_ATTRS)
+p4_both_semantics_test = semantics_test(_p4_both_impl)
 
 def _p4_include_npm_impl(ctx):
     env = analysistest.begin(ctx)
@@ -656,20 +687,20 @@ def _p4_grouped_copy_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     resolved = resolve_target(ctx, target)
-    asserts.true(env, resolved != None, "library with grouped data must emit RGI")
+    found = group_by_name(resolved)
     related = related_admitted(runfiles_files(target), ctx.file.original)
     asserts.true(env, len(related) > 1, "expected original plus copy on the library")
-    grouped = {}
-    for g in resolved.groups:
-        for f in runfiles_groups.files(g).to_list():
-            grouped[f] = True
-    for f in related:
-        asserts.true(env, f in grouped, "admitted {} missing from library RGI".format(f.path))
+    owner_name = runfiles_groups.name_str(ctx.attr.producer.label)
+    owner = found.get(owner_name)
+    asserts.true(env, owner != None, "missing inherited group {}".format(owner_name))
+    asserts.true(env, owner.do_not_merge, "copy must keep do_not_merge on the inherited entry")
+    assert_files_exact(env, owner, related)
     return analysistest.end(env)
 
-# Copying a source that is already in a grouped dep still admits the copy.
+# Copying a grouped source keeps the copy on that entry, including do_not_merge.
 p4_grouped_copy_semantics_test = semantics_test(_p4_grouped_copy_impl, attrs = {
     "original": attr.label(allow_single_file = True, mandatory = True),
+    "producer": attr.label(mandatory = True),
 })
 
 def _p4_generated_impl(ctx):
@@ -680,16 +711,14 @@ def _p4_generated_impl(ctx):
         env,
         found,
         runfiles_files(target),
-        ctx.file.generated,
+        "p2_generated.txt",
         js_runfiles_groups.FIRST_PARTY_GROUP,
         [runfiles_groups.name_str(target.label)],
     )
     return analysistest.end(env)
 
 # Generated ordinary data (write_file / genrule) is first_party, not the application group.
-p4_generated_semantics_test = semantics_test(_p4_generated_impl, attrs = {
-    "generated": attr.label(allow_single_file = True, mandatory = True),
-})
+p4_generated_semantics_test = semantics_test(_p4_generated_impl)
 
 def _p4_dir_impl(ctx):
     env = analysistest.begin(ctx)

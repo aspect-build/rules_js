@@ -513,6 +513,13 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         transitive_files = transitive_launcher_files,
     ))
 
+    if not js_runfiles_groups.is_enabled(ctx):
+        return struct(
+            executable = launcher,
+            runfiles = runfiles,
+            data_runfiles = data_runfiles,
+            chdir = chdir,
+        )
     return struct(
         executable = launcher,
         runfiles = runfiles,

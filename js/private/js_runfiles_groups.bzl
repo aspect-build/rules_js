@@ -74,15 +74,6 @@ def _runfiles_nonempty(runfiles):
         _depset_nonempty(runfiles.root_symlinks)
     )
 
-def _runfiles_has_non_file_components(runfiles):
-    if runfiles == None:
-        return False
-    return (
-        _depset_nonempty(runfiles.empty_filenames) or
-        _depset_nonempty(runfiles.symlinks) or
-        _depset_nonempty(runfiles.root_symlinks)
-    )
-
 def _fallback_runfiles_entry(ctx, dep):
     runfiles = dep[DefaultInfo].default_runfiles
     if runfiles == None:
@@ -148,12 +139,16 @@ def _lift(files_dict, copy_of, admitted):
             result[copy] = True
     return result
 
-def _extend_with_copies(ctx, entry, copy_of, admitted):
-    extras = []
-    for f in runfiles_groups.files(entry).to_list():
-        copy = copy_of.get(f)
-        if copy != None and copy != f and copy in admitted:
-            extras.append(copy)
+def _extend_with_copies(ctx, entry, copy_of, admitted = None):
+    """Add copies of Files already in this entry. Skip the file scan when nothing was copied."""
+    copy_pairs = []
+    for orig, copy in copy_of.items():
+        if copy != orig and (admitted == None or copy in admitted):
+            copy_pairs.append((orig, copy))
+    if not copy_pairs:
+        return entry
+    files = {f: True for f in runfiles_groups.files(entry).to_list()}
+    extras = [copy for orig, copy in copy_pairs if orig in files]
     if not extras:
         return entry
     return runfiles_groups.derive(
@@ -161,12 +156,30 @@ def _extend_with_copies(ctx, entry, copy_of, admitted):
         content = runfiles_groups.union(ctx, [entry.content, depset(extras)]),
     )
 
-def _collect_rgi(ctx, own, transitive, executable_group = None):
+def _relay_grouped(ctx, dep, copy_of, own, transitive):
+    entries = dep[RunfilesGroupInfo].entries
+    has_copies = False
+    for orig, copy in copy_of.items():
+        if copy != orig:
+            has_copies = True
+            break
+    if not has_copies:
+        transitive.append(entries)
+        return
+    for entry in entries.to_list():
+        own.append(_extend_with_copies(ctx, entry, copy_of))
+
+def _relay_runfiles(ctx, dep, copy_of, own):
+    fallback = _fallback_runfiles_entry(ctx, dep)
+    if fallback:
+        own.append(_extend_with_copies(ctx, fallback, copy_of))
+
+def _collect_rgi(ctx, own, transitive):
     if not own and not transitive:
         return None
     return RunfilesGroupInfo(
         entries = runfiles_groups.collect(ctx, deps = [], data = [], own = own, transitive = transitive),
-        executable_group = executable_group,
+        executable_group = None,
     )
 
 def _direct_files_and_copies(dep, copy_of):
@@ -177,28 +190,6 @@ def _direct_files_and_copies(dep, copy_of):
         if copy != None and copy != f:
             files.append(copy)
     return files
-
-def _copies_of_outputs(dep, copy_of):
-    """Copies of this dep's default outputs, including when the original is already grouped."""
-    copies = []
-    for f in dep[DefaultInfo].files.to_list() if dep[DefaultInfo].files else []:
-        copy = copy_of.get(f)
-        if copy != None and copy != f:
-            copies.append(copy)
-    return copies
-
-def _ordinary_needs_runfiles_fallback(dep):
-    """True when default_runfiles has components or files beyond DefaultInfo.files."""
-    rf = dep[DefaultInfo].default_runfiles
-    if _runfiles_has_non_file_components(rf):
-        return True
-    default_files = dep[DefaultInfo].files.to_list() if dep[DefaultInfo].files else []
-    default_set = {f: True for f in default_files}
-    rf_files = rf.files.to_list() if rf != None and _depset_nonempty(rf.files) else []
-    for f in rf_files:
-        if f not in default_set:
-            return True
-    return False
 
 def _npm_src_if_in_outputs(dep, copy_of):
     """NpmPackageInfo.src only when it is this target's default output."""
@@ -217,7 +208,11 @@ def _npm_src_if_in_outputs(dep, copy_of):
     return out
 
 def library_groups(ctx, *, data, srcs_types_deps, copied_data_files, copied_originals):
-    """Relay/classify a js_library's admitted default-runfiles contribution."""
+    """Relay inherited runfiles and independently admit this library's direct outputs.
+
+    Default-runfiles relay is exact (borrowed RGI or the complete default_runfiles
+    object). Direct DefaultInfo.files and copies are a separate contribution.
+    """
     copy_of = _copy_map(copied_originals, copied_data_files)
     own = []
     transitive = []
@@ -226,43 +221,17 @@ def library_groups(ctx, *, data, srcs_types_deps, copied_data_files, copied_orig
 
     for dep in data:
         if RunfilesGroupInfo in dep:
-            transitive.append(dep[RunfilesGroupInfo].entries)
-            first_party.extend(_copies_of_outputs(dep, copy_of))
-        elif _is_ordinary_data(dep):
-            if _ordinary_needs_runfiles_fallback(dep):
-                fallback = _fallback_runfiles_entry(ctx, dep)
-                if fallback:
-                    own.append(fallback)
-                first_party.extend(_copies_of_outputs(dep, copy_of))
-            else:
-                first_party.extend(_direct_files_and_copies(dep, copy_of))
-        elif JsInfo in dep or NpmPackageInfo in dep:
-            first_party.extend(_direct_files_and_copies(dep, copy_of))
-            if _runfiles_has_non_file_components(dep[DefaultInfo].default_runfiles):
-                fallback = _fallback_runfiles_entry(ctx, dep)
-                if fallback:
-                    own.append(fallback)
+            _relay_grouped(ctx, dep, copy_of, own, transitive)
         else:
-            fallback = _fallback_runfiles_entry(ctx, dep)
-            if fallback:
-                own.append(fallback)
+            _relay_runfiles(ctx, dep, copy_of, own)
+        first_party.extend(_direct_files_and_copies(dep, copy_of))
         third_party.extend(_npm_src_if_in_outputs(dep, copy_of))
 
     for dep in srcs_types_deps:
         if RunfilesGroupInfo in dep:
-            transitive.append(dep[RunfilesGroupInfo].entries)
-            first_party.extend(_copies_of_outputs(dep, copy_of))
-        elif JsInfo in dep or NpmPackageInfo in dep:
-            # Inventories travel in JsInfo. Relay extra runfiles components
-            # without flattening this dep's file closure onto first_party.
-            if _runfiles_has_non_file_components(dep[DefaultInfo].default_runfiles):
-                fallback = _fallback_runfiles_entry(ctx, dep)
-                if fallback:
-                    own.append(fallback)
+            _relay_grouped(ctx, dep, copy_of, own, transitive)
         else:
-            fallback = _fallback_runfiles_entry(ctx, dep)
-            if fallback:
-                own.append(fallback)
+            _relay_runfiles(ctx, dep, copy_of, own)
 
     e = _maybe_files_entry(FIRST_PARTY_GROUP, first_party, "first_party", RANK_FIRST_PARTY_DEPS)
     if e:
@@ -650,5 +619,4 @@ js_runfiles_groups = struct(
     RANK_FOUNDATION = runfiles_groups.RANK_FOUNDATION,
     RANK_SHARED_DEPS = runfiles_groups.RANK_SHARED_DEPS,
     RANK_EXECUTABLE = runfiles_groups.RANK_EXECUTABLE,
-    RunfilesGroupInfo = RunfilesGroupInfo,
 )

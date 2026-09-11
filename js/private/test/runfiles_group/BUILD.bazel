@@ -26,7 +26,7 @@ load(
     "rgi_passthrough",
     "single_output_executable",
 )
-load(":semantics.bzl", "p1_launcher_only_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_grouped_copy_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_exec_vs_raw_semantics_test", "p6_foreign_semantics_test", "p6_library_relay_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
+load(":semantics.bzl", "p1_launcher_only_test", "p1_library_outputs_test", "p1_opaque_deps_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_grouped_copy_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_exec_vs_raw_semantics_test", "p6_foreign_semantics_test", "p6_library_relay_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
 load(":tests.bzl", "runfiles_group_tests")
 
 package(default_testonly = True)
@@ -61,6 +61,35 @@ js_library(
     name = "lib_with_data",
     data = ["data.txt"],
     srcs = ["lib.js"],
+)
+
+js_library(
+    name = "p1_inner",
+    srcs = ["p1_inner_dep.js"],
+    data = ["p1_inner_asset.json"],
+)
+
+js_library(
+    name = "p1_outer",
+    data = [":p1_inner"],
+)
+
+opaque_jsinfo(
+    name = "p1_opaque",
+    shared = "p1_opaque_shared.js",
+)
+
+js_library(
+    name = "p1_opaque_lib",
+    data = ["p1_opaque_asset.json"],
+    deps = [":p1_opaque"],
+)
+
+foreign_rgi_data(name = "p1_foreign_rgi")
+
+js_library(
+    name = "p1_foreign_outputs_lib",
+    data = [":p1_foreign_rgi"],
 )
 
 custom_grouped_binary(
@@ -144,6 +173,11 @@ js_library(
     srcs = ["shared.js"],
 )
 
+opaque_jsinfo(
+    name = "p3_a_as_jsinfo",
+    shared = "p3_a_only.txt",
+)
+
 js_binary(
     name = "p3_a",
     data = [
@@ -162,6 +196,7 @@ js_binary(
     data = [
         "p3_b_only.txt",
         "p3_both.txt",
+        ":p3_a_as_jsinfo",
         ":p3_shared_lib",
         ":source_backed_link",
         "//:node_modules/circles",
@@ -610,31 +645,29 @@ p1_rebuilt_disabled_test(
     target_under_test = ":rebuilt_rgi",
 )
 
+p1_library_outputs_test(
+    name = "p1_library_outputs",
+    target_under_test = ":p1_outer",
+)
+
+p1_opaque_deps_test(
+    name = "p1_opaque_deps",
+    target_under_test = ":p1_opaque_lib",
+)
+
 p2_semantics_test(
     name = "p2_semantics",
     target_under_test = ":p2_bin",
-    entry = "main.js",
-    raw_data = "p2_raw.txt",
-    generated = ":p2_generated_data",
-    immediate_src = "lib.js",
-    immediate_types = "lib.d.ts",
-    transitive_src = "src_only.js",
-    opaque_src = "p2_custom.js",
 )
 
 p2_swap_guard_test(
     name = "p2_swap_guard",
     target_under_test = ":p2_bin",
-    immediate_src = "lib.js",
 )
 
 p3_limit_semantics_test(
     name = "p3_limit_semantics",
     target_under_test = ":p3_aggregate",
-    owned_by_a = "p3_a_only.txt",
-    owned_by_b = "p3_b_only.txt",
-    owned_by_both = "p3_both.txt",
-    shared_dep = "shared.js",
     bin_a = ":p3_a",
     bin_b = ":p3_b",
 )
@@ -647,19 +680,16 @@ p4_none_semantics_test(
 p4_direct_semantics_test(
     name = "p4_direct_semantics",
     target_under_test = ":p4_direct",
-    jsinfo = ":p4_jsinfo",
 )
 
 p4_trans_semantics_test(
     name = "p4_trans_semantics",
     target_under_test = ":p4_trans",
-    jsinfo = ":p4_jsinfo",
 )
 
 p4_both_semantics_test(
     name = "p4_both_semantics",
     target_under_test = ":p4_both",
-    jsinfo = ":p4_jsinfo",
 )
 
 p4_include_npm_semantics_test(
@@ -683,12 +713,12 @@ p4_grouped_copy_semantics_test(
     name = "p4_grouped_copy_semantics",
     target_under_test = ":p4_grouped_copy_lib",
     original = "p4_grouped_src.txt",
+    producer = ":p4_grouped_src",
 )
 
 p4_generated_semantics_test(
     name = "p4_generated_semantics",
     target_under_test = ":p4_generated_data",
-    generated = ":p2_generated_data",
 )
 
 p4_dir_semantics_test(
@@ -715,7 +745,6 @@ p5_link_coarse_semantics_test(
 p5_custom_npm_semantics_test(
     name = "p5_custom_npm_semantics",
     target_under_test = ":p5_custom_npm_bin",
-    custom_pkg = ":p5_custom_npm",
 )
 
 p5_link_as_src_semantics_test(
