@@ -75,7 +75,7 @@ def _js_proto_aspect_impl(target, ctx):
         additional_args = rewrite_args,
     )
 
-    providers = [
+    return [
         js_info(
             target = ctx.label,
             sources = depset(js_outputs),
@@ -86,7 +86,6 @@ def _js_proto_aspect_impl(target, ctx):
             npm_package_store_infos = gather_npm_package_store_infos([proto_lang_toolchain_info.runtime]),
         ),
     ]
-    return providers
 
 js_proto_aspect = aspect(
     implementation = _js_proto_aspect_impl,

@@ -127,33 +127,6 @@ def copy_js_data_files(ctx, data_files, copy_data_files_to_bin, no_copy_to_bin):
             files_runfiles.append(d)
     return files_runfiles
 
-def selected_js_info_channels(
-        include_sources,
-        include_types,
-        include_transitive_sources,
-        include_transitive_types,
-        include_npm_sources):
-    """Which JsInfo fields the include_* flags select.
-
-    `include_transitive_*` takes precedence over the corresponding direct flag.
-    """
-    return struct(
-        source_field = "transitive_sources" if include_transitive_sources else ("sources" if include_sources else None),
-        type_field = "transitive_types" if include_transitive_types else ("types" if include_types else None),
-        npm_field = "npm_sources" if include_npm_sources else None,
-    )
-
-def js_info_selected_file_depsets(js_info, channels):
-    """File depsets selected from one JsInfo by `selected_js_info_channels`."""
-    files_depsets = []
-    if channels.source_field:
-        files_depsets.append(getattr(js_info, channels.source_field))
-    if channels.type_field:
-        files_depsets.append(getattr(js_info, channels.type_field))
-    if channels.npm_field:
-        files_depsets.append(js_info.npm_sources)
-    return files_depsets
-
 def gather_runfiles(
         ctx,
         sources = None,
@@ -285,17 +258,23 @@ def gather_files_from_js_infos(
     Returns:
         A depset of files
     """
-    channels = selected_js_info_channels(
-        include_sources = include_sources,
-        include_types = include_types,
-        include_transitive_sources = include_transitive_sources,
-        include_transitive_types = include_transitive_types,
-        include_npm_sources = include_npm_sources,
-    )
     files_depsets = []
     for target in targets:
         if JsInfo in target:
-            files_depsets.extend(js_info_selected_file_depsets(target[JsInfo], channels))
+            js_info = target[JsInfo]
+
+            if include_transitive_sources:
+                files_depsets.append(js_info.transitive_sources)
+            elif include_sources:
+                files_depsets.append(js_info.sources)
+
+            if include_transitive_types:
+                files_depsets.append(js_info.transitive_types)
+            elif include_types:
+                files_depsets.append(js_info.types)
+
+            if include_npm_sources:
+                files_depsets.append(js_info.npm_sources)
 
     return depset(transitive = files_depsets)
 

@@ -7,8 +7,9 @@ load("//npm:defs.bzl", "npm_link_package", "npm_package")
 def js_library_chain(name, count):
     """Create `{name}_lib0` .. `{name}_lib{count-1}` with unique payloads.
 
-    Every node also data-depends on one shared npm link so grouping relays the
-    borrowed coarse npm depsets instead of flattening the store closure.
+    Every node data-depends on a unique runtime file plus one shared npm link
+    so grouping relays borrowed coarse npm depsets while still grouping a
+    growing admitted runtime inventory.
     """
     write_file(
         name = "%s_pkg_src" % name,
@@ -36,6 +37,11 @@ def js_library_chain(name, count):
             out = "%s_%d.js" % (name, i),
             content = ["exports.n = %d;" % i],
         )
+        write_file(
+            name = "%s_rt%d" % (name, i),
+            out = "%s_rt%d.txt" % (name, i),
+            content = ["rt %d" % i],
+        )
         deps = []
         if i >= 1:
             deps.append(":%s_lib%d" % (name, i - 1))
@@ -44,7 +50,10 @@ def js_library_chain(name, count):
         js_library(
             name = "%s_lib%d" % (name, i),
             srcs = [":%s_src%d" % (name, i)],
-            data = [":%s_link" % name],
+            data = [
+                ":%s_rt%d" % (name, i),
+                ":%s_link" % name,
+            ],
             deps = deps,
             visibility = ["//visibility:public"],
         )

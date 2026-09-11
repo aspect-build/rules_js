@@ -78,6 +78,38 @@ def _foreign_symlinks_impl(ctx):
 
 foreign_symlinks = rule(implementation = _foreign_symlinks_impl)
 
+def _grouped_source_impl(ctx):
+    src = ctx.file.src
+    runfiles = ctx.runfiles(files = [src])
+    return [
+        DefaultInfo(files = depset([src]), runfiles = runfiles),
+        RunfilesGroupInfo(
+            entries = runfiles_groups.entries(direct = [
+                runfiles_groups.entry(name = ctx.label, content = runfiles),
+            ]),
+            executable_group = None,
+        ),
+    ]
+
+grouped_source = rule(
+    implementation = _grouped_source_impl,
+    attrs = {"src": attr.label(allow_single_file = True, mandatory = True)},
+)
+
+def _single_output_exec_impl(ctx):
+    out = ctx.actions.declare_file(ctx.label.name + ".sh")
+    ctx.actions.write(out, "#!/bin/true", is_executable = True)
+    return [DefaultInfo(
+        executable = out,
+        files = depset([out]),
+        runfiles = ctx.runfiles(files = [out]),
+    )]
+
+single_output_executable = rule(
+    implementation = _single_output_exec_impl,
+    executable = True,
+)
+
 def _foreign_files_order_impl(ctx):
     a = ctx.actions.declare_file(ctx.label.name + "_a.txt")
     b = ctx.actions.declare_file(ctx.label.name + "_b.txt")
@@ -95,8 +127,9 @@ def _foreign_rgi_mixed_impl(ctx):
     f2 = ctx.actions.declare_file(ctx.label.name + "_rf.txt")
     ctx.actions.write(f1, "1")
     ctx.actions.write(f2, "2")
+    runfiles = ctx.runfiles(files = [f1, f2])
     return [
-        DefaultInfo(files = depset([f1]), runfiles = ctx.runfiles(files = [f2])),
+        DefaultInfo(files = depset([f1, f2]), runfiles = runfiles),
         RunfilesGroupInfo(
             entries = runfiles_groups.entries(direct = [
                 runfiles_groups.entry(name = ctx.label, content = depset([f1])),

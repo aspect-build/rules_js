@@ -16,6 +16,7 @@ load(
     "foreign_rgi_data",
     "foreign_rgi_mixed",
     "foreign_symlinks",
+    "grouped_source",
     "node_path_toolchain",
     "npm_package_info_data",
     "opaque_jsinfo",
@@ -23,8 +24,9 @@ load(
     "rgi_aggregate",
     "rgi_drop",
     "rgi_passthrough",
+    "single_output_executable",
 )
-load(":semantics.bzl", "p1_launcher_only_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_foreign_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
+load(":semantics.bzl", "p1_launcher_only_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_grouped_copy_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_exec_vs_raw_semantics_test", "p6_foreign_semantics_test", "p6_library_relay_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
 load(":tests.bzl", "runfiles_group_tests")
 
 package(default_testonly = True)
@@ -158,6 +160,7 @@ js_binary(
 js_binary(
     name = "p3_b",
     data = [
+        "p3_b_only.txt",
         "p3_both.txt",
         ":p3_shared_lib",
         ":source_backed_link",
@@ -254,6 +257,16 @@ js_binary(
     entry_point = "main.js",
     include_npm = False,
     no_copy_to_bin = ["p4_copy_skip.txt"],
+)
+
+grouped_source(
+    name = "p4_grouped_src",
+    src = "p4_grouped_src.txt",
+)
+
+js_library(
+    name = "p4_grouped_copy_lib",
+    data = [":p4_grouped_src"],
 )
 
 js_binary(
@@ -424,6 +437,20 @@ js_binary(
     include_npm = False,
 )
 
+js_binary(
+    name = "p6_carrier_bin",
+    data = [":p6_carrier"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
+js_binary(
+    name = "p6_via_deps_bin",
+    data = [":p6_via_deps"],
+    entry_point = "main.js",
+    include_npm = False,
+)
+
 alias(
     name = "p6_alias",
     actual = ":p6_outer",
@@ -460,6 +487,34 @@ foreign_rgi_mixed(name = "p6_foreign_mixed")
 foreign_protected(name = "p6_foreign_protected")
 
 foreign_symlinks(name = "p6_foreign_symlinks")
+
+js_library(
+    name = "p6_symlink_lib",
+    data = [":p6_foreign_symlinks"],
+)
+
+filegroup(
+    name = "p6_fg_extra",
+    srcs = ["p6_fg_src.txt"],
+    data = ["p6_fg_data.txt"],
+)
+
+js_library(
+    name = "p6_fg_lib",
+    data = [":p6_fg_extra"],
+)
+
+single_output_executable(name = "p6_one_output_exec")
+
+js_binary(
+    name = "p6_exec_vs_raw_bin",
+    data = [
+        "p6_raw_file.txt",
+        ":p6_one_output_exec",
+    ],
+    entry_point = "main.js",
+    include_npm = False,
+)
 
 foreign_files_order(
     name = "p6_foreign_topo",
@@ -577,6 +632,7 @@ p3_limit_semantics_test(
     name = "p3_limit_semantics",
     target_under_test = ":p3_aggregate",
     owned_by_a = "p3_a_only.txt",
+    owned_by_b = "p3_b_only.txt",
     owned_by_both = "p3_both.txt",
     shared_dep = "shared.js",
     bin_a = ":p3_a",
@@ -623,6 +679,12 @@ p4_copy_semantics_test(
     skip = "p4_copy_skip.txt",
 )
 
+p4_grouped_copy_semantics_test(
+    name = "p4_grouped_copy_semantics",
+    target_under_test = ":p4_grouped_copy_lib",
+    original = "p4_grouped_src.txt",
+)
+
 p4_generated_semantics_test(
     name = "p4_generated_semantics",
     target_under_test = ":p4_generated_data",
@@ -659,7 +721,6 @@ p5_custom_npm_semantics_test(
 p5_link_as_src_semantics_test(
     name = "p5_link_as_src_semantics",
     target_under_test = ":p5_link_as_src_bin",
-    pkg_tree = ":p5_pkg",
 )
 
 p6_marker_semantics_test(
@@ -674,8 +735,35 @@ p6_passthrough_semantics_test(
 
 p6_nested_semantics_test(
     name = "p6_nested_semantics",
-    target_under_test = ":p6_outer",
+    target_under_test = ":p6_carrier_bin",
     inner = ":p6_inner",
+)
+
+p6_nested_semantics_test(
+    name = "p6_via_deps_semantics",
+    target_under_test = ":p6_via_deps_bin",
+    inner = ":p6_inner",
+)
+
+p6_library_relay_semantics_test(
+    name = "p6_symlink_lib_semantics",
+    target_under_test = ":p6_symlink_lib",
+    expect_symlinks = True,
+    extra_basename = "",
+)
+
+p6_library_relay_semantics_test(
+    name = "p6_fg_lib_semantics",
+    target_under_test = ":p6_fg_lib",
+    expect_symlinks = False,
+    extra_basename = "p6_fg_data.txt",
+)
+
+p6_exec_vs_raw_semantics_test(
+    name = "p6_exec_vs_raw_semantics",
+    target_under_test = ":p6_exec_vs_raw_bin",
+    raw_data = "p6_raw_file.txt",
+    executable_dep = ":p6_one_output_exec",
 )
 
 p6_drop_semantics_test(

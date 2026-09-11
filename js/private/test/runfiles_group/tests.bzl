@@ -163,9 +163,17 @@ def _nested_and_foreign():
     # and Node toolchain Files are preserved as-is.
     runfiles_group_analysis_test(
         name = "p6_nested_contract",
-        binaries = [":p6_outer"],
+        binaries = [":p6_carrier_bin"],
         check_disabled = False,
-        expected_executable_group = runfiles_groups.name_str(Label(":p6_outer")),
+        expected_executable_group = runfiles_groups.name_str(Label(":p6_carrier_bin")),
+        overlapping_group_behavior = "ignore",
+        max_groups = 100,
+    )
+    runfiles_group_analysis_test(
+        name = "p6_via_deps_contract",
+        binaries = [":p6_via_deps_bin"],
+        check_disabled = False,
+        expected_executable_group = runfiles_groups.name_str(Label(":p6_via_deps_bin")),
         overlapping_group_behavior = "ignore",
         max_groups = 100,
     )

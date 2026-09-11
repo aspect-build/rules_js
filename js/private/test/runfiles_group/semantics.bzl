@@ -20,6 +20,8 @@ load(
     "assert_has_rgi",
     "assert_name_absent",
     "assert_no_rgi",
+    "file_set",
+    "files_list",
     "group_by_name",
     "related_admitted",
     "resolve_target",
@@ -186,6 +188,13 @@ def _p2_impl(ctx):
         js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
     ]
     others_from_first = [app_name, js_runfiles_groups.THIRD_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP]
+    exe = target[DefaultInfo].files_to_run.executable if target[DefaultInfo].files_to_run else None
+    asserts.true(env, exe != None, "binary executable missing")
+    assert_contains_files(env, found[app_name], [exe])
+    for name in others_from_app:
+        other = found.get(name)
+        if other:
+            assert_excludes_files(env, other, [exe])
     _assert_role(env, found, rf_files, ctx.file.entry, app_name, others_from_app)
     _assert_role(env, found, rf_files, ctx.file.raw_data, app_name, others_from_app)
     _assert_role(env, found, rf_files, ctx.file.generated, js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
@@ -228,6 +237,7 @@ p2_swap_guard_test = semantics_test(_swap_must_fail_helper, attrs = {
 
 _P3_ATTRS = {
     "owned_by_a": attr.label(allow_single_file = True, mandatory = True),
+    "owned_by_b": attr.label(allow_single_file = True, mandatory = True),
     "owned_by_both": attr.label(allow_single_file = True, mandatory = True),
     "shared_dep": attr.label(allow_single_file = True, mandatory = True),
     "bin_a": attr.label(mandatory = True),
@@ -258,6 +268,7 @@ def _p3_limit_impl(ctx):
 
     rf_files = runfiles_files(target)
     _assert_role(env, found, rf_files, ctx.file.owned_by_a, name_a, [name_b, js_runfiles_groups.FIRST_PARTY_GROUP])
+    _assert_role(env, found, rf_files, ctx.file.owned_by_b, name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
     _assert_role(env, found, rf_files, ctx.file.shared_dep, js_runfiles_groups.FIRST_PARTY_GROUP, [name_a, name_b])
     both = ctx.file.owned_by_both
     asserts.true(env, both in rf_files, "shared application File not admitted")
@@ -278,6 +289,8 @@ def _p3_limit_impl(ctx):
         js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
     ]:
         asserts.equals(env, False, limited_found[name].do_not_merge)
+    _assert_role(env, limited_found, rf_files, ctx.file.owned_by_a, name_a, [name_b, js_runfiles_groups.FIRST_PARTY_GROUP])
+    _assert_role(env, limited_found, rf_files, ctx.file.owned_by_b, name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
     return analysistest.end(env)
 
 # Shared mergeable groups fold by name; protected application groups stay distinct.
@@ -376,15 +389,26 @@ def _p5_link_as_src_impl(ctx):
     target = analysistest.target_under_test(env)
     found = group_by_name(resolve_target(ctx, target))
     asserts.true(env, js_runfiles_groups.THIRD_PARTY_GROUP in found or js_runfiles_groups.NPM_LINKS_GROUP in found)
+    admitted = [f for f in runfiles_files(target) if "/.aspect_rules_js/" in f.path]
+    asserts.true(env, admitted, "expected admitted npm store/link payload")
     first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
-    if first and ctx.file.pkg_tree:
-        assert_excludes_files(env, first, [ctx.file.pkg_tree])
+    if first:
+        assert_excludes_files(env, first, admitted)
+    owned = False
+    for name in [js_runfiles_groups.THIRD_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP]:
+        group = found.get(name)
+        if not group:
+            continue
+        have = file_set(files_list(group))
+        for f in admitted:
+            if f in have:
+                owned = True
+                break
+    asserts.true(env, owned, "admitted npm payload missing from third_party/npm_links")
     return analysistest.end(env)
 
 # js_library(srcs = [npm_link_package]) still classifies the package tree as npm, not first_party.
-p5_link_as_src_semantics_test = semantics_test(_p5_link_as_src_impl, attrs = {
-    "pkg_tree": attr.label(allow_single_file = True, mandatory = True),
-})
+p5_link_as_src_semantics_test = semantics_test(_p5_link_as_src_impl)
 
 def _p6_marker_impl(ctx):
     env = analysistest.begin(ctx)
@@ -628,6 +652,26 @@ p4_copy_semantics_test = semantics_test(_p4_copy_impl, attrs = {
     "skip": attr.label(allow_single_file = True, mandatory = True),
 })
 
+def _p4_grouped_copy_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    asserts.true(env, resolved != None, "library with grouped data must emit RGI")
+    related = related_admitted(runfiles_files(target), ctx.file.original)
+    asserts.true(env, len(related) > 1, "expected original plus copy on the library")
+    grouped = {}
+    for g in resolved.groups:
+        for f in runfiles_groups.files(g).to_list():
+            grouped[f] = True
+    for f in related:
+        asserts.true(env, f in grouped, "admitted {} missing from library RGI".format(f.path))
+    return analysistest.end(env)
+
+# Copying a source that is already in a grouped dep still admits the copy.
+p4_grouped_copy_semantics_test = semantics_test(_p4_grouped_copy_impl, attrs = {
+    "original": attr.label(allow_single_file = True, mandatory = True),
+})
+
 def _p4_generated_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
@@ -690,4 +734,63 @@ def _p4_no_copy_impl(ctx):
 # copy_data_to_bin = False keeps the original source File in the application group.
 p4_no_copy_semantics_test = semantics_test(_p4_no_copy_impl, attrs = {
     "raw_data": attr.label(allow_single_file = True, mandatory = True),
+})
+
+def _p6_library_relay_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    asserts.true(env, resolved != None, "library with extra data runfiles must emit RGI")
+    if ctx.attr.expect_symlinks:
+        has_symlink = False
+        has_root = False
+        for g in resolved.groups:
+            rf = runfiles_groups.runfiles(ctx, g)
+            if rf.symlinks and rf.symlinks.to_list():
+                has_symlink = True
+            if rf.root_symlinks and rf.root_symlinks.to_list():
+                has_root = True
+        asserts.true(env, has_symlink, "library dropped inherited symlinks")
+        asserts.true(env, has_root, "library dropped inherited root_symlinks")
+    extra = ctx.attr.extra_basename
+    if extra:
+        names = []
+        for g in resolved.groups:
+            names.extend([f.basename for f in runfiles_groups.files(g).to_list()])
+        asserts.true(env, extra in names, "library dropped extra runfiles file {}".format(extra))
+    return analysistest.end(env)
+
+# js_library must relay complete admitted runfiles, including extra filegroup
+# data and symlink/root_symlink components.
+p6_library_relay_semantics_test = semantics_test(_p6_library_relay_impl, attrs = {
+    "expect_symlinks": attr.bool(),
+    "extra_basename": attr.string(),
+})
+
+def _p6_exec_vs_raw_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    app_name = runfiles_groups.name_str(target.label)
+    _assert_role(
+        env,
+        found,
+        runfiles_files(target),
+        ctx.file.raw_data,
+        app_name,
+        [js_runfiles_groups.FIRST_PARTY_GROUP],
+    )
+    exec_name = runfiles_groups.name_str(ctx.attr.executable_dep.label)
+    asserts.true(env, exec_name in found, "single-output executable should keep a Label group")
+    exec_files = files_list(found[exec_name])
+    asserts.true(env, exec_files, "executable Label group is empty")
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    if first:
+        assert_excludes_files(env, first, exec_files)
+    return analysistest.end(env)
+
+# A generated single-output executable is not ordinary data; a raw File still is.
+p6_exec_vs_raw_semantics_test = semantics_test(_p6_exec_vs_raw_impl, attrs = {
+    "raw_data": attr.label(allow_single_file = True, mandatory = True),
+    "executable_dep": attr.label(mandatory = True),
 })

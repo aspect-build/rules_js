@@ -66,7 +66,11 @@ def assert_excludes_files(env, group, forbidden_files, msg = None):
 def assert_files_exact(env, group, expected_files):
     have = file_set(files_list(group))
     want = file_set(expected_files)
-    asserts.equals(env, sorted([f.path for f in want]), sorted([f.path for f in have]))
+    asserts.equals(env, len(want), len(have), "file count {} != {}".format(len(have), len(want)))
+    for f in want:
+        asserts.true(env, f in have, "missing {} in {}".format(f.path, group.name))
+    for f in have:
+        asserts.true(env, f in want, "unexpected {} in {}".format(f.path, group.name))
 
 def assert_name_absent(env, found, name):
     asserts.false(env, name in found, "unexpected group {}".format(name))
@@ -105,12 +109,23 @@ def assert_allowed_overlaps(env, resolved, allowed):
         )
 
 def related_admitted(runfiles_files, original):
-    """Admitted Files that match original by identity or unique basename."""
-    related = []
-    for f in runfiles_files:
-        if f == original or f.basename == original.basename:
-            related.append(f)
-    return related
+    """Admitted Files matching original by identity, copy association, or unique basename.
+
+    Extra analysistest File attrs are not in the target's configuration. Identity
+    works for source Files; generated Files fall back to a unique basename in
+    this target's runfiles. Two unrelated Files that share a basename (two
+    `shared.js` roots) match by identity only.
+    """
+    related = [f for f in runfiles_files if f == original]
+    same = [f for f in runfiles_files if f.basename == original.basename]
+    if related:
+        for f in same:
+            if f not in related and f.is_source != original.is_source:
+                related.append(f)
+        return related
+    if len(same) == 1:
+        return same
+    return []
 
 def runfiles_files(target):
     rf = target[DefaultInfo].default_runfiles

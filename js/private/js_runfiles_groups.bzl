@@ -60,23 +60,28 @@ def _maybe_files_entry(name, files, kind, rank, do_not_merge = False):
         files = depset(files)
     return _native_entry(name, files, kind, rank, do_not_merge = do_not_merge)
 
-def _depset_has_members(d):
-    return d != None and bool(d.to_list())
+def _depset_nonempty(d):
+    """True when a depset has members. Empty depsets are false; do not flatten."""
+    return d != None and bool(d)
 
 def _runfiles_nonempty(runfiles):
     if runfiles == None:
         return False
+    return (
+        _depset_nonempty(runfiles.files) or
+        _depset_nonempty(runfiles.empty_filenames) or
+        _depset_nonempty(runfiles.symlinks) or
+        _depset_nonempty(runfiles.root_symlinks)
+    )
 
-    # Empty depsets are still truthy; inspect this one target's components.
-    if _depset_has_members(runfiles.files):
-        return True
-    if _depset_has_members(runfiles.empty_filenames):
-        return True
-    if _depset_has_members(runfiles.symlinks):
-        return True
-    if _depset_has_members(runfiles.root_symlinks):
-        return True
-    return False
+def _runfiles_has_non_file_components(runfiles):
+    if runfiles == None:
+        return False
+    return (
+        _depset_nonempty(runfiles.empty_filenames) or
+        _depset_nonempty(runfiles.symlinks) or
+        _depset_nonempty(runfiles.root_symlinks)
+    )
 
 def _fallback_runfiles_entry(ctx, dep):
     runfiles = dep[DefaultInfo].default_runfiles
@@ -87,13 +92,12 @@ def _fallback_runfiles_entry(ctx, dep):
     return runfiles_groups.entry(name = dep.label, content = runfiles)
 
 def _has_executable(target):
-    """True for nested binaries, not for a lone File listed as its own executable."""
+    """True for executable rules. A source File listed as its own executable is not."""
     files_to_run = target[DefaultInfo].files_to_run
     executable = files_to_run.executable if files_to_run else None
     if executable == None:
         return False
-    files = target[DefaultInfo].files.to_list() if target[DefaultInfo].files else []
-    if files == [executable]:
+    if executable.is_source:
         return False
     return True
 
@@ -174,22 +178,43 @@ def _direct_files_and_copies(dep, copy_of):
             files.append(copy)
     return files
 
-def _extra_default_outputs(dep, copy_of):
-    """DefaultInfo.files not already in the target's default_runfiles, plus copies."""
-    default_info = dep[DefaultInfo]
-    runfiles = default_info.default_runfiles
-    runfiles_files = {}
-    if runfiles != None and runfiles.files:
-        for f in runfiles.files.to_list():
-            runfiles_files[f] = True
-    extras = []
-    for f in default_info.files.to_list() if default_info.files else []:
-        if f not in runfiles_files:
-            extras.append(f)
-            copy = copy_of.get(f)
-            if copy != None and copy != f:
-                extras.append(copy)
-    return extras
+def _copies_of_outputs(dep, copy_of):
+    """Copies of this dep's default outputs, including when the original is already grouped."""
+    copies = []
+    for f in dep[DefaultInfo].files.to_list() if dep[DefaultInfo].files else []:
+        copy = copy_of.get(f)
+        if copy != None and copy != f:
+            copies.append(copy)
+    return copies
+
+def _ordinary_needs_runfiles_fallback(dep):
+    """True when default_runfiles has components or files beyond DefaultInfo.files."""
+    rf = dep[DefaultInfo].default_runfiles
+    if _runfiles_has_non_file_components(rf):
+        return True
+    default_files = dep[DefaultInfo].files.to_list() if dep[DefaultInfo].files else []
+    default_set = {f: True for f in default_files}
+    rf_files = rf.files.to_list() if rf != None and _depset_nonempty(rf.files) else []
+    for f in rf_files:
+        if f not in default_set:
+            return True
+    return False
+
+def _npm_src_if_in_outputs(dep, copy_of):
+    """NpmPackageInfo.src only when it is this target's default output."""
+    if NpmPackageInfo not in dep:
+        return []
+    src = dep[NpmPackageInfo].src
+    if not src:
+        return []
+    files = dep[DefaultInfo].files.to_list() if dep[DefaultInfo].files else []
+    if src not in files:
+        return []
+    out = [src]
+    copy = copy_of.get(src)
+    if copy != None and copy != src:
+        out.append(copy)
+    return out
 
 def library_groups(ctx, *, data, srcs_types_deps, copied_data_files, copied_originals):
     """Relay/classify a js_library's admitted default-runfiles contribution."""
@@ -198,38 +223,42 @@ def library_groups(ctx, *, data, srcs_types_deps, copied_data_files, copied_orig
     transitive = []
     first_party = []
     third_party = []
-    unclassified = []
 
     for dep in data:
         if RunfilesGroupInfo in dep:
             transitive.append(dep[RunfilesGroupInfo].entries)
-            unclassified.extend(_extra_default_outputs(dep, copy_of))
+            first_party.extend(_copies_of_outputs(dep, copy_of))
         elif _is_ordinary_data(dep):
-            first_party.extend(_direct_files_and_copies(dep, copy_of))
+            if _ordinary_needs_runfiles_fallback(dep):
+                fallback = _fallback_runfiles_entry(ctx, dep)
+                if fallback:
+                    own.append(fallback)
+                first_party.extend(_copies_of_outputs(dep, copy_of))
+            else:
+                first_party.extend(_direct_files_and_copies(dep, copy_of))
         elif JsInfo in dep or NpmPackageInfo in dep:
             first_party.extend(_direct_files_and_copies(dep, copy_of))
+            if _runfiles_has_non_file_components(dep[DefaultInfo].default_runfiles):
+                fallback = _fallback_runfiles_entry(ctx, dep)
+                if fallback:
+                    own.append(fallback)
         else:
             fallback = _fallback_runfiles_entry(ctx, dep)
             if fallback:
                 own.append(fallback)
-        if NpmPackageInfo in dep:
-            src = dep[NpmPackageInfo].src
-            if src:
-                third_party.append(src)
-                copy = copy_of.get(src)
-                if copy != None and copy != src:
-                    third_party.append(copy)
+        third_party.extend(_npm_src_if_in_outputs(dep, copy_of))
 
     for dep in srcs_types_deps:
         if RunfilesGroupInfo in dep:
             transitive.append(dep[RunfilesGroupInfo].entries)
+            first_party.extend(_copies_of_outputs(dep, copy_of))
         elif JsInfo in dep or NpmPackageInfo in dep:
-            # Inventories travel in JsInfo. Only default-runfiles files are admitted.
-            rf = dep[DefaultInfo].default_runfiles
-            if rf != None and _depset_has_members(rf.files):
-                first_party.extend(rf.files.to_list())
-            elif _depset_has_members(dep[DefaultInfo].files) and _runfiles_nonempty(rf):
-                first_party.extend(_direct_files_and_copies(dep, copy_of))
+            # Inventories travel in JsInfo. Relay extra runfiles components
+            # without flattening this dep's file closure onto first_party.
+            if _runfiles_has_non_file_components(dep[DefaultInfo].default_runfiles):
+                fallback = _fallback_runfiles_entry(ctx, dep)
+                if fallback:
+                    own.append(fallback)
         else:
             fallback = _fallback_runfiles_entry(ctx, dep)
             if fallback:
@@ -239,9 +268,6 @@ def library_groups(ctx, *, data, srcs_types_deps, copied_data_files, copied_orig
     if e:
         own.append(e)
     e = _maybe_files_entry(THIRD_PARTY_GROUP, third_party, "third_party", runfiles_groups.RANK_SHARED_DEPS)
-    if e:
-        own.append(e)
-    e = _maybe_files_entry(UNCLASSIFIED_GROUP, unclassified, "", RANK_UNCLASSIFIED)
     if e:
         own.append(e)
     return _collect_rgi(ctx, own, transitive)
@@ -309,8 +335,7 @@ def binary_groups(
         npm_sources,
         include_npm,
         data,
-        entry_point_file,
-        entry_point_target):
+        entry_point_file):
     """Normalize the final js_binary / js_test runtime closure."""
     copy_of = _copy_map(copied_originals, copied_files)
     admitted = _flatten_files([runfiles.files] if runfiles.files else [])
@@ -327,7 +352,6 @@ def binary_groups(
     ordinary_generated = []
     app_files = []
     fallbacks = []
-    extra_unclassified = []
 
     if executable:
         app_files.append(executable)
@@ -346,11 +370,10 @@ def binary_groups(
     for dep in data:
         if RunfilesGroupInfo in dep:
             inherited_depsets.append(dep[RunfilesGroupInfo].entries)
-            extra_unclassified.extend(_extra_default_outputs(dep, copy_of))
         elif JsInfo in dep or NpmPackageInfo in dep or NpmPackageStoreInfo in dep:
             # Classify through inventories at this boundary; do not wrap as a
             # foreign Label group (that would hide first/third-party roles).
-            extra_unclassified.extend(_extra_default_outputs(dep, copy_of))
+            pass
         elif not _is_ordinary_data(dep):
             fallback = _fallback_runfiles_entry(ctx, dep)
             if fallback:
@@ -358,9 +381,9 @@ def binary_groups(
         else:
             dr = dep[DefaultInfo].default_runfiles
             if dr != None and (
-                _depset_has_members(dr.symlinks) or
-                _depset_has_members(dr.root_symlinks) or
-                _depset_has_members(dr.empty_filenames)
+                _depset_nonempty(dr.symlinks) or
+                _depset_nonempty(dr.root_symlinks) or
+                _depset_nonempty(dr.empty_filenames)
             ):
                 fallback = _fallback_runfiles_entry(ctx, dep)
                 if fallback:
@@ -411,14 +434,13 @@ def binary_groups(
     for fallback in fallbacks:
         preserved.append(_extend_with_copies(ctx, fallback, copy_of, admitted))
 
-    N = _lift(_flatten_files(npm_ds + store_ds), copy_of, admitted)
+    N_pre = _flatten_files(npm_ds + store_ds)
+    N = _lift(N_pre, copy_of, admitted)
     P = _lift(_flatten_files(packaged_ds + third_party_inherited), copy_of, admitted)
-    L = _lift(_flatten_files(routing_ds), copy_of, admitted)
     S = _lift(_flatten_files(source_ds + first_party_inherited), copy_of, admitted)
     D = _lift(_file_dict(ordinary_generated), copy_of, admitted)
 
     # Routing from npm-channel symlinks is computed on pre-copy identities.
-    N_pre = _flatten_files(npm_ds + store_ds)
     routing_from_shape = {}
     for f in N_pre:
         if getattr(f, "is_symlink", False):
@@ -525,7 +547,6 @@ def binary_groups(
 
     leftover_files = [f for f in admitted if f not in assigned]
     leftover_files.extend(unclassified)
-    leftover_files.extend([f for f in extra_unclassified if f in admitted and f not in assigned])
     covered_symlinks = {}
     covered_root_symlinks = {}
     covered_empty = {}
@@ -583,7 +604,7 @@ def binary_groups(
         extra_rf = []
         for dep in data:
             dr = dep[DefaultInfo].default_runfiles
-            if dr != None and _depset_has_members(dr.empty_filenames):
+            if dr != None and _depset_nonempty(dr.empty_filenames):
                 extra_rf.append(dr)
         if extra_rf:
             if type(leftover_rf) == "list":
