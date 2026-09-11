@@ -572,6 +572,29 @@ assert_contains(
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
 )
 
+# The locale family, which ICU reads once as node starts. Its own prefix, because a target that
+# sets LC_ALL and runs in the launcher's process would format dates and numbers as the ambient
+# locale rather than the one it asked for.
+js_binary(
+    name = "locale_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"LC_ALL": "de_DE.UTF-8"},
+)
+
+filegroup(
+    name = "locale_env_launcher_js",
+    srcs = [":locale_env_bin"],
+    output_group = "launcher_js",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "locale_configures_startup_test",
+    actual = ":locale_env_launcher_js",
+    expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
 # The inverse, for a name that does match a family but is exempt because bootstrap.cjs applies it
 # at run time. Dropping that exemption would otherwise show up only as a silent slowdown.
 js_binary(

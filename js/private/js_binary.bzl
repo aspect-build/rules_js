@@ -318,7 +318,18 @@ _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
 # variables before it execve()s node -- its whole API is args and runfiles -- so the launcher
 # cannot run until after node has booted. If it grows one, this and ENV_CONFIGURES_NODE_STARTUP
 # both delete.
-_NODE_STARTUP_ENV_PREFIXES = ["NODE_", "UV_", "V8_", "OPENSSL_", "SSL_CERT_"]
+_NODE_STARTUP_ENV_PREFIXES = [
+    "NODE_",
+    "UV_",
+    "V8_",
+    "OPENSSL_",
+    "SSL_CERT_",
+    # ICU fixes node's default locale from LANG/LC_* as it starts and never re-reads it,
+    # so a target setting one of these formats dates and numbers differently depending on
+    # which launcher ran it. "LANG" also covers LANGUAGE, which belongs to the same family.
+    "LANG",
+    "LC_",
+]
 
 # Names matching a family above that node nonetheless does not need to have seen as it started.
 # TZ and the colour variables are absent because they are not in a family at all: node re-reads
