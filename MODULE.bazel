@@ -119,6 +119,26 @@ bazel_dep(name = "aspect_rules_lint", version = "2.3.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.1", dev_dependency = True)
 bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
 
+# G30: real empty-filename supplier (legacy __init__.py) for opaque runfiles grouping.
+bazel_dep(name = "rules_python", version = "1.7.0", dev_dependency = True)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python", dev_dependency = True)
+python.toolchain(
+    is_default = True,
+    python_version = "3.11",
+)
+
+bazel_dep(name = "bundle_root_a", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "bundle_root_a",
+    path = "js/private/test/runfiles_group/repos/root_a",
+)
+bazel_dep(name = "bundle_root_b", version = "0.0.0", dev_dependency = True)
+local_path_override(
+    module_name = "bundle_root_b",
+    path = "js/private/test/runfiles_group/repos/root_b",
+)
+
 # Override transitive rules_go from rules_buf; <0.59.0 uses CcInfo as a Bazel global which was removed in Bazel 9.0.1
 bazel_dep(name = "rules_go", version = "0.60.0", dev_dependency = True, repo_name = None)
 

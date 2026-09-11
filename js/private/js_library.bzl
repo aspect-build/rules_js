@@ -153,23 +153,13 @@ def _gather_sources_and_types(ctx, targets, files):
     """
     sources = []
     types = []
-    owned_sources = []
-    owned_types = []
-    foreign_sources = {}
-    foreign_types = {}
-    jsinfo_owners = {target.label: None for target in targets if JsInfo in target}
 
     for file in files:
-        was_source = file.is_source
-        if was_source:
+        if file.is_source:
             file = copy_js_file_to_bin_action(ctx, file)
 
-        as_source = False
-        as_type = False
         if file.is_directory:
             # assume a directory contains types since we can't know that it doesn't
-            as_type = True
-            as_source = True
             types.append(file)
             sources.append(file)
         elif (
@@ -180,31 +170,14 @@ def _gather_sources_and_types(ctx, targets, files):
             file.path.endswith(".d.cts") or
             file.path.endswith(".d.cts.map")
         ):
-            as_type = True
             types.append(file)
         elif file.path.endswith(".json"):
             # Any .json can produce types: https://www.typescriptlang.org/tsconfig/#resolveJsonModule
             # package.json may be required to resolve types with the "typings" key
-            as_type = True
-            as_source = True
             types.append(file)
             sources.append(file)
         else:
-            as_source = True
             sources.append(file)
-
-        # Newly copied files, and files this target generated, belong to ctx.label.
-        # Forwarded JsInfo outputs keep the dependency's companion ownership.
-        if was_source or file.owner == ctx.label:
-            if as_source:
-                owned_sources.append(file)
-            if as_type:
-                owned_types.append(file)
-        elif file.owner not in jsinfo_owners:
-            if as_source:
-                _append_owner_files(foreign_sources, file.owner, file)
-            if as_type:
-                _append_owner_files(foreign_types, file.owner, file)
 
     # sources as depset
     sources = depset(sources, transitive = [
@@ -220,30 +193,16 @@ def _gather_sources_and_types(ctx, targets, files):
         if JsInfo in target
     ])
 
-    return (sources, types, owned_sources, owned_types, foreign_sources, foreign_types)
-
-def _append_owner_files(owned, owner, file):
-    files = owned.get(owner)
-    if files == None:
-        files = []
-        owned[owner] = files
-    files.append(file)
-
-def _fallback_files_entries(owner_files):
-    entries = []
-    for owner, files in owner_files.items():
-        if files:
-            entries.append(js_runfiles_groups.fallback_entry(owner, depset(files)))
-    return entries
+    return (sources, types)
 
 def _js_library_impl(ctx):
-    sources, types, owned_srcs_sources, owned_srcs_types, foreign_srcs_sources, foreign_srcs_types = _gather_sources_and_types(
+    sources, types = _gather_sources_and_types(
         ctx = ctx,
         targets = ctx.attr.srcs,
         files = ctx.files.srcs,
     )
 
-    additional_sources, additional_types, owned_types_sources, owned_types_types, foreign_types_sources, foreign_types_types = _gather_sources_and_types(
+    additional_sources, additional_types = _gather_sources_and_types(
         ctx = ctx,
         targets = ctx.attr.types,
         files = ctx.files.types,
@@ -252,10 +211,6 @@ def _js_library_impl(ctx):
     # Direct sources and types
     sources = depset(transitive = [sources, additional_sources])
     types = depset(transitive = [types, additional_sources, additional_types])
-    owned_sources = owned_srcs_sources + owned_types_sources
-    owned_types = owned_srcs_types + owned_types_sources + owned_types_types
-    foreign_source_entries = _fallback_files_entries(foreign_srcs_sources) + _fallback_files_entries(foreign_types_sources)
-    foreign_type_entries = _fallback_files_entries(foreign_srcs_types) + _fallback_files_entries(foreign_types_sources) + _fallback_files_entries(foreign_types_types)
 
     # Transitive sources and types
     transitive_sources = [sources]
@@ -329,84 +284,17 @@ def _js_library_impl(ctx):
     ]
 
     if js_runfiles_groups.is_enabled(ctx):
-        providers.extend(_js_library_groups(
+        rgi = js_runfiles_groups.library_groups(
             ctx,
-            sources = sources,
-            owned_sources = owned_sources,
-            owned_types = owned_types,
-            foreign_source_entries = foreign_source_entries,
-            foreign_type_entries = foreign_type_entries,
+            data = ctx.attr.data,
             srcs_types_deps = srcs_types_deps,
             copied_data_files = copied_data_files,
-        ))
+            copied_originals = ctx.files.data,
+        )
+        if rgi:
+            providers.append(rgi)
 
     return providers
-
-def _js_library_groups(ctx, sources, owned_sources, owned_types, foreign_source_entries, foreign_type_entries, srcs_types_deps, copied_data_files):
-    own_src = js_runfiles_groups.maybe_files_entry(ctx.label, owned_sources, "first_party", js_runfiles_groups.RANK_EXECUTABLE)
-    own_types = js_runfiles_groups.maybe_files_entry(ctx.label, owned_types, "first_party", js_runfiles_groups.RANK_EXECUTABLE)
-    src_direct = ([own_src] if own_src else []) + foreign_source_entries
-    type_direct = ([own_types] if own_types else []) + foreign_type_entries
-
-    sources_ch = js_runfiles_groups.channel_entries_from_targets(
-        ctx.attr.srcs + ctx.attr.types,
-        "sources",
-        "sources",
-        own = src_direct,
-    )
-    types_ch = js_runfiles_groups.channel_entries_from_targets(
-        ctx.attr.srcs + ctx.attr.types,
-        "types",
-        "types",
-        own = type_direct,
-    )
-    companion = js_runfiles_groups.JsRunfilesGroupsInfo(
-        default_files = sources_ch,
-        sources = sources_ch,
-        types = types_ch,
-        transitive_sources = js_runfiles_groups.channel_entries_from_targets(
-            srcs_types_deps,
-            "transitive_sources",
-            "transitive_sources",
-            own = src_direct,
-        ),
-        transitive_types = js_runfiles_groups.channel_entries_from_targets(
-            srcs_types_deps,
-            "transitive_types",
-            "transitive_types",
-            own = type_direct,
-        ),
-        npm_sources = js_runfiles_groups.channel_entries_from_targets(srcs_types_deps, "npm_sources", "npm_sources"),
-    )
-
-    own = []
-    transitive = []
-    data_owned = []
-    for i, f in enumerate(copied_data_files):
-        original = ctx.files.data[i]
-        if original.is_source and ctx.attr.copy_data_to_bin and original not in ctx.files.no_copy_to_bin:
-            data_owned.append(f)
-    if data_owned:
-        own.append(js_runfiles_groups.native_entry(ctx.label, depset(data_owned), "first_party", js_runfiles_groups.RANK_EXECUTABLE))
-
-    empty_channels = struct(source_field = None, type_field = None, npm_field = None)
-    for dep in ctx.attr.data:
-        d, t = js_runfiles_groups.data_target_runtime(ctx, dep, empty_channels)
-        own.extend(d)
-        transitive.extend(t)
-    for dep in srcs_types_deps:
-        d, t = js_runfiles_groups.srcs_deps_runtime(ctx, dep)
-        own.extend(d)
-        transitive.extend(t)
-
-    _ = sources  # DefaultInfo.files == sources; companion.default_files tracks it.
-    return [
-        companion,
-        js_runfiles_groups.RunfilesGroupInfo(
-            entries = js_runfiles_groups.collect(ctx, deps = [], data = [], own = own, transitive = transitive),
-            executable_group = None,
-        ),
-    ]
 
 js_library_lib = struct(
     attrs = _ATTRS,

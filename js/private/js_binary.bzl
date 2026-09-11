@@ -589,8 +589,9 @@ def _js_binary_impl(ctx):
         lcov_merger = None
         if ctx.attr.testonly and ctx.configuration.coverage_enabled and hasattr(ctx.attr, "_lcov_merger"):
             lcov_merger = ctx.attr._lcov_merger
-        rgi, companion = js_runfiles_groups.binary_groups(
+        rgi = js_runfiles_groups.binary_groups(
             ctx,
+            runfiles = runfiles,
             executable = launcher.executable,
             bash_launcher = launcher.bash_launcher,
             copied_files = launcher.copied_data_files,
@@ -604,17 +605,10 @@ def _js_binary_impl(ctx):
             coverage_report = coverage_report,
             lcov_merger = lcov_merger,
             data = ctx.attr.data,
-            include_sources = ctx.attr.include_sources,
-            include_types = ctx.attr.include_types,
-            include_transitive_sources = ctx.attr.include_transitive_sources,
-            include_transitive_types = ctx.attr.include_transitive_types,
-            include_npm_sources = ctx.attr.include_npm_sources,
             entry_point_file = launcher.entry_point_file,
             entry_point_target = ctx.attr.entry_point,
-            entry_point_was_copied = launcher.entry_point_was_copied,
         )
         providers.append(rgi)
-        providers.append(companion)
 
     return providers + [
         DefaultInfo(

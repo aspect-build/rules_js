@@ -1,6 +1,9 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_runfiles_group//runfiles_group:runfiles_group_analysis_test.bzl", "runfiles_group_analysis_test")
+load("//js:defs.bzl", "js_binary", "js_library")
 load("//js:proto.bzl", "js_proto_toolchain")
 load("//js:rpc.bzl", "js_rpc_toolchain")
+load("//js/private/test/runfiles_group:semantics.bzl", "p4_proto_semantics_test")
 load(":js_proto_aspect_test.bzl", "js_proto_aspect_test_suite")
 load(":js_rpc_library_test.bzl", "js_rpc_library_test_suite")
 
@@ -49,3 +52,34 @@ js_rpc_toolchain(
 js_proto_aspect_test_suite(name = "js_proto_aspect_tests")
 
 js_rpc_library_test_suite(name = "js_rpc_library_tests")
+
+write_file(
+    name = "grouping_main",
+    out = "grouping_main.js",
+    content = ["console.log(1)"],
+)
+
+js_library(
+    name = "grouping_proto_lib",
+    deps = [":simple_proto"],
+)
+
+js_binary(
+    name = "grouping_proto_bin",
+    data = [":grouping_proto_lib"],
+    entry_point = ":grouping_main",
+    include_npm = False,
+)
+
+runfiles_group_analysis_test(
+    name = "p4_proto_bin_contract",
+    binaries = [":grouping_proto_bin"],
+    check_disabled = False,
+    overlapping_group_behavior = "ignore",
+    max_groups = 100,
+)
+
+p4_proto_semantics_test(
+    name = "p4_proto_semantics",
+    target_under_test = ":grouping_proto_bin",
+)

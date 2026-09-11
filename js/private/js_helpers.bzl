@@ -133,7 +133,7 @@ def selected_js_info_channels(
         include_transitive_sources,
         include_transitive_types,
         include_npm_sources):
-    """Which JsInfo / companion fields the include_* flags select.
+    """Which JsInfo fields the include_* flags select.
 
     `include_transitive_*` takes precedence over the corresponding direct flag.
     """

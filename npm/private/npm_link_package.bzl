@@ -1,7 +1,7 @@
 "npm_link_package rule"
 
 load(":npm_link_package_store.bzl", "npm_link_package_store")
-load(":npm_package_store.bzl", "npm_local_package_store")
+load(":npm_package_store.bzl", "npm_package_store")
 load(":utils.bzl", "utils")
 
 def npm_link_package(
@@ -45,7 +45,7 @@ def npm_link_package(
         tags.append("manual")
 
     # link the package store when linking at the root
-    npm_local_package_store(
+    npm_package_store(
         name = store_target_name,
         src = src,
         deps = deps,

@@ -143,40 +143,15 @@ def _npm_link_package_store_impl(ctx):
         providers.append(ctx.attr.src[OutputGroupInfo])
 
     if js_runfiles_groups.is_enabled(ctx):
-        src = ctx.attr.src
-        own = js_runfiles_groups.maybe_files_entry(ctx.label, files, "first_party", js_runfiles_groups.RANK_EXECUTABLE)
-        own_list = [own] if own else []
-        default_trans = []
-        if js_runfiles_groups.JsRunfilesGroupsInfo in src:
-            default_trans = [
-                src[js_runfiles_groups.JsRunfilesGroupsInfo].store_files,
-                src[js_runfiles_groups.JsRunfilesGroupsInfo].sources,
-                src[js_runfiles_groups.JsRunfilesGroupsInfo].npm_sources,
-            ]
-        providers.append(js_runfiles_groups.JsRunfilesGroupsInfo(
-            default_files = js_runfiles_groups.entries(direct = own_list, transitive = default_trans),
-            sources = js_runfiles_groups.channel_entries_from_targets([src], "sources", "sources"),
-            types = js_runfiles_groups.channel_entries_from_targets([src], "types", "types"),
-            transitive_sources = js_runfiles_groups.channel_entries_from_targets([src], "transitive_sources", "transitive_sources"),
-            transitive_types = js_runfiles_groups.channel_entries_from_targets([src], "transitive_types", "transitive_types"),
-            npm_sources = js_runfiles_groups.channel_entries_from_targets([src], "npm_sources", "npm_sources", own = own_list),
-            store_files = src[js_runfiles_groups.JsRunfilesGroupsInfo].store_files if js_runfiles_groups.JsRunfilesGroupsInfo in src else js_runfiles_groups.entries(),
-            transitive_store_files = src[js_runfiles_groups.JsRunfilesGroupsInfo].transitive_store_files if js_runfiles_groups.JsRunfilesGroupsInfo in src else js_runfiles_groups.entries(),
-        ))
-        runtime_own = list(own_list)
-        runtime_trans = []
-        if js_runfiles_groups.RunfilesGroupInfo in src:
-            runtime_trans.append(src[js_runfiles_groups.RunfilesGroupInfo].entries)
-        if js_runfiles_groups.JsRunfilesGroupsInfo in src:
-            runtime_trans.append(src[js_runfiles_groups.JsRunfilesGroupsInfo].transitive_store_files)
-            runtime_trans.append(src[js_runfiles_groups.JsRunfilesGroupsInfo].npm_sources)
-            runtime_trans.append(src[js_runfiles_groups.JsRunfilesGroupsInfo].transitive_sources)
-        else:
-            runtime_own.append(js_runfiles_groups.fallback_entry(src.label, ctx.runfiles(transitive_files = transitive_files_depset).merge(src[DefaultInfo].default_runfiles)))
-        providers.append(js_runfiles_groups.RunfilesGroupInfo(
-            entries = js_runfiles_groups.collect(ctx, deps = [], data = [], own = runtime_own, transitive = runtime_trans),
-            executable_group = None,
-        ))
+        rgi = js_runfiles_groups.link_groups(
+            ctx,
+            src = ctx.attr.src,
+            store_info = store_info,
+            store_js_info = store_js_info,
+            link_files = files,
+        )
+        if rgi:
+            providers.append(rgi)
 
     return providers
 

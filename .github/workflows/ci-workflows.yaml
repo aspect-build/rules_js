@@ -309,7 +309,7 @@ jobs:
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
     conclusion:
-        needs: [format, buildifier, test, smoke]
+        needs: [format, buildifier, test, smoke, grouping-compat, grouping-memory]
         runs-on: ubuntu-latest
         if: always()
         steps:
@@ -317,8 +317,56 @@ jobs:
                   if [[ "${{ needs.format.result }}" == "success" \
                      && "${{ needs.buildifier.result }}" == "success" \
                      && "${{ needs.test.result }}" == "success" \
-                     && ("${{ needs.smoke.result }}" == "success" || "${{ needs.smoke.result }}" == "skipped") ]]; then
+                     && ("${{ needs.smoke.result }}" == "success" || "${{ needs.smoke.result }}" == "skipped") \
+                     && "${{ needs.grouping-compat.result }}" == "success" \
+                     && "${{ needs.grouping-memory.result }}" == "success" ]]; then
                     exit 0
                   else
                     exit 1
                   fi
+
+    grouping-compat:
+        name: grouping (${{ matrix.bazel }})
+        runs-on: ubuntu-22.04
+        strategy:
+            fail-fast: false
+            matrix:
+                bazel: ['7.6.0', '7.7.1', '8.8.0', '9.2.0']
+        env:
+            USE_BAZEL_VERSION: ${{ matrix.bazel }}
+            ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+        steps:
+            - uses: actions/checkout@v6
+            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+              with:
+                  bazelisk-cache: true
+                  repository-cache: true
+            - name: grouping analysis tests
+              run: |
+                  bazel test \
+                    --test_tag_filters=-manual \
+                    -- \
+                    //js/private/test/runfiles_group/... \
+                    -//js/private/test/runfiles_group/stress/... \
+                    //js/private/test/proto:p4_proto_bin_contract \
+                    //js/private/test/proto:p4_proto_semantics
+
+    grouping-memory:
+        name: grouping memory
+        runs-on: ubuntu-22.04
+        env:
+            USE_BAZEL_VERSION: 8.8.0
+            ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+        steps:
+            - uses: actions/checkout@v6
+            - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+              with:
+                  bazelisk-cache: true
+                  repository-cache: true
+            - name: shallow heap ratio
+              run: bash js/private/test/runfiles_group/stress/measure_grouping.sh
+            - uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: grouping-heap-dumps
+                  path: /tmp/rules_js_grouping_heap

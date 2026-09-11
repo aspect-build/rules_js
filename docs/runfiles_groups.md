@@ -1,8 +1,9 @@
 # Runfiles groups
 
-`js_binary`, `js_test`, `js_library`, npm store/link producers, and the proto aspect can emit
+`js_binary`, `js_test`, `js_library`, and npm store/link producers can emit
 [`RunfilesGroupInfo`](https://github.com/bazel-contrib/rules_runfiles_group)
-so a packager can split the executable's runfiles without flattening the graph at analysis.
+describing the admitted runtime closure. Grouping is metadata only: it does not
+change copying, launchers, `JsInfo`, or execution.
 
 This is **off by default**. Enable it with:
 
@@ -10,46 +11,49 @@ This is **off by default**. Enable it with:
 --@rules_runfiles_group//runfiles_group:enabled=true
 ```
 
-When disabled, those rules emit no grouping providers and do no grouping-only allocations.
-Existing runfiles, actions, and `JsInfo` are unchanged.
+When disabled, those rules emit no grouping providers and do no grouping-only
+work. `RunfilesGroupInfo` is the only new production provider.
 
-## Group policy
+## Classification
 
-Named groups use the `aspect_rules_js#` prefix:
+Libraries do not put JsInfo-only sources on `RunfilesGroupInfo`. Those files are
+classified when a `js_binary` / `js_test` admits them. The public provider always
+equals `DefaultInfo.default_runfiles` in all four runfiles components.
 
-| Name | Contents |
-| --- | --- |
-| `aspect_rules_js#node` | Selected Node binary |
-| `aspect_rules_js#runtime_support` | Platform node wrapper, fs patches, bootstrap, coverage bootstrap |
-| `aspect_rules_js#npm` | npm wrapper and toolchain npm sources when `include_npm=True` |
-| `aspect_rules_js#coverage` | Coverage report program when the existing coverage predicates include it |
+Named groups use the `aspect_rules_js#` prefix and `merge_affinity = "aspect_rules_js"`:
 
-Per-target groups are named with the producing target's `Label`: the binary's launchers and copied
-application files, each `js_library`'s owned outputs, each npm store's package directory and
-internal links, and each root-link's `node_modules/<pkg>` and `.bin` scripts.
+| Name | Role | Rank | Merge |
+| --- | --- | ---: | --- |
+| target `Label` | Protected application (launcher, entry point, ordinary raw `data` sources) | 0 | `do_not_merge=True` |
+| `aspect_rules_js#first_party` | Source-backed JS and generated ordinary data | -50 | mergeable |
+| `aspect_rules_js#third_party` | Packaged npm payloads (`NpmPackageInfo` / store directories) | -100 | mergeable |
+| `aspect_rules_js#npm_links` | Root links and known `.bin` shims | -200 | mergeable |
+| `aspect_rules_js#npm` | Coarse npm inventory at a link; **absent** from normalized binaries | -200 | mergeable |
+| `aspect_rules_js#node` | Admitted Node executable File | -1000 | mergeable |
+| `aspect_rules_js#node_external:<label>` | Path-only Node marker (empty files) | -1000 | `do_not_merge=True` |
+| `aspect_rules_js#runtime_support` | Launcher wrapper, fs patches, bootstrap | -900 | mergeable |
+| `aspect_rules_js#npm_toolchain` | `include_npm` toolchain inventory | -900 | mergeable |
+| `aspect_rules_js#coverage` | Coverage bootstrap/report when coverage is enabled | -900 | mergeable |
+| `aspect_rules_js#unclassified` | Admitted leftovers with no known role | -300 | mergeable |
 
-Imported npm stores are `third_party` at shared-deps rank. Workspace-local stores and first-party
-libraries/binaries are `first_party`. Manually declared stores without a known generation path stay
-unspecified.
+Classification follows the **representation visible at admission**, not package
+history. A source-backed library in an external repository is first-party. A
+locally built `npm_package` consumed through the store/link API is third-party.
+Wrapping `npm_package` in `js_library(srcs = ...)` exposes a generated source
+tree and is first-party; that loss of npm provenance is intentional.
 
-## Companion channels
+`js_proto_aspect` remains JsInfo-only. Generated JS admitted by a downstream
+`js_binary` is first-party; that path is tested in `//js/private/test/proto`.
 
-`JsRunfilesGroupsInfo` (`@aspect_rules_js//js:runfiles_groups.bzl`) describes selectable *file*
-channels (`sources`, `types`, npm, store files). It is not a substitute for `RunfilesGroupInfo`.
-A library's public `RunfilesGroupInfo` matches `DefaultInfo.default_runfiles` only — not the full
-`JsInfo` closure.
+Same-name folding unions File identities. It does not prove that two distinct
+Files are equivalent packages.
 
-Downstream `JsInfo` producers should merge `js_runfiles_groups.RULE_ATTRS`, gate on
-`js_runfiles_groups.is_enabled(ctx)`, and emit companion entries with `runfiles_groups.entry`.
+## Downstream producers
 
-Packagers must not evaluate `aspect_hints` in producer rules. A consuming rule should attach an
-aspect that forwards `aspect_hints` and call `runfiles_groups.resolve` once. When grouping is
-disabled, `resolve` returns `None` and the consumer should use `DefaultInfo.default_runfiles`.
+Merge `js_runfiles_groups.RULE_ATTRS`, gate on `js_runfiles_groups.is_enabled(ctx)`,
+and emit `RunfilesGroupInfo` whose entries equal admitted default runfiles. Do
+not add another grouping provider. A derivative that changes default runfiles
+after `js_binary_lib.implementation` must rebuild `RunfilesGroupInfo`.
 
-## Foreign overlap
-
-Native rules_js graphs are required to be overlap-free after name folding. Opaque foreign
-producers may overlap; packagers should use `overlapping_group_behavior = "warn"` at those
-boundaries. Do not globally ignore overlap or subtract files to hide it.
-
-`js_image_layer` is unchanged. Migrating it to the consumer API is a separate change.
+`js_image_layer` is unchanged. Packaging, relocation, and byte-dedup are consumer
+work, not part of this producer.

@@ -177,7 +177,9 @@ bzl_library(
 bzl_library(
     name = "npm_package_internal",
     srcs = ["npm_package_internal.bzl"],
-    deps = [":npm_package_info"],
+    deps = [
+        ":npm_package_info",
+    ],
 )
 
 bzl_library(
