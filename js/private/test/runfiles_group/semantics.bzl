@@ -33,6 +33,7 @@ load(
     "semantics_test",
     "unique_admitted",
 )
+load(":fixtures.bzl", "RgiAggregateInfo")
 
 # Coverage execution is unchanged; grouping does not expose a coverage group.
 _COVERAGE_GROUP = "aspect_rules_js#coverage"
@@ -295,66 +296,68 @@ _P3_ATTRS = {
     "bin_b": attr.label(mandatory = True),
 }
 
+def _p3_configured_bins(target, ctx):
+    configured = {}
+    for b in target[RgiAggregateInfo].binaries:
+        configured[b.label] = b
+    return configured[ctx.attr.bin_a.label], configured[ctx.attr.bin_b.label]
+
 def _p3_membership(env, ctx, resolved, found, name_a, name_b, target):
     first = js_runfiles_groups.FIRST_PARTY_GROUP
     owners = file_owners(resolved)
     rf_files = runfiles_files(target)
-    a_paths = {f.path: True for f in runfiles_files(ctx.attr.bin_a)}
-    b_paths = {f.path: True for f in runfiles_files(ctx.attr.bin_b)}
-
-    a_files = [f for f in unique_admitted(rf_files, "p3_a_only.txt") if f.path in a_paths]
+    bin_a, bin_b = _p3_configured_bins(target, ctx)
+    a_files = unique_admitted(runfiles_files(bin_a), "p3_a_only.txt")
     asserts.true(env, a_files, "p3_a_only.txt not admitted on A")
     a_sources = [f for f in a_files if f.is_source]
+    a_copies = [f for f in a_files if not f.is_source]
     asserts.true(env, a_sources, "p3_a_only.txt source missing from A's runfiles")
+    asserts.true(env, a_copies, "p3_a_only.txt copy missing from A's runfiles")
     assert_exact_file_owners(env, owners, a_sources, [name_a, first])
+    assert_exact_file_owners(env, owners, a_copies, [name_a])
     for f in a_files:
         names = owners.get(f, [])
-        asserts.true(env, name_a in names, "{} dropped from A's protection: {}".format(f.path, names))
         asserts.false(env, name_b in names, "{} entered B: {}".format(f.path, names))
-        for n in names:
-            asserts.true(env, n in [name_a, first], "{} unexpected owner {}".format(f.path, n))
 
     _assert_role(env, found, rf_files, "p3_b_only.txt", name_b, [name_a, first])
     _assert_role(env, found, rf_files, "shared.js", first, [name_a, name_b])
 
-    a_both = [f for f in unique_admitted(rf_files, "p3_both.txt") if f.path in a_paths]
-    b_both = [f for f in unique_admitted(rf_files, "p3_both.txt") if f.path in b_paths]
+    a_both = unique_admitted(runfiles_files(bin_a), "p3_both.txt")
+    b_both = unique_admitted(runfiles_files(bin_b), "p3_both.txt")
     asserts.true(env, a_both, "p3_both.txt not admitted on A")
     asserts.true(env, b_both, "p3_both.txt not admitted on B")
     both_sources = [f for f in a_both if f.is_source]
     if not both_sources:
         both_sources = [f for f in b_both if f.is_source]
+    a_both_copies = [f for f in a_both if not f.is_source]
+    b_both_copies = [f for f in b_both if not f.is_source]
     asserts.true(env, both_sources, "p3_both.txt source missing")
+    asserts.true(env, a_both_copies, "p3_both.txt copy missing from A's runfiles")
+    asserts.true(env, b_both_copies, "p3_both.txt copy missing from B's runfiles")
     assert_exact_file_owners(env, owners, both_sources, [name_a, name_b])
-    for f in a_both:
-        names = owners.get(f, [])
-        asserts.true(env, name_a in names, "{} dropped from A's protection: {}".format(f.path, names))
-        asserts.false(env, first in names, "{} lost app protection: {}".format(f.path, names))
-        for n in names:
-            asserts.true(env, n in [name_a, name_b], "{} unexpected owner {}".format(f.path, n))
-    for f in b_both:
-        names = owners.get(f, [])
-        asserts.true(env, name_b in names, "{} dropped from B's protection: {}".format(f.path, names))
-        asserts.false(env, first in names, "{} lost app protection: {}".format(f.path, names))
-        for n in names:
-            asserts.true(env, n in [name_a, name_b], "{} unexpected owner {}".format(f.path, n))
+    b_both_set = file_set(b_both)
+    for f in a_both_copies:
+        if f in b_both_set:
+            assert_exact_file_owners(env, owners, [f], [name_a, name_b])
+        else:
+            assert_exact_file_owners(env, owners, [f], [name_a])
+    a_both_set = file_set(a_both)
+    for f in b_both_copies:
+        if f in a_both_set:
+            assert_exact_file_owners(env, owners, [f], [name_a, name_b])
+        else:
+            assert_exact_file_owners(env, owners, [f], [name_b])
 
     allowed = {}
     for f in a_sources:
         allowed[f] = sorted([name_a, first])
     for f in both_sources:
         allowed[f] = sorted([name_a, name_b])
-    for f in a_files:
-        names = owners.get(f, [])
-        if name_a in names and first in names:
-            allowed[f] = sorted([name_a, first])
-    for f in a_both:
-        names = owners.get(f, [])
-        if name_a in names and name_b in names:
+    for f in a_both_copies:
+        if f in b_both_set:
             allowed[f] = sorted([name_a, name_b])
-    for f in b_both:
-        names = owners.get(f, [])
-        if name_a in names and name_b in names:
+    for f in b_both_copies:
+        if f in a_both_set:
             allowed[f] = sorted([name_a, name_b])
     assert_overlap_files(env, resolved, allowed)
     assert_grouped_runfiles_match(env, ctx, resolved, target)
@@ -908,7 +911,7 @@ def _p6_empty_carrier_impl(ctx):
     assert_grouped_runfiles_match(env, ctx, resolved, target)
     return analysistest.end(env)
 
-# JsInfo on a grouped library stays first-party even when that library relays empty filenames.
+# Independent library JS stays first-party when extra runfiles components are present.
 p6_empty_carrier_semantics_test = semantics_test(_p6_empty_carrier_impl)
 
 def _p6_empty_mixed_impl(ctx):
@@ -933,31 +936,60 @@ def _p6_empty_mixed_impl(ctx):
         js_runfiles_groups.FIRST_PARTY_GROUP,
         [js_runfiles_groups.UNCLASSIFIED_GROUP],
     )
-    adapter_rf = ctx.attr.adapter[DefaultInfo].default_runfiles
-    adapter_opaque = adapter_rf != None and adapter_rf.empty_filenames and bool(adapter_rf.empty_filenames)
-    if adapter_opaque:
-        _assert_role(
-            env,
-            found,
-            rf_files,
-            "p6_empty_adapter.js",
-            js_runfiles_groups.UNCLASSIFIED_GROUP,
-            [js_runfiles_groups.FIRST_PARTY_GROUP],
-        )
-    else:
-        _assert_role(
-            env,
-            found,
-            rf_files,
-            "p6_empty_adapter.js",
-            js_runfiles_groups.FIRST_PARTY_GROUP,
-            [js_runfiles_groups.UNCLASSIFIED_GROUP],
-        )
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "p6_empty_adapter.js",
+        js_runfiles_groups.UNCLASSIFIED_GROUP,
+        [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
     assert_grouped_runfiles_match(env, ctx, resolved, target)
     return analysistest.end(env)
 
-# Covered empty-filename suppliers stay first-party; unmatched adapter Files in those
-# opaque runfiles are unclassified. Native py_library may omit empty names on Bazel 7.
+# Adapter Files inside unmatched extra runfiles stay unclassified; carrier JS stays first-party.
 p6_empty_mixed_semantics_test = semantics_test(_p6_empty_mixed_impl, attrs = {
+    "adapter": attr.label(mandatory = True),
+})
+
+def _p6_empty_nested_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    bins = {}
+    for b in target[RgiAggregateInfo].binaries:
+        bins[b.label.name] = b
+    inner = bins["p6_empty_inner"]
+    outer = bins["p6_empty_outer"]
+    inner_resolved = resolve_target(ctx, inner)
+    outer_resolved = resolve_target(ctx, outer)
+    inner_rf = inner[DefaultInfo].default_runfiles
+    asserts.true(env, inner_rf.symlinks and bool(inner_rf.symlinks), "inner must admit extra symlinks")
+    asserts.true(env, inner_rf.root_symlinks and bool(inner_rf.root_symlinks), "inner must admit extra root symlinks")
+    assert_grouped_runfiles_match(env, ctx, inner_resolved, inner)
+    assert_grouped_runfiles_match(env, ctx, outer_resolved, outer)
+    return analysistest.end(env)
+
+# Nested consumption keeps unclassified non-File runfiles components.
+p6_empty_nested_semantics_test = semantics_test(_p6_empty_nested_impl)
+
+def _p6_empty_npm_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    rf_files = runfiles_files(target)
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "p6_empty_npm_adapter.js",
+        js_runfiles_groups.UNCLASSIFIED_GROUP,
+        [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP],
+    )
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+    return analysistest.end(env)
+
+# An unmatched extra-runfiles npm-shaped File is unclassified, not also third_party.
+p6_empty_npm_semantics_test = semantics_test(_p6_empty_npm_impl, attrs = {
     "adapter": attr.label(mandatory = True),
 })

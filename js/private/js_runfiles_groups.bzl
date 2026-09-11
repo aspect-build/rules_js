@@ -32,7 +32,6 @@ _CONSUMED_NAMES = {
     THIRD_PARTY_GROUP: True,
     NPM_GROUP: True,
     NPM_LINKS_GROUP: True,
-    UNCLASSIFIED_GROUP: True,
 }
 
 def _is_enabled(ctx):
@@ -82,36 +81,47 @@ def _fallback_runfiles_entry(ctx, dep):
         return None
     return runfiles_groups.entry(name = dep.label, content = runfiles)
 
-def _unmatched_empty_suppliers(data, leftover_empty_set, fallback_labels):
-    """Runfiles of data deps whose empty names are still unmatched.
+def _unmatched_extra_suppliers(data, leftover_empty_set, leftover_symlinks, leftover_root_symlinks, fallback_labels):
+    """Runfiles of data deps whose extra components are still unmatched.
 
     Inherited RGI and already-emitted Label fallbacks already account for their
-    empty names. Wrapping those suppliers again would duplicate ordinary Files.
+    extra components. Wrapping those suppliers again would duplicate ordinary Files.
+    Inherited `#unclassified` is preserved in full, so RGI suppliers are skipped.
     """
     extra_rf = []
-    opaque = {}
-    if not leftover_empty_set:
-        return extra_rf, opaque
+    opaque_ds = []
+    if not leftover_empty_set and not leftover_symlinks and not leftover_root_symlinks:
+        return extra_rf, {}
     for dep in data:
         if RunfilesGroupInfo in dep:
             continue
         if dep.label in fallback_labels:
             continue
         dr = dep[DefaultInfo].default_runfiles
-        if dr == None or not _depset_nonempty(dr.empty_filenames):
+        if dr == None:
             continue
         unmatched = False
-        for n in dr.empty_filenames.to_list():
-            if n in leftover_empty_set:
-                unmatched = True
-                break
+        if leftover_empty_set and _depset_nonempty(dr.empty_filenames):
+            for n in dr.empty_filenames.to_list():
+                if n in leftover_empty_set:
+                    unmatched = True
+                    break
+        if not unmatched and leftover_symlinks and dr.symlinks:
+            for s in dr.symlinks.to_list():
+                if s.path in leftover_symlinks:
+                    unmatched = True
+                    break
+        if not unmatched and leftover_root_symlinks and dr.root_symlinks:
+            for s in dr.root_symlinks.to_list():
+                if s.path in leftover_root_symlinks:
+                    unmatched = True
+                    break
         if not unmatched:
             continue
         extra_rf.append(dr)
         if dr.files:
-            for f in dr.files.to_list():
-                opaque[f] = True
-    return extra_rf, opaque
+            opaque_ds.append(dr.files)
+    return extra_rf, _flatten_files(opaque_ds)
 
 def _has_executable(target):
     """True for executable rules. A source File listed as its own executable is not."""
@@ -544,7 +554,13 @@ def binary_groups(
         for n in runfiles.empty_filenames.to_list():
             if n not in covered_empty:
                 leftover_empty_set[n] = True
-    extra_rf, opaque_files = _unmatched_empty_suppliers(data, leftover_empty_set, fallback_labels)
+    extra_rf, opaque_files = _unmatched_extra_suppliers(
+        data,
+        leftover_empty_set,
+        leftover_symlinks,
+        leftover_root_symlinks,
+        fallback_labels,
+    )
     opaque_files = _lift(opaque_files, copy_of, admitted)
 
     N_pre = _flatten_files(npm_ds + store_ds)
@@ -628,15 +644,15 @@ def binary_groups(
     first_party = []
     unclassified = []
     for f in P:
-        if f in admitted and f not in assigned and f not in app:
+        if f in admitted and f not in assigned and f not in app and f not in opaque_files:
             third_party.append(f)
             assigned[f] = True
     for f in L:
-        if f in admitted and f not in assigned and f not in app:
+        if f in admitted and f not in assigned and f not in app and f not in opaque_files:
             routing.append(f)
             assigned[f] = True
     for f in N:
-        if f in admitted and f not in assigned and f not in app:
+        if f in admitted and f not in assigned and f not in app and f not in opaque_files:
             third_party.append(f)
             assigned[f] = True
     for f in S:
@@ -666,8 +682,9 @@ def binary_groups(
         own.append(e)
 
     leftover_rf = None
-    if leftover_files or leftover_symlinks or leftover_root_symlinks:
-        if leftover_symlinks or leftover_root_symlinks:
+    reconstruct_extra = (leftover_symlinks or leftover_root_symlinks) and not extra_rf
+    if leftover_files or reconstruct_extra:
+        if reconstruct_extra:
             leftover_rf = ctx.runfiles(
                 files = leftover_files,
                 symlinks = leftover_symlinks,
@@ -675,9 +692,10 @@ def binary_groups(
             )
         else:
             leftover_rf = leftover_files
-    if leftover_empty_set and extra_rf:
-        # Bazel 7 ctx.runfiles has no empty_filenames=. Wrap only unmatched
-        # suppliers so empty names survive without re-adding covered runfiles.
+    if extra_rf:
+        # Borrow unmatched supplier runfiles so extra components keep their
+        # original identities. Files inside those runfiles stay unclassified,
+        # including npm-shaped Files.
         if type(leftover_rf) == "list":
             leftover_rf = ctx.runfiles(files = leftover_rf).merge_all(extra_rf)
         elif leftover_rf != None:

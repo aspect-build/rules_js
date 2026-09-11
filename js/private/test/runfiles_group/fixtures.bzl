@@ -9,6 +9,11 @@ load("//js/private:js_info.bzl", "js_info")
 load("//js/private:js_runfiles_groups.bzl", "js_runfiles_groups")
 load("//npm:providers.bzl", "NpmPackageInfo")
 
+RgiAggregateInfo = provider(
+    doc = "Same-configuration binaries aggregated for membership tests.",
+    fields = ["binaries"],
+)
+
 def _empty_jsinfo_impl(ctx):
     s_direct = ctx.actions.declare_file("{}_s_direct.js".format(ctx.label.name))
     s_trans = ctx.actions.declare_file("{}_s_transitive.js".format(ctx.label.name))
@@ -196,14 +201,18 @@ opaque_jsinfo = rule(
     attrs = {"shared": attr.label(allow_single_file = True, mandatory = True)},
 )
 
-def _empty_filename_jsinfo_impl(ctx):
+def _extra_component_jsinfo_impl(ctx):
     src = ctx.actions.declare_file(ctx.label.name + ".js")
+    marker = ctx.actions.declare_file(ctx.label.name + "_link.txt")
     ctx.actions.write(src, "adapter")
-    runfiles = ctx.runfiles(files = [src])
-    py_rf = ctx.attr.runtime[DefaultInfo].default_runfiles
-    if py_rf != None:
-        runfiles = runfiles.merge(py_rf)
+    ctx.actions.write(marker, "link")
+    runfiles = ctx.runfiles(
+        files = [src, marker],
+        symlinks = {ctx.label.name + "/symlink": marker},
+        root_symlinks = {ctx.label.name + "/root": marker},
+    )
     sources = depset([src])
+    npm_sources = sources if ctx.attr.as_npm else depset()
     return [
         DefaultInfo(files = depset([src]), runfiles = runfiles),
         js_info(
@@ -212,14 +221,15 @@ def _empty_filename_jsinfo_impl(ctx):
             types = depset(),
             transitive_sources = sources,
             transitive_types = depset(),
-            npm_sources = depset(),
+            npm_sources = npm_sources,
         ),
     ]
 
-# Ungrouped JsInfo whose runfiles may carry implicit empty filenames from `runtime`.
-empty_filename_jsinfo = rule(
-    implementation = _empty_filename_jsinfo_impl,
-    attrs = {"runtime": attr.label(mandatory = True)},
+extra_component_jsinfo = rule(
+    implementation = _extra_component_jsinfo_impl,
+    attrs = {
+        "as_npm": attr.bool(default = False),
+    },
 )
 
 def _custom_npm_file_impl(ctx):
@@ -352,6 +362,7 @@ def _rgi_aggregate_impl(ctx):
             entries = runfiles_groups.collect(ctx, deps = [], data = [], own = [], transitive = trans),
             executable_group = None,
         ))
+    providers.append(RgiAggregateInfo(binaries = ctx.attr.binaries))
     return providers
 
 rgi_aggregate = rule(
