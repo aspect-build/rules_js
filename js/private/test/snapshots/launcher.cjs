@@ -590,14 +590,10 @@ if (process.env.JS_BINARY__LOG_INFO) {
 
 const expectedExitCode = process.env.JS_BINARY__EXPECTED_EXIT_CODE
 
-// The stub already started this node process with STUB_NODE_OPTIONS applied, and with whatever
-// environment it inherited. When that is what the program asked for, node is already configured
-// the way the program needs it and the program can run right here, saving a second node runtime
-// bootstrap. Anything else -- a node_options entry on the target, a --node_options= passed at
-// run time, an env entry that configures node startup -- can only be applied by starting node
-// again. An expected exit code also keeps the child, since this launcher has to outlive the
-// program to remap its status. It stays a run-time read because an outer js_run_binary can set
-// it in the action environment, which is what the bash launcher honors too.
+// If possible, we go straight to the entry point without exec'ing node again. However, we
+// need to re-launch node if expected_exit_code is used, if we set any environment variables
+// that affect node at startup, or if we are using any node options that were not already set
+// on the current process.
 const runInProcess =
     !ENV_CONFIGURES_NODE_STARTUP &&
     !expectedExitCode &&
@@ -625,8 +621,7 @@ if (runInProcess) {
     // JS_BINARY__ variables that only exist once the launcher above has run.
     require(process.env.JS_BINARY__NODE_PATCHES)
 
-    // Runs the entry point as the main module, so that `require.main === module` holds for it
-    // and --preserve-symlinks-main applies to it. An ESM entry point takes the same call.
+    // Runs the entry point as the main module, so that `require.main === module` holds for it.
     require('node:module').runMain()
 } else {
     // We invoke node directly rather than through JS_BINARY__NODE_WRAPPER. This
