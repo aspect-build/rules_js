@@ -2,6 +2,7 @@ load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("//js/private/test:launcher_flags.bzl", "BASH_LAUNCHER_ONLY", "HERMETIC_LAUNCHER_ONLY")
 load(":direct_capture.bzl", "direct_capture")
 
 package(default_testonly = True)
@@ -337,6 +338,7 @@ assert_contains(
 # A tool that writes to both streams and exits 0: the captures must land in the declared files.
 direct_capture(
     name = "direct_capture_streams",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
     tool = ":stdout_stderr_bin",
 )
 
@@ -368,6 +370,7 @@ diff_test(
 # still succeeds and all three declared outputs appear.
 direct_capture(
     name = "direct_capture_exit",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
     tool = ":exit_plain_bin",
 )
 
@@ -389,6 +392,7 @@ genrule(
     name = "direct_silent_run",
     outs = ["direct_silent_out.txt"],
     cmd = "JS_BINARY__SILENT_ON_SUCCESS=1 BAZEL_BINDIR=$(BINDIR) $(execpath :stdout_stderr_bin) > $@ 2>&1",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
     tools = [":stdout_stderr_bin"],
 )
 
@@ -423,4 +427,187 @@ assert_contains(
     name = "direct_not_silent_stderr_test",
     actual = ":direct_noisy_out.txt",
     expected = "ON_STDERR",
+)
+
+# ==================================================================================================
+# Case 8: with nothing but the node options the stub already applied, the hermetic launcher runs the
+# program in its own node process instead of starting a second one.
+
+js_binary(
+    name = "in_process_probe_bin",
+    entry_point = "in_process_probe.cjs",
+)
+
+genrule(
+    name = "in_process_run",
+    outs = ["in_process_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_bin) > $@",
+    tools = [":in_process_probe_bin"],
+)
+
+assert_contains(
+    name = "runs_in_launcher_process_test",
+    actual = ":in_process_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=yes",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# Both launchers must ensure that the entry point file is the main module. A CommonJS entry
+# point guarded by `require.main === module` would otherwise run nothing while still exiting 0.
+assert_contains(
+    name = "entry_point_is_main_module_test",
+    actual = ":in_process_out.txt",
+    expected = "IS_MAIN_MODULE=yes",
+)
+
+# node_options cannot be applied to a node that is already running, so a target carrying one has to
+# fall back to starting node again.
+
+js_binary(
+    name = "in_process_probe_opts_bin",
+    entry_point = "in_process_probe.cjs",
+    node_options = ["--title=probe"],
+)
+
+genrule(
+    name = "in_process_opts_run",
+    outs = ["in_process_opts_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_opts_bin) > $@",
+    tools = [":in_process_probe_opts_bin"],
+)
+
+assert_contains(
+    name = "node_options_start_a_second_node_test",
+    actual = ":in_process_opts_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=no",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# A variable that node only reads as it starts, such as NODE_OPTIONS, likewise requires
+# re-launching node.
+
+js_binary(
+    name = "in_process_probe_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"NODE_OPTIONS": "--title=probe-env"},
+)
+
+genrule(
+    name = "in_process_env_run",
+    outs = ["in_process_env_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_env_bin) > $@",
+    tools = [":in_process_probe_env_bin"],
+)
+
+assert_contains(
+    name = "node_env_starts_a_second_node_test",
+    actual = ":in_process_env_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=no",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# For both launchers, we should find that the NODE_OPTIONS variable had the expected effect.
+assert_contains(
+    name = "node_options_from_env_apply_test",
+    actual = ":in_process_env_out.txt",
+    expected = "TITLE=probe-env",
+)
+
+# The NODE_ENV variable is commonly used but does not influence node's behavior. It should
+# therefore not necessitate re-launching node.
+
+js_binary(
+    name = "in_process_probe_node_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"NODE_ENV": "production"},
+)
+
+genrule(
+    name = "in_process_node_env_run",
+    outs = ["in_process_node_env_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :in_process_probe_node_env_bin) > $@",
+    tools = [":in_process_probe_node_env_bin"],
+)
+
+assert_contains(
+    name = "node_env_keeps_one_process_test",
+    actual = ":in_process_node_env_out.txt",
+    expected = "IN_LAUNCHER_PROCESS=yes",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "node_env_reaches_the_program_test",
+    actual = ":in_process_node_env_out.txt",
+    expected = "NODE_ENV=production",
+)
+
+# Locale-related environment variables require re-launching node, because for example a target
+# that sets LC_ALL and runs in the launcher's process would format dates and numbers as the
+# ambient locale rather than the one it asked for.
+js_binary(
+    name = "locale_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"LC_ALL": "de_DE.UTF-8"},
+)
+
+filegroup(
+    name = "locale_env_launcher_js",
+    srcs = [":locale_env_bin"],
+    output_group = "launcher_js",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "locale_configures_startup_test",
+    actual = ":locale_env_launcher_js",
+    expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# Setting NODE_COMPILE_CACHE after node starts is not a problem, because we explicitly handle
+# that situation at runtime.
+js_binary(
+    name = "compile_cache_env_bin",
+    entry_point = "in_process_probe.cjs",
+    env = {"NODE_COMPILE_CACHE": "node-compile-cache"},
+)
+
+filegroup(
+    name = "compile_cache_env_launcher_js",
+    srcs = [":compile_cache_env_bin"],
+    output_group = "launcher_js",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+assert_contains(
+    name = "compile_cache_keeps_startup_unconfigured_test",
+    actual = ":compile_cache_env_launcher_js",
+    expected = "const ENV_CONFIGURES_NODE_STARTUP = false",
+    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
+)
+
+# =======================================================================================
+# Case 9: an uncaught exception is reported by node itself, with the program's own stack.
+#
+# The hermetic launcher installs an uncaughtException handler for its own failures, and
+# has to hand it back before running the program in its process, or else the stack below
+# is replaced by a one-line FATAL.
+
+js_binary(
+    name = "throw_deep_bin",
+    entry_point = "throw_deep.cjs",
+)
+
+genrule(
+    name = "throw_deep_run",
+    outs = ["throw_deep_out.txt"],
+    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :throw_deep_bin) > $@ 2>&1 || true",
+    tools = [":throw_deep_bin"],
+)
+
+assert_contains(
+    name = "uncaught_exception_keeps_program_stack_test",
+    actual = ":throw_deep_out.txt",
+    expected = "at inner",
 )

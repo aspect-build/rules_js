@@ -37,6 +37,10 @@ def _custom_test_impl(ctx):
             executable = launcher.executable,
             runfiles = runfiles,
         ),
+        OutputGroupInfo(
+            # Republished so that js_image_layer can find the generated JavaScript launcher.
+            launcher_js = launcher.launcher_js,
+        ),
     ]
 
 _custom_test = rule(
