@@ -79,6 +79,8 @@ function setEnv(name, value) {
     process.env[name] = expandEnvRefs(value)
 }
 
+// An empty value counts as unset, matching the `[[ -z ]]` test the bash launcher
+// writes for the same env entry.
 function setEnvIfUnset(name, value) {
     if (!process.env[name]) {
         process.env[name] = expandEnvRefs(value)
@@ -198,25 +200,17 @@ function exitWith(exitCode) {
     process.exit(exitCode)
 }
 
+// Node already exits 1 on an uncaught exception; this only reports it the way the
+// launcher reports every other failure, rather than as a raw stack trace. Whatever
+// comes to run the entry point in this process has to remove the handler first, or
+// the program's own exceptions get reported as launcher failures.
 process.on('uncaughtException', (err) => {
+    // The message alone: logTo collapses whitespace, so a stack would come out as one
+    // unreadable line. It is still worth having at debug level.
     logfFatal(String((err && err.message) || err))
     logfDebug(String((err && err.stack) || err))
     exitWith(1)
 })
-
-// Ends this process the way node ended, so that callers see a signal-terminated
-// process rather than an interposed 128+N exit code. That is what they would
-// have seen had this launcher been able to exec node instead of spawning it.
-function reraiseSignal(signal, exitCode) {
-    logfDebug(`exit code: ${exitCode}`)
-    // Removing the last listener restores node's default disposition for the
-    // signal, so killing ourselves with it now terminates this process.
-    process.removeAllListeners('SIGTERM')
-    process.removeAllListeners('SIGINT')
-    process.kill(process.pid, signal)
-    // Only reached if the signal turned out not to be fatal after all.
-    process.exit(exitCode)
-}
 
 // ==============================================================================
 // Initialize RUNFILES environment variable
@@ -610,7 +604,10 @@ if (runInProcess) {
     // JS_BINARY__ variables that only exist once the launcher above has run.
     require(process.env.JS_BINARY__NODE_PATCHES)
 
-    // Runs the entry point as the main module, so that `require.main === module` holds for it.
+    // Runs the entry point as the main module, so that `require.main === module` holds for
+    // it. This returns as soon as the entry point's top level does; node then exits on its
+    // own once the event loop drains, exactly as it would have on the exec path. Nothing may
+    // follow it here -- an exit would truncate every asynchronous program.
     require('node:module').runMain()
 } else {
     // We invoke node directly rather than through JS_BINARY__NODE_WRAPPER. This
@@ -680,6 +677,20 @@ if (runInProcess) {
     }
     process.on('SIGTERM', forwardSignal('SIGTERM'))
     process.on('SIGINT', forwardSignal('SIGINT'))
+
+    // Ends this process the way node ended, so that callers see a signal-terminated
+    // process rather than an interposed 128+N exit code. That is what they would
+    // have seen had this launcher been able to exec node instead of spawning it.
+    function reraiseSignal(signal, exitCode) {
+        logfDebug(`exit code: ${exitCode}`)
+        // Removing the last listener restores node's default disposition for the
+        // signal, so killing ourselves with it now terminates this process.
+        process.removeAllListeners('SIGTERM')
+        process.removeAllListeners('SIGINT')
+        process.kill(process.pid, signal)
+        // Only reached if the signal turned out not to be fatal after all.
+        process.exit(exitCode)
+    }
 
     child.on('error', (err) => {
         logfFatal(
