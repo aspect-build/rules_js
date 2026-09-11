@@ -26,7 +26,7 @@ load(
     "rgi_passthrough",
     "single_output_executable",
 )
-load(":semantics.bzl", "p1_launcher_only_test", "p1_library_outputs_test", "p1_opaque_deps_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_grouped_copy_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_exec_vs_raw_semantics_test", "p6_foreign_semantics_test", "p6_library_relay_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
+load(":semantics.bzl", "p1_foreign_outputs_test", "p1_launcher_only_test", "p1_library_outputs_test", "p1_opaque_deps_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_grouped_copy_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_exec_vs_raw_semantics_test", "p6_foreign_semantics_test", "p6_library_relay_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
 load(":tests.bzl", "runfiles_group_tests")
 
 package(default_testonly = True)
@@ -90,6 +90,13 @@ foreign_rgi_data(name = "p1_foreign_rgi")
 js_library(
     name = "p1_foreign_outputs_lib",
     data = [":p1_foreign_rgi"],
+)
+
+js_binary(
+    name = "p1_foreign_outputs_bin",
+    data = [":p1_foreign_outputs_lib"],
+    entry_point = "main.js",
+    include_npm = False,
 )
 
 custom_grouped_binary(
@@ -653,6 +660,11 @@ p1_library_outputs_test(
 p1_opaque_deps_test(
     name = "p1_opaque_deps",
     target_under_test = ":p1_opaque_lib",
+)
+
+p1_foreign_outputs_test(
+    name = "p1_foreign_outputs",
+    target_under_test = ":p1_foreign_outputs_bin",
 )
 
 p2_semantics_test(

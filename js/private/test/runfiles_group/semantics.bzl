@@ -14,12 +14,16 @@ load(
     "assert_allowed_overlaps",
     "assert_contains_files",
     "assert_empty_files",
+    "assert_exact_file_owners",
     "assert_excludes_files",
     "assert_files_exact",
+    "assert_grouped_runfiles_match",
     "assert_group_metadata",
     "assert_has_rgi",
     "assert_name_absent",
     "assert_no_rgi",
+    "assert_overlap_files",
+    "file_owners",
     "file_set",
     "files_list",
     "group_by_name",
@@ -140,6 +144,23 @@ def _p1_opaque_deps_impl(ctx):
 
 # Ungrouped JsInfo deps with File-only runfiles are relayed onto library RGI.
 p1_opaque_deps_test = semantics_test(_p1_opaque_deps_impl)
+
+def _p1_foreign_outputs_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    extras = unique_admitted(runfiles_files(target), "p1_foreign_rgi_extra.txt")
+    asserts.true(env, extras, "foreign extra output not admitted")
+    unclass = found.get(js_runfiles_groups.UNCLASSIFIED_GROUP)
+    asserts.true(env, unclass != None, "foreign extra output missing from unclassified")
+    assert_contains_files(env, unclass, extras)
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    if first:
+        assert_excludes_files(env, first, extras)
+    return analysistest.end(env)
+
+# Extra outputs of a grouped foreign data dep stay unclassified through a library.
+p1_foreign_outputs_test = semantics_test(_p1_foreign_outputs_impl)
 
 # Launcher, entry point, and raw data sources are the protected application
 # group. JsInfo sources (direct, transitive, types) are first_party. Binaries
@@ -274,6 +295,45 @@ _P3_ATTRS = {
     "bin_b": attr.label(mandatory = True),
 }
 
+def _p3_membership(env, ctx, resolved, found, name_a, name_b, target):
+    first = js_runfiles_groups.FIRST_PARTY_GROUP
+    owners = file_owners(resolved)
+    rf_files = runfiles_files(target)
+
+    a_files = unique_admitted(rf_files, "p3_a_only.txt")
+    asserts.true(env, a_files, "p3_a_only.txt not admitted")
+    a_sources = [f for f in a_files if f.is_source]
+    asserts.true(env, a_sources, "p3_a_only.txt source missing from runfiles")
+    assert_exact_file_owners(env, owners, a_sources, [name_a, first])
+    for f in a_files:
+        names = owners.get(f, [])
+        asserts.false(env, name_b in names, "{} entered B: {}".format(f.path, names))
+        for n in names:
+            asserts.true(env, n in [name_a, first], "{} unexpected owner {}".format(f.path, n))
+
+    _assert_role(env, found, rf_files, "p3_b_only.txt", name_b, [name_a, first])
+    _assert_role(env, found, rf_files, "shared.js", first, [name_a, name_b])
+
+    both = unique_admitted(rf_files, "p3_both.txt")
+    asserts.true(env, both, "p3_both.txt not admitted")
+    both_sources = [f for f in both if f.is_source]
+    asserts.true(env, both_sources, "p3_both.txt source missing from runfiles")
+    assert_exact_file_owners(env, owners, both_sources, [name_a, name_b])
+    for f in both:
+        names = owners.get(f, [])
+        asserts.false(env, first in names, "{} lost app protection: {}".format(f.path, names))
+        asserts.true(env, name_a in names or name_b in names, "{} not in app groups: {}".format(f.path, names))
+        for n in names:
+            asserts.true(env, n in [name_a, name_b], "{} unexpected owner {}".format(f.path, n))
+
+    allowed = {}
+    for f in a_sources:
+        allowed[f] = sorted([name_a, first])
+    for f in both_sources:
+        allowed[f] = sorted([name_a, name_b])
+    assert_overlap_files(env, resolved, allowed)
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+
 def _p3_limit_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
@@ -296,31 +356,7 @@ def _p3_limit_impl(ctx):
     assert_name_absent(env, found, _COVERAGE_GROUP)
     asserts.equals(env, 7, len(resolved.groups))
 
-    rf_files = runfiles_files(target)
-
-    def _some_in(group, files, msg):
-        have = file_set(files_list(group))
-        asserts.true(env, any([f in have for f in files]), msg)
-
-    def _none_in(group, files, msg):
-        have = file_set(files_list(group))
-        asserts.false(env, any([f in have for f in files]), msg)
-
-    a_files = unique_admitted(rf_files, "p3_a_only.txt")
-    asserts.true(env, a_files, "p3_a_only.txt not admitted")
-    _some_in(found[name_a], a_files, "A-owned File missing from A's application group")
-    _some_in(found[js_runfiles_groups.FIRST_PARTY_GROUP], a_files, "A-owned File missing from first_party via B")
-    _none_in(found[name_b], a_files, "A-owned File must not enter B's application group")
-    _assert_role(env, found, rf_files, "p3_b_only.txt", name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
-    _assert_role(env, found, rf_files, "shared.js", js_runfiles_groups.FIRST_PARTY_GROUP, [name_a, name_b])
-    both = unique_admitted(rf_files, "p3_both.txt")
-    asserts.true(env, both, "p3_both.txt not admitted")
-    _some_in(found[name_a], both, "shared application File missing from A")
-    _some_in(found[name_b], both, "shared application File missing from B")
-    assert_allowed_overlaps(env, resolved, [
-        sorted([name_a, name_b]),
-        sorted([name_a, js_runfiles_groups.FIRST_PARTY_GROUP]),
-    ])
+    _p3_membership(env, ctx, resolved, found, name_a, name_b, target)
 
     limited = runfiles_groups.limit(ctx, resolved, max_groups = 1)
     asserts.equals(env, 7, limited.group_count)
@@ -335,10 +371,7 @@ def _p3_limit_impl(ctx):
         js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
     ]:
         asserts.equals(env, False, limited_found[name].do_not_merge)
-    _some_in(limited_found[name_a], a_files, "A-owned File dropped from A's group after limit()")
-    _some_in(limited_found[js_runfiles_groups.FIRST_PARTY_GROUP], a_files, "A-owned File dropped from first_party after limit()")
-    _none_in(limited_found[name_b], a_files, "A-owned File entered B's group after limit()")
-    _assert_role(env, limited_found, rf_files, "p3_b_only.txt", name_b, [name_a, js_runfiles_groups.FIRST_PARTY_GROUP])
+    _p3_membership(env, ctx, limited, limited_found, name_a, name_b, target)
     return analysistest.end(env)
 
 # Shared mergeable groups fold by name; protected application groups stay distinct.

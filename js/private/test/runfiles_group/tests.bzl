@@ -25,6 +25,7 @@ def _gate_and_exports():
             ":p1_outer",
             ":p1_opaque_lib",
             ":p1_foreign_outputs_lib",
+            ":p1_foreign_outputs_bin",
             ":p4_grouped_copy_lib",
             ":p6_symlink_lib",
             ":p6_fg_lib",

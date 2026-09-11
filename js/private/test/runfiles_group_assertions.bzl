@@ -80,6 +80,14 @@ def assert_empty_files(env, group):
 
 def overlap_pairs(resolved):
     """Return {file: [group names]} for files in more than one group."""
+    overlaps = {}
+    for f, names in file_owners(resolved).items():
+        if len(names) > 1:
+            overlaps[f] = names
+    return overlaps
+
+def file_owners(resolved):
+    """Return {file: sorted group names} for every File on a resolved group."""
     owners = {}
     if resolved == None:
         return owners
@@ -91,11 +99,16 @@ def overlap_pairs(resolved):
                 owners[f] = [name]
             else:
                 names.append(name)
-    overlaps = {}
+    result = {}
     for f, names in owners.items():
-        if len(names) > 1:
-            overlaps[f] = sorted(names)
-    return overlaps
+        result[f] = sorted(names)
+    return result
+
+def assert_exact_file_owners(env, owners, files, expected_names, msg = None):
+    want = sorted(expected_names)
+    for f in files:
+        got = owners.get(f, [])
+        asserts.equals(env, want, got, msg or "{} owners {} != {}".format(f.path, got, want))
 
 def assert_allowed_overlaps(env, resolved, allowed):
     """allowed is a list of sorted name-lists that may share a File."""
@@ -107,6 +120,57 @@ def assert_allowed_overlaps(env, resolved, allowed):
             key in allowed_keys,
             "unexpected overlap of {} on {}".format(names, f.path),
         )
+
+def assert_overlap_files(env, resolved, allowed):
+    """allowed is {file: sorted names} for every File that may appear in multiple groups."""
+    for f, names in overlap_pairs(resolved).items():
+        want = allowed.get(f)
+        asserts.true(env, want != None, "unexpected overlap of {} on {}".format(names, f.path))
+        asserts.equals(env, want, names, "overlap owners for {} were {}".format(f.path, names))
+
+def assert_grouped_runfiles_match(env, ctx, resolved, target):
+    """Resolved groups' four runfiles components equal the target's default_runfiles."""
+    rf = target[DefaultInfo].default_runfiles
+    g_files = {}
+    g_empty = {}
+    g_sym = {}
+    g_root = {}
+    if resolved != None:
+        for g in resolved.groups:
+            gr = runfiles_groups.runfiles(ctx, g)
+            if gr.files:
+                for f in gr.files.to_list():
+                    g_files[f] = True
+            if gr.empty_filenames:
+                for n in gr.empty_filenames.to_list():
+                    g_empty[n] = True
+            if gr.symlinks:
+                for s in gr.symlinks.to_list():
+                    g_sym[s.path] = True
+            if gr.root_symlinks:
+                for s in gr.root_symlinks.to_list():
+                    g_root[s.path] = True
+    want_files = file_set(rf.files.to_list() if rf != None and rf.files else [])
+    want_empty = {}
+    if rf != None and rf.empty_filenames:
+        for n in rf.empty_filenames.to_list():
+            want_empty[n] = True
+    want_sym = {}
+    if rf != None and rf.symlinks:
+        for s in rf.symlinks.to_list():
+            want_sym[s.path] = True
+    want_root = {}
+    if rf != None and rf.root_symlinks:
+        for s in rf.root_symlinks.to_list():
+            want_root[s.path] = True
+    asserts.equals(env, len(want_files), len(g_files), "grouped file count {} != runfiles {}".format(len(g_files), len(want_files)))
+    for f in want_files:
+        asserts.true(env, f in g_files, "grouped missing {}".format(f.path))
+    for f in g_files:
+        asserts.true(env, f in want_files, "grouped extra {}".format(f.path))
+    asserts.equals(env, sorted(want_empty.keys()), sorted(g_empty.keys()))
+    asserts.equals(env, sorted(want_sym.keys()), sorted(g_sym.keys()))
+    asserts.equals(env, sorted(want_root.keys()), sorted(g_root.keys()))
 
 def unique_admitted(runfiles_files, basename):
     """Same-configuration Files from this target's runfiles with an exact basename."""

@@ -139,40 +139,63 @@ def _lift(files_dict, copy_of, admitted):
             result[copy] = True
     return result
 
-def _extend_with_copies(ctx, entry, copy_of, admitted = None):
-    """Add copies of Files already in this entry. Skip the file scan when nothing was copied."""
-    copy_pairs = []
-    for orig, copy in copy_of.items():
-        if copy != orig and (admitted == None or copy in admitted):
-            copy_pairs.append((orig, copy))
-    if not copy_pairs:
-        return entry
-    files = {f: True for f in runfiles_groups.files(entry).to_list()}
-    extras = [copy for orig, copy in copy_pairs if orig in files]
-    if not extras:
-        return entry
-    return runfiles_groups.derive(
-        entry,
-        content = runfiles_groups.union(ctx, [entry.content, depset(extras)]),
-    )
-
-def _relay_grouped(ctx, dep, copy_of, own, transitive):
-    entries = dep[RunfilesGroupInfo].entries
-    has_copies = False
+def _copy_pairs(copy_of):
+    pairs = []
     for orig, copy in copy_of.items():
         if copy != orig:
-            has_copies = True
-            break
-    if not has_copies:
-        transitive.append(entries)
-        return
-    for entry in entries.to_list():
-        own.append(_extend_with_copies(ctx, entry, copy_of))
+            pairs.append((orig, copy))
+    return pairs
 
-def _relay_runfiles(ctx, dep, copy_of, own):
+def _cached_list(cache, ds):
+    for item in cache:
+        if item[0] == ds:
+            return item[1]
+    value = ds.to_list() if ds else []
+    cache.append((ds, value))
+    return value
+
+def _cached_file_dict(cache, ds):
+    for item in cache:
+        if item[0] == ds:
+            return item[1]
+    value = {}
+    if ds:
+        for f in ds.to_list():
+            value[f] = True
+    cache.append((ds, value))
+    return value
+
+def _copy_only_entry(entry, copy_pairs, files_cache, admitted = None):
+    """Same-name entry containing only copies found in `entry`. Does not rebuild it."""
+    if not copy_pairs:
+        return None
+    files = _cached_file_dict(files_cache, runfiles_groups.files(entry))
+    extras = []
+    for orig, copy in copy_pairs:
+        if orig in files and (admitted == None or copy in admitted):
+            extras.append(copy)
+    if not extras:
+        return None
+    return runfiles_groups.derive(entry, content = depset(extras))
+
+def _relay_grouped(dep, copy_pairs, own, transitive, entries_cache, files_cache):
+    entries = dep[RunfilesGroupInfo].entries
+    transitive.append(entries)
+    if not copy_pairs:
+        return
+    for entry in _cached_list(entries_cache, entries):
+        extra = _copy_only_entry(entry, copy_pairs, files_cache)
+        if extra:
+            own.append(extra)
+
+def _relay_runfiles(ctx, dep, copy_pairs, own, files_cache):
     fallback = _fallback_runfiles_entry(ctx, dep)
-    if fallback:
-        own.append(_extend_with_copies(ctx, fallback, copy_of))
+    if not fallback:
+        return
+    own.append(fallback)
+    extra = _copy_only_entry(fallback, copy_pairs, files_cache)
+    if extra:
+        own.append(extra)
 
 def _collect_rgi(ctx, own, transitive):
     if not own and not transitive:
@@ -190,6 +213,24 @@ def _direct_files_and_copies(dep, copy_of):
         if copy != None and copy != f:
             files.append(copy)
     return files
+
+def _runfiles_file_set(dep):
+    result = {}
+    dr = dep[DefaultInfo].default_runfiles
+    if dr == None or not dr.files:
+        return result
+    for f in dr.files.to_list():
+        result[f] = True
+    return result
+
+def _unclaimed_direct_outputs(dep, copy_of, claimed):
+    """Default outputs with no inherited/npm role. Ordinary runfiles Files are claimed."""
+    rf = _runfiles_file_set(dep)
+    extra = []
+    for f in _direct_files_and_copies(dep, copy_of):
+        if f not in rf and f not in claimed:
+            extra.append(f)
+    return extra
 
 def _npm_src_if_in_outputs(dep, copy_of):
     """NpmPackageInfo.src only when it is this target's default output."""
@@ -211,32 +252,46 @@ def library_groups(ctx, *, data, srcs_types_deps, copied_data_files, copied_orig
     """Relay inherited runfiles and independently admit this library's direct outputs.
 
     Default-runfiles relay is exact (borrowed RGI or the complete default_runfiles
-    object). Direct DefaultInfo.files and copies are a separate contribution.
+    object). Direct DefaultInfo.files are classified by known role: ordinary/JsInfo
+    as first_party, NpmPackageInfo.src as third_party, other extras as unclassified.
+    Inherited entries stay transitive; copies are same-name extra entries.
     """
     copy_of = _copy_map(copied_originals, copied_data_files)
+    copy_pairs = _copy_pairs(copy_of)
     own = []
     transitive = []
     first_party = []
     third_party = []
+    unclassified = []
+    entries_cache = []
+    files_cache = []
 
     for dep in data:
         if RunfilesGroupInfo in dep:
-            _relay_grouped(ctx, dep, copy_of, own, transitive)
+            _relay_grouped(dep, copy_pairs, own, transitive, entries_cache, files_cache)
         else:
-            _relay_runfiles(ctx, dep, copy_of, own)
-        first_party.extend(_direct_files_and_copies(dep, copy_of))
-        third_party.extend(_npm_src_if_in_outputs(dep, copy_of))
+            _relay_runfiles(ctx, dep, copy_pairs, own, files_cache)
+        npm_files = _npm_src_if_in_outputs(dep, copy_of)
+        third_party.extend(npm_files)
+        claimed = {f: True for f in npm_files}
+        if _is_ordinary_data(dep) or JsInfo in dep:
+            first_party.extend(_direct_files_and_copies(dep, copy_of))
+        else:
+            unclassified.extend(_unclaimed_direct_outputs(dep, copy_of, claimed))
 
     for dep in srcs_types_deps:
         if RunfilesGroupInfo in dep:
-            _relay_grouped(ctx, dep, copy_of, own, transitive)
+            _relay_grouped(dep, copy_pairs, own, transitive, entries_cache, files_cache)
         else:
-            _relay_runfiles(ctx, dep, copy_of, own)
+            _relay_runfiles(ctx, dep, copy_pairs, own, files_cache)
 
     e = _maybe_files_entry(FIRST_PARTY_GROUP, first_party, "first_party", RANK_FIRST_PARTY_DEPS)
     if e:
         own.append(e)
     e = _maybe_files_entry(THIRD_PARTY_GROUP, third_party, "third_party", runfiles_groups.RANK_SHARED_DEPS)
+    if e:
+        own.append(e)
+    e = _maybe_files_entry(UNCLASSIFIED_GROUP, unclassified, "", RANK_UNCLASSIFIED)
     if e:
         own.append(e)
     return _collect_rgi(ctx, own, transitive)
@@ -307,6 +362,7 @@ def binary_groups(
         entry_point_file):
     """Normalize the final js_binary / js_test runtime closure."""
     copy_of = _copy_map(copied_originals, copied_files)
+    copy_pairs = _copy_pairs(copy_of)
     admitted = _flatten_files([runfiles.files] if runfiles.files else [])
 
     inherited_depsets = []
@@ -359,12 +415,18 @@ def binary_groups(
                     fallbacks.append(fallback)
 
         if JsInfo in dep:
-            jsinfo = dep[JsInfo]
-            npm_ds.append(jsinfo.npm_sources)
-            source_ds.append(jsinfo.sources)
-            source_ds.append(jsinfo.types)
-            source_ds.append(jsinfo.transitive_sources)
-            source_ds.append(jsinfo.transitive_types)
+            dr = dep[DefaultInfo].default_runfiles
+            if dr != None and _depset_nonempty(dr.empty_filenames):
+                # Bazel 7 cannot build empty_filenames onto a files-only entry, so
+                # this adapter's default_runfiles stay opaque unclassified together.
+                pass
+            else:
+                jsinfo = dep[JsInfo]
+                npm_ds.append(jsinfo.npm_sources)
+                source_ds.append(jsinfo.sources)
+                source_ds.append(jsinfo.types)
+                source_ds.append(jsinfo.transitive_sources)
+                source_ds.append(jsinfo.transitive_types)
         if NpmPackageStoreInfo in dep:
             store_ds.append(dep[NpmPackageStoreInfo].transitive_files)
         if NpmPackageInfo in dep and dep[NpmPackageInfo].src:
@@ -382,26 +444,49 @@ def binary_groups(
                     if copy != None and copy != f:
                         ordinary_generated.append(copy)
 
+    files_cache = []
     preserved = []
+    assigned = {}
     entries_list = depset(transitive = inherited_depsets).to_list() if inherited_depsets else []
     for entry in entries_list:
         name = runfiles_groups.name_str(entry.name)
+        files_ds = runfiles_groups.files(entry)
+        files = _cached_file_dict(files_cache, files_ds)
         if name in _CONSUMED_NAMES:
-            files = runfiles_groups.files(entry)
             if name == NPM_GROUP:
-                npm_ds.append(files)
+                npm_ds.append(files_ds)
             elif name == NPM_LINKS_GROUP:
-                routing_ds.append(files)
+                routing_ds.append(files_ds)
             elif name == FIRST_PARTY_GROUP:
-                first_party_inherited.append(files)
+                first_party_inherited.append(files_ds)
             elif name == THIRD_PARTY_GROUP:
-                third_party_inherited.append(files)
+                third_party_inherited.append(files_ds)
             else:
-                unclassified_ds.append(files)
+                unclassified_ds.append(files_ds)
         else:
-            preserved.append(_extend_with_copies(ctx, entry, copy_of, admitted))
+            preserved.append(entry)
+            extra = _copy_only_entry(entry, copy_pairs, files_cache, admitted)
+            if extra:
+                preserved.append(extra)
+            for f in files:
+                if f in admitted:
+                    assigned[f] = True
+            if extra:
+                for f in runfiles_groups.files(extra).to_list():
+                    if f in admitted:
+                        assigned[f] = True
     for fallback in fallbacks:
-        preserved.append(_extend_with_copies(ctx, fallback, copy_of, admitted))
+        preserved.append(fallback)
+        extra = _copy_only_entry(fallback, copy_pairs, files_cache, admitted)
+        if extra:
+            preserved.append(extra)
+        for f in runfiles_groups.files(fallback).to_list():
+            if f in admitted:
+                assigned[f] = True
+        if extra:
+            for f in runfiles_groups.files(extra).to_list():
+                if f in admitted:
+                    assigned[f] = True
 
     N_pre = _flatten_files(npm_ds + store_ds)
     N = _lift(N_pre, copy_of, admitted)
@@ -420,13 +505,7 @@ def binary_groups(
     L = _lift(L_pre, copy_of, admitted)
 
     app = _file_dict([f for f in app_files if f in admitted])
-
-    assigned = {}
     assigned.update(app)
-    for entry in preserved:
-        for f in runfiles_groups.files(entry).to_list():
-            if f in admitted:
-                assigned[f] = True
 
     own = list(preserved)
     U = _lift(_flatten_files(unclassified_ds), copy_of, admitted)
@@ -569,7 +648,9 @@ def binary_groups(
         else:
             leftover_rf = leftover_files
     if leftover_empty:
-        # Bazel 7 ctx.runfiles has no empty_filenames=; wrap suppliers' runfiles.
+        # Bazel 7 ctx.runfiles has no empty_filenames=. Wrap supplier runfiles
+        # so unmatched empty names survive. Those Files stay on this opaque
+        # unclassified entry (JsInfo inventories for the same deps were skipped).
         extra_rf = []
         for dep in data:
             dr = dep[DefaultInfo].default_runfiles
