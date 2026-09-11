@@ -67,6 +67,28 @@ command(
     command = ":devserver_alt",
 )
 
+# Same as :devserver_alt but with the npm package store materialized inside the custom sandbox so
+# that node_modules symlinks resolve within it. Covers that incremental ibazel syncing still works
+# in that mode.
+js_run_devserver(
+    name = "devserver_sandbox",
+    chdir = package_name(),
+    command = "../node_modules/.bin/http-server",
+    data = [
+        ":http_root",
+        ":web_files",
+        "//:node_modules/http-server",
+    ],
+    log_level = "debug",
+    package_store_mode = "sandbox",
+)
+
+command(
+    name = "serve_sandbox",
+    arguments = ["."],
+    command = ":devserver_sandbox",
+)
+
 # Use command to bake-in the arguments into the runnable binary so that the target
 # can be used with `multirun` below.
 command(
