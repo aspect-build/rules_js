@@ -1,7 +1,0 @@
-exports_files(["lib/shared.js"])
-
-filegroup(
-    name = "root",
-    srcs = ["lib/shared.js"],
-    visibility = ["//visibility:public"],
-)

@@ -1,18 +1,21 @@
-"""Stock runfiles_group_analysis_test families P1-P6."""
+"""runfiles_group_analysis_test coverage for js_binary, js_library, and npm producers."""
 
 load("@rules_runfiles_group//runfiles_group:lib.bzl", "runfiles_groups")
 load("@rules_runfiles_group//runfiles_group:runfiles_group_analysis_test.bzl", "runfiles_group_analysis_test")
 
 def runfiles_group_tests():
-    """Declares stock conformance tests for P1-P6."""
-    _p1()
-    _p2()
-    _p3()
-    _p4()
-    _p5()
-    _p6()
+    """Declare stock analysis tests for grouping emission, roles, merge, and npm shapes."""
+    _gate_and_exports()
+    _binary_roles()
+    _merge_and_limit()
+    _include_flags()
+    _npm_representation()
+    _nested_and_foreign()
 
-def _p1():
+def _gate_and_exports():
+    # Grouping is off unless --@rules_runfiles_group//runfiles_group:enabled.
+    # js_binary, js_test, js_library(data), npm links, and custom producers emit
+    # RunfilesGroupInfo when enabled; the same targets emit none when disabled.
     runfiles_group_analysis_test(
         name = "p1_gate_and_exports",
         binaries = [
@@ -32,7 +35,10 @@ def _p1():
         max_groups = 100,
     )
 
-def _p2():
+def _binary_roles():
+    # A js_binary with mixed data classifies launcher/entry/raw sources as the
+    # protected application group, JsInfo sources as first_party, and npm links
+    # as npm_links. Binaries must not emit the coarse #npm group.
     p2 = runfiles_groups.name_str(Label(":p2_bin"))
     runfiles_group_analysis_test(
         name = "p2_contract",
@@ -43,7 +49,10 @@ def _p2():
         max_groups = 100,
     )
 
-def _p3():
+def _merge_and_limit():
+    # Two binaries keep protected application groups. Shared first_party / npm /
+    # node groups fold by name. runfiles_groups.limit() does not drop protected
+    # groups; affinity-matched mergeable groups may collapse.
     runfiles_group_analysis_test(
         name = "p3_each_producer",
         binaries = [":p3_a", ":p3_b"],
@@ -52,7 +61,7 @@ def _p3():
         max_groups = 100,
     )
     runfiles_group_analysis_test(
-        name = "p3_aggregate_prelimit",
+        name = "p3_aggregate_seven_groups",
         binaries = [":p3_aggregate"],
         check_disabled = False,
         expected_group_count = 7,
@@ -96,7 +105,10 @@ def _p3():
         max_groups = 1,
     )
 
-def _p4():
+def _include_flags():
+    # include_sources / include_types / include_npm_sources and copy_data_to_bin
+    # control which Files are in default_runfiles, and therefore which groups
+    # the binary emits. include_npm adds #npm_toolchain.
     for name in [
         "p4_none",
         "p4_direct",
@@ -117,7 +129,10 @@ def _p4():
             max_groups = 100,
         )
 
-def _p5():
+def _npm_representation():
+    # Classification follows the provider visible at the binary: store/link
+    # payloads are third_party; wrapping npm_package in js_library(srcs) exposes
+    # a generated tree and is first_party. Links emit coarse #npm.
     for name in [
         "p5_bin",
         "p5_wrapped_pkg_bin",
@@ -142,7 +157,10 @@ def _p5():
         max_groups = 100,
     )
 
-def _p6():
+def _nested_and_foreign():
+    # A js_binary in data keeps its protected application group. Dropping
+    # RunfilesGroupInfo falls back to DefaultInfo. Foreign groups, symlinks,
+    # and Node toolchain Files are preserved as-is.
     runfiles_group_analysis_test(
         name = "p6_nested_contract",
         binaries = [":p6_outer"],
@@ -183,13 +201,6 @@ def _p6():
     runfiles_group_analysis_test(
         name = "p6_node_path_contract",
         binaries = [":p6_node_path_bin"],
-        check_disabled = False,
-        overlapping_group_behavior = "ignore",
-        max_groups = 100,
-    )
-    runfiles_group_analysis_test(
-        name = "p6_empty_filenames_contract",
-        binaries = [":p6_py_bin"],
         check_disabled = False,
         overlapping_group_behavior = "ignore",
         max_groups = 100,

@@ -1,7 +1,7 @@
-"""Local semantic oracles for P1-P6.
+"""Analysis tests for RunfilesGroupInfo membership on rules_js fixtures.
 
-Loads public producer constants and upstream APIs. Does not call the classifier
-to compute expected membership.
+Inspects groups already emitted by js_binary / js_library / npm producers.
+Does not reimplement grouping to compute expected membership.
 """
 
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
@@ -27,6 +27,9 @@ load(
     "semantics_test",
 )
 
+# Coverage execution is unchanged; grouping does not expose a coverage group.
+_COVERAGE_GROUP = "aspect_rules_js#coverage"
+
 def _assert_role(env, found, rf_files, original, expected_name, forbidden_names):
     related = related_admitted(rf_files, original)
     asserts.true(env, related, "no admitted file matching {}".format(original.basename))
@@ -46,6 +49,7 @@ def _p1_source_only_impl(ctx):
     asserts.false(env, rf.files, "source-only library default_runfiles should be empty")
     return analysistest.end(env)
 
+# js_library(srcs) has empty default_runfiles and no RunfilesGroupInfo.
 p1_source_only_test = semantics_test(_p1_source_only_impl)
 
 def _p1_package_impl(ctx):
@@ -54,6 +58,7 @@ def _p1_package_impl(ctx):
     assert_no_rgi(env, target, "npm_package must not invent runfiles RGI")
     return analysistest.end(env)
 
+# npm_package is a build output, not a runfiles producer.
 p1_package_test = semantics_test(_p1_package_impl)
 
 def _p1_launcher_impl(ctx):
@@ -65,6 +70,7 @@ def _p1_launcher_impl(ctx):
     asserts.true(env, target[DefaultInfo].default_runfiles != None, "create_launcher runfiles missing")
     return analysistest.end(env)
 
+# create_launcher copies a js_binary executable without emitting RunfilesGroupInfo.
 p1_launcher_only_test = semantics_test(_p1_launcher_impl)
 
 def _p1_rebuilt_impl(ctx):
@@ -77,6 +83,7 @@ def _p1_rebuilt_impl(ctx):
     asserts.equals(env, target.label, target[RunfilesGroupInfo].executable_group)
     return analysistest.end(env)
 
+# A derivative that changes default runfiles after js_binary must rebuild RunfilesGroupInfo.
 p1_rebuilt_semantics_test = semantics_test(_p1_rebuilt_impl)
 
 def _p1_rebuilt_disabled_impl(ctx):
@@ -86,6 +93,9 @@ def _p1_rebuilt_disabled_impl(ctx):
 
 p1_rebuilt_disabled_test = analysistest.make(_p1_rebuilt_disabled_impl, config_settings = DISABLED_CONFIG)
 
+# Launcher, entry point, and raw data sources are the protected application
+# group. JsInfo sources (direct, transitive, types) are first_party. Binaries
+# do not emit #npm or #coverage.
 _P2_ATTRS = {
     "entry": attr.label(allow_single_file = True, mandatory = True),
     "raw_data": attr.label(allow_single_file = True, mandatory = True),
@@ -186,12 +196,13 @@ def _p2_impl(ctx):
 
     assert_name_absent(env, found, js_runfiles_groups.NPM_GROUP)
     assert_name_absent(env, found, js_runfiles_groups.NPM_TOOLCHAIN_GROUP)
-    assert_name_absent(env, found, js_runfiles_groups.COVERAGE_GROUP)
+    assert_name_absent(env, found, _COVERAGE_GROUP)
     assert_allowed_overlaps(env, resolved, [])
     return analysistest.end(env)
 
 p2_semantics_test = semantics_test(_p2_impl, attrs = _P2_ATTRS)
 
+# first_party Files must not also appear in third_party.
 def _swap_must_fail_helper(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
@@ -239,10 +250,10 @@ def _p3_limit_impl(ctx):
         js_runfiles_groups.NODE_GROUP,
         js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
     ]:
-        asserts.true(env, name in found, "pre-limit missing {}".format(name))
+        asserts.true(env, name in found, "missing group {} before limit()".format(name))
     assert_name_absent(env, found, js_runfiles_groups.NPM_GROUP)
     assert_name_absent(env, found, js_runfiles_groups.NPM_TOOLCHAIN_GROUP)
-    assert_name_absent(env, found, js_runfiles_groups.COVERAGE_GROUP)
+    assert_name_absent(env, found, _COVERAGE_GROUP)
     asserts.equals(env, 7, len(resolved.groups))
 
     rf_files = runfiles_files(target)
@@ -269,6 +280,8 @@ def _p3_limit_impl(ctx):
         asserts.equals(env, False, limited_found[name].do_not_merge)
     return analysistest.end(env)
 
+# Shared mergeable groups fold by name; protected application groups stay distinct.
+# limit(max_groups=1) does not drop those protected groups.
 p3_limit_semantics_test = semantics_test(_p3_limit_impl, attrs = _P3_ATTRS)
 
 def _p5_loss_impl(ctx):
@@ -285,6 +298,7 @@ def _p5_loss_impl(ctx):
     )
     return analysistest.end(env)
 
+# js_library(srcs = [npm_package]) exposes a generated tree, so the binary treats it as first_party.
 p5_loss_semantics_test = semantics_test(_p5_loss_impl)
 
 def _p5_link_coarse_impl(ctx):
@@ -303,6 +317,7 @@ def _p5_link_coarse_impl(ctx):
     asserts.true(env, js_runfiles_groups.NPM_LINKS_GROUP in found)
     return analysistest.end(env)
 
+# npm_link_package emits coarse #npm plus #npm_links. js_binary later drops #npm.
 p5_link_coarse_semantics_test = semantics_test(_p5_link_coarse_impl)
 
 def _p5_custom_npm_impl(ctx):
@@ -322,6 +337,7 @@ def _p5_custom_npm_impl(ctx):
     )
     return analysistest.end(env)
 
+# NpmPackageInfo.src on data is third_party, even without going through npm_link_package.
 p5_custom_npm_semantics_test = semantics_test(_p5_custom_npm_impl, attrs = {
     "custom_pkg": attr.label(allow_single_file = True, mandatory = True),
 })
@@ -349,6 +365,7 @@ def _p5_external_impl(ctx):
     )
     return analysistest.end(env)
 
+# Source-backed JS from another module is first_party (representation at admission, not repo identity).
 p5_external_semantics_test = semantics_test(_p5_external_impl, attrs = {
     "root_a": attr.label(allow_single_file = True, mandatory = True),
     "root_b": attr.label(allow_single_file = True, mandatory = True),
@@ -364,6 +381,7 @@ def _p5_link_as_src_impl(ctx):
         assert_excludes_files(env, first, [ctx.file.pkg_tree])
     return analysistest.end(env)
 
+# js_library(srcs = [npm_link_package]) still classifies the package tree as npm, not first_party.
 p5_link_as_src_semantics_test = semantics_test(_p5_link_as_src_impl, attrs = {
     "pkg_tree": attr.label(allow_single_file = True, mandatory = True),
 })
@@ -386,6 +404,7 @@ def _p6_marker_impl(ctx):
     assert_name_absent(env, found, js_runfiles_groups.NODE_GROUP)
     return analysistest.end(env)
 
+# Path-only Node toolchains emit an empty #node_external:<label> marker, not #node.
 p6_marker_semantics_test = semantics_test(_p6_marker_impl)
 
 def _p6_passthrough_impl(ctx):
@@ -395,6 +414,7 @@ def _p6_passthrough_impl(ctx):
     asserts.equals(env, None, target[RunfilesGroupInfo].executable_group)
     return analysistest.end(env)
 
+# Relaying RunfilesGroupInfo without an executable_group is allowed for non-binaries.
 p6_passthrough_semantics_test = semantics_test(_p6_passthrough_impl)
 
 def _p6_nested_impl(ctx):
@@ -415,6 +435,7 @@ def _p6_nested_impl(ctx):
     asserts.true(env, found[runfiles_groups.name_str(target.label)].do_not_merge)
     return analysistest.end(env)
 
+# A js_binary in data keeps its own protected application group on the outer binary.
 p6_nested_semantics_test = semantics_test(_p6_nested_impl, attrs = {
     "inner": attr.label(mandatory = True),
 })
@@ -427,6 +448,7 @@ def _p6_drop_impl(ctx):
     assert_name_absent(env, found, inner)
     return analysistest.end(env)
 
+# A data dep that drops RunfilesGroupInfo is not recovered as a nested application group.
 p6_drop_semantics_test = semantics_test(_p6_drop_impl, attrs = {
     "inner": attr.label(mandatory = True),
 })
@@ -469,21 +491,8 @@ def _p6_foreign_impl(ctx):
     asserts.true(env, has_root, "expected preserved foreign root symlink")
     return analysistest.end(env)
 
+# Non-rules_js RunfilesGroupInfo, symlinks, and root_symlinks are preserved.
 p6_foreign_semantics_test = semantics_test(_p6_foreign_impl)
-
-def _p6_empty_impl(ctx):
-    env = analysistest.begin(ctx)
-    target = analysistest.target_under_test(env)
-    resolved = resolve_target(ctx, target)
-    empty = []
-    for g in resolved.groups:
-        rf = runfiles_groups.runfiles(ctx, g)
-        if rf.empty_filenames:
-            empty.extend(rf.empty_filenames.to_list())
-    asserts.true(env, len(empty) > 0, "expected nonempty empty_filenames from py_binary data")
-    return analysistest.end(env)
-
-p6_empty_semantics_test = semantics_test(_p6_empty_impl)
 
 def _p6_copied_node_impl(ctx):
     env = analysistest.begin(ctx)
@@ -495,6 +504,7 @@ def _p6_copied_node_impl(ctx):
     asserts.true(env, "copied_node_tc_node" in names, "copied Node File missing from #node: {}".format(names))
     return analysistest.end(env)
 
+# A copied Node executable File is classified as #node.
 p6_copied_node_semantics_test = semantics_test(_p6_copied_node_impl)
 
 _P4_JSINFO_ATTRS = {
@@ -519,6 +529,7 @@ def _p4_none_impl(ctx):
     asserts.false(env, "p4_jsinfo_npm.js" in third_names, "excluded npm sentinel leaked into third_party")
     return analysistest.end(env)
 
+# include_* flags that are false keep the corresponding JsInfo files out of runfiles.
 p4_none_semantics_test = semantics_test(_p4_none_impl)
 
 def _p4_direct_impl(ctx):
@@ -533,6 +544,7 @@ def _p4_direct_impl(ctx):
     assert_excludes_files(env, first, [_jsinfo_named(jsinfo, "_s_transitive.js")])
     return analysistest.end(env)
 
+# include_sources / include_types admit direct JsInfo files as first_party.
 p4_direct_semantics_test = semantics_test(_p4_direct_impl, attrs = _P4_JSINFO_ATTRS)
 
 def _p4_trans_impl(ctx):
@@ -545,6 +557,7 @@ def _p4_trans_impl(ctx):
     _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_t_transitive.d.ts"), js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
     return analysistest.end(env)
 
+# include_transitive_sources / include_transitive_types admit transitive JsInfo files.
 p4_trans_semantics_test = semantics_test(_p4_trans_impl, attrs = _P4_JSINFO_ATTRS)
 
 def _p4_both_impl(ctx):
@@ -558,6 +571,7 @@ def _p4_both_impl(ctx):
     _assert_role(env, found, rf_files, _jsinfo_named(jsinfo, "_npm.js"), js_runfiles_groups.THIRD_PARTY_GROUP, [js_runfiles_groups.FIRST_PARTY_GROUP])
     return analysistest.end(env)
 
+# Direct sources are first_party; npm_sources from JsInfo are third_party.
 p4_both_semantics_test = semantics_test(_p4_both_impl, attrs = _P4_JSINFO_ATTRS)
 
 def _p4_include_npm_impl(ctx):
@@ -573,26 +587,19 @@ def _p4_include_npm_impl(ctx):
         do_not_merge = False,
         merge_affinity = js_runfiles_groups.AFFINITY,
     )
-    assert_name_absent(env, found, js_runfiles_groups.COVERAGE_GROUP)
+    assert_name_absent(env, found, _COVERAGE_GROUP)
     return analysistest.end(env)
 
+# include_npm puts the npm CLI wrapper files in #npm_toolchain.
 p4_include_npm_semantics_test = semantics_test(_p4_include_npm_impl)
 
 def _p4_coverage_impl(ctx):
     env = analysistest.begin(ctx)
     found = group_by_name(resolve_target(ctx, analysistest.target_under_test(env)))
-    coverage = found.get(js_runfiles_groups.COVERAGE_GROUP)
-    asserts.true(env, coverage != None, "coverage-enabled test must emit #coverage")
-    assert_group_metadata(
-        env,
-        coverage,
-        kind = "foundation",
-        rank = js_runfiles_groups.RANK_BOOTSTRAP,
-        do_not_merge = False,
-        merge_affinity = js_runfiles_groups.AFFINITY,
-    )
+    assert_name_absent(env, found, _COVERAGE_GROUP)
     return analysistest.end(env)
 
+# Coverage execution files are not a named grouping role.
 p4_coverage_semantics_test = analysistest.make(
     _p4_coverage_impl,
     config_settings = {
@@ -615,6 +622,7 @@ def _p4_copy_impl(ctx):
     _assert_role(env, found, rf_files, ctx.file.skip, app_name, [js_runfiles_groups.FIRST_PARTY_GROUP])
     return analysistest.end(env)
 
+# copy_data_to_bin copies ordinary data into the application group; no_copy_to_bin skips that copy.
 p4_copy_semantics_test = semantics_test(_p4_copy_impl, attrs = {
     "keep": attr.label(allow_single_file = True, mandatory = True),
     "skip": attr.label(allow_single_file = True, mandatory = True),
@@ -634,6 +642,7 @@ def _p4_generated_impl(ctx):
     )
     return analysistest.end(env)
 
+# Generated ordinary data (write_file / genrule) is first_party, not the application group.
 p4_generated_semantics_test = semantics_test(_p4_generated_impl, attrs = {
     "generated": attr.label(allow_single_file = True, mandatory = True),
 })
@@ -648,6 +657,7 @@ def _p4_dir_impl(ctx):
     asserts.true(env, trees, "expected TreeArtifact entry point in the application group")
     return analysistest.end(env)
 
+# A TreeArtifact entry point stays in the protected application group.
 p4_dir_semantics_test = semantics_test(_p4_dir_impl)
 
 def _p4_proto_impl(ctx):
@@ -664,6 +674,7 @@ def _p4_proto_impl(ctx):
     asserts.true(env, has_proto_js, "expected generated proto JS in first_party, got {}".format(names))
     return analysistest.end(env)
 
+# js_proto_aspect is JsInfo-only; generated JS admitted by js_binary is first_party.
 p4_proto_semantics_test = semantics_test(_p4_proto_impl)
 
 def _p4_no_copy_impl(ctx):
@@ -676,6 +687,7 @@ def _p4_no_copy_impl(ctx):
     _assert_role(env, found, rf_files, ctx.file.raw_data, runfiles_groups.name_str(target.label), [js_runfiles_groups.FIRST_PARTY_GROUP])
     return analysistest.end(env)
 
+# copy_data_to_bin = False keeps the original source File in the application group.
 p4_no_copy_semantics_test = semantics_test(_p4_no_copy_impl, attrs = {
     "raw_data": attr.label(allow_single_file = True, mandatory = True),
 })

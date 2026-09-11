@@ -1,6 +1,6 @@
-"""Local semantic assertions for RunfilesGroupInfo producers.
+"""Helpers for RunfilesGroupInfo analysis tests.
 
-Loads only public upstream APIs. Does not call the producer classifier.
+Reads groups through rules_runfiles_group APIs. Does not reimplement grouping.
 """
 
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")

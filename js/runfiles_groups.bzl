@@ -28,7 +28,6 @@ js_runfiles_groups = struct(
     NODE_EXTERNAL_PREFIX = _js_runfiles_groups.NODE_EXTERNAL_PREFIX,
     RUNTIME_SUPPORT_GROUP = _js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
     NPM_TOOLCHAIN_GROUP = _js_runfiles_groups.NPM_TOOLCHAIN_GROUP,
-    COVERAGE_GROUP = _js_runfiles_groups.COVERAGE_GROUP,
     UNCLASSIFIED_GROUP = _js_runfiles_groups.UNCLASSIFIED_GROUP,
     RANK_FIRST_PARTY_DEPS = _js_runfiles_groups.RANK_FIRST_PARTY_DEPS,
     RANK_NPM_LINKS = _js_runfiles_groups.RANK_NPM_LINKS,

@@ -1,0 +1,11 @@
+"""Test-only workspace: @aspect_rules_js is an external module."""
+
+module(name = "runfiles_group_nested")
+
+bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+local_path_override(
+    module_name = "aspect_rules_js",
+    path = "../../../../..",
+)
+
+bazel_dep(name = "rules_runfiles_group", version = "0.1.0")

@@ -527,7 +527,6 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         copied_originals = data_originals,
         entry_point_file = copied_data_files[0],
         entry_point_was_copied = entry_point.is_source and ctx.attr.copy_data_to_bin and entry_point not in ctx.files.no_copy_to_bin,
-        coverage_bootstrap = ctx.file._coverage_bootstrap if ctx.configuration.coverage_enabled else None,
     )
 
 def _js_binary_impl(ctx):
@@ -585,10 +584,6 @@ def _js_binary_impl(ctx):
         )
 
     if js_runfiles_groups.is_enabled(ctx):
-        coverage_report = ctx.file._coverage_report if _generates_coverage_report(ctx) else None
-        lcov_merger = None
-        if ctx.attr.testonly and ctx.configuration.coverage_enabled and hasattr(ctx.attr, "_lcov_merger"):
-            lcov_merger = ctx.attr._lcov_merger
         rgi = js_runfiles_groups.binary_groups(
             ctx,
             runfiles = runfiles,
@@ -601,9 +596,6 @@ def _js_binary_impl(ctx):
             npm_wrapper_files = launcher.npm_wrapper_files,
             npm_sources = launcher.npm_sources,
             include_npm = ctx.attr.include_npm,
-            coverage_bootstrap = launcher.coverage_bootstrap,
-            coverage_report = coverage_report,
-            lcov_merger = lcov_merger,
             data = ctx.attr.data,
             entry_point_file = launcher.entry_point_file,
             entry_point_target = ctx.attr.entry_point,

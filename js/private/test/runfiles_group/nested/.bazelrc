@@ -1,0 +1,6 @@
+import %workspace%/../../../../../tools/preset.bazelrc
+
+common --noenable_workspace
+common --check_direct_dependencies=off
+common --lockfile_mode=off
+common:ci --lockfile_mode=off

@@ -350,6 +350,9 @@ jobs:
                     -//js/private/test/runfiles_group/stress/... \
                     //js/private/test/proto:p4_proto_bin_contract \
                     //js/private/test/proto:p4_proto_semantics
+            - name: nested grouping analysis tests
+              working-directory: js/private/test/runfiles_group/nested
+              run: bazel test --test_tag_filters=-manual -- //...
 
     grouping-memory:
         name: grouping memory

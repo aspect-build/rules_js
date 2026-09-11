@@ -1,6 +1,7 @@
 # Nested modules
 e2e/
 examples/
+js/private/test/runfiles_group/nested
 
 # TODO(bazel 8): move to REPO.bazel
 js/private/coverage/bundle/node_modules

@@ -59,6 +59,10 @@ write_file(
     content = ["console.log(1)"],
 )
 
+# js_proto_aspect puts generated JS on JsInfo only. A downstream js_binary
+# classifies that JS as first_party. Kept in this package so grouping tests
+# do not compile protoc.
+
 js_library(
     name = "grouping_proto_lib",
     deps = [":simple_proto"],

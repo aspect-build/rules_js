@@ -20,7 +20,6 @@ NODE_GROUP = "aspect_rules_js#node"
 NODE_EXTERNAL_PREFIX = "aspect_rules_js#node_external:"
 RUNTIME_SUPPORT_GROUP = "aspect_rules_js#runtime_support"
 NPM_TOOLCHAIN_GROUP = "aspect_rules_js#npm_toolchain"
-COVERAGE_GROUP = "aspect_rules_js#coverage"
 UNCLASSIFIED_GROUP = "aspect_rules_js#unclassified"
 
 RANK_FIRST_PARTY_DEPS = -50
@@ -309,9 +308,6 @@ def binary_groups(
         npm_wrapper_files,
         npm_sources,
         include_npm,
-        coverage_bootstrap,
-        coverage_report,
-        lcov_merger,
         data,
         entry_point_file,
         entry_point_target):
@@ -393,9 +389,6 @@ def binary_groups(
                     copy = copy_of.get(f)
                     if copy != None and copy != f:
                         ordinary_generated.append(copy)
-
-    if lcov_merger and RunfilesGroupInfo in lcov_merger:
-        inherited_depsets.append(lcov_merger[RunfilesGroupInfo].entries)
 
     preserved = []
     entries_list = depset(transitive = inherited_depsets).to_list() if inherited_depsets else []
@@ -484,17 +477,6 @@ def binary_groups(
     if e:
         own.append(e)
         for f in support:
-            assigned[f] = True
-
-    coverage_files = []
-    if coverage_bootstrap and coverage_bootstrap in admitted and coverage_bootstrap not in assigned:
-        coverage_files.append(coverage_bootstrap)
-    if coverage_report and coverage_report in admitted and coverage_report not in assigned:
-        coverage_files.append(coverage_report)
-    e = _maybe_files_entry(COVERAGE_GROUP, coverage_files, "foundation", RANK_BOOTSTRAP)
-    if e:
-        own.append(e)
-        for f in coverage_files:
             assigned[f] = True
 
     if include_npm:
@@ -639,7 +621,6 @@ js_runfiles_groups = struct(
     NODE_EXTERNAL_PREFIX = NODE_EXTERNAL_PREFIX,
     RUNTIME_SUPPORT_GROUP = RUNTIME_SUPPORT_GROUP,
     NPM_TOOLCHAIN_GROUP = NPM_TOOLCHAIN_GROUP,
-    COVERAGE_GROUP = COVERAGE_GROUP,
     UNCLASSIFIED_GROUP = UNCLASSIFIED_GROUP,
     RANK_FIRST_PARTY_DEPS = RANK_FIRST_PARTY_DEPS,
     RANK_NPM_LINKS = RANK_NPM_LINKS,

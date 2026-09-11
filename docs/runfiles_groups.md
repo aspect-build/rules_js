@@ -33,7 +33,6 @@ Named groups use the `aspect_rules_js#` prefix and `merge_affinity = "aspect_rul
 | `aspect_rules_js#node_external:<label>` | Path-only Node marker (empty files) | -1000 | `do_not_merge=True` |
 | `aspect_rules_js#runtime_support` | Launcher wrapper, fs patches, bootstrap | -900 | mergeable |
 | `aspect_rules_js#npm_toolchain` | `include_npm` toolchain inventory | -900 | mergeable |
-| `aspect_rules_js#coverage` | Coverage bootstrap/report when coverage is enabled | -900 | mergeable |
 | `aspect_rules_js#unclassified` | Admitted leftovers with no known role | -300 | mergeable |
 
 Classification follows the **representation visible at admission**, not package

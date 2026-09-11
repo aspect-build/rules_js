@@ -1,5 +1,4 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@rules_python//python:py_binary.bzl", "py_binary")
 load("//js:defs.bzl", "js_binary", "js_library", "js_test")
 load("//npm:defs.bzl", "npm_link_package", "npm_package")
 load(
@@ -25,13 +24,18 @@ load(
     "rgi_drop",
     "rgi_passthrough",
 )
-load(":semantics.bzl", "p1_launcher_only_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_external_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_empty_semantics_test", "p6_foreign_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
+load(":semantics.bzl", "p1_launcher_only_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_foreign_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
 load(":tests.bzl", "runfiles_group_tests")
 
 package(default_testonly = True)
 
+exports_files(
+    ["shared.js"],
+    visibility = ["//visibility:public"],
+)
+
 # ---------------------------------------------------------------------------
-# P1 / shared fixtures
+# Shared fixtures
 # ---------------------------------------------------------------------------
 
 js_binary(
@@ -82,7 +86,7 @@ rebuilt_rgi_binary(
 )
 
 # ---------------------------------------------------------------------------
-# P2
+# Mixed data: raw sources, generated files, JsInfo, and an npm link
 # ---------------------------------------------------------------------------
 
 write_file(
@@ -130,7 +134,7 @@ js_binary(
 )
 
 # ---------------------------------------------------------------------------
-# P3
+# Two binaries that share first_party / npm deps and overlap on some raw data
 # ---------------------------------------------------------------------------
 
 js_library(
@@ -174,7 +178,7 @@ rgi_aggregate(
 affinity_witness(name = "affinity_witness")
 
 # ---------------------------------------------------------------------------
-# P4
+# include_* flags, copy_data_to_bin, directory entry points
 # ---------------------------------------------------------------------------
 
 empty_jsinfo_fixture(name = "p4_jsinfo")
@@ -272,11 +276,14 @@ js_binary(
     include_npm = False,
 )
 
-# Proto admission (js_proto_aspect → js_library.deps → js_binary) lives in
-# //js/private/test/proto so this package does not build protoc.
+# Generated proto JS is grouped in //js/private/test/proto so this package
+# does not compile protoc.
+#
+# Source-backed JS from another module is tested in nested/, where
+# @aspect_rules_js is an external repo.
 
 # ---------------------------------------------------------------------------
-# P5 npm representation
+# npm_package / npm_link_package representation
 # ---------------------------------------------------------------------------
 
 js_library(
@@ -292,16 +299,6 @@ npm_package(
     srcs = [":local_lib"],
     package = "@test/local",
     version = "0.0.0",
-)
-
-opaque_jsinfo(
-    name = "p5_external_src",
-    shared = "@bundle_root_a//:lib/shared.js",
-)
-
-opaque_jsinfo(
-    name = "p5_external_src_b",
-    shared = "@bundle_root_b//:lib/shared.js",
 )
 
 npm_link_package(
@@ -335,15 +332,9 @@ js_binary(
         ":p5_link",
         ":source_backed_link",
         "//:node_modules/circles",
-        ":p5_external_src",
-        ":p5_external_src_b",
     ],
     entry_point = "main.js",
     include_npm = False,
-    no_copy_to_bin = [
-        "@bundle_root_a//:lib/shared.js",
-        "@bundle_root_b//:lib/shared.js",
-    ],
 )
 
 js_binary(
@@ -403,7 +394,7 @@ js_binary(
 )
 
 # ---------------------------------------------------------------------------
-# P6 nested / foreign / runtime
+# Nested binaries, foreign RunfilesGroupInfo, Node toolchain shapes
 # ---------------------------------------------------------------------------
 
 js_binary(
@@ -514,21 +505,6 @@ js_binary(
     entry_point = "main.js",
     include_npm = False,
     node_toolchain = ":node_path_tc",
-)
-
-py_binary(
-    name = "g30_py",
-    srcs = ["g30_pkg/mod.py"],
-    data = ["data.txt"],
-    legacy_create_init = True,
-    main = "g30_pkg/mod.py",
-)
-
-js_binary(
-    name = "p6_py_bin",
-    data = [":g30_py"],
-    entry_point = "main.js",
-    include_npm = False,
 )
 
 # ---------------------------------------------------------------------------
@@ -680,13 +656,6 @@ p5_custom_npm_semantics_test(
     custom_pkg = ":p5_custom_npm",
 )
 
-p5_external_semantics_test(
-    name = "p5_external_semantics",
-    target_under_test = ":p5_bin",
-    root_a = "@bundle_root_a//:lib/shared.js",
-    root_b = "@bundle_root_b//:lib/shared.js",
-)
-
 p5_link_as_src_semantics_test(
     name = "p5_link_as_src_semantics",
     target_under_test = ":p5_link_as_src_bin",
@@ -718,11 +687,6 @@ p6_drop_semantics_test(
 p6_foreign_semantics_test(
     name = "p6_foreign_semantics",
     target_under_test = ":p6_foreign_bin",
-)
-
-p6_empty_semantics_test(
-    name = "p6_empty_semantics",
-    target_under_test = ":p6_py_bin",
 )
 
 p6_copied_node_semantics_test(
