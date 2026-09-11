@@ -306,41 +306,28 @@ _ENV_SET_JS = """setEnv({quoted_var}, {quoted_value})"""
 _ENV_SET_IFF_NOT_SET_JS = """setEnvIfUnset({quoted_var}, {quoted_value})"""
 _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
 
-# Families whose members node reads as it starts. The hermetic launcher runs in a node the stub
-# has already started, so a target that sets one of these has to have node started a second time
-# for it to take effect; see the in-process path in js_binary.cjs.tpl.
+# Environment variables node reads as it starts. When these variables are set in the env
+# attribute on js_binary, the hermetic launcher needs to re-launch node for them to take
+# effect.
 #
-# Prefixes rather than individual names, deliberately: `node --help` under-reports what node
-# reads (it omits NODE_OPTIONS, OPENSSL_CONF and SSL_CERT_*), so an unanticipated variable should
-# cost one extra node boot rather than being silently dropped.
-#
-# The real fix is upstream. hermetic_launcher has no way for the stub to set environment
-# variables before it execve()s node -- its whole API is args and runfiles -- so the launcher
-# cannot run until after node has booted. If it grows one, this and ENV_CONFIGURES_NODE_STARTUP
-# both delete.
+# TZ, FORCE_COLOR, and NO_COLOR are intentionally absent from this list. Node relies on these
+# variables but picks up changes made to them at runtime.
 _NODE_STARTUP_ENV_PREFIXES = [
     "NODE_",
     "UV_",
     "V8_",
     "OPENSSL_",
     "SSL_CERT_",
-    # ICU fixes node's default locale from LANG/LC_* as it starts and never re-reads it,
-    # so a target setting one of these formats dates and numbers differently depending on
-    # which launcher ran it. "LANG" also covers LANGUAGE, which belongs to the same family.
+    # "LANG" also covers LANGUAGE.
     "LANG",
     "LC_",
 ]
 
-# Names matching a family above that node nonetheless does not need to have seen as it started.
-# TZ and the colour variables are absent because they are not in a family at all: node re-reads
-# TZ when it is assigned, and tty.getColorDepth reads FORCE_COLOR/NO_COLOR at call time.
+# Names matching a prefix above that node nonetheless does not need to see at startup.
 _NOT_NODE_STARTUP_ENV = [
-    # Not a node variable at all -- node reads nothing from it, and the programs that do read it
-    # do so at run time. Named because it is a common env entry, and treating it as a node one
-    # would give up the in-process path for nothing.
+    # Commonly used by convention, but not used by node itself
     "NODE_ENV",
-    # js/private/node-bootstrap/bootstrap.cjs applies the compile cache policy itself, at run
-    # time, so node does not need to have seen these as it started.
+    # Handled at runtime in bootstrap.cjs
     "NODE_COMPILE_CACHE",
     "NODE_DISABLE_COMPILE_CACHE",
 ]
@@ -370,13 +357,7 @@ def _is_node_startup_env(var):
     return any([var.startswith(prefix) for prefix in _NODE_STARTUP_ENV_PREFIXES])
 
 def _env_configures_node_startup(envs):
-    """Whether the launcher's env names a variable node only reads as it starts.
-
-    Conservative for an iff_not_set entry, whose answer is really a run-time one: if the
-    variable is already in the environment the launcher does not write it, so node saw it as it
-    started and nothing has to be restarted. No entry the rule sets that way is a node variable
-    today -- they are all JS_BINARY__* -- so this costs nothing yet.
-    """
+    """Whether the launcher's env names a variable that must be set before node starts."""
     return any([_is_node_startup_env(var) for (var, _, _) in envs])
 
 def _quote(value):
@@ -744,9 +725,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
             transformed_args = [],
         )
 
-    # node's own flags, so that the launcher can run the program in this very process rather
-    # than starting a second node to apply them. Everything here is a literal, never an
-    # rlocation path, so none of it is runfiles-transformed.
+    # node's own flags. Everything here is a literal, so none of it is runfiles-transformed.
     for stub_node_option in node_options.stub:
         embedded_args, transformed_args = hermetic_launcher.append_embedded_arg(
             arg = stub_node_option,
