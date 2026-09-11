@@ -299,14 +299,17 @@ def _p3_membership(env, ctx, resolved, found, name_a, name_b, target):
     first = js_runfiles_groups.FIRST_PARTY_GROUP
     owners = file_owners(resolved)
     rf_files = runfiles_files(target)
+    a_paths = {f.path: True for f in runfiles_files(ctx.attr.bin_a)}
+    b_paths = {f.path: True for f in runfiles_files(ctx.attr.bin_b)}
 
-    a_files = unique_admitted(rf_files, "p3_a_only.txt")
-    asserts.true(env, a_files, "p3_a_only.txt not admitted")
+    a_files = [f for f in unique_admitted(rf_files, "p3_a_only.txt") if f.path in a_paths]
+    asserts.true(env, a_files, "p3_a_only.txt not admitted on A")
     a_sources = [f for f in a_files if f.is_source]
-    asserts.true(env, a_sources, "p3_a_only.txt source missing from runfiles")
+    asserts.true(env, a_sources, "p3_a_only.txt source missing from A's runfiles")
     assert_exact_file_owners(env, owners, a_sources, [name_a, first])
     for f in a_files:
         names = owners.get(f, [])
+        asserts.true(env, name_a in names, "{} dropped from A's protection: {}".format(f.path, names))
         asserts.false(env, name_b in names, "{} entered B: {}".format(f.path, names))
         for n in names:
             asserts.true(env, n in [name_a, first], "{} unexpected owner {}".format(f.path, n))
@@ -314,15 +317,25 @@ def _p3_membership(env, ctx, resolved, found, name_a, name_b, target):
     _assert_role(env, found, rf_files, "p3_b_only.txt", name_b, [name_a, first])
     _assert_role(env, found, rf_files, "shared.js", first, [name_a, name_b])
 
-    both = unique_admitted(rf_files, "p3_both.txt")
-    asserts.true(env, both, "p3_both.txt not admitted")
-    both_sources = [f for f in both if f.is_source]
-    asserts.true(env, both_sources, "p3_both.txt source missing from runfiles")
+    a_both = [f for f in unique_admitted(rf_files, "p3_both.txt") if f.path in a_paths]
+    b_both = [f for f in unique_admitted(rf_files, "p3_both.txt") if f.path in b_paths]
+    asserts.true(env, a_both, "p3_both.txt not admitted on A")
+    asserts.true(env, b_both, "p3_both.txt not admitted on B")
+    both_sources = [f for f in a_both if f.is_source]
+    if not both_sources:
+        both_sources = [f for f in b_both if f.is_source]
+    asserts.true(env, both_sources, "p3_both.txt source missing")
     assert_exact_file_owners(env, owners, both_sources, [name_a, name_b])
-    for f in both:
+    for f in a_both:
         names = owners.get(f, [])
+        asserts.true(env, name_a in names, "{} dropped from A's protection: {}".format(f.path, names))
         asserts.false(env, first in names, "{} lost app protection: {}".format(f.path, names))
-        asserts.true(env, name_a in names or name_b in names, "{} not in app groups: {}".format(f.path, names))
+        for n in names:
+            asserts.true(env, n in [name_a, name_b], "{} unexpected owner {}".format(f.path, n))
+    for f in b_both:
+        names = owners.get(f, [])
+        asserts.true(env, name_b in names, "{} dropped from B's protection: {}".format(f.path, names))
+        asserts.false(env, first in names, "{} lost app protection: {}".format(f.path, names))
         for n in names:
             asserts.true(env, n in [name_a, name_b], "{} unexpected owner {}".format(f.path, n))
 
@@ -331,6 +344,18 @@ def _p3_membership(env, ctx, resolved, found, name_a, name_b, target):
         allowed[f] = sorted([name_a, first])
     for f in both_sources:
         allowed[f] = sorted([name_a, name_b])
+    for f in a_files:
+        names = owners.get(f, [])
+        if name_a in names and first in names:
+            allowed[f] = sorted([name_a, first])
+    for f in a_both:
+        names = owners.get(f, [])
+        if name_a in names and name_b in names:
+            allowed[f] = sorted([name_a, name_b])
+    for f in b_both:
+        names = owners.get(f, [])
+        if name_a in names and name_b in names:
+            allowed[f] = sorted([name_a, name_b])
     assert_overlap_files(env, resolved, allowed)
     assert_grouped_runfiles_match(env, ctx, resolved, target)
 
@@ -591,6 +616,7 @@ def _p6_foreign_impl(ctx):
             has_root = True
     asserts.true(env, has_symlink, "expected preserved foreign symlink")
     asserts.true(env, has_root, "expected preserved foreign root symlink")
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
     return analysistest.end(env)
 
 # Non-rules_js RunfilesGroupInfo, symlinks, and root_symlinks are preserved.
@@ -855,4 +881,83 @@ def _p6_exec_vs_raw_impl(ctx):
 p6_exec_vs_raw_semantics_test = semantics_test(_p6_exec_vs_raw_impl, attrs = {
     "raw_data": attr.label(allow_single_file = True, mandatory = True),
     "executable_dep": attr.label(mandatory = True),
+})
+
+def _p6_empty_carrier_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    rf_files = runfiles_files(target)
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "p6_empty_carrier.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP],
+    )
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "p6_empty_asset.txt",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP],
+    )
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+    return analysistest.end(env)
+
+# JsInfo on a grouped library stays first-party even when that library relays empty filenames.
+p6_empty_carrier_semantics_test = semantics_test(_p6_empty_carrier_impl)
+
+def _p6_empty_mixed_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    rf_files = runfiles_files(target)
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "p6_empty_carrier.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP],
+    )
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "p6_empty_asset.txt",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP],
+    )
+    adapter_rf = ctx.attr.adapter[DefaultInfo].default_runfiles
+    adapter_opaque = adapter_rf != None and adapter_rf.empty_filenames and bool(adapter_rf.empty_filenames)
+    if adapter_opaque:
+        _assert_role(
+            env,
+            found,
+            rf_files,
+            "p6_empty_adapter.js",
+            js_runfiles_groups.UNCLASSIFIED_GROUP,
+            [js_runfiles_groups.FIRST_PARTY_GROUP],
+        )
+    else:
+        _assert_role(
+            env,
+            found,
+            rf_files,
+            "p6_empty_adapter.js",
+            js_runfiles_groups.FIRST_PARTY_GROUP,
+            [js_runfiles_groups.UNCLASSIFIED_GROUP],
+        )
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+    return analysistest.end(env)
+
+# Covered empty-filename suppliers stay first-party; unmatched adapter Files in those
+# opaque runfiles are unclassified. Native py_library may omit empty names on Bazel 7.
+p6_empty_mixed_semantics_test = semantics_test(_p6_empty_mixed_impl, attrs = {
+    "adapter": attr.label(mandatory = True),
 })

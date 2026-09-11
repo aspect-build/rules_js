@@ -82,6 +82,37 @@ def _fallback_runfiles_entry(ctx, dep):
         return None
     return runfiles_groups.entry(name = dep.label, content = runfiles)
 
+def _unmatched_empty_suppliers(data, leftover_empty_set, fallback_labels):
+    """Runfiles of data deps whose empty names are still unmatched.
+
+    Inherited RGI and already-emitted Label fallbacks already account for their
+    empty names. Wrapping those suppliers again would duplicate ordinary Files.
+    """
+    extra_rf = []
+    opaque = {}
+    if not leftover_empty_set:
+        return extra_rf, opaque
+    for dep in data:
+        if RunfilesGroupInfo in dep:
+            continue
+        if dep.label in fallback_labels:
+            continue
+        dr = dep[DefaultInfo].default_runfiles
+        if dr == None or not _depset_nonempty(dr.empty_filenames):
+            continue
+        unmatched = False
+        for n in dr.empty_filenames.to_list():
+            if n in leftover_empty_set:
+                unmatched = True
+                break
+        if not unmatched:
+            continue
+        extra_rf.append(dr)
+        if dr.files:
+            for f in dr.files.to_list():
+                opaque[f] = True
+    return extra_rf, opaque
+
 def _has_executable(target):
     """True for executable rules. A source File listed as its own executable is not."""
     files_to_run = target[DefaultInfo].files_to_run
@@ -165,15 +196,20 @@ def _cached_file_dict(cache, ds):
     cache.append((ds, value))
     return value
 
-def _copy_only_entry(entry, copy_pairs, files_cache, admitted = None):
-    """Same-name entry containing only copies found in `entry`. Does not rebuild it."""
-    if not copy_pairs:
-        return None
-    files = _cached_file_dict(files_cache, runfiles_groups.files(entry))
+def _copy_only_extras(files, copy_pairs, admitted = None):
     extras = []
     for orig, copy in copy_pairs:
         if orig in files and (admitted == None or copy in admitted):
             extras.append(copy)
+    return extras
+
+def _copy_only_entry(entry, copy_pairs, files_cache, admitted = None, files = None):
+    """Same-name entry containing only copies found in `entry`. Does not rebuild it."""
+    if not copy_pairs:
+        return None
+    if files == None:
+        files = _cached_file_dict(files_cache, runfiles_groups.files(entry))
+    extras = _copy_only_extras(files, copy_pairs, admitted)
     if not extras:
         return None
     return runfiles_groups.derive(entry, content = depset(extras))
@@ -214,21 +250,11 @@ def _direct_files_and_copies(dep, copy_of):
             files.append(copy)
     return files
 
-def _runfiles_file_set(dep):
-    result = {}
-    dr = dep[DefaultInfo].default_runfiles
-    if dr == None or not dr.files:
-        return result
-    for f in dr.files.to_list():
-        result[f] = True
-    return result
-
 def _unclaimed_direct_outputs(dep, copy_of, claimed):
-    """Default outputs with no inherited/npm role. Ordinary runfiles Files are claimed."""
-    rf = _runfiles_file_set(dep)
+    """Direct outputs with no npm-src role. Overlap with relayed runfiles is allowed."""
     extra = []
     for f in _direct_files_and_copies(dep, copy_of):
-        if f not in rf and f not in claimed:
+        if f not in claimed:
             extra.append(f)
     return extra
 
@@ -377,6 +403,7 @@ def binary_groups(
     ordinary_generated = []
     app_files = []
     fallbacks = []
+    fallback_labels = {}
 
     if executable:
         app_files.append(executable)
@@ -400,9 +427,10 @@ def binary_groups(
             # foreign Label group (that would hide first/third-party roles).
             pass
         elif not _is_ordinary_data(dep):
-            fallback = _fallback_runfiles_entry(ctx, dep)
-            if fallback:
-                fallbacks.append(fallback)
+                fallback = _fallback_runfiles_entry(ctx, dep)
+                if fallback:
+                    fallbacks.append(fallback)
+                    fallback_labels[dep.label] = True
         else:
             dr = dep[DefaultInfo].default_runfiles
             if dr != None and (
@@ -413,20 +441,15 @@ def binary_groups(
                 fallback = _fallback_runfiles_entry(ctx, dep)
                 if fallback:
                     fallbacks.append(fallback)
+                    fallback_labels[dep.label] = True
 
         if JsInfo in dep:
-            dr = dep[DefaultInfo].default_runfiles
-            if dr != None and _depset_nonempty(dr.empty_filenames):
-                # Bazel 7 cannot build empty_filenames onto a files-only entry, so
-                # this adapter's default_runfiles stay opaque unclassified together.
-                pass
-            else:
-                jsinfo = dep[JsInfo]
-                npm_ds.append(jsinfo.npm_sources)
-                source_ds.append(jsinfo.sources)
-                source_ds.append(jsinfo.types)
-                source_ds.append(jsinfo.transitive_sources)
-                source_ds.append(jsinfo.transitive_types)
+            jsinfo = dep[JsInfo]
+            npm_ds.append(jsinfo.npm_sources)
+            source_ds.append(jsinfo.sources)
+            source_ds.append(jsinfo.types)
+            source_ds.append(jsinfo.transitive_sources)
+            source_ds.append(jsinfo.transitive_types)
         if NpmPackageStoreInfo in dep:
             store_ds.append(dep[NpmPackageStoreInfo].transitive_files)
         if NpmPackageInfo in dep and dep[NpmPackageInfo].src:
@@ -451,7 +474,6 @@ def binary_groups(
     for entry in entries_list:
         name = runfiles_groups.name_str(entry.name)
         files_ds = runfiles_groups.files(entry)
-        files = _cached_file_dict(files_cache, files_ds)
         if name in _CONSUMED_NAMES:
             if name == NPM_GROUP:
                 npm_ds.append(files_ds)
@@ -464,29 +486,66 @@ def binary_groups(
             else:
                 unclassified_ds.append(files_ds)
         else:
+            files = _cached_file_dict(files_cache, files_ds)
             preserved.append(entry)
-            extra = _copy_only_entry(entry, copy_pairs, files_cache, admitted)
-            if extra:
-                preserved.append(extra)
+            extras = _copy_only_extras(files, copy_pairs, admitted)
+            if extras:
+                preserved.append(runfiles_groups.derive(entry, content = depset(extras)))
+                for f in extras:
+                    if f in admitted:
+                        assigned[f] = True
             for f in files:
                 if f in admitted:
                     assigned[f] = True
-            if extra:
-                for f in runfiles_groups.files(extra).to_list():
-                    if f in admitted:
-                        assigned[f] = True
     for fallback in fallbacks:
+        files_ds = runfiles_groups.files(fallback)
+        files = _cached_file_dict(files_cache, files_ds)
         preserved.append(fallback)
-        extra = _copy_only_entry(fallback, copy_pairs, files_cache, admitted)
-        if extra:
-            preserved.append(extra)
-        for f in runfiles_groups.files(fallback).to_list():
-            if f in admitted:
-                assigned[f] = True
-        if extra:
-            for f in runfiles_groups.files(extra).to_list():
+        extras = _copy_only_extras(files, copy_pairs, admitted)
+        if extras:
+            preserved.append(runfiles_groups.derive(fallback, content = depset(extras)))
+            for f in extras:
                 if f in admitted:
                     assigned[f] = True
+        for f in files:
+            if f in admitted:
+                assigned[f] = True
+
+    covered_symlinks = {}
+    covered_root_symlinks = {}
+    covered_empty = {}
+    for entry in preserved:
+        rf = runfiles_groups.runfiles(ctx, entry)
+        if rf.symlinks:
+            for s in rf.symlinks.to_list():
+                covered_symlinks[s.path] = True
+        if rf.root_symlinks:
+            for s in rf.root_symlinks.to_list():
+                covered_root_symlinks[s.path] = True
+        if rf.empty_filenames:
+            for name in rf.empty_filenames.to_list():
+                covered_empty[name] = True
+    leftover_symlinks = {}
+    leftover_root_symlinks = {}
+    leftover_empty_set = {}
+    if runfiles.symlinks:
+        leftover_symlinks = {
+            s.path: s.target_file
+            for s in runfiles.symlinks.to_list()
+            if s.path not in covered_symlinks
+        }
+    if runfiles.root_symlinks:
+        leftover_root_symlinks = {
+            s.path: s.target_file
+            for s in runfiles.root_symlinks.to_list()
+            if s.path not in covered_root_symlinks
+        }
+    if runfiles.empty_filenames:
+        for n in runfiles.empty_filenames.to_list():
+            if n not in covered_empty:
+                leftover_empty_set[n] = True
+    extra_rf, opaque_files = _unmatched_empty_suppliers(data, leftover_empty_set, fallback_labels)
+    opaque_files = _lift(opaque_files, copy_of, admitted)
 
     N_pre = _flatten_files(npm_ds + store_ds)
     N = _lift(N_pre, copy_of, admitted)
@@ -581,11 +640,11 @@ def binary_groups(
             third_party.append(f)
             assigned[f] = True
     for f in S:
-        if f in admitted and f not in assigned and f not in app:
+        if f in admitted and f not in assigned and f not in app and f not in opaque_files:
             first_party.append(f)
             assigned[f] = True
     for f in D:
-        if f in admitted and f not in assigned and f not in app:
+        if f in admitted and f not in assigned and f not in app and f not in opaque_files:
             first_party.append(f)
             assigned[f] = True
     for f in U:
@@ -595,37 +654,6 @@ def binary_groups(
 
     leftover_files = [f for f in admitted if f not in assigned]
     leftover_files.extend(unclassified)
-    covered_symlinks = {}
-    covered_root_symlinks = {}
-    covered_empty = {}
-    for entry in preserved:
-        rf = runfiles_groups.runfiles(ctx, entry)
-        if rf.symlinks:
-            for s in rf.symlinks.to_list():
-                covered_symlinks[s.path] = True
-        if rf.root_symlinks:
-            for s in rf.root_symlinks.to_list():
-                covered_root_symlinks[s.path] = True
-        if rf.empty_filenames:
-            for name in rf.empty_filenames.to_list():
-                covered_empty[name] = True
-    leftover_symlinks = {}
-    leftover_root_symlinks = {}
-    leftover_empty = []
-    if runfiles.symlinks:
-        leftover_symlinks = {
-            s.path: s.target_file
-            for s in runfiles.symlinks.to_list()
-            if s.path not in covered_symlinks
-        }
-    if runfiles.root_symlinks:
-        leftover_root_symlinks = {
-            s.path: s.target_file
-            for s in runfiles.root_symlinks.to_list()
-            if s.path not in covered_root_symlinks
-        }
-    if runfiles.empty_filenames:
-        leftover_empty = [n for n in runfiles.empty_filenames.to_list() if n not in covered_empty]
 
     e = _maybe_files_entry(THIRD_PARTY_GROUP, third_party, "third_party", runfiles_groups.RANK_SHARED_DEPS)
     if e:
@@ -647,22 +675,15 @@ def binary_groups(
             )
         else:
             leftover_rf = leftover_files
-    if leftover_empty:
-        # Bazel 7 ctx.runfiles has no empty_filenames=. Wrap supplier runfiles
-        # so unmatched empty names survive. Those Files stay on this opaque
-        # unclassified entry (JsInfo inventories for the same deps were skipped).
-        extra_rf = []
-        for dep in data:
-            dr = dep[DefaultInfo].default_runfiles
-            if dr != None and _depset_nonempty(dr.empty_filenames):
-                extra_rf.append(dr)
-        if extra_rf:
-            if type(leftover_rf) == "list":
-                leftover_rf = ctx.runfiles(files = leftover_rf).merge_all(extra_rf)
-            elif leftover_rf != None:
-                leftover_rf = leftover_rf.merge_all(extra_rf)
-            else:
-                leftover_rf = extra_rf[0].merge_all(extra_rf[1:]) if len(extra_rf) > 1 else extra_rf[0]
+    if leftover_empty_set and extra_rf:
+        # Bazel 7 ctx.runfiles has no empty_filenames=. Wrap only unmatched
+        # suppliers so empty names survive without re-adding covered runfiles.
+        if type(leftover_rf) == "list":
+            leftover_rf = ctx.runfiles(files = leftover_rf).merge_all(extra_rf)
+        elif leftover_rf != None:
+            leftover_rf = leftover_rf.merge_all(extra_rf)
+        else:
+            leftover_rf = extra_rf[0].merge_all(extra_rf[1:]) if len(extra_rf) > 1 else extra_rf[0]
     if leftover_rf != None:
         if type(leftover_rf) == "list":
             e = _maybe_files_entry(UNCLASSIFIED_GROUP, leftover_rf, "", RANK_UNCLASSIFIED)

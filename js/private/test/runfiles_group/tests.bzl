@@ -26,6 +26,8 @@ def _gate_and_exports():
             ":p1_opaque_lib",
             ":p1_foreign_outputs_lib",
             ":p1_foreign_outputs_bin",
+            ":p6_empty_carrier_bin",
+            ":p6_empty_mixed_bin",
             ":p4_grouped_copy_lib",
             ":p6_symlink_lib",
             ":p6_fg_lib",
@@ -223,6 +225,13 @@ def _nested_and_foreign():
     runfiles_group_analysis_test(
         name = "p6_copied_node_contract",
         binaries = [":p6_copied_node_bin"],
+        check_disabled = False,
+        overlapping_group_behavior = "ignore",
+        max_groups = 100,
+    )
+    runfiles_group_analysis_test(
+        name = "p6_empty_mixed_contract",
+        binaries = [":p6_empty_carrier_bin", ":p6_empty_mixed_bin"],
         check_disabled = False,
         overlapping_group_behavior = "ignore",
         max_groups = 100,

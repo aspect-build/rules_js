@@ -146,10 +146,10 @@ def assert_grouped_runfiles_match(env, ctx, resolved, target):
                     g_empty[n] = True
             if gr.symlinks:
                 for s in gr.symlinks.to_list():
-                    g_sym[s.path] = True
+                    g_sym[(s.path, s.target_file)] = True
             if gr.root_symlinks:
                 for s in gr.root_symlinks.to_list():
-                    g_root[s.path] = True
+                    g_root[(s.path, s.target_file)] = True
     want_files = file_set(rf.files.to_list() if rf != None and rf.files else [])
     want_empty = {}
     if rf != None and rf.empty_filenames:
@@ -158,19 +158,27 @@ def assert_grouped_runfiles_match(env, ctx, resolved, target):
     want_sym = {}
     if rf != None and rf.symlinks:
         for s in rf.symlinks.to_list():
-            want_sym[s.path] = True
+            want_sym[(s.path, s.target_file)] = True
     want_root = {}
     if rf != None and rf.root_symlinks:
         for s in rf.root_symlinks.to_list():
-            want_root[s.path] = True
+            want_root[(s.path, s.target_file)] = True
     asserts.equals(env, len(want_files), len(g_files), "grouped file count {} != runfiles {}".format(len(g_files), len(want_files)))
     for f in want_files:
         asserts.true(env, f in g_files, "grouped missing {}".format(f.path))
     for f in g_files:
         asserts.true(env, f in want_files, "grouped extra {}".format(f.path))
     asserts.equals(env, sorted(want_empty.keys()), sorted(g_empty.keys()))
-    asserts.equals(env, sorted(want_sym.keys()), sorted(g_sym.keys()))
-    asserts.equals(env, sorted(want_root.keys()), sorted(g_root.keys()))
+    asserts.equals(env, len(want_sym), len(g_sym), "grouped symlink count {} != runfiles {}".format(len(g_sym), len(want_sym)))
+    for key in want_sym:
+        asserts.true(env, key in g_sym, "grouped missing symlink {} -> {}".format(key[0], key[1].path))
+    for key in g_sym:
+        asserts.true(env, key in want_sym, "grouped extra symlink {} -> {}".format(key[0], key[1].path))
+    asserts.equals(env, len(want_root), len(g_root), "grouped root symlink count {} != runfiles {}".format(len(g_root), len(want_root)))
+    for key in want_root:
+        asserts.true(env, key in g_root, "grouped missing root symlink {} -> {}".format(key[0], key[1].path))
+    for key in g_root:
+        asserts.true(env, key in want_root, "grouped extra root symlink {} -> {}".format(key[0], key[1].path))
 
 def unique_admitted(runfiles_files, basename):
     """Same-configuration Files from this target's runfiles with an exact basename."""

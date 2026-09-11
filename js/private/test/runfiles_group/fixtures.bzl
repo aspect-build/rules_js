@@ -196,6 +196,32 @@ opaque_jsinfo = rule(
     attrs = {"shared": attr.label(allow_single_file = True, mandatory = True)},
 )
 
+def _empty_filename_jsinfo_impl(ctx):
+    src = ctx.actions.declare_file(ctx.label.name + ".js")
+    ctx.actions.write(src, "adapter")
+    runfiles = ctx.runfiles(files = [src])
+    py_rf = ctx.attr.runtime[DefaultInfo].default_runfiles
+    if py_rf != None:
+        runfiles = runfiles.merge(py_rf)
+    sources = depset([src])
+    return [
+        DefaultInfo(files = depset([src]), runfiles = runfiles),
+        js_info(
+            target = ctx.label,
+            sources = sources,
+            types = depset(),
+            transitive_sources = sources,
+            transitive_types = depset(),
+            npm_sources = depset(),
+        ),
+    ]
+
+# Ungrouped JsInfo whose runfiles may carry implicit empty filenames from `runtime`.
+empty_filename_jsinfo = rule(
+    implementation = _empty_filename_jsinfo_impl,
+    attrs = {"runtime": attr.label(mandatory = True)},
+)
+
 def _custom_npm_file_impl(ctx):
     pkg = ctx.actions.declare_file(ctx.label.name + "_pkg.js")
     ctx.actions.write(pkg, "pkg")
