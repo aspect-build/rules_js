@@ -206,8 +206,9 @@ def _extra_component_jsinfo_impl(ctx):
     marker = ctx.actions.declare_file(ctx.label.name + "_link.txt")
     ctx.actions.write(src, "adapter")
     ctx.actions.write(marker, "link")
+    files = [src, marker] + ctx.files.opaque_srcs
     runfiles = ctx.runfiles(
-        files = [src, marker],
+        files = files,
         symlinks = {ctx.label.name + "/symlink": marker},
         root_symlinks = {ctx.label.name + "/root": marker},
     )
@@ -229,6 +230,44 @@ extra_component_jsinfo = rule(
     implementation = _extra_component_jsinfo_impl,
     attrs = {
         "as_npm": attr.bool(default = False),
+        "opaque_srcs": attr.label_list(allow_files = True),
+    },
+)
+
+def _independent_runfiles_alias_impl(ctx):
+    """Independently constructed same-path aliases. Distinct SymlinkEntry objects."""
+    target = ctx.file.target
+    rf = ctx.runfiles(
+        files = [target],
+        symlinks = {ctx.attr.path: target},
+        root_symlinks = {ctx.attr.root_path: target},
+    )
+    providers = [DefaultInfo(files = depset([target]), runfiles = rf)]
+    if ctx.attr.emit_rgi:
+        providers.append(RunfilesGroupInfo(
+            entries = runfiles_groups.entries(direct = [
+                runfiles_groups.entry(name = ctx.label, content = rf),
+            ]),
+            executable_group = None,
+        ))
+    else:
+        providers.append(js_info(
+            target = ctx.label,
+            sources = depset(),
+            types = depset(),
+            transitive_sources = depset(),
+            transitive_types = depset(),
+            npm_sources = depset(),
+        ))
+    return providers
+
+independent_runfiles_alias = rule(
+    implementation = _independent_runfiles_alias_impl,
+    attrs = {
+        "emit_rgi": attr.bool(default = False),
+        "path": attr.string(mandatory = True),
+        "root_path": attr.string(mandatory = True),
+        "target": attr.label(allow_single_file = True, mandatory = True),
     },
 )
 

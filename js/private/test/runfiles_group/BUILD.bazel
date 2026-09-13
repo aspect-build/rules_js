@@ -18,6 +18,7 @@ load(
     "foreign_rgi_mixed",
     "foreign_symlinks",
     "grouped_source",
+    "independent_runfiles_alias",
     "node_path_toolchain",
     "npm_package_info_data",
     "opaque_jsinfo",
@@ -27,7 +28,7 @@ load(
     "rgi_passthrough",
     "single_output_executable",
 )
-load(":semantics.bzl", "p1_foreign_outputs_test", "p1_launcher_only_test", "p1_library_outputs_test", "p1_opaque_deps_test", "p1_package_test", "p1_rebuilt_disabled_test", "p1_rebuilt_semantics_test", "p1_source_only_test", "p2_semantics_test", "p2_swap_guard_test", "p3_limit_semantics_test", "p4_both_semantics_test", "p4_copy_semantics_test", "p4_coverage_semantics_test", "p4_dir_semantics_test", "p4_direct_semantics_test", "p4_generated_semantics_test", "p4_grouped_copy_semantics_test", "p4_include_npm_semantics_test", "p4_no_copy_semantics_test", "p4_none_semantics_test", "p4_trans_semantics_test", "p5_custom_npm_semantics_test", "p5_link_as_src_semantics_test", "p5_link_coarse_semantics_test", "p5_loss_semantics_test", "p6_copied_node_semantics_test", "p6_drop_semantics_test", "p6_extra_symlink_carrier_semantics_test", "p6_extra_symlink_mixed_semantics_test", "p6_extra_symlink_nested_semantics_test", "p6_extra_symlink_npm_semantics_test", "p6_exec_vs_raw_semantics_test", "p6_foreign_semantics_test", "p6_library_relay_semantics_test", "p6_marker_semantics_test", "p6_nested_semantics_test", "p6_passthrough_semantics_test")
+load(":semantics.bzl", "foreign_outputs_test", "launcher_only_test", "library_outputs_test", "opaque_jsinfo_deps_test", "npm_package_test", "rebuilt_disabled_test", "rebuilt_semantics_test", "source_only_test", "binary_roles_semantics_test", "swap_guard_test", "limit_semantics_test", "include_both_semantics_test", "copy_semantics_test", "coverage_semantics_test", "directory_entry_semantics_test", "include_direct_semantics_test", "generated_semantics_test", "grouped_copy_semantics_test", "include_npm_semantics_test", "no_copy_semantics_test", "include_none_semantics_test", "include_transitive_semantics_test", "custom_npm_semantics_test", "npm_link_as_src_semantics_test", "npm_link_coarse_semantics_test", "npm_provenance_loss_semantics_test", "copied_node_semantics_test", "rgi_drop_dep_semantics_test", "extra_symlink_mixed_semantics_test", "extra_symlink_nested_semantics_test", "extra_symlink_npm_semantics_test", "exec_vs_raw_semantics_test", "foreign_rgi_dep_semantics_test", "library_relay_semantics_test", "node_external_marker_semantics_test", "nested_rgi_semantics_test", "rgi_passthrough_dep_semantics_test")
 load(":tests.bzl", "runfiles_group_tests")
 
 package(default_testonly = True)
@@ -65,37 +66,37 @@ js_library(
 )
 
 js_library(
-    name = "p1_inner",
-    srcs = ["p1_inner_dep.js"],
-    data = ["p1_inner_asset.json"],
+    name = "nested_lib_inner",
+    srcs = ["nested_lib_inner_dep.js"],
+    data = ["nested_lib_inner_asset.json"],
 )
 
 js_library(
-    name = "p1_outer",
-    data = [":p1_inner"],
+    name = "nested_lib_outer",
+    data = [":nested_lib_inner"],
 )
 
 opaque_jsinfo(
-    name = "p1_opaque",
-    shared = "p1_opaque_shared.js",
+    name = "opaque_jsinfo_src",
+    shared = "opaque_jsinfo_shared.js",
 )
 
 js_library(
-    name = "p1_opaque_lib",
-    data = ["p1_opaque_asset.json"],
-    deps = [":p1_opaque"],
+    name = "opaque_jsinfo_lib",
+    data = ["opaque_jsinfo_asset.json"],
+    deps = [":opaque_jsinfo_src"],
 )
 
-foreign_rgi_data(name = "p1_foreign_rgi")
+foreign_rgi_data(name = "foreign_rgi")
 
 js_library(
-    name = "p1_foreign_outputs_lib",
-    data = [":p1_foreign_rgi"],
+    name = "foreign_outputs_lib",
+    data = [":foreign_rgi"],
 )
 
 js_binary(
-    name = "p1_foreign_outputs_bin",
-    data = [":p1_foreign_outputs_lib"],
+    name = "foreign_outputs_bin",
+    data = [":foreign_outputs_lib"],
     entry_point = "main.js",
     include_npm = False,
 )
@@ -129,41 +130,41 @@ rebuilt_rgi_binary(
 # ---------------------------------------------------------------------------
 
 write_file(
-    name = "p2_generated_data",
-    out = "p2_generated.txt",
+    name = "generated_data_file",
+    out = "generated_data.txt",
     content = ["generated"],
 )
 
 filegroup(
-    name = "p2_raw_assets",
-    srcs = ["p2_raw.txt"],
+    name = "raw_assets",
+    srcs = ["raw_asset.txt"],
 )
 
 js_library(
-    name = "p2_immediate",
+    name = "immediate",
     srcs = ["lib.js"],
     types = ["lib.d.ts"],
 )
 
 js_library(
-    name = "p2_transitive",
+    name = "transitive",
     srcs = ["src_only.js"],
-    deps = [":p2_immediate"],
+    deps = [":immediate"],
 )
 
 opaque_jsinfo(
-    name = "p2_opaque",
-    shared = "p2_custom.js",
+    name = "binary_roles_opaque",
+    shared = "binary_roles_custom.js",
 )
 
 js_binary(
-    name = "p2_bin",
+    name = "binary_roles_bin",
     copy_data_to_bin = True,
     data = [
-        ":p2_generated_data",
-        ":p2_opaque",
-        ":p2_raw_assets",
-        ":p2_transitive",
+        ":generated_data_file",
+        ":binary_roles_opaque",
+        ":raw_assets",
+        ":transitive",
         "//:node_modules/circles",
     ],
     entry_point = "main.js",
@@ -177,21 +178,21 @@ js_binary(
 # ---------------------------------------------------------------------------
 
 js_library(
-    name = "p3_shared_lib",
+    name = "shared_lib",
     srcs = ["shared.js"],
 )
 
 opaque_jsinfo(
-    name = "p3_a_as_jsinfo",
-    shared = "p3_a_only.txt",
+    name = "merge_bin_a_jsinfo",
+    shared = "merge_a_only.txt",
 )
 
 js_binary(
-    name = "p3_a",
+    name = "merge_bin_a",
     data = [
-        "p3_a_only.txt",
-        "p3_both.txt",
-        ":p3_shared_lib",
+        "merge_a_only.txt",
+        "merge_shared.txt",
+        ":shared_lib",
         ":source_backed_link",
         "//:node_modules/circles",
     ],
@@ -200,12 +201,12 @@ js_binary(
 )
 
 js_binary(
-    name = "p3_b",
+    name = "merge_bin_b",
     data = [
-        "p3_b_only.txt",
-        "p3_both.txt",
-        ":p3_a_as_jsinfo",
-        ":p3_shared_lib",
+        "merge_b_only.txt",
+        "merge_shared.txt",
+        ":merge_bin_a_jsinfo",
+        ":shared_lib",
         ":source_backed_link",
         "//:node_modules/circles",
     ],
@@ -214,10 +215,10 @@ js_binary(
 )
 
 rgi_aggregate(
-    name = "p3_aggregate",
+    name = "aggregate",
     binaries = [
-        ":p3_a",
-        ":p3_b",
+        ":merge_bin_a",
+        ":merge_bin_b",
     ],
 )
 
@@ -227,11 +228,11 @@ affinity_witness(name = "affinity_witness")
 # include_* flags, copy_data_to_bin, directory entry points
 # ---------------------------------------------------------------------------
 
-empty_jsinfo_fixture(name = "p4_jsinfo")
+empty_jsinfo_fixture(name = "jsinfo")
 
 js_binary(
-    name = "p4_none",
-    data = [":p4_jsinfo"],
+    name = "include_none",
+    data = [":jsinfo"],
     entry_point = "main.js",
     include_npm = False,
     include_npm_sources = False,
@@ -242,8 +243,8 @@ js_binary(
 )
 
 js_binary(
-    name = "p4_direct",
-    data = [":p4_jsinfo"],
+    name = "include_direct",
+    data = [":jsinfo"],
     entry_point = "main.js",
     include_npm = False,
     include_npm_sources = False,
@@ -254,8 +255,8 @@ js_binary(
 )
 
 js_binary(
-    name = "p4_trans",
-    data = [":p4_jsinfo"],
+    name = "include_transitive",
+    data = [":jsinfo"],
     entry_point = "main.js",
     include_npm = False,
     include_npm_sources = False,
@@ -266,8 +267,8 @@ js_binary(
 )
 
 js_binary(
-    name = "p4_both",
-    data = [":p4_jsinfo"],
+    name = "include_both",
+    data = [":jsinfo"],
     entry_point = "main.js",
     include_npm = False,
     include_sources = True,
@@ -276,7 +277,7 @@ js_binary(
 )
 
 js_binary(
-    name = "p4_no_copy",
+    name = "no_copy",
     copy_data_to_bin = False,
     data = ["data.txt"],
     entry_point = "main.js",
@@ -284,51 +285,51 @@ js_binary(
 )
 
 js_binary(
-    name = "p4_generated_data",
-    data = [":p2_generated_data"],
+    name = "generated_data_bin",
+    data = [":generated_data_file"],
     entry_point = "main.js",
     include_npm = False,
 )
 
 js_binary(
-    name = "p4_copy_exception",
+    name = "copy_exception",
     copy_data_to_bin = True,
     data = [
-        "p4_copy_keep.txt",
-        "p4_copy_skip.txt",
+        "copy_keep.txt",
+        "copy_skip.txt",
     ],
     entry_point = "main.js",
     include_npm = False,
-    no_copy_to_bin = ["p4_copy_skip.txt"],
+    no_copy_to_bin = ["copy_skip.txt"],
 )
 
 grouped_source(
-    name = "p4_grouped_src",
-    src = "p4_grouped_src.txt",
+    name = "grouped_src",
+    src = "grouped_src.txt",
 )
 
 js_library(
-    name = "p4_grouped_copy_lib",
-    data = [":p4_grouped_src"],
+    name = "grouped_copy_lib",
+    data = [":grouped_src"],
 )
 
 js_binary(
-    name = "p4_include_npm",
+    name = "include_npm",
     entry_point = "main.js",
     include_npm = True,
 )
 
 js_test(
-    name = "p4_coverage_test",
+    name = "coverage_test",
     entry_point = "main.js",
     include_npm = False,
 )
 
-directory_entry_point(name = "p4_dir")
+directory_entry_point(name = "directory_entry_test")
 
 js_binary(
-    name = "p4_dir_entry",
-    entry_point = ":p4_dir",
+    name = "directory_entry_bin",
+    entry_point = ":directory_entry_test",
     include_npm = False,
 )
 
@@ -351,15 +352,15 @@ js_library(
 )
 
 npm_package(
-    name = "p5_pkg",
+    name = "npm_pkg",
     srcs = [":local_lib"],
     package = "@test/local",
     version = "0.0.0",
 )
 
 npm_link_package(
-    name = "p5_link",
-    src = ":p5_pkg",
+    name = "npm_link",
+    src = ":npm_pkg",
     tags = ["manual"],
 )
 
@@ -379,13 +380,13 @@ npm_link_package(
 
 js_library(
     name = "wrapped_pkg",
-    srcs = [":p5_pkg"],
+    srcs = [":npm_pkg"],
 )
 
 js_binary(
-    name = "p5_bin",
+    name = "npm_link_bin",
     data = [
-        ":p5_link",
+        ":npm_link",
         ":source_backed_link",
         "//:node_modules/circles",
     ],
@@ -394,7 +395,7 @@ js_binary(
 )
 
 js_binary(
-    name = "p5_wrapped_pkg_bin",
+    name = "wrapped_pkg_bin",
     data = [":wrapped_pkg"],
     entry_point = "main.js",
     include_npm = False,
@@ -404,12 +405,12 @@ js_library(
     name = "lib_data_pkg",
     data = [
         "data.txt",
-        ":p5_pkg",
+        ":npm_pkg",
     ],
 )
 
 js_binary(
-    name = "p5_lib_data_pkg_bin",
+    name = "lib_data_pkg_bin",
     data = [":lib_data_pkg"],
     entry_point = "main.js",
     include_npm = False,
@@ -417,34 +418,34 @@ js_binary(
 
 js_library(
     name = "link_as_src",
-    srcs = [":p5_link"],
+    srcs = [":npm_link"],
 )
 
 js_binary(
-    name = "p5_link_as_src_bin",
+    name = "npm_link_as_src_bin",
     data = [":link_as_src"],
     entry_point = "main.js",
     include_npm = False,
 )
 
 npm_package_info_data(
-    name = "p5_direct_pkg",
+    name = "direct_pkg",
     package = "direct-pkg",
     version = "0.0.0",
 )
 
 js_binary(
-    name = "p5_direct_pkg_bin",
-    data = [":p5_direct_pkg"],
+    name = "direct_pkg_bin",
+    data = [":direct_pkg"],
     entry_point = "main.js",
     include_npm = False,
 )
 
-custom_npm_file(name = "p5_custom_npm")
+custom_npm_file(name = "custom_npm")
 
 js_binary(
-    name = "p5_custom_npm_bin",
-    data = [":p5_custom_npm"],
+    name = "custom_npm_bin",
+    data = [":custom_npm"],
     entry_point = "main.js",
     include_npm = False,
 )
@@ -454,26 +455,26 @@ js_binary(
 # ---------------------------------------------------------------------------
 
 js_binary(
-    name = "p6_inner",
+    name = "nested_rgi_inner",
     entry_point = "main.js",
     include_npm = False,
 )
 
 js_library(
-    name = "p6_carrier",
-    data = [":p6_inner"],
+    name = "nested_rgi_carrier",
+    data = [":nested_rgi_inner"],
 )
 
 js_library(
-    name = "p6_via_deps",
-    deps = [":p6_carrier"],
+    name = "nested_via_deps",
+    deps = [":nested_rgi_carrier"],
 )
 
 js_binary(
-    name = "p6_outer",
+    name = "nested_rgi_outer",
     data = [
-        ":p6_carrier",
-        ":p6_via_deps",
+        ":nested_rgi_carrier",
+        ":nested_via_deps",
         ":source_backed_link",
     ],
     entry_point = "main.js",
@@ -481,97 +482,97 @@ js_binary(
 )
 
 js_binary(
-    name = "p6_carrier_bin",
-    data = [":p6_carrier"],
+    name = "nested_rgi_carrier_bin",
+    data = [":nested_rgi_carrier"],
     entry_point = "main.js",
     include_npm = False,
 )
 
 js_binary(
-    name = "p6_via_deps_bin",
-    data = [":p6_via_deps"],
+    name = "nested_via_deps_bin",
+    data = [":nested_via_deps"],
     entry_point = "main.js",
     include_npm = False,
 )
 
 alias(
-    name = "p6_alias",
-    actual = ":p6_outer",
+    name = "nested_rgi_alias",
+    actual = ":nested_rgi_outer",
 )
 
 rgi_passthrough(
-    name = "p6_passthrough",
-    dep = ":p6_inner",
+    name = "rgi_passthrough_dep",
+    dep = ":nested_rgi_inner",
 )
 
 js_binary(
-    name = "p6_passthrough_bin",
-    data = [":p6_passthrough"],
+    name = "rgi_passthrough_dep_bin",
+    data = [":rgi_passthrough_dep"],
     entry_point = "main.js",
     include_npm = False,
 )
 
 rgi_drop(
-    name = "p6_drop",
-    dep = ":p6_inner",
+    name = "rgi_drop_dep",
+    dep = ":nested_rgi_inner",
 )
 
 js_binary(
-    name = "p6_drop_bin",
-    data = [":p6_drop"],
+    name = "rgi_drop_dep_bin",
+    data = [":rgi_drop_dep"],
     entry_point = "main.js",
     include_npm = False,
 )
 
-foreign_rgi_data(name = "p6_foreign")
+foreign_rgi_data(name = "foreign_rgi_dep")
 
-foreign_rgi_mixed(name = "p6_foreign_mixed")
+foreign_rgi_mixed(name = "foreign_rgi_dep_mixed")
 
-foreign_protected(name = "p6_foreign_protected")
+foreign_protected(name = "foreign_rgi_dep_protected")
 
-foreign_symlinks(name = "p6_foreign_symlinks")
+foreign_symlinks(name = "foreign_rgi_dep_symlinks")
 
 js_library(
-    name = "p6_symlink_lib",
-    data = [":p6_foreign_symlinks"],
+    name = "symlink_lib",
+    data = [":foreign_rgi_dep_symlinks"],
 )
 
 filegroup(
-    name = "p6_fg_extra",
-    srcs = ["p6_fg_src.txt"],
-    data = ["p6_fg_data.txt"],
+    name = "filegroup_extra",
+    srcs = ["filegroup_src.txt"],
+    data = ["filegroup_data.txt"],
 )
 
 js_library(
-    name = "p6_fg_lib",
-    data = [":p6_fg_extra"],
+    name = "filegroup_lib",
+    data = [":filegroup_extra"],
 )
 
-single_output_executable(name = "p6_one_output_exec")
+single_output_executable(name = "single_output_exec")
 
 js_binary(
-    name = "p6_exec_vs_raw_bin",
+    name = "exec_vs_raw_bin",
     data = [
-        "p6_raw_file.txt",
-        ":p6_one_output_exec",
+        "raw_file.txt",
+        ":single_output_exec",
     ],
     entry_point = "main.js",
     include_npm = False,
 )
 
 foreign_files_order(
-    name = "p6_foreign_topo",
+    name = "foreign_rgi_dep_topo",
     order = "topological",
 )
 
 js_binary(
-    name = "p6_foreign_bin",
+    name = "foreign_rgi_dep_bin",
     data = [
-        ":p6_foreign",
-        ":p6_foreign_mixed",
-        ":p6_foreign_protected",
-        ":p6_foreign_symlinks",
-        ":p6_foreign_topo",
+        ":foreign_rgi_dep",
+        ":foreign_rgi_dep_mixed",
+        ":foreign_rgi_dep_protected",
+        ":foreign_rgi_dep_symlinks",
+        ":foreign_rgi_dep_topo",
     ],
     entry_point = "main.js",
     include_npm = False,
@@ -592,14 +593,14 @@ copied_node_toolchain(
 )
 
 js_binary(
-    name = "p6_copied_node_bin",
+    name = "copied_node_bin",
     entry_point = "main.js",
     include_npm = False,
     node_toolchain = ":copied_node_tc",
 )
 
 js_binary(
-    name = "p6_node_path_bin",
+    name = "node_path_bin",
     entry_point = "main.js",
     include_npm = False,
     node_toolchain = ":node_path_tc",
@@ -628,287 +629,311 @@ write_file(
 
 runfiles_group_tests()
 
-p1_source_only_test(
-    name = "p1_source_only",
+source_only_test(
+    name = "source_only",
     target_under_test = ":leaf",
 )
 
-p1_package_test(
-    name = "p1_package_absence",
-    target_under_test = ":p5_pkg",
+npm_package_test(
+    name = "npm_package_absence",
+    target_under_test = ":npm_pkg",
 )
 
-p1_launcher_only_test(
-    name = "p1_launcher_only",
+launcher_only_test(
+    name = "launcher_only",
     target_under_test = "//js/private/test/create_launcher:test",
 )
 
-p1_rebuilt_semantics_test(
-    name = "p1_rebuilt_semantics",
+rebuilt_semantics_test(
+    name = "rebuilt_semantics",
     target_under_test = ":rebuilt_rgi",
 )
 
-p1_rebuilt_disabled_test(
-    name = "p1_rebuilt_disabled",
+rebuilt_disabled_test(
+    name = "rebuilt_disabled",
     target_under_test = ":rebuilt_rgi",
 )
 
-p1_library_outputs_test(
-    name = "p1_library_outputs",
-    target_under_test = ":p1_outer",
+library_outputs_test(
+    name = "library_outputs",
+    target_under_test = ":nested_lib_outer",
 )
 
-p1_opaque_deps_test(
-    name = "p1_opaque_deps",
-    target_under_test = ":p1_opaque_lib",
+opaque_jsinfo_deps_test(
+    name = "opaque_jsinfo_deps",
+    target_under_test = ":opaque_jsinfo_lib",
 )
 
-p1_foreign_outputs_test(
-    name = "p1_foreign_outputs",
-    target_under_test = ":p1_foreign_outputs_bin",
+foreign_outputs_test(
+    name = "foreign_outputs",
+    target_under_test = ":foreign_outputs_bin",
 )
 
-p2_semantics_test(
-    name = "p2_semantics",
-    target_under_test = ":p2_bin",
+binary_roles_semantics_test(
+    name = "binary_roles_semantics",
+    target_under_test = ":binary_roles_bin",
 )
 
-p2_swap_guard_test(
-    name = "p2_swap_guard",
-    target_under_test = ":p2_bin",
+swap_guard_test(
+    name = "swap_guard",
+    target_under_test = ":binary_roles_bin",
 )
 
-p3_limit_semantics_test(
-    name = "p3_limit_semantics",
-    target_under_test = ":p3_aggregate",
-    bin_a = ":p3_a",
-    bin_b = ":p3_b",
+limit_semantics_test(
+    name = "limit_semantics",
+    target_under_test = ":aggregate",
+    bin_a = ":merge_bin_a",
+    bin_b = ":merge_bin_b",
 )
 
-p4_none_semantics_test(
-    name = "p4_none_semantics",
-    target_under_test = ":p4_none",
+include_none_semantics_test(
+    name = "include_none_semantics",
+    target_under_test = ":include_none",
 )
 
-p4_direct_semantics_test(
-    name = "p4_direct_semantics",
-    target_under_test = ":p4_direct",
+include_direct_semantics_test(
+    name = "include_direct_semantics",
+    target_under_test = ":include_direct",
 )
 
-p4_trans_semantics_test(
-    name = "p4_trans_semantics",
-    target_under_test = ":p4_trans",
+include_transitive_semantics_test(
+    name = "include_transitive_semantics",
+    target_under_test = ":include_transitive",
 )
 
-p4_both_semantics_test(
-    name = "p4_both_semantics",
-    target_under_test = ":p4_both",
+include_both_semantics_test(
+    name = "include_both_semantics",
+    target_under_test = ":include_both",
 )
 
-p4_include_npm_semantics_test(
-    name = "p4_include_npm_semantics",
-    target_under_test = ":p4_include_npm",
+include_npm_semantics_test(
+    name = "include_npm_semantics",
+    target_under_test = ":include_npm",
 )
 
-p4_coverage_semantics_test(
-    name = "p4_coverage_semantics",
-    target_under_test = ":p4_coverage_test",
+coverage_semantics_test(
+    name = "coverage_semantics",
+    target_under_test = ":coverage_test",
 )
 
-p4_copy_semantics_test(
-    name = "p4_copy_semantics",
-    target_under_test = ":p4_copy_exception",
-    keep = "p4_copy_keep.txt",
-    skip = "p4_copy_skip.txt",
+copy_semantics_test(
+    name = "copy_semantics",
+    target_under_test = ":copy_exception",
+    keep = "copy_keep.txt",
+    skip = "copy_skip.txt",
 )
 
-p4_grouped_copy_semantics_test(
-    name = "p4_grouped_copy_semantics",
-    target_under_test = ":p4_grouped_copy_lib",
-    original = "p4_grouped_src.txt",
-    producer = ":p4_grouped_src",
+grouped_copy_semantics_test(
+    name = "grouped_copy_semantics",
+    target_under_test = ":grouped_copy_lib",
+    original = "grouped_src.txt",
+    producer = ":grouped_src",
 )
 
-p4_generated_semantics_test(
-    name = "p4_generated_semantics",
-    target_under_test = ":p4_generated_data",
+generated_semantics_test(
+    name = "generated_semantics",
+    target_under_test = ":generated_data_bin",
 )
 
-p4_dir_semantics_test(
-    name = "p4_dir_semantics",
-    target_under_test = ":p4_dir_entry",
+directory_entry_semantics_test(
+    name = "directory_entry_semantics",
+    target_under_test = ":directory_entry_bin",
 )
 
-p4_no_copy_semantics_test(
-    name = "p4_no_copy_semantics",
-    target_under_test = ":p4_no_copy",
+no_copy_semantics_test(
+    name = "no_copy_semantics",
+    target_under_test = ":no_copy",
     raw_data = "data.txt",
 )
 
-p5_loss_semantics_test(
-    name = "p5_loss_semantics",
-    target_under_test = ":p5_wrapped_pkg_bin",
+npm_provenance_loss_semantics_test(
+    name = "npm_provenance_loss_semantics",
+    target_under_test = ":wrapped_pkg_bin",
 )
 
-p5_link_coarse_semantics_test(
-    name = "p5_link_coarse_semantics",
-    target_under_test = ":p5_link",
+npm_link_coarse_semantics_test(
+    name = "npm_link_coarse_semantics",
+    target_under_test = ":npm_link",
 )
 
-p5_custom_npm_semantics_test(
-    name = "p5_custom_npm_semantics",
-    target_under_test = ":p5_custom_npm_bin",
+custom_npm_semantics_test(
+    name = "custom_npm_semantics",
+    target_under_test = ":custom_npm_bin",
 )
 
-p5_link_as_src_semantics_test(
-    name = "p5_link_as_src_semantics",
-    target_under_test = ":p5_link_as_src_bin",
+npm_link_as_src_semantics_test(
+    name = "npm_link_as_src_semantics",
+    target_under_test = ":npm_link_as_src_bin",
 )
 
-p6_marker_semantics_test(
-    name = "p6_marker_semantics",
-    target_under_test = ":p6_node_path_bin",
+node_external_marker_semantics_test(
+    name = "node_external_marker_semantics",
+    target_under_test = ":node_path_bin",
 )
 
-p6_passthrough_semantics_test(
-    name = "p6_passthrough_semantics",
-    target_under_test = ":p6_passthrough",
+rgi_passthrough_dep_semantics_test(
+    name = "rgi_passthrough_dep_semantics",
+    target_under_test = ":rgi_passthrough_dep",
 )
 
-p6_nested_semantics_test(
-    name = "p6_nested_semantics",
-    target_under_test = ":p6_carrier_bin",
-    inner = ":p6_inner",
+nested_rgi_semantics_test(
+    name = "nested_rgi_semantics",
+    target_under_test = ":nested_rgi_carrier_bin",
+    inner = ":nested_rgi_inner",
 )
 
-p6_nested_semantics_test(
-    name = "p6_via_deps_semantics",
-    target_under_test = ":p6_via_deps_bin",
-    inner = ":p6_inner",
+nested_rgi_semantics_test(
+    name = "nested_via_deps_semantics",
+    target_under_test = ":nested_via_deps_bin",
+    inner = ":nested_rgi_inner",
 )
 
-p6_library_relay_semantics_test(
-    name = "p6_symlink_lib_semantics",
-    target_under_test = ":p6_symlink_lib",
+library_relay_semantics_test(
+    name = "symlink_lib_semantics",
+    target_under_test = ":symlink_lib",
     expect_symlinks = True,
     extra_basename = "",
 )
 
-p6_library_relay_semantics_test(
-    name = "p6_fg_lib_semantics",
-    target_under_test = ":p6_fg_lib",
+library_relay_semantics_test(
+    name = "filegroup_lib_semantics",
+    target_under_test = ":filegroup_lib",
     expect_symlinks = False,
-    extra_basename = "p6_fg_data.txt",
+    extra_basename = "filegroup_data.txt",
 )
 
-p6_exec_vs_raw_semantics_test(
-    name = "p6_exec_vs_raw_semantics",
-    target_under_test = ":p6_exec_vs_raw_bin",
-    raw_data = "p6_raw_file.txt",
-    executable_dep = ":p6_one_output_exec",
+exec_vs_raw_semantics_test(
+    name = "exec_vs_raw_semantics",
+    target_under_test = ":exec_vs_raw_bin",
+    raw_data = "raw_file.txt",
+    executable_dep = ":single_output_exec",
 )
 
-p6_drop_semantics_test(
-    name = "p6_drop_semantics",
-    target_under_test = ":p6_drop_bin",
-    inner = ":p6_inner",
+rgi_drop_dep_semantics_test(
+    name = "rgi_drop_dep_semantics",
+    target_under_test = ":rgi_drop_dep_bin",
+    inner = ":nested_rgi_inner",
 )
 
-p6_foreign_semantics_test(
-    name = "p6_foreign_semantics",
-    target_under_test = ":p6_foreign_bin",
+foreign_rgi_dep_semantics_test(
+    name = "foreign_rgi_dep_semantics",
+    target_under_test = ":foreign_rgi_dep_bin",
 )
 
-p6_copied_node_semantics_test(
-    name = "p6_copied_node_semantics",
-    target_under_test = ":p6_copied_node_bin",
+copied_node_semantics_test(
+    name = "copied_node_semantics",
+    target_under_test = ":copied_node_bin",
 )
 
 write_file(
-    name = "p6_extra_symlink_carrier_src",
-    out = "p6_extra_symlink_carrier.js",
+    name = "extra_symlink_carrier_src",
+    out = "extra_symlink_carrier.js",
     content = ["// carrier"],
 )
 
 js_library(
-    name = "p6_extra_symlink_carrier",
-    srcs = [":p6_extra_symlink_carrier_src"],
+    name = "extra_symlink_carrier",
+    srcs = [":extra_symlink_carrier_src"],
     data = [
-        "p6_extra_symlink_asset.txt",
+        "extra_symlink_asset.txt",
     ],
 )
 
 extra_component_jsinfo(
-    name = "p6_extra_symlink_adapter",
+    name = "extra_symlink_adapter",
+    opaque_srcs = ["extra_symlink_unknown.txt"],
 )
 
 extra_component_jsinfo(
-    name = "p6_extra_symlink_npm_adapter",
+    name = "extra_symlink_npm_adapter",
     as_npm = True,
 )
 
 js_binary(
-    name = "p6_extra_symlink_carrier_bin",
-    data = [":p6_extra_symlink_carrier"],
+    name = "extra_symlink_carrier_bin",
+    data = [":extra_symlink_carrier"],
     entry_point = "main.js",
     include_npm = False,
 )
 
 js_binary(
-    name = "p6_extra_symlink_mixed_bin",
+    name = "extra_symlink_mixed_bin",
     data = [
-        ":p6_extra_symlink_adapter",
-        ":p6_extra_symlink_carrier",
+        ":extra_symlink_adapter",
+        ":extra_symlink_carrier",
     ],
     entry_point = "main.js",
     include_npm = False,
 )
 
 js_binary(
-    name = "p6_extra_symlink_inner",
-    data = [":p6_extra_symlink_adapter"],
+    name = "extra_symlink_inner",
+    data = [":extra_symlink_adapter"],
     entry_point = "main.js",
     include_npm = False,
 )
 
 js_binary(
-    name = "p6_extra_symlink_outer",
-    data = [":p6_extra_symlink_inner"],
+    name = "extra_symlink_outer",
+    data = [
+        ":extra_symlink_inner",
+        "extra_symlink_unknown.txt",
+    ],
     entry_point = "main.js",
     include_npm = False,
 )
 
 rgi_aggregate(
-    name = "p6_extra_symlink_nested_aggregate",
+    name = "extra_symlink_nested_aggregate",
     binaries = [
-        ":p6_extra_symlink_inner",
-        ":p6_extra_symlink_outer",
+        ":extra_symlink_inner",
+        ":extra_symlink_outer",
     ],
 )
 
 js_binary(
-    name = "p6_extra_symlink_npm_bin",
-    data = [":p6_extra_symlink_npm_adapter"],
+    name = "extra_symlink_npm_bin",
+    data = [":extra_symlink_npm_adapter"],
     entry_point = "main.js",
     include_npm = False,
 )
 
-p6_extra_symlink_carrier_semantics_test(
-    name = "p6_extra_symlink_carrier_semantics",
-    target_under_test = ":p6_extra_symlink_carrier_bin",
+extra_symlink_mixed_semantics_test(
+    name = "extra_symlink_mixed_semantics",
+    target_under_test = ":extra_symlink_mixed_bin",
 )
 
-p6_extra_symlink_mixed_semantics_test(
-    name = "p6_extra_symlink_mixed_semantics",
-    target_under_test = ":p6_extra_symlink_mixed_bin",
+extra_symlink_nested_semantics_test(
+    name = "extra_symlink_nested_semantics",
+    target_under_test = ":extra_symlink_nested_aggregate",
 )
 
-p6_extra_symlink_nested_semantics_test(
-    name = "p6_extra_symlink_nested_semantics",
-    target_under_test = ":p6_extra_symlink_nested_aggregate",
+extra_symlink_npm_semantics_test(
+    name = "extra_symlink_npm_semantics",
+    target_under_test = ":extra_symlink_npm_bin",
 )
 
-p6_extra_symlink_npm_semantics_test(
-    name = "p6_extra_symlink_npm_semantics",
-    target_under_test = ":p6_extra_symlink_npm_bin",
+independent_runfiles_alias(
+    name = "independent_alias_rgi",
+    emit_rgi = True,
+    path = "shared/alias",
+    root_path = "shared/root",
+    target = "independent_alias_target.txt",
+)
+
+independent_runfiles_alias(
+    name = "independent_alias_jsinfo",
+    path = "shared/alias",
+    root_path = "shared/root",
+    target = "independent_alias_target.txt",
+)
+
+js_binary(
+    name = "independent_alias_identity_bin",
+    data = [
+        ":independent_alias_rgi",
+        ":independent_alias_jsinfo",
+    ],
+    entry_point = "main.js",
+    include_npm = False,
 )

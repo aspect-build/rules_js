@@ -372,7 +372,6 @@ def binary_groups(
     ordinary_generated = []
     app_files = []
     fallbacks = []
-    fallback_labels = {}
 
     if executable:
         app_files.append(executable)
@@ -399,7 +398,6 @@ def binary_groups(
                 fallback = _fallback_runfiles_entry(ctx, dep)
                 if fallback:
                     fallbacks.append(fallback)
-                    fallback_labels[dep.label] = True
         else:
             dr = dep[DefaultInfo].default_runfiles
             if dr != None and (
@@ -410,7 +408,6 @@ def binary_groups(
                 fallback = _fallback_runfiles_entry(ctx, dep)
                 if fallback:
                     fallbacks.append(fallback)
-                    fallback_labels[dep.label] = True
 
         if JsInfo in dep:
             jsinfo = dep[JsInfo]
@@ -486,23 +483,23 @@ def binary_groups(
         rf = runfiles_groups.runfiles(ctx, entry)
         if rf.symlinks:
             for s in rf.symlinks.to_list():
-                covered_symlinks[s.path] = True
+                covered_symlinks[s] = True
         if rf.root_symlinks:
             for s in rf.root_symlinks.to_list():
-                covered_root_symlinks[s.path] = True
+                covered_root_symlinks[s] = True
     leftover_symlink_entries = []
     leftover_root_entries = []
     if runfiles.symlinks:
         leftover_symlink_entries = [
             s
             for s in runfiles.symlinks.to_list()
-            if s.path not in covered_symlinks
+            if s not in covered_symlinks
         ]
     if runfiles.root_symlinks:
         leftover_root_entries = [
             s
             for s in runfiles.root_symlinks.to_list()
-            if s.path not in covered_root_symlinks
+            if s not in covered_root_symlinks
         ]
 
     N_pre = _flatten_files(npm_ds + store_ds)
