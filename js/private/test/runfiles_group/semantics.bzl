@@ -886,7 +886,7 @@ p6_exec_vs_raw_semantics_test = semantics_test(_p6_exec_vs_raw_impl, attrs = {
     "executable_dep": attr.label(mandatory = True),
 })
 
-def _p6_empty_carrier_impl(ctx):
+def _p6_extra_symlink_carrier_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     resolved = resolve_target(ctx, target)
@@ -896,7 +896,7 @@ def _p6_empty_carrier_impl(ctx):
         env,
         found,
         rf_files,
-        "p6_empty_carrier.js",
+        "p6_extra_symlink_carrier.js",
         js_runfiles_groups.FIRST_PARTY_GROUP,
         [js_runfiles_groups.UNCLASSIFIED_GROUP],
     )
@@ -904,17 +904,17 @@ def _p6_empty_carrier_impl(ctx):
         env,
         found,
         rf_files,
-        "p6_empty_asset.txt",
+        "p6_extra_symlink_asset.txt",
         js_runfiles_groups.FIRST_PARTY_GROUP,
         [js_runfiles_groups.UNCLASSIFIED_GROUP],
     )
     assert_grouped_runfiles_match(env, ctx, resolved, target)
     return analysistest.end(env)
 
-# Independent library JS stays first-party when extra runfiles components are present.
-p6_empty_carrier_semantics_test = semantics_test(_p6_empty_carrier_impl)
+# Independent library JS stays first-party; extra symlink aliases do not erase that role.
+p6_extra_symlink_carrier_semantics_test = semantics_test(_p6_extra_symlink_carrier_impl)
 
-def _p6_empty_mixed_impl(ctx):
+def _p6_extra_symlink_mixed_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     resolved = resolve_target(ctx, target)
@@ -924,7 +924,7 @@ def _p6_empty_mixed_impl(ctx):
         env,
         found,
         rf_files,
-        "p6_empty_carrier.js",
+        "p6_extra_symlink_carrier.js",
         js_runfiles_groups.FIRST_PARTY_GROUP,
         [js_runfiles_groups.UNCLASSIFIED_GROUP],
     )
@@ -932,7 +932,7 @@ def _p6_empty_mixed_impl(ctx):
         env,
         found,
         rf_files,
-        "p6_empty_asset.txt",
+        "p6_extra_symlink_asset.txt",
         js_runfiles_groups.FIRST_PARTY_GROUP,
         [js_runfiles_groups.UNCLASSIFIED_GROUP],
     )
@@ -940,39 +940,56 @@ def _p6_empty_mixed_impl(ctx):
         env,
         found,
         rf_files,
-        "p6_empty_adapter.js",
-        js_runfiles_groups.UNCLASSIFIED_GROUP,
-        [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
+        "p6_extra_symlink_adapter.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
     )
+    rf = target[DefaultInfo].default_runfiles
+    asserts.true(env, rf.symlinks and bool(rf.symlinks), "mixed binary must admit extra symlinks")
+    asserts.true(env, rf.root_symlinks and bool(rf.root_symlinks), "mixed binary must admit extra root symlinks")
     assert_grouped_runfiles_match(env, ctx, resolved, target)
     return analysistest.end(env)
 
-# Adapter Files inside unmatched extra runfiles stay unclassified; carrier JS stays first-party.
-p6_empty_mixed_semantics_test = semantics_test(_p6_empty_mixed_impl, attrs = {
-    "adapter": attr.label(mandatory = True),
-})
+# A runfiles alias does not move a known JsInfo source into unclassified.
+p6_extra_symlink_mixed_semantics_test = semantics_test(_p6_extra_symlink_mixed_impl)
 
-def _p6_empty_nested_impl(ctx):
+def _p6_extra_symlink_nested_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     bins = {}
     for b in target[RgiAggregateInfo].binaries:
         bins[b.label.name] = b
-    inner = bins["p6_empty_inner"]
-    outer = bins["p6_empty_outer"]
+    inner = bins["p6_extra_symlink_inner"]
+    outer = bins["p6_extra_symlink_outer"]
     inner_resolved = resolve_target(ctx, inner)
     outer_resolved = resolve_target(ctx, outer)
     inner_rf = inner[DefaultInfo].default_runfiles
     asserts.true(env, inner_rf.symlinks and bool(inner_rf.symlinks), "inner must admit extra symlinks")
     asserts.true(env, inner_rf.root_symlinks and bool(inner_rf.root_symlinks), "inner must admit extra root symlinks")
+    _assert_role(
+        env,
+        group_by_name(inner_resolved),
+        runfiles_files(inner),
+        "p6_extra_symlink_adapter.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
+    _assert_role(
+        env,
+        group_by_name(outer_resolved),
+        runfiles_files(outer),
+        "p6_extra_symlink_adapter.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
     assert_grouped_runfiles_match(env, ctx, inner_resolved, inner)
     assert_grouped_runfiles_match(env, ctx, outer_resolved, outer)
     return analysistest.end(env)
 
-# Nested consumption keeps unclassified non-File runfiles components.
-p6_empty_nested_semantics_test = semantics_test(_p6_empty_nested_impl)
+# Nested consumption keeps extra symlink identities and reclassifies inherited unclassified Files.
+p6_extra_symlink_nested_semantics_test = semantics_test(_p6_extra_symlink_nested_impl)
 
-def _p6_empty_npm_impl(ctx):
+def _p6_extra_symlink_npm_impl(ctx):
     env = analysistest.begin(ctx)
     target = analysistest.target_under_test(env)
     resolved = resolve_target(ctx, target)
@@ -982,14 +999,12 @@ def _p6_empty_npm_impl(ctx):
         env,
         found,
         rf_files,
-        "p6_empty_npm_adapter.js",
-        js_runfiles_groups.UNCLASSIFIED_GROUP,
-        [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP],
+        "p6_extra_symlink_npm_adapter.js",
+        js_runfiles_groups.THIRD_PARTY_GROUP,
+        [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.NPM_LINKS_GROUP],
     )
     assert_grouped_runfiles_match(env, ctx, resolved, target)
     return analysistest.end(env)
 
-# An unmatched extra-runfiles npm-shaped File is unclassified, not also third_party.
-p6_empty_npm_semantics_test = semantics_test(_p6_empty_npm_impl, attrs = {
-    "adapter": attr.label(mandatory = True),
-})
+# A runfiles alias does not move a known npm payload into unclassified.
+p6_extra_symlink_npm_semantics_test = semantics_test(_p6_extra_symlink_npm_impl)
