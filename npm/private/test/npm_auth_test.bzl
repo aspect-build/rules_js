@@ -331,6 +331,23 @@ def _token_helper_precedence_test_impl(ctx):
 
     return unittest.end(env)
 
+def _pnpm_auth_env_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        {
+            "npm_config_//registry.corp.com/:_authToken": "TOKEN",
+            "npm_config_//registry.corp.com/basic/:_auth": "dXNlcjpwYXNz",
+        },
+        helpers.pnpm_auth_env({
+            "https://registry.corp.com": "Bearer TOKEN",
+            "https://registry.corp.com/basic/": "Basic dXNlcjpwYXNz",
+        }),
+    )
+
+    return unittest.end(env)
+
 def _env_var_token_test_impl(ctx):
     env = unittest.begin(ctx)
 
@@ -634,6 +651,7 @@ token_helper_memoized_test = unittest.make(_token_helper_memoized_test_impl)
 token_helper_precedence_test = unittest.make(_token_helper_precedence_test_impl)
 select_npm_auth_longest_prefix_test = unittest.make(_select_npm_auth_longest_prefix_test_impl)
 select_npm_auth_boundary_test = unittest.make(_select_npm_auth_boundary_test_impl)
+pnpm_auth_env_test = unittest.make(_pnpm_auth_env_test_impl)
 
 def npm_auth_test_suite():
     unittest.suite(
@@ -655,6 +673,7 @@ def npm_auth_test_suite():
         partial.make(token_helper_precedence_test, timeout = "short"),
         partial.make(select_npm_auth_longest_prefix_test, timeout = "short"),
         partial.make(select_npm_auth_boundary_test, timeout = "short"),
+        partial.make(pnpm_auth_env_test, timeout = "short"),
     )
 
 # A failing tokenHelper aborts analysis, which unittest.make cannot observe, so these drive the

@@ -1,0 +1,4 @@
+import %workspace%/../../tools/preset.bazelrc
+import %workspace%/../e2e.bazelrc
+
+common --credential_helper=%workspace%/credential-helper.sh

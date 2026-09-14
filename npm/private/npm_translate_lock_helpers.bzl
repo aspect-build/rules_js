@@ -143,6 +143,30 @@ def _run_token_helper(helper, npmrc_path, rctx):
     return token
 
 ################################################################################
+def _pnpm_auth_env(authorization):
+    """Converts Authorization headers into the environment variables pnpm reads registry auth from.
+
+    Args:
+        authorization: A dict of registry URL to Authorization header value, e.g.
+            `{"https://registry.corp.com/": "Bearer TOKEN"}`.
+
+    Returns:
+        A dict of URL-scoped `npm_config_` environment variables, e.g.
+        `{"npm_config_//registry.corp.com/:_authToken": "TOKEN"}`.
+    """
+    env = {}
+    for url, header in authorization.items():
+        scheme, _, credential = header.partition(" ")
+        key = "npm_config_//" + url.split("//", 1)[-1].removesuffix("/") + "/:"
+        if scheme == "Bearer":
+            env[key + "_authToken"] = credential
+        elif scheme == "Basic":
+            env[key + "_auth"] = credential
+        else:
+            fail("unsupported Authorization scheme `{}` for registry {}".format(scheme, url))
+    return env
+
+################################################################################
 def _get_npm_auth(npmrc, npmrc_path, rctx):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
@@ -772,6 +796,7 @@ helpers = struct(
     get_npm_auth = _get_npm_auth,
     get_npm_imports = _get_npm_imports,
     link_package = _link_package,
+    pnpm_auth_env = _pnpm_auth_env,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
     verify_lifecycle_hooks_specified = _verify_lifecycle_hooks_specified,

@@ -157,6 +157,12 @@ To update the `pnpm-lock.yaml` file manually, either
 -   [install pnpm](https://pnpm.io/installation) and run `pnpm install --lockfile-only` or `pnpm import`
 -   use the Bazel-managed pnpm by running `bazel run -- @pnpm//:pnpm --dir $PWD install --lockfile-only` or `bazel run -- @pnpm//:pnpm --dir $PWD import`
 
+Private registries need credentials on both sides: `npm_import` downloads go through Bazel's downloader,
+while the lock file update runs `pnpm`. Auth settings in the `.npmrc` serve both. If Bazel authenticates
+with a [credential helper](https://bazel.build/reference/command-line-reference#flag--credential_helper)
+instead, pass the same helper as the `credential_helper` attribute and `npm_translate_lock` queries it for
+each registry and hands the credentials to `pnpm`.
+
 If the `ASPECT_RULES_JS_FROZEN_PNPM_LOCK` environment variable is set and `update_pnpm_lock` is True,
 the build will fail if the pnpm lock file needs updating.
 
