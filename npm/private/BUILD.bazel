@@ -11,6 +11,8 @@ js_library(
     visibility = ["//visibility:public"],
 )
 
+exports_files(["credential_helper.mjs"])
+
 bzl_library(
     name = "npm_package",
     srcs = ["npm_package.bzl"],

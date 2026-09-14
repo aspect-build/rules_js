@@ -1,0 +1,11 @@
+{
+    "private": true,
+    "packageManager": "pnpm@11.25.0",
+    "devDependencies": {
+        "@types/node": "22.18.13"
+    },
+    "dependencies": {
+        "@aspect-build/a": "1.0.0",
+        "@aspect-priv-npm/a": "1.0.0"
+    }
+}

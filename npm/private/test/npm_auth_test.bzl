@@ -331,6 +331,94 @@ def _token_helper_precedence_test_impl(ctx):
 
     return unittest.end(env)
 
+def _pnpm_workspace_registries_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        {
+            "default": "https://registry.corp.com/",
+            "@myorg": "https://registry.corp.com/myorg/",
+        },
+        helpers.pnpm_workspace_registries({
+            "default": "https://registry.corp.com/",
+            "@myorg": "registry.corp.com/myorg/",
+        }),
+    )
+
+    url_keyed = {
+        "https://registry.corp.com/": {"scopes": ["@", "@myorg"], "serverType": "artifactory"},
+        "https://other.corp.com/": {"scopes": ["@other"]},
+        "https://prefixed.corp.com/": {"prefix": "work"},
+    }
+    asserts.equals(
+        env,
+        {
+            "default": "https://registry.corp.com/",
+            "@myorg": "https://registry.corp.com/",
+            "@other": "https://other.corp.com/",
+        },
+        helpers.pnpm_workspace_registries(url_keyed),
+    )
+
+    # A prefix-only registry has no scope to route by but still needs credentials
+    asserts.equals(
+        env,
+        ["https://registry.corp.com/", "https://other.corp.com/", "https://prefixed.corp.com/"],
+        helpers.pnpm_workspace_registry_urls(url_keyed),
+    )
+    asserts.equals(
+        env,
+        ["https://registry.corp.com/", "https://registry.corp.com/myorg/"],
+        helpers.pnpm_workspace_registry_urls({
+            "default": "https://registry.corp.com/",
+            "@myorg": "registry.corp.com/myorg/",
+        }),
+    )
+
+    return unittest.end(env)
+
+def _credential_helper_for_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    by_scope = {
+        "": "default",
+        "*.corp.com": "corp",
+        "*.npm.corp.com": "npm-corp",
+        "npm.pkg.github.com": "github",
+    }
+    for url, want in {
+        "https://npm.pkg.github.com/": "github",
+        "https://npm.pkg.github.com:8443/": "github",
+        "https://foo.npm.corp.com/": "npm-corp",
+        "https://npm.corp.com/": "npm-corp",
+        "https://other.corp.com/path/": "corp",
+        "https://corp.com/": "corp",
+        "https://registry.npmjs.org/": "default",
+    }.items():
+        asserts.equals(env, want, helpers.credential_helper_for(url, by_scope), url)
+
+    asserts.equals(env, None, helpers.credential_helper_for("https://registry.npmjs.org/", {"*.corp.com": "corp"}))
+
+    return unittest.end(env)
+
+def _pnpm_auth_env_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    asserts.equals(
+        env,
+        {
+            "pnpm_config_//registry.corp.com/:_authToken": "TOKEN",
+            "pnpm_config_//registry.corp.com/basic/:_auth": "dXNlcjpwYXNz",
+        },
+        helpers.pnpm_auth_env({
+            "https://registry.corp.com": "Bearer TOKEN",
+            "https://registry.corp.com/basic/": "basic dXNlcjpwYXNz",
+        }),
+    )
+
+    return unittest.end(env)
+
 def _env_var_token_test_impl(ctx):
     env = unittest.begin(ctx)
 
@@ -634,6 +722,9 @@ token_helper_memoized_test = unittest.make(_token_helper_memoized_test_impl)
 token_helper_precedence_test = unittest.make(_token_helper_precedence_test_impl)
 select_npm_auth_longest_prefix_test = unittest.make(_select_npm_auth_longest_prefix_test_impl)
 select_npm_auth_boundary_test = unittest.make(_select_npm_auth_boundary_test_impl)
+pnpm_auth_env_test = unittest.make(_pnpm_auth_env_test_impl)
+credential_helper_for_test = unittest.make(_credential_helper_for_test_impl)
+pnpm_workspace_registries_test = unittest.make(_pnpm_workspace_registries_test_impl)
 
 def npm_auth_test_suite():
     unittest.suite(
@@ -655,6 +746,9 @@ def npm_auth_test_suite():
         partial.make(token_helper_precedence_test, timeout = "short"),
         partial.make(select_npm_auth_longest_prefix_test, timeout = "short"),
         partial.make(select_npm_auth_boundary_test, timeout = "short"),
+        partial.make(pnpm_auth_env_test, timeout = "short"),
+        partial.make(credential_helper_for_test, timeout = "short"),
+        partial.make(pnpm_workspace_registries_test, timeout = "short"),
     )
 
 # A failing tokenHelper aborts analysis, which unittest.make cannot observe, so these drive the
