@@ -111,6 +111,16 @@ const npmWrapper = path.join(
 )
 const bootstrapPath = path.join(bootstrapDir, 'bootstrap.cjs')
 
+// Child processes that inherit process.execArgv (child_process.fork, or a spawn of
+// process.execPath that passes it on) need the per-process bootstrap, not this once-per-launch
+// setup, so point the entry we were loaded through at the bootstrap instead.
+//
+// Ahead of the worker early-return below, because a worker is handed node's original exec
+// arguments rather than this array. A worker that forks would otherwise hand the child a
+// --require of this file and start it as a fresh launch, which would rerun the whole launch
+// against whatever the child happens to be.
+process.execArgv[1] = bootstrapPath
+
 // A worker thread is started with the exec arguments node itself was given, so this preload
 // runs in every worker as well. A worker is not a launch: it has no entry point in argv,
 // inherits an environment that is already complete, and cannot chdir. All it needs is the same
@@ -285,15 +295,6 @@ if (npmBinDir) {
     PATH = `${npmBinDir}${path.delimiter}${PATH}`
 }
 process.env.PATH = `${path.dirname(nodeWrapper)}${path.delimiter}${PATH}`
-
-// Child processes that inherit process.execArgv (child_process.fork, or a spawn of
-// process.execPath with it) need the per-process bootstrap, not this once-per-launch setup.
-if (
-    process.execArgv[0] === '--require' &&
-    process.execArgv[1] === launcherPath
-) {
-    process.execArgv[1] = bootstrapPath
-}
 
 // ==============================================================================
 // Logs

@@ -28,9 +28,9 @@ check('process.env.PWD', process.env.PWD, cwd)
 // launcher.cjs consumes JS_BINARY__CHDIR when it applies it.
 check('process.env.JS_BINARY__CHDIR', process.env.JS_BINARY__CHDIR, undefined)
 
-// A child node process re-enters bootstrap.cjs through the node wrapper's --require, and
-// one forked from a worker thread re-enters launcher.cjs itself. Either way it already
-// inherits this cwd, so a relative chdir must not be applied a second time.
+// A child node process re-enters bootstrap.cjs, through the node wrapper's --require or
+// through the exec arguments it inherits, whether it is started from this thread or from a
+// worker. It already inherits this cwd, so a relative chdir must not be applied again.
 const child = spawnSync('node', ['-e', 'console.log(process.cwd())'], {
     encoding: 'utf8',
 })
