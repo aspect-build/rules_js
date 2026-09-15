@@ -401,6 +401,30 @@ if (runInProcess) {
     // because it reads JS_BINARY__ variables that only exist once the launcher above has run.
     require(launcher)
 
+    // A worker thread is started with the exec arguments node itself was given, which on this
+    // path carry no --require at all -- the preload above was reached by require(), not by a
+    // command line. Without this a worker would run with unpatched fs, where on the exec path
+    // it would have re-run the preload and returned early with the bootstrap applied. A
+    // program that asks for its own exec arguments is left alone.
+    const workerThreads = require('node:worker_threads')
+    const RealWorker = workerThreads.Worker
+    workerThreads.Worker = class Worker extends RealWorker {
+        constructor(filename, options = {}) {
+            super(
+                filename,
+                options.execArgv
+                    ? options
+                    : {
+                          ...options,
+                          execArgv: [
+                              '--require',
+                              process.env.JS_BINARY__NODE_PATCHES,
+                          ],
+                      }
+            )
+        }
+    }
+
     // Give the program node's own uncaught-exception reporting back. The handler installed
     // above is for failures in this launcher; left in place it would replace the program's
     // stack trace with a one-line FATAL.
