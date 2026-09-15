@@ -1,9 +1,17 @@
-// Disable Node's module compile cache unless the user explicitly opted in
-// (aspect-build/rules_js#2937). Note that setting NODE_DISABLE_COMPILE_CACHE
-// at runtime has no effect unless module.enableCompileCache() is subsequently
-// called, in which case it will prevent the cache from being enabled.
-if (!process.env.NODE_COMPILE_CACHE && !process.env.NODE_DISABLE_COMPILE_CACHE) {
-    process.env.NODE_DISABLE_COMPILE_CACHE = 1
+// If the user opted into the compile cache, we explicitly enable it here. Node
+// automatically enables it at startup if NODE_COMPILE_CACHE is set, but we cannot
+// necessarily rely on that since the hermetic launcher does not set user-specified
+// environment variables until after node has started. If the user did not opt in, we set
+// NODE_DISABLE_COMPILE_CACHE so that any future calls to module.enableCompileCache() do
+// not have an effect (aspect-build/rules_js#2937).
+if (!process.env.NODE_DISABLE_COMPILE_CACHE) {
+    if (process.env.NODE_COMPILE_CACHE) {
+        require('node:module').enableCompileCache?.(
+            process.env.NODE_COMPILE_CACHE
+        )
+    } else {
+        process.env.NODE_DISABLE_COMPILE_CACHE = 1
+    }
 }
 
 // Code coverage. We load this early on so that the coverage session sees as much of this
@@ -14,10 +22,9 @@ if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
 }
 
 const patchfs = require('./fs.cjs').patcher
+const { logDebug } = require('./util.cjs')
 const {
     JS_BINARY__FS_PATCH_ROOTS,
-    JS_BINARY__LOG_DEBUG,
-    JS_BINARY__LOG_PREFIX,
     JS_BINARY__NODE_WRAPPER,
     JS_BINARY__PATCH_NODE_FS,
 } = process.env
@@ -36,11 +43,9 @@ if (!process.env.JS_BINARY__NODE_PATCHES_DEPTH) {
 if (process.platform == 'win32') {
     // FIXME: need to make an exe, or run in a shell so we can use .bat
 } else {
-    if (JS_BINARY__LOG_DEBUG) {
-        console.error(
-            `DEBUG: ${JS_BINARY__LOG_PREFIX}: overriding process.execPath to node wrapper path ${JS_BINARY__NODE_WRAPPER}`
-        )
-    }
+    logDebug(
+        `overriding process.execPath to node wrapper path ${JS_BINARY__NODE_WRAPPER}`
+    )
     process.argv[0] = process.execPath = JS_BINARY__NODE_WRAPPER
 }
 
@@ -52,10 +57,6 @@ if (
 ) {
     const { delimiter } = require('node:path')
     const roots = JS_BINARY__FS_PATCH_ROOTS.split(delimiter)
-    if (JS_BINARY__LOG_DEBUG) {
-        console.error(
-            `DEBUG: ${JS_BINARY__LOG_PREFIX}: node fs patches will be applied with roots: ${roots}`
-        )
-    }
+    logDebug(`node fs patches will be applied with roots: ${roots}`)
     patchfs(roots)
 }
