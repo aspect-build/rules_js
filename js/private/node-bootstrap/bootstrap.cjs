@@ -15,40 +15,12 @@ if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
 
 const patchfs = require('./fs.cjs').patcher
 const {
-    BUILD_WORKSPACE_DIRECTORY,
-    JS_BINARY__CHDIR,
     JS_BINARY__FS_PATCH_ROOTS,
     JS_BINARY__LOG_DEBUG,
     JS_BINARY__LOG_PREFIX,
     JS_BINARY__NODE_WRAPPER,
     JS_BINARY__PATCH_NODE_FS,
-    TEST_SRCDIR,
 } = process.env
-
-// Change directory as indicated by the chdir option on js_binary or js_run_binary.
-if (JS_BINARY__CHDIR) {
-    let dir = JS_BINARY__CHDIR
-    // chdir is relative to the root of the output tree, where an external repository's package sits
-    // under "external/<repo>". The runfiles tree instead gives every repository a top-level
-    // directory beside our own, so re-point the path there rather than leaving the tree. Bazel sets
-    // TEST_SRCDIR for a test and BUILD_WORKSPACE_DIRECTORY for `bazel run`, and these are the two
-    // situations where we will be in the runfiles tree.
-    if ((TEST_SRCDIR || BUILD_WORKSPACE_DIRECTORY) && dir.startsWith('external/')) {
-        dir = '../' + dir.slice('external/'.length)
-    }
-    try {
-        process.chdir(dir)
-    } catch (e) {
-        console.error(
-            `FATAL: ${JS_BINARY__LOG_PREFIX}: could not change directory to '${dir}': ${e.message}`
-        )
-        process.exit(1)
-    }
-    // process.chdir() does not maintain PWD, so let's update it here.
-    process.env.PWD = process.cwd()
-    // Prevent child processes and worker threads from attempting to cd a second time.
-    delete process.env.JS_BINARY__CHDIR
-}
 
 // Keep a count of how many times these patches are applied; this should reflect the depth
 // of child processes in the default case where a child process inherits process.env since
@@ -78,7 +50,8 @@ if (
     JS_BINARY__PATCH_NODE_FS != '0' &&
     JS_BINARY__FS_PATCH_ROOTS
 ) {
-    const roots = JS_BINARY__FS_PATCH_ROOTS.split(':')
+    const { delimiter } = require('node:path')
+    const roots = JS_BINARY__FS_PATCH_ROOTS.split(delimiter)
     if (JS_BINARY__LOG_DEBUG) {
         console.error(
             `DEBUG: ${JS_BINARY__LOG_PREFIX}: node fs patches will be applied with roots: ${roots}`

@@ -88,61 +88,38 @@ LOG_ERROR_CAPTURE="${STDERR_CAPTURE_IS_TEMP:+$STDERR_CAPTURE}"
 export JS_BINARY__LOG_PREFIX="{{log_prefix_rule_set}}[{{log_prefix_rule}}]"
 
 # Emit a log line to $1, or to the real stderr when $1 is empty.
-function logf_to {
+function log_to {
     local capture="$1"
     local level="$2"
-    local format_string="$3\n"
-    shift 3
+    local message="$3"
     if [ "$capture" ]; then
-        printf "%s: %s: " "$level" "$JS_BINARY__LOG_PREFIX" >>"$capture"
-        # shellcheck disable=SC2059,SC2046
-        echo -e $(printf "$format_string" "$@") >>"$capture"
+        printf "%s: %s: %s\n" "$level" "$JS_BINARY__LOG_PREFIX" "$message" >>"$capture"
     else
-        printf "%s: %s: " "$level" "$JS_BINARY__LOG_PREFIX" >&2
-        # shellcheck disable=SC2059,SC2046
-        echo -e $(printf "$format_string" "$@") >&2
+        printf "%s: %s: %s\n" "$level" "$JS_BINARY__LOG_PREFIX" "$message" >&2
     fi
 }
 
-function logf_fatal {
+function log_fatal {
     if [ "${JS_BINARY__LOG_FATAL:-}" ]; then
-        logf_to "${LOG_ERROR_CAPTURE:-}" FATAL "$@"
+        log_to "${LOG_ERROR_CAPTURE:-}" FATAL "$1"
     fi
 }
 
-function logf_error {
+function log_error {
     if [ "${JS_BINARY__LOG_ERROR:-}" ]; then
-        logf_to "${LOG_ERROR_CAPTURE:-}" ERROR "$@"
+        log_to "${LOG_ERROR_CAPTURE:-}" ERROR "$1"
     fi
 }
 
-function logf_info {
+function log_info {
     if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-        logf_to "${STDERR_CAPTURE:-}" INFO "$@"
+        log_to "${STDERR_CAPTURE:-}" INFO "$1"
     fi
 }
 
-function logf_debug {
+function log_debug {
     if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
-        logf_to "${STDERR_CAPTURE:-}" DEBUG "$@"
-    fi
-}
-
-function resolve_execroot_bin_path {
-    local short_path="$1"
-    if [[ "$short_path" == ../* ]]; then
-        echo "$JS_BINARY__EXECROOT/$BAZEL_BINDIR/external/${short_path:3}"
-    else
-        echo "$JS_BINARY__EXECROOT/$BAZEL_BINDIR/$short_path"
-    fi
-}
-
-function resolve_execroot_src_path {
-    local short_path="$1"
-    if [[ "$short_path" == ../* ]]; then
-        echo "$JS_BINARY__EXECROOT/external/${short_path:3}"
-    else
-        echo "$JS_BINARY__EXECROOT/$short_path"
+        log_to "${STDERR_CAPTURE:-}" DEBUG "$1"
     fi
 }
 
@@ -165,7 +142,7 @@ _exit() {
         rm "$STDOUT_CAPTURE"
     fi
 
-    logf_debug "exit code: %s" "$EXIT_CODE"
+    log_debug "exit code: $EXIT_CODE"
 
     exit "$EXIT_CODE"
 }
@@ -183,183 +160,98 @@ export JS_BINARY__RUNFILES
 # Prepare to run main program
 # ==============================================================================
 
-if [[ "$PWD" == *"/bazel-out/"* ]]; then
-    bazel_out_segment="/bazel-out/"
-elif [[ "$PWD" == *"/BAZEL-~1/"* ]]; then
-    bazel_out_segment="/BAZEL-~1/"
-elif [[ "$PWD" == *"/bazel-~1/"* ]]; then
-    bazel_out_segment="/bazel-~1/"
-fi
-
-# When $PWD is a build action execroot the bindir hangs off it (BAZEL_BINDIR resolves from $PWD), so
-# $PWD is the execroot even if its path contains a "bazel-out" segment (e.g. a matching output base).
-# Otherwise scan the output tree for the execroot (runfiles, or a nested js_binary in the bindir).
-if [[ "${bazel_out_segment:-}" && ( -z "${BAZEL_BINDIR:-}" || ! -d "$PWD/$BAZEL_BINDIR" ) ]]; then
-    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
-        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
-    else
-        # We in runfiles and we don't yet know the execroot; strip from the last "bazel-out" segment
-        rest="${PWD##*"$bazel_out_segment"}"
-        index=$((${#PWD} - ${#rest} - ${#bazel_out_segment}))
-        if [ ${index} -lt 0 ]; then
-            printf "\nERROR: %s: No 'bazel-out' folder found in path '${PWD}'\n" "$JS_BINARY__LOG_PREFIX" >&2
-            exit 1
-        fi
-        JS_BINARY__EXECROOT="${PWD:0:$index}"
-    fi
+# The execroot the entry point is resolved against below. A parent js_binary process hands its
+# own down when it asks for an execroot entry point, because the entry point it resolved is in
+# that tree; otherwise this script was started in it. Nothing else here needs an execroot: the
+# launcher preload works out JS_BINARY__EXECROOT for the program and everything it spawns.
+if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
+    execroot="$JS_BINARY__EXECROOT"
 else
-    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
-        logf_debug "inheriting JS_BINARY__EXECROOT %s from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set" "$JS_BINARY__EXECROOT"
+    execroot="$PWD"
+fi
+
+# Build actions are started in the execroot, so change into the root of the Bazel output tree,
+# which is where js_binary programs run. See
+# https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
+# for more context on why we do this. It cannot wait for the preload: node resolves the bare
+# specifier of a --require in node_options against the directory it was started in.
+#
+# The bindir is only there to change into when this really is an execroot; in a runfiles tree,
+# or in a nested js_binary already running in the bindir, there is nothing to do. The preload
+# tells those apart from the broken case by JS_BINARY__CHANGED_TO_BINDIR.
+if [ -z "${JS_BINARY__NO_CD_BINDIR:-}" ] && [ "${BAZEL_BINDIR:-}" ] && [ -d "$BAZEL_BINDIR" ]; then
+    log_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) $BAZEL_BINDIR"
+    export JS_BINARY__CHANGED_TO_BINDIR=1
+    cd "$BAZEL_BINDIR"
+fi
+
+if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ -z "${BAZEL_BINDIR:-}" ]; then
+    log_fatal "Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
+    exit 1
+fi
+
+function resolve_execroot_bin_path {
+    local short_path="$1"
+    if [[ "$short_path" == ../* ]]; then
+        echo "$execroot/$BAZEL_BINDIR/external/${short_path:3}"
     else
-        # We are in execroot or in some other context all together such as a nodejs_image or a manually run js_binary
-        JS_BINARY__EXECROOT="$PWD"
+        echo "$execroot/$BAZEL_BINDIR/$short_path"
     fi
+}
 
-    if [ -z "${JS_BINARY__NO_CD_BINDIR:-}" ]; then
-        if [ -z "${BAZEL_BINDIR:-}" ]; then
-            logf_fatal "BAZEL_BINDIR must be set in environment to the makevar \$(BINDIR) in js_binary build actions (which \
-run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output \
-tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set \
-by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended \
-rule to use for using a js_binary as the tool of a build action. If you are invoking a js_binary directly from your own \
-custom rule implementation, use the 'js_binary_lib.run_binary_action' helper \
-(https://github.com/aspect-build/rules_js/blob/main/js/libs.bzl) instead of calling ctx.actions.run yourself so that \
-BAZEL_BINDIR is set correctly. If this is not a build action you can set the \
-BAZEL_BINDIR to '.' instead to supress this error. For more context on this design decision, please read the \
-aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs."
-            exit 1
-        fi
+function resolve_execroot_src_path {
+    local short_path="$1"
+    if [[ "$short_path" == ../* ]]; then
+        echo "$execroot/external/${short_path:3}"
+    else
+        echo "$execroot/$short_path"
+    fi
+}
 
-        # Since the process was launched in the execroot, we automatically change directory into the root of the
-        # output tree (which we expect to be set in BAZEL_BIN). See
-        # https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
-        # for more context on why we do this.
-        logf_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) %s" "$BAZEL_BINDIR"
-        cd "$BAZEL_BINDIR"
+# Resolve a toolchain file that is a file of this workspace or another repository
+# in the runfiles tree, or an absolute path a user set in node_toolchain.
+function resolve_toolchain_path {
+    local file
+    file="$(_normalize_path "$1")"
+    if [ "${file:0:1}" = "/" ]; then
+        echo "$file"
+    elif [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+        resolve_execroot_src_path "$file"
+    else
+        echo "$JS_BINARY__RUNFILES/{{workspace_name}}/$file"
     fi
-fi
-export JS_BINARY__EXECROOT
+}
 
-if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
-    if [ -z "${BAZEL_BINDIR:-}" ]; then
-        logf_fatal "Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set"
-        exit 1
-    fi
-    if [ -z "${JS_BINARY__COPY_DATA_TO_BIN:-}" ] && [ -z "${JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN:-}" ]; then
-        logf_fatal "Expected js_binary copy_data_to_bin to be True when js_run_binary use_execroot_entry_point is True. \
-To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary"
-        exit 1
-    fi
-fi
-
-if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
-    if [ -z "${JS_BINARY__COPY_DATA_TO_BIN:-}" ] && [ -z "${JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN:-}" ]; then
-        logf_fatal "Expected js_binary copy_data_to_bin to be True when js_binary use_execroot_entry_point is True. \
-To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary"
-        exit 1
-    fi
-fi
+# Everything below is resolved here only because node needs it on its command line
+# or bash needs it to start node at all. The checks that can wait, and the rest of
+# the environment the program sees, are done by the launcher preload once node is up.
 
 if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
     entry_point=$(resolve_execroot_bin_path "{{entry_point_path}}")
 else
     entry_point="$JS_BINARY__RUNFILES/{{workspace_name}}/{{entry_point_path}}"
 fi
-if [ ! -f "$entry_point" ]; then
-    logf_fatal "the entry_point '%s' not found" "$entry_point"
+
+export JS_BINARY__NODE_BINARY
+JS_BINARY__NODE_BINARY=$(resolve_toolchain_path "{{node}}")
+if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
+    log_fatal "node binary '$JS_BINARY__NODE_BINARY' not found"
     exit 1
 fi
-
-node="$(_normalize_path "{{node}}")"
-if [ "${node:0:1}" = "/" ]; then
-    # A user may specify an absolute path to node using target_tool_path in node_toolchain
-    export JS_BINARY__NODE_BINARY="$node"
-    if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
-        logf_fatal "node binary '%s' not found" "$JS_BINARY__NODE_BINARY"
-        exit 1
-    fi
-else
-    if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
-        export JS_BINARY__NODE_BINARY
-        JS_BINARY__NODE_BINARY=$(resolve_execroot_src_path "{{node}}")
-    else
-        export JS_BINARY__NODE_BINARY="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node}}"
-    fi
-    if [ ! -f "$JS_BINARY__NODE_BINARY" ]; then
-        logf_fatal "node binary '%s' not found" "$JS_BINARY__NODE_BINARY"
-        exit 1
-    fi
-fi
 if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_BINARY" ]; then
-    logf_fatal "node binary '%s' is not executable" "$JS_BINARY__NODE_BINARY"
+    log_fatal "node binary '$JS_BINARY__NODE_BINARY' is not executable"
     exit 1
 fi
 
 npm="{{npm}}"
 if [ "$npm" ]; then
-    npm="$(_normalize_path "$npm")"
-    if [ "${npm:0:1}" = "/" ]; then
-        # A user may specify an absolute path to npm using npm_path in node_toolchain
-        export JS_BINARY__NPM_BINARY="$npm"
-        if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
-            logf_fatal "npm binary '%s' not found" "$JS_BINARY__NPM_BINARY"
-            exit 1
-        fi
-    else
-        if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
-            export JS_BINARY__NPM_BINARY
-            JS_BINARY__NPM_BINARY=$(resolve_execroot_src_path "{{npm}}")
-        else
-            export JS_BINARY__NPM_BINARY="$JS_BINARY__RUNFILES/{{workspace_name}}/{{npm}}"
-        fi
-        if [ ! -f "$JS_BINARY__NPM_BINARY" ]; then
-            logf_fatal "npm binary '%s' not found" "$JS_BINARY__NPM_BINARY"
-            exit 1
-        fi
-    fi
-    if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NPM_BINARY" ]; then
-        logf_fatal "npm binary '%s' is not executable" "$JS_BINARY__NPM_BINARY"
-        exit 1
-    fi
-    if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
-        npm_wrapper=$(resolve_execroot_src_path "{{npm_wrapper}}")
-    else
-        npm_wrapper="$JS_BINARY__RUNFILES/{{workspace_name}}/{{npm_wrapper}}"
-    fi
-    if [ ! -f "$npm_wrapper" ]; then
-        logf_fatal "npm wrapper '%s' not found" "$npm_wrapper"
-        exit 1
-    fi
-    if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$npm_wrapper" ]; then
-        logf_fatal "npm wrapper '%s' is not executable" "$npm_wrapper"
-        exit 1
-    fi
-    npm_bin_dir="$(dirname "$npm_wrapper")"
+    export JS_BINARY__NPM_BINARY
+    JS_BINARY__NPM_BINARY=$(resolve_toolchain_path "$npm")
 fi
 
-if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
-    export JS_BINARY__NODE_WRAPPER
-    JS_BINARY__NODE_WRAPPER=$(resolve_execroot_src_path "{{node_wrapper}}")
-else
-    export JS_BINARY__NODE_WRAPPER="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_wrapper}}"
-fi
-if [ ! -f "$JS_BINARY__NODE_WRAPPER" ]; then
-    logf_fatal "node wrapper '%s' not found" "$JS_BINARY__NODE_WRAPPER"
-    exit 1
-fi
-if [ "$_IS_WINDOWS" -ne "1" ] && [ ! -x "$JS_BINARY__NODE_WRAPPER" ]; then
-    logf_fatal "node wrapper '%s' is not executable" "$JS_BINARY__NODE_WRAPPER"
-    exit 1
-fi
-
-if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
-    export JS_BINARY__NODE_PATCHES
-    JS_BINARY__NODE_PATCHES=$(resolve_execroot_src_path "{{node_patches}}")
-else
-    export JS_BINARY__NODE_PATCHES="$JS_BINARY__RUNFILES/{{workspace_name}}/{{node_patches}}"
-fi
-if [ ! -f "$JS_BINARY__NODE_PATCHES" ]; then
-    logf_fatal "node patches '%s' not found" "$JS_BINARY__NODE_PATCHES"
+launcher=$(resolve_toolchain_path "{{launcher}}")
+if [ ! -f "$launcher" ]; then
+    log_fatal "launcher '$launcher' not found"
     exit 1
 fi
 
@@ -378,87 +270,6 @@ for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     esac
 done
 
-# Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require below.
-# Don't override JS_BINARY__FS_PATCH_ROOTS if already set by an outer js_binary incase a js_binary such
-# as js_run_deverser runs another js_binary tool.
-if [ -z "${JS_BINARY__FS_PATCH_ROOTS:-}" ]; then
-    JS_BINARY__FS_PATCH_ROOTS="$JS_BINARY__EXECROOT:$JS_BINARY__RUNFILES"
-fi
-export JS_BINARY__FS_PATCH_ROOTS
-
-# Put the node wrapper directory and optionally the npm wrapper directory on the path so that
-# child processes can find them.
-if [ "${npm_bin_dir:-}" ]; then
-    PATH="$npm_bin_dir:$PATH"
-fi
-PATH="$(dirname "$JS_BINARY__NODE_WRAPPER"):$PATH"
-export PATH
-
-# Debug logs
-if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
-    logf_debug "PATH %s" "$PATH"
-    if [ "${BAZEL_BINDIR:-}" ]; then
-        logf_debug "BAZEL_BINDIR %s" "$BAZEL_BINDIR"
-    fi
-    if [ "${BAZEL_BUILD_FILE_PATH:-}" ]; then
-        logf_debug "BAZEL_BUILD_FILE_PATH %s" "$BAZEL_BUILD_FILE_PATH"
-    fi
-    if [ "${BAZEL_COMPILATION_MODE:-}" ]; then
-        logf_debug "BAZEL_COMPILATION_MODE %s" "$BAZEL_COMPILATION_MODE"
-    fi
-    if [ "${BAZEL_INFO_FILE:-}" ]; then
-        logf_debug "BAZEL_INFO_FILE %s" "$BAZEL_INFO_FILE"
-    fi
-    if [ "${BAZEL_PACKAGE:-}" ]; then
-        logf_debug "BAZEL_PACKAGE %s" "$BAZEL_PACKAGE"
-    fi
-    if [ "${BAZEL_TARGET_CPU:-}" ]; then
-        logf_debug "BAZEL_TARGET_CPU %s" "$BAZEL_TARGET_CPU"
-    fi
-    if [ "${BAZEL_TARGET_NAME:-}" ]; then
-        logf_debug "BAZEL_TARGET_NAME %s" "$BAZEL_TARGET_NAME"
-    fi
-    if [ "${BAZEL_VERSION_FILE:-}" ]; then
-        logf_debug "BAZEL_VERSION_FILE %s" "$BAZEL_VERSION_FILE"
-    fi
-    if [ "${BAZEL_WORKSPACE:-}" ]; then
-        logf_debug "BAZEL_WORKSPACE %s" "$BAZEL_WORKSPACE"
-    fi
-    logf_debug "JS_BINARY__FS_PATCH_ROOTS %s" "${JS_BINARY__FS_PATCH_ROOTS:-}"
-    logf_debug "JS_BINARY__NODE_PATCHES %s" "${JS_BINARY__NODE_PATCHES:-}"
-    logf_debug "JS_BINARY__NODE_OPTIONS %s" "${JS_BINARY__NODE_OPTIONS:-}"
-    logf_debug "JS_BINARY__BINDIR %s" "${JS_BINARY__BINDIR:-}"
-    logf_debug "JS_BINARY__BUILD_FILE_PATH %s" "${JS_BINARY__BUILD_FILE_PATH:-}"
-    logf_debug "JS_BINARY__COMPILATION_MODE %s" "${JS_BINARY__COMPILATION_MODE:-}"
-    logf_debug "JS_BINARY__NODE_BINARY %s" "${JS_BINARY__NODE_BINARY:-}"
-    logf_debug "JS_BINARY__NODE_WRAPPER %s" "${JS_BINARY__NODE_WRAPPER:-}"
-    if [ "${JS_BINARY__NPM_BINARY:-}" ]; then
-        logf_debug "JS_BINARY__NPM_BINARY %s" "$JS_BINARY__NPM_BINARY"
-    fi
-    if [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
-        logf_debug "JS_BINARY__NO_RUNFILES %s" "$JS_BINARY__NO_RUNFILES"
-    fi
-    logf_debug "JS_BINARY__PACKAGE %s" "${JS_BINARY__PACKAGE:-}"
-    logf_debug "JS_BINARY__TARGET_CPU %s" "${JS_BINARY__TARGET_CPU:-}"
-    logf_debug "JS_BINARY__TARGET_NAME %s" "${JS_BINARY__TARGET_NAME:-}"
-    logf_debug "JS_BINARY__WORKSPACE %s" "${JS_BINARY__WORKSPACE:-}"
-    logf_debug "js_binary entry point %s" "$entry_point"
-    if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
-        logf_debug "JS_BINARY__USE_EXECROOT_ENTRY_POINT %s" "$JS_BINARY__USE_EXECROOT_ENTRY_POINT"
-    fi
-fi
-
-# Info logs
-if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-    if [ "${BAZEL_TARGET:-}" ]; then
-        logf_info "BAZEL_TARGET %s" "${BAZEL_TARGET:-}"
-    fi
-    logf_info "JS_BINARY__TARGET %s" "${JS_BINARY__TARGET:-}"
-    logf_info "JS_BINARY__RUNFILES %s" "${JS_BINARY__RUNFILES:-}"
-    logf_info "JS_BINARY__EXECROOT %s" "${JS_BINARY__EXECROOT:-}"
-    logf_info "PWD %s" "$PWD"
-fi
-
 # ==============================================================================
 # Run the main program
 # ==============================================================================
@@ -467,10 +278,10 @@ fi
 # we avoid spawning an extra bash process on every launch. The wrapper is
 # still put on the PATH as `node` so that child processes get the patched
 # runtime.
-node_cmd=("$JS_BINARY__NODE_BINARY" --require "$JS_BINARY__NODE_PATCHES")
+node_cmd=("$JS_BINARY__NODE_BINARY" --require "$launcher")
 
 if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-    logf_info "$(echo -n "running" "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
+    log_info "$(echo -n "running" "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
 # De-export capture-related vars so child processes (e.g. a nested js_binary)
@@ -535,7 +346,7 @@ set -e
 
 if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
     if [ "$RESULT" != "$JS_BINARY__EXPECTED_EXIT_CODE" ]; then
-        logf_error "expected exit code to be '%s', but got '%s'" "$JS_BINARY__EXPECTED_EXIT_CODE" "$RESULT"
+        log_error "expected exit code to be '$JS_BINARY__EXPECTED_EXIT_CODE', but got '$RESULT'"
         if [ $RESULT -eq 0 ]; then
             # This exit code is handled specially by Bazel:
             # https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
