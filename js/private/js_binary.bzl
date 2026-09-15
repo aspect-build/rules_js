@@ -550,22 +550,16 @@ def _launcher_node_options(ctx):
 
 def _launcher_paths(ctx, nodeinfo, is_windows):
     """The toolchain paths both launchers bake in, and the files that back them."""
-    node_wrapper = ctx.file._node_wrapper_bat if is_windows else ctx.file._node_wrapper_sh
-    toolchain_files = [node_wrapper]
+    toolchain_files = [ctx.file._node_wrapper_bat if is_windows else ctx.file._node_wrapper_sh]
 
     npm_path = ""
-    npm_wrapper_path = ""
     if ctx.attr.include_npm:
         npm_path = nodeinfo.npm.short_path if nodeinfo.npm else nodeinfo.npm_path
-        npm_wrapper = ctx.file._npm_wrapper_bat if is_windows else ctx.file._npm_wrapper_sh
-        npm_wrapper_path = npm_wrapper.short_path
-        toolchain_files.append(npm_wrapper)
+        toolchain_files.append(ctx.file._npm_wrapper_bat if is_windows else ctx.file._npm_wrapper_sh)
 
     return struct(
         node_path = nodeinfo.node.short_path if nodeinfo.node else nodeinfo.node_path,
-        node_wrapper_path = node_wrapper.short_path,
         npm_path = npm_path,
-        npm_wrapper_path = npm_wrapper_path,
         toolchain_files = toolchain_files,
     )
 
@@ -680,6 +674,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
                 for fixed_arg in fixed_args
                 for token in _shell_tokenize(fixed_arg)
             ]),
+            "{{launcher}}": _quote(ctx.file._launcher_js.short_path),
             "{{log_prefix_rule_set}}": _quote(log_prefix_rule_set),
             "{{log_prefix_rule}}": _quote(log_prefix_rule),
             "{{node_options}}": "\n".join([
@@ -688,11 +683,8 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
             ]),
             "{{stub_node_options}}": json.encode(node_options.stub),
             "{{env_configures_node_startup}}": json.encode(_env_configures_node_startup(envs)),
-            "{{node_patches}}": _quote(ctx.file._node_patches.short_path),
-            "{{node_wrapper}}": _quote(paths.node_wrapper_path),
             "{{node}}": _quote(paths.node_path),
             "{{npm}}": _quote(paths.npm_path),
-            "{{npm_wrapper}}": _quote(paths.npm_wrapper_path),
             "{{workspace_name}}": _quote(ctx.workspace_name),
         },
     )

@@ -7,6 +7,11 @@
 //
 // The template used to generate this launcher is
 //     @@//js/private:js_binary.cjs.tpl
+//
+// It is the hermetic launcher's counterpart to js_binary.sh.tpl, and does the same job: work
+// out where node, the entry point and the per-launch preload are, set the environment the
+// target asked for, and start node on them. Everything that can wait until node is up lives in
+// js/private/node-bootstrap/launcher.cjs, which both launchers load as node's first --require.
 
 'use strict'
 
@@ -24,9 +29,7 @@ const WORKSPACE_NAME = "_main"
 const ENTRY_POINT_PATH = "js/private/test/shellcheck.js"
 const NODE_PATH = "../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node"
 const NPM_PATH = ""
-const NPM_WRAPPER_PATH = ""
-const NODE_WRAPPER_PATH = "js/private/node_bin/node"
-const NODE_PATCHES_PATH = "js/private/node-bootstrap/bootstrap.cjs"
+const LAUNCHER_PATH = "js/private/node-bootstrap/launcher.cjs"
 const LOG_PREFIX_RULE_SET = "aspect_rules_js"
 const LOG_PREFIX_RULE = "js_binary"
 // The node options the launcher's own process was already started with, by the native stub.
@@ -185,27 +188,6 @@ function logfDebug(message) {
     }
 }
 
-function resolveExecrootBinPath(shortPath) {
-    const bindir = process.env.BAZEL_BINDIR
-    if (!bindir) {
-        logfFatal(
-            'BAZEL_BINDIR must be set in the environment to the makevar $(BINDIR) to resolve a path in the Bazel output tree'
-        )
-        exitWith(1)
-    }
-    if (shortPath.startsWith('../')) {
-        return `${process.env.JS_BINARY__EXECROOT}/${bindir}/external/${shortPath.slice(3)}`
-    }
-    return `${process.env.JS_BINARY__EXECROOT}/${bindir}/${shortPath}`
-}
-
-function resolveExecrootSrcPath(shortPath) {
-    if (shortPath.startsWith('../')) {
-        return `${process.env.JS_BINARY__EXECROOT}/external/${shortPath.slice(3)}`
-    }
-    return `${process.env.JS_BINARY__EXECROOT}/${shortPath}`
-}
-
 function exitWith(exitCode) {
     logfDebug(`exit code: ${exitCode}`)
     process.exit(exitCode)
@@ -266,116 +248,78 @@ process.env.RUNFILES_DIR = process.env.RUNFILES_DIR || runfiles
 // Prepare to run main program
 // ==============================================================================
 
-let bazelOutSegment
-if (cwd().includes('/bazel-out/')) {
-    bazelOutSegment = '/bazel-out/'
-} else if (cwd().includes('/BAZEL-~1/')) {
-    bazelOutSegment = '/BAZEL-~1/'
-} else if (cwd().includes('/bazel-~1/')) {
-    bazelOutSegment = '/bazel-~1/'
-}
+// The execroot the entry point is resolved against below. A parent js_binary process hands its
+// own down when it asks for an execroot entry point, because the entry point it resolved is in
+// that tree; otherwise this launcher was started in it. Nothing else here needs an execroot:
+// the preload works out JS_BINARY__EXECROOT for the program and everything it spawns.
+const execroot =
+    process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
+    process.env.JS_BINARY__EXECROOT
+        ? normalizePath(process.env.JS_BINARY__EXECROOT)
+        : cwd()
 
-// When the cwd is a build action execroot the bindir hangs off it (BAZEL_BINDIR resolves from the
-// cwd), so the cwd is the execroot even if its path contains a "bazel-out" segment (e.g. a matching
-// output base). Otherwise scan the output tree for the execroot (runfiles, or a nested js_binary in
-// the bindir).
+// Build actions are started in the execroot, so change into the root of the Bazel output tree,
+// which is where js_binary programs run. See
+// https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
+// for more context on why we do this. It cannot wait for the preload: node resolves the bare
+// specifier of a --require in node_options against the directory it was started in.
+//
+// The bindir is only there to change into when this really is an execroot; in a runfiles tree,
+// or in a nested js_binary already running in the bindir, there is nothing to do. The preload
+// tells those apart from the broken case by JS_BINARY__CHANGED_TO_BINDIR.
 if (
-    bazelOutSegment &&
-    (!process.env.BAZEL_BINDIR ||
-        !isDirectory(path.join(cwd(), process.env.BAZEL_BINDIR)))
+    !process.env.JS_BINARY__NO_CD_BINDIR &&
+    process.env.BAZEL_BINDIR &&
+    isDirectory(process.env.BAZEL_BINDIR)
 ) {
-    if (
-        process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
-        process.env.JS_BINARY__EXECROOT
-    ) {
-        logfDebug(
-            `inheriting JS_BINARY__EXECROOT ${process.env.JS_BINARY__EXECROOT} from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set`
-        )
-    } else {
-        // We are in runfiles and we don't yet know the execroot; strip from the last "bazel-out" segment
-        const index = cwd().lastIndexOf(bazelOutSegment)
-        if (index < 0) {
-            fs.writeSync(
-                2,
-                `\nERROR: ${process.env.JS_BINARY__LOG_PREFIX}: No 'bazel-out' folder found in path '${cwd()}'\n`
-            )
-            exitWith(1)
-        }
-        process.env.JS_BINARY__EXECROOT = cwd().slice(0, index)
-    }
-} else {
-    if (
-        process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
-        process.env.JS_BINARY__EXECROOT
-    ) {
-        logfDebug(
-            `inheriting JS_BINARY__EXECROOT ${process.env.JS_BINARY__EXECROOT} from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set`
-        )
-    } else {
-        // We are in execroot or in some other context all together such as a nodejs_image or a manually run js_binary
-        process.env.JS_BINARY__EXECROOT = cwd()
-    }
-
-    if (!process.env.JS_BINARY__NO_CD_BINDIR) {
-        if (!process.env.BAZEL_BINDIR) {
-            logfFatal(
-                `BAZEL_BINDIR must be set in environment to the makevar $(BINDIR) in js_binary build actions (which
-run in the execroot) so that build actions can change directories to always run out of the root of the Bazel output
-tree. See https://docs.bazel.build/versions/main/be/make-variables.html#predefined_variables. This is automatically set
-by 'js_run_binary' (https://github.com/aspect-build/rules_js/blob/main/docs/js_run_binary.md) which is the recommended
-rule to use for using a js_binary as the tool of a build action. If you are invoking a js_binary directly from your own
-custom rule implementation, use the 'js_binary_lib.run_binary_action' helper
-(https://github.com/aspect-build/rules_js/blob/main/js/libs.bzl) instead of calling ctx.actions.run yourself so that
-BAZEL_BINDIR is set correctly. If this is not a build action you can set the
-BAZEL_BINDIR to '.' instead to supress this error. For more context on this design decision, please read the
-aspect_rules_js README https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs.`
-            )
-            exitWith(1)
-        }
-
-        // Since the process was launched in the execroot, we automatically change directory into the root of the
-        // output tree (which we expect to be set in BAZEL_BINDIR). See
-        // https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
-        // for more context on why we do this.
-        logfDebug(
-            `changing directory to BAZEL_BINDIR (root of Bazel output tree) ${process.env.BAZEL_BINDIR}`
-        )
-        process.chdir(process.env.BAZEL_BINDIR)
-        process.env.PWD = process.cwd()
-    }
+    logfDebug(
+        `changing directory to BAZEL_BINDIR (root of Bazel output tree) ${process.env.BAZEL_BINDIR}`
+    )
+    process.env.JS_BINARY__CHANGED_TO_BINDIR = '1'
+    process.chdir(process.env.BAZEL_BINDIR)
+    process.env.PWD = process.cwd()
 }
 
-if (process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT) {
-    if (!process.env.BAZEL_BINDIR) {
-        logfFatal(
-            'Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set'
-        )
-        exitWith(1)
-    }
-    if (
-        !process.env.JS_BINARY__COPY_DATA_TO_BIN &&
-        !process.env.JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN
-    ) {
-        logfFatal(
-            `Expected js_binary copy_data_to_bin to be True when js_run_binary use_execroot_entry_point is True.
-To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary`
-        )
-        exitWith(1)
-    }
+if (
+    process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
+    !process.env.BAZEL_BINDIR
+) {
+    logfFatal(
+        'Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set'
+    )
+    exitWith(1)
 }
 
-if (process.env.JS_BINARY__NO_RUNFILES) {
-    if (
-        !process.env.JS_BINARY__COPY_DATA_TO_BIN &&
-        !process.env.JS_BINARY__ALLOW_EXECROOT_ENTRY_POINT_WITH_NO_COPY_DATA_TO_BIN
-    ) {
-        logfFatal(
-            `Expected js_binary copy_data_to_bin to be True when js_binary use_execroot_entry_point is True.
-To disable this validation you can set allow_execroot_entry_point_with_no_copy_data_to_bin to True in js_run_binary`
-        )
-        exitWith(1)
+function resolveExecrootBinPath(shortPath) {
+    if (shortPath.startsWith('../')) {
+        return `${execroot}/${process.env.BAZEL_BINDIR}/external/${shortPath.slice(3)}`
     }
+    return `${execroot}/${process.env.BAZEL_BINDIR}/${shortPath}`
 }
+
+function resolveExecrootSrcPath(shortPath) {
+    if (shortPath.startsWith('../')) {
+        return `${execroot}/external/${shortPath.slice(3)}`
+    }
+    return `${execroot}/${shortPath}`
+}
+
+// Resolve a toolchain file that is a file of this workspace or another repository
+// in the runfiles tree, or an absolute path a user set in node_toolchain.
+function resolveToolchainPath(file) {
+    const normalized = normalizePath(file)
+    if (path.isAbsolute(normalized)) {
+        return normalized
+    }
+    if (process.env.JS_BINARY__NO_RUNFILES) {
+        return resolveExecrootSrcPath(normalized)
+    }
+    return `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${normalized}`
+}
+
+// Everything below is resolved here only because node needs it on its command line
+// or this launcher needs it to start node at all. The checks that can wait, and the rest of
+// the environment the program sees, are done by the preload once node is up.
 
 let entryPoint
 if (
@@ -386,20 +330,8 @@ if (
 } else {
     entryPoint = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${ENTRY_POINT_PATH}`
 }
-if (!isFile(entryPoint)) {
-    logfFatal(`the entry_point '${entryPoint}' not found`)
-    exitWith(1)
-}
 
-const node = normalizePath(NODE_PATH)
-if (path.isAbsolute(node)) {
-    // A user may specify an absolute path to node using target_tool_path in node_toolchain
-    process.env.JS_BINARY__NODE_BINARY = node
-} else if (process.env.JS_BINARY__NO_RUNFILES) {
-    process.env.JS_BINARY__NODE_BINARY = resolveExecrootSrcPath(NODE_PATH)
-} else {
-    process.env.JS_BINARY__NODE_BINARY = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NODE_PATH}`
-}
+process.env.JS_BINARY__NODE_BINARY = resolveToolchainPath(NODE_PATH)
 if (!isFile(process.env.JS_BINARY__NODE_BINARY)) {
     logfFatal(`node binary '${process.env.JS_BINARY__NODE_BINARY}' not found`)
     exitWith(1)
@@ -409,64 +341,13 @@ if (!IS_WINDOWS && !isExecutable(process.env.JS_BINARY__NODE_BINARY)) {
     exitWith(1)
 }
 
-let npmBinDir
 if (NPM_PATH) {
-    const npmPath = normalizePath(NPM_PATH)
-    if (path.isAbsolute(npmPath)) {
-        // A user may specify an absolute path to npm using npm_path in node_toolchain
-        process.env.JS_BINARY__NPM_BINARY = npmPath
-    } else if (process.env.JS_BINARY__NO_RUNFILES) {
-        process.env.JS_BINARY__NPM_BINARY = resolveExecrootSrcPath(NPM_PATH)
-    } else {
-        process.env.JS_BINARY__NPM_BINARY = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NPM_PATH}`
-    }
-    if (!isFile(process.env.JS_BINARY__NPM_BINARY)) {
-        logfFatal(`npm binary '${process.env.JS_BINARY__NPM_BINARY}' not found`)
-        exitWith(1)
-    }
-    if (!IS_WINDOWS && !isExecutable(process.env.JS_BINARY__NPM_BINARY)) {
-        logfFatal(`npm binary '${process.env.JS_BINARY__NPM_BINARY}' is not executable`)
-        exitWith(1)
-    }
-
-    let npmWrapper
-    if (process.env.JS_BINARY__NO_RUNFILES) {
-        npmWrapper = resolveExecrootSrcPath(NPM_WRAPPER_PATH)
-    } else {
-        npmWrapper = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NPM_WRAPPER_PATH}`
-    }
-    if (!isFile(npmWrapper)) {
-        logfFatal(`npm wrapper '${npmWrapper}' not found`)
-        exitWith(1)
-    }
-    if (!IS_WINDOWS && !isExecutable(npmWrapper)) {
-        logfFatal(`npm wrapper '${npmWrapper}' is not executable`)
-        exitWith(1)
-    }
-    npmBinDir = path.dirname(npmWrapper)
+    process.env.JS_BINARY__NPM_BINARY = resolveToolchainPath(NPM_PATH)
 }
 
-if (process.env.JS_BINARY__NO_RUNFILES) {
-    process.env.JS_BINARY__NODE_WRAPPER = resolveExecrootSrcPath(NODE_WRAPPER_PATH)
-} else {
-    process.env.JS_BINARY__NODE_WRAPPER = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NODE_WRAPPER_PATH}`
-}
-if (!isFile(process.env.JS_BINARY__NODE_WRAPPER)) {
-    logfFatal(`node wrapper '${process.env.JS_BINARY__NODE_WRAPPER}' not found`)
-    exitWith(1)
-}
-if (!IS_WINDOWS && !isExecutable(process.env.JS_BINARY__NODE_WRAPPER)) {
-    logfFatal(`node wrapper '${process.env.JS_BINARY__NODE_WRAPPER}' is not executable`)
-    exitWith(1)
-}
-
-if (process.env.JS_BINARY__NO_RUNFILES) {
-    process.env.JS_BINARY__NODE_PATCHES = resolveExecrootSrcPath(NODE_PATCHES_PATH)
-} else {
-    process.env.JS_BINARY__NODE_PATCHES = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${NODE_PATCHES_PATH}`
-}
-if (!isFile(process.env.JS_BINARY__NODE_PATCHES)) {
-    logfFatal(`node patches '${process.env.JS_BINARY__NODE_PATCHES}' not found`)
+const launcher = resolveToolchainPath(LAUNCHER_PATH)
+if (!isFile(launcher)) {
+    logfFatal(`launcher '${launcher}' not found`)
     exitWith(1)
 }
 
@@ -496,88 +377,6 @@ for (const arg of [...FIXED_ARGS, ...argv]) {
     }
 }
 
-// Configure JS_BINARY__FS_PATCH_ROOTS for node fs patches which are run via --require below.
-// Don't override JS_BINARY__FS_PATCH_ROOTS if already set by an outer js_binary incase a js_binary such
-// as js_run_deverser runs another js_binary tool.
-if (!process.env.JS_BINARY__FS_PATCH_ROOTS) {
-    process.env.JS_BINARY__FS_PATCH_ROOTS = `${process.env.JS_BINARY__EXECROOT}:${process.env.JS_BINARY__RUNFILES}`
-}
-
-// Put the node wrapper directory and optionally the npm wrapper directory on the path so that
-// child processes can find them.
-let currentPath = process.env.PATH || ''
-if (npmBinDir) {
-    currentPath = `${npmBinDir}${path.delimiter}${currentPath}`
-}
-process.env.PATH = `${path.dirname(process.env.JS_BINARY__NODE_WRAPPER)}${path.delimiter}${currentPath}`
-
-// Debug logs
-if (process.env.JS_BINARY__LOG_DEBUG) {
-    logfDebug(`PATH ${process.env.PATH}`)
-    if (process.env.BAZEL_BINDIR) {
-        logfDebug(`BAZEL_BINDIR ${process.env.BAZEL_BINDIR}`)
-    }
-    if (process.env.BAZEL_BUILD_FILE_PATH) {
-        logfDebug(`BAZEL_BUILD_FILE_PATH ${process.env.BAZEL_BUILD_FILE_PATH}`)
-    }
-    if (process.env.BAZEL_COMPILATION_MODE) {
-        logfDebug(`BAZEL_COMPILATION_MODE ${process.env.BAZEL_COMPILATION_MODE}`)
-    }
-    if (process.env.BAZEL_INFO_FILE) {
-        logfDebug(`BAZEL_INFO_FILE ${process.env.BAZEL_INFO_FILE}`)
-    }
-    if (process.env.BAZEL_PACKAGE) {
-        logfDebug(`BAZEL_PACKAGE ${process.env.BAZEL_PACKAGE}`)
-    }
-    if (process.env.BAZEL_TARGET_CPU) {
-        logfDebug(`BAZEL_TARGET_CPU ${process.env.BAZEL_TARGET_CPU}`)
-    }
-    if (process.env.BAZEL_TARGET_NAME) {
-        logfDebug(`BAZEL_TARGET_NAME ${process.env.BAZEL_TARGET_NAME}`)
-    }
-    if (process.env.BAZEL_VERSION_FILE) {
-        logfDebug(`BAZEL_VERSION_FILE ${process.env.BAZEL_VERSION_FILE}`)
-    }
-    if (process.env.BAZEL_WORKSPACE) {
-        logfDebug(`BAZEL_WORKSPACE ${process.env.BAZEL_WORKSPACE}`)
-    }
-    logfDebug(`JS_BINARY__FS_PATCH_ROOTS ${process.env.JS_BINARY__FS_PATCH_ROOTS || ''}`)
-    logfDebug(`JS_BINARY__NODE_PATCHES ${process.env.JS_BINARY__NODE_PATCHES || ''}`)
-    logfDebug(`JS_BINARY__NODE_OPTIONS ${nodeOptions.join(' ')}`)
-    logfDebug(`JS_BINARY__BINDIR ${process.env.JS_BINARY__BINDIR || ''}`)
-    logfDebug(`JS_BINARY__BUILD_FILE_PATH ${process.env.JS_BINARY__BUILD_FILE_PATH || ''}`)
-    logfDebug(`JS_BINARY__COMPILATION_MODE ${process.env.JS_BINARY__COMPILATION_MODE || ''}`)
-    logfDebug(`JS_BINARY__NODE_BINARY ${process.env.JS_BINARY__NODE_BINARY || ''}`)
-    logfDebug(`JS_BINARY__NODE_WRAPPER ${process.env.JS_BINARY__NODE_WRAPPER || ''}`)
-    if (process.env.JS_BINARY__NPM_BINARY) {
-        logfDebug(`JS_BINARY__NPM_BINARY ${process.env.JS_BINARY__NPM_BINARY}`)
-    }
-    if (process.env.JS_BINARY__NO_RUNFILES) {
-        logfDebug(`JS_BINARY__NO_RUNFILES ${process.env.JS_BINARY__NO_RUNFILES}`)
-    }
-    logfDebug(`JS_BINARY__PACKAGE ${process.env.JS_BINARY__PACKAGE || ''}`)
-    logfDebug(`JS_BINARY__TARGET_CPU ${process.env.JS_BINARY__TARGET_CPU || ''}`)
-    logfDebug(`JS_BINARY__TARGET_NAME ${process.env.JS_BINARY__TARGET_NAME || ''}`)
-    logfDebug(`JS_BINARY__WORKSPACE ${process.env.JS_BINARY__WORKSPACE || ''}`)
-    logfDebug(`js_binary entry point ${entryPoint}`)
-    if (process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT) {
-        logfDebug(
-            `JS_BINARY__USE_EXECROOT_ENTRY_POINT ${process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT}`
-        )
-    }
-}
-
-// Info logs
-if (process.env.JS_BINARY__LOG_INFO) {
-    if (process.env.BAZEL_TARGET) {
-        logfInfo(`BAZEL_TARGET ${process.env.BAZEL_TARGET}`)
-    }
-    logfInfo(`JS_BINARY__TARGET ${process.env.JS_BINARY__TARGET || ''}`)
-    logfInfo(`JS_BINARY__RUNFILES ${process.env.JS_BINARY__RUNFILES || ''}`)
-    logfInfo(`JS_BINARY__EXECROOT ${process.env.JS_BINARY__EXECROOT || ''}`)
-    logfInfo(`PWD ${cwd()}`)
-}
-
 // ==============================================================================
 // Run the main program
 // ==============================================================================
@@ -599,21 +398,24 @@ if (runInProcess) {
         logfInfo(['running in this process', entryPoint, ...args].join(' '))
     }
 
+    process.argv = [process.argv[0], entryPoint, ...args]
+
+    // node itself was only given STUB_NODE_OPTIONS, because the preload is required below
+    // rather than passed on a command line. Report the arguments the exec path would have
+    // used: the preload reads its own location out of execArgv[1], and a tool forwarding
+    // execArgv to a child still reproduces the patched runtime.
+    process.execArgv = ['--require', launcher, ...nodeOptions]
+
+    // The same per-launch setup node would have run as its first --require on the exec path:
+    // execroot, the remaining validations, PATH, JS_BINARY__NODE_PATCHES, the logs, the fs
+    // patches, and the chdir option. It is required here rather than passed to the stub
+    // because it reads JS_BINARY__ variables that only exist once the launcher above has run.
+    require(launcher)
+
     // Give the program node's own uncaught-exception reporting back. The handler installed
     // above is for failures in this launcher; left in place it would replace the program's
     // stack trace with a one-line FATAL.
     process.removeAllListeners('uncaughtException')
-
-    process.argv = [process.argv[0], entryPoint, ...args]
-
-    // node itself was only given STUB_NODE_OPTIONS, because the patches are required below
-    // rather than preloaded. Report the arguments the exec path would have used, so that a
-    // tool forwarding execArgv to a worker still reproduces the patched runtime.
-    process.execArgv = ['--require', process.env.JS_BINARY__NODE_PATCHES, ...nodeOptions]
-
-    // Required here rather than baked into the stub as a --require: the patches read
-    // JS_BINARY__ variables that only exist once the launcher above has run.
-    require(process.env.JS_BINARY__NODE_PATCHES)
 
     // Runs the entry point as the main module, so that `require.main === module` holds for
     // it. This returns as soon as the entry point's top level does; node then exits on its
@@ -628,7 +430,7 @@ if (runInProcess) {
 
     const nodeArgs = [
         '--require',
-        process.env.JS_BINARY__NODE_PATCHES,
+        launcher,
         ...nodeOptions,
         '--',
         entryPoint,
