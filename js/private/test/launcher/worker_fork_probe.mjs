@@ -1,9 +1,6 @@
-// A worker thread is handed node's original exec arguments rather than the array launcher.cjs
-// rewrote for its children, so a child spawned from a worker is the one place the launcher can
-// leak back into a child process and run a second launch against it.
-//
-// Each line is a separate assert_contains in BUILD.bazel, so one failure names the invariant it
-// broke.
+// A worker thread is handed node's original exec arguments, so a child spawned from a worker
+// is the one place the launcher could potentially leak back into a child process and run a
+// second launch against it.
 import * as path from 'node:path'
 import { Worker } from 'node:worker_threads'
 

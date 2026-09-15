@@ -278,7 +278,6 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
-    # The per-launch setup the bash launcher runs as node's first --require
     "_launcher_js": attr.label(
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:launcher.cjs"),

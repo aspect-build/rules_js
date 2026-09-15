@@ -2,10 +2,7 @@
 // (aspect-build/rules_js#2937). Note that setting NODE_DISABLE_COMPILE_CACHE
 // at runtime has no effect unless module.enableCompileCache() is subsequently
 // called, in which case it will prevent the cache from being enabled.
-if (
-    !process.env.NODE_COMPILE_CACHE &&
-    !process.env.NODE_DISABLE_COMPILE_CACHE
-) {
+if (!process.env.NODE_COMPILE_CACHE && !process.env.NODE_DISABLE_COMPILE_CACHE) {
     process.env.NODE_DISABLE_COMPILE_CACHE = 1
 }
 

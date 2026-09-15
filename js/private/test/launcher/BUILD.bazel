@@ -471,9 +471,8 @@ js_run_binary(
 # ==================================================================================================
 # Case 9: a child spawned from a worker thread gets the bootstrap, not the launcher.
 #
-# A worker runs launcher.cjs too, but with node's original exec arguments rather than the array the
-# main thread rewrote, so it is the one place the launcher can leak into a child and run a second
-# launch there.
+# A worker runs launcher.cjs too, but with node's original exec arguments, so it is the one
+# place the launcher could leak into a child and run a second launch there.
 
 js_binary(
     name = "worker_fork_probe_bin",
