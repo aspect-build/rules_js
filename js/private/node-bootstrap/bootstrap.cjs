@@ -22,10 +22,9 @@ if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
 }
 
 const patchfs = require('./fs.cjs').patcher
+const { logDebug } = require('./util.cjs')
 const {
     JS_BINARY__FS_PATCH_ROOTS,
-    JS_BINARY__LOG_DEBUG,
-    JS_BINARY__LOG_PREFIX,
     JS_BINARY__NODE_WRAPPER,
     JS_BINARY__PATCH_NODE_FS,
 } = process.env
@@ -44,11 +43,9 @@ if (!process.env.JS_BINARY__NODE_PATCHES_DEPTH) {
 if (process.platform == 'win32') {
     // FIXME: need to make an exe, or run in a shell so we can use .bat
 } else {
-    if (JS_BINARY__LOG_DEBUG) {
-        console.error(
-            `DEBUG: ${JS_BINARY__LOG_PREFIX}: overriding process.execPath to node wrapper path ${JS_BINARY__NODE_WRAPPER}`
-        )
-    }
+    logDebug(
+        `overriding process.execPath to node wrapper path ${JS_BINARY__NODE_WRAPPER}`
+    )
     process.argv[0] = process.execPath = JS_BINARY__NODE_WRAPPER
 }
 
@@ -60,10 +57,6 @@ if (
 ) {
     const { delimiter } = require('node:path')
     const roots = JS_BINARY__FS_PATCH_ROOTS.split(delimiter)
-    if (JS_BINARY__LOG_DEBUG) {
-        console.error(
-            `DEBUG: ${JS_BINARY__LOG_PREFIX}: node fs patches will be applied with roots: ${roots}`
-        )
-    }
+    logDebug(`node fs patches will be applied with roots: ${roots}`)
     patchfs(roots)
 }
