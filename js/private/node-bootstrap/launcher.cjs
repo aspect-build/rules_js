@@ -21,33 +21,33 @@ const IS_WINDOWS = process.platform === 'win32'
 //
 // We use fs.writeSync rather than console.error, so that the line is flushed before a
 // process.exit that may follow it.
-function logTo(level, message) {
+function log(level, message) {
     fs.writeSync(
         2,
         `${level}: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}\n`
     )
 }
 
-function logfFatal(message) {
+function logFatal(message) {
     if (process.env.JS_BINARY__LOG_FATAL) {
-        logTo('FATAL', message)
+        log('FATAL', message)
     }
 }
 
-function logfInfo(message) {
+function logInfo(message) {
     if (process.env.JS_BINARY__LOG_INFO) {
-        logTo('INFO', message)
+        log('INFO', message)
     }
 }
 
-function logfDebug(message) {
+function logDebug(message) {
     if (process.env.JS_BINARY__LOG_DEBUG) {
-        logTo('DEBUG', message)
+        log('DEBUG', message)
     }
 }
 
 function fatal(message) {
-    logfFatal(message)
+    logFatal(message)
     process.exit(1)
 }
 
@@ -166,7 +166,7 @@ const inheritedExecroot =
     process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
     process.env.JS_BINARY__EXECROOT
 if (inheritedExecroot) {
-    logfDebug(
+    logDebug(
         `inheriting JS_BINARY__EXECROOT ${inheritedExecroot} from parent js_binary process as JS_BINARY__USE_EXECROOT_ENTRY_POINT is set`
     )
 }
@@ -296,7 +296,7 @@ process.env.PATH = `${path.dirname(nodeWrapper)}${path.delimiter}${PATH}`
 // ==============================================================================
 
 if (process.env.JS_BINARY__LOG_DEBUG) {
-    logfDebug(`PATH ${process.env.PATH}`)
+    logDebug(`PATH ${process.env.PATH}`)
     for (const name of [
         'BAZEL_BINDIR',
         'BAZEL_BUILD_FILE_PATH',
@@ -309,14 +309,14 @@ if (process.env.JS_BINARY__LOG_DEBUG) {
         'BAZEL_WORKSPACE',
     ]) {
         if (process.env[name]) {
-            logfDebug(`${name} ${process.env[name]}`)
+            logDebug(`${name} ${process.env[name]}`)
         }
     }
-    logfDebug(
+    logDebug(
         `JS_BINARY__FS_PATCH_ROOTS ${process.env.JS_BINARY__FS_PATCH_ROOTS}`
     )
-    logfDebug(`JS_BINARY__NODE_PATCHES ${process.env.JS_BINARY__NODE_PATCHES}`)
-    logfDebug(`JS_BINARY__NODE_OPTIONS ${process.execArgv.slice(2).join(' ')}`)
+    logDebug(`JS_BINARY__NODE_PATCHES ${process.env.JS_BINARY__NODE_PATCHES}`)
+    logDebug(`JS_BINARY__NODE_OPTIONS ${process.execArgv.slice(2).join(' ')}`)
     for (const name of [
         'JS_BINARY__BINDIR',
         'JS_BINARY__BUILD_FILE_PATH',
@@ -324,15 +324,13 @@ if (process.env.JS_BINARY__LOG_DEBUG) {
         'JS_BINARY__NODE_BINARY',
         'JS_BINARY__NODE_WRAPPER',
     ]) {
-        logfDebug(`${name} ${process.env[name] || ''}`)
+        logDebug(`${name} ${process.env[name] || ''}`)
     }
     if (process.env.JS_BINARY__NPM_BINARY) {
-        logfDebug(`JS_BINARY__NPM_BINARY ${process.env.JS_BINARY__NPM_BINARY}`)
+        logDebug(`JS_BINARY__NPM_BINARY ${process.env.JS_BINARY__NPM_BINARY}`)
     }
     if (process.env.JS_BINARY__NO_RUNFILES) {
-        logfDebug(
-            `JS_BINARY__NO_RUNFILES ${process.env.JS_BINARY__NO_RUNFILES}`
-        )
+        logDebug(`JS_BINARY__NO_RUNFILES ${process.env.JS_BINARY__NO_RUNFILES}`)
     }
     for (const name of [
         'JS_BINARY__PACKAGE',
@@ -340,11 +338,11 @@ if (process.env.JS_BINARY__LOG_DEBUG) {
         'JS_BINARY__TARGET_NAME',
         'JS_BINARY__WORKSPACE',
     ]) {
-        logfDebug(`${name} ${process.env[name] || ''}`)
+        logDebug(`${name} ${process.env[name] || ''}`)
     }
-    logfDebug(`js_binary entry point ${entryPoint}`)
+    logDebug(`js_binary entry point ${entryPoint}`)
     if (process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT) {
-        logfDebug(
+        logDebug(
             `JS_BINARY__USE_EXECROOT_ENTRY_POINT ${process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT}`
         )
     }
@@ -352,12 +350,12 @@ if (process.env.JS_BINARY__LOG_DEBUG) {
 
 if (process.env.JS_BINARY__LOG_INFO) {
     if (process.env.BAZEL_TARGET) {
-        logfInfo(`BAZEL_TARGET ${process.env.BAZEL_TARGET}`)
+        logInfo(`BAZEL_TARGET ${process.env.BAZEL_TARGET}`)
     }
-    logfInfo(`JS_BINARY__TARGET ${process.env.JS_BINARY__TARGET || ''}`)
-    logfInfo(`JS_BINARY__RUNFILES ${process.env.JS_BINARY__RUNFILES || ''}`)
-    logfInfo(`JS_BINARY__EXECROOT ${process.env.JS_BINARY__EXECROOT || ''}`)
-    logfInfo(`PWD ${process.cwd()}`)
+    logInfo(`JS_BINARY__TARGET ${process.env.JS_BINARY__TARGET || ''}`)
+    logInfo(`JS_BINARY__RUNFILES ${process.env.JS_BINARY__RUNFILES || ''}`)
+    logInfo(`JS_BINARY__EXECROOT ${process.env.JS_BINARY__EXECROOT || ''}`)
+    logInfo(`PWD ${process.cwd()}`)
 }
 
 // ==============================================================================
