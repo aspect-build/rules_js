@@ -1,8 +1,8 @@
 "Bash snippets for js rules"
 
-# Bash snipped to initialize the RUNFILES environment variable.
-# Depends on there being a logf_fatal function defined.
-# NB: If this can be generalized fully in the future and not depend on logf_fatal
+# Bash snippet to initialize the RUNFILES environment variable.
+# Depends on there being a log_fatal function defined.
+# NB: If this can be generalized fully in the future and not depend on log_fatal
 # then it could be hoisted to bazel-lib where we have other bash snippets.
 BASH_INITIALIZE_RUNFILES = r"""
 # It helps to determine if we are running on a Windows environment (excludes WSL as it acts like Unix)
@@ -66,7 +66,7 @@ elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
         # Bazel for windows puts the manifest file named MANIFEST in the runfiles directory
         RUNFILES=${RUNFILES%/MANIFEST}
     else
-        logf_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
+        log_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
         exit 1
     fi
 else
@@ -99,7 +99,7 @@ else
     done
 
     if [ -z "${RUNFILES:-}" ]; then
-        logf_fatal "RUNFILES environment variable is not set"
+        log_fatal "RUNFILES environment variable is not set"
         exit 1
     fi
 

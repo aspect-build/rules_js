@@ -1,0 +1,69 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+
+package(default_testonly = True)
+
+# JS_BINARY__EXECROOT is worked out by the launcher preload from the directory the launcher
+# script was started in. The cases below are the ones that derivation distinguishes.
+
+# A runfiles tree: the launcher script has no bindir to change into, and the execroot is the
+# output tree the runfiles were built in.
+js_test(
+    name = "execroot_runfiles_test",
+    size = "small",
+    entry_point = "execroot_probe.mjs",
+)
+
+js_binary(
+    name = "execroot_probe_bin",
+    entry_point = "execroot_probe.mjs",
+)
+
+# A build action: the launcher script starts in the execroot and changes into the bindir.
+js_run_binary(
+    name = "execroot_action",
+    silent_on_success = False,
+    stdout = "execroot_action_stdout.txt",
+    tool = ":execroot_probe_bin",
+    use_execroot_entry_point = False,
+)
+
+assert_contains(
+    name = "execroot_action_test",
+    actual = ":execroot_action_stdout.txt",
+    expected = "execroot ok: /",
+)
+
+# The same, with an execroot entry point, which is the case a parent js_binary process hands
+# its own execroot down on.
+js_run_binary(
+    name = "execroot_action_entry_point",
+    silent_on_success = False,
+    stdout = "execroot_action_entry_point_stdout.txt",
+    tool = ":execroot_probe_bin",
+    use_execroot_entry_point = True,
+)
+
+assert_contains(
+    name = "execroot_action_entry_point_test",
+    actual = ":execroot_action_entry_point_stdout.txt",
+    expected = "execroot ok: /",
+)
+
+# Spawning a launcher needs a directed path to it and a controlled environment, so this case is
+# driven from a test rather than declared as one.
+js_test(
+    name = "bindir_unset_test",
+    size = "small",
+    data = [
+        ":execroot_probe_bin",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "bindir_unset.mjs",
+    fixed_args = ["$(rlocationpath :execroot_probe_bin)"],
+    # The child is spawned from the root directory, which Windows has no equivalent of.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)

@@ -1,7 +1,7 @@
 // Asserts that js_binary(chdir) lands the process in the right directory and that nothing
-// downstream of the process re-applies it. The move is done by bootstrap.cjs, which every
-// node process in the tree preloads, so a child node process and a worker thread are the
-// two places a second, compounding chdir could creep in.
+// downstream of the process re-applies it. The move is done once, by launcher.cjs, but a
+// child node process and a worker thread both inherit the directory it left us in, so they
+// are the two places a second, compounding chdir could creep in.
 import { spawnSync } from 'node:child_process'
 import * as path from 'node:path'
 import { Worker } from 'node:worker_threads'
@@ -25,11 +25,12 @@ if (expectedSuffix && !cwd.endsWith(expectedSuffix)) {
 
 check('process.env.PWD', process.env.PWD, cwd)
 
-// bootstrap.cjs consumes JS_BINARY__CHDIR when it applies it.
+// launcher.cjs consumes JS_BINARY__CHDIR when it applies it.
 check('process.env.JS_BINARY__CHDIR', process.env.JS_BINARY__CHDIR, undefined)
 
-// A child node process re-enters bootstrap.cjs through the node wrapper's --require. It
-// already inherits this cwd, so a relative chdir must not be applied a second time.
+// A child node process re-enters bootstrap.cjs through the node wrapper's --require, and
+// one forked from a worker thread re-enters launcher.cjs itself. Either way it already
+// inherits this cwd, so a relative chdir must not be applied a second time.
 const child = spawnSync('node', ['-e', 'console.log(process.cwd())'], {
     encoding: 'utf8',
 })

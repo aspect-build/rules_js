@@ -1,7 +1,7 @@
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 
-# The chdir is applied by bootstrap.cjs, so it has to hold for every process that preloads it.
+# The chdir is applied once by launcher.cjs, and every process below it inherits the result.
 # cwd.mjs checks the cwd itself, a spawned node child and a worker thread; the rules below cover
 # the two directories a chdir can be relative to -- the runfiles tree for a js_test and the bin
 # directory for a build action -- and the shapes a chdir value can take.
