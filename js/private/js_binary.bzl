@@ -289,7 +289,9 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
-    "_launcher_js": attr.label(
+    # Per-launch setup, loaded by both launchers as node's first --require. Not to be confused
+    # with _launcher_js_template, which generates the hermetic launcher's own per-target file.
+    "_launcher_preload": attr.label(
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:launcher.cjs"),
     ),
@@ -580,7 +582,7 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
-        "{{launcher}}": ctx.file._launcher_js.short_path,
+        "{{launcher}}": ctx.file._launcher_preload.short_path,
         "{{node_options}}": "\n".join([
             _NODE_OPTION.format(value = value)
             for value in node_options.all
@@ -674,7 +676,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
                 for fixed_arg in fixed_args
                 for token in _shell_tokenize(fixed_arg)
             ]),
-            "{{launcher}}": _quote(ctx.file._launcher_js.short_path),
+            "{{launcher}}": _quote(ctx.file._launcher_preload.short_path),
             "{{log_prefix_rule_set}}": _quote(log_prefix_rule_set),
             "{{log_prefix_rule}}": _quote(log_prefix_rule),
             "{{node_options}}": "\n".join([
@@ -788,7 +790,10 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     if nodeinfo.node:
         launcher_files.append(nodeinfo.node)
 
-    launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches, ctx.file._launcher_js])
+    launcher_files.extend(ctx.files._node_patches_files + [
+        ctx.file._node_patches,
+        ctx.file._launcher_preload,
+    ])
 
     # The coverage bootstrap code is required in the root node process, which will enable
     # coverage for child processes by setting NODE_V8_COVERAGE. Any js_binary could in
