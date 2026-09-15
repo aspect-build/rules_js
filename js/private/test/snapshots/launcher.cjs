@@ -29,7 +29,6 @@ const WORKSPACE_NAME = "_main"
 const ENTRY_POINT_PATH = "js/private/test/shellcheck.js"
 const NODE_PATH = "../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node"
 const NPM_PATH = ""
-const LAUNCHER_PATH = "js/private/node-bootstrap/launcher.cjs"
 const LOG_PREFIX_RULE_SET = "aspect_rules_js"
 const LOG_PREFIX_RULE = "js_binary"
 // The node options the launcher's own process was already started with, by the native stub.
@@ -38,30 +37,35 @@ const STUB_NODE_OPTIONS = ["--preserve-symlinks-main"]
 const ENV_CONFIGURES_NODE_STARTUP = false
 
 // ==============================================================================
-// Helpers
+// Shared helpers
 // ==============================================================================
 
-const IS_WINDOWS = process.platform === 'win32'
-
-// Normalizes paths when running on Windows.
+// The per-launch preload, resolved out of the runfiles by the stub before node started and
+// handed to this launcher as its first argument. The helpers both launchers use sit beside
+// it, so the same argument finds them, and finding them is the first thing done here because
+// everything below needs them.
 //
-// Example:
-// C:\Users\XUser\_bazel_XUser\7q7kkv32\execroot\A\b\C -> C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
-//
-// Only the separator changes. Node accepts forward slashes on Windows, so the separator
-// rewrite is all that is needed and the comparisons below can stay written with '/'.
-function normalizePath(p) {
-    if (!IS_WINDOWS) {
-        return p
-    }
-    return p.replace(/\\/g, '/')
-}
+// Made absolute against the directory this launcher was started in, before the chdir below
+// moves it: the stub resolves an rlocation to a relative path when it was given a relative
+// runfiles directory, and a relative specifier with no leading "./" is a package name to
+// require().
+const launcher = path.resolve(process.argv[2])
+const {
+    checkExecutableFile,
+    isDirectory,
+    isFile,
+    logDebug,
+    logError,
+    logFatal,
+    logInfo,
+    withSlashes,
+} = require(path.join(path.dirname(launcher), 'util.cjs'))
 
 // process.cwd() reports the native separator on Windows, so it has to be
 // normalized everywhere it is compared against or spliced into a path built with
 // '/'. Not hoisted into a constant, because the launcher chdir()s further down.
 function cwd() {
-    return normalizePath(process.cwd())
+    return withSlashes(process.cwd())
 }
 
 // The env values, node options, and fixed args below were spliced into
@@ -90,31 +94,6 @@ function setEnvIfUnset(name, value) {
     }
 }
 
-function isFile(p) {
-    try {
-        return fs.statSync(p).isFile()
-    } catch {
-        return false
-    }
-}
-
-function isDirectory(p) {
-    try {
-        return fs.statSync(p).isDirectory()
-    } catch {
-        return false
-    }
-}
-
-function isExecutable(p) {
-    try {
-        fs.accessSync(p, fs.constants.X_OK)
-        return true
-    } catch {
-        return false
-    }
-}
-
 // ==============================================================================
 // Environment
 // ==============================================================================
@@ -139,7 +118,10 @@ setEnvIfUnset("JS_BINARY__LOG_ERROR", "1")
 // If a --bazel-bindir <path> flag is passed it must be the first two
 // arguments. It is consumed by this launcher and used to set BAZEL_BINDIR,
 // overriding any value already set in the environment.
-const argv = process.argv.slice(2)
+//
+// The caller's arguments start at index 3: node's own argv[0] and argv[1], then the preload
+// the stub resolved above.
+const argv = process.argv.slice(3)
 if (argv.length > 0 && argv[0] === '--bazel-bindir') {
     if (argv.length < 2) {
         fs.writeSync(2, 'ERROR: --bazel-bindir flag requires a value\n')
@@ -153,43 +135,12 @@ if (argv.length > 0 && argv[0] === '--bazel-bindir') {
 // Prepare logging
 // ==============================================================================
 
+// Read by the shared log functions on every call, so it has to be set before the first of
+// them runs.
 process.env.JS_BINARY__LOG_PREFIX = `${LOG_PREFIX_RULE_SET}[${LOG_PREFIX_RULE}]`
 
-// Emit a log line to stderr.
-//
-// We use fs.writeSync rather than console.error, so that the line is flushed before the
-// execve() at the bottom replaces this process.
-function logTo(level, message) {
-    const collapsed = message.trim().replace(/\s+/g, ' ')
-    fs.writeSync(2, `${level}: ${process.env.JS_BINARY__LOG_PREFIX}: ${collapsed}\n`)
-}
-
-function logfFatal(message) {
-    if (process.env.JS_BINARY__LOG_FATAL) {
-        logTo('FATAL', message)
-    }
-}
-
-function logfError(message) {
-    if (process.env.JS_BINARY__LOG_ERROR) {
-        logTo('ERROR', message)
-    }
-}
-
-function logfInfo(message) {
-    if (process.env.JS_BINARY__LOG_INFO) {
-        logTo('INFO', message)
-    }
-}
-
-function logfDebug(message) {
-    if (process.env.JS_BINARY__LOG_DEBUG) {
-        logTo('DEBUG', message)
-    }
-}
-
 function exitWith(exitCode) {
-    logfDebug(`exit code: ${exitCode}`)
+    logDebug(`exit code: ${exitCode}`)
     process.exit(exitCode)
 }
 
@@ -198,10 +149,10 @@ function exitWith(exitCode) {
 // comes to run the entry point in this process has to remove the handler first, or
 // the program's own exceptions get reported as launcher failures.
 process.on('uncaughtException', (err) => {
-    // The message alone: logTo collapses whitespace, so a stack would come out as one
-    // unreadable line. It is still worth having at debug level.
-    logfFatal(String((err && err.message) || err))
-    logfDebug(String((err && err.stack) || err))
+    // The message alone: the log functions collapse whitespace, so a stack would come out
+    // as one unreadable line. It is still worth having at debug level.
+    logFatal(String((err && err.message) || err))
+    logDebug(String((err && err.stack) || err))
     exitWith(1)
 })
 
@@ -213,7 +164,7 @@ let runfiles = process.env.TEST_SRCDIR || process.env.RUNFILES_DIR
 if (!runfiles && process.env.RUNFILES_MANIFEST_FILE) {
     // Normalized before the suffix tests because on Windows Bazel hands out a
     // backslash-separated path, which would not match '/MANIFEST'.
-    const manifest = normalizePath(process.env.RUNFILES_MANIFEST_FILE)
+    const manifest = withSlashes(process.env.RUNFILES_MANIFEST_FILE)
     if (manifest.endsWith('.runfiles_manifest')) {
         // Bazel puts the manifest besides the runfiles with the suffix
         // .runfiles_manifest. For example, the runfiles directory is named
@@ -225,19 +176,19 @@ if (!runfiles && process.env.RUNFILES_MANIFEST_FILE) {
         // runfiles directory
         runfiles = manifest.slice(0, -'/MANIFEST'.length)
     } else {
-        logfFatal(`Unexpected RUNFILES_MANIFEST_FILE value ${manifest}`)
+        logFatal(`Unexpected RUNFILES_MANIFEST_FILE value ${manifest}`)
         exitWith(1)
     }
 }
 if (!runfiles) {
-    logfFatal('RUNFILES_DIR environment variable is not set')
+    logFatal('RUNFILES_DIR environment variable is not set')
     exitWith(1)
 }
-runfiles = normalizePath(runfiles)
+runfiles = withSlashes(runfiles)
 if (!path.isAbsolute(runfiles)) {
     // Must be absolute: the runfiles path may be relative to the cwd, and we may
     // be about to change directory.
-    runfiles = normalizePath(path.join(cwd(), runfiles))
+    runfiles = withSlashes(path.join(cwd(), runfiles))
 }
 process.env.JS_BINARY__RUNFILES = runfiles
 // Set RUNFILES_DIR if not already set so that tools such as @bazel/runfiles can
@@ -255,7 +206,7 @@ process.env.RUNFILES_DIR = process.env.RUNFILES_DIR || runfiles
 const execroot =
     process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
     process.env.JS_BINARY__EXECROOT
-        ? normalizePath(process.env.JS_BINARY__EXECROOT)
+        ? withSlashes(process.env.JS_BINARY__EXECROOT)
         : cwd()
 
 // Build actions are started in the execroot, so change into the root of the Bazel output tree,
@@ -272,7 +223,7 @@ if (
     process.env.BAZEL_BINDIR &&
     isDirectory(process.env.BAZEL_BINDIR)
 ) {
-    logfDebug(
+    logDebug(
         `changing directory to BAZEL_BINDIR (root of Bazel output tree) ${process.env.BAZEL_BINDIR}`
     )
     process.env.JS_BINARY__CHANGED_TO_BINDIR = '1'
@@ -284,7 +235,7 @@ if (
     process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
     !process.env.BAZEL_BINDIR
 ) {
-    logfFatal(
+    logFatal(
         'Expected BAZEL_BINDIR to be set when JS_BINARY__USE_EXECROOT_ENTRY_POINT is set'
     )
     exitWith(1)
@@ -294,7 +245,7 @@ function resolveExecrootBinPath(shortPath) {
     // The bash launcher gets this from `set -o nounset`; without it an unset BAZEL_BINDIR
     // silently builds '<execroot>/undefined/<path>' and only surfaces as a missing entry point.
     if (!process.env.BAZEL_BINDIR) {
-        logfFatal(
+        logFatal(
             'BAZEL_BINDIR must be set in the environment to the makevar $(BINDIR) to resolve a path in the Bazel output tree'
         )
         exitWith(1)
@@ -315,7 +266,7 @@ function resolveExecrootSrcPath(shortPath) {
 // Resolve a toolchain file that is a file of this workspace or another repository
 // in the runfiles tree, or an absolute path a user set in node_toolchain.
 function resolveToolchainPath(file) {
-    const normalized = normalizePath(file)
+    const normalized = withSlashes(file)
     if (path.isAbsolute(normalized)) {
         return normalized
     }
@@ -340,23 +291,10 @@ if (
 }
 
 process.env.JS_BINARY__NODE_BINARY = resolveToolchainPath(NODE_PATH)
-if (!isFile(process.env.JS_BINARY__NODE_BINARY)) {
-    logfFatal(`node binary '${process.env.JS_BINARY__NODE_BINARY}' not found`)
-    exitWith(1)
-}
-if (!IS_WINDOWS && !isExecutable(process.env.JS_BINARY__NODE_BINARY)) {
-    logfFatal(`node binary '${process.env.JS_BINARY__NODE_BINARY}' is not executable`)
-    exitWith(1)
-}
+checkExecutableFile('node binary', process.env.JS_BINARY__NODE_BINARY)
 
 if (NPM_PATH) {
     process.env.JS_BINARY__NPM_BINARY = resolveToolchainPath(NPM_PATH)
-}
-
-const launcher = resolveToolchainPath(LAUNCHER_PATH)
-if (!isFile(launcher)) {
-    logfFatal(`launcher '${launcher}' not found`)
-    exitWith(1)
 }
 
 // Gather node options
@@ -403,7 +341,7 @@ const runInProcess =
 
 if (runInProcess) {
     if (process.env.JS_BINARY__LOG_INFO) {
-        logfInfo(['running in this process', entryPoint, ...args].join(' '))
+        logInfo(['running in this process', entryPoint, ...args].join(' '))
     }
 
     process.argv = [process.argv[0], entryPoint, ...args]
@@ -472,7 +410,7 @@ if (runInProcess) {
     ]
 
     if (process.env.JS_BINARY__LOG_INFO) {
-        logfInfo(['running', process.env.JS_BINARY__NODE_BINARY, ...nodeArgs].join(' '))
+        logInfo(['running', process.env.JS_BINARY__NODE_BINARY, ...nodeArgs].join(' '))
     }
 
     if (!expectedExitCode) {
@@ -491,7 +429,7 @@ if (runInProcess) {
                     { ...process.env }
                 )
             } catch (e) {
-                logfDebug(`process.execve failed (${e.message}); falling back to spawn`)
+                logDebug(`process.execve failed (${e.message}); falling back to spawn`)
             }
         }
     }
@@ -529,7 +467,7 @@ if (runInProcess) {
     // process rather than an interposed 128+N exit code. That is what they would
     // have seen had this launcher been able to exec node instead of spawning it.
     function reraiseSignal(signal, exitCode) {
-        logfDebug(`exit code: ${exitCode}`)
+        logDebug(`exit code: ${exitCode}`)
         // Removing the last listener restores node's default disposition for the
         // signal, so killing ourselves with it now terminates this process.
         process.removeAllListeners('SIGTERM')
@@ -540,7 +478,7 @@ if (runInProcess) {
     }
 
     child.on('error', (err) => {
-        logfFatal(
+        logFatal(
             `failed to spawn node binary '${process.env.JS_BINARY__NODE_BINARY}': ${err.message}`
         )
         exitWith(127)
@@ -558,7 +496,7 @@ if (runInProcess) {
 
         if (expectedExitCode) {
             if (String(result) !== String(expectedExitCode)) {
-                logfError(
+                logError(
                     `expected exit code to be '${expectedExitCode}', but got '${result}'`
                 )
                 if (result === 0) {

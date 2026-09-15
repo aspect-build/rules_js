@@ -11,7 +11,8 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/plat
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/node-bootstrap/
 -r-xr-xr-x  0 0      0        2586 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/node-bootstrap/bootstrap.cjs
 -r-xr-xr-x  0 0      0       37120 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/node-bootstrap/fs.cjs
--r-xr-xr-x  0 0      0       15355 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/node-bootstrap/launcher.cjs
+-r-xr-xr-x  0 0      0       13710 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/node-bootstrap/launcher.cjs
+-r-xr-xr-x  0 0      0        3259 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/_main/js/private/node-bootstrap/util.cjs
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/bin/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/bin/nodejs/

@@ -295,6 +295,12 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:launcher.cjs"),
     ),
+    # Helpers shared by _launcher_preload and the generated launcher, required by both out of
+    # the directory _launcher_preload sits in.
+    "_launcher_util": attr.label(
+        allow_single_file = True,
+        default = Label("@aspect_rules_js//js/private/node-bootstrap:util.cjs"),
+    ),
     # Required by bootstrap.cjs only under `bazel coverage`
     "_coverage_bootstrap": attr.label(
         allow_single_file = True,
@@ -683,7 +689,6 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
                 for fixed_arg in fixed_args
                 for token in _shell_tokenize(fixed_arg)
             ]),
-            "{{launcher}}": _quote(ctx.file._launcher_preload.short_path),
             "{{log_prefix_rule_set}}": _quote(log_prefix_rule_set),
             "{{log_prefix_rule}}": _quote(log_prefix_rule),
             "{{node_options}}": "\n".join([
@@ -738,6 +743,16 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
 
     embedded_args, transformed_args = hermetic_launcher.append_runfile(
         file = launcher_js,
+        embedded_args = embedded_args,
+        transformed_args = transformed_args,
+    )
+
+    # The generated launcher's own first argument: the per-launch preload it requires, and
+    # the directory the helpers both launchers share are found in. Resolved here rather than
+    # from a short_path in the launcher because the stub reads the runfiles manifest, which
+    # is all a js_run_binary without a runfiles tree has.
+    embedded_args, transformed_args = hermetic_launcher.append_runfile(
+        file = ctx.file._launcher_preload,
         embedded_args = embedded_args,
         transformed_args = transformed_args,
     )
@@ -800,6 +815,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     launcher_files.extend(ctx.files._node_patches_files + [
         ctx.file._node_patches,
         ctx.file._launcher_preload,
+        ctx.file._launcher_util,
     ])
 
     # The coverage bootstrap code is required in the root node process, which will enable
