@@ -1,0 +1,15 @@
+packages:
+    - '.'
+
+# Disabling pnpm [hoisting](https://pnpm.io/settings/node-modules-settings#hoist) is recommended on
+# projects using rules_js so that pnpm outside of Bazel lays out a node_modules tree similar to what
+# rules_js lays out under Bazel (without a hidden node_modules/.pnpm/node_modules)
+hoist: false
+
+onlyBuiltDependencies: []
+
+# @aspect-build private GitHub registry. No .npmrc and no auth settings: credentials for it and for
+# the private @aspect-priv-npm scope on registry.npmjs.org come from credential-helper.sh.
+registries:
+    https://npm.pkg.github.com/:
+        scopes: ['@aspect-build']

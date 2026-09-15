@@ -143,6 +143,92 @@ def _run_token_helper(helper, npmrc_path, rctx):
     return token
 
 ################################################################################
+def _pnpm_workspace_registries(registries):
+    """Normalizes the `registries` setting of `pnpm-workspace.yaml` into a scope to URL map.
+
+    Both shapes pnpm accepts are handled: `{"@scope": url, "default": url}` and, since pnpm 11.23,
+    `{url: {"scopes": ["@scope", "@"], ...}}` where the bare `@` scope names the default registry.
+
+    Args:
+        registries: The parsed `registries` setting.
+
+    Returns:
+        A dict of scope (or `"default"`) to registry URL.
+    """
+    by_scope = {}
+    for key, value in registries.items():
+        if type(value) == "string":
+            by_scope[key] = utils.to_registry_url(value)
+        else:
+            for scope in value.get("scopes", []):
+                by_scope["default" if scope == "@" else scope] = utils.to_registry_url(key)
+    return by_scope
+
+def _pnpm_workspace_registry_urls(registries):
+    """Lists every registry URL the `registries` setting of `pnpm-workspace.yaml` declares.
+
+    Unlike `_pnpm_workspace_registries` this includes registries reached only through a
+    `prefix`, which have no scope to route by but still need credentials.
+
+    Args:
+        registries: The parsed `registries` setting.
+
+    Returns:
+        A list of registry URLs.
+    """
+    return [utils.to_registry_url(value if type(value) == "string" else key) for key, value in registries.items()]
+
+################################################################################
+def _credential_helper_for(url, helpers_by_scope):
+    """Picks the credential helper for a registry the way Bazel's `--credential_helper` scopes do.
+
+    Args:
+        url: The registry URL.
+        helpers_by_scope: A dict of scope to helper. A scope is a host, a `*.domain` wildcard that
+            also matches the domain itself, or `""` for every host.
+
+    Returns:
+        The helper of the exact host, else of the most specific wildcard, else the unscoped one,
+        else None.
+    """
+    host = url.split("//", 1)[-1].split("/", 1)[0].split(":", 1)[0]
+    if host in helpers_by_scope:
+        return helpers_by_scope[host]
+
+    labels = host.split(".")
+    for i in range(len(labels)):
+        wildcard = "*." + ".".join(labels[i:])
+        if wildcard in helpers_by_scope:
+            return helpers_by_scope[wildcard]
+
+    return helpers_by_scope.get("")
+
+################################################################################
+def _pnpm_auth_env(authorization):
+    """Converts Authorization headers into the environment variables pnpm reads registry auth from.
+
+    Args:
+        authorization: A dict of registry URL to Authorization header value, e.g.
+            `{"https://registry.corp.com/": "Bearer TOKEN"}`.
+
+    Returns:
+        A dict of URL-scoped `pnpm_config_` environment variables, e.g.
+        `{"pnpm_config_//registry.corp.com/:_authToken": "TOKEN"}`. pnpm 11.6 and newer read the
+        `pnpm_config_` prefix and prefer it over `npm_config_`.
+    """
+    env = {}
+    for url, header in authorization.items():
+        scheme, _, credential = header.partition(" ")
+        key = "pnpm_config_//" + url.split("//", 1)[-1].removesuffix("/") + "/:"
+        if scheme.lower() == "bearer":
+            env[key + "_authToken"] = credential
+        elif scheme.lower() == "basic":
+            env[key + "_auth"] = credential
+        else:
+            fail("unsupported Authorization scheme `{}` for registry {}".format(scheme, url))
+    return env
+
+################################################################################
 def _get_npm_auth(npmrc, npmrc_path, rctx):
     """Parses npm tokens, registries and scopes from `.npmrc`.
 
@@ -770,8 +856,12 @@ To disable this check, remove the `verify_patches` attribute from `npm_translate
 helpers = struct(
     gather_values_from_matching_names = _gather_values_from_matching_names,
     get_npm_auth = _get_npm_auth,
+    credential_helper_for = _credential_helper_for,
     get_npm_imports = _get_npm_imports,
     link_package = _link_package,
+    pnpm_auth_env = _pnpm_auth_env,
+    pnpm_workspace_registries = _pnpm_workspace_registries,
+    pnpm_workspace_registry_urls = _pnpm_workspace_registry_urls,
     to_apparent_repo_name = _to_apparent_repo_name,
     verify_node_modules_ignored = _verify_node_modules_ignored,
     verify_lifecycle_hooks_specified = _verify_lifecycle_hooks_specified,
