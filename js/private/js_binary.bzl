@@ -327,6 +327,12 @@ _NODE_STARTUP_ENV_PREFIXES = [
     # "LANG" also covers LANGUAGE.
     "LANG",
     "LC_",
+    # Read by the dynamic loader, not by node. glibc caches the LD_LIBRARY_PATH search list
+    # when the process starts, so a later assignment does not reach the dlopen() of a native
+    # addon's dependency, and LD_PRELOAD is only ever read at execve(). "DYLD_" is the macOS
+    # spelling of the same family.
+    "LD_",
+    "DYLD_",
 ]
 
 # Names matching a prefix above that node nonetheless does not need to see at startup.
