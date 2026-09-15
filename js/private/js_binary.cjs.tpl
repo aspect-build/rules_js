@@ -408,19 +408,21 @@ if (runInProcess) {
     // program that asks for its own exec arguments is left alone.
     const workerThreads = require('node:worker_threads')
     const RealWorker = workerThreads.Worker
+    // The node options too, not just the bootstrap: on the exec path a worker inherits node's
+    // whole command line, so dropping them here would lose --preserve-symlinks-main and let a
+    // worker's entry point resolve out of the runfiles tree (aspect-build/rules_js#362).
+    const workerExecArgv = [
+        '--require',
+        process.env.JS_BINARY__NODE_PATCHES,
+        ...nodeOptions,
+    ]
     workerThreads.Worker = class Worker extends RealWorker {
-        constructor(filename, options = {}) {
+        constructor(filename, options) {
             super(
                 filename,
-                options.execArgv
+                options && options.execArgv
                     ? options
-                    : {
-                          ...options,
-                          execArgv: [
-                              '--require',
-                              process.env.JS_BINARY__NODE_PATCHES,
-                          ],
-                      }
+                    : { ...options, execArgv: workerExecArgv }
             )
         }
     }
