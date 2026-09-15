@@ -11,3 +11,7 @@ min/
 npm/private/test/vendored/
 js/private/worker/worker.js
 js/private/worker/src/worker_protocol.ts
+e2e/pnp_zero_install/.pnp.*
+e2e/pnp_zero_install/.yarn/**
+e2e/pnp_zero_install_yarn3/.pnp.*
+e2e/pnp_zero_install_yarn3/.yarn/**
