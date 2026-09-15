@@ -28,12 +28,10 @@ use_repo(npm, "npm")
 ```
 """
 
-load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 load("//npm/private:npm_import.bzl", "npm_import", "npm_import_lib")
 load("//npm/private:npm_translate_lock.bzl", "npm_translate_lock_lib", "parse_and_verify_lock")
 load("//npm/private:npm_translate_lock_generate.bzl", "generate_repository_files")
 load("//npm/private:npm_translate_lock_helpers.bzl", npm_translate_lock_helpers = "helpers")
-load("//npm/private:npmrc.bzl", "parse_npmrc")
 load("//npm/private:pnpm_extension.bzl", "DEFAULT_PNPM_REPO_NAME", "resolve_pnpm_repositories")
 load("//npm/private:pnpm_repository.bzl", "pnpm_repository", _DEFAULT_PNPM_VERSION = "DEFAULT_PNPM_VERSION", _LATEST_PNPM_VERSION = "LATEST_PNPM_VERSION")
 
@@ -138,27 +136,8 @@ def _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_c
 
     module_ctx.report_progress("Generating starlark for npm dependencies")
 
-    registries = {}
-    npm_auth = {}
-    if attr.npmrc:
-        npmrc = parse_npmrc(module_ctx.read(attr.npmrc))
-        (registries, npm_auth) = npm_translate_lock_helpers.get_npm_auth(npmrc, module_ctx.path(attr.npmrc), module_ctx)
-
-    if attr.use_home_npmrc:
-        home_directory = repo_utils.get_home_directory(module_ctx)
-        if home_directory:
-            home_npmrc_path = "{}/{}".format(home_directory, ".npmrc")
-            if module_ctx.path(home_npmrc_path).exists:
-                home_npmrc = parse_npmrc(module_ctx.read(home_npmrc_path))
-
-                (registries2, npm_auth2) = npm_translate_lock_helpers.get_npm_auth(home_npmrc, home_npmrc_path, module_ctx)
-                registries.update(registries2)
-                npm_auth.update(npm_auth2)
-        else:
-            # buildifier: disable=print
-            print("""
-WARNING: Cannot determine home directory in order to load home `.npmrc` file in module extension `npm_translate_lock(name = "{attr_name}")`.
-""".format(attr_name = attr.name))
+    registries = state.npm_registries()
+    npm_auth = state.npm_auth()
 
     imports = npm_translate_lock_helpers.get_npm_imports(
         state = state,

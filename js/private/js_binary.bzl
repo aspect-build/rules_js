@@ -289,6 +289,10 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
+    "_launcher_js": attr.label(
+        allow_single_file = True,
+        default = Label("@aspect_rules_js//js/private/node-bootstrap:launcher.cjs"),
+    ),
     # Required by bootstrap.cjs only under `bazel coverage`
     "_coverage_bootstrap": attr.label(
         allow_single_file = True,
@@ -582,15 +586,13 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
         "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
+        "{{launcher}}": ctx.file._launcher_js.short_path,
         "{{node_options}}": "\n".join([
             _NODE_OPTION.format(value = value)
             for value in node_options.all
         ]),
-        "{{node_patches}}": ctx.file._node_patches.short_path,
-        "{{node_wrapper}}": paths.node_wrapper_path,
         "{{node}}": paths.node_path,
         "{{npm}}": paths.npm_path,
-        "{{npm_wrapper}}": paths.npm_wrapper_path,
         "{{workspace_name}}": ctx.workspace_name,
     }
 
@@ -794,7 +796,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     if nodeinfo.node:
         launcher_files.append(nodeinfo.node)
 
-    launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches])
+    launcher_files.extend(ctx.files._node_patches_files + [ctx.file._node_patches, ctx.file._launcher_js])
 
     # The coverage bootstrap code is required in the root node process, which will enable
     # coverage for child processes by setting NODE_V8_COVERAGE. Any js_binary could in

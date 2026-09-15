@@ -50,6 +50,9 @@ WARNING: `update_pnpm_lock` attribute in `npm_translate_lock(name = "{rctx_name}
 
     _init_npmrc(priv, rctx, attr)
 
+    # Applied after the .npmrc since pnpm gives pnpm-workspace.yaml registries precedence
+    _init_workspace_registries(priv)
+
     if _should_update_pnpm_lock(priv):
         _copy_update_input_files(priv, rctx, attr)
         _copy_unspecified_input_files(priv, rctx, attr)
@@ -163,6 +166,19 @@ def _init_workspace(priv, rctx, is_windows):
                 print(msg)
             else:
                 fail(msg)
+
+################################################################################
+def _init_workspace_registries(priv):
+    registries = helpers.pnpm_workspace_registries(priv["pnpm_settings"].get("registries") or {})
+    if "default" in registries:
+        priv["default_registry"] = registries.pop("default")
+    priv["npm_registries"].update(registries)
+
+################################################################################
+def _registry_urls(priv):
+    urls = [priv["default_registry"]] + priv["npm_registries"].values()
+    urls += helpers.pnpm_workspace_registry_urls(priv["pnpm_settings"].get("registries") or {})
+    return {url: None for url in urls}.keys()
 
 ################################################################################
 def _init_npmrc(priv, rctx, attr):
@@ -363,6 +379,9 @@ def _load_npmrc(priv, rctx, attr, npmrc_path, npmrc_label):
         priv["default_registry"] = utils.to_registry_url(contents["registry"])
 
     (registries, auth) = helpers.get_npm_auth(contents, npmrc_path, rctx)
+
+    # TODO(v4): drop `.npmrc` registry routing once pnpm < 11 support is dropped;
+    # pnpm 11 declares registries in pnpm-workspace.yaml
     priv["npm_registries"].update(registries)
     priv["npm_auth"].update(auth)
 
@@ -534,6 +553,7 @@ def _new(rctx, mod, attr):
         pnpm_patch_for = lambda name: _patch_path_for(priv, name),
         only_built_dependencies = lambda: priv["only_built_dependencies"],
         npm_registries = lambda: priv["npm_registries"],
+        registry_urls = lambda: _registry_urls(priv),
         npm_auth = lambda: priv["npm_auth"],
         root_package = lambda: priv["root_package"],
         set_input_hash = lambda label, value: _set_input_hash(priv, label, value),

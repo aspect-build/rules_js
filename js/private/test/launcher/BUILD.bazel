@@ -611,3 +611,76 @@ assert_contains(
     actual = ":throw_deep_out.txt",
     expected = "at inner",
 )
+
+# ==================================================================================================
+# Case 10: a user node_options preload runs after the launcher has done its setup.
+#
+# launcher.cjs is node's first --require and bootstrap.cjs is loaded by it, so a preload from
+# node_options must see the bindir as cwd, the JS_BINARY__ environment complete, the fs patches
+# applied once, and an execArgv that hands children bootstrap.cjs rather than launcher.cjs.
+
+js_binary(
+    name = "preload_probe_bin",
+    data = ["preload_probe.cjs"],
+    entry_point = "exit_with.mjs",
+    fixed_args = ["0"],
+    node_options = [
+        "--require",
+        "$$RUNFILES_DIR/$(rlocationpath :preload_probe.cjs)",
+    ],
+)
+
+js_run_binary(
+    name = "preload_probe_run",
+    silent_on_success = False,
+    stdout = "preload_probe_stdout.txt",
+    tool = ":preload_probe_bin",
+)
+
+[
+    assert_contains(
+        name = "preload_probe_{}_test".format(invariant.replace(" ", "_")),
+        actual = ":preload_probe_stdout.txt",
+        expected = "{}: true".format(invariant),
+    )
+    for invariant in [
+        "preload cwd is bindir",
+        "preload sees node wrapper",
+        "preload sees node patches",
+        "preload runs after bootstrap",
+        "preload execArgv[1] is bootstrap",
+        "preload execArgv has no launcher",
+        "child depth is two",
+        "child execArgv has no launcher",
+    ]
+]
+
+# ==================================================================================================
+# Case 11: a child spawned from a worker thread gets the bootstrap, not the launcher.
+#
+# A worker runs launcher.cjs too, but with node's original exec arguments, so it is the one
+# place the launcher could leak into a child and run a second launch there.
+
+js_binary(
+    name = "worker_fork_probe_bin",
+    entry_point = "worker_fork_probe.mjs",
+)
+
+js_run_binary(
+    name = "worker_fork_probe_run",
+    silent_on_success = False,
+    stdout = "worker_fork_probe_stdout.txt",
+    tool = ":worker_fork_probe_bin",
+)
+
+[
+    assert_contains(
+        name = "worker_fork_probe_{}_test".format(invariant.replace(" ", "_")),
+        actual = ":worker_fork_probe_stdout.txt",
+        expected = "{}: true".format(invariant),
+    )
+    for invariant in [
+        "worker execArgv is bootstrap",
+        "worker child path not doubled",
+    ]
+]

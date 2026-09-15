@@ -100,6 +100,8 @@ run_target "$REPO_ROOT" "//js/private/test/image:default_test_update_all" "js/pr
 run_target "$REPO_ROOT" "//js/private/test/image:custom_owner_test_update_all" "js/private/test/image custom_owner"
 run_target "$REPO_ROOT" "//js/private/test/image:regex_edge_cases_test_update_all" "js/private/test/image regex_edge_cases"
 run_target "$REPO_ROOT" "//js/private/test/image:custom_layers_nomatch_test_update_all" "js/private/test/image custom_layers_nomatch"
+run_target "$REPO_ROOT" "//js/private/test/image/non_ascii:custom_layer_groups_test_update_all" "js/private/test/image/non_ascii custom_layer_groups"
+run_target "$REPO_ROOT" "//js/private/test/image/platform_deps:rspack_linux_arm64_test_update_all" "js/private/test/image/platform_deps rspack_linux_arm64"
 
 ##############################################################################
 # GENERATED SOURCES

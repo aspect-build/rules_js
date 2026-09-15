@@ -100,6 +100,32 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             Custom postinstalls are additive and joined with ` && ` when there are multiple matches for a package.
             More specific matches are appended to previous matches.
         """),
+        "credential_helpers": attr.label_keyed_string_dict(doc = """
+            [Bazel credential helpers](https://bazel.build/reference/command-line-reference#flag--credential_helper)
+            to authenticate `pnpm install` with when `update_pnpm_lock` is enabled, keyed by helper with the
+            scope of registries it serves as the value, like the `[scope=]path` syntax of `--credential_helper`:
+
+            ```
+            credential_helpers = {
+                "//tools:gcloud-helper": "*.pkg.dev",
+                "//tools:github-helper": "npm.pkg.github.com",
+                "//tools:default-helper": "",
+            }
+            ```
+
+            A scope is a registry host, a `*.` wildcard matching a domain and its subdomains, or empty for every
+            registry. A registry is matched the way Bazel does it: exact host first, then the most specific
+            wildcard, then the unscoped helper. A registry no helper covers is left unauthenticated.
+
+            Bazel's own `--credential_helper` flag only covers downloads made by Bazel, so `npm_import` fetches
+            already honor it, but `pnpm install` run by `update_pnpm_lock` does not. Point this at the same helpers
+            with the same scopes and rules_js invokes them with the credential helper protocol for the default
+            registry and each registry declared in `pnpm-workspace.yaml` or the `.npmrc`, then passes the
+            credentials to pnpm through its environment. No auth settings, or even an `.npmrc`, are needed for
+            private registries.
+
+            Only used when `update_pnpm_lock` is True. Requires pnpm 11 or newer.
+        """),
         "data": attr.label_list(doc = """
             Data files required by this repository rule when auto-updating the pnpm lock file.
 
@@ -194,6 +220,10 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 
             When set, the `.npmrc` file specified is parsed and npm auth tokens and basic authentication configuration
             specified in the file are passed to the Bazel downloader for authentication with private npm registries.
+
+            `@scope:registry` entries route scoped packages to their registry. With pnpm 11 and newer, declare
+            registries with the `registries` setting of `pnpm-workspace.yaml` instead; routing from `.npmrc` is
+            kept for older pnpm versions and will be removed in rules_js 4.
 
             A [`tokenHelper`](https://pnpm.io/npmrc#urltokenhelper) is also honored: rules_js runs the executable it
             names and uses the token it prints on stdout. The helper path may be absolute or relative to this
@@ -462,6 +492,47 @@ STDERR:
             fail(msg)
 
 ################################################################################
+def _credential_helper_env(rctx, attr, state):
+    helpers_by_scope = {scope: helper for helper, scope in attr.credential_helpers.items()}
+
+    urls_by_helper = {}
+    for url in state.registry_urls():
+        helper = helpers.credential_helper_for(url, helpers_by_scope)
+        if helper:
+            urls_by_helper.setdefault(helper, []).append(url)
+
+    env = {}
+    for helper, urls in urls_by_helper.items():
+        rctx.report_progress("Fetching registry credentials from `{}`".format(helper))
+
+        result = rctx.execute(
+            [
+                _host_node_path(rctx, attr),
+                rctx.path(Label("//npm/private:credential_helper.mjs")),
+                rctx.path(helper),
+            ] + urls,
+            quiet = True,
+        )
+        if result.return_code:
+            # stdout carries the credentials, so only stderr is reported
+            fail("""
+
+ERROR: credential helper `{helper}` of `npm_translate_lock(name = "{rctx_name}")` exited with status {status}.
+
+STDERR:
+{stderr}
+""".format(
+                helper = helper,
+                rctx_name = attr.name,
+                status = result.return_code,
+                stderr = result.stderr,
+            ))
+
+        env.update(helpers.pnpm_auth_env(json.decode(result.stdout)))
+
+    return env
+
+################################################################################
 def _update_pnpm_lock(rctx, attr, state):
     _execute_preupdate_scripts(rctx, attr, state)
 
@@ -493,6 +564,7 @@ INFO: Updating `{pnpm_lock}` file as its inputs have changed since the last upda
             _host_node_path(rctx, attr),
             rctx.path(attr.use_pnpm),
         ] + update_cmd,
+        environment = _credential_helper_env(rctx, attr, state),
         # Run pnpm in the external repository so that we are hermetic and all data files that are required need
         # to be specified. This requirement means that if any data file changes then the update command will be
         # re-run. For cases where all data files cannot be specified a user can simply turn off auto-updates
