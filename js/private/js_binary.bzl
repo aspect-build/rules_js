@@ -402,9 +402,10 @@ def _shell_tokenize(value):
     plain string.
 
     Backslash escapes are deliberately not interpreted (bash would have), so a
-    Windows-style path in a fixed_arg survives intact. The one place that still shows is
-    `\\$VAR`, which bash passes through literally and this launcher expands; quote it
-    instead if you want a literal `$`.
+    Windows-style path in a fixed_arg survives intact. Two places show that: `\\$VAR`, which
+    bash passes through literally and this launcher expands, and an escaped separator such as
+    `a\\ b`, which bash makes one token and this splits into two. Quote the argument in either
+    case to get bash's answer.
 
     Args:
         value: the fixed_arg to split

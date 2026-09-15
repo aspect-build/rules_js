@@ -280,6 +280,14 @@ if (
 }
 
 function resolveExecrootBinPath(shortPath) {
+    // The bash launcher gets this from `set -o nounset`; without it an unset BAZEL_BINDIR
+    // silently builds '<execroot>/undefined/<path>' and only surfaces as a missing entry point.
+    if (!process.env.BAZEL_BINDIR) {
+        logfFatal(
+            'BAZEL_BINDIR must be set in the environment to the makevar $(BINDIR) to resolve a path in the Bazel output tree'
+        )
+        exitWith(1)
+    }
     if (shortPath.startsWith('../')) {
         return `${execroot}/${process.env.BAZEL_BINDIR}/external/${shortPath.slice(3)}`
     }
