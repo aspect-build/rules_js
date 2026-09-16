@@ -1,0 +1,24 @@
+name: Aspect Workflows Warming
+
+# Archives a Bazel output base for the `aspect-large` runner pool so each job
+# starts from a warm repository cache instead of fetching everything cold.
+on:
+    schedule:
+        - cron: '0 8 * * *'
+    workflow_dispatch:
+
+jobs:
+    warming-archive:
+        name: Aspect Workflows Warming
+        runs-on: [self-hosted, aspect-workflows, aspect-large]
+        timeout-minutes: 90
+        permissions:
+            contents: read
+            id-token: write
+        steps:
+            - uses: actions/checkout@v6
+            - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
+              with:
+                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+            - name: Warming
+              run: aspect ci warming --task:name warming -- //...
