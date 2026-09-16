@@ -494,6 +494,8 @@ js_run_binary(
     )
     for invariant in [
         "worker execArgv is bootstrap",
+        "worker keeps node options",
+        "worker ran the bootstrap",
         "worker child path not doubled",
     ]
 ]
