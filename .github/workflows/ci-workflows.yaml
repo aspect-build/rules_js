@@ -137,8 +137,8 @@ jobs:
                       slug=${slug//./_}
                     fi
                     # Slow workspaces get a larger runner: the Aspect Workflows `aspect-large`
-                    # pool (32 vCPU spot, silo-aws). Fork PRs get no repo secrets and must
-                    # not run on self-hosted runners, so they stay on GitHub's 32-core runner.
+                    # pool. Fork PRs get no repo secrets and must not run on self-hosted
+                    # runners, so they stay on GitHub's 32-core runner.
                     runner='"ubuntu-latest"'
                     if [[ "$p" == "." || "$p" == "examples" || "$p" == "e2e/js_image_oci" ]]; then
                       if [[ "${IS_FORK}" == "true" ]]; then
