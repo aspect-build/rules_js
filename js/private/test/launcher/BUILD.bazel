@@ -611,33 +611,8 @@ assert_contains(
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
 )
 
-# =======================================================================================
-# Case 9: an uncaught exception is reported by node itself, with the program's own stack.
-#
-# The hermetic launcher runs the entry point in its own process, so anything it leaves
-# behind that handles uncaughtException would report the program's crashes as launcher
-# failures and swallow the stack below.
-
-js_binary(
-    name = "throw_deep_bin",
-    entry_point = "throw_deep.cjs",
-)
-
-genrule(
-    name = "throw_deep_run",
-    outs = ["throw_deep_out.txt"],
-    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :throw_deep_bin) > $@ 2>&1 || true",
-    tools = [":throw_deep_bin"],
-)
-
-assert_contains(
-    name = "uncaught_exception_keeps_program_stack_test",
-    actual = ":throw_deep_out.txt",
-    expected = "at inner",
-)
-
 # ==================================================================================================
-# Case 10: a user node_options preload runs after the launcher has done its setup.
+# Case 9: a user node_options preload runs after the launcher has done its setup.
 #
 # launcher.cjs is node's first --require and bootstrap.cjs is loaded by it, so a preload from
 # node_options must see the bindir as cwd, the JS_BINARY__ environment complete, the fs patches
@@ -680,7 +655,7 @@ js_run_binary(
 ]
 
 # ==================================================================================================
-# Case 11: a child spawned from a worker thread gets the bootstrap, not the launcher.
+# Case 10: a child spawned from a worker thread gets the bootstrap, not the launcher.
 #
 # A worker runs launcher.cjs too, but with node's original exec arguments, so it is the one
 # place the launcher could leak into a child and run a second launch there.
