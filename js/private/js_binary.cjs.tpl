@@ -140,7 +140,11 @@ function exitWith(exitCode) {
 // had to resolve this launcher and the preload out of them, and it exports what it found as
 // RUNFILES_DIR. This only republishes that as JS_BINARY__RUNFILES, the variable this rule set
 // documents and the paths below are built from.
-let runfiles = process.env.TEST_SRCDIR || process.env.RUNFILES_DIR
+//
+// TEST_SRCDIR is not consulted, though the bash launcher consults it first. Bazel sets both
+// for every test, so it adds nothing; and where the two could disagree, RUNFILES_DIR is the
+// one to believe, because it names the tree this launcher itself was resolved out of.
+let runfiles = process.env.RUNFILES_DIR
 if (!runfiles) {
     logFatal('RUNFILES_DIR environment variable is not set')
     exitWith(1)
