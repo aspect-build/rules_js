@@ -60,13 +60,6 @@ const {
     withSlashes,
 } = require(path.join(path.dirname(launcher), 'util.cjs'))
 
-// process.cwd() reports the native separator on Windows, so it has to be
-// normalized everywhere it is compared against or spliced into a path built with
-// '/'. Not hoisted into a constant, because the launcher chdir()s further down.
-function cwd() {
-    return withSlashes(process.cwd())
-}
-
 // The env values, node options, and fixed args below were spliced into
 // double-quoted bash strings before this launcher was ported to JavaScript, so
 // shell parameter expansion happened at launch time and users depend on it. For
@@ -137,19 +130,16 @@ function exitWith(exitCode) {
 // ==============================================================================
 
 // The hermetic_launcher stub should have already initialized RUNFILES_DIR.
-let runfiles = process.env.RUNFILES_DIR
+const runfiles = process.env.RUNFILES_DIR
 if (!runfiles) {
     logFatal('RUNFILES_DIR environment variable is not set')
     exitWith(1)
 }
 
 // JS_BINARY__RUNFILES is documented to be an absolute path to the runfiles
-// directory, so we need to uphold that guarantee.
-runfiles = withSlashes(runfiles)
-if (!path.isAbsolute(runfiles)) {
-    runfiles = withSlashes(path.join(cwd(), runfiles))
-}
-process.env.JS_BINARY__RUNFILES = runfiles
+// directory, so we need to uphold that guarantee. Resolving it here, before the
+// chdir below, is what makes a relative one come out right.
+process.env.JS_BINARY__RUNFILES = withSlashes(path.resolve(runfiles))
 
 // ==============================================================================
 // Prepare to run main program
@@ -163,7 +153,7 @@ const execroot =
     process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT &&
     process.env.JS_BINARY__EXECROOT
         ? withSlashes(process.env.JS_BINARY__EXECROOT)
-        : cwd()
+        : withSlashes(process.cwd())
 
 // Build actions are started in the execroot, so change into the root of the Bazel output tree,
 // which is where js_binary programs run. See
@@ -222,14 +212,15 @@ function resolveExecrootSrcPath(shortPath) {
 // Resolve a toolchain file that is a file of this workspace or another repository
 // in the runfiles tree, or an absolute path a user set in node_toolchain.
 function resolveToolchainPath(file) {
-    const normalized = withSlashes(file)
-    if (path.isAbsolute(normalized)) {
-        return normalized
+    // Only an absolute path can arrive with backslashes, from a node_toolchain a
+    // user configured; a short path baked in above uses '/' on every platform.
+    if (path.isAbsolute(file)) {
+        return withSlashes(file)
     }
     if (process.env.JS_BINARY__NO_RUNFILES) {
-        return resolveExecrootSrcPath(normalized)
+        return resolveExecrootSrcPath(file)
     }
-    return `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${normalized}`
+    return `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${file}`
 }
 
 // Everything below is resolved here only because node needs it on its command line
