@@ -148,8 +148,7 @@ if (!runfiles) {
 }
 
 // JS_BINARY__RUNFILES is documented to be an absolute path to the runfiles
-// directory, so we need to uphold that guarantee. Resolving it here, before the
-// chdir below, is what makes a relative one come out right.
+// directory, so we need to uphold that guarantee.
 process.env.JS_BINARY__RUNFILES = withSlashes(path.resolve(runfiles))
 
 // ==============================================================================
