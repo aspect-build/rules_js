@@ -147,40 +147,24 @@ function exitWith(exitCode) {
 // Initialize RUNFILES environment variable
 // ==============================================================================
 
+// Nothing here discovers the runfiles: the stub already did, before node started, because it
+// had to resolve this launcher and the preload out of them, and it exports what it found as
+// RUNFILES_DIR. This only republishes that as JS_BINARY__RUNFILES, the variable this rule set
+// documents and the paths below are built from.
 let runfiles = process.env.TEST_SRCDIR || process.env.RUNFILES_DIR
-if (!runfiles && process.env.RUNFILES_MANIFEST_FILE) {
-    // Normalized before the suffix tests because on Windows Bazel hands out a
-    // backslash-separated path, which would not match '/MANIFEST'.
-    const manifest = withSlashes(process.env.RUNFILES_MANIFEST_FILE)
-    if (manifest.endsWith('.runfiles_manifest')) {
-        // Bazel puts the manifest besides the runfiles with the suffix
-        // .runfiles_manifest. For example, the runfiles directory is named
-        // my_binary.runfiles then the manifest is beside the runfiles directory
-        // and named my_binary.runfiles_manifest
-        runfiles = manifest.slice(0, -'_manifest'.length)
-    } else if (manifest.endsWith('/MANIFEST')) {
-        // Bazel for windows puts the manifest file named MANIFEST in the
-        // runfiles directory
-        runfiles = manifest.slice(0, -'/MANIFEST'.length)
-    } else {
-        logFatal(`Unexpected RUNFILES_MANIFEST_FILE value ${manifest}`)
-        exitWith(1)
-    }
-}
 if (!runfiles) {
     logFatal('RUNFILES_DIR environment variable is not set')
     exitWith(1)
 }
+// Slash-separated, because everything downstream concatenates onto it with '/', and absolute,
+// because a relative one is resolved against the directory this launcher was started in and
+// the chdir below is about to leave it. The stub hands over a relative path when it was given
+// one, which is what a genrule invoking a js_binary through another binary's runfiles does.
 runfiles = withSlashes(runfiles)
 if (!path.isAbsolute(runfiles)) {
-    // Must be absolute: the runfiles path may be relative to the cwd, and we may
-    // be about to change directory.
     runfiles = withSlashes(path.join(cwd(), runfiles))
 }
 process.env.JS_BINARY__RUNFILES = runfiles
-// Set RUNFILES_DIR if not already set so that tools such as @bazel/runfiles can
-// locate runfiles.
-process.env.RUNFILES_DIR = process.env.RUNFILES_DIR || runfiles
 
 // ==============================================================================
 // Prepare to run main program
