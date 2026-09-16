@@ -314,9 +314,32 @@ _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 
 # The same three, in the JavaScript launcher's syntax. setEnv/setEnvIfUnset and
 # addNodeOption are defined by js_binary.cjs.tpl.
-_ENV_SET_JS = """setEnv({quoted_var}, {quoted_value})"""
-_ENV_SET_IFF_NOT_SET_JS = """setEnvIfUnset({quoted_var}, {quoted_value})"""
+_ENV_SET_JS = """setEnv({quoted_var}, {value_expr})"""
+_ENV_SET_IFF_NOT_SET_JS = """setEnvIfUnset({quoted_var}, {value_expr})"""
 _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
+
+# An image runs the launcher from the container's working directory on whatever CPU the
+# container has, so these two values, baked in here at analysis time, are wrong there.
+# js_image_layer sets global.JS_IMAGE_LAYER to pick the other side of each ternary.
+_JS_IMAGE_LAYER_OVERRIDES = {
+    "JS_BINARY__BINDIR": "process.cwd()",
+    "JS_BINARY__TARGET_CPU": "os.machine()",
+}
+
+def _env_value_js(var, value):
+    """The JavaScript expression a setEnv call takes, allowing for js_image_layer's override.
+
+    Args:
+        var: the environment variable name
+        value: the value baked in at analysis time
+
+    Returns:
+        a JavaScript expression
+    """
+    override = _JS_IMAGE_LAYER_OVERRIDES.get(var)
+    if override:
+        return "global.JS_IMAGE_LAYER ? {} : {}".format(override, _quote(value))
+    return _quote(value)
 
 # Environment variables node reads as it starts. When these variables are set in the env
 # attribute on js_binary, the hermetic launcher needs to re-launch node for them to take
@@ -678,7 +701,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
             "{{envs}}": "\n".join([
                 (_ENV_SET_IFF_NOT_SET_JS if iff_not_set else _ENV_SET_JS).format(
                     quoted_var = _quote(var),
-                    quoted_value = _quote(value),
+                    value_expr = _env_value_js(var, value),
                 )
                 for (var, value, iff_not_set) in envs
             ]),

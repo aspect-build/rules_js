@@ -189,8 +189,10 @@ _PATCH_POINT = "This line is replaced by js_image_layer to make the launcher her
 # for why this is needed.
 _LAUNCHER_PREAMBLE = '# patched by js_image_layer for hermeticity\nexport BAZEL_BINDIR="."'
 
-# The JavaScript launcher's equivalent.
-_JS_LAUNCHER_PREAMBLE = "// patched by js_image_layer for hermeticity\nprocess.env.BAZEL_BINDIR = '.'"
+# The JavaScript launcher's equivalent. The global tells the launcher to work out its bindir
+# and CPU from the container rather than use the values baked in at analysis time; see
+# _JS_IMAGE_LAYER_OVERRIDES in js_binary.bzl.
+_JS_LAUNCHER_PREAMBLE = "// patched by js_image_layer for hermeticity\nglobal.JS_IMAGE_LAYER = true\nprocess.env.BAZEL_BINDIR = '.'"
 
 def _launcher_js(binary):
     """The generated JavaScript launcher of a js_binary, or None when it uses the bash launcher."""
@@ -213,17 +215,10 @@ def _write_js_launcher(ctx, launcher_js):
     "Sanitizes the JavaScript launcher the way _write_launcher does the bash one."
     launcher = ctx.actions.declare_file("%s_launcher.cjs" % ctx.label.name)
 
-    substitutions = {
-        "// " + _PATCH_POINT: _JS_LAUNCHER_PREAMBLE,
-        'setEnv("JS_BINARY__BINDIR", "%s")' % launcher_js.root.path: 'setEnv("JS_BINARY__BINDIR", process.cwd())',
-        'setEnv("JS_BINARY__TARGET_CPU", "%s")' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'setEnv("JS_BINARY__TARGET_CPU", os.machine())',
-    }
-    substitutions['setEnv("JS_BINARY__BINDIR", "%s")' % ctx.bin_dir.path] = 'setEnv("JS_BINARY__BINDIR", process.cwd())'
-
     ctx.actions.expand_template(
         template = launcher_js,
         output = launcher,
-        substitutions = substitutions,
+        substitutions = {"// " + _PATCH_POINT: _JS_LAUNCHER_PREAMBLE},
         is_executable = True,
     )
     return launcher

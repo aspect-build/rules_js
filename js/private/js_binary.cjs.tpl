@@ -15,6 +15,7 @@
 
 'use strict'
 
+// The replacement sets global.JS_IMAGE_LAYER, which the env block below reads.
 // This line is replaced by js_image_layer to make the launcher hermetic.
 
 const fs = require('node:fs')
