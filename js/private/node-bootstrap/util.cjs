@@ -9,6 +9,7 @@
 'use strict'
 
 const fs = require('node:fs')
+const path = require('node:path')
 
 const IS_WINDOWS = process.platform === 'win32'
 
@@ -61,6 +62,41 @@ function fatal(message) {
     process.exit(1)
 }
 
+function exitWith(exitCode) {
+    logDebug(`exit code: ${exitCode}`)
+    process.exit(exitCode)
+}
+
+// ==============================================================================
+// Environment
+// ==============================================================================
+
+// The env values, node options and fixed args the generated launcher applies were spliced
+// into double-quoted bash strings before it was ported to JavaScript, so shell parameter
+// expansion happened at launch time and users depend on it. For example,
+// examples/stack_traces passes
+// node_options = ["--require", "$$JS_BINARY__RUNFILES/$$JS_BINARY__WORKSPACE/..."].
+// Only $VAR / ${VAR} expansion is reproduced here; command substitution is not, and the
+// result is not re-split on whitespace the way bash would have.
+function expandEnvRefs(value) {
+    return value.replace(
+        /\$(?:\{([A-Za-z_][A-Za-z0-9_]*)\}|([A-Za-z_][A-Za-z0-9_]*))/g,
+        (_match, braced, bare) => process.env[braced || bare] || ''
+    )
+}
+
+function setEnv(name, value) {
+    process.env[name] = expandEnvRefs(value)
+}
+
+// An empty value counts as unset, matching the `[[ -z ]]` test the bash launcher
+// writes for the same env entry.
+function setEnvIfUnset(name, value) {
+    if (!process.env[name]) {
+        process.env[name] = expandEnvRefs(value)
+    }
+}
+
 // ==============================================================================
 // Paths
 // ==============================================================================
@@ -110,10 +146,86 @@ function checkExecutableFile(what, p) {
     }
 }
 
+// Resolve a short path in the Bazel output tree against the execroot the launcher was
+// started in.
+function resolveExecrootBinPath(execroot, shortPath) {
+    // The bash launcher gets this from `set -o nounset`; without it an unset BAZEL_BINDIR
+    // silently builds '<execroot>/undefined/<path>' and only surfaces as a missing entry point.
+    if (!process.env.BAZEL_BINDIR) {
+        logFatal(
+            'BAZEL_BINDIR must be set in the environment to the makevar $(BINDIR) to resolve a path in the Bazel output tree'
+        )
+        exitWith(1)
+    }
+    if (shortPath.startsWith('../')) {
+        return `${execroot}/${process.env.BAZEL_BINDIR}/external/${shortPath.slice(3)}`
+    }
+    return `${execroot}/${process.env.BAZEL_BINDIR}/${shortPath}`
+}
+
+function resolveExecrootSrcPath(execroot, shortPath) {
+    if (shortPath.startsWith('../')) {
+        return `${execroot}/external/${shortPath.slice(3)}`
+    }
+    return `${execroot}/${shortPath}`
+}
+
+// Resolve a toolchain file that is a file of this workspace or another repository
+// in the runfiles tree, or an absolute path a user set in node_toolchain.
+function resolveToolchainPath(execroot, workspaceName, file) {
+    // Only an absolute path can arrive with backslashes, from a node_toolchain a
+    // user configured; a short path baked in at analysis time uses '/' on every platform.
+    if (path.isAbsolute(file)) {
+        return withSlashes(file)
+    }
+    if (process.env.JS_BINARY__NO_RUNFILES) {
+        return resolveExecrootSrcPath(execroot, file)
+    }
+    return `${process.env.JS_BINARY__RUNFILES}/${workspaceName}/${file}`
+}
+
+// ==============================================================================
+// Signals
+// ==============================================================================
+
+// Node does not forward termination signals to any child process, so the signals are
+// trapped and forwarded manually. The handlers are removed on the first signal so that a
+// second one terminates the launcher.
+function forwardSignals(child) {
+    const forward = (signal) => () => {
+        process.removeAllListeners('SIGTERM')
+        process.removeAllListeners('SIGINT')
+        try {
+            child.kill(signal)
+        } catch {
+            // the child already exited
+        }
+    }
+    process.on('SIGTERM', forward('SIGTERM'))
+    process.on('SIGINT', forward('SIGINT'))
+}
+
+// Ends this process the way node ended, so that callers see a signal-terminated
+// process rather than an interposed 128+N exit code. That is what they would
+// have seen had the launcher been able to exec node instead of spawning it.
+function reraiseSignal(signal, exitCode) {
+    logDebug(`exit code: ${exitCode}`)
+    // Removing the last listener restores node's default disposition for the
+    // signal, so killing ourselves with it now terminates this process.
+    process.removeAllListeners('SIGTERM')
+    process.removeAllListeners('SIGINT')
+    process.kill(process.pid, signal)
+    // Only reached if the signal turned out not to be fatal after all.
+    process.exit(exitCode)
+}
+
 module.exports = {
     IS_WINDOWS,
     checkExecutableFile,
+    exitWith,
+    expandEnvRefs,
     fatal,
+    forwardSignals,
     isDirectory,
     isExecutable,
     isFile,
@@ -122,5 +234,10 @@ module.exports = {
     logError,
     logFatal,
     logInfo,
+    reraiseSignal,
+    resolveExecrootBinPath,
+    resolveToolchainPath,
+    setEnv,
+    setEnvIfUnset,
     withSlashes,
 }
