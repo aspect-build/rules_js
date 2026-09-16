@@ -38,14 +38,13 @@ console.log(
 
 // A worker on the exec path inherits node's whole command line, so the target's node options
 // have to reach it as well as the preload. js_binary passes --preserve-symlinks-main by
-// default, and a worker without it resolves its entry point out of the runfiles tree.
+// default, and a worker without it would resolve its entry point out of the runfiles tree.
 console.log(
     `worker keeps node options: ${workerExecArgv.includes('--preserve-symlinks-main')}`
 )
 
-// The exec arguments only say what the worker was asked to preload. A worker inherits a copy of
-// the environment, so the depth the bootstrap bumps reads one deeper than the launch's own '.'
-// only if the bootstrap actually ran in this thread.
+// Check whether the worker ran the bootstrap.cjs preload. We know it ran if the worker
+// incremented JS_BINARY__NODE_PATCHES_DEPTH.
 console.log(`worker ran the bootstrap: ${workerDepth === '..'}`)
 
 // A launch puts the node wrapper directory on the front of PATH. A child that re-ran the launcher
