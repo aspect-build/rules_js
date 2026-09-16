@@ -31,7 +31,7 @@ jobs:
             id-token: write
         steps:
             - uses: actions/checkout@v6
-            - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
+            - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
                   aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Format
@@ -44,7 +44,7 @@ jobs:
             id-token: write
         steps:
             - uses: actions/checkout@v6
-            - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
+            - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
                   aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Buildifier
@@ -229,7 +229,7 @@ jobs:
               if: matrix.workspace.slug == 'e2e-git_dep_metadata' || matrix.workspace.slug == 'e2e-npm_translate_lock_git_ssh' || matrix.workspace.slug == 'e2e-pnpm_lockfiles'
               with:
                   ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
-            - uses: aspect-build/setup-aspect@c22a8f64fb38f82f59ce809cd7eb9f8ae096da44 # v2026.23.2
+            - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
                   aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
             - name: Test
