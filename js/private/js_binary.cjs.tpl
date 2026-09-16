@@ -61,7 +61,6 @@ const {
     logError,
     logFatal,
     logInfo,
-    reraiseSignal,
     resolveExecrootBinPath,
     resolveToolchainPath,
     setEnv,
@@ -337,7 +336,7 @@ if (runInProcess) {
     // Wait for program to finish
     // ==============================================================================
 
-    forwardSignals(child)
+    const signals = forwardSignals(child)
 
     child.on('error', (err) => {
         logFatal(
@@ -374,7 +373,7 @@ if (runInProcess) {
         }
 
         if (signal) {
-            reraiseSignal(signal, result)
+            signals.reraise(signal, result)
         } else {
             exitWith(result)
         }

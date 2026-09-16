@@ -189,34 +189,52 @@ function resolveToolchainPath(execroot, workspaceName, file) {
 // ==============================================================================
 
 // Node does not forward termination signals to any child process, so the signals are
-// trapped and forwarded manually. The handlers are removed on the first signal so that a
-// second one terminates the launcher.
+// trapped and forwarded manually.
+//
+// Each signal stops being forwarded as soon as it has been forwarded once, so a repeat of
+// it terminates the launcher rather than being swallowed. Only that signal, and only the
+// launcher's own listener for it: the other signal keeps being forwarded, so a caller that
+// escalates from SIGINT to SIGTERM still reaches the program.
 function forwardSignals(child) {
-    const forward = (signal) => () => {
-        process.removeAllListeners('SIGTERM')
-        process.removeAllListeners('SIGINT')
-        try {
-            child.kill(signal)
-        } catch {
-            // the child already exited
+    const handlers = new Map()
+
+    // Once the launcher's listener is gone node restores its default disposition for the
+    // signal, which is what lets the signal terminate this process.
+    function stopForwarding(signal) {
+        const handler = handlers.get(signal)
+        if (handler) {
+            handlers.delete(signal)
+            process.off(signal, handler)
         }
     }
-    process.on('SIGTERM', forward('SIGTERM'))
-    process.on('SIGINT', forward('SIGINT'))
-}
 
-// Ends this process the way node ended, so that callers see a signal-terminated
-// process rather than an interposed 128+N exit code. That is what they would
-// have seen had the launcher been able to exec node instead of spawning it.
-function reraiseSignal(signal, exitCode) {
-    logDebug(`exit code: ${exitCode}`)
-    // Removing the last listener restores node's default disposition for the
-    // signal, so killing ourselves with it now terminates this process.
-    process.removeAllListeners('SIGTERM')
-    process.removeAllListeners('SIGINT')
-    process.kill(process.pid, signal)
-    // Only reached if the signal turned out not to be fatal after all.
-    process.exit(exitCode)
+    for (const signal of ['SIGTERM', 'SIGINT']) {
+        const handler = () => {
+            stopForwarding(signal)
+            try {
+                child.kill(signal)
+            } catch {
+                // the child already exited
+            }
+        }
+        handlers.set(signal, handler)
+        process.on(signal, handler)
+    }
+
+    return {
+        // Ends this process the way node ended, so that callers see a signal-terminated
+        // process rather than an interposed 128+N exit code. That is what they would have
+        // seen had the launcher been able to exec node instead of spawning it.
+        reraise(signal, exitCode) {
+            logDebug(`exit code: ${exitCode}`)
+            // Otherwise the listener forwards the signal to the dead child instead of
+            // letting it terminate this process.
+            stopForwarding(signal)
+            process.kill(process.pid, signal)
+            // Only reached if the signal turned out not to be fatal after all.
+            process.exit(exitCode)
+        },
+    }
 }
 
 module.exports = {
@@ -234,7 +252,6 @@ module.exports = {
     logError,
     logFatal,
     logInfo,
-    reraiseSignal,
     resolveExecrootBinPath,
     resolveToolchainPath,
     setEnv,
