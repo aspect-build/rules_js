@@ -144,26 +144,18 @@ function exitWith(exitCode) {
 }
 
 // ==============================================================================
-// Initialize RUNFILES environment variable
+// Runfiles initialization
 // ==============================================================================
 
-// Nothing here discovers the runfiles: the stub already did, before node started, because it
-// had to resolve this launcher and the preload out of them, and it exports what it found as
-// RUNFILES_DIR. This only republishes that as JS_BINARY__RUNFILES, the variable this rule set
-// documents and the paths below are built from.
-//
-// TEST_SRCDIR is not consulted, though the bash launcher consults it first. Bazel sets both
-// for every test, so it adds nothing; and where the two could disagree, RUNFILES_DIR is the
-// one to believe, because it names the tree this launcher itself was resolved out of.
+// The hermetic_launcher stub should have already initialized RUNFILES_DIR.
 let runfiles = process.env.RUNFILES_DIR
 if (!runfiles) {
     logFatal('RUNFILES_DIR environment variable is not set')
     exitWith(1)
 }
-// Slash-separated, because everything downstream concatenates onto it with '/', and absolute,
-// because a relative one is resolved against the directory this launcher was started in and
-// the chdir below is about to leave it. The stub hands over a relative path when it was given
-// one, which is what a genrule invoking a js_binary through another binary's runfiles does.
+
+// JS_BINARY__RUNFILES is documented to be an absolute path to the runfiles
+// directory, so we need to uphold that guarantee.
 runfiles = withSlashes(runfiles)
 if (!path.isAbsolute(runfiles)) {
     runfiles = withSlashes(path.join(cwd(), runfiles))
