@@ -614,9 +614,9 @@ assert_contains(
 # =======================================================================================
 # Case 9: an uncaught exception is reported by node itself, with the program's own stack.
 #
-# The hermetic launcher installs an uncaughtException handler for its own failures, and
-# has to hand it back before running the program in its process, or else the stack below
-# is replaced by a one-line FATAL.
+# The hermetic launcher runs the entry point in its own process, so anything it leaves
+# behind that handles uncaughtException would report the program's crashes as launcher
+# failures and swallow the stack below.
 
 js_binary(
     name = "throw_deep_bin",

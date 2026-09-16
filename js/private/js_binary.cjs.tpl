@@ -53,7 +53,6 @@ const launcher = path.resolve(process.argv[2])
 const {
     checkExecutableFile,
     isDirectory,
-    isFile,
     logDebug,
     logError,
     logFatal,
@@ -132,18 +131,6 @@ function exitWith(exitCode) {
     logDebug(`exit code: ${exitCode}`)
     process.exit(exitCode)
 }
-
-// Node already exits 1 on an uncaught exception; this only reports it the way the
-// launcher reports every other failure, rather than as a raw stack trace. Whatever
-// comes to run the entry point in this process has to remove the handler first, or
-// the program's own exceptions get reported as launcher failures.
-process.on('uncaughtException', (err) => {
-    // The message alone: the log functions collapse whitespace, so a stack would come out
-    // as one unreadable line. It is still worth having at debug level.
-    logFatal(String((err && err.message) || err))
-    logDebug(String((err && err.stack) || err))
-    exitWith(1)
-})
 
 // ==============================================================================
 // Initialize RUNFILES environment variable
@@ -372,11 +359,6 @@ if (runInProcess) {
             )
         }
     }
-
-    // Give the program node's own uncaught-exception reporting back. The handler installed
-    // above is for failures in this launcher; left in place it would replace the program's
-    // stack trace with a one-line FATAL.
-    process.removeAllListeners('uncaughtException')
 
     // Runs the entry point as the main module, so that `require.main === module` holds for
     // it. This returns as soon as the entry point's top level does; node then exits on its
