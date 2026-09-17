@@ -106,6 +106,20 @@ _ATTRS = {
         `fixed_args` are passed before the ones specified in `args` and before ones
         that are specified on the `bazel run` or `bazel test` command line.
 
+        Each `fixed_arg` is split into arguments at analysis time, following bash's word
+        splitting and quote removal, and each resulting argument is baked into the launcher
+        quoted. At launch time the shell therefore expands `$VAR` and `${VAR}` but does not
+        split or glob:
+
+        | in a `fixed_arg`       | result                                     |
+        | ---------------------- | ------------------------------------------ |
+        | `a b`                  | two arguments                              |
+        | `"a b"`, `'a b'`       | one argument                               |
+        | `$VAR`, `${VAR}`       | expanded at launch time                    |
+        | `'$VAR'`               | literal                                    |
+        | `*`, `?`, `[...]`, `~` | literal; no globbing or tilde expansion    |
+        | `\\`                   | literal; backslash escapes are not applied |
+
         See https://bazel.build/reference/be/common-definitions#common-attributes-binaries
         for more info on the built-in `args` attribute.
         """,
@@ -301,6 +315,93 @@ def _expand_env_if_needed(ctx, value):
 def _bash_quote(value):
     return json.encode(value)
 
+def _append_segment(segments, text, expand):
+    """Appends a non-empty (text, expand) segment to a fixed_arg token."""
+    if text:
+        return segments + [[text, expand]]
+    return segments
+
+def _shell_tokenize(value):
+    """Splits a fixed_arg the way bash would when it is spliced into an array literal.
+
+    The launcher builds `ALL_ARGS=({{fixed_args}} "$@")`. Splicing each fixed_arg in raw
+    would leave word splitting and quote removal to the shell at launch time; doing them
+    here instead means the arguments a target passes are decided at analysis time, and the
+    launcher can quote each one so the shell only expands it.
+
+    Quote removal alone would lose the one thing the quotes were there to say: bash expands
+    `$VAR` inside double quotes and outside quotes, but not inside single quotes, and that
+    decision has to survive to the launcher, which does the expansion at run time. So each
+    token is emitted as a list of (text, expand) segments rather than as a plain string.
+
+    Backslash escapes are deliberately not interpreted (bash would have), so a Windows-style
+    path in a fixed_arg survives intact. That differs from bash for `\\$VAR`, which this
+    expands, and for an escaped separator such as `a\\ b`, which this splits into two tokens;
+    quote the argument in either case to get bash's answer.
+
+    Args:
+        value: the fixed_arg to split
+
+    Returns:
+        a list of argv entries, each a list of [text, expand] segments to concatenate
+    """
+    tokens = []
+    segments = []
+    current = ""
+    expand = True
+    has_token = False
+    quote = None
+
+    for ch in value.elems():
+        if quote:
+            if ch == quote:
+                segments = _append_segment(segments, current, expand)
+                current = ""
+                expand = True
+                quote = None
+            else:
+                current += ch
+        elif ch == "'" or ch == "\"":
+            segments = _append_segment(segments, current, expand)
+            current = ""
+            quote = ch
+            expand = ch == "\""
+            has_token = True
+        elif ch == " " or ch == "\t" or ch == "\n" or ch == "\r":
+            if has_token:
+                tokens.append(_append_segment(segments, current, expand))
+                segments = []
+                current = ""
+                expand = True
+                has_token = False
+        else:
+            current += ch
+            has_token = True
+    if has_token:
+        tokens.append(_append_segment(segments, current, expand))
+    return tokens
+
+def _bash_dq_expand(text):
+    """Escapes text for a bash double-quoted string, leaving expansions live.
+
+    Only the characters that would end the string or be consumed as an escape are touched,
+    so `$VAR` and `$(...)` still expand at launch time. Backslashes are escaped because the
+    tokenizer above does not interpret them, and because text ending in one would otherwise
+    escape the closing quote.
+    """
+    return text.replace("\\", "\\\\").replace("\"", "\\\"")
+
+def _bash_dq_literal(text):
+    """The same, for text that came from single quotes and so must not expand at all."""
+    return _bash_dq_expand(text).replace("$", "\\$").replace("`", "\\`")
+
+def _bash_arg(token):
+    """Renders one tokenized argument as a single double-quoted bash word."""
+    return "\"{}\"".format("".join([
+        _bash_dq_expand(text) if expand else _bash_dq_literal(text)
+        for (text, expand) in token
+    ]))
+
 def _generates_coverage_report(ctx):
     """Whether the launcher generates the lcov report in the test action. See #2901."""
     return (hasattr(ctx.file, "_coverage_report") and
@@ -409,7 +510,11 @@ def _bash_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_pre
         "{{entry_point_label}}": str(ctx.attr.entry_point.label),
         "{{entry_point_path}}": entry_point_path,
         "{{envs}}": "\n".join(envs),
-        "{{fixed_args}}": " ".join(fixed_args),
+        "{{fixed_args}}": " ".join([
+            _bash_arg(token)
+            for fixed_arg in fixed_args
+            for token in _shell_tokenize(fixed_arg)
+        ]),
         "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,

@@ -1,4 +1,5 @@
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
 package(default_testonly = True)
@@ -135,3 +136,69 @@ assert_contains(
     actual = "unquoted_var_out",
     expected = "_main/x",
 )
+
+##############################################################################################
+# Tokenization. Each fixed_arg is split at analysis time and the pieces are baked into the
+# launcher quoted, so the shell expands them but does not split or glob them.
+
+write_file(
+    name = "write_a",
+    out = "split_a.txt",
+    content = [],
+)
+
+write_file(
+    name = "write_b",
+    out = "split_b.txt",
+    content = [],
+)
+
+filegroup(
+    name = "split_files",
+    srcs = [
+        "split_a.txt",
+        "split_b.txt",
+    ],
+)
+
+js_binary(
+    name = "tokenize_bin",
+    data = [":split_files"],
+    entry_point = "all_args.mjs",
+    fixed_args = [
+        # Quoted whitespace holds an argument together; unquoted whitespace splits it.
+        "\"one argument\"",
+        "two arguments",
+        # One fixed_arg expanding to several paths becomes several arguments.
+        "$(rootpaths :split_files)",
+        # A glob is passed through rather than matched against the bindir.
+        "js/private/test/fixed_args/*.txt",
+        # A double quote survives the quoting the launcher puts around each argument.
+        "'say \"hi\"'",
+    ],
+)
+
+js_run_binary(
+    name = "run_tokenize",
+    silent_on_success = False,
+    stdout = "tokenize_out",
+    tool = ":tokenize_bin",
+)
+
+[
+    assert_contains(
+        name = "tokenize_%s_test" % name,
+        actual = "tokenize_out",
+        expected = expected,
+    )
+    for (name, expected) in [
+        ("quoted_space_is_one_arg", "[one argument]"),
+        ("unquoted_space_splits_first", "[two]"),
+        ("unquoted_space_splits_second", "[arguments]"),
+        ("rootpaths_splits_first", "[js/private/test/fixed_args/split_a.txt]"),
+        ("rootpaths_splits_second", "[js/private/test/fixed_args/split_b.txt]"),
+        ("glob_is_literal", "[js/private/test/fixed_args/*.txt]"),
+        ("double_quote_survives", "[say \"hi\"]"),
+    ]
+]
+
