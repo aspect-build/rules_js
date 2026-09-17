@@ -15,8 +15,8 @@
 
 'use strict'
 
-// The replacement sets global.JS_IMAGE_LAYER, which the env block below reads.
-// This line is replaced by js_image_layer to make the launcher hermetic.
+// Replaced by js_image_layer to make the launcher hermetic; the env block below reads it.
+const JS_IMAGE_LAYER = false
 
 const fs = require('node:fs')
 const os = require('node:os')
@@ -72,9 +72,9 @@ const {
 // Environment
 // ==============================================================================
 
-setEnv("JS_BINARY__BINDIR", global.JS_IMAGE_LAYER ? process.cwd() : "bazel-out/k8-fastbuild/bin")
+setEnv("JS_BINARY__BINDIR", JS_IMAGE_LAYER ? process.cwd() : "bazel-out/k8-fastbuild/bin")
 setEnv("JS_BINARY__COMPILATION_MODE", "fastbuild")
-setEnv("JS_BINARY__TARGET_CPU", global.JS_IMAGE_LAYER ? os.machine() : "k8")
+setEnv("JS_BINARY__TARGET_CPU", JS_IMAGE_LAYER ? os.machine() : "k8")
 setEnv("JS_BINARY__BUILD_FILE_PATH", "js/private/test/BUILD.bazel")
 setEnv("JS_BINARY__PACKAGE", "js/private/test")
 setEnv("JS_BINARY__TARGET_NAME", "shellcheck_launcher")

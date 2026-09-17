@@ -47,7 +47,7 @@ launcher_snapshot(
     src = ":shellcheck_launcher_js",
     out = "snapshots/launcher.cjs",
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
-    target_cpu_format = "setEnv(\\\"JS_BINARY__TARGET_CPU\\\", global.JS_IMAGE_LAYER ? os.machine() : \\\"{}\\\")",
+    target_cpu_format = "setEnv(\\\"JS_BINARY__TARGET_CPU\\\", JS_IMAGE_LAYER ? os.machine() : \\\"{}\\\")",
 )
 
 # Drives the merger's branches directly. //js/private/test/coverage covers them

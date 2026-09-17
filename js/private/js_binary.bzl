@@ -320,7 +320,7 @@ _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
 
 # An image runs the launcher from the container's working directory on whatever CPU the
 # container has, so these two values, baked in here at analysis time, are wrong there.
-# js_image_layer sets global.JS_IMAGE_LAYER to pick the other side of each ternary.
+# js_image_layer sets JS_IMAGE_LAYER to pick the other side of each ternary.
 _JS_IMAGE_LAYER_OVERRIDES = {
     "JS_BINARY__BINDIR": "process.cwd()",
     "JS_BINARY__TARGET_CPU": "os.machine()",
@@ -338,7 +338,7 @@ def _env_value_js(var, value):
     """
     override = _JS_IMAGE_LAYER_OVERRIDES.get(var)
     if override:
-        return "global.JS_IMAGE_LAYER ? {} : {}".format(override, _quote(value))
+        return "JS_IMAGE_LAYER ? {} : {}".format(override, _quote(value))
     return _quote(value)
 
 # Environment variables node reads as it starts. When these variables are set in the env

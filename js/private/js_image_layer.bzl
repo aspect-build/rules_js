@@ -180,7 +180,7 @@ The default layer groups are as follows and always created.
 
 """
 
-# The line both launcher templates carry for js_image_layer to replace, minus its comment
+# The line the bash launcher template carries for js_image_layer to replace, minus its comment
 # marker.
 _PATCH_POINT = "This line is replaced by js_image_layer to make the launcher hermetic."
 
@@ -189,10 +189,11 @@ _PATCH_POINT = "This line is replaced by js_image_layer to make the launcher her
 # for why this is needed.
 _LAUNCHER_PREAMBLE = '# patched by js_image_layer for hermeticity\nexport BAZEL_BINDIR="."'
 
-# The JavaScript launcher's equivalent. The global tells the launcher to work out its bindir
-# and CPU from the container rather than use the values baked in at analysis time; see
-# _JS_IMAGE_LAYER_OVERRIDES in js_binary.bzl.
-_JS_LAUNCHER_PREAMBLE = "// patched by js_image_layer for hermeticity\nglobal.JS_IMAGE_LAYER = true\nprocess.env.BAZEL_BINDIR = '.'"
+# The JavaScript launcher declares the flag it replaces rather than carrying the comment the bash
+# one does. Setting it tells the launcher to work out its bindir and CPU from the container rather
+# than use the values baked in at analysis time; see _JS_IMAGE_LAYER_OVERRIDES in js_binary.bzl.
+_JS_PATCH_POINT = "const JS_IMAGE_LAYER = false"
+_JS_LAUNCHER_PREAMBLE = "const JS_IMAGE_LAYER = true\nprocess.env.BAZEL_BINDIR = '.'"
 
 def _launcher_js(binary):
     """The generated JavaScript launcher of a js_binary, or None when it uses the bash launcher."""
@@ -218,7 +219,7 @@ def _write_js_launcher(ctx, launcher_js):
     ctx.actions.expand_template(
         template = launcher_js,
         output = launcher,
-        substitutions = {"// " + _PATCH_POINT: _JS_LAUNCHER_PREAMBLE},
+        substitutions = {_JS_PATCH_POINT: _JS_LAUNCHER_PREAMBLE},
         is_executable = True,
     )
     return launcher
