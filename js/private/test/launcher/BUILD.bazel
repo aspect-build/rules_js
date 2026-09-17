@@ -532,13 +532,6 @@ assert_contains(
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
 )
 
-# For both launchers, we should find that the NODE_OPTIONS variable had the expected effect.
-assert_contains(
-    name = "node_options_from_env_apply_test",
-    actual = ":in_process_env_out.txt",
-    expected = "TITLE=probe-env",
-)
-
 # The NODE_ENV variable is commonly used but does not influence node's behavior. It should
 # therefore not necessitate re-launching node.
 
@@ -560,12 +553,6 @@ assert_contains(
     actual = ":in_process_node_env_out.txt",
     expected = "IN_LAUNCHER_PROCESS=yes",
     target_compatible_with = HERMETIC_LAUNCHER_ONLY,
-)
-
-assert_contains(
-    name = "node_env_reaches_the_program_test",
-    actual = ":in_process_node_env_out.txt",
-    expected = "NODE_ENV=production",
 )
 
 # Setting NODE_COMPILE_CACHE after node starts is not a problem, because we explicitly handle

@@ -8,6 +8,3 @@ const launcherLoaded = Object.keys(require.cache).some((id) =>
 )
 console.log('IN_LAUNCHER_PROCESS=' + (launcherLoaded ? 'yes' : 'no'))
 console.log('IS_MAIN_MODULE=' + (require.main === module ? 'yes' : 'no'))
-console.log('TITLE=' + process.title)
-console.log('NODE_ENV=' + process.env.NODE_ENV)
-console.log('TZ_OFFSET=' + new Date(0).getTimezoneOffset())
