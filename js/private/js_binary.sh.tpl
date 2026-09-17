@@ -342,6 +342,10 @@ while kill -0 "$child" 2>/dev/null; do
     wait "$child"
     RESULT="$?"
 done
+
+# Nothing left to forward to, so a signal arriving during the mop-up below should
+# terminate this script rather than be swallowed.
+trap - SIGTERM SIGINT
 set -e
 
 # ==============================================================================
