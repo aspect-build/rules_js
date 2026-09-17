@@ -1,10 +1,8 @@
-// Spawns the target js_binary and sends it SIGINT once it reports READY, then SIGTERM once it
-// reports GOT_INT, so the second signal only goes out after the launcher has forwarded the
-// first. A launcher that stops trapping every signal after the first one is terminated by the
-// SIGTERM instead, and the target never prints HANDLED.
+// Spawns the target js_binary and sends it two different directed signals in
+// turn: SIGINT once it reports READY, then SIGTERM once it reports GOT_INT.
 //
-// The launcher must then still wait for the target's exit code, which its expected_exit_code
-// remaps to 0.
+// The launcher must then still wait for the target's exit code, which its
+// expected_exit_code remaps to 0.
 import { spawn } from 'node:child_process'
 import { runfiles } from '@bazel/runfiles'
 
