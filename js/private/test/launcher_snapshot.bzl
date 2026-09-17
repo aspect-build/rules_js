@@ -1,10 +1,8 @@
 """Writes a js_binary launcher to the source tree so that it is reviewed on every change.
 
-Both launchers get the same treatment: bake one out, normalize the values that move
-between platforms and Bazel versions, and check the result in. Sharing the normalization
-matters because it is the fiddly part -- the sed expressions carry two layers of quoting
--- and because a value that has to be normalized in one launcher has to be normalized in
-the other.
+Both launchers get the same treatment: bake one out, normalize the values that move between
+platforms and Bazel versions, and check the result in. The normalization is shared because a
+value that has to be normalized in one launcher has to be normalized in the other.
 """
 
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")

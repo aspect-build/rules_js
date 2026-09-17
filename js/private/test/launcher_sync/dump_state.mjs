@@ -30,10 +30,8 @@ const DROPPED = new Set([
 // is built in its own configuration. Neither difference is launcher behavior, so both are
 // replaced with tokens.
 //
-// The execroot is derived from the cwd rather than read from JS_BINARY__EXECROOT so that the
-// value of JS_BINARY__EXECROOT stays genuinely compared: a launcher that computed it wrongly
-// would leave an unsubstituted absolute path behind and fail the diff, rather than having its
-// own mistake normalized away.
+// The execroot is derived from the cwd rather than read from JS_BINARY__EXECROOT, so that
+// JS_BINARY__EXECROOT itself stays genuinely compared.
 const cwd = process.cwd().replace(/\\/g, '/')
 const bazelOut = cwd.lastIndexOf('/bazel-out/')
 const execroot = bazelOut < 0 ? cwd : cwd.slice(0, bazelOut)
@@ -59,8 +57,7 @@ process.execArgv.forEach((arg, i) => emit(`execArgv[${i}]`, arg))
 
 // Compared as a derived fact rather than by value: bash keeps a logical path across `cd` while
 // process.cwd() is physical, so the two spellings can differ if any execroot component is a
-// symlink even when both launchers are correct. What has to agree is that PWD is set and
-// describes where we actually are.
+// symlink even when both launchers are correct.
 lines.push(`pwd_is_cwd=${process.env.PWD === process.cwd()}`)
 
 for (const key of Object.keys(process.env).sort()) {

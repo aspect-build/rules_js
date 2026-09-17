@@ -1,4 +1,4 @@
-// Reports various details about the environment that are influenced by the launcher.
+// Reports the details of the environment that the launcher influences.
 //
 // The hermetic launcher's generated `.cjs` sits at `<name>_/<name>.cjs` beside the binary, so the
 // shape identifies it whichever target loaded us. It is in this process's require.cache only when

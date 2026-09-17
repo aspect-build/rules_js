@@ -41,15 +41,12 @@ const ENV_CONFIGURES_NODE_STARTUP = {{env_configures_node_startup}}
 // Shared helpers
 // ==============================================================================
 
-// The per-launch preload, resolved out of the runfiles by the stub before node started and
-// handed to this launcher as its first argument. The helpers both launchers use sit beside
-// it, so the same argument finds them, and finding them is the first thing done here because
-// everything below needs them.
+// The per-launch preload, resolved out of the runfiles by the stub and handed to this
+// launcher as its first argument. The helpers both launchers share sit beside it.
 //
-// Made absolute against the directory this launcher was started in, before the chdir below
-// moves it: the stub resolves an rlocation to a relative path when it was given a relative
-// runfiles directory, and a relative specifier with no leading "./" is a package name to
-// require().
+// Made absolute before the chdir below moves it: the stub resolves an rlocation to a relative
+// path when it was given a relative runfiles directory, and a relative specifier with no
+// leading "./" is a package name to require().
 const launcher = path.resolve(process.argv[2])
 const {
     checkExecutableFile,
@@ -199,10 +196,9 @@ function addNodeOption(value) {
 }
 {{node_options}}
 
-// fixed_args were tokenized at analysis time, each token as a list of
-// [text, expand] segments: bash removed the quotes but this launcher still has to
-// know which of them were single quotes, since those are the ones whose $VAR the
-// shell would not have expanded. Expansion itself happens now, at run time.
+// fixed_args were tokenized at analysis time, each token as a list of [text, expand]
+// segments: the quotes are gone but this launcher still has to know which were single
+// quotes, since bash would not have expanded $VAR inside those. Expansion happens now.
 const FIXED_ARGS = {{fixed_args}}.map((segments) =>
     segments.map(([text, expand]) => (expand ? expandEnvRefs(text) : text)).join('')
 )
@@ -247,17 +243,15 @@ if (runInProcess) {
     // execArgv to a child still reproduces the patched runtime.
     process.execArgv = ['--require', launcher, ...nodeOptions]
 
-    // The same per-launch setup node would have run as its first --require on the exec path:
-    // execroot, the remaining validations, PATH, JS_BINARY__NODE_PATCHES, the logs, the fs
-    // patches, and the chdir option. It is required here rather than passed to the stub
-    // because it reads JS_BINARY__ variables that only exist once the launcher above has run.
+    // The per-launch setup node would have run as its first --require on the exec path. It
+    // is required here rather than passed to the stub because it reads JS_BINARY__ variables
+    // that only exist once the launcher above has run.
     require(launcher)
 
     // A worker thread is started with the exec arguments node itself was given, which on this
     // path carry no --require at all -- the preload above was reached by require(), not by a
-    // command line. Without this a worker would run with unpatched fs, where on the exec path
-    // it would have re-run the preload and returned early with the bootstrap applied. A
-    // program that asks for its own exec arguments is left alone.
+    // command line, so a worker would otherwise run with unpatched fs. A program that asks
+    // for its own exec arguments is left alone.
     const workerThreads = require('node:worker_threads')
     const RealWorker = workerThreads.Worker
     // The node options too, not just the bootstrap: on the exec path a worker inherits node's
@@ -280,9 +274,9 @@ if (runInProcess) {
     }
 
     // Runs the entry point as the main module, so that `require.main === module` holds for
-    // it. This returns as soon as the entry point's top level does; node then exits on its
-    // own once the event loop drains, exactly as it would have on the exec path. Nothing may
-    // follow it here -- an exit would truncate every asynchronous program.
+    // it. This returns as soon as the entry point's top level does, and node then exits on
+    // its own once the event loop drains. Nothing may follow it here -- an exit would
+    // truncate every asynchronous program.
     require('node:module').runMain()
 } else {
     // We invoke node directly rather than through JS_BINARY__NODE_WRAPPER. This

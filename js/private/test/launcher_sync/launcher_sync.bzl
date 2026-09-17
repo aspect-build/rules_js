@@ -26,11 +26,10 @@ _use_hermetic_launcher_transition = transition(
 
 def _dump_launcher_state_impl(ctx):
     # The transition is on this rule, so it reaches the tool down a cfg = "exec" edge. The exec
-    # transition resets the platform and the mirrored --host_* options but not Starlark build
-    # settings, so the flag survives. If that ever stops being true both variants would quietly
-    # be the bash launcher and the diff would pass for the wrong reason, so check rather than
-    # assume: js_binary's launcher_js output group is non-empty exactly when the hermetic
-    # launcher was selected.
+    # transition does not reset Starlark build settings, so the flag survives. If that ever
+    # stopped being true, both variants would quietly be the bash launcher and the diff would pass
+    # for the wrong reason, so check: js_binary's launcher_js output group is non-empty exactly
+    # when the hermetic launcher was selected.
     launcher_js = ctx.attr.tool[OutputGroupInfo].launcher_js.to_list()
     if ctx.attr.use_hermetic_launcher and not launcher_js:
         fail("{} was unexpectedly built without the hermetic launcher.".format(ctx.attr.tool.label))
@@ -45,9 +44,8 @@ def _dump_launcher_state_impl(ctx):
         outputs = [out],
         mnemonic = "LauncherStateDump",
         # ctx.actions.run replaces the action environment rather than extending it, so start
-        # from the default one. Without it the launcher would run with no PATH at all, which no
-        # real action does, and bash would silently substitute its own built-in default while
-        # node would not -- a difference in the rig rather than in the launchers.
+        # from the default one; otherwise the launcher runs with no PATH at all, which no real
+        # action does.
         env = dict(ctx.configuration.default_shell_env, JS_LAUNCHER_SYNC_OUT = out.path),
     )
 

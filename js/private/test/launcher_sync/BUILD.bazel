@@ -17,8 +17,8 @@ launcher_sync_test(
     tool = ":state_bin",
 )
 
-# A diff_test over two files passes just as happily when both are empty or when a filter has
-# scrubbed them to nothing, so let's pin one line that has to be there.
+# A diff_test passes just as happily when both files are empty, so pin one line that has to
+# be there.
 assert_contains(
     name = "state_dump_not_empty_test",
     actual = ":state_test_bash",

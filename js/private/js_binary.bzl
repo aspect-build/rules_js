@@ -356,10 +356,6 @@ _NODE_STARTUP_ENV_PREFIXES = [
     # "LANG" also covers LANGUAGE.
     "LANG",
     "LC_",
-    # Read by the dynamic loader, not by node. glibc caches the LD_LIBRARY_PATH search list
-    # when the process starts, so a later assignment does not reach the dlopen() of a native
-    # addon's dependency, and LD_PRELOAD is only ever read at execve(). "DYLD_" is the macOS
-    # spelling of the same family.
     "LD_",
     "DYLD_",
 ]
@@ -373,11 +369,10 @@ _NOT_NODE_STARTUP_ENV = [
     "NODE_DISABLE_COMPILE_CACHE",
 ]
 
-# Toolchains of the hermetic launcher, resolved here as Labels rather than used as the
-# bare strings hermetic_launcher exposes: under --incompatible_auto_exec_groups a string
-# toolchain type is resolved against the repository mapping of whichever module is being
-# built, so a consumer that does not itself depend on hermetic_launcher cannot resolve
-# the name. A Label is resolved against this file's own mapping at load time instead.
+# Toolchains of the hermetic launcher, as Labels rather than the bare strings it exposes:
+# under --incompatible_auto_exec_groups a string toolchain type resolves against the
+# repository mapping of whichever module is being built, which need not depend on
+# hermetic_launcher. A Label resolves against this file's own mapping at load time instead.
 _FINALIZER_TOOLCHAIN_TYPE = Label(hermetic_launcher.finalizer_toolchain_type)
 _TEMPLATE_TOOLCHAIN_TYPE = Label(hermetic_launcher.template_toolchain_type)
 
@@ -430,11 +425,10 @@ def _shell_tokenize(value):
     time. So each token is emitted as a list of (text, expand) segments rather than as a
     plain string.
 
-    Backslash escapes are deliberately not interpreted (bash would have), so a
-    Windows-style path in a fixed_arg survives intact. Two places show that: `\\$VAR`, which
-    bash passes through literally and this launcher expands, and an escaped separator such as
-    `a\\ b`, which bash makes one token and this splits into two. Quote the argument in either
-    case to get bash's answer.
+    Backslash escapes are deliberately not interpreted (bash would have), so a Windows-style
+    path in a fixed_arg survives intact. That differs from bash for `\\$VAR`, which this
+    expands, and for an escaped separator such as `a\\ b`, which this splits into two tokens;
+    quote the argument in either case to get bash's answer.
 
     Args:
         value: the fixed_arg to split
@@ -669,8 +663,7 @@ def _is_absolute_path(path):
     """Whether a node_toolchain's target_tool_path names an absolute path.
 
     Mirrors the launcher's own path.isAbsolute() test, which on Windows also accepts a
-    drive-letter prefix. Getting this wrong would embed a path like `_main/C:/nodejs/node.exe`
-    in the stub, which resolves through the runfiles to nothing.
+    drive-letter prefix.
     """
     if path.startswith("/") or path.startswith("\\"):
         return True
@@ -770,10 +763,10 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
         transformed_args = transformed_args,
     )
 
-    # The generated launcher's own first argument: the per-launch preload it requires, and
-    # the directory the helpers both launchers share are found in. Resolved here rather than
-    # from a short_path in the launcher because the stub reads the runfiles manifest, which
-    # is all a js_run_binary without a runfiles tree has.
+    # The generated launcher's own first argument: the per-launch preload it requires, which
+    # is also where it finds the shared helpers. Resolved here rather than from a short_path
+    # because the stub reads the runfiles manifest, which is all a js_run_binary without a
+    # runfiles tree has.
     embedded_args, transformed_args = hermetic_launcher.append_runfile(
         file = ctx.file._launcher_preload,
         embedded_args = embedded_args,
@@ -882,9 +875,9 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
         runfiles = runfiles,
         data_runfiles = data_runfiles,
         chdir = chdir,
-        # The generated JavaScript launcher, empty when the bash launcher is in use. Shaped
-        # as a depset so that a rule built on create_launcher can republish it verbatim in a
-        # `launcher_js` output group, which is how js_image_layer tells the launchers apart.
+        # The generated JavaScript launcher, empty when the bash launcher is in use. A depset
+        # so that a rule built on create_launcher can republish it verbatim in a `launcher_js`
+        # output group, which is how js_image_layer tells the launchers apart.
         launcher_js = depset([launcher_js] if launcher_js else []),
     )
 

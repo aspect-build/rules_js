@@ -2,9 +2,8 @@
 // launcher the hermetic stub runs, and launcher.cjs, the per-launch preload that both
 // launchers load as node's first --require.
 //
-// Nothing here may do anything at load time. The generated launcher requires this file before
-// it has set up any of the environment, so a side effect here would run too early to be
-// correct and too far from its cause to be found.
+// Nothing here may do anything at load time: the generated launcher requires this file
+// before it has set up any of the environment.
 
 'use strict'
 
@@ -22,9 +21,8 @@ const IS_WINDOWS = process.platform === 'win32'
 // We use fs.writeSync rather than console.error, so that the line is flushed before a
 // process.exit, or the execve that replaces the generated launcher, can follow it.
 //
-// The message is collapsed onto one line: several of these are long enough to be written
-// across multiple source lines, and a caller that logs an exception has no control over
-// what is in it.
+// The message is collapsed onto one line, since callers wrap long messages across source
+// lines and may log an exception.
 function log(level, message) {
     const collapsed = message.trim().replace(/\s+/g, ' ')
     fs.writeSync(
@@ -71,13 +69,12 @@ function exitWith(exitCode) {
 // Environment
 // ==============================================================================
 
-// The env values, node options and fixed args the generated launcher applies were spliced
-// into double-quoted bash strings before it was ported to JavaScript, so shell parameter
-// expansion happened at launch time and users depend on it. For example,
+// The bash launcher splices env values, node options and fixed args into double-quoted
+// strings, so users rely on shell parameter expansion happening at launch time; for example
 // examples/stack_traces passes
 // node_options = ["--require", "$$JS_BINARY__RUNFILES/$$JS_BINARY__WORKSPACE/..."].
-// Only $VAR / ${VAR} expansion is reproduced here; command substitution is not, and the
-// result is not re-split on whitespace the way bash would have.
+// Only $VAR / ${VAR} expansion is reproduced here: no command substitution, and no
+// re-splitting on whitespace.
 function expandEnvRefs(value) {
     return value.replace(
         /\$(?:\{([A-Za-z_][A-Za-z0-9_]*)\}|([A-Za-z_][A-Za-z0-9_]*))/g,
@@ -101,13 +98,8 @@ function setEnvIfUnset(name, value) {
 // Paths
 // ==============================================================================
 
-// Normalizes paths when running on Windows.
-//
-// Example:
-// C:\Users\XUser\_bazel_XUser\7q7kkv32\execroot\A\b\C -> C:/Users/XUser/_bazel_XUser/7q7kkv32/execroot/A/b/C
-//
-// Only the separator changes. Node accepts forward slashes on Windows, so the separator
-// rewrite is all that is needed and the comparisons in the callers can stay written with '/'.
+// Node accepts forward slashes on Windows, so rewriting the separator is all that is needed
+// to let the comparisons in the callers stay written with '/'.
 function withSlashes(p) {
     return IS_WINDOWS ? p.replace(/\\/g, '/') : p
 }
@@ -149,8 +141,6 @@ function checkExecutableFile(what, p) {
 // Resolve a short path in the Bazel output tree against the execroot the launcher was
 // started in.
 function resolveExecrootBinPath(execroot, shortPath) {
-    // The bash launcher gets this from `set -o nounset`; without it an unset BAZEL_BINDIR
-    // silently builds '<execroot>/undefined/<path>' and only surfaces as a missing entry point.
     if (!process.env.BAZEL_BINDIR) {
         logFatal(
             'BAZEL_BINDIR must be set in the environment to the makevar $(BINDIR) to resolve a path in the Bazel output tree'
@@ -198,8 +188,8 @@ function resolveToolchainPath(execroot, workspaceName, file) {
 function forwardSignals(child) {
     const handlers = new Map()
 
-    // Once the launcher's listener is gone node restores its default disposition for the
-    // signal, which is what lets the signal terminate this process.
+    // With no listener left, node restores the signal's default disposition, which is what
+    // lets it terminate this process.
     function stopForwarding(signal) {
         const handler = handlers.get(signal)
         if (handler) {
@@ -223,12 +213,10 @@ function forwardSignals(child) {
 
     return {
         // Ends this process the way node ended, so that callers see a signal-terminated
-        // process rather than an interposed 128+N exit code. That is what they would have
-        // seen had the launcher been able to exec node instead of spawning it.
+        // process rather than an interposed 128+N exit code.
         reraise(signal, exitCode) {
             logDebug(`exit code: ${exitCode}`)
-            // Otherwise the listener forwards the signal to the dead child instead of
-            // letting it terminate this process.
+            // The listener would otherwise forward to the defunct child process.
             stopForwarding(signal)
             process.kill(process.pid, signal)
             // Only reached if the signal turned out not to be fatal after all.

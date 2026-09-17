@@ -568,9 +568,8 @@ assert_contains(
     expected = "NODE_ENV=production",
 )
 
-# Locale-related environment variables require re-launching node, because for example a target
-# that sets LC_ALL and runs in the launcher's process would format dates and numbers as the
-# ambient locale rather than the one it asked for.
+# Locale-related environment variables require re-launching node: a target that sets LC_ALL and
+# runs in the launcher's process would format dates and numbers in the ambient locale.
 js_binary(
     name = "locale_env_bin",
     entry_point = "in_process_probe.cjs",
@@ -592,9 +591,7 @@ assert_contains(
 )
 
 # The dynamic loader's variables need re-launching node too, even though node itself reads
-# nothing from them: glibc caches the LD_LIBRARY_PATH search list when the process starts, so a
-# target that sets it and ran in the launcher's process would fail to dlopen() a native addon's
-# dependency.
+# nothing from them; see _NODE_STARTUP_ENV_PREFIXES in js/private/js_binary.bzl.
 js_binary(
     name = "loader_path_env_bin",
     entry_point = "in_process_probe.cjs",
