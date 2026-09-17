@@ -445,19 +445,26 @@ fi
 
 readonly child=$!
 # Bash does not forward termination signals to any child process when
-# running in docker so need to manually trap and forward the signals
-_term() { kill -TERM "${child}" 2>/dev/null; }
-_int() { kill -INT "${child}" 2>/dev/null; }
+# running in docker, so we need to manually trap and forward the signals.
+#
+# Each trap is reset as it fires, so that a repeat of that signal terminates this
+# script rather than being swallowed.
+_term() { trap - SIGTERM; kill -TERM "${child}" 2>/dev/null; }
+_int() { trap - SIGINT; kill -INT "${child}" 2>/dev/null; }
 trap _term SIGTERM
 trap _int SIGINT
-wait "$child"
-# Remove trap after first signal has been receieved and wait for child to exit
-# (first wait returns immediatel if SIGTERM is received while waiting). Second
-# wait is a no-op if child has already terminated.
-trap - SIGTERM SIGINT
-wait "$child"
 
+# A wait returns as soon as a trapped signal has been handled, whether or not the
+# child has exited, so keep waiting until it has.
+wait "$child"
 RESULT="$?"
+while kill -0 "$child" 2>/dev/null; do
+    wait "$child"
+    RESULT="$?"
+done
+
+# Remove traps now that the child process has exited
+trap - SIGTERM SIGINT
 set -e
 
 # ==============================================================================

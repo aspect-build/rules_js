@@ -113,6 +113,32 @@ js_test(
 )
 
 # ==================================================================================================
+# Case 1c: a second, different signal is still forwarded.
+#
+# The launcher stops trapping a signal once it has forwarded it, so that a repeat terminates the
+# launcher instead of being swallowed. It stops trapping only that signal: a caller escalating from
+# SIGINT to SIGTERM must still reach node. This requires the expected_exit_code path, since that is
+# the only one where a launcher process is still around to do the forwarding.
+
+js_binary(
+    name = "signal_sequence_target_bin",
+    entry_point = "signal_sequence_target.mjs",
+    expected_exit_code = 42,
+)
+
+js_test(
+    name = "signal_sequence_test",
+    size = "small",
+    data = [
+        ":signal_sequence_target_bin",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "signal_sequence_driver.mjs",
+    fixed_args = ["$(rlocationpath :signal_sequence_target_bin)"],
+    target_compatible_with = _POSIX_ONLY,
+)
+
+# ==================================================================================================
 # Case 2: node killed by an unhandled signal is terminated by that signal.
 #
 # stay_alive installs no signal handlers. On the exec path the launcher has replaced itself with
