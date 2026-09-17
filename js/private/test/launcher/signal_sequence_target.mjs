@@ -1,8 +1,7 @@
-// Reports SIGINT without exiting, then exits with the launcher's
-// expected_exit_code on SIGTERM, so that signal_sequence_driver.mjs can check
-// both that the launcher still forwards a second, different signal after it has
-// forwarded the first, and that it waits for the exit code rather than
-// abandoning the program once it has forwarded one.
+// Reports SIGINT without exiting, then exits with the launcher's expected_exit_code on SIGTERM.
+// This way signal_sequence_driver.mjs can check both that the launcher still forwards a second,
+// different signal after it has forwarded the first, and that it waits for the exit code rather
+// than abandoning the program once it has forwarded one.
 process.on('SIGINT', () => process.stdout.write('GOT_INT\n'))
 
 process.on('SIGTERM', () => {
