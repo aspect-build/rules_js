@@ -1,5 +1,6 @@
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
+load(":shell_expansion_case.bzl", "shell_expansion_case")
 
 package(default_testonly = True)
 
@@ -134,4 +135,466 @@ assert_contains(
     name = "unquoted_var_test",
     actual = "unquoted_var_out",
     expected = "_main/x",
+)
+
+# ==================================================================================================
+# Shell expansion of fixed_args.
+#
+# js_binary.bzl joins fixed_args with spaces and substitutes the result into
+# js_binary.sh.tpl as `ALL_ARGS=({{fixed_args}} "$@")`, unquoted. Bash therefore applies one
+# full round of expansion to them before the program ever sees them. The cases below record
+# what that currently means. They are characterization tests, not a specification: almost
+# none of this was designed, and the point of writing it down is to make the eventual
+# removal of the bash launcher a reviewable break.
+#
+# Two of these behaviors are relied on today and a replacement has to keep them: run-time
+# `$VAR` expansion (the `$$RUNFILES_DIR/$(rlocationpath ...)` idiom in
+# docs/use_execroot_entry_point.md) and word splitting of a plural `$(rootpaths ...)`.
+#
+# Unless a case says otherwise it sets expand_args = False, so the string in the BUILD file
+# is exactly the string bash sees. The cases at the end set it to True to cover how the
+# analysis-time make-variable layer stacks on top of the run-time shell layer.
+#
+# Note that `node_options` are spliced in with the same lack of quoting but *inside* double
+# quotes (js_binary.bzl `_NODE_OPTION`), so they get a third, different treatment: expansion
+# but no word splitting. That is not covered here.
+
+# --------------------------------------------------------------------------------------------
+# Word splitting and quote removal. The join is lossy: bash, not the caller, decides where
+# one argument ends and the next begins.
+
+shell_expansion_case(
+    name = "plain",
+    fixed_args = ["--flag"],
+    want_argv = ["--flag"],
+)
+
+shell_expansion_case(
+    name = "space_splits_one_entry",
+    fixed_args = ["one two"],
+    want_argv = [
+        "one",
+        "two",
+    ],
+)
+
+# Byte for byte the same launcher line as the case above: the list structure a caller writes
+# carries no meaning by the time bash sees it.
+shell_expansion_case(
+    name = "two_entries_are_indistinguishable",
+    fixed_args = [
+        "one",
+        "two",
+    ],
+    want_argv = [
+        "one",
+        "two",
+    ],
+)
+
+shell_expansion_case(
+    name = "whitespace_runs_collapse",
+    fixed_args = ["a  b"],
+    want_argv = [
+        "a",
+        "b",
+    ],
+)
+
+shell_expansion_case(
+    name = "newline_splits",
+    fixed_args = ["a\nb"],
+    want_argv = [
+        "a",
+        "b",
+    ],
+)
+
+# An empty argument cannot be passed at all.
+shell_expansion_case(
+    name = "empty_entry_disappears",
+    fixed_args = [""],
+    want_argv = [],
+)
+
+shell_expansion_case(
+    name = "empty_entry_among_others_disappears",
+    fixed_args = [
+        "",
+        "b",
+    ],
+    want_argv = ["b"],
+)
+
+shell_expansion_case(
+    name = "single_quotes_group",
+    fixed_args = ["'one two'"],
+    want_argv = ["one two"],
+)
+
+shell_expansion_case(
+    name = "double_quotes_group",
+    fixed_args = ["\"one two\""],
+    want_argv = ["one two"],
+)
+
+shell_expansion_case(
+    name = "quotes_removed_mid_word",
+    fixed_args = ["a\"b\"c"],
+    want_argv = ["abc"],
+)
+
+# The only way to give a flag a value containing a space.
+shell_expansion_case(
+    name = "quoted_flag_value_keeps_space",
+    fixed_args = ["--flag='x y'"],
+    want_argv = ["--flag=x y"],
+)
+
+# A control case: not everything is mangled.
+shell_expansion_case(
+    name = "ordinary_punctuation_survives",
+    fixed_args = [
+        "a=b",
+        "a!b",
+        "a@b",
+        "a%b",
+        "a#b",
+    ],
+    want_argv = [
+        "a=b",
+        "a!b",
+        "a@b",
+        "a%b",
+        "a#b",
+    ],
+)
+
+# --------------------------------------------------------------------------------------------
+# Backslash escapes. A backslash is consumed whether or not it was meant as an escape, so a
+# value that is not shell syntax at all, such as a Windows path, is silently corrupted.
+
+shell_expansion_case(
+    name = "backslash_escapes_space",
+    fixed_args = ["one\\ two"],
+    want_argv = ["one two"],
+)
+
+shell_expansion_case(
+    name = "backslash_before_letter_is_dropped",
+    fixed_args = ["a\\b"],
+    want_argv = ["ab"],
+)
+
+shell_expansion_case(
+    name = "windows_path_loses_its_separators",
+    fixed_args = ["C:\\Users\\foo"],
+    want_argv = ["C:Usersfoo"],
+)
+
+shell_expansion_case(
+    name = "backslash_escapes_glob",
+    fixed_args = ["\\*.txt"],
+    want_argv = ["*.txt"],
+)
+
+# ANSI-C quoting, which is the only way to get a control character into an argument.
+shell_expansion_case(
+    name = "ansi_c_quoting",
+    fixed_args = ["$'a\\tb'"],
+    want_argv = ["a\tb"],
+)
+
+# --------------------------------------------------------------------------------------------
+# Brace expansion.
+
+shell_expansion_case(
+    name = "brace_list",
+    fixed_args = ["{a,b}"],
+    want_argv = [
+        "a",
+        "b",
+    ],
+)
+
+shell_expansion_case(
+    name = "brace_range",
+    fixed_args = ["pre{1..3}"],
+    want_argv = [
+        "pre1",
+        "pre2",
+        "pre3",
+    ],
+)
+
+shell_expansion_case(
+    name = "brace_without_comma_is_literal",
+    fixed_args = ["{a}"],
+    want_argv = ["{a}"],
+)
+
+# --------------------------------------------------------------------------------------------
+# Parameter expansion. The launcher exports `env` before it builds the argument array, so a
+# fixed_arg can read the target's own environment.
+
+shell_expansion_case(
+    name = "braced_var",
+    fixed_args = ["${JS_BINARY__WORKSPACE}"],
+    want_argv = ["_main"],
+)
+
+shell_expansion_case(
+    name = "default_for_unset_var",
+    fixed_args = ["${JS_BINARY_FIXED_ARGS_UNSET:-fallback}"],
+    want_argv = ["fallback"],
+)
+
+# The full set of substring operators is available.
+shell_expansion_case(
+    name = "substring_operator",
+    fixed_args = ["${JS_BINARY__WORKSPACE#_}"],
+    want_argv = ["main"],
+)
+
+# An env value is word split like anything else, so env cannot carry a value with a space
+# into a single argument either.
+shell_expansion_case(
+    name = "env_value_is_word_split",
+    env = {"CASE_SPACEY": "a b"},
+    fixed_args = ["$CASE_SPACEY"],
+    want_argv = [
+        "a",
+        "b",
+    ],
+)
+
+# The contrast worth noticing: `env` values are json.encode()d into the launcher, so an
+# apostrophe in an env value is harmless, while the same character written directly in
+# fixed_args stops the launcher from parsing at all (see apostrophe_breaks_launcher below).
+shell_expansion_case(
+    name = "env_value_with_apostrophe_is_safe",
+    env = {"CASE_QUOTEY": "it's"},
+    fixed_args = ["$CASE_QUOTEY"],
+    want_argv = ["it's"],
+)
+
+# A word only has to look like a node option *after* expansion to be intercepted by the
+# launcher's own flag scan, in which case the program never sees it.
+shell_expansion_case(
+    name = "expanded_node_options_is_intercepted",
+    env = {"CASE_OPT": "--node_options=--no-warnings"},
+    fixed_args = ["$CASE_OPT"],
+    want_argv = [],
+)
+
+# --------------------------------------------------------------------------------------------
+# Tilde expansion. HOME is pinned on the target so the result is not the developer's own.
+
+shell_expansion_case(
+    name = "tilde_alone",
+    env = {"HOME": "/js_binary_test_home"},
+    fixed_args = ["~"],
+    want_argv = ["/js_binary_test_home"],
+)
+
+shell_expansion_case(
+    name = "tilde_with_path",
+    env = {"HOME": "/js_binary_test_home"},
+    fixed_args = ["~/sub"],
+    want_argv = ["/js_binary_test_home/sub"],
+)
+
+# --------------------------------------------------------------------------------------------
+# Command substitution and arithmetic. A fixed_arg can run an arbitrary program at launch.
+
+shell_expansion_case(
+    name = "command_substitution",
+    fixed_args = ["$(echo hi)"],
+    want_argv = ["hi"],
+)
+
+shell_expansion_case(
+    name = "backtick_substitution",
+    fixed_args = ["`echo tick`"],
+    want_argv = ["tick"],
+)
+
+shell_expansion_case(
+    name = "arithmetic_expansion",
+    fixed_args = ["$((1+2))"],
+    want_argv = ["3"],
+)
+
+# --------------------------------------------------------------------------------------------
+# Pathname expansion. The launcher has already chdir'd to BAZEL_BINDIR by this point, so a
+# pattern is matched against the output tree of the action's own configuration. The files are
+# srcs of the js_run_binary rather than data of the js_binary for that reason: the tool is
+# built in the exec configuration and its runfiles are not what the glob can see.
+#
+# They also live in their own directory. Globbing the package directory would be
+# non-deterministic, because every expectation file these cases declare lands there too.
+
+shell_expansion_case(
+    name = "glob_matches_bindir",
+    srcs = [
+        "globdir/alpha.txt",
+        "globdir/beta.txt",
+    ],
+    fixed_args = ["js/private/test/fixed_args/globdir/*.txt"],
+    want_argv = [
+        "js/private/test/fixed_args/globdir/alpha.txt",
+        "js/private/test/fixed_args/globdir/beta.txt",
+    ],
+)
+
+shell_expansion_case(
+    name = "glob_single_character",
+    srcs = [
+        "globdir/alpha.txt",
+        "globdir/beta.txt",
+    ],
+    fixed_args = ["js/private/test/fixed_args/globdir/alph?.txt"],
+    want_argv = ["js/private/test/fixed_args/globdir/alpha.txt"],
+)
+
+# nullglob is off, so a pattern that matches nothing is passed through as itself.
+shell_expansion_case(
+    name = "glob_without_match_is_literal",
+    srcs = [
+        "globdir/alpha.txt",
+        "globdir/beta.txt",
+    ],
+    fixed_args = ["js/private/test/fixed_args/globdir/*.nomatch"],
+    want_argv = ["js/private/test/fixed_args/globdir/*.nomatch"],
+)
+
+shell_expansion_case(
+    name = "quoted_glob_is_literal",
+    srcs = [
+        "globdir/alpha.txt",
+        "globdir/beta.txt",
+    ],
+    fixed_args = ["'js/private/test/fixed_args/globdir/*.txt'"],
+    want_argv = ["js/private/test/fixed_args/globdir/*.txt"],
+)
+
+# --------------------------------------------------------------------------------------------
+# Both layers at once: Bazel make-variable expansion at analysis time, then the shell at run
+# time. These cases set expand_args = True.
+#
+# Not covered, because it fails during analysis rather than producing a value: a bare
+# `$(echo hi)` with expand_args = True, which Bazel reads as a reference to a make variable
+# named `echo hi` and rejects.
+
+filegroup(
+    name = "globdir_files",
+    srcs = [
+        "globdir/alpha.txt",
+        "globdir/beta.txt",
+    ],
+)
+
+# `$$` is how a literal dollar sign survives analysis to reach the shell. This is the
+# mechanism behind the documented `$$RUNFILES_DIR/$(rlocationpath ...)` idiom.
+shell_expansion_case(
+    name = "dollar_dollar_reaches_the_shell",
+    expand_args = True,
+    fixed_args = ["$$JS_BINARY__WORKSPACE"],
+    want_argv = ["_main"],
+)
+
+# A plural $(rootpaths ...) becomes one space-separated string at analysis time and only
+# becomes separate arguments because the substitution is unquoted. Of everything in this
+# file, this is the behavior most likely to be depended on outside the repository.
+shell_expansion_case(
+    name = "rootpaths_plural_splits",
+    data = [":globdir_files"],
+    expand_args = True,
+    fixed_args = ["$(rootpaths :globdir_files)"],
+    want_argv = [
+        "js/private/test/fixed_args/globdir/alpha.txt",
+        "js/private/test/fixed_args/globdir/beta.txt",
+    ],
+)
+
+# --------------------------------------------------------------------------------------------
+# Values that stop the launcher from running at all.
+#
+# These targets build: expand_template never parses the script it writes. The damage only
+# shows up on execution, and for the syntax errors bash rejects the file as a whole, so no
+# part of the launcher runs and expected_exit_code cannot observe it either. Capturing the
+# exit code keeps the action itself successful so the failure can be asserted on.
+
+shell_expansion_case(
+    name = "apostrophe_breaks_launcher",
+    fixed_args = ["it's"],
+    want_exit_code = "2",
+    want_stderr = "unexpected EOF",
+)
+
+shell_expansion_case(
+    name = "double_quote_breaks_launcher",
+    fixed_args = ["a\"b"],
+    want_exit_code = "2",
+    want_stderr = "unexpected EOF",
+)
+
+shell_expansion_case(
+    name = "backtick_breaks_launcher",
+    fixed_args = ["a`b"],
+    want_exit_code = "2",
+    want_stderr = "unexpected EOF",
+)
+
+# A word starting with `#` comments out the rest of the line, which is the closing paren of
+# the array and the `"$@"` that forwards the caller's own arguments.
+shell_expansion_case(
+    name = "hash_breaks_launcher",
+    fixed_args = ["#comment"],
+    want_exit_code = "2",
+    want_stderr = "syntax error",
+)
+
+shell_expansion_case(
+    name = "semicolon_breaks_launcher",
+    fixed_args = ["a;b"],
+    want_exit_code = "2",
+    want_stderr = "syntax error",
+)
+
+shell_expansion_case(
+    name = "pipe_breaks_launcher",
+    fixed_args = ["a|b"],
+    want_exit_code = "2",
+    want_stderr = "syntax error",
+)
+
+shell_expansion_case(
+    name = "redirect_breaks_launcher",
+    fixed_args = ["a>b"],
+    want_exit_code = "2",
+    want_stderr = "syntax error",
+)
+
+shell_expansion_case(
+    name = "paren_breaks_launcher",
+    fixed_args = ["a(b"],
+    want_exit_code = "2",
+    want_stderr = "syntax error",
+)
+
+# The launcher runs under `set -o nounset`, so naming a variable nothing set is fatal.
+shell_expansion_case(
+    name = "unset_var_breaks_launcher",
+    fixed_args = ["$JS_BINARY_FIXED_ARGS_UNSET"],
+    want_exit_code = "1",
+    want_stderr = "unbound variable",
+)
+
+# And under `set -o errexit`, a command substitution that fails becomes the exit code of the
+# launcher itself, with nothing said about why.
+shell_expansion_case(
+    name = "failing_command_substitution_breaks_launcher",
+    fixed_args = ["$(exit 7)"],
+    want_exit_code = "7",
 )
