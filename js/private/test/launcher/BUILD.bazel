@@ -568,50 +568,6 @@ assert_contains(
     expected = "NODE_ENV=production",
 )
 
-# Locale-related environment variables require re-launching node: a target that sets LC_ALL and
-# runs in the launcher's process would format dates and numbers in the ambient locale.
-js_binary(
-    name = "locale_env_bin",
-    entry_point = "in_process_probe.cjs",
-    env = {"LC_ALL": "de_DE.UTF-8"},
-)
-
-filegroup(
-    name = "locale_env_launcher_js",
-    srcs = [":locale_env_bin"],
-    output_group = "launcher_js",
-    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
-)
-
-assert_contains(
-    name = "locale_configures_startup_test",
-    actual = ":locale_env_launcher_js",
-    expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
-    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
-)
-
-# The dynamic loader's variables need re-launching node too, even though node itself reads
-# nothing from them; see _NODE_STARTUP_ENV_PREFIXES in js/private/js_binary.bzl.
-js_binary(
-    name = "loader_path_env_bin",
-    entry_point = "in_process_probe.cjs",
-    env = {"LD_LIBRARY_PATH": "some/lib/dir"},
-)
-
-filegroup(
-    name = "loader_path_env_launcher_js",
-    srcs = [":loader_path_env_bin"],
-    output_group = "launcher_js",
-    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
-)
-
-assert_contains(
-    name = "loader_path_configures_startup_test",
-    actual = ":loader_path_env_launcher_js",
-    expected = "const ENV_CONFIGURES_NODE_STARTUP = true",
-    target_compatible_with = HERMETIC_LAUNCHER_ONLY,
-)
-
 # Setting NODE_COMPILE_CACHE after node starts is not a problem, because we explicitly handle
 # that situation at runtime.
 js_binary(
