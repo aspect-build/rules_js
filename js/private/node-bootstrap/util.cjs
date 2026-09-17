@@ -18,8 +18,8 @@ const IS_WINDOWS = process.platform === 'win32'
 
 // Emit a log line to stderr.
 //
-// We use fs.writeSync rather than console.error, so that the line is flushed before a
-// process.exit, or the execve that replaces the generated launcher, can follow it.
+// We use fs.writeSync rather than console.error, so that the line is flushed before
+// the process exits.
 //
 // The message is collapsed onto one line, since callers wrap long messages across source
 // lines and may log an exception.
@@ -72,7 +72,7 @@ function exitWith(exitCode) {
 // The bash launcher splices env values, node options and fixed args into double-quoted
 // strings, so users rely on shell parameter expansion happening at launch time; for example
 // examples/stack_traces passes
-// node_options = ["--require", "$$JS_BINARY__RUNFILES/$$JS_BINARY__WORKSPACE/..."].
+// node_options = ["--require", "$$RUNFILES_DIR/..."].
 // Only $VAR / ${VAR} expansion is reproduced here: no command substitution, and no
 // re-splitting on whitespace.
 function expandEnvRefs(value) {
@@ -138,8 +138,7 @@ function checkExecutableFile(what, p) {
     }
 }
 
-// Resolve a short path in the Bazel output tree against the execroot the launcher was
-// started in.
+// Resolve a short path in the Bazel output tree against the execroot the launcher was started in.
 function resolveExecrootBinPath(execroot, shortPath) {
     if (!process.env.BAZEL_BINDIR) {
         logFatal(
@@ -182,9 +181,7 @@ function resolveToolchainPath(execroot, workspaceName, file) {
 // trapped and forwarded manually.
 //
 // Each signal stops being forwarded as soon as it has been forwarded once, so a repeat of
-// it terminates the launcher rather than being swallowed. Only that signal, and only the
-// launcher's own listener for it: the other signal keeps being forwarded, so a caller that
-// escalates from SIGINT to SIGTERM still reaches the program.
+// it terminates the launcher rather than being swallowed.
 function forwardSignals(child) {
     const handlers = new Map()
 

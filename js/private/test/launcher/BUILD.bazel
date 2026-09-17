@@ -456,7 +456,7 @@ assert_contains(
 )
 
 # ==================================================================================================
-# Case 8: with nothing but the node options the stub already applied, the hermetic launcher runs the
+# Case 8: without env or user-provided node options, the hermetic launcher runs the
 # program in its own node process instead of starting a second one.
 
 js_binary(
@@ -479,7 +479,7 @@ assert_contains(
 )
 
 # Both launchers must ensure that the entry point file is the main module. A CommonJS entry
-# point guarded by `require.main === module` would otherwise run nothing while still exiting 0.
+# point guarded by `require.main === module` would otherwise run nothing.
 assert_contains(
     name = "entry_point_is_main_module_test",
     actual = ":in_process_out.txt",
