@@ -3,6 +3,10 @@
 // the second signal is only sent after the launcher has finished forwarding the
 // first. A launcher that stops trapping every signal after the first one leaves
 // the SIGTERM to terminate it instead, and the target never prints HANDLED.
+//
+// The launcher must then still wait for the target's exit code, which its
+// expected_exit_code remaps to 0; one that gives up as soon as it has forwarded
+// a signal reports the signal's own 128+N instead.
 import { spawn } from 'node:child_process'
 import { runfiles } from '@bazel/runfiles'
 
@@ -43,12 +47,19 @@ child.stdout.on('data', (chunk) => {
 // to the data listener before asserting on HANDLED.
 child.on('close', (code, sig) => {
     clearTimeout(timeout)
-    if (out.includes('HANDLED')) {
-        process.exit(0)
+    if (!out.includes('HANDLED')) {
+        process.stderr.write(
+            `SIGTERM was not forwarded after SIGINT (exit code=${code} signal=${sig}); ` +
+                `target output was ${JSON.stringify(out)}\n`
+        )
+        process.exit(1)
     }
-    process.stderr.write(
-        `SIGTERM was not forwarded after SIGINT (exit code=${code} signal=${sig}); ` +
-            `target output was ${JSON.stringify(out)}\n`
-    )
-    process.exit(1)
+    if (code !== 0) {
+        process.stderr.write(
+            `the launcher did not wait for the target's exit code ` +
+                `(exit code=${code} signal=${sig})\n`
+        )
+        process.exit(1)
+    }
+    process.exit(0)
 })
