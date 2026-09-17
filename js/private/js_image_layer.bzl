@@ -191,11 +191,9 @@ export BAZEL_BINDIR="."
 # patched by js_image_layer for hermeticity
 """
 
-# The JavaScript launcher's equivalent, replacing a declaration the template carries rather than
-# its shebang. Setting the flag tells the launcher to work out its bindir and CPU from the
-# container rather than use the values baked in at analysis time; see _JS_IMAGE_LAYER_OVERRIDES
-# in js_binary.bzl.
-_JS_PATCH_POINT = "const JS_IMAGE_LAYER = false"
+# The JavaScript launcher's equivalent. Setting the flag tells the launcher to work out
+# its bindir and CPU from the container rather than use the values baked in at analysis
+# time; see _JS_IMAGE_LAYER_OVERRIDES in js_binary.bzl.
 _JS_LAUNCHER_PREAMBLE = "const JS_IMAGE_LAYER = true\nprocess.env.BAZEL_BINDIR = '.'"
 
 def _launcher_js(binary):
@@ -222,7 +220,7 @@ def _write_js_launcher(ctx, launcher_js):
     ctx.actions.expand_template(
         template = launcher_js,
         output = launcher,
-        substitutions = {_JS_PATCH_POINT: _JS_LAUNCHER_PREAMBLE},
+        substitutions = {"const JS_IMAGE_LAYER = false": _JS_LAUNCHER_PREAMBLE},
         is_executable = True,
     )
     return launcher

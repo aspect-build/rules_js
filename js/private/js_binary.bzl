@@ -289,14 +289,12 @@ _ATTRS = {
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
-    # Per-launch setup, loaded by both launchers as node's first --require. Not to be confused
-    # with _launcher_js_template, which generates the hermetic launcher's own per-target file.
+    # Per-launch setup, loaded by both launchers as node's first --require.
     "_launcher_preload": attr.label(
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:launcher.cjs"),
     ),
-    # Helpers shared by _launcher_preload and the generated launcher, required by both out of
-    # the directory _launcher_preload sits in.
+    # Helpers shared by _launcher_preload and the generated JS launcher.
     "_launcher_util": attr.label(
         allow_single_file = True,
         default = Label("@aspect_rules_js//js/private/node-bootstrap:util.cjs"),
@@ -312,8 +310,7 @@ _ENV_SET = """export {var}={quoted_value}"""
 _ENV_SET_IFF_NOT_SET = """if [[ -z "${{{var}:-}}" ]]; then export {var}={quoted_value}; fi"""
 _NODE_OPTION = """JS_BINARY__NODE_OPTIONS+=(\"{value}\")"""
 
-# The same three, in the JavaScript launcher's syntax. setEnv/setEnvIfUnset and
-# addNodeOption are defined by js_binary.cjs.tpl.
+# The same three, in the JavaScript launcher's syntax
 _ENV_SET_JS = """setEnv({quoted_var}, {value_expr})"""
 _ENV_SET_IFF_NOT_SET_JS = """setEnvIfUnset({quoted_var}, {value_expr})"""
 _NODE_OPTION_JS = """addNodeOption({quoted_value})"""
@@ -728,7 +725,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
         )
         return launcher, launcher_js
 
-    # The stub embeds two arguments: node, and the JavaScript launcher it runs. Both are
+    # The first two arguments are node and the JavaScript launcher it runs. Both are
     # rlocation paths, which carry no output-tree configuration segment and so stay
     # correct under path mapping.
     if nodeinfo.node:

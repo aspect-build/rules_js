@@ -17,8 +17,7 @@ def launcher_snapshot(name, src, out, target_cpu_format, target_compatible_with)
         src: the generated launcher to snapshot.
         out: path of the checked-in snapshot, relative to this package.
         target_cpu_format: how the launcher spells the JS_BINARY__TARGET_CPU assignment,
-            with `{}` where the cpu goes. One format rather than a search and a replacement
-            so the two cannot describe different assignments.
+            with `{}` where the cpu goes.
         target_compatible_with: the launcher this snapshot exists for; see launcher_flags.bzl.
     """
     sed = "_{}_sed".format(name)

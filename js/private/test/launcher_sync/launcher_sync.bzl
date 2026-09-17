@@ -4,10 +4,6 @@ js_binary emits exactly one launcher per configuration (see `_create_launcher` i
 js/private/js_binary.bzl), so the only way to get both into one `bazel test` is to build the
 same target twice in two configurations that differ in //js:use_hermetic_launcher. That is
 what the transition below does.
-
-The comparison is relative -- it asserts the two launchers agree, not that either matches a
-recorded golden -- so it is unaffected by the Bazel version, the platform, the output base, or
-the other flags the CI matrix flips.
 """
 
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
@@ -95,6 +91,6 @@ def launcher_sync_test(name, tool, **kwargs):
         name = name,
         file1 = "{}_bash".format(name),
         file2 = "{}_hermetic".format(name),
-        failure_message = "The bash and JavaScript js_binary launchers no longer leave a js_binary in the same state. See js/private/test/launcher_sync/BUILD.bazel and docs/hermetic_launcher.md.",
+        failure_message = "The bash and hermetic launchers no longer leave a js_binary in the same state. See js/private/test/launcher_sync/BUILD.bazel and docs/hermetic_launcher.md.",
         **kwargs
     )

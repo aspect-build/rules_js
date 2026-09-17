@@ -2,32 +2,29 @@
 // (js/private/js_binary.sh.tpl) and the JavaScript one (js/private/js_binary.cjs.tpl) can be
 // compared directly.
 //
-// This runs after js/private/node-bootstrap/bootstrap.cjs, which is deliberate: bootstrap is
-// common to both launchers, so what it does is the same on both sides, and what this prints is
-// what a js_binary program actually observes.
+// This runs after js/private/node-bootstrap/bootstrap.cjs, which is deliberate: bootstrap.cjs
+// is common to both launchers, so what it does is the same on both sides, and what this prints
+// is what a js_binary program actually observes.
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
-// Dropped before comparison. Everything not listed here has to match, so keep this list short
-// and say why for each entry.
+// Dropped before comparison. Everything not listed here has to match.
 const DROPPED = new Set([
-    // Bash bookkeeping. The bash launcher is a bash process and the hermetic one is a native
-    // stub that execve()s node, so these are artifacts of the shell rather than launcher output.
-    '_', // bash exports the path of the command it is about to run
-    'OLDPWD', // set by the `cd "$BAZEL_BINDIR"` in js_binary.sh.tpl
-    'SHLVL', // incremented by every bash in the chain
+    // Bash bookkeeping. These are artifacts of the shell rather than launcher output.
+    '_',
+    'OLDPWD',
+    'SHLVL',
     // Set per action by Bazel, not by either launcher.
     'TMPDIR',
-    // Exported by the hermetic_launcher stub for legacy runfiles consumers before it hands off
-    // to the launcher. RUNFILES_DIR, which both launchers do set, stays compared.
+    // Exported by the hermetic_launcher stub for legacy runfiles consumers.
     'JAVA_RUNFILES',
     // This fixture's own plumbing; it names the output file, which differs per variant.
     'JS_LAUNCHER_SYNC_OUT',
 ])
 
-// Each variant runs as its own action and so gets its own sandbox, and the launcher under test
-// is built in its own configuration. Neither difference is launcher behavior, so both are
+// Each variant runs as its own action and gets its own sandbox, and the launcher under test is
+// built in its own configuration. Neither difference is launcher behavior, so both are
 // replaced with tokens.
 //
 // The execroot is derived from the cwd rather than read from JS_BINARY__EXECROOT, so that
