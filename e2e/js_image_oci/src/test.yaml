@@ -6,7 +6,7 @@ commandTests:
       expectedOutput:
           [
               'OS',
-              'ARCH/CPU',
+              ' ARCH/CPU    (x86_64|aarch64)',
               'WORKSPACE',
               ' TARGET    //src:bin',
               ' CWD    /app/src/bin.runfiles/',
@@ -26,7 +26,7 @@ commandTests:
       expectedOutput:
           [
               'OS',
-              'ARCH/CPU',
+              ' ARCH/CPU    (x86_64|aarch64)',
               'WORKSPACE',
               ' TARGET    //src:bin',
               ' CWD    /app/src/bin.runfiles/',

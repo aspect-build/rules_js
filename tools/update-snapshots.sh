@@ -88,8 +88,11 @@ print_category "ROOT TEST SNAPSHOTS"
 # npm/private/test - npm translation test snapshots
 run_target "$REPO_ROOT" "//npm/private/test:write_npm_translate_lock" "npm/private/test"
 
-# js/private/test - js_binary launcher snapshot
-run_target "$REPO_ROOT" "//js/private/test:write_launcher" "js/private/test"
+# js/private/test - js_binary launcher snapshots. The JavaScript launcher is only generated
+# when the hermetic launcher is selected, so its snapshot needs the flag.
+run_target "$REPO_ROOT" "//js/private/test:write_launcher" "js/private/test (bash launcher)"
+run_target "$REPO_ROOT" "//js/private/test:write_launcher_js" "js/private/test (JS launcher)" \
+    "--@aspect_rules_js//js:use_hermetic_launcher=True"
 
 # js/private/test/image - js_image_layer test snapshots
 run_target "$REPO_ROOT" "//js/private/test/image:checksum_test_test" "js/private/test/image checksum"
@@ -97,6 +100,8 @@ run_target "$REPO_ROOT" "//js/private/test/image:default_test_update_all" "js/pr
 run_target "$REPO_ROOT" "//js/private/test/image:custom_owner_test_update_all" "js/private/test/image custom_owner"
 run_target "$REPO_ROOT" "//js/private/test/image:regex_edge_cases_test_update_all" "js/private/test/image regex_edge_cases"
 run_target "$REPO_ROOT" "//js/private/test/image:custom_layers_nomatch_test_update_all" "js/private/test/image custom_layers_nomatch"
+run_target "$REPO_ROOT" "//js/private/test/image/non_ascii:custom_layer_groups_test_update_all" "js/private/test/image/non_ascii custom_layer_groups"
+run_target "$REPO_ROOT" "//js/private/test/image/platform_deps:rspack_linux_arm64_test_update_all" "js/private/test/image/platform_deps rspack_linux_arm64"
 
 ##############################################################################
 # GENERATED SOURCES

@@ -11,3 +11,4 @@ min/
 npm/private/test/vendored/
 js/private/worker/worker.js
 js/private/worker/src/worker_protocol.ts
+js/private/test/snapshots/launcher.cjs
