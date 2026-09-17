@@ -327,11 +327,10 @@ fi
 
 readonly child=$!
 # Bash does not forward termination signals to any child process when
-# running in docker so need to manually trap and forward the signals.
+# running in docker, so we need to manually trap and forward the signals.
 #
 # Each trap is reset as it fires, so that a repeat of that signal terminates this
-# script rather than being swallowed. Only that signal: the other one keeps being
-# forwarded, so a caller escalating from SIGINT to SIGTERM still reaches node.
+# script rather than being swallowed.
 _term() { trap - SIGTERM; kill -TERM "${child}" 2>/dev/null; }
 _int() { trap - SIGINT; kill -INT "${child}" 2>/dev/null; }
 trap _term SIGTERM
@@ -345,6 +344,10 @@ while kill -0 "$child" 2>/dev/null; do
     wait "$child"
     RESULT="$?"
 done
+
+# Nothing left to forward to, so a signal arriving during the mop-up below should
+# terminate this script rather than be swallowed.
+trap - SIGTERM SIGINT
 set -e
 
 # ==============================================================================
