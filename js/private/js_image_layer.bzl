@@ -180,18 +180,21 @@ The default layer groups are as follows and always created.
 
 """
 
-# The line the bash launcher template carries for js_image_layer to replace, minus its comment
-# marker.
-_PATCH_POINT = "This line is replaced by js_image_layer to make the launcher hermetic."
-
 # BAZEL_BINDIR has to be set to '.' so that js_binary preserves the PWD when running inside container.
 # See https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs
 # for why this is needed.
-_LAUNCHER_PREAMBLE = '# patched by js_image_layer for hermeticity\nexport BAZEL_BINDIR="."'
+_LAUNCHER_PREAMBLE = """\
+#!/usr/bin/env bash
 
-# The JavaScript launcher declares the flag it replaces rather than carrying the comment the bash
-# one does. Setting it tells the launcher to work out its bindir and CPU from the container rather
-# than use the values baked in at analysis time; see _JS_IMAGE_LAYER_OVERRIDES in js_binary.bzl.
+export BAZEL_BINDIR="."
+
+# patched by js_image_layer for hermeticity
+"""
+
+# The JavaScript launcher's equivalent, replacing a declaration the template carries rather than
+# its shebang. Setting the flag tells the launcher to work out its bindir and CPU from the
+# container rather than use the values baked in at analysis time; see _JS_IMAGE_LAYER_OVERRIDES
+# in js_binary.bzl.
 _JS_PATCH_POINT = "const JS_IMAGE_LAYER = false"
 _JS_LAUNCHER_PREAMBLE = "const JS_IMAGE_LAYER = true\nprocess.env.BAZEL_BINDIR = '.'"
 
@@ -229,7 +232,7 @@ def _write_launcher(ctx, real_binary):
     launcher = ctx.actions.declare_file("%s_launcher" % ctx.label.name)
 
     substitutions = {
-        "# " + _PATCH_POINT: _LAUNCHER_PREAMBLE,
+        "#!/usr/bin/env bash": _LAUNCHER_PREAMBLE,
         'export JS_BINARY__BINDIR="%s"' % real_binary.root.path: 'export JS_BINARY__BINDIR="$(pwd)"',
         'export JS_BINARY__TARGET_CPU="%s"' % ctx.expand_make_variables("", "$(TARGET_CPU)", {}): 'export JS_BINARY__TARGET_CPU="$(uname -m)"',
     }
