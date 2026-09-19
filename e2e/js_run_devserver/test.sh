@@ -7,6 +7,7 @@ bazel run -- @pnpm --dir "$PWD" install
 
 ./serve_test.sh //src:serve
 ./serve_test.sh //src:serve_alt
+./serve_test.sh //src:serve_sandbox
 ./serve_test.sh //src:serve_simple
 ./serve_test.sh //src:serve_simple_bin
 ./serve_test.sh //src:serve_naughty
