@@ -108,15 +108,6 @@ _ATTRS = {
 
         See https://bazel.build/reference/be/common-definitions#common-attributes-binaries
         for more info on the built-in `args` attribute.
-
-        The resulting arguments are interpolated into the generated launcher script unquoted,
-        so bash applies one further round of expansion to them at run time, whether or not
-        `expand_args` is set: word splitting, quote removal, backslash escapes, brace and
-        tilde expansion, `$VAR`, `$(command)` and globbing all apply. An entry containing a
-        space therefore becomes several arguments, an empty entry becomes none, and an entry
-        containing `;`, `|`, `&`, `>`, `(`, `#` or an unbalanced quote makes the launcher fail
-        to parse. Unlike `env`, which is quoted, none of this is escaped for you. See
-        //js/private/test/fixed_args for what the launcher does with each of these today.
         """,
     ),
     "node_options": attr.string_list(
