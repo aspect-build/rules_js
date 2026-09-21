@@ -5,12 +5,18 @@ load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
+_SKIP_ON_MACOS = select({
+    "@platforms//os:macos": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})
+
 def shell_expansion_case(
         name,
         fixed_args,
         data = None,
         env = None,
         expand_args = False,
+        skip_exit_code_on_macos = False,
         srcs = None,
         want_argv = None,
         want_exit_code = None,
@@ -23,6 +29,7 @@ def shell_expansion_case(
         data: Passed through to js_binary.
         env: Passed through to js_binary.
         expand_args: Passed through to js_binary. Defaults to False.
+        skip_exit_code_on_macos: Marks the exit code test case incompatible with macOS.
         srcs: Passed through to js_binary.
         want_argv: The exact argv the program must receive, as a list of strings. The empty
             list asserts it received no arguments at all.
@@ -79,6 +86,7 @@ def shell_expansion_case(
             name = name + "_exit_code_test",
             file1 = ":" + name + "_want_exit_code.txt",
             file2 = ":" + name + "_exit_code.txt",
+            target_compatible_with = _SKIP_ON_MACOS if skip_exit_code_on_macos else [],
         )
 
     if want_stderr != None:

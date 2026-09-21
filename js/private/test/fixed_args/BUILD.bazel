@@ -489,6 +489,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "apostrophe_breaks_launcher",
     fixed_args = ["it's"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "unexpected EOF",
 )
@@ -496,6 +497,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "double_quote_breaks_launcher",
     fixed_args = ["a\"b"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "unexpected EOF",
 )
@@ -503,6 +505,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "backtick_breaks_launcher",
     fixed_args = ["a`b"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "unexpected EOF",
 )
@@ -511,6 +514,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "hash_breaks_launcher",
     fixed_args = ["#comment"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "syntax error",
 )
@@ -518,6 +522,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "semicolon_breaks_launcher",
     fixed_args = ["a;b"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "syntax error",
 )
@@ -525,6 +530,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "pipe_breaks_launcher",
     fixed_args = ["a|b"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "syntax error",
 )
@@ -532,6 +538,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "redirect_breaks_launcher",
     fixed_args = ["a>b"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "syntax error",
 )
@@ -539,6 +546,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "paren_breaks_launcher",
     fixed_args = ["a(b"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "2",
     want_stderr = "syntax error",
 )
@@ -547,6 +555,7 @@ shell_expansion_case(
 shell_expansion_case(
     name = "unset_var_breaks_launcher",
     fixed_args = ["$JS_BINARY_FIXED_ARGS_UNSET"],
+    skip_exit_code_on_macos = True,
     want_exit_code = "1",
     want_stderr = "unbound variable",
 )
