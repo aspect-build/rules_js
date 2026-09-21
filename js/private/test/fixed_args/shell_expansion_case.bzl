@@ -1,10 +1,4 @@
-"""Characterization rig for how the bash launcher expands `fixed_args`.
-
-js_binary.bzl splices each fixed_arg into js_binary.sh.tpl raw and unquoted -- unlike `env`,
-which is json.encode()d -- so bash applies one full round of expansion to them at launch time.
-None of that is a designed feature. These cases pin down what the launcher does today so that
-replacing it is a deliberate, reviewable break rather than a silent one.
-"""
+"""Test macro for asserting on how the bash launcher expands `fixed_args`."""
 
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
@@ -27,14 +21,9 @@ def shell_expansion_case(
         name: Base name for the generated targets.
         fixed_args: Passed through to js_binary verbatim.
         data: Passed through to js_binary.
-        env: Passed through to js_binary. Exported by the launcher before it builds its
-            argument array, so a case can pin a variable that its fixed_args expand.
-        expand_args: Passed through to js_binary. Defaults to False, off, so that the value
-            written in the BUILD file is the one bash sees. Cases that exercise the
-            make-variable layer as well set it to True.
-        srcs: Files the action needs in its own bindir rather than in the tool's runfiles.
-            Globbing resolves against the bindir the launcher chdir'd to, which belongs to
-            the action's target configuration, not to the exec-configuration tool.
+        env: Passed through to js_binary.
+        expand_args: Passed through to js_binary. Defaults to False.
+        srcs: Passed through to js_binary.
         want_argv: The exact argv the program must receive, as a list of strings. The empty
             list asserts it received no arguments at all.
         want_exit_code: The exact exit code of the launcher, as a string. Set this for a
@@ -80,7 +69,6 @@ def shell_expansion_case(
         )
 
     if want_exit_code != None:
-        # Compared exactly rather than with assert_contains, which would let "2" match "127".
         write_file(
             name = name + "_want_exit_code",
             out = name + "_want_exit_code.txt",

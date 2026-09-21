@@ -140,28 +140,14 @@ assert_contains(
 # ==================================================================================================
 # Shell expansion of fixed_args.
 #
-# js_binary.bzl joins fixed_args with spaces and substitutes the result into
-# js_binary.sh.tpl as `ALL_ARGS=({{fixed_args}} "$@")`, unquoted. Bash therefore applies one
-# full round of expansion to them before the program ever sees them. The cases below record
-# what that currently means. They are characterization tests, not a specification: almost
-# none of this was designed, and the point of writing it down is to make the eventual
-# removal of the bash launcher a reviewable break.
+# js_binary.bzl joins fixed_args with spaces and substitutes the result into js_binary.sh.tpl
+# as raw, unquoted text. Bash therefore applies a full round of expansion to them before the
+# program ever sees them.
 #
-# Two of these behaviors are relied on today and a replacement has to keep them: run-time
-# `$VAR` expansion (the `$$RUNFILES_DIR/$(rlocationpath ...)` idiom in
-# docs/use_execroot_entry_point.md) and word splitting of a plural `$(rootpaths ...)`.
-#
-# Unless a case says otherwise it sets expand_args = False, so the string in the BUILD file
-# is exactly the string bash sees. The cases at the end set it to True to cover how the
-# analysis-time make-variable layer stacks on top of the run-time shell layer.
-#
-# Note that `node_options` are spliced in with the same lack of quoting but *inside* double
-# quotes (js_binary.bzl `_NODE_OPTION`), so they get a third, different treatment: expansion
-# but no word splitting. That is not covered here.
+# The test cases below are characterization tests, not a specification.
 
 # --------------------------------------------------------------------------------------------
-# Word splitting and quote removal. The join is lossy: bash, not the caller, decides where
-# one argument ends and the next begins.
+# Word splitting and quote removal. Bash decides where one argument ends and the next begins.
 
 shell_expansion_case(
     name = "plain",
@@ -178,8 +164,6 @@ shell_expansion_case(
     ],
 )
 
-# Byte for byte the same launcher line as the case above: the list structure a caller writes
-# carries no meaning by the time bash sees it.
 shell_expansion_case(
     name = "two_entries_are_indistinguishable",
     fixed_args = [
@@ -244,14 +228,12 @@ shell_expansion_case(
     want_argv = ["abc"],
 )
 
-# The only way to give a flag a value containing a space.
 shell_expansion_case(
     name = "quoted_flag_value_keeps_space",
     fixed_args = ["--flag='x y'"],
     want_argv = ["--flag=x y"],
 )
 
-# A control case: not everything is mangled.
 shell_expansion_case(
     name = "ordinary_punctuation_survives",
     fixed_args = [
@@ -271,8 +253,7 @@ shell_expansion_case(
 )
 
 # --------------------------------------------------------------------------------------------
-# Backslash escapes. A backslash is consumed whether or not it was meant as an escape, so a
-# value that is not shell syntax at all, such as a Windows path, is silently corrupted.
+# Backslash escapes. A backslash is consumed whether or not it was meant as an escape.
 
 shell_expansion_case(
     name = "backslash_escapes_space",
@@ -368,9 +349,9 @@ shell_expansion_case(
     ],
 )
 
-# The contrast worth noticing: `env` values are json.encode()d into the launcher, so an
-# apostrophe in an env value is harmless, while the same character written directly in
-# fixed_args stops the launcher from parsing at all (see apostrophe_breaks_launcher below).
+# env values are json.encode()d into the launcher, so an apostrophe in an env value is
+# harmless, while the same character written directly in fixed_args stops the launcher from
+# parsing at all (see apostrophe_breaks_launcher below).
 shell_expansion_case(
     name = "env_value_with_apostrophe_is_safe",
     env = {"CASE_QUOTEY": "it's"},
@@ -426,13 +407,7 @@ shell_expansion_case(
 )
 
 # --------------------------------------------------------------------------------------------
-# Pathname expansion. The launcher has already chdir'd to BAZEL_BINDIR by this point, so a
-# pattern is matched against the output tree of the action's own configuration. The files are
-# srcs of the js_run_binary rather than data of the js_binary for that reason: the tool is
-# built in the exec configuration and its runfiles are not what the glob can see.
-#
-# They also live in their own directory. Globbing the package directory would be
-# non-deterministic, because every expectation file these cases declare lands there too.
+# Pathname expansion.
 
 shell_expansion_case(
     name = "glob_matches_bindir",
@@ -481,10 +456,6 @@ shell_expansion_case(
 # --------------------------------------------------------------------------------------------
 # Both layers at once: Bazel make-variable expansion at analysis time, then the shell at run
 # time. These cases set expand_args = True.
-#
-# Not covered, because it fails during analysis rather than producing a value: a bare
-# `$(echo hi)` with expand_args = True, which Bazel reads as a reference to a make variable
-# named `echo hi` and rejects.
 
 filegroup(
     name = "globdir_files",
@@ -494,8 +465,6 @@ filegroup(
     ],
 )
 
-# `$$` is how a literal dollar sign survives analysis to reach the shell. This is the
-# mechanism behind the documented `$$RUNFILES_DIR/$(rlocationpath ...)` idiom.
 shell_expansion_case(
     name = "dollar_dollar_reaches_the_shell",
     expand_args = True,
@@ -503,9 +472,6 @@ shell_expansion_case(
     want_argv = ["_main"],
 )
 
-# A plural $(rootpaths ...) becomes one space-separated string at analysis time and only
-# becomes separate arguments because the substitution is unquoted. Of everything in this
-# file, this is the behavior most likely to be depended on outside the repository.
 shell_expansion_case(
     name = "rootpaths_plural_splits",
     data = [":globdir_files"],
@@ -519,11 +485,6 @@ shell_expansion_case(
 
 # --------------------------------------------------------------------------------------------
 # Values that stop the launcher from running at all.
-#
-# These targets build: expand_template never parses the script it writes. The damage only
-# shows up on execution, and for the syntax errors bash rejects the file as a whole, so no
-# part of the launcher runs and expected_exit_code cannot observe it either. Capturing the
-# exit code keeps the action itself successful so the failure can be asserted on.
 
 shell_expansion_case(
     name = "apostrophe_breaks_launcher",
@@ -546,8 +507,7 @@ shell_expansion_case(
     want_stderr = "unexpected EOF",
 )
 
-# A word starting with `#` comments out the rest of the line, which is the closing paren of
-# the array and the `"$@"` that forwards the caller's own arguments.
+# A word starting with `#` comments out the rest of the line.
 shell_expansion_case(
     name = "hash_breaks_launcher",
     fixed_args = ["#comment"],
@@ -591,8 +551,8 @@ shell_expansion_case(
     want_stderr = "unbound variable",
 )
 
-# And under `set -o errexit`, a command substitution that fails becomes the exit code of the
-# launcher itself, with nothing said about why.
+# Under `set -o errexit`, a command substitution that fails becomes the exit code of the
+# launcher itself.
 shell_expansion_case(
     name = "failing_command_substitution_breaks_launcher",
     fixed_args = ["$(exit 7)"],
