@@ -12,6 +12,9 @@ jobs:
         name: Aspect Workflows Warming
         runs-on: [self-hosted, aspect-workflows, aspect-large]
         timeout-minutes: 90
+        env:
+            # The runner's remote cache requires RE API 2.3, unsupported by Bazel 7.
+            USE_BAZEL_VERSION: '9.0.0'
         permissions:
             contents: read
             id-token: write
