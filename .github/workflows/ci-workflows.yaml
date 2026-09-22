@@ -15,6 +15,12 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
     cancel-in-progress: true
 
+env:
+    # Indicates where the aspect CLI should look for .aspect/config.json
+    ASPECT_WORKSPACE: ${{ github.workspace }}
+    # Skip the --remote flag on fork PRs, which do not have access to secrets
+    REMOTE_FLAG: ${{ secrets.ASPECT_OSS_API_TOKEN != '' && '--remote' || '' }}
+
 jobs:
     semantic-pull-request:
         if: github.event_name == 'pull_request'
@@ -33,9 +39,9 @@ jobs:
             - uses: actions/checkout@v6
             - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
-                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+                  aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
             - name: Format
-              run: aspect format --task-key=format
+              run: aspect format $REMOTE_FLAG --task:name=format
 
     buildifier:
         runs-on: ubuntu-latest
@@ -46,9 +52,9 @@ jobs:
             - uses: actions/checkout@v6
             - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
-                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+                  aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
             - name: Buildifier
-              run: aspect buildifier --task-key=buildifier
+              run: aspect buildifier $REMOTE_FLAG --task:name=buildifier
 
     # Builds the workspace matrix axis. e2e tests gated on secrets that forks don't have
     # (ASPECT_GHTESTER_SSH_KEY, ASPECT_NPM_AUTH_TOKEN) are only appended when the secret is
@@ -123,7 +129,7 @@ jobs:
                     )
                   fi
 
-                  # Slug feeds aspect --task-key, the disk-cache key, and the job name, all
+                  # Slug feeds aspect --task:name, the disk-cache key, and the job name, all
                   # of which require [A-Za-z0-9_-]. Map "." → "root"; replace "/" with "-"
                   # and "+" and "." with "_" so e.g. e2e/npm_translate_lock_git+ssh becomes
                   # a valid e2e-npm_translate_lock_git_ssh slug.
@@ -220,6 +226,10 @@ jobs:
                       }
         env:
             USE_BAZEL_VERSION: ${{ matrix.bazel.version }}
+            # Skip the --remote flag on self-hosted runners and fork PRs. Our self-hosted
+            # Aspect Workflows runners have their own cache, and fork PRs do not have access to
+            # secrets.
+            REMOTE_FLAG: ${{ !contains(matrix.workspace.runner, 'self-hosted') && secrets.ASPECT_OSS_API_TOKEN != '' && '--remote' || '' }}
             ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
             ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
         steps:
@@ -231,10 +241,10 @@ jobs:
                   ssh-private-key: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
             - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
-                  aspect-api-token: ${{ secrets.ASPECT_API_TOKEN }}
+                  aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
             - name: Test
               working-directory: ${{ matrix.workspace.path }}
-              run: aspect test --task-key=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
+              run: aspect test $REMOTE_FLAG --task:name=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
 
             # The root workspace lockfile contains an intentionally-unused npm package
             # (npm/private/test/package.json) to assert that rules_js fetches packages
@@ -256,14 +266,14 @@ jobs:
             # mergers' assertions would never execute.
             - name: Coverage
               if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-7'
-              run: aspect test --task-key=coverage-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results -- //js/private/test/coverage/...
+              run: aspect test $REMOTE_FLAG --task:name=coverage-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results -- //js/private/test/coverage/...
 
             # Again with the merger as its own action, as remote execution requires. The
             # mergers assert different things in that mode -- bazel discards a report the
             # test wrote to COVERAGE_OUTPUT_FILE itself -- so both modes need a run.
             - name: Coverage (split postprocessing)
               if: matrix.workspace.path == '.' && matrix.bazel.id == 'bazel-7'
-              run: aspect test --task-key=coverage-split-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results --bazel-flag=--experimental_split_coverage_postprocessing --bazel-flag=--experimental_fetch_all_coverage_outputs -- //js/private/test/coverage/...
+              run: aspect test $REMOTE_FLAG --task:name=coverage-split-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} --bazel-flag=--collect_code_coverage --bazel-flag=--instrument_test_targets --bazel-flag=--nocache_test_results --bazel-flag=--experimental_split_coverage_postprocessing --bazel-flag=--experimental_fetch_all_coverage_outputs -- //js/private/test/coverage/...
 
             # Skipped on the no-execroot-entry-point variant: test.sh scripts invoke plain
             # `bazel` without matrix.bazel.flags, so that leg wouldn't exercise the flag —
