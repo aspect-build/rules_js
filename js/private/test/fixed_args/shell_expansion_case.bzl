@@ -5,11 +5,6 @@ load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary")
 
-_SKIP_ON_MACOS = select({
-    "@platforms//os:macos": ["@platforms//:incompatible"],
-    "//conditions:default": [],
-})
-
 def shell_expansion_case(
         name,
         fixed_args,
