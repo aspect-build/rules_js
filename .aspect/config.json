@@ -1,0 +1,27 @@
+{
+  "deployments": [
+    {
+      "name": "aspect-cloud",
+      "issuer": "https://auth.aspect.build",
+      "client_id": "efcf21f7-ebdc-4ffa-9f93-12129dbfdc44",
+      "hosts": [
+        "api.aspect.build",
+        "cache.aspect.build",
+        "bes.aspect.build"
+      ],
+      "scopes": [
+        "openid",
+        "profile",
+        "email",
+        "offline_access"
+      ],
+      "endpoints": {
+        "cache": "cache.aspect.build",
+        "bes": "bes.aspect.build",
+        "api": "api.aspect.build",
+        "results_url": "https://app.aspect.build/i/"
+      },
+      "login_redirect_uri": "https://app.aspect.build/auth/cli/callback"
+    }
+  ]
+}
