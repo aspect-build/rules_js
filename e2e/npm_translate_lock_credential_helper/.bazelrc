@@ -1,4 +1,4 @@
 import %workspace%/../../tools/preset.bazelrc
 import %workspace%/../e2e.bazelrc
 
-common --credential_helper=%workspace%/credential-helper.sh
+common --credential_helper=registry.npmjs.org=%workspace%/credential-helper.sh
