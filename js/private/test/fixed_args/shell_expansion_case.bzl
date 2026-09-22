@@ -16,7 +16,7 @@ def shell_expansion_case(
         data = None,
         env = None,
         expand_args = False,
-        skip_exit_code_on_macos = False,
+        macos_want_exit_code = None,
         srcs = None,
         want_argv = None,
         want_exit_code = None,
@@ -29,7 +29,7 @@ def shell_expansion_case(
         data: Passed through to js_binary.
         env: Passed through to js_binary.
         expand_args: Passed through to js_binary. Defaults to False.
-        skip_exit_code_on_macos: Marks the exit code test case incompatible with macOS.
+        macos_want_exit_code: The exact exit code on macOS.
         srcs: Passed through to js_binary.
         want_argv: The exact argv the program must receive, as a list of strings. The empty
             list asserts it received no arguments at all.
@@ -79,14 +79,16 @@ def shell_expansion_case(
         write_file(
             name = name + "_want_exit_code",
             out = name + "_want_exit_code.txt",
-            content = [want_exit_code],
+            content = select({
+                "@platforms//os:macos": [macos_want_exit_code],
+                "//conditions:default": [want_exit_code],
+            }) if macos_want_exit_code != None else [want_exit_code],
             newline = "unix",
         )
         diff_test(
             name = name + "_exit_code_test",
             file1 = ":" + name + "_want_exit_code.txt",
             file2 = ":" + name + "_exit_code.txt",
-            target_compatible_with = _SKIP_ON_MACOS if skip_exit_code_on_macos else [],
         )
 
     if want_stderr != None:
