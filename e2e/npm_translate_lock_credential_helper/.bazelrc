@@ -1,9 +1,7 @@
 import %workspace%/../../tools/preset.bazelrc
 import %workspace%/../e2e.bazelrc
 
-# One scope per registry the lockfile resolves against: the default, plus the
-# @aspect-build registry in pnpm-workspace.yaml. Add a line when adding one.
-# Unscoped, the helper applies to every URI -- including Aspect's cache and BES,
-# which it has no token for, so the CLI suppresses its own auth header.
+# We need to explicitly specify scopes for the credential helper. Otherwise,
+# the helper would apply everywhere, including for Aspect's cache and BES.
 common --credential_helper=registry.npmjs.org=%workspace%/credential-helper.sh
 common --credential_helper=npm.pkg.github.com=%workspace%/credential-helper.sh
