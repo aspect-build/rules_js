@@ -16,14 +16,9 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    # Pins where the CLI looks for .aspect/config.json, the file naming
-    # cache.aspect.build/bes.aspect.build as Aspect Cloud's. The test matrix builds
-    # from nested workspaces via working-directory, so without this the file is
-    # never found and the cache is reached as an unknown third party.
+    # Indicates where the aspect CLI should look for .aspect/config.json
     ASPECT_WORKSPACE: ${{ github.workspace }}
-    # Empty on a fork PR, which gets no org secrets: --remote with no discovered
-    # deployment fails the invocation rather than degrading. The test job narrows
-    # this further; see its env.
+    # Skip the --remote flag on fork PRs, which do not have access to secrets
     REMOTE_FLAG: ${{ secrets.ASPECT_OSS_API_TOKEN != '' && '--remote' || '' }}
 
 jobs:
@@ -231,9 +226,9 @@ jobs:
                       }
         env:
             USE_BAZEL_VERSION: ${{ matrix.bazel.version }}
-            # Self-hosted Aspect Workflows runners inject their own in-region cache
-            # and BES (ASPECT_WORKFLOWS_*); --remote would route those builds off them
-            # and onto cache.aspect.build. Only the GitHub-hosted legs need it.
+            # Skip the --remote flag on self-hosted runners and fork PRs. Our self-hosted
+            # Aspect Workflows runners have their own cache, and fork PRs do not have access to
+            # secrets.
             REMOTE_FLAG: ${{ !contains(matrix.workspace.runner, 'self-hosted') && secrets.ASPECT_OSS_API_TOKEN != '' && '--remote' || '' }}
             ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
             ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
