@@ -14,6 +14,7 @@ js_image_layer(
 """
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 _DEFAULT_LAYER_GROUPS = {
@@ -196,13 +197,18 @@ export BAZEL_BINDIR="."
 # time; see _JS_IMAGE_LAYER_OVERRIDES in js_binary.bzl.
 _JS_LAUNCHER_PREAMBLE = "const JS_IMAGE_LAYER = true\nprocess.env.BAZEL_BINDIR = '.'"
 
-def _launcher_js(binary):
+def _launcher_js(binary, hermetic_launcher):
     """The generated JavaScript launcher of a js_binary, or None when it uses the bash launcher."""
     if OutputGroupInfo not in binary or not hasattr(binary[OutputGroupInfo], "launcher_js"):
-        fail("""{}: not a js_binary.
+        if not hermetic_launcher:
+            # There is no JavaScript launcher to publish, so an absent output group says
+            # nothing and the executable is the launcher.
+            return None
+        fail("""{}: no launcher_js output group.
 
-The binary attribute of js_image_layer takes a js_binary, or a custom rule built on
-js_binary_lib.create_launcher that republishes its launcher_js in an output group:
+With --@aspect_rules_js//js:use_hermetic_launcher the binary attribute of js_image_layer
+takes a js_binary, or a custom rule built on js_binary_lib.create_launcher that republishes
+its launcher_js in an output group:
 
     OutputGroupInfo(launcher_js = launcher.launcher_js)""".format(binary.label))
     launchers = binary[OutputGroupInfo].launcher_js.to_list()
@@ -376,7 +382,7 @@ def _js_image_layer_impl(ctx):
     # The hermetic launcher's executable is a native binary with nothing in it to
     # sanitize; the non-reproducible values live in the JavaScript launcher it runs, which
     # is in the runfiles rather than at the image entry point.
-    launcher_js = _launcher_js(ctx.attr.binary[0])
+    launcher_js = _launcher_js(ctx.attr.binary[0], ctx.attr._use_hermetic_launcher[BuildSettingInfo].value)
     if launcher_js:
         launcher = _write_js_launcher(ctx, launcher_js)
         sanitized_original = launcher_js
@@ -561,14 +567,19 @@ js_image_layer_lib = struct(
             default = "//js/private:js_image_layer.mjs",
             allow_single_file = True,
         ),
+        "_use_hermetic_launcher": attr.label(
+            default = Label("//js:use_hermetic_launcher"),
+            providers = [BuildSettingInfo],
+        ),
         "binary": attr.label(
             mandatory = True,
             cfg = _js_image_layer_transition,
             executable = True,
             doc = """Label to a js_binary target.
 
-            A custom rule built on `js_binary_lib.create_launcher` works too, as long as
-            it republishes `launcher_js` in an output group the way `js_binary` does.""",
+            A custom rule built on `js_binary_lib.create_launcher` works too. Under
+            `--@aspect_rules_js//js:use_hermetic_launcher` it must also republish
+            `launcher_js` in an output group the way `js_binary` does.""",
         ),
         "root": attr.string(
             doc = "Path where the files from js_binary will reside in. eg: /apps/app1 or /app",

@@ -58,3 +58,34 @@ def custom_test(**kwargs):
         }),
         **kwargs
     )
+
+# A rule that does not republish launcher_js, standing in for one written before
+# js_image_layer learned about the JavaScript launcher. Under the bash launcher there is
+# nothing to republish, so js_image_layer must still accept it.
+def _custom_binary_impl(ctx):
+    launcher = js_binary_lib.create_launcher(
+        ctx,
+        log_prefix_rule_set = "aspect_rules_js",
+        log_prefix_rule = "custom_binary",
+    )
+
+    return [DefaultInfo(
+        executable = launcher.executable,
+        runfiles = ctx.runfiles().merge(launcher.runfiles),
+    )]
+
+_custom_binary = rule(
+    attrs = js_binary_lib.attrs,
+    implementation = _custom_binary_impl,
+    executable = True,
+    toolchains = js_binary_lib.toolchains,
+)
+
+def custom_binary(**kwargs):
+    _custom_binary(
+        enable_runfiles = select({
+            Label("@bazel_lib//lib:enable_runfiles"): True,
+            "//conditions:default": False,
+        }),
+        **kwargs
+    )

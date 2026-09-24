@@ -1,8 +1,32 @@
-load(":custom_test.bzl", "custom_test")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("//js:defs.bzl", "js_image_layer")
+load("//js/private/test:launcher_flags.bzl", "BASH_LAUNCHER_ONLY")
+load(":custom_test.bzl", "custom_binary", "custom_test")
 
 package(default_testonly = True)
 
 custom_test(
     name = "test",
     entry_point = "test.js",
+)
+
+# js_image_layer asks for the launcher_js output group only when there is a JavaScript
+# launcher to ask for; a rule that does not publish one still works under the bash launcher.
+custom_binary(
+    name = "no_output_group_bin",
+    entry_point = "test.js",
+)
+
+js_image_layer(
+    name = "no_output_group_layer",
+    binary = ":no_output_group_bin",
+    root = "/app",
+    tags = ["manual"],
+    target_compatible_with = BASH_LAUNCHER_ONLY,
+)
+
+build_test(
+    name = "no_output_group_layer_test",
+    target_compatible_with = BASH_LAUNCHER_ONLY,
+    targets = [":no_output_group_layer"],
 )
