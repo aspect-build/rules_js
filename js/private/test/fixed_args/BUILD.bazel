@@ -506,72 +506,72 @@ shell_expansion_case(
 )
 
 # --------------------------------------------------------------------------------------------
-# Values that stop the launcher from running at all.
+# Shell metacharacters. The bash launcher splices a fixed_arg into its source text, so these
+# stop it from parsing at all; the hermetic launcher has no source text to corrupt and hands
+# each one to the program intact, which is the behavior pinned here.
 
+# An unterminated quote has no partner to pair with, so it is just a character.
 shell_expansion_case(
-    name = "apostrophe_breaks_launcher",
-    bash_only = True,
+    name = "apostrophe_is_literal",
     fixed_args = ["it's"],
-    want_exit_code = "2",
-    want_stderr = "unexpected EOF",
+    hermetic_only = True,
+    want_argv = ["it's"],
 )
 
 shell_expansion_case(
-    name = "double_quote_breaks_launcher",
-    bash_only = True,
+    name = "double_quote_is_literal",
     fixed_args = ["a\"b"],
-    want_exit_code = "2",
-    want_stderr = "unexpected EOF",
+    hermetic_only = True,
+    want_argv = ["a\"b"],
 )
 
 shell_expansion_case(
-    name = "backtick_breaks_launcher",
-    bash_only = True,
+    name = "backtick_is_literal",
     fixed_args = ["a`b"],
-    want_exit_code = "2",
-    want_stderr = "unexpected EOF",
+    hermetic_only = True,
+    want_argv = ["a`b"],
 )
 
-# A word starting with `#` comments out the rest of the line.
 shell_expansion_case(
-    name = "hash_breaks_launcher",
-    bash_only = True,
+    name = "hash_is_literal",
     fixed_args = ["#comment"],
-    want_exit_code = "2",
-    want_stderr = "syntax error",
+    hermetic_only = True,
+    want_argv = ["#comment"],
 )
 
 shell_expansion_case(
-    name = "semicolon_breaks_launcher",
-    bash_only = True,
+    name = "semicolon_is_literal",
     fixed_args = ["a;b"],
-    want_exit_code = "2",
-    want_stderr = "syntax error",
+    hermetic_only = True,
+    want_argv = ["a;b"],
 )
 
 shell_expansion_case(
-    name = "pipe_breaks_launcher",
-    bash_only = True,
+    name = "pipe_is_literal",
     fixed_args = ["a|b"],
-    want_exit_code = "2",
-    want_stderr = "syntax error",
+    hermetic_only = True,
+    want_argv = ["a|b"],
 )
 
 shell_expansion_case(
-    name = "redirect_breaks_launcher",
-    bash_only = True,
+    name = "redirect_is_literal",
     fixed_args = ["a>b"],
-    want_exit_code = "2",
-    want_stderr = "syntax error",
+    hermetic_only = True,
+    want_argv = ["a>b"],
 )
 
 shell_expansion_case(
-    name = "paren_breaks_launcher",
-    bash_only = True,
+    name = "paren_is_literal",
     fixed_args = ["a(b"],
-    want_exit_code = "2",
-    want_stderr = "syntax error",
+    hermetic_only = True,
+    want_argv = ["a(b"],
 )
+
+# --------------------------------------------------------------------------------------------
+# Values that stop the bash launcher from running at all, and where it is the one that is
+# right: the hermetic launcher hands the program an empty argument for a variable bash would
+# have called unbound, and splits a substitution in half. Left pinned to bash until those are
+# refused at analysis time.
 
 # The launcher runs under `set -o nounset`, so naming a variable nothing set is fatal.
 shell_expansion_case(

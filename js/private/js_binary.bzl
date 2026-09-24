@@ -427,6 +427,10 @@ def _shell_tokenize(value):
     expands, and for an escaped separator such as `a\\ b`, which this splits into two tokens;
     quote the argument in either case to get bash's answer.
 
+    A quote with no partner later in the fixed_arg is one more character rather than the
+    start of a quoted run, so `it's` arrives intact. Bash has a script to corrupt and so
+    stops at the unbalanced quote instead.
+
     Args:
         value: the fixed_arg to split
 
@@ -440,7 +444,8 @@ def _shell_tokenize(value):
     has_token = False
     quote = None
 
-    for ch in value.elems():
+    for i in range(len(value)):
+        ch = value[i]
         if quote:
             if ch == quote:
                 segments = _append_segment(segments, current, expand)
@@ -449,7 +454,7 @@ def _shell_tokenize(value):
                 quote = None
             else:
                 current += ch
-        elif ch == "'" or ch == "\"":
+        elif (ch == "'" or ch == "\"") and value.find(ch, i + 1) != -1:
             segments = _append_segment(segments, current, expand)
             current = ""
             quote = ch
