@@ -61,6 +61,104 @@ describe('testing lstat', async () => {
         )
     })
 
+    await it('hides escaping file links reached through directory aliases', async () => {
+        await withFixtures(
+            {
+                sandbox: { packages: { pkg: {} }, node_modules: {} },
+                'package.json': '{"name":"fixture"}',
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+                const root = path.join(fixturesDir, 'sandbox')
+                fs.symlinkSync(
+                    path.join(fixturesDir, 'package.json'),
+                    path.join(root, 'packages/pkg/package.json')
+                )
+                fs.symlinkSync(
+                    '../packages/pkg',
+                    path.join(root, 'node_modules/pkg'),
+                    'dir'
+                )
+                const file = path.join(root, 'node_modules/pkg/package.json')
+                const revertPatches = patcher([root])
+                try {
+                    for (const stats of [
+                        fs.lstatSync(file, { bigint: true }),
+                        await util.promisify(fs.lstat)(file, { bigint: true }),
+                        await fs.promises.lstat(file, { bigint: true }),
+                    ]) {
+                        assert.ok(stats.isFile())
+                        assert.equal(typeof stats.size, 'bigint')
+                    }
+                    assert.throws(() => fs.readlinkSync(file), {
+                        code: 'EINVAL',
+                    })
+                    await assert.rejects(util.promisify(fs.readlink)(file), {
+                        code: 'EINVAL',
+                    })
+                    await assert.rejects(fs.promises.readlink(file), {
+                        code: 'EINVAL',
+                    })
+                } finally {
+                    revertPatches()
+                }
+            }
+        )
+    })
+
+    await it('classifies file links through nested relative directory aliases', async () => {
+        await withFixtures(
+            {
+                sandbox: {
+                    packages: { group: { pkg: {}, other: {} } },
+                    node_modules: {},
+                    local: 'inside',
+                },
+                outside: 'outside',
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+                const root = path.join(fixturesDir, 'sandbox')
+                const pkg = path.join(root, 'packages/group/pkg')
+                const other = path.join(root, 'packages/group/other')
+                fs.symlinkSync(
+                    '../packages/group/pkg',
+                    path.join(root, 'node_modules/pkg'),
+                    'dir'
+                )
+                fs.symlinkSync('../other', path.join(pkg, 'sub'), 'dir')
+                fs.symlinkSync('../../../local', path.join(other, 'visible'))
+                fs.symlinkSync(
+                    '../../../../outside',
+                    path.join(other, 'hidden')
+                )
+                const revertPatches = patcher([root])
+                try {
+                    for (const [leaf, visible] of [
+                        ['visible', true],
+                        ['hidden', false],
+                    ]) {
+                        const file = path.join(
+                            root,
+                            'node_modules/pkg/sub',
+                            leaf
+                        )
+                        for (const stats of [
+                            fs.lstatSync(file),
+                            await util.promisify(fs.lstat)(file),
+                            await fs.promises.lstat(file),
+                        ]) {
+                            assert.equal(stats.isSymbolicLink(), visible, leaf)
+                            assert.equal(stats.isFile(), !visible, leaf)
+                        }
+                    }
+                } finally {
+                    revertPatches()
+                }
+            }
+        )
+    })
+
     await it('can lstatSync throwIfNoEntry:false', async () => {
         await withFixtures(
             {

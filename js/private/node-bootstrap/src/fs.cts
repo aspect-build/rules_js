@@ -86,6 +86,9 @@ export function patcher(roots: string[]): () => void {
         return function () {}
     }
 
+    const origStat = fs.stat.bind(fs) as typeof FsType.stat
+    const origStatSync = fs.statSync.bind(fs) as typeof FsType.statSync
+
     const origLstat = fs.lstat.bind(fs) as typeof FsType.lstat
     const origLstatSync = fs.lstatSync.bind(fs) as typeof FsType.lstatSync
 
@@ -185,29 +188,22 @@ export function patcher(roots: string[]): () => void {
                 return cb(null, stats)
             }
 
-            return guardedReadLink(args[0], guardedReadLinkCb)
+            return readlink(args[0], guardedReadLinkCb)
 
-            function guardedReadLinkCb(str: string) {
-                if (str != args[0]) {
-                    // there are one or more hops within the guards so there is nothing more to do
+            function guardedReadLinkCb(err: NodeJS.ErrnoException | null) {
+                if (!err) {
+                    // The final component is a visible link in the guarded filesystem.
                     return cb(null, stats)
                 }
+                if (err.code === 'ENOENT') return cb(null, stats)
+                if (err.code !== 'EINVAL') return cb(err)
 
-                // there are no hops so lets report the stats of the real file;
-                // we can't use origRealPath here since that function calls lstat internally
-                // which can result in an infinite loop
-                return unguardedRealPath(args[0], unguardedRealPathCb)
-
-                function unguardedRealPathCb(err: Error | null, str?: string) {
-                    if (err) {
-                        if ((err as any).code === 'ENOENT') {
-                            // broken link so there is nothing more to do
-                            return cb(null, stats)
-                        }
-                        return cb(err)
-                    }
-                    return origLstat(str!, cb)
+                // readlink hides this link; return its target's stats, preserving options.
+                args[args.length - 1] = function statCb(err, targetStats) {
+                    if (err?.code === 'ENOENT') return cb(null, stats)
+                    return cb(err, targetStats)
                 }
+                return origStat(...args)
             }
         }
 
@@ -231,19 +227,16 @@ export function patcher(roots: string[]): () => void {
             return stats
         }
 
-        const guardedReadLink: string = guardedReadLinkSync(args[0])
-        if (guardedReadLink != args[0]) {
-            // there are one or more hops within the guards so there is nothing more to do
+        try {
+            readlinkSync(args[0])
             return stats
+        } catch (err: any) {
+            if (err.code === 'ENOENT') return stats
+            if (err.code !== 'EINVAL') throw err
         }
 
         try {
-            args[0] = unguardedRealPathSync(args[0])
-
-            // there are no hops so lets report the stats of the real file;
-            // we can't use origRealPathSync here since that function calls lstat internally
-            // which can result in an infinite loop
-            return origLstatSync(...args)
+            return origStatSync(...args)
         } catch (err: any) {
             if (err.code === 'ENOENT') {
                 // broken link so there is nothing more to do
@@ -333,7 +326,8 @@ export function patcher(roots: string[]): () => void {
     // fs.readlink
     // =========================================================================
 
-    fs.readlink = function readlink(...args: Parameters<typeof origReadlink>) {
+    fs.readlink = readlink
+    function readlink(...args: Parameters<typeof origReadlink>) {
         // preserve error when calling function without required callback
         if (typeof args[args.length - 1] !== 'function') {
             return origReadlink(...args)
@@ -389,9 +383,8 @@ export function patcher(roots: string[]): () => void {
         origReadlink(...args)
     }
 
-    fs.readlinkSync = function readlinkSync(
-        ...args: Parameters<typeof origReadlinkSync>
-    ) {
+    fs.readlinkSync = readlinkSync
+    function readlinkSync(...args: Parameters<typeof origReadlinkSync>) {
         const resolved = resolvePathLike(args[0])
         const linkTarget = origReadlinkSync(...args)
         const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget)
@@ -878,24 +871,6 @@ export function patcher(roots: string[]): () => void {
         return next
     }
 
-    function unguardedRealPath(start: PathLike, cb: ErrPathCallback): void {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
-        oneHop(stringifyPathLike(start), cb)
-
-        function oneHop(loc: string, cb: ErrPathCallback) {
-            nextHop(loc, function oneHopeNextCb(next) {
-                if (next == undefined) {
-                    // file does not exist (broken link)
-                    return cb(enoent('realpath', start), undefined)
-                } else if (!next) {
-                    // we've hit a real file
-                    return cb(null, loc)
-                }
-                oneHop(next, cb)
-            })
-        }
-    }
-
     function guardedRealPath(
         start: PathLike,
         cb: ErrPathCallback,
@@ -927,20 +902,6 @@ export function patcher(roots: string[]): () => void {
                 }
                 oneHop(next, cb)
             })
-        }
-    }
-
-    function unguardedRealPathSync(start: PathLike): string {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = stringifyPathLike(start), next; ; loc = next) {
-            next = nextHopSync(loc)
-            if (next == undefined) {
-                // file does not exist (broken link)
-                throw enoent('realpath', start)
-            } else if (!next) {
-                // we've hit a real file
-                return loc
-            }
         }
     }
 
