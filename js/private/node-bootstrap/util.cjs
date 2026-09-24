@@ -68,10 +68,21 @@ function exitWith(exitCode) {
 // node_options = ["--require", "$$RUNFILES_DIR/..."].
 // Only $VAR / ${VAR} expansion is reproduced here: no command substitution, and no
 // re-splitting on whitespace.
+//
+// Naming a variable that is not set is fatal, as it is for the bash launcher under
+// `set -o nounset`. A variable that is set to the empty string expands to it, which is
+// also what bash does.
 function expandEnvRefs(value) {
     return value.replace(
         /\$(?:\{([A-Za-z_][A-Za-z0-9_]*)\}|([A-Za-z_][A-Za-z0-9_]*))/g,
-        (_match, braced, bare) => process.env[braced || bare] || ''
+        (_match, braced, bare) => {
+            const name = braced || bare
+            const expanded = process.env[name]
+            if (expanded === undefined) {
+                fatal(`${name}: unbound variable`)
+            }
+            return expanded
+        }
     )
 }
 
