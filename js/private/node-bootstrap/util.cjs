@@ -20,15 +20,8 @@ const IS_WINDOWS = process.platform === 'win32'
 //
 // We use fs.writeSync rather than console.error, so that the line is flushed before
 // the process exits.
-//
-// The message is collapsed onto one line, since callers wrap long messages across source
-// lines and may log an exception.
 function log(level, message) {
-    const collapsed = message.trim().replace(/\s+/g, ' ')
-    fs.writeSync(
-        2,
-        `${level}: ${process.env.JS_BINARY__LOG_PREFIX}: ${collapsed}\n`
-    )
+    fs.writeSync(2, `${level}: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}\n`)
 }
 
 function logFatal(message) {

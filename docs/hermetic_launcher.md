@@ -7,7 +7,7 @@ root of the output tree, and finally execs node. That is a shell process and a
 few hundred lines of path resolution on every invocation, and it cannot run at
 all where there is no bash.
 
-The hermetic launcher is an experimental alternative, off by default:
+The hermetic launcher is an experimental alternative, off by default. To enable it:
 
 ```sh
 bazel build //... --@aspect_rules_js//js:use_hermetic_launcher
