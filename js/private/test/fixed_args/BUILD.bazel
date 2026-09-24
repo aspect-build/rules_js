@@ -572,12 +572,16 @@ shell_expansion_case(
 # right: the hermetic launcher hands the program an empty argument for a variable bash would
 # have called unbound, and splits a substitution in half. Left pinned to bash until those are
 # refused at analysis time.
+#
+# macos_want_exit_code is 0 because macOS ships an old version of bash (3.2), which runs the
+# launcher's EXIT trap with `$?` set to 0.
 
 # The launcher runs under `set -o nounset`, so naming a variable nothing set is fatal.
 shell_expansion_case(
     name = "unset_var_breaks_launcher",
     bash_only = True,
     fixed_args = ["$JS_BINARY_FIXED_ARGS_UNSET"],
+    macos_want_exit_code = "0",
     want_exit_code = "1",
     want_stderr = "unbound variable",
 )

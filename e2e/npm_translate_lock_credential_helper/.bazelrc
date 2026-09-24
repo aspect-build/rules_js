@@ -1,4 +1,7 @@
 import %workspace%/../../tools/preset.bazelrc
 import %workspace%/../e2e.bazelrc
 
-common --credential_helper=%workspace%/credential-helper.sh
+# We need to explicitly specify scopes for the credential helper. Otherwise,
+# the helper would apply everywhere, including for Aspect's cache and BES.
+common --credential_helper=registry.npmjs.org=%workspace%/credential-helper.sh
+common --credential_helper=npm.pkg.github.com=%workspace%/credential-helper.sh

@@ -14,6 +14,7 @@ def shell_expansion_case(
         env = None,
         expand_args = False,
         hermetic_only = False,
+        macos_want_exit_code = None,
         srcs = None,
         want_argv = None,
         want_exit_code = None,
@@ -30,6 +31,7 @@ def shell_expansion_case(
         expand_args: Passed through to js_binary. Defaults to False.
         hermetic_only: The mirror of bash_only, for an expectation that holds only under
             --//js:use_hermetic_launcher.
+        macos_want_exit_code: The exact exit code on macOS.
         srcs: Passed through to js_binary.
         want_argv: The exact argv the program must receive, as a list of strings. The empty
             list asserts it received no arguments at all.
@@ -87,7 +89,10 @@ def shell_expansion_case(
         write_file(
             name = name + "_want_exit_code",
             out = name + "_want_exit_code.txt",
-            content = [want_exit_code],
+            content = select({
+                "@platforms//os:macos": [macos_want_exit_code],
+                "//conditions:default": [want_exit_code],
+            }) if macos_want_exit_code != None else [want_exit_code],
             newline = "unix",
         )
         diff_test(
