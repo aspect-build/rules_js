@@ -507,10 +507,9 @@ shell_expansion_case(
 
 # --------------------------------------------------------------------------------------------
 # Shell metacharacters. The bash launcher splices a fixed_arg into its source text, so these
-# stop it from parsing at all; the hermetic launcher has no source text to corrupt and hands
-# each one to the program intact, which is the behavior pinned here.
+# stop it from parsing at all; the hermetic launcher and hands each one to the program intact,
+# which is the behavior pinned here.
 
-# An unterminated quote has no partner to pair with, so it is just a character.
 shell_expansion_case(
     name = "apostrophe_is_literal",
     fixed_args = ["it's"],
