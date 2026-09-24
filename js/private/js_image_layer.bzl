@@ -201,14 +201,12 @@ def _launcher_js(binary, hermetic_launcher):
     """The generated JavaScript launcher of a js_binary, or None when it uses the bash launcher."""
     if OutputGroupInfo not in binary or not hasattr(binary[OutputGroupInfo], "launcher_js"):
         if not hermetic_launcher:
-            # There is no JavaScript launcher to publish, so an absent output group says
-            # nothing and the executable is the launcher.
+            # We are using the bash launcher.
             return None
         fail("""{}: no launcher_js output group.
 
-With --@aspect_rules_js//js:use_hermetic_launcher the binary attribute of js_image_layer
-takes a js_binary, or a custom rule built on js_binary_lib.create_launcher that republishes
-its launcher_js in an output group:
+The binary attribute of js_image_layer takes a js_binary, or a custom rule built on
+js_binary_lib.create_launcher that republishes its launcher_js in an output group:
 
     OutputGroupInfo(launcher_js = launcher.launcher_js)""".format(binary.label))
     launchers = binary[OutputGroupInfo].launcher_js.to_list()
