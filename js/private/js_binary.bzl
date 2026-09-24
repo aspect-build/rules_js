@@ -636,8 +636,10 @@ def _compile_stub(ctx, embedded_args, transformed_args, output_file):
     """Stamps a launcher binary from the prebuilt template stub.
 
     This is `hermetic_launcher.compile_stub` reimplemented so the finalizer toolchain can
-    be named by Label; see the comment on _FINALIZER_TOOLCHAIN_TYPE. Drop this in favour
-    of the upstream helper once it takes Labels.
+    be named by Label; see the comment on _FINALIZER_TOOLCHAIN_TYPE.
+
+    We can drop this once the upstream fix has made it into a release:
+    https://github.com/hermeticbuild/hermetic-launcher/pull/75
     """
     template = ctx.toolchains[_TEMPLATE_TOOLCHAIN_TYPE].templatetoolchaininfo.template_exe
     args = ctx.actions.args()
