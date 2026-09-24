@@ -116,18 +116,6 @@ function patcher(roots) {
         return { lexical, real };
     })
         .sort((a, b) => b.lexical.length - a.lexical.length);
-    // Keep real paths in the lexical namespace when the configured root is
-    // itself a symlink. Nested links that leave the root remain canonical.
-    function realpathInRootNamespace(p) {
-        const real = origRealpathSyncNative(p);
-        for (const root of rootMappings) {
-            if (isSubPath(root.lexical, p) &&
-                isSubPath(root.real, real)) {
-                return path.resolve(root.lexical, path.relative(root.real, real));
-            }
-        }
-        return real;
-    }
     // Resolve a relative symlink `linkTarget` against the REAL location of the
     // link's parent directory. `resolved` is an absolute path whose final
     // component is a symlink we just read successfully, but the path we were
@@ -135,8 +123,31 @@ function patcher(roots) {
     // (e.g. a pnpm/node_modules alias); joining `linkTarget` onto the *lexical*
     // parent would then land at the wrong absolute path.
     function resolveTargetAgainstRealParent(resolved, linkTarget) {
-        const linkDir = realpathInRootNamespace(path.dirname(resolved));
-        return path.resolve(linkDir, linkTarget);
+        const linkDir = origRealpathSyncNative(path.dirname(resolved));
+        const target = path.resolve(linkDir, linkTarget);
+        // Project only targets that remain inside a symlinked root. Resolving
+        // relative escapes after projecting the parent would change their depth.
+        if (!path.isAbsolute(linkTarget)) {
+            for (const root of rootMappings) {
+                if (isSubPath(root.lexical, resolved) &&
+                    isSubPath(root.real, target)) {
+                    return path.resolve(root.lexical, path.relative(root.real, target));
+                }
+            }
+        }
+        return target;
+    }
+    // A relative path with the same shape is only a valid sandbox remapping
+    // when it leads to the original target. Otherwise a walker could follow an
+    // absent or unrelated file in the sandbox.
+    function hasSameTarget(original, mapped) {
+        try {
+            return (origRealpathSyncNative(original) ===
+                origRealpathSyncNative(mapped));
+        }
+        catch (_a) {
+            return false;
+        }
     }
     // =========================================================================
     // fs.lstat
@@ -174,7 +185,9 @@ function patcher(roots) {
                 args[args.length - 1] = function statCb(err, targetStats) {
                     if ((err === null || err === void 0 ? void 0 : err.code) === 'ENOENT')
                         return cb(null, stats);
-                    return cb(err, targetStats);
+                    if (err)
+                        return cb(err);
+                    return cb(null, targetStats !== null && targetStats !== void 0 ? targetStats : stats);
                 };
                 return origStat(...args);
             }
@@ -182,6 +195,7 @@ function patcher(roots) {
         origLstat(...args);
     };
     fs.lstatSync = function lstatSync(...args) {
+        var _a;
         const stats = origLstatSync(...args);
         if (!(stats === null || stats === void 0 ? void 0 : stats.isSymbolicLink())) {
             // the file is not a symbolic link so there is nothing more to do
@@ -203,7 +217,7 @@ function patcher(roots) {
                 throw err;
         }
         try {
-            return origStatSync(...args);
+            return (_a = origStatSync(...args)) !== null && _a !== void 0 ? _a : stats;
         }
         catch (err) {
             if (err.code === 'ENOENT') {
@@ -302,7 +316,9 @@ function patcher(roots) {
                         }
                     }
                     const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(targetAbs), next));
-                    if (r != resolved && !isEscape(resolved, r, escapedRoots)) {
+                    if (r != resolved &&
+                        !isEscape(resolved, r, escapedRoots) &&
+                        hasSameTarget(resolved, r)) {
                         if (path.isAbsolute(linkTarget)) {
                             return cb(null, r);
                         }
@@ -338,7 +354,9 @@ function patcher(roots) {
                 }
             }
             const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(targetAbs), next));
-            if (r != resolved && !isEscape(resolved, r, [escapedRoot])) {
+            if (r != resolved &&
+                !isEscape(resolved, r, [escapedRoot]) &&
+                hasSameTarget(resolved, r)) {
                 if (path.isAbsolute(linkTarget)) {
                     return r;
                 }

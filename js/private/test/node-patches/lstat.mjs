@@ -159,6 +159,73 @@ describe('testing lstat', async () => {
         )
     })
 
+    await it('only exposes remapped links that lead to the original target', async () => {
+        await withFixtures(
+            {
+                sandbox: {
+                    absent: {},
+                    unrelated: {},
+                    corresponding: {},
+                    aliased: {},
+                },
+                outside: { payload: 'correct' },
+            },
+            async (fixturesDir) => {
+                fixturesDir = fs.realpathSync(fixturesDir)
+                fs.symlinkSync(
+                    'payload',
+                    path.join(fixturesDir, 'outside/chain')
+                )
+                for (const kind of [
+                    'absent',
+                    'unrelated',
+                    'corresponding',
+                    'aliased',
+                ]) {
+                    let root = path.join(fixturesDir, 'sandbox', kind)
+                    if (kind === 'aliased') {
+                        // The guard's lexical and physical parents differ in depth.
+                        const alias = path.join(fixturesDir, 'alias')
+                        fs.symlinkSync(root, alias, 'dir')
+                        root = alias
+                    }
+                    const file = path.join(root, 'entry')
+                    fs.symlinkSync('../../outside/chain', file)
+                    if (kind === 'unrelated') {
+                        fs.writeFileSync(path.join(root, 'payload'), 'wrong')
+                    } else if (kind === 'corresponding') {
+                        fs.symlinkSync(
+                            '../../outside/payload',
+                            path.join(root, 'payload')
+                        )
+                    }
+                    const revertPatches = patcher([root])
+                    try {
+                        for (const stats of [
+                            fs.lstatSync(file),
+                            await util.promisify(fs.lstat)(file),
+                            await fs.promises.lstat(file),
+                        ]) {
+                            assert.equal(
+                                stats.isSymbolicLink(),
+                                kind === 'corresponding'
+                            )
+                            const target = stats.isSymbolicLink()
+                                ? path.resolve(root, fs.readlinkSync(file))
+                                : file
+                            assert.equal(
+                                fs.readFileSync(target, 'utf8'),
+                                'correct'
+                            )
+                        }
+                    } finally {
+                        revertPatches()
+                    }
+                }
+            }
+        )
+    })
+
     await it('can lstatSync throwIfNoEntry:false', async () => {
         await withFixtures(
             {
@@ -271,6 +338,17 @@ describe('testing lstat', async () => {
                     fs.lstatSync(brokenLinkPath).isSymbolicLink(),
                     'if a symlink is broken but is escaping return it as a link.'
                 )
+                for (const bigint of [false, true]) {
+                    const stats = fs.lstatSync(brokenLinkPath, {
+                        bigint,
+                        throwIfNoEntry: false,
+                    })
+                    assert.ok(stats.isSymbolicLink())
+                    assert.equal(
+                        typeof stats.size,
+                        bigint ? 'bigint' : 'number'
+                    )
+                }
                 assert.ok(
                     (
                         await util.promisify(fs.lstat)(brokenLinkPath)
