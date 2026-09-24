@@ -21,14 +21,7 @@ import * as path from 'node:path'
 import * as util from 'node:util'
 
 import { patcher } from '../../node-bootstrap/src/fs.cjs'
-
-// We don't want to bring jest into this repo so we just fake the describe and it functions here
-async function describe(_, fn) {
-    await fn()
-}
-async function it(_, fn) {
-    await fn()
-}
+import { describe, it } from './harness.cjs'
 
 describe('testing readdir', async () => {
     await it('can readdir dirent in root', async () => {
