@@ -56,6 +56,11 @@ npm_link_all_packages()
 ]
 
 js_library(
+    name = "harness",
+    srcs = ["harness.cjs"],
+)
+
+js_library(
     name = "babel_config",
     srcs = ["babel.config.js"],
     deps = [
@@ -93,6 +98,7 @@ babel_bin.babel(
                     toolchain_name,
                 ),
                 data = [
+                    ":harness",
                     ":node_modules/inline-fixtures",
                     "//js/private/node-bootstrap/src:compile",
                 ],
@@ -114,6 +120,7 @@ babel_bin.babel(
                     toolchain_name,
                 ),
                 data = [
+                    ":harness",
                     ":node_modules/inline-fixtures",
                     "//js/private/node-bootstrap/src:compile",
                 ],
@@ -144,6 +151,7 @@ babel_bin.babel(
             "$(rootpath //js/private/test/node-patches:spawn_patch_depth.sh)",
         ],
         data = [
+            ":harness",
             "//js/private/test/node-patches:spawn_node_path.js",
             "//js/private/test/node-patches:spawn_node_path.sh",
             "//js/private/test/node-patches:spawn_patch_depth.js",
@@ -171,6 +179,7 @@ js_test(
         "$(rootpath //js/private/test/node-patches:spawn_patch_depth.sh)",
     ],
     data = [
+        ":harness",
         "//js/private/test/node-patches:spawn_node_path.js",
         "//js/private/test/node-patches:spawn_node_path.sh",
         "//js/private/test/node-patches:spawn_patch_depth.js",

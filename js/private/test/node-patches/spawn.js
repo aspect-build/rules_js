@@ -1,17 +1,10 @@
 const child_process = require('child_process')
+const { describe, it } = require('./harness.cjs')
 
 const printbinjs = process.argv[2]
 const printbinsh = process.argv[3]
 const printdepthjs = process.argv[4]
 const printdepthsh = process.argv[5]
-
-// We don't want to bring jest into this repo so we just fake the describe and it functions here
-async function describe(_, fn) {
-    await fn()
-}
-async function it(_, fn) {
-    await fn()
-}
 
 describe('child_process node path', async () => {
     function assertNodePath({ stdout, stderr, code, error }) {
