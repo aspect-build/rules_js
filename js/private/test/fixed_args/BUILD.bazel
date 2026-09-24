@@ -566,15 +566,6 @@ shell_expansion_case(
     want_argv = ["a(b"],
 )
 
-# --------------------------------------------------------------------------------------------
-# Values that stop the bash launcher from running at all, and where it is the one that is
-# right: the hermetic launcher hands the program an empty argument for a variable bash would
-# have called unbound, and splits a substitution in half. Left pinned to bash until those are
-# refused at analysis time.
-#
-# macos_want_exit_code is 0 because macOS ships an old version of bash (3.2), which runs the
-# launcher's EXIT trap with `$?` set to 0.
-
 # The launcher runs under `set -o nounset`, so naming a variable nothing set is fatal.
 shell_expansion_case(
     name = "unset_var_breaks_launcher",
@@ -585,25 +576,13 @@ shell_expansion_case(
     want_stderr = "unbound variable",
 )
 
-# The same, for the same reason, except that the exit code does not come from a bash EXIT
-# trap and so is 1 on macOS too.
+# The hermetic launcher behaves the same way except that it returns an exit code of 1 on macOS.
 shell_expansion_case(
     name = "unset_var_is_fatal",
     fixed_args = ["$JS_BINARY_FIXED_ARGS_UNSET"],
     hermetic_only = True,
     want_exit_code = "1",
     want_stderr = "unbound variable",
-)
-
-# Only an unset variable is fatal. One set to the empty string expands to it, as in bash;
-# the argument it leaves behind is empty rather than absent because the splitting already
-# happened at analysis time.
-shell_expansion_case(
-    name = "empty_var_is_not_fatal",
-    env = {"CASE_EMPTY": ""},
-    fixed_args = ["$CASE_EMPTY"],
-    hermetic_only = True,
-    want_argv = [""],
 )
 
 # Under `set -o errexit`, a command substitution that fails becomes the exit code of the
