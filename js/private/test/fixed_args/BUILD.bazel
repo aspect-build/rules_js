@@ -145,6 +145,10 @@ assert_contains(
 # program ever sees them.
 #
 # The test cases below are characterization tests, not a specification.
+#
+# The hermetic launcher has no shell: js_binary.bzl splits each fixed_arg at analysis time and
+# the launcher expands only $NAME and ${NAME} at run time. A case that rests on anything else
+# therefore describes bash rather than js_binary, and is marked bash_only.
 
 # --------------------------------------------------------------------------------------------
 # Word splitting and quote removal. Bash decides where one argument ends and the next begins.
@@ -253,28 +257,33 @@ shell_expansion_case(
 )
 
 # --------------------------------------------------------------------------------------------
-# Backslash escapes. A backslash is consumed whether or not it was meant as an escape.
+# Backslash escapes. A backslash is consumed whether or not it was meant as an escape. The
+# hermetic launcher does not interpret backslashes at all, so it keeps every one of them.
 
 shell_expansion_case(
     name = "backslash_escapes_space",
+    bash_only = True,
     fixed_args = ["one\\ two"],
     want_argv = ["one two"],
 )
 
 shell_expansion_case(
     name = "backslash_before_letter_is_dropped",
+    bash_only = True,
     fixed_args = ["a\\b"],
     want_argv = ["ab"],
 )
 
 shell_expansion_case(
     name = "windows_path_loses_its_separators",
+    bash_only = True,
     fixed_args = ["C:\\Users\\foo"],
     want_argv = ["C:Usersfoo"],
 )
 
 shell_expansion_case(
     name = "backslash_escapes_glob",
+    bash_only = True,
     fixed_args = ["\\*.txt"],
     want_argv = ["*.txt"],
 )
@@ -282,6 +291,7 @@ shell_expansion_case(
 # ANSI-C quoting, which is the only way to get a control character into an argument.
 shell_expansion_case(
     name = "ansi_c_quoting",
+    bash_only = True,
     fixed_args = ["$'a\\tb'"],
     want_argv = ["a\tb"],
 )
@@ -291,6 +301,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "brace_list",
+    bash_only = True,
     fixed_args = ["{a,b}"],
     want_argv = [
         "a",
@@ -300,6 +311,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "brace_range",
+    bash_only = True,
     fixed_args = ["pre{1..3}"],
     want_argv = [
         "pre1",
@@ -326,6 +338,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "default_for_unset_var",
+    bash_only = True,
     fixed_args = ["${JS_BINARY_FIXED_ARGS_UNSET:-fallback}"],
     want_argv = ["fallback"],
 )
@@ -333,6 +346,7 @@ shell_expansion_case(
 # The full set of substring operators is available.
 shell_expansion_case(
     name = "substring_operator",
+    bash_only = True,
     fixed_args = ["${JS_BINARY__WORKSPACE#_}"],
     want_argv = ["main"],
 )
@@ -341,6 +355,7 @@ shell_expansion_case(
 # into a single argument either.
 shell_expansion_case(
     name = "env_value_is_word_split",
+    bash_only = True,
     env = {"CASE_SPACEY": "a b"},
     fixed_args = ["$CASE_SPACEY"],
     want_argv = [
@@ -373,6 +388,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "tilde_alone",
+    bash_only = True,
     env = {"HOME": "/js_binary_test_home"},
     fixed_args = ["~"],
     want_argv = ["/js_binary_test_home"],
@@ -380,6 +396,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "tilde_with_path",
+    bash_only = True,
     env = {"HOME": "/js_binary_test_home"},
     fixed_args = ["~/sub"],
     want_argv = ["/js_binary_test_home/sub"],
@@ -390,18 +407,21 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "command_substitution",
+    bash_only = True,
     fixed_args = ["$(echo hi)"],
     want_argv = ["hi"],
 )
 
 shell_expansion_case(
     name = "backtick_substitution",
+    bash_only = True,
     fixed_args = ["`echo tick`"],
     want_argv = ["tick"],
 )
 
 shell_expansion_case(
     name = "arithmetic_expansion",
+    bash_only = True,
     fixed_args = ["$((1+2))"],
     want_argv = ["3"],
 )
@@ -411,6 +431,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "glob_matches_bindir",
+    bash_only = True,
     srcs = [
         "globdir/alpha.txt",
         "globdir/beta.txt",
@@ -424,6 +445,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "glob_single_character",
+    bash_only = True,
     srcs = [
         "globdir/alpha.txt",
         "globdir/beta.txt",
@@ -488,6 +510,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "apostrophe_breaks_launcher",
+    bash_only = True,
     fixed_args = ["it's"],
     want_exit_code = "2",
     want_stderr = "unexpected EOF",
@@ -495,6 +518,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "double_quote_breaks_launcher",
+    bash_only = True,
     fixed_args = ["a\"b"],
     want_exit_code = "2",
     want_stderr = "unexpected EOF",
@@ -502,6 +526,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "backtick_breaks_launcher",
+    bash_only = True,
     fixed_args = ["a`b"],
     want_exit_code = "2",
     want_stderr = "unexpected EOF",
@@ -510,6 +535,7 @@ shell_expansion_case(
 # A word starting with `#` comments out the rest of the line.
 shell_expansion_case(
     name = "hash_breaks_launcher",
+    bash_only = True,
     fixed_args = ["#comment"],
     want_exit_code = "2",
     want_stderr = "syntax error",
@@ -517,6 +543,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "semicolon_breaks_launcher",
+    bash_only = True,
     fixed_args = ["a;b"],
     want_exit_code = "2",
     want_stderr = "syntax error",
@@ -524,6 +551,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "pipe_breaks_launcher",
+    bash_only = True,
     fixed_args = ["a|b"],
     want_exit_code = "2",
     want_stderr = "syntax error",
@@ -531,6 +559,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "redirect_breaks_launcher",
+    bash_only = True,
     fixed_args = ["a>b"],
     want_exit_code = "2",
     want_stderr = "syntax error",
@@ -538,6 +567,7 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "paren_breaks_launcher",
+    bash_only = True,
     fixed_args = ["a(b"],
     want_exit_code = "2",
     want_stderr = "syntax error",
@@ -546,6 +576,7 @@ shell_expansion_case(
 # The launcher runs under `set -o nounset`, so naming a variable nothing set is fatal.
 shell_expansion_case(
     name = "unset_var_breaks_launcher",
+    bash_only = True,
     fixed_args = ["$JS_BINARY_FIXED_ARGS_UNSET"],
     want_exit_code = "1",
     want_stderr = "unbound variable",
@@ -555,6 +586,7 @@ shell_expansion_case(
 # launcher itself.
 shell_expansion_case(
     name = "failing_command_substitution_breaks_launcher",
+    bash_only = True,
     fixed_args = ["$(exit 7)"],
     want_exit_code = "7",
 )
