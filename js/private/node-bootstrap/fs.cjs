@@ -86,6 +86,8 @@ function patcher(roots) {
         }
         return function () { };
     }
+    const origStat = fs.stat.bind(fs);
+    const origStatSync = fs.statSync.bind(fs);
     const origLstat = fs.lstat.bind(fs);
     const origLstatSync = fs.lstatSync.bind(fs);
     const origReaddir = fs.readdir.bind(fs);
@@ -158,26 +160,23 @@ function patcher(roots) {
                 // the file can not escaped the sandbox so there is nothing more to do
                 return cb(null, stats);
             }
-            return guardedReadLink(args[0], guardedReadLinkCb);
-            function guardedReadLinkCb(str) {
-                if (str != args[0]) {
-                    // there are one or more hops within the guards so there is nothing more to do
+            return readlink(args[0], guardedReadLinkCb);
+            function guardedReadLinkCb(err) {
+                if (!err) {
+                    // The final component is a visible link in the guarded filesystem.
                     return cb(null, stats);
                 }
-                // there are no hops so lets report the stats of the real file;
-                // we can't use origRealPath here since that function calls lstat internally
-                // which can result in an infinite loop
-                return unguardedRealPath(args[0], unguardedRealPathCb);
-                function unguardedRealPathCb(err, str) {
-                    if (err) {
-                        if (err.code === 'ENOENT') {
-                            // broken link so there is nothing more to do
-                            return cb(null, stats);
-                        }
-                        return cb(err);
-                    }
-                    return origLstat(str, cb);
-                }
+                if (err.code === 'ENOENT')
+                    return cb(null, stats);
+                if (err.code !== 'EINVAL')
+                    return cb(err);
+                // readlink hides this link; return its target's stats, preserving options.
+                args[args.length - 1] = function statCb(err, targetStats) {
+                    if ((err === null || err === void 0 ? void 0 : err.code) === 'ENOENT')
+                        return cb(null, stats);
+                    return cb(err, targetStats);
+                };
+                return origStat(...args);
             }
         };
         origLstat(...args);
@@ -193,17 +192,18 @@ function patcher(roots) {
             // the file can not escaped the sandbox so there is nothing more to do
             return stats;
         }
-        const guardedReadLink = guardedReadLinkSync(args[0]);
-        if (guardedReadLink != args[0]) {
-            // there are one or more hops within the guards so there is nothing more to do
+        try {
+            readlinkSync(args[0]);
             return stats;
         }
+        catch (err) {
+            if (err.code === 'ENOENT')
+                return stats;
+            if (err.code !== 'EINVAL')
+                throw err;
+        }
         try {
-            args[0] = unguardedRealPathSync(args[0]);
-            // there are no hops so lets report the stats of the real file;
-            // we can't use origRealPathSync here since that function calls lstat internally
-            // which can result in an infinite loop
-            return origLstatSync(...args);
+            return origStatSync(...args);
         }
         catch (err) {
             if (err.code === 'ENOENT') {
@@ -273,7 +273,8 @@ function patcher(roots) {
     // =========================================================================
     // fs.readlink
     // =========================================================================
-    fs.readlink = function readlink(...args) {
+    fs.readlink = readlink;
+    function readlink(...args) {
         // preserve error when calling function without required callback
         if (typeof args[args.length - 1] !== 'function') {
             return origReadlink(...args);
@@ -317,8 +318,9 @@ function patcher(roots) {
             }
         };
         origReadlink(...args);
-    };
-    fs.readlinkSync = function readlinkSync(...args) {
+    }
+    fs.readlinkSync = readlinkSync;
+    function readlinkSync(...args) {
         const resolved = resolvePathLike(args[0]);
         const linkTarget = origReadlinkSync(...args);
         const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
@@ -347,7 +349,7 @@ function patcher(roots) {
             throw einval('readlink', args[0]);
         }
         return linkTarget;
-    };
+    }
     // =========================================================================
     // fs.readdir
     // =========================================================================
@@ -724,23 +726,6 @@ function patcher(roots) {
         }
         return next;
     }
-    function unguardedRealPath(start, cb) {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
-        oneHop(stringifyPathLike(start), cb);
-        function oneHop(loc, cb) {
-            nextHop(loc, function oneHopeNextCb(next) {
-                if (next == undefined) {
-                    // file does not exist (broken link)
-                    return cb(enoent('realpath', start), undefined);
-                }
-                else if (!next) {
-                    // we've hit a real file
-                    return cb(null, loc);
-                }
-                oneHop(next, cb);
-            });
-        }
-    }
     function guardedRealPath(start, cb, escapedRoots) {
         // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
         oneHop(stringifyPathLike(start), cb);
@@ -765,20 +750,6 @@ function patcher(roots) {
                 }
                 oneHop(next, cb);
             });
-        }
-    }
-    function unguardedRealPathSync(start) {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = stringifyPathLike(start), next;; loc = next) {
-            next = nextHopSync(loc);
-            if (next == undefined) {
-                // file does not exist (broken link)
-                throw enoent('realpath', start);
-            }
-            else if (!next) {
-                // we've hit a real file
-                return loc;
-            }
         }
     }
     function guardedRealPathSync(start, escapedRoots) {
