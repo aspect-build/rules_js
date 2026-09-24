@@ -431,11 +431,11 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "glob_matches_bindir",
-    bash_only = True,
     srcs = [
         "globdir/alpha.txt",
         "globdir/beta.txt",
     ],
+    bash_only = True,
     fixed_args = ["js/private/test/fixed_args/globdir/*.txt"],
     want_argv = [
         "js/private/test/fixed_args/globdir/alpha.txt",
@@ -445,11 +445,11 @@ shell_expansion_case(
 
 shell_expansion_case(
     name = "glob_single_character",
-    bash_only = True,
     srcs = [
         "globdir/alpha.txt",
         "globdir/beta.txt",
     ],
+    bash_only = True,
     fixed_args = ["js/private/test/fixed_args/globdir/alph?.txt"],
     want_argv = ["js/private/test/fixed_args/globdir/alpha.txt"],
 )
