@@ -299,7 +299,13 @@ function patcher(roots) {
                 return cb(err);
             const resolved = resolvePathLike(args[0]);
             const linkTarget = p;
-            const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
+            let targetAbs;
+            try {
+                targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
+            }
+            catch (error) {
+                return cb(error);
+            }
             const escapedRoot = isEscape(resolved, targetAbs);
             if (escapedRoot) {
                 const escapedRoots = [escapedRoot];
