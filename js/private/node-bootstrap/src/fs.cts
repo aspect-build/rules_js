@@ -86,6 +86,9 @@ export function patcher(roots: string[]): () => void {
         return function () {}
     }
 
+    const origStat = fs.stat.bind(fs) as typeof FsType.stat
+    const origStatSync = fs.statSync.bind(fs) as typeof FsType.statSync
+
     const origLstat = fs.lstat.bind(fs) as typeof FsType.lstat
     const origLstatSync = fs.lstatSync.bind(fs) as typeof FsType.lstatSync
 
@@ -122,24 +125,6 @@ export function patcher(roots: string[]): () => void {
         })
         .sort((a, b) => b.lexical.length - a.lexical.length)
 
-    // Keep real paths in the lexical namespace when the configured root is
-    // itself a symlink. Nested links that leave the root remain canonical.
-    function realpathInRootNamespace(p: string): string {
-        const real = origRealpathSyncNative(p) as string
-        for (const root of rootMappings) {
-            if (
-                isSubPath(root.lexical, p) &&
-                isSubPath(root.real, real)
-            ) {
-                return path.resolve(
-                    root.lexical,
-                    path.relative(root.real, real)
-                )
-            }
-        }
-        return real
-    }
-
     // Resolve a relative symlink `linkTarget` against the REAL location of the
     // link's parent directory. `resolved` is an absolute path whose final
     // component is a symlink we just read successfully, but the path we were
@@ -150,8 +135,37 @@ export function patcher(roots: string[]): () => void {
         resolved: string,
         linkTarget: string
     ): string {
-        const linkDir = realpathInRootNamespace(path.dirname(resolved))
-        return path.resolve(linkDir, linkTarget)
+        if (path.isAbsolute(linkTarget)) return path.resolve(linkTarget)
+        const linkDir = origRealpathSyncNative(path.dirname(resolved)) as string
+        const target = path.resolve(linkDir, linkTarget)
+        // Project only targets that remain inside a symlinked root. Resolving
+        // relative escapes after projecting the parent would change their depth.
+        for (const root of rootMappings) {
+            if (
+                isSubPath(root.lexical, resolved) &&
+                isSubPath(root.real, target)
+            ) {
+                return path.resolve(
+                    root.lexical,
+                    path.relative(root.real, target)
+                )
+            }
+        }
+        return target
+    }
+
+    // A relative path with the same shape is only a valid sandbox remapping
+    // when it leads to the original target. Otherwise a walker could follow an
+    // absent or unrelated file in the sandbox.
+    function hasSameTarget(original: string, mapped: string): boolean {
+        try {
+            return (
+                origRealpathSyncNative(original) ===
+                origRealpathSyncNative(mapped)
+            )
+        } catch {
+            return false
+        }
     }
 
     // =========================================================================
@@ -185,29 +199,23 @@ export function patcher(roots: string[]): () => void {
                 return cb(null, stats)
             }
 
-            return guardedReadLink(args[0], guardedReadLinkCb)
+            return readlink(args[0], guardedReadLinkCb)
 
-            function guardedReadLinkCb(str: string) {
-                if (str != args[0]) {
-                    // there are one or more hops within the guards so there is nothing more to do
+            function guardedReadLinkCb(err: NodeJS.ErrnoException | null) {
+                if (!err) {
+                    // The final component is a visible link in the guarded filesystem.
                     return cb(null, stats)
                 }
+                if (err.code === 'ENOENT') return cb(null, stats)
+                if (err.code !== 'EINVAL') return cb(err)
 
-                // there are no hops so lets report the stats of the real file;
-                // we can't use origRealPath here since that function calls lstat internally
-                // which can result in an infinite loop
-                return unguardedRealPath(args[0], unguardedRealPathCb)
-
-                function unguardedRealPathCb(err: Error | null, str?: string) {
-                    if (err) {
-                        if ((err as any).code === 'ENOENT') {
-                            // broken link so there is nothing more to do
-                            return cb(null, stats)
-                        }
-                        return cb(err)
-                    }
-                    return origLstat(str!, cb)
+                // readlink hides this link; return its target's stats, preserving options.
+                args[args.length - 1] = function statCb(err, targetStats) {
+                    if (err?.code === 'ENOENT') return cb(null, stats)
+                    if (err) return cb(err)
+                    return cb(null, targetStats ?? stats)
                 }
+                return origStat(...args)
             }
         }
 
@@ -231,19 +239,16 @@ export function patcher(roots: string[]): () => void {
             return stats
         }
 
-        const guardedReadLink: string = guardedReadLinkSync(args[0])
-        if (guardedReadLink != args[0]) {
-            // there are one or more hops within the guards so there is nothing more to do
+        try {
+            readlinkSync(args[0])
             return stats
+        } catch (err: any) {
+            if (err.code === 'ENOENT') return stats
+            if (err.code !== 'EINVAL') throw err
         }
 
         try {
-            args[0] = unguardedRealPathSync(args[0])
-
-            // there are no hops so lets report the stats of the real file;
-            // we can't use origRealPathSync here since that function calls lstat internally
-            // which can result in an infinite loop
-            return origLstatSync(...args)
+            return origStatSync(...args) ?? stats
         } catch (err: any) {
             if (err.code === 'ENOENT') {
                 // broken link so there is nothing more to do
@@ -333,7 +338,8 @@ export function patcher(roots: string[]): () => void {
     // fs.readlink
     // =========================================================================
 
-    fs.readlink = function readlink(...args: Parameters<typeof origReadlink>) {
+    fs.readlink = readlink
+    function readlink(...args: Parameters<typeof origReadlink>) {
         // preserve error when calling function without required callback
         if (typeof args[args.length - 1] !== 'function') {
             return origReadlink(...args)
@@ -348,10 +354,12 @@ export function patcher(roots: string[]): () => void {
             if (err) return cb(err)
             const resolved = resolvePathLike(args[0])
             const linkTarget = p!
-            const targetAbs = resolveTargetAgainstRealParent(
-                resolved,
-                linkTarget
-            )
+            let targetAbs: string
+            try {
+                targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget)
+            } catch (error) {
+                return cb(error)
+            }
             const escapedRoot: string | false = isEscape(resolved, targetAbs)
             if (escapedRoot) {
                 const escapedRoots = [escapedRoot]
@@ -371,7 +379,11 @@ export function patcher(roots: string[]): () => void {
                         path.dirname(resolved),
                         path.relative(path.dirname(targetAbs), next)
                     )
-                    if (r != resolved && !isEscape(resolved, r, escapedRoots)) {
+                    if (
+                        r != resolved &&
+                        !isEscape(resolved, r, escapedRoots) &&
+                        hasSameTarget(resolved, r)
+                    ) {
                         if (path.isAbsolute(linkTarget)) {
                             return cb(null, r)
                         }
@@ -389,9 +401,8 @@ export function patcher(roots: string[]): () => void {
         origReadlink(...args)
     }
 
-    fs.readlinkSync = function readlinkSync(
-        ...args: Parameters<typeof origReadlinkSync>
-    ) {
+    fs.readlinkSync = readlinkSync
+    function readlinkSync(...args: Parameters<typeof origReadlinkSync>) {
         const resolved = resolvePathLike(args[0])
         const linkTarget = origReadlinkSync(...args)
         const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget)
@@ -412,7 +423,11 @@ export function patcher(roots: string[]): () => void {
                 path.dirname(resolved),
                 path.relative(path.dirname(targetAbs), next)
             )
-            if (r != resolved && !isEscape(resolved, r, [escapedRoot])) {
+            if (
+                r != resolved &&
+                !isEscape(resolved, r, [escapedRoot]) &&
+                hasSameTarget(resolved, r)
+            ) {
                 if (path.isAbsolute(linkTarget)) {
                     return r
                 }
@@ -878,24 +893,6 @@ export function patcher(roots: string[]): () => void {
         return next
     }
 
-    function unguardedRealPath(start: PathLike, cb: ErrPathCallback): void {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
-        oneHop(stringifyPathLike(start), cb)
-
-        function oneHop(loc: string, cb: ErrPathCallback) {
-            nextHop(loc, function oneHopeNextCb(next) {
-                if (next == undefined) {
-                    // file does not exist (broken link)
-                    return cb(enoent('realpath', start), undefined)
-                } else if (!next) {
-                    // we've hit a real file
-                    return cb(null, loc)
-                }
-                oneHop(next, cb)
-            })
-        }
-    }
-
     function guardedRealPath(
         start: PathLike,
         cb: ErrPathCallback,
@@ -927,20 +924,6 @@ export function patcher(roots: string[]): () => void {
                 }
                 oneHop(next, cb)
             })
-        }
-    }
-
-    function unguardedRealPathSync(start: PathLike): string {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = stringifyPathLike(start), next; ; loc = next) {
-            next = nextHopSync(loc)
-            if (next == undefined) {
-                // file does not exist (broken link)
-                throw enoent('realpath', start)
-            } else if (!next) {
-                // we've hit a real file
-                return loc
-            }
         }
     }
 

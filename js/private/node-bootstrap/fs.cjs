@@ -86,6 +86,8 @@ function patcher(roots) {
         }
         return function () { };
     }
+    const origStat = fs.stat.bind(fs);
+    const origStatSync = fs.statSync.bind(fs);
     const origLstat = fs.lstat.bind(fs);
     const origLstatSync = fs.lstatSync.bind(fs);
     const origReaddir = fs.readdir.bind(fs);
@@ -114,18 +116,6 @@ function patcher(roots) {
         return { lexical, real };
     })
         .sort((a, b) => b.lexical.length - a.lexical.length);
-    // Keep real paths in the lexical namespace when the configured root is
-    // itself a symlink. Nested links that leave the root remain canonical.
-    function realpathInRootNamespace(p) {
-        const real = origRealpathSyncNative(p);
-        for (const root of rootMappings) {
-            if (isSubPath(root.lexical, p) &&
-                isSubPath(root.real, real)) {
-                return path.resolve(root.lexical, path.relative(root.real, real));
-            }
-        }
-        return real;
-    }
     // Resolve a relative symlink `linkTarget` against the REAL location of the
     // link's parent directory. `resolved` is an absolute path whose final
     // component is a symlink we just read successfully, but the path we were
@@ -133,8 +123,31 @@ function patcher(roots) {
     // (e.g. a pnpm/node_modules alias); joining `linkTarget` onto the *lexical*
     // parent would then land at the wrong absolute path.
     function resolveTargetAgainstRealParent(resolved, linkTarget) {
-        const linkDir = realpathInRootNamespace(path.dirname(resolved));
-        return path.resolve(linkDir, linkTarget);
+        if (path.isAbsolute(linkTarget))
+            return path.resolve(linkTarget);
+        const linkDir = origRealpathSyncNative(path.dirname(resolved));
+        const target = path.resolve(linkDir, linkTarget);
+        // Project only targets that remain inside a symlinked root. Resolving
+        // relative escapes after projecting the parent would change their depth.
+        for (const root of rootMappings) {
+            if (isSubPath(root.lexical, resolved) &&
+                isSubPath(root.real, target)) {
+                return path.resolve(root.lexical, path.relative(root.real, target));
+            }
+        }
+        return target;
+    }
+    // A relative path with the same shape is only a valid sandbox remapping
+    // when it leads to the original target. Otherwise a walker could follow an
+    // absent or unrelated file in the sandbox.
+    function hasSameTarget(original, mapped) {
+        try {
+            return (origRealpathSyncNative(original) ===
+                origRealpathSyncNative(mapped));
+        }
+        catch (_a) {
+            return false;
+        }
     }
     // =========================================================================
     // fs.lstat
@@ -158,31 +171,31 @@ function patcher(roots) {
                 // the file can not escaped the sandbox so there is nothing more to do
                 return cb(null, stats);
             }
-            return guardedReadLink(args[0], guardedReadLinkCb);
-            function guardedReadLinkCb(str) {
-                if (str != args[0]) {
-                    // there are one or more hops within the guards so there is nothing more to do
+            return readlink(args[0], guardedReadLinkCb);
+            function guardedReadLinkCb(err) {
+                if (!err) {
+                    // The final component is a visible link in the guarded filesystem.
                     return cb(null, stats);
                 }
-                // there are no hops so lets report the stats of the real file;
-                // we can't use origRealPath here since that function calls lstat internally
-                // which can result in an infinite loop
-                return unguardedRealPath(args[0], unguardedRealPathCb);
-                function unguardedRealPathCb(err, str) {
-                    if (err) {
-                        if (err.code === 'ENOENT') {
-                            // broken link so there is nothing more to do
-                            return cb(null, stats);
-                        }
+                if (err.code === 'ENOENT')
+                    return cb(null, stats);
+                if (err.code !== 'EINVAL')
+                    return cb(err);
+                // readlink hides this link; return its target's stats, preserving options.
+                args[args.length - 1] = function statCb(err, targetStats) {
+                    if ((err === null || err === void 0 ? void 0 : err.code) === 'ENOENT')
+                        return cb(null, stats);
+                    if (err)
                         return cb(err);
-                    }
-                    return origLstat(str, cb);
-                }
+                    return cb(null, targetStats !== null && targetStats !== void 0 ? targetStats : stats);
+                };
+                return origStat(...args);
             }
         };
         origLstat(...args);
     };
     fs.lstatSync = function lstatSync(...args) {
+        var _a;
         const stats = origLstatSync(...args);
         if (!(stats === null || stats === void 0 ? void 0 : stats.isSymbolicLink())) {
             // the file is not a symbolic link so there is nothing more to do
@@ -193,17 +206,18 @@ function patcher(roots) {
             // the file can not escaped the sandbox so there is nothing more to do
             return stats;
         }
-        const guardedReadLink = guardedReadLinkSync(args[0]);
-        if (guardedReadLink != args[0]) {
-            // there are one or more hops within the guards so there is nothing more to do
+        try {
+            readlinkSync(args[0]);
             return stats;
         }
+        catch (err) {
+            if (err.code === 'ENOENT')
+                return stats;
+            if (err.code !== 'EINVAL')
+                throw err;
+        }
         try {
-            args[0] = unguardedRealPathSync(args[0]);
-            // there are no hops so lets report the stats of the real file;
-            // we can't use origRealPathSync here since that function calls lstat internally
-            // which can result in an infinite loop
-            return origLstatSync(...args);
+            return (_a = origStatSync(...args)) !== null && _a !== void 0 ? _a : stats;
         }
         catch (err) {
             if (err.code === 'ENOENT') {
@@ -273,7 +287,8 @@ function patcher(roots) {
     // =========================================================================
     // fs.readlink
     // =========================================================================
-    fs.readlink = function readlink(...args) {
+    fs.readlink = readlink;
+    function readlink(...args) {
         // preserve error when calling function without required callback
         if (typeof args[args.length - 1] !== 'function') {
             return origReadlink(...args);
@@ -284,7 +299,13 @@ function patcher(roots) {
                 return cb(err);
             const resolved = resolvePathLike(args[0]);
             const linkTarget = p;
-            const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
+            let targetAbs;
+            try {
+                targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
+            }
+            catch (error) {
+                return cb(error);
+            }
             const escapedRoot = isEscape(resolved, targetAbs);
             if (escapedRoot) {
                 const escapedRoots = [escapedRoot];
@@ -301,7 +322,9 @@ function patcher(roots) {
                         }
                     }
                     const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(targetAbs), next));
-                    if (r != resolved && !isEscape(resolved, r, escapedRoots)) {
+                    if (r != resolved &&
+                        !isEscape(resolved, r, escapedRoots) &&
+                        hasSameTarget(resolved, r)) {
                         if (path.isAbsolute(linkTarget)) {
                             return cb(null, r);
                         }
@@ -317,8 +340,9 @@ function patcher(roots) {
             }
         };
         origReadlink(...args);
-    };
-    fs.readlinkSync = function readlinkSync(...args) {
+    }
+    fs.readlinkSync = readlinkSync;
+    function readlinkSync(...args) {
         const resolved = resolvePathLike(args[0]);
         const linkTarget = origReadlinkSync(...args);
         const targetAbs = resolveTargetAgainstRealParent(resolved, linkTarget);
@@ -336,7 +360,9 @@ function patcher(roots) {
                 }
             }
             const r = path.resolve(path.dirname(resolved), path.relative(path.dirname(targetAbs), next));
-            if (r != resolved && !isEscape(resolved, r, [escapedRoot])) {
+            if (r != resolved &&
+                !isEscape(resolved, r, [escapedRoot]) &&
+                hasSameTarget(resolved, r)) {
                 if (path.isAbsolute(linkTarget)) {
                     return r;
                 }
@@ -347,7 +373,7 @@ function patcher(roots) {
             throw einval('readlink', args[0]);
         }
         return linkTarget;
-    };
+    }
     // =========================================================================
     // fs.readdir
     // =========================================================================
@@ -724,23 +750,6 @@ function patcher(roots) {
         }
         return next;
     }
-    function unguardedRealPath(start, cb) {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
-        oneHop(stringifyPathLike(start), cb);
-        function oneHop(loc, cb) {
-            nextHop(loc, function oneHopeNextCb(next) {
-                if (next == undefined) {
-                    // file does not exist (broken link)
-                    return cb(enoent('realpath', start), undefined);
-                }
-                else if (!next) {
-                    // we've hit a real file
-                    return cb(null, loc);
-                }
-                oneHop(next, cb);
-            });
-        }
-    }
     function guardedRealPath(start, cb, escapedRoots) {
         // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpath)
         oneHop(stringifyPathLike(start), cb);
@@ -765,20 +774,6 @@ function patcher(roots) {
                 }
                 oneHop(next, cb);
             });
-        }
-    }
-    function unguardedRealPathSync(start) {
-        // stringifyPathLike() to handle the "undefined" case (matches behavior as fs.realpathSync)
-        for (let loc = stringifyPathLike(start), next;; loc = next) {
-            next = nextHopSync(loc);
-            if (next == undefined) {
-                // file does not exist (broken link)
-                throw enoent('realpath', start);
-            }
-            else if (!next) {
-                // we've hit a real file
-                return loc;
-            }
         }
     }
     function guardedRealPathSync(start, escapedRoots) {

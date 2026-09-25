@@ -16,19 +16,13 @@
  */
 import * as assert from 'node:assert'
 import * as fs from 'node:fs'
+import { syncBuiltinESMExports } from 'node:module'
 import { withFixtures } from 'inline-fixtures'
 import * as path from 'node:path'
 import * as util from 'node:util'
 
 import { patcher } from '../../node-bootstrap/src/fs.cjs'
-
-// We don't want to bring jest into this repo so we just fake the describe and it functions here
-async function describe(_, fn) {
-    await fn()
-}
-async function it(_, fn) {
-    await fn()
-}
+import { describe, it } from './harness.cjs'
 
 describe('testing readlink', async () => {
     await it('can resolve symlink in root', async () => {
@@ -407,6 +401,57 @@ describe('testing readlink', async () => {
                 revertPatches()
             }
         )
+    })
+
+    await it('handles parent renames through asynchronous APIs', async () => {
+        await withFixtures({ parent: {}, file: 'contents' }, async (root) => {
+            root = fs.realpathSync(root)
+            const parent = path.join(root, 'parent')
+            const moved = path.join(root, 'moved')
+            const link = path.join(parent, 'link')
+            fs.symlinkSync('../file', link)
+            const { default: mutableFs } = await import('node:fs')
+            const nativeReadlink = mutableFs.readlink
+            mutableFs.readlink = (...args) => {
+                const callback = args.pop()
+                nativeReadlink(...args, (error, target) => {
+                    // Remove the parent after native readlink succeeds but before
+                    // the guard resolves the relative target against that parent.
+                    if (!error) fs.renameSync(parent, moved)
+                    callback(error, target)
+                })
+            }
+            const revert = patcher([root])
+            try {
+                for (const method of [
+                    util.promisify(fs.readlink),
+                    fs.promises.readlink,
+                ]) {
+                    await assert.rejects(method(link), { code: 'ENOENT' })
+                    fs.renameSync(moved, parent)
+                }
+                for (const method of [
+                    util.promisify(fs.lstat),
+                    fs.promises.lstat,
+                ]) {
+                    assert.ok((await method(link)).isSymbolicLink())
+                    fs.renameSync(moved, parent)
+                }
+                fs.unlinkSync(link)
+                fs.symlinkSync(path.join(root, 'file'), link)
+                for (const method of [
+                    util.promisify(fs.readlink),
+                    fs.promises.readlink,
+                ]) {
+                    assert.equal(await method(link), path.join(root, 'file'))
+                    fs.renameSync(moved, parent)
+                }
+            } finally {
+                revert()
+                mutableFs.readlink = nativeReadlink
+                syncBuiltinESMExports()
+            }
+        })
     })
 
     await it('includes parent calls in stack traces', async function readlinkStackTest1() {

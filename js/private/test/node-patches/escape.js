@@ -18,14 +18,7 @@ const assert = require('assert')
 const path = require('path')
 const escapeFunction = require('../../node-bootstrap/src/fs.cjs').escapeFunction
 const isSubPath = require('../../node-bootstrap/src/fs.cjs').isSubPath
-
-// We don't want to bring jest into this repo so we just fake the describe and it functions here
-async function describe(_, fn) {
-    await fn()
-}
-async function it(_, fn) {
-    await fn()
-}
+const { describe, it } = require('./harness.cjs')
 
 describe('escape function', () => {
     it('isSubPath is correct', () => {
