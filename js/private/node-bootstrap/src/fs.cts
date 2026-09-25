@@ -135,21 +135,20 @@ export function patcher(roots: string[]): () => void {
         resolved: string,
         linkTarget: string
     ): string {
+        if (path.isAbsolute(linkTarget)) return path.resolve(linkTarget)
         const linkDir = origRealpathSyncNative(path.dirname(resolved)) as string
         const target = path.resolve(linkDir, linkTarget)
         // Project only targets that remain inside a symlinked root. Resolving
         // relative escapes after projecting the parent would change their depth.
-        if (!path.isAbsolute(linkTarget)) {
-            for (const root of rootMappings) {
-                if (
-                    isSubPath(root.lexical, resolved) &&
-                    isSubPath(root.real, target)
-                ) {
-                    return path.resolve(
-                        root.lexical,
-                        path.relative(root.real, target)
-                    )
-                }
+        for (const root of rootMappings) {
+            if (
+                isSubPath(root.lexical, resolved) &&
+                isSubPath(root.real, target)
+            ) {
+                return path.resolve(
+                    root.lexical,
+                    path.relative(root.real, target)
+                )
             }
         }
         return target
