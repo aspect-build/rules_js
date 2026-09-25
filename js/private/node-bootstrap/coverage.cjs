@@ -10,7 +10,7 @@
 // The report is generated here because the test action is the only place the profiles and
 // the instrumented sources are both present, and in its own process because coverage.js is
 // async, chdir()s, and would otherwise land in this process's own profile. See #2901.
-const { JS_BINARY__LOG_ERROR, JS_BINARY__LOG_PREFIX } = process.env
+const { logError } = require('./util.cjs')
 
 const collecting = startCollection()
 
@@ -197,12 +197,6 @@ function sourceMapCache(result) {
         }
     }
     return cache
-}
-
-function logError(message) {
-    if (JS_BINARY__LOG_ERROR) {
-        console.error(`ERROR: ${JS_BINARY__LOG_PREFIX}: ${message}`)
-    }
 }
 
 // Fail the target, without masking an exit code the program has already chosen.

@@ -8,86 +8,18 @@
 
 'use strict'
 
-const fs = require('node:fs')
 const path = require('node:path')
 
-const IS_WINDOWS = process.platform === 'win32'
-
-// ==============================================================================
-// Logging
-// ==============================================================================
-
-// Emit a log line to stderr.
-//
-// We use fs.writeSync rather than console.error, so that the line is flushed before a
-// process.exit that may follow it.
-function log(level, message) {
-    fs.writeSync(
-        2,
-        `${level}: ${process.env.JS_BINARY__LOG_PREFIX}: ${message}\n`
-    )
-}
-
-function logFatal(message) {
-    if (process.env.JS_BINARY__LOG_FATAL) {
-        log('FATAL', message)
-    }
-}
-
-function logInfo(message) {
-    if (process.env.JS_BINARY__LOG_INFO) {
-        log('INFO', message)
-    }
-}
-
-function logDebug(message) {
-    if (process.env.JS_BINARY__LOG_DEBUG) {
-        log('DEBUG', message)
-    }
-}
-
-function fatal(message) {
-    logFatal(message)
-    process.exit(1)
-}
-
-// ==============================================================================
-// Helpers
-// ==============================================================================
-
-function isFile(p) {
-    try {
-        return fs.statSync(p).isFile()
-    } catch {
-        return false
-    }
-}
-
-function isDirectory(p) {
-    try {
-        return fs.statSync(p).isDirectory()
-    } catch {
-        return false
-    }
-}
-
-function isExecutable(p) {
-    try {
-        fs.accessSync(p, fs.constants.X_OK)
-        return true
-    } catch {
-        return false
-    }
-}
-
-function checkExecutableFile(what, p) {
-    if (!isFile(p)) {
-        fatal(`${what} '${p}' not found`)
-    }
-    if (!IS_WINDOWS && !isExecutable(p)) {
-        fatal(`${what} '${p}' is not executable`)
-    }
-}
+const {
+    IS_WINDOWS,
+    checkExecutableFile,
+    fatal,
+    isDirectory,
+    isFile,
+    logDebug,
+    logInfo,
+    withSlashes,
+} = require('./util.cjs')
 
 if (process.execArgv[0] !== '--require' || !process.execArgv[1]) {
     fatal("launcher.cjs must be node's first --require")
@@ -128,10 +60,6 @@ if (!require('node:worker_threads').isMainThread) {
 // ==============================================================================
 // Execroot
 // ==============================================================================
-
-function withSlashes(p) {
-    return IS_WINDOWS ? p.replace(/\\/g, '/') : p
-}
 
 // The directory the launcher script was started in.
 //
