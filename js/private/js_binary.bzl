@@ -108,6 +108,29 @@ _ATTRS = {
         `fixed_args` are passed before the ones specified in `args` and before ones
         that are specified on the `bazel run` or `bazel test` command line.
 
+        Each `fixed_arg` is split into arguments at analysis time, following bash's word
+        splitting and quote removal, and each resulting argument is baked into the launcher
+        quoted. At launch time the shell therefore expands `$VAR` and `${VAR}` but does not
+        split or glob:
+
+        | in a `fixed_arg`         | result                                      |
+        | ------------------------ | ------------------------------------------- |
+        | `a b`                    | two arguments                               |
+        | `"a b"`, `'a b'`         | one argument                                |
+        | `$VAR`, `${VAR}`         | expanded at launch time                     |
+        | `'$VAR'`                 | literal                                     |
+        | `*`, `?`, `[...]`, `~`   | literal; no globbing or tilde expansion     |
+        | `\\`                     | literal; backslash escapes are not applied  |
+        | unterminated `'` or `"`  | literal                                     |
+        | `$(...)`, `` `...` ``    | build error if it holds a space; see below  |
+        | unterminated `` ` ``     | build error                                 |
+        | `$'...'`, `$"..."`       | build error                                 |
+
+        A substitution has to stay inside one argument, since splitting it in half would
+        leave the shell reparsing the pieces into a different command. Write `"$(...)"` to
+        keep one holding a space, and note that its result is one argument rather than being
+        split again.
+
         See https://bazel.build/reference/be/common-definitions#common-attributes-binaries
         for more info on the built-in `args` attribute.
         """,
@@ -407,20 +430,58 @@ def _append_segment(segments, text, expand):
         return segments + [[text, expand]]
     return segments
 
+_SHELL_WHITESPACE = [" ", "\t", "\n", "\r"]
+
+def _matching_close(value, start, open_ch, close_ch):
+    """Index just past the region opening at `start`, or -1 if it is never closed."""
+    depth = 0
+    for i in range(start, len(value)):
+        ch = value[i]
+        if ch == open_ch:
+            depth += 1
+        elif ch == close_ch:
+            depth -= 1
+            if depth == 0:
+                return i + 1
+    return -1
+
+def _atomic_region(value, start):
+    """The whole `$(...)`, `${...}` or backtick region beginning at `start`.
+
+    Taken as a unit so that a quote inside it is not mistaken for an outer quote. A region
+    holding whitespace would be split across two arguments and the shell would then reparse
+    the halves into something else, so that is rejected here rather than at launch time.
+    """
+    if value[start] == "`":
+        end = value.find("`", start + 1) + 1
+        shown = "`...`"
+    else:
+        open_ch = value[start + 1]
+        shown = "$(...)" if open_ch == "(" else "${...}"
+        end = _matching_close(value, start + 1, open_ch, ")" if open_ch == "(" else "}")
+    if end <= 0:
+        fail("unterminated {} in a fixed_arg: {}".format(shown, repr(value)))
+
+    region = value[start:end]
+    for ch in _SHELL_WHITESPACE:
+        if ch in region:
+            fail(("whitespace inside {} would split a fixed_arg into separate arguments; " +
+                  "wrap it in double quotes to keep it one argument: {}").format(shown, repr(value)))
+    return region
+
 def _shell_tokenize(value):
-    """Splits a fixed_arg the way bash does when it is spliced into an array literal.
+    """Splits a fixed_arg the way bash would when it is spliced into an array literal.
 
-    The bash launcher builds `ALL_ARGS=({{fixed_args}} "$@")`, so each fixed_arg is
-    subject to word splitting and quote removal. `$(rootpaths ...)` expanding to several
-    paths relies on the splitting and a single-quoted arg relies on the quote removal;
-    both are covered by //js/private/test/fixed_args. The JavaScript launcher has no
-    shell, so the same splitting is done here.
+    The bash launcher builds `ALL_ARGS=({{fixed_args}} "$@")`. Splicing each fixed_arg in
+    raw would leave word splitting and quote removal to the shell at launch time; doing
+    them here instead means the arguments a target passes are decided at analysis time,
+    and the launcher can quote each one so the shell only expands it. The JavaScript
+    launcher has no shell at all, so it needs the same splitting either way.
 
-    Quote removal alone would lose the one thing the quotes were there to say: bash
-    expands `$VAR` inside double quotes and outside quotes, but not inside single quotes,
-    and that decision has to survive to the launcher, which does the expansion at run
-    time. So each token is emitted as a list of (text, expand) segments rather than as a
-    plain string.
+    Quote removal alone would lose the one thing the quotes were there to say: bash expands
+    `$VAR` inside double quotes and outside quotes, but not inside single quotes, and that
+    decision has to survive to the launcher, which does the expansion at run time. So each
+    token is emitted as a list of (text, expand) segments rather than as a plain string.
 
     Backslash escapes are deliberately not interpreted (bash would have), so a Windows-style
     path in a fixed_arg survives intact. That differs from bash for `\\$VAR`, which this
@@ -428,8 +489,9 @@ def _shell_tokenize(value):
     quote the argument in either case to get bash's answer.
 
     A quote with no partner later in the fixed_arg is one more character rather than the
-    start of a quoted run, so `it's` arrives intact. Bash has a script to corrupt and so
-    stops at the unbalanced quote instead.
+    start of a quoted run, so `it's` arrives intact; it renders as "it's", which bash reads
+    as the literal. Anything that could not survive being emitted as one double-quoted word
+    is a build error rather than a silent mangling: see _atomic_region.
 
     Args:
         value: the fixed_arg to split
@@ -443,9 +505,15 @@ def _shell_tokenize(value):
     expand = True
     has_token = False
     quote = None
+    skip = 0
 
     for i in range(len(value)):
+        if skip > 0:
+            skip -= 1
+            continue
         ch = value[i]
+        next_ch = value[i + 1] if i + 1 < len(value) else ""
+
         if quote:
             if ch == quote:
                 segments = _append_segment(segments, current, expand)
@@ -454,13 +522,21 @@ def _shell_tokenize(value):
                 quote = None
             else:
                 current += ch
+        elif ch == "$" and next_ch in ["'", "\""]:
+            # Inert inside the double quotes the launcher emits, so it cannot be carried across.
+            fail("${} quoting is not supported in a fixed_arg: {}".format(next_ch, repr(value)))
+        elif ch == "`" or (ch == "$" and next_ch in ["(", "{"]):
+            region = _atomic_region(value, i)
+            current += region
+            skip = len(region) - 1
+            has_token = True
         elif (ch == "'" or ch == "\"") and value.find(ch, i + 1) != -1:
             segments = _append_segment(segments, current, expand)
             current = ""
             quote = ch
             expand = ch == "\""
             has_token = True
-        elif ch == " " or ch == "\t" or ch == "\n" or ch == "\r":
+        elif ch in _SHELL_WHITESPACE:
             if has_token:
                 tokens.append(_append_segment(segments, current, expand))
                 segments = []
@@ -473,6 +549,27 @@ def _shell_tokenize(value):
     if has_token:
         tokens.append(_append_segment(segments, current, expand))
     return tokens
+
+def _bash_dq_expand(text):
+    """Escapes text for a bash double-quoted string, leaving expansions live.
+
+    Only the characters that would end the string or be consumed as an escape are touched,
+    so `$VAR` and `$(...)` still expand at launch time. Backslashes are escaped because the
+    tokenizer above does not interpret them, and because text ending in one would otherwise
+    escape the closing quote.
+    """
+    return text.replace("\\", "\\\\").replace("\"", "\\\"")
+
+def _bash_dq_literal(text):
+    """The same, for text that came from single quotes and so must not expand at all."""
+    return _bash_dq_expand(text).replace("$", "\\$").replace("`", "\\`")
+
+def _bash_arg(token):
+    """Renders one tokenized argument as a single double-quoted bash word."""
+    return "\"{}\"".format("".join([
+        _bash_dq_expand(text) if expand else _bash_dq_literal(text)
+        for (text, expand) in token
+    ]))
 
 def _generates_coverage_report(ctx):
     """Whether the launcher generates the lcov report in the test action. See #2901."""
@@ -610,7 +707,11 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
             )
             for (var, value, iff_not_set) in envs
         ]),
-        "{{fixed_args}}": " ".join(fixed_args),
+        "{{fixed_args}}": " ".join([
+            _bash_arg(token)
+            for fixed_arg in fixed_args
+            for token in _shell_tokenize(fixed_arg)
+        ]),
         "{{initialize_runfiles}}": BASH_INITIALIZE_RUNFILES,
         "{{log_prefix_rule_set}}": log_prefix_rule_set,
         "{{log_prefix_rule}}": log_prefix_rule,
