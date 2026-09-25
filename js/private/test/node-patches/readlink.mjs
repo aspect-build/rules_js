@@ -403,7 +403,7 @@ describe('testing readlink', async () => {
         )
     })
 
-    await it('reports parent-resolution failures through asynchronous APIs', async () => {
+    await it('handles parent renames through asynchronous APIs', async () => {
         await withFixtures({ parent: {}, file: 'contents' }, async (root) => {
             root = fs.realpathSync(root)
             const parent = path.join(root, 'parent')
@@ -435,6 +435,15 @@ describe('testing readlink', async () => {
                     fs.promises.lstat,
                 ]) {
                     assert.ok((await method(link)).isSymbolicLink())
+                    fs.renameSync(moved, parent)
+                }
+                fs.unlinkSync(link)
+                fs.symlinkSync(path.join(root, 'file'), link)
+                for (const method of [
+                    util.promisify(fs.readlink),
+                    fs.promises.readlink,
+                ]) {
+                    assert.equal(await method(link), path.join(root, 'file'))
                     fs.renameSync(moved, parent)
                 }
             } finally {

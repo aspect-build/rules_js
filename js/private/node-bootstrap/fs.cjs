@@ -123,16 +123,16 @@ function patcher(roots) {
     // (e.g. a pnpm/node_modules alias); joining `linkTarget` onto the *lexical*
     // parent would then land at the wrong absolute path.
     function resolveTargetAgainstRealParent(resolved, linkTarget) {
+        if (path.isAbsolute(linkTarget))
+            return path.resolve(linkTarget);
         const linkDir = origRealpathSyncNative(path.dirname(resolved));
         const target = path.resolve(linkDir, linkTarget);
         // Project only targets that remain inside a symlinked root. Resolving
         // relative escapes after projecting the parent would change their depth.
-        if (!path.isAbsolute(linkTarget)) {
-            for (const root of rootMappings) {
-                if (isSubPath(root.lexical, resolved) &&
-                    isSubPath(root.real, target)) {
-                    return path.resolve(root.lexical, path.relative(root.real, target));
-                }
+        for (const root of rootMappings) {
+            if (isSubPath(root.lexical, resolved) &&
+                isSubPath(root.real, target)) {
+                return path.resolve(root.lexical, path.relative(root.real, target));
             }
         }
         return target;
