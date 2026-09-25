@@ -380,7 +380,7 @@ JS_BINARY__NODE_OPTIONS=()
 JS_BINARY__NODE_OPTIONS+=("--preserve-symlinks-main")
 
 ARGS=()
-ALL_ARGS=(--my_arg "$@")
+ALL_ARGS=("--my_arg" "$@")
 for ARG in ${ALL_ARGS[@]+"${ALL_ARGS[@]}"}; do
     case "$ARG" in
     # Let users pass through arguments to node itself
