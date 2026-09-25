@@ -110,6 +110,23 @@ this option is not needed.
 
     return copy_file_to_bin_action(ctx, file)
 
+def copy_js_data_files(ctx, data_files, copy_data_files_to_bin, no_copy_to_bin):
+    """Copy eligible source data files to the output tree.
+
+    Same copy policy `gather_runfiles` uses. Callers that need the exact output
+    Files (for grouping) should copy once here and pass the result to
+    `gather_runfiles` with `copy_data_files_to_bin = False`.
+    """
+    if not copy_data_files_to_bin:
+        return data_files
+    files_runfiles = []
+    for d in data_files:
+        if d.is_source and d not in no_copy_to_bin:
+            files_runfiles.append(copy_js_file_to_bin_action(ctx, d))
+        else:
+            files_runfiles.append(d)
+    return files_runfiles
+
 def gather_runfiles(
         ctx,
         sources = None,
@@ -167,16 +184,12 @@ def gather_runfiles(
     for target in data:
         transitive_files_depsets.append(target[DefaultInfo].files)
 
-    # Use `data_files` as-is if `copy_data_files_to_bin` is False
-    if copy_data_files_to_bin:
-        files_runfiles = []
-        for d in data_files:
-            if d.is_source and d not in no_copy_to_bin:
-                files_runfiles.append(copy_js_file_to_bin_action(ctx, d))
-            else:
-                files_runfiles.append(d)
-    else:
-        files_runfiles = data_files
+    files_runfiles = copy_js_data_files(
+        ctx,
+        data_files,
+        copy_data_files_to_bin,
+        no_copy_to_bin,
+    )
 
     # Merge the above with the transitive runfiles of data & deps.
     return ctx.runfiles(
@@ -246,7 +259,6 @@ def gather_files_from_js_infos(
         A depset of files
     """
     files_depsets = []
-
     for target in targets:
         if JsInfo in target:
             js_info = target[JsInfo]

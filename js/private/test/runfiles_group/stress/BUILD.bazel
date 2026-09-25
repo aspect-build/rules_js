@@ -1,0 +1,11 @@
+load(":gen.bzl", "js_library_chain")
+
+js_library_chain(
+    name = "chain250",
+    count = 250,
+)
+
+js_library_chain(
+    name = "chain500",
+    count = 500,
+)

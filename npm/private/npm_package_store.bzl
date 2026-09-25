@@ -6,6 +6,9 @@ load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 # buildifier: disable=bzl-visibility
 load("//js/private:js_info.bzl", "JsInfo")
+
+# buildifier: disable=bzl-visibility
+load("//js/private:js_runfiles_groups.bzl", "js_runfiles_groups")
 load(":npm_package_info.bzl", "NpmPackageInfo")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
@@ -160,7 +163,7 @@ If set, takes precedence over the package version in the `NpmPackageInfo` src.
     "verbose": attr.bool(
         doc = """If true, prints out verbose logs to stdout""",
     ),
-}
+} | js_runfiles_groups.RULE_ATTRS
 
 def _npm_package_store_impl(ctx):
     if ctx.attr.src:
@@ -479,6 +482,11 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # package directory for use in $(execpath) and $(rootpath).
         # Output group name must match utils.package_directory_output_group
         providers.append(OutputGroupInfo(package_directory = depset([package_store_directory])))
+
+    if js_runfiles_groups.is_enabled(ctx):
+        rgi = js_runfiles_groups.store_groups(ctx, ctx.attr.src)
+        if rgi:
+            providers.append(rgi)
 
     return providers
 

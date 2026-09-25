@@ -1,6 +1,9 @@
 "npm_link_package_store rule"
 
 load("//js:providers.bzl", "JsInfo")
+
+# buildifier: disable=bzl-visibility
+load("//js/private:js_runfiles_groups.bzl", "js_runfiles_groups")
 load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 load(":utils.bzl", "utils")
 
@@ -56,7 +59,7 @@ If set, takes precedence over the package name in the src npm_package_store.
         https://github.com/pnpm/pnpm/issues/5131.
         """,
     ),
-}
+} | js_runfiles_groups.RULE_ATTRS
 
 _BIN_TMPL = """#!/bin/sh
 basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
@@ -138,6 +141,17 @@ def _npm_link_package_store_impl(ctx):
     ]
     if OutputGroupInfo in ctx.attr.src:
         providers.append(ctx.attr.src[OutputGroupInfo])
+
+    if js_runfiles_groups.is_enabled(ctx):
+        rgi = js_runfiles_groups.link_groups(
+            ctx,
+            src = ctx.attr.src,
+            store_info = store_info,
+            store_js_info = store_js_info,
+            link_files = files,
+        )
+        if rgi:
+            providers.append(rgi)
 
     return providers
 

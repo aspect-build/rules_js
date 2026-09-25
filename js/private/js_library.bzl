@@ -25,8 +25,9 @@ js_library(
 
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("//js/private/coverage:extensions.bzl", "COVERAGE_EXTENSIONS")
-load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_runfiles")
+load(":js_helpers.bzl", "copy_js_data_files", "copy_js_file_to_bin_action", "gather_runfiles")
 load(":js_info.bzl", "JsInfo", "js_info")
+load(":js_runfiles_groups.bzl", "js_runfiles_groups")
 load(":proto.bzl", "js_proto_aspect")
 
 _DOC = """A library of JavaScript sources. Provides JsInfo, the primary provider used in rules_js
@@ -131,7 +132,7 @@ a runtime dependency on this target.
         doc = """When True, `data` files are copied to the Bazel output tree before being passed as inputs to runfiles.""",
         default = True,
     ),
-}
+} | js_runfiles_groups.RULE_ATTRS
 
 def _gather_sources_and_types(ctx, targets, files):
     """Gathers sources and types from a list of targets
@@ -241,16 +242,22 @@ def _js_library_impl(ctx):
     npm_sources = depset(transitive = npm_sources)
     npm_package_store_infos = depset(transitive = npm_package_store_infos)
 
+    copied_data_files = copy_js_data_files(
+        ctx,
+        ctx.files.data,
+        ctx.attr.copy_data_to_bin,
+        ctx.files.no_copy_to_bin,
+    )
     runfiles = gather_runfiles(
         ctx = ctx,
         data = ctx.attr.data,
         deps = srcs_types_deps,
-        data_files = ctx.files.data,
-        copy_data_files_to_bin = ctx.attr.copy_data_to_bin,
+        data_files = copied_data_files,
+        copy_data_files_to_bin = False,
         no_copy_to_bin = ctx.files.no_copy_to_bin,
     )
 
-    return [
+    providers = [
         coverage_common.instrumented_files_info(
             ctx,
             dependency_attributes = ["deps"],
@@ -275,6 +282,19 @@ def _js_library_impl(ctx):
             runfiles = runfiles.files,
         ),
     ]
+
+    if js_runfiles_groups.is_enabled(ctx):
+        rgi = js_runfiles_groups.library_groups(
+            ctx,
+            data = ctx.attr.data,
+            srcs_types_deps = srcs_types_deps,
+            copied_data_files = copied_data_files,
+            copied_originals = ctx.files.data,
+        )
+        if rgi:
+            providers.append(rgi)
+
+    return providers
 
 js_library_lib = struct(
     attrs = _ATTRS,

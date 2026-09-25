@@ -1,0 +1,998 @@
+"""Analysis tests for RunfilesGroupInfo membership on rules_js fixtures.
+
+Inspects groups already emitted by js_binary / js_library / npm producers.
+Does not reimplement grouping to compute expected membership.
+"""
+
+load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
+load("@rules_runfiles_group//runfiles_group:lib.bzl", "runfiles_groups")
+load("@rules_runfiles_group//runfiles_group:providers.bzl", "RunfilesGroupInfo")
+load("//js/private:js_runfiles_groups.bzl", "js_runfiles_groups")
+load(
+    "//js/private/test:runfiles_group_assertions.bzl",
+    "DISABLED_CONFIG",
+    "assert_allowed_overlaps",
+    "assert_contains_files",
+    "assert_empty_files",
+    "assert_exact_file_owners",
+    "assert_excludes_files",
+    "assert_files_exact",
+    "assert_grouped_runfiles_match",
+    "assert_group_metadata",
+    "assert_has_rgi",
+    "assert_name_absent",
+    "assert_no_rgi",
+    "assert_overlap_files",
+    "file_owners",
+    "file_set",
+    "files_list",
+    "group_by_name",
+    "related_admitted",
+    "resolve_target",
+    "runfiles_files",
+    "semantics_test",
+    "unique_admitted",
+)
+load(":fixtures.bzl", "RgiAggregateInfo")
+
+# Coverage execution is unchanged; grouping does not expose a coverage group.
+_COVERAGE_GROUP = "aspect_rules_js#coverage"
+
+def _assert_role(env, found, rf_files, original, expected_name, forbidden_names):
+    if type(original) == "string":
+        related = unique_admitted(rf_files, original)
+    else:
+        related = related_admitted(rf_files, original)
+    asserts.true(env, related, "no admitted file matching {}".format(original if type(original) == "string" else original.basename))
+    expected = found.get(expected_name)
+    asserts.true(env, expected != None, "missing group {}".format(expected_name))
+    assert_contains_files(env, expected, related)
+    for name in forbidden_names:
+        other = found.get(name)
+        if other:
+            assert_excludes_files(env, other, related)
+
+def _source_only_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_no_rgi(env, target, "source-only library must omit RGI")
+    rf = target[DefaultInfo].default_runfiles
+    asserts.false(env, rf.files, "source-only library default_runfiles should be empty")
+    return analysistest.end(env)
+
+# js_library(srcs) has empty default_runfiles and no RunfilesGroupInfo.
+source_only_test = semantics_test(_source_only_impl)
+
+def _npm_package_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_no_rgi(env, target, "npm_package must not invent runfiles RGI")
+    return analysistest.end(env)
+
+# npm_package is a build output, not a runfiles producer.
+npm_package_test = semantics_test(_npm_package_impl)
+
+def _launcher_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_no_rgi(env, target, "launcher-only derivative must not emit RGI")
+    ftr = target[DefaultInfo].files_to_run
+    asserts.true(env, ftr != None and ftr.executable != None, "create_launcher executable missing")
+    asserts.true(env, target[DefaultInfo].default_runfiles != None, "create_launcher runfiles missing")
+    return analysistest.end(env)
+
+# create_launcher copies a js_binary executable without emitting RunfilesGroupInfo.
+launcher_only_test = semantics_test(_launcher_impl)
+
+def _rebuilt_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    asserts.true(env, first != None)
+    asserts.true(env, "rebuilt_rgi_sentinel.txt" in [f.basename for f in runfiles_groups.files(first).to_list()])
+    asserts.equals(env, target.label, target[RunfilesGroupInfo].executable_group)
+    return analysistest.end(env)
+
+# A derivative that changes default runfiles after js_binary must rebuild RunfilesGroupInfo.
+rebuilt_semantics_test = semantics_test(_rebuilt_impl)
+
+def _rebuilt_disabled_impl(ctx):
+    env = analysistest.begin(ctx)
+    assert_no_rgi(env, analysistest.target_under_test(env))
+    return analysistest.end(env)
+
+rebuilt_disabled_test = analysistest.make(_rebuilt_disabled_impl, config_settings = DISABLED_CONFIG)
+
+def _grouped_files(resolved):
+    grouped = {}
+    if resolved == None:
+        return grouped
+    for g in resolved.groups:
+        for f in runfiles_groups.files(g).to_list():
+            grouped[f] = True
+    return grouped
+
+def _library_outputs_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_has_rgi(env, target)
+    rf_files = runfiles_files(target)
+    grouped = _grouped_files(resolve_target(ctx, target))
+    for basename in ["nested_lib_inner_dep.js", "nested_lib_inner_asset.json"]:
+        related = unique_admitted(rf_files, basename)
+        asserts.true(env, related, "missing admitted {}".format(basename))
+        for f in related:
+            asserts.true(env, f in grouped, "{} missing from outer RGI".format(f.path))
+    return analysistest.end(env)
+
+# A library must group a data dep's default outputs even when those outputs
+# are outside the dep's own default runfiles.
+library_outputs_test = semantics_test(_library_outputs_impl)
+
+def _opaque_jsinfo_deps_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_has_rgi(env, target)
+    rf_files = runfiles_files(target)
+    grouped = _grouped_files(resolve_target(ctx, target))
+    for basename in ["opaque_jsinfo_src_own.js", "opaque_jsinfo_shared.js", "opaque_jsinfo_asset.json"]:
+        related = unique_admitted(rf_files, basename)
+        asserts.true(env, related, "missing admitted {}".format(basename))
+        for f in related:
+            asserts.true(env, f in grouped, "{} missing from library RGI".format(f.path))
+    return analysistest.end(env)
+
+# Ungrouped JsInfo deps with File-only runfiles are relayed onto library RGI.
+opaque_jsinfo_deps_test = semantics_test(_opaque_jsinfo_deps_impl)
+
+def _foreign_outputs_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    extras = unique_admitted(runfiles_files(target), "foreign_rgi_extra.txt")
+    asserts.true(env, extras, "foreign extra output not admitted")
+    unclass = found.get(js_runfiles_groups.UNCLASSIFIED_GROUP)
+    asserts.true(env, unclass != None, "foreign extra output missing from unclassified")
+    assert_contains_files(env, unclass, extras)
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    if first:
+        assert_excludes_files(env, first, extras)
+    return analysistest.end(env)
+
+# Extra outputs of a grouped foreign data dep stay unclassified through a library.
+foreign_outputs_test = semantics_test(_foreign_outputs_impl)
+
+# Launcher, entry point, and raw data sources are the protected application
+# group. JsInfo sources (direct, transitive, types) are first_party. Binaries
+# do not emit #npm or #coverage.
+def _binary_roles_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_has_rgi(env, target)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    rf_files = runfiles_files(target)
+    app_name = runfiles_groups.name_str(target.label)
+    app = found.get(app_name)
+    asserts.true(env, app != None, "missing application group")
+    assert_group_metadata(
+        env,
+        app,
+        kind = "first_party",
+        rank = js_runfiles_groups.RANK_EXECUTABLE,
+        do_not_merge = True,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    asserts.equals(env, target.label, target[RunfilesGroupInfo].executable_group)
+    asserts.equals(env, js_runfiles_groups.AFFINITY, app.merge_affinity)
+
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    asserts.true(env, first != None)
+    assert_group_metadata(
+        env,
+        first,
+        kind = "first_party",
+        rank = js_runfiles_groups.RANK_FIRST_PARTY_DEPS,
+        do_not_merge = False,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    third = found.get(js_runfiles_groups.THIRD_PARTY_GROUP)
+    asserts.true(env, third != None)
+    assert_group_metadata(
+        env,
+        third,
+        kind = "third_party",
+        rank = js_runfiles_groups.RANK_SHARED_DEPS,
+        do_not_merge = False,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    links = found.get(js_runfiles_groups.NPM_LINKS_GROUP)
+    asserts.true(env, links != None)
+    assert_group_metadata(
+        env,
+        links,
+        kind = "",
+        rank = js_runfiles_groups.RANK_NPM_LINKS,
+        do_not_merge = False,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    node = found.get(js_runfiles_groups.NODE_GROUP)
+    asserts.true(env, node != None)
+    assert_group_metadata(
+        env,
+        node,
+        kind = "foundation",
+        rank = js_runfiles_groups.RANK_FOUNDATION,
+        do_not_merge = False,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    support = found.get(js_runfiles_groups.RUNTIME_SUPPORT_GROUP)
+    asserts.true(env, support != None)
+    assert_group_metadata(
+        env,
+        support,
+        kind = "foundation",
+        rank = js_runfiles_groups.RANK_BOOTSTRAP,
+        do_not_merge = False,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+
+    others_from_app = [
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        js_runfiles_groups.THIRD_PARTY_GROUP,
+        js_runfiles_groups.NPM_LINKS_GROUP,
+        js_runfiles_groups.NODE_GROUP,
+        js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
+    ]
+    others_from_first = [app_name, js_runfiles_groups.THIRD_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP]
+    exe = target[DefaultInfo].files_to_run.executable if target[DefaultInfo].files_to_run else None
+    asserts.true(env, exe != None, "binary executable missing")
+    assert_contains_files(env, found[app_name], [exe])
+    for name in others_from_app:
+        other = found.get(name)
+        if other:
+            assert_excludes_files(env, other, [exe])
+    _assert_role(env, found, rf_files, "main.js", app_name, others_from_app)
+    _assert_role(env, found, rf_files, "raw_asset.txt", app_name, others_from_app)
+    _assert_role(env, found, rf_files, "generated_data.txt", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "lib.js", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "lib.d.ts", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "src_only.js", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+    _assert_role(env, found, rf_files, "binary_roles_custom.js", js_runfiles_groups.FIRST_PARTY_GROUP, others_from_first)
+
+    assert_name_absent(env, found, js_runfiles_groups.NPM_GROUP)
+    assert_name_absent(env, found, js_runfiles_groups.NPM_TOOLCHAIN_GROUP)
+    assert_name_absent(env, found, _COVERAGE_GROUP)
+    assert_allowed_overlaps(env, resolved, [])
+    return analysistest.end(env)
+
+binary_roles_semantics_test = semantics_test(_binary_roles_impl)
+
+# first_party Files must not also appear in third_party.
+def _swap_must_fail_helper(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    third = found.get(js_runfiles_groups.THIRD_PARTY_GROUP)
+    if first and third:
+        assert_excludes_files(env, third, runfiles_groups.files(first).to_list())
+        assert_excludes_files(env, first, runfiles_groups.files(third).to_list())
+    _assert_role(
+        env,
+        found,
+        runfiles_files(target),
+        "lib.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
+    return analysistest.end(env)
+
+swap_guard_test = semantics_test(_swap_must_fail_helper)
+
+_LIMIT_ATTRS = {
+    "bin_a": attr.label(mandatory = True),
+    "bin_b": attr.label(mandatory = True),
+}
+
+def _configured_bins(target, ctx):
+    configured = {}
+    for b in target[RgiAggregateInfo].binaries:
+        configured[b.label] = b
+    return configured[ctx.attr.bin_a.label], configured[ctx.attr.bin_b.label]
+
+def _membership(env, ctx, resolved, found, name_a, name_b, target):
+    first = js_runfiles_groups.FIRST_PARTY_GROUP
+    owners = file_owners(resolved)
+    rf_files = runfiles_files(target)
+    bin_a, bin_b = _configured_bins(target, ctx)
+    a_files = unique_admitted(runfiles_files(bin_a), "merge_a_only.txt")
+    asserts.true(env, a_files, "merge_a_only.txt not admitted on A")
+    a_sources = [f for f in a_files if f.is_source]
+    a_copies = [f for f in a_files if not f.is_source]
+    asserts.true(env, a_sources, "merge_a_only.txt source missing from A's runfiles")
+    asserts.true(env, a_copies, "merge_a_only.txt copy missing from A's runfiles")
+    assert_exact_file_owners(env, owners, a_sources, [name_a, first])
+    assert_exact_file_owners(env, owners, a_copies, [name_a])
+    for f in a_files:
+        names = owners.get(f, [])
+        asserts.false(env, name_b in names, "{} entered B: {}".format(f.path, names))
+
+    _assert_role(env, found, rf_files, "merge_b_only.txt", name_b, [name_a, first])
+    _assert_role(env, found, rf_files, "shared.js", first, [name_a, name_b])
+
+    a_both = unique_admitted(runfiles_files(bin_a), "merge_shared.txt")
+    b_both = unique_admitted(runfiles_files(bin_b), "merge_shared.txt")
+    asserts.true(env, a_both, "merge_shared.txt not admitted on A")
+    asserts.true(env, b_both, "merge_shared.txt not admitted on B")
+    both_sources = [f for f in a_both if f.is_source]
+    if not both_sources:
+        both_sources = [f for f in b_both if f.is_source]
+    a_both_copies = [f for f in a_both if not f.is_source]
+    b_both_copies = [f for f in b_both if not f.is_source]
+    asserts.true(env, both_sources, "merge_shared.txt source missing")
+    asserts.true(env, a_both_copies, "merge_shared.txt copy missing from A's runfiles")
+    asserts.true(env, b_both_copies, "merge_shared.txt copy missing from B's runfiles")
+    assert_exact_file_owners(env, owners, both_sources, [name_a, name_b])
+    b_both_set = file_set(b_both)
+    for f in a_both_copies:
+        if f in b_both_set:
+            assert_exact_file_owners(env, owners, [f], [name_a, name_b])
+        else:
+            assert_exact_file_owners(env, owners, [f], [name_a])
+    a_both_set = file_set(a_both)
+    for f in b_both_copies:
+        if f in a_both_set:
+            assert_exact_file_owners(env, owners, [f], [name_a, name_b])
+        else:
+            assert_exact_file_owners(env, owners, [f], [name_b])
+
+    allowed = {}
+    for f in a_sources:
+        allowed[f] = sorted([name_a, first])
+    for f in both_sources:
+        allowed[f] = sorted([name_a, name_b])
+    for f in a_both_copies:
+        if f in b_both_set:
+            allowed[f] = sorted([name_a, name_b])
+    for f in b_both_copies:
+        if f in a_both_set:
+            allowed[f] = sorted([name_a, name_b])
+    assert_overlap_files(env, resolved, allowed)
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+
+def _limit_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    name_a = runfiles_groups.name_str(ctx.attr.bin_a.label)
+    name_b = runfiles_groups.name_str(ctx.attr.bin_b.label)
+    for name in [
+        name_a,
+        name_b,
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        js_runfiles_groups.THIRD_PARTY_GROUP,
+        js_runfiles_groups.NPM_LINKS_GROUP,
+        js_runfiles_groups.NODE_GROUP,
+        js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
+    ]:
+        asserts.true(env, name in found, "missing group {} before limit()".format(name))
+    assert_name_absent(env, found, js_runfiles_groups.NPM_GROUP)
+    assert_name_absent(env, found, js_runfiles_groups.NPM_TOOLCHAIN_GROUP)
+    assert_name_absent(env, found, _COVERAGE_GROUP)
+    asserts.equals(env, 7, len(resolved.groups))
+
+    _membership(env, ctx, resolved, found, name_a, name_b, target)
+
+    limited = runfiles_groups.limit(ctx, resolved, max_groups = 1)
+    asserts.equals(env, 7, limited.group_count)
+    limited_found = group_by_name(limited)
+    asserts.true(env, limited_found[name_a].do_not_merge)
+    asserts.true(env, limited_found[name_b].do_not_merge)
+    for name in [
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        js_runfiles_groups.THIRD_PARTY_GROUP,
+        js_runfiles_groups.NPM_LINKS_GROUP,
+        js_runfiles_groups.NODE_GROUP,
+        js_runfiles_groups.RUNTIME_SUPPORT_GROUP,
+    ]:
+        asserts.equals(env, False, limited_found[name].do_not_merge)
+    _membership(env, ctx, limited, limited_found, name_a, name_b, target)
+    return analysistest.end(env)
+
+# Shared mergeable groups fold by name; protected application groups stay distinct.
+# limit(max_groups=1) does not drop those protected groups.
+limit_semantics_test = semantics_test(_limit_impl, attrs = _LIMIT_ATTRS)
+
+def _npm_provenance_loss_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    asserts.true(env, first != None)
+    names = [f.basename for f in runfiles_groups.files(first).to_list()]
+    asserts.true(
+        env,
+        "npm_pkg" in names or "package.json" in names or "index.js" in names or "local_index.js" in names,
+        "expected wrapped package tree in first_party, got {}".format(names),
+    )
+    return analysistest.end(env)
+
+# js_library(srcs = [npm_package]) exposes a generated tree, so the binary treats it as first_party.
+npm_provenance_loss_semantics_test = semantics_test(_npm_provenance_loss_impl)
+
+def _npm_link_coarse_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    asserts.true(env, js_runfiles_groups.NPM_GROUP in found)
+    assert_group_metadata(
+        env,
+        found[js_runfiles_groups.NPM_GROUP],
+        kind = "",
+        rank = js_runfiles_groups.RANK_NPM_LINKS,
+        do_not_merge = False,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    asserts.true(env, js_runfiles_groups.NPM_LINKS_GROUP in found)
+    return analysistest.end(env)
+
+# npm_link_package emits coarse #npm plus #npm_links. js_binary later drops #npm.
+npm_link_coarse_semantics_test = semantics_test(_npm_link_coarse_impl)
+
+def _custom_npm_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    third = found.get(js_runfiles_groups.THIRD_PARTY_GROUP)
+    asserts.true(env, third != None, "missing third_party; groups={}".format(sorted(found.keys())))
+    _assert_role(
+        env,
+        found,
+        runfiles_files(target),
+        "custom_npm_pkg.js",
+        js_runfiles_groups.THIRD_PARTY_GROUP,
+        [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.NPM_LINKS_GROUP],
+    )
+    return analysistest.end(env)
+
+# NpmPackageInfo.src on data is third_party, even without going through npm_link_package.
+custom_npm_semantics_test = semantics_test(_custom_npm_impl)
+
+def _external_src_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    rf_files = runfiles_files(target)
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        ctx.file.root_a,
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        ctx.file.root_b,
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
+    return analysistest.end(env)
+
+# Source-backed JS from another module is first_party (representation at admission, not repo identity).
+external_src_semantics_test = semantics_test(_external_src_impl, attrs = {
+    "root_a": attr.label(allow_single_file = True, mandatory = True),
+    "root_b": attr.label(allow_single_file = True, mandatory = True),
+})
+
+def _npm_link_as_src_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    third = found.get(js_runfiles_groups.THIRD_PARTY_GROUP)
+    links = found.get(js_runfiles_groups.NPM_LINKS_GROUP)
+    asserts.true(env, third != None and files_list(third), "missing third_party store payload")
+    asserts.true(env, links != None and files_list(links), "missing npm_links routing")
+    store = [f for f in runfiles_files(target) if "/.aspect_rules_js/" in f.path]
+    asserts.true(env, store, "expected admitted npm store files")
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    if first:
+        assert_excludes_files(env, first, store)
+    third_set = file_set(files_list(third))
+    link_set = file_set(files_list(links))
+    in_third = [f for f in store if f in third_set]
+    asserts.true(env, in_third, "store payload missing from third_party")
+    for f in in_third:
+        asserts.false(env, f in link_set, "store payload also in npm_links: {}".format(f.path))
+    routing_only = [f for f in files_list(links) if f not in third_set]
+    asserts.true(env, routing_only, "npm_links must contain routing files distinct from third_party")
+    return analysistest.end(env)
+
+# js_library(srcs = [npm_link_package]) still classifies the package tree as npm, not first_party.
+npm_link_as_src_semantics_test = semantics_test(_npm_link_as_src_impl)
+
+def _node_external_marker_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    marker = js_runfiles_groups.NODE_EXTERNAL_PREFIX + runfiles_groups.name_str(target.label)
+    asserts.true(env, marker in found, "missing {}".format(marker))
+    assert_group_metadata(
+        env,
+        found[marker],
+        kind = "foundation",
+        rank = js_runfiles_groups.RANK_FOUNDATION,
+        do_not_merge = True,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    assert_empty_files(env, found[marker])
+    assert_name_absent(env, found, js_runfiles_groups.NODE_GROUP)
+    return analysistest.end(env)
+
+# Path-only Node toolchains emit an empty #node_external:<label> marker, not #node.
+node_external_marker_semantics_test = semantics_test(_node_external_marker_impl)
+
+def _rgi_passthrough_dep_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    assert_has_rgi(env, target)
+    asserts.equals(env, None, target[RunfilesGroupInfo].executable_group)
+    return analysistest.end(env)
+
+# Relaying RunfilesGroupInfo without an executable_group is allowed for non-binaries.
+rgi_passthrough_dep_semantics_test = semantics_test(_rgi_passthrough_dep_impl)
+
+def _nested_rgi_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    inner = runfiles_groups.name_str(ctx.attr.inner.label)
+    asserts.true(env, inner in found, "nested inner application missing")
+    assert_group_metadata(
+        env,
+        found[inner],
+        kind = "first_party",
+        rank = js_runfiles_groups.RANK_EXECUTABLE,
+        do_not_merge = True,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    asserts.equals(env, target.label, target[RunfilesGroupInfo].executable_group)
+    asserts.true(env, found[runfiles_groups.name_str(target.label)].do_not_merge)
+    return analysistest.end(env)
+
+# A js_binary in data keeps its own protected application group on the outer binary.
+nested_rgi_semantics_test = semantics_test(_nested_rgi_impl, attrs = {
+    "inner": attr.label(mandatory = True),
+})
+
+def _rgi_drop_dep_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    inner = runfiles_groups.name_str(ctx.attr.inner.label)
+    assert_name_absent(env, found, inner)
+    return analysistest.end(env)
+
+# A data dep that drops RunfilesGroupInfo is not recovered as a nested application group.
+rgi_drop_dep_semantics_test = semantics_test(_rgi_drop_dep_impl, attrs = {
+    "inner": attr.label(mandatory = True),
+})
+
+def _foreign_rgi_dep_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    protected = found.get("foreign#protected")
+    asserts.true(env, protected != None, "foreign protected group missing")
+    assert_group_metadata(
+        env,
+        protected,
+        kind = "docs",
+        rank = js_runfiles_groups.RANK_FOUNDATION,
+        do_not_merge = True,
+        merge_affinity = "foreign",
+    )
+    mixed = found.get("foreign#mixed")
+    asserts.true(env, mixed != None, "foreign mixed group missing")
+    assert_group_metadata(
+        env,
+        mixed,
+        kind = "docs",
+        rank = 50,
+        do_not_merge = False,
+        merge_affinity = "foreign",
+        weight = 3,
+    )
+    has_symlink = False
+    has_root = False
+    for g in resolved.groups:
+        rf = runfiles_groups.runfiles(ctx, g)
+        if rf.symlinks and rf.symlinks.to_list():
+            has_symlink = True
+        if rf.root_symlinks and rf.root_symlinks.to_list():
+            has_root = True
+    asserts.true(env, has_symlink, "expected preserved foreign symlink")
+    asserts.true(env, has_root, "expected preserved foreign root symlink")
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+    return analysistest.end(env)
+
+# Non-rules_js RunfilesGroupInfo, symlinks, and root_symlinks are preserved.
+foreign_rgi_dep_semantics_test = semantics_test(_foreign_rgi_dep_impl)
+
+def _copied_node_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    node = found.get(js_runfiles_groups.NODE_GROUP)
+    asserts.true(env, node != None)
+    names = [f.basename for f in runfiles_groups.files(node).to_list()]
+    asserts.true(env, "copied_node_tc_node" in names, "copied Node File missing from #node: {}".format(names))
+    return analysistest.end(env)
+
+# A copied Node executable File is classified as #node.
+copied_node_semantics_test = semantics_test(_copied_node_impl)
+
+def _include_none_impl(ctx):
+    env = analysistest.begin(ctx)
+    found = group_by_name(resolve_target(ctx, analysistest.target_under_test(env)))
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    third = found.get(js_runfiles_groups.THIRD_PARTY_GROUP)
+    first_names = [f.basename for f in runfiles_groups.files(first).to_list()] if first else []
+    third_names = [f.basename for f in runfiles_groups.files(third).to_list()] if third else []
+    for name in ["jsinfo_s_direct.js", "jsinfo_s_transitive.js", "jsinfo_t_direct.d.ts", "jsinfo_t_transitive.d.ts"]:
+        asserts.false(env, name in first_names, "excluded source/type {} leaked into first_party".format(name))
+    asserts.false(env, "jsinfo_npm.js" in third_names, "excluded npm sentinel leaked into third_party")
+    return analysistest.end(env)
+
+# include_* flags that are false keep the corresponding JsInfo files out of runfiles.
+include_none_semantics_test = semantics_test(_include_none_impl)
+
+def _include_direct_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    rf_files = runfiles_files(target)
+    _assert_role(env, found, rf_files, "jsinfo_s_direct.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "jsinfo_t_direct.d.ts", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    asserts.equals(env, [], unique_admitted(rf_files, "jsinfo_s_transitive.js"))
+    return analysistest.end(env)
+
+# include_sources / include_types admit direct JsInfo files as first_party.
+include_direct_semantics_test = semantics_test(_include_direct_impl)
+
+def _include_transitive_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    rf_files = runfiles_files(target)
+    _assert_role(env, found, rf_files, "jsinfo_s_transitive.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "jsinfo_t_transitive.d.ts", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    return analysistest.end(env)
+
+# include_transitive_sources / include_transitive_types admit transitive JsInfo files.
+include_transitive_semantics_test = semantics_test(_include_transitive_impl)
+
+def _include_both_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    rf_files = runfiles_files(target)
+    _assert_role(env, found, rf_files, "jsinfo_s_direct.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "jsinfo_s_transitive.js", js_runfiles_groups.FIRST_PARTY_GROUP, [js_runfiles_groups.THIRD_PARTY_GROUP])
+    _assert_role(env, found, rf_files, "jsinfo_npm.js", js_runfiles_groups.THIRD_PARTY_GROUP, [js_runfiles_groups.FIRST_PARTY_GROUP])
+    return analysistest.end(env)
+
+# Direct sources are first_party; npm_sources from JsInfo are third_party.
+include_both_semantics_test = semantics_test(_include_both_impl)
+
+def _include_npm_impl(ctx):
+    env = analysistest.begin(ctx)
+    found = group_by_name(resolve_target(ctx, analysistest.target_under_test(env)))
+    toolchain = found.get(js_runfiles_groups.NPM_TOOLCHAIN_GROUP)
+    asserts.true(env, toolchain != None, "include_npm must emit #npm_toolchain")
+    assert_group_metadata(
+        env,
+        toolchain,
+        kind = "foundation",
+        rank = js_runfiles_groups.RANK_BOOTSTRAP,
+        do_not_merge = False,
+        merge_affinity = js_runfiles_groups.AFFINITY,
+    )
+    assert_name_absent(env, found, _COVERAGE_GROUP)
+    return analysistest.end(env)
+
+# include_npm puts the npm CLI wrapper files in #npm_toolchain.
+include_npm_semantics_test = semantics_test(_include_npm_impl)
+
+def _coverage_impl(ctx):
+    env = analysistest.begin(ctx)
+    found = group_by_name(resolve_target(ctx, analysistest.target_under_test(env)))
+    assert_name_absent(env, found, _COVERAGE_GROUP)
+    return analysistest.end(env)
+
+# Coverage execution files are not a named grouping role.
+coverage_semantics_test = analysistest.make(
+    _coverage_impl,
+    config_settings = {
+        str(Label("@rules_runfiles_group//runfiles_group:enabled")): True,
+        "//command_line_option:collect_code_coverage": True,
+    },
+)
+
+def _copy_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    rf_files = runfiles_files(target)
+    app_name = runfiles_groups.name_str(target.label)
+    keep = related_admitted(rf_files, ctx.file.keep)
+    skip = related_admitted(rf_files, ctx.file.skip)
+    asserts.true(env, len(keep) > 1, "expected copied keep file plus original")
+    asserts.equals(env, 1, len(skip), "no-copy exception must not add a copy")
+    _assert_role(env, found, rf_files, ctx.file.keep, app_name, [js_runfiles_groups.FIRST_PARTY_GROUP])
+    _assert_role(env, found, rf_files, ctx.file.skip, app_name, [js_runfiles_groups.FIRST_PARTY_GROUP])
+    return analysistest.end(env)
+
+# copy_data_to_bin copies ordinary data into the application group; no_copy_to_bin skips that copy.
+copy_semantics_test = semantics_test(_copy_impl, attrs = {
+    "keep": attr.label(allow_single_file = True, mandatory = True),
+    "skip": attr.label(allow_single_file = True, mandatory = True),
+})
+
+def _grouped_copy_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    related = related_admitted(runfiles_files(target), ctx.file.original)
+    asserts.true(env, len(related) > 1, "expected original plus copy on the library")
+    owner_name = runfiles_groups.name_str(ctx.attr.producer.label)
+    owner = found.get(owner_name)
+    asserts.true(env, owner != None, "missing inherited group {}".format(owner_name))
+    asserts.true(env, owner.do_not_merge, "copy must keep do_not_merge on the inherited entry")
+    assert_files_exact(env, owner, related)
+    return analysistest.end(env)
+
+# Copying a grouped source keeps the copy on that entry, including do_not_merge.
+grouped_copy_semantics_test = semantics_test(_grouped_copy_impl, attrs = {
+    "original": attr.label(allow_single_file = True, mandatory = True),
+    "producer": attr.label(mandatory = True),
+})
+
+def _generated_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    _assert_role(
+        env,
+        found,
+        runfiles_files(target),
+        "generated_data.txt",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [runfiles_groups.name_str(target.label)],
+    )
+    return analysistest.end(env)
+
+# Generated ordinary data (write_file / genrule) is first_party, not the application group.
+generated_semantics_test = semantics_test(_generated_impl)
+
+def _directory_entry_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    app = found.get(runfiles_groups.name_str(target.label))
+    asserts.true(env, app != None)
+    trees = [f for f in runfiles_groups.files(app).to_list() if f.is_directory]
+    asserts.true(env, trees, "expected TreeArtifact entry point in the application group")
+    return analysistest.end(env)
+
+# A TreeArtifact entry point stays in the protected application group.
+directory_entry_semantics_test = semantics_test(_directory_entry_impl)
+
+def _proto_generated_impl(ctx):
+    env = analysistest.begin(ctx)
+    found = group_by_name(resolve_target(ctx, analysistest.target_under_test(env)))
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    asserts.true(env, first != None)
+    names = [f.basename for f in runfiles_groups.files(first).to_list()]
+    has_proto_js = False
+    for n in names:
+        if n.endswith(".js") or "_pb" in n:
+            has_proto_js = True
+            break
+    asserts.true(env, has_proto_js, "expected generated proto JS in first_party, got {}".format(names))
+    return analysistest.end(env)
+
+# js_proto_aspect is JsInfo-only; generated JS admitted by js_binary is first_party.
+proto_generated_semantics_test = semantics_test(_proto_generated_impl)
+
+def _no_copy_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    rf_files = runfiles_files(target)
+    related = related_admitted(rf_files, ctx.file.raw_data)
+    asserts.equals(env, 1, len(related), "copying disabled must keep the original File only")
+    _assert_role(env, found, rf_files, ctx.file.raw_data, runfiles_groups.name_str(target.label), [js_runfiles_groups.FIRST_PARTY_GROUP])
+    return analysistest.end(env)
+
+# copy_data_to_bin = False keeps the original source File in the application group.
+no_copy_semantics_test = semantics_test(_no_copy_impl, attrs = {
+    "raw_data": attr.label(allow_single_file = True, mandatory = True),
+})
+
+def _library_relay_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    asserts.true(env, resolved != None, "library with extra data runfiles must emit RGI")
+    if ctx.attr.expect_symlinks:
+        has_symlink = False
+        has_root = False
+        for g in resolved.groups:
+            rf = runfiles_groups.runfiles(ctx, g)
+            if rf.symlinks and rf.symlinks.to_list():
+                has_symlink = True
+            if rf.root_symlinks and rf.root_symlinks.to_list():
+                has_root = True
+        asserts.true(env, has_symlink, "library dropped inherited symlinks")
+        asserts.true(env, has_root, "library dropped inherited root_symlinks")
+    extra = ctx.attr.extra_basename
+    if extra:
+        names = []
+        for g in resolved.groups:
+            names.extend([f.basename for f in runfiles_groups.files(g).to_list()])
+        asserts.true(env, extra in names, "library dropped extra runfiles file {}".format(extra))
+    return analysistest.end(env)
+
+# js_library must relay complete admitted runfiles, including extra filegroup
+# data and symlink/root_symlink components.
+library_relay_semantics_test = semantics_test(_library_relay_impl, attrs = {
+    "expect_symlinks": attr.bool(),
+    "extra_basename": attr.string(),
+})
+
+def _exec_vs_raw_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    found = group_by_name(resolve_target(ctx, target))
+    app_name = runfiles_groups.name_str(target.label)
+    _assert_role(
+        env,
+        found,
+        runfiles_files(target),
+        ctx.file.raw_data,
+        app_name,
+        [js_runfiles_groups.FIRST_PARTY_GROUP],
+    )
+    exec_name = runfiles_groups.name_str(ctx.attr.executable_dep.label)
+    asserts.true(env, exec_name in found, "single-output executable should keep a Label group")
+    exec_files = files_list(found[exec_name])
+    asserts.true(env, exec_files, "executable Label group is empty")
+    first = found.get(js_runfiles_groups.FIRST_PARTY_GROUP)
+    if first:
+        assert_excludes_files(env, first, exec_files)
+    return analysistest.end(env)
+
+# A generated single-output executable is not ordinary data; a raw File still is.
+exec_vs_raw_semantics_test = semantics_test(_exec_vs_raw_impl, attrs = {
+    "raw_data": attr.label(allow_single_file = True, mandatory = True),
+    "executable_dep": attr.label(mandatory = True),
+})
+
+def _extra_symlink_mixed_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    rf_files = runfiles_files(target)
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "extra_symlink_carrier.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP],
+    )
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "extra_symlink_asset.txt",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP],
+    )
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "extra_symlink_adapter.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
+    rf = target[DefaultInfo].default_runfiles
+    asserts.true(env, rf.symlinks and bool(rf.symlinks), "mixed binary must admit extra symlinks")
+    asserts.true(env, rf.root_symlinks and bool(rf.root_symlinks), "mixed binary must admit extra root symlinks")
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+    return analysistest.end(env)
+
+# A runfiles alias does not move a known JsInfo source into unclassified.
+extra_symlink_mixed_semantics_test = semantics_test(_extra_symlink_mixed_impl)
+
+def _extra_symlink_nested_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    bins = {}
+    for b in target[RgiAggregateInfo].binaries:
+        bins[b.label.name] = b
+    inner = bins["extra_symlink_inner"]
+    outer = bins["extra_symlink_outer"]
+    inner_resolved = resolve_target(ctx, inner)
+    outer_resolved = resolve_target(ctx, outer)
+    inner_rf = inner[DefaultInfo].default_runfiles
+    asserts.true(env, inner_rf.symlinks and bool(inner_rf.symlinks), "inner must admit extra symlinks")
+    asserts.true(env, inner_rf.root_symlinks and bool(inner_rf.root_symlinks), "inner must admit extra root symlinks")
+    _assert_role(
+        env,
+        group_by_name(inner_resolved),
+        runfiles_files(inner),
+        "extra_symlink_adapter.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
+    _assert_role(
+        env,
+        group_by_name(outer_resolved),
+        runfiles_files(outer),
+        "extra_symlink_adapter.js",
+        js_runfiles_groups.FIRST_PARTY_GROUP,
+        [js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.THIRD_PARTY_GROUP],
+    )
+    _assert_role(
+        env,
+        group_by_name(inner_resolved),
+        runfiles_files(inner),
+        "extra_symlink_unknown.txt",
+        js_runfiles_groups.UNCLASSIFIED_GROUP,
+        [js_runfiles_groups.FIRST_PARTY_GROUP, runfiles_groups.name_str(inner.label)],
+    )
+    _assert_role(
+        env,
+        group_by_name(outer_resolved),
+        runfiles_files(outer),
+        "extra_symlink_unknown.txt",
+        runfiles_groups.name_str(outer.label),
+        [js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.FIRST_PARTY_GROUP],
+    )
+    assert_grouped_runfiles_match(env, ctx, inner_resolved, inner)
+    assert_grouped_runfiles_match(env, ctx, outer_resolved, outer)
+    return analysistest.end(env)
+
+# Nested consumption keeps extra symlink identities and promotes inner unclassified Files to outer application ownership.
+extra_symlink_nested_semantics_test = semantics_test(_extra_symlink_nested_impl)
+
+def _extra_symlink_npm_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    resolved = resolve_target(ctx, target)
+    found = group_by_name(resolved)
+    rf_files = runfiles_files(target)
+    _assert_role(
+        env,
+        found,
+        rf_files,
+        "extra_symlink_npm_adapter.js",
+        js_runfiles_groups.THIRD_PARTY_GROUP,
+        [js_runfiles_groups.FIRST_PARTY_GROUP, js_runfiles_groups.UNCLASSIFIED_GROUP, js_runfiles_groups.NPM_LINKS_GROUP],
+    )
+    assert_grouped_runfiles_match(env, ctx, resolved, target)
+    return analysistest.end(env)
+
+# A runfiles alias does not move a known npm payload into unclassified.
+extra_symlink_npm_semantics_test = semantics_test(_extra_symlink_npm_impl)

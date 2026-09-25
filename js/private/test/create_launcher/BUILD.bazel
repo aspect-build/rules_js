@@ -5,4 +5,5 @@ package(default_testonly = True)
 custom_test(
     name = "test",
     entry_point = "test.js",
+    visibility = ["//js/private/test/runfiles_group:__pkg__"],
 )

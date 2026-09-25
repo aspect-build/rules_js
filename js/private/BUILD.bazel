@@ -38,11 +38,23 @@ bzl_library(
 )
 
 bzl_library(
+    name = "js_runfiles_groups",
+    srcs = ["js_runfiles_groups.bzl"],
+    deps = [
+        ":js_info",
+        "//npm:providers",
+        "@rules_runfiles_group//runfiles_group:lib",
+        "@rules_runfiles_group//runfiles_group:providers",
+    ],
+)
+
+bzl_library(
     name = "js_binary",
     srcs = ["js_binary.bzl"],
     deps = [
         ":bash",
         ":js_helpers",
+        ":js_runfiles_groups",
         "//js/private/coverage:extensions",
         "@bazel_lib//lib:copy_to_bin",
         "@bazel_lib//lib:directory_path",
@@ -70,6 +82,7 @@ bzl_library(
     deps = [
         ":js_helpers",
         ":js_info",
+        ":js_runfiles_groups",
         ":proto",
         "//js/private/coverage:extensions",
         "@bazel_lib//lib:copy_to_bin",
