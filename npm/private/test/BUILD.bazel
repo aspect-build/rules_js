@@ -1,4 +1,5 @@
-load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_test")
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -139,4 +140,51 @@ js_test(
     name = "pkg_versions_test",
     data = [":node_modules"],
     entry_point = "versions.js",
+)
+
+js_binary(
+    name = "esbuild_bin",
+    testonly = True,
+    data = [":node_modules/esbuild"],
+    entry_point = "versions.js",
+)
+
+platform(
+    name = "linux_amd64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+js_image_layer(
+    name = "esbuild_image_linux",
+    testonly = True,
+    binary = ":esbuild_bin",
+    platform = ":linux_amd64",
+)
+
+filegroup(
+    name = "esbuild_image_linux_package_store_3p",
+    testonly = True,
+    srcs = [":esbuild_image_linux"],
+    output_group = "package_store_3p",
+)
+
+genrule(
+    name = "esbuild_image_linux_magic",
+    testonly = True,
+    srcs = [":esbuild_image_linux_package_store_3p"],
+    outs = ["esbuild_image_linux_magic.txt"],
+    cmd = "$(BSDTAR_BIN) -xOf $< '*/node_modules/esbuild/bin/esbuild' | { head -c 4 | od -An -tx1 | tr -d ' \\n' > $@; cat > /dev/null; }",
+    toolchains = ["@bsd_tar_toolchains//:resolved_toolchain"],
+)
+
+# esbuild's install lifecycle hook runs on the exec platform and replaces bin/esbuild with the exec
+# platform's native binary, which then leaks into image layers built for other platforms.
+assert_contains(
+    name = "esbuild_image_linux_elf_test",
+    actual = ":esbuild_image_linux_magic",
+    expected = "7f454c46",
+    tags = ["manual"],
 )
