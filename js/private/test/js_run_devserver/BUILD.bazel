@@ -41,6 +41,7 @@ js_run_devserver_test(
     chdir = "js/private/test/js_run_devserver",
     data = [
         "node_modules_in_sandbox.test.mjs",
+        "sandbox_test_utils.mjs",
         ":node_modules/@types/node",
         ":node_modules/jasmine",
     ],
@@ -93,6 +94,35 @@ js_run_devserver_test(
     tool = ":jasmine",
 )
 
+# Checks first-party packages in both modes: a dependency of a first-party package must resolve to
+# the same real path as the package itself, and the package must be linked to its synced source
+# directory rather than copied.
+[
+    js_run_devserver_test(
+        name = "first_party_packages_{}_test".format(mode),
+        args = ["first_party_packages.test.mjs"],
+        chdir = "js/private/test/js_run_devserver",
+        data = [
+            "first_party_packages.test.mjs",
+            "sandbox_test_utils.mjs",
+            ":node_modules/jasmine",
+            "//js/private/test/image:node_modules/@image-test/d",
+        ],
+        env = {"PACKAGE_STORE_MODE": mode},
+        package_store_mode = mode,
+        tags = [
+            # devserver is meant to be `bazel run` locally.
+            # See https://github.com/aspect-build/rules_js/pull/1233
+            "no-remote-exec",
+        ],
+        tool = ":jasmine",
+    )
+    for mode in [
+        "execroot",
+        "sandbox",
+    ]
+]
+
 jasmine_bin.jasmine_binary(
     name = "jasmine",
 )
@@ -101,6 +131,15 @@ js_test(
     name = "js_run_devserver_test",
     data = ["//js/private/devserver:js_devserver_entrypoint"],
     entry_point = "js_run_devserver.spec.mjs",
+    env = {
+        "__RULES_JS_UNIT_TEST__": "1",
+    },
+)
+
+js_test(
+    name = "js_run_devserver_sync_test",
+    data = ["//js/private/devserver:js_devserver_entrypoint"],
+    entry_point = "js_run_devserver_sync.spec.mjs",
     env = {
         "__RULES_JS_UNIT_TEST__": "1",
     },

@@ -28,9 +28,11 @@ const syncedChecksum = new Map()
 const mkdirs = new Set()
 
 // Set of all data file paths (workspace-relative, posix separators) that the sandbox is expected to
-// contain after the current sync. Used to resolve node_modules symlinks to their in-sandbox targets
-// without depending on the order in which entries happen to be synced.
+// contain after the current sync, and the set of directories containing them. Used to resolve
+// node_modules symlinks to their in-sandbox targets without depending on the order in which entries
+// happen to be synced.
 const entryPaths = new Set()
+const entryDirs = new Set()
 
 // When true the package store is materialized inside the sandbox and node_modules symlinks are
 // pointed at it instead of at the execroot. Set from the rule config in main().
@@ -79,6 +81,18 @@ export function isNodeModulePath(p) {
     return false
 }
 
+// Determines if a file path is a 1p dep in the package store.
+// See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
+export function is1pPackageStoreDep(p) {
+    // unscoped1p: https://regex101.com/r/hBR08J/1
+    const unscoped1p =
+        /^.+\/\.aspect_rules_js\/([^@\/]+)@0\.0\.0\/node_modules\/\1$/
+    // scoped1p: https://regex101.com/r/bWS7Hl/1
+    const scoped1p =
+        /^.+\/\.aspect_rules_js\/@([^@+\/]+)\+([^@+\/]+)@0\.0\.0\/node_modules\/@\1\/\2$/
+    return unscoped1p.test(p) || scoped1p.test(p)
+}
+
 // Determines if a file path is within the rules_js package store.
 // See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
 export function isPackageStorePath(p) {
@@ -97,11 +111,21 @@ function toPosix(p) {
     return path.sep === '/' ? p : p.split(path.sep).join('/')
 }
 
+// Applies the settings from the rule config that change how files are synced.
+function applyConfig(config) {
+    sandboxPackageStore = config.package_store_mode === 'sandbox'
+}
+
 // Records the full set of data files that the current sync will place in the sandbox.
 function updateEntryPaths(files) {
     entryPaths.clear()
+    entryDirs.clear()
     for (const [file] of files) {
-        entryPaths.add(toPosix(file))
+        let p = toPosix(file)
+        entryPaths.add(p)
+        while ((p = path.posix.dirname(p)) !== '.' && !entryDirs.has(p)) {
+            entryDirs.add(p)
+        }
     }
 }
 
@@ -111,18 +135,36 @@ async function readSandboxSymlinkTarget(file, src, sandbox) {
     let linkPath = await fs.promises.readlink(src)
     const linkAbs = path.resolve(path.dirname(src), linkPath)
     linkPath = path.relative(src, linkAbs) || '.'
-    return resolveSandboxSymlinkTarget(sandbox, file, linkPath, entryPaths)
+    return resolveSandboxSymlinkTarget(
+        sandbox,
+        file,
+        linkPath,
+        entryPaths,
+        entryDirs
+    )
 }
 
 // Resolves the target of a symlink to a path inside the sandbox, or returns undefined
 // if the target is not something this devserver syncs into the sandbox. `linkPath` is the symlink
 // target relative to the link itself, as computed by readSandboxSymlinkTarget.
-export function resolveSandboxSymlinkTarget(sandbox, file, linkPath, entries) {
+export function resolveSandboxSymlinkTarget(
+    sandbox,
+    file,
+    linkPath,
+    entries,
+    dirs = new Set()
+) {
     const target = path.join(sandbox, file, linkPath)
     let rel = toPosix(path.relative(sandbox, target))
     if (!rel || rel === '..' || rel.startsWith('../')) {
         // Escapes the sandbox root; nothing we can point at.
         return undefined
+    }
+    // A directory whose files are synced, such as the source directory that a first-party package
+    // store entry links to. Linking to it rather than copying it keeps the package live: files
+    // removed from it are deleted from the sandbox along with their entries.
+    if (dirs.has(rel)) {
+        return target
     }
     // The target is in the sandbox if it, or a directory entry containing it, is synced.
     while (rel && rel !== '.') {
@@ -265,7 +307,7 @@ async function syncSymlink(file, src, dst, sandbox, exists, sandboxSrc) {
         )
     }
     if (exists) {
-        await fs.promises.unlink(dst)
+        await removeSynced(file, dst)
     } else {
         // Intentionally synchronous; see comment on mkdirpSync
         mkdirpSync(path.dirname(dst))
@@ -279,6 +321,9 @@ async function syncDirectory(file, src, sandbox, writePerm, derefDepth = 0) {
         console.error(`Syncing directory ${file}...`)
     }
     const contents = await fs.promises.readdir(src)
+    if (derefDepth > 0) {
+        await pruneRemovedEntries(file, sandbox, contents)
+    }
     return (
         await Promise.all(
             contents.map(
@@ -293,6 +338,35 @@ async function syncDirectory(file, src, sandbox, writePerm, derefDepth = 0) {
             )
         )
     ).reduce((s, t) => s + t, 0)
+}
+
+// Copies the contents of a symlinked directory into the sandbox in place of the symlink. Files
+// removed from the source are pruned on every sync; see pruneRemovedEntries.
+async function syncDereferencedDirectory(
+    file,
+    src,
+    dst,
+    sandbox,
+    writePerm,
+    exists,
+    derefDepth
+) {
+    if (JS_BINARY__LOG_DEBUG) {
+        console.error(`Dereferencing symlinked directory ${file}`)
+    }
+    if (exists) {
+        const st = await fs.promises.lstat(dst).catch((e) => {
+            if (e.code === 'ENOENT') {
+                return null
+            }
+            throw e
+        })
+        if (st && st.isSymbolicLink()) {
+            // Previously synced as a symlink; writing through it would modify its target.
+            await fs.promises.unlink(dst)
+        }
+    }
+    return syncDirectory(file, src, sandbox, writePerm, derefDepth + 1)
 }
 
 // Materializes src at dst using a copy-on-write clone when possible. Node falls back to a regular
@@ -404,10 +478,15 @@ async function syncRecursive(file, _, sandbox, writePerm, derefDepth = 0) {
         const exists = syncedTime.has(file) || fs.existsSync(dst)
         syncedTime.set(file, lstat.mtimeMs)
         if (derefDirectory) {
-            if (JS_BINARY__LOG_DEBUG) {
-                console.error(`Dereferencing symlinked directory ${file}`)
-            }
-            return syncDirectory(file, src, sandbox, writePerm, derefDepth + 1)
+            return syncDereferencedDirectory(
+                file,
+                src,
+                dst,
+                sandbox,
+                writePerm,
+                exists,
+                derefDepth
+            )
         } else if (lstat.isSymbolicLink() && !deref) {
             return syncSymlink(file, src, dst, sandbox, exists, sandboxSrc)
         } else if (lstat.isDirectory()) {
@@ -440,6 +519,85 @@ async function syncRecursive(file, _, sandbox, writePerm, derefDepth = 0) {
     }
 }
 
+// Clears any matching files or files rooted at this folder from the syncedTime and syncedChecksum
+// maps, so that they are synced again if they reappear. With `includeSelf` false only the files
+// rooted at the folder are cleared.
+function forgetSynced(f, includeSelf = true) {
+    const fSlash = f + '/'
+    for (const k of syncedTime.keys()) {
+        if ((includeSelf && k == f) || k.startsWith(fSlash)) {
+            syncedTime.delete(k)
+        }
+    }
+    for (const k of syncedChecksum.keys()) {
+        if ((includeSelf && k == f) || k.startsWith(fSlash)) {
+            syncedChecksum.delete(k)
+        }
+    }
+}
+
+// Removes a synced path from the sandbox so that something of a different kind can take its place,
+// such as a dereferenced directory that is now a symlink or the reverse. Unlike unlink, this handles
+// a real directory, and unlike rm it never follows a symlink into its target.
+async function removeSynced(file, dst) {
+    let st
+    try {
+        st = await fs.promises.lstat(dst)
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            return
+        }
+        throw e
+    }
+    if (st.isDirectory()) {
+        await fs.promises.rm(dst, { recursive: true, force: true })
+        // Forget what was synced beneath it, but not the path itself, which the caller has just
+        // recorded.
+        forgetSynced(file, false)
+        mkdirs.clear()
+    } else {
+        await fs.promises.unlink(dst)
+    }
+}
+
+// A dereferenced directory is a copy rather than a link, so files that are removed from its source
+// have to be removed from the sandbox too, or they remain resolvable there. `contents` is the
+// current listing of the source directory.
+async function pruneRemovedEntries(file, sandbox, contents) {
+    const dst = sandbox + path.sep + file
+    let st
+    try {
+        st = await fs.promises.lstat(dst)
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            return
+        }
+        throw e
+    }
+    // Never follow a symlink here: pruning its target would delete files outside this directory.
+    if (!st.isDirectory()) {
+        return
+    }
+    const keep = new Set(contents)
+    const stale = (await fs.promises.readdir(dst)).filter((e) => !keep.has(e))
+    if (stale.length === 0) {
+        return
+    }
+    await Promise.all(
+        stale.map(async (entry) => {
+            const f = file + path.sep + entry
+            console.error(`Deleting ${f}`)
+            forgetSynced(f)
+            await fs.promises.rm(dst + path.sep + entry, {
+                recursive: true,
+                force: true,
+            })
+        })
+    )
+    // clear mkdirs since we have deleted files so we re-populate on next sync
+    mkdirs.clear()
+}
+
 // Delete files from sandbox
 async function deleteFiles(previousFiles, updatedFiles, sandbox) {
     const startTime = perf_hooks.performance.now()
@@ -458,19 +616,7 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
 
         console.error(`Deleting ${f}`)
 
-        // clear any matching files or files rooted at this folder from the
-        // syncedTime and syncedChecksum maps
-        const fSlash = f + '/'
-        for (const k of syncedTime.keys()) {
-            if (k == f || k.startsWith(fSlash)) {
-                syncedTime.delete(k)
-            }
-        }
-        for (const k of syncedChecksum.keys()) {
-            if (k == f || k.startsWith(fSlash)) {
-                syncedChecksum.delete(k)
-            }
-        }
+        forgetSynced(f)
 
         // clear mkdirs if we have deleted any files so we re-populate on next sync
         mkdirs.clear()
@@ -507,17 +653,20 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     const startTime = perf_hooks.performance.now()
 
     // Partition files into node_modules and non-node_modules files
-    const packageStoreDeps = []
+    const packageStore1pDeps = []
     const otherNodeModulesFiles = []
     const otherFiles = []
     for (const fileInfo of files) {
         const file = fileInfo[0]
-        if (isPackageStorePath(file)) {
-            // Package store deps must land before the direct node_modules symlinks that point at
-            // them. The entries list is filtered by the rule according to package_store_mode.
-            packageStoreDeps.push(fileInfo)
-        } else if (isNodeModulePath(file)) {
-            otherNodeModulesFiles.push(fileInfo)
+        if (isNodeModulePath(file)) {
+            // Node module file
+            if (is1pPackageStoreDep(file)) {
+                // 1p package store dep
+                packageStore1pDeps.push(fileInfo)
+            } else {
+                // Other node_modules file
+                otherNodeModulesFiles.push(fileInfo)
+            }
         } else {
             otherFiles.push(fileInfo)
         }
@@ -539,17 +688,17 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
         )
     ).reduce((s, t) => s + t, 0)
 
-    // Sync package store files before other node_modules files since correctly syncing direct
-    // node_modules symlinks depends on the package store files they point at being in place.
-    if (JS_BINARY__LOG_DEBUG && packageStoreDeps.length > 0) {
+    // Sync first-party package store files before other node_modules files since correctly syncing
+    // direct 1p node_modules symlinks depends on checking if the package store synced files exist.
+    if (JS_BINARY__LOG_DEBUG && packageStore1pDeps.length > 0) {
         console.error(
-            `+ Syncing ${packageStoreDeps.length} package store dep(s)`
+            `+ Syncing ${packageStore1pDeps.length} first party package store dep(s)`
         )
     }
 
     totalSynced += (
         await Promise.all(
-            packageStoreDeps.map(async ([file, isDirectory]) => {
+            packageStore1pDeps.map(async ([file, isDirectory]) => {
                 return await doSync(file, isDirectory, sandbox, writePerm)
             })
         )
@@ -591,7 +740,7 @@ async function main(args, sandbox, config) {
 
     const entriesPath = path.join(RUNFILES_ROOT, args[1])
 
-    sandboxPackageStore = config.package_store_mode === 'sandbox'
+    applyConfig(config)
 
     const cwd = path.join(sandbox, sandboxRelativeChdir(config.chdir))
 
@@ -890,7 +1039,15 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
             if (!sandboxSrc) {
                 const followed = await statFollowingLinks(src, file)
                 if (followed && followed.isDirectory()) {
-                    return syncDirectory(file, src, sandbox, writePerm, 1)
+                    return syncDereferencedDirectory(
+                        file,
+                        src,
+                        dst,
+                        sandbox,
+                        writePerm,
+                        exists,
+                        0
+                    )
                 }
                 if (followed) {
                     return syncFile(file, src, dst, exists, followed, writePerm)
@@ -908,6 +1065,15 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     }
 }
 
+// Exported for js/private/test/js_run_devserver/js_run_devserver_sync.spec.mjs
+export {
+    applyConfig,
+    cycleSyncRecurse,
+    deleteFiles,
+    syncFiles,
+    syncRecursive,
+    updateEntryPaths,
+}
 ;(async () => {
     if (process.env.__RULES_JS_UNIT_TEST__)
         // short-circuit for unit tests
