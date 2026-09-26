@@ -1,6 +1,7 @@
 import * as path from 'node:path'
 import {
     isNodeModulePath,
+    is1pPackageStoreDep,
     isPackageStorePath,
     isUnderNodeModules,
     resolveSandboxSymlinkTarget,
@@ -23,6 +24,36 @@ const isNodeModulePath_false = ['/private/var/some/path/some-file.js']
 for (const p of isNodeModulePath_false) {
     if (isNodeModulePath(p)) {
         console.error(`ERROR: expected ${p} to not be a node_modules path`)
+        process.exit(1)
+    }
+}
+
+// is1pPackageStoreDep
+const is1pPackageStoreDep_true = [
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/mycorp-pkg@0.0.0/node_modules/mycorp-pkg',
+]
+for (const p of is1pPackageStoreDep_true) {
+    if (!is1pPackageStoreDep(p)) {
+        console.error(`ERROR: expected ${p} to be a 1p package store dep`)
+        process.exit(1)
+    }
+}
+const is1pPackageStoreDep_false = [
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg0.0.0/node_modules/@mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/mycorp-pkg0.0.0/node_modules/mycorp-pkg',
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/acorn',
+    'some/path/node_modules/.aspect_rules_js/mycorp-pkg@0.0.0/node_modules/acorn',
+    'some/path/node_modules/.aspect_rules_js/@babel+runtime@7.21.0/node_modules/@babel/runtime',
+    'some/path/node_modules/.aspect_rules_js/@babel+runtime@7.21.0/node_modules/acorn',
+    'some/path/node_modules/.aspect_rules_js/eval@0.1.6/node_modules/eval',
+    'some/path/node_modules/.aspect_rules_js/eval@0.1.6/node_modules/acorn',
+]
+for (const p of is1pPackageStoreDep_false) {
+    if (is1pPackageStoreDep(p)) {
+        console.error(`ERROR: expected ${p} to not be a 1p package store dep`)
         process.exit(1)
     }
 }
@@ -145,6 +176,25 @@ const STORE_ENTRY =
     if (actual !== undefined) {
         console.error(
             `ERROR: expected resolveSandboxSymlinkTarget to return undefined but got '${actual}'`
+        )
+        process.exit(1)
+    }
+}
+
+// A directory whose files are synced resolves too, such as the source directory that a first-party
+// package store entry links to; it is linked rather than copied into the sandbox.
+{
+    const actual = resolveSandboxSymlinkTarget(
+        SANDBOX,
+        'node_modules/.aspect_rules_js/pkg@0.0.0/node_modules/pkg',
+        path.join('..', '..', '..', '..', '..', 'lib', 'pkg'),
+        new Set(['lib/pkg/index.js']),
+        new Set(['lib', 'lib/pkg'])
+    )
+    const expected = path.join(SANDBOX, 'lib', 'pkg')
+    if (actual !== expected) {
+        console.error(
+            `ERROR: expected resolveSandboxSymlinkTarget to return '${expected}' for a directory of synced files but got '${actual}'`
         )
         process.exit(1)
     }
