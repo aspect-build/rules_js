@@ -155,27 +155,46 @@ Error: Next.js inferred your workspace root, but it may not be correct.
     will not be compiled.
 ```
 
-Setting `turbopack.root` does not help: no directory contains both the sandbox and the execroot.
+Setting `turbopack.root` does not help on its own: no directory contains both the sandbox and the
+execroot.
 
 The fix is to materialize the package store inside the sandbox so that `realpath()` of every
-`node_modules` entry stays under the sandbox root:
+`node_modules` entry stays under the sandbox root, and to start the devserver from there with
+`command`:
 
 ```python
 js_run_devserver(
     name = "dev",
     args = ["dev"],
     chdir = package_name(),
+    command = "./node_modules/.bin/next",
     data = [...],
     package_store_mode = "sandbox",
-    tool = ":next_js_binary",
 )
 ```
 
+Where the `./node_modules/.bin/next` bin entry is configured with `bins` in `npm_translate_lock`; see
+the `js_run_devserver` documentation.
+
+Do not start it as a `js_binary` `tool` in this mode. A tool runs from the execroot, so Next.js loads
+React from there while the pages load the copy in the sandbox, and rendering fails with:
+
+```
+TypeError: Cannot read properties of null (reading 'useContext')
+```
+
+If `next` is resolved from a `node_modules` above the app directory, as in a monorepo, point
+Turbopack's root at a directory that contains it, such as the workspace root in the sandbox: set
+`turbopack.root`, or `outputFileTracingRoot` on Next.js 15. See
+[e2e/nextjs/v15/mjs/devserver](../e2e/nextjs/v15/mjs/devserver) for a working example.
+
 Package store files use copy-on-write filesystem clones where possible, with a regular copy
 fallback. This keeps devserver writes isolated from Bazel outputs while avoiding duplicate disk
-usage on filesystems that support cloning. Set the `JS_RUN_DEVSERVER_SANDBOX_DIR` environment
-variable to place the sandbox alongside the execroot and increase the chance that cloning is
-available.
+usage on filesystems that support cloning. On a filesystem without cloning, such as ext4, the
+package store is copied in full each time the devserver starts: for Next.js and React that is
+several hundred MB and takes around half a second. Set the `JS_RUN_DEVSERVER_SANDBOX_DIR`
+environment variable to place the sandbox alongside the execroot and increase the chance that
+cloning is available.
 
 ## Ugly stack traces
 
