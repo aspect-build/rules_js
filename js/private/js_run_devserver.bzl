@@ -283,11 +283,20 @@ def js_run_devserver(
             compiled" under the default mode, since every third party package physically lives in
             the execroot.
 
+            In this mode, start the devserver from the sandbox with `command`, for example
+            `./node_modules/.bin/next` as in the Next.js example above, rather than as a `tool`. A
+            `tool` runs from the execroot, so it loads its own copies of packages from there while
+            the application loads the ones in the sandbox. Packages that must only be loaded once
+            then break; with Next.js, React fails with "Cannot read properties of null (reading
+            'useContext')".
+
             Package store files use copy-on-write filesystem clones where possible, with a regular
-            copy fallback. Both strategies keep sandbox writes isolated from Bazel outputs. Set the
-            `JS_RUN_DEVSERVER_SANDBOX_DIR` environment variable to place the sandbox on the same
-            filesystem as the execroot and increase the chance that copy-on-write cloning is
-            available.
+            copy fallback. Both strategies keep sandbox writes isolated from Bazel outputs. On a
+            filesystem without cloning, such as ext4, the package store is copied in full each time
+            the devserver starts: for Next.js and React that is several hundred MB and takes around
+            half a second. Set the `JS_RUN_DEVSERVER_SANDBOX_DIR` environment variable to place the
+            sandbox on the same filesystem as the execroot and increase the chance that
+            copy-on-write cloning is available.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
