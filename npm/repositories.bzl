@@ -32,6 +32,7 @@ def npm_import(name, package, integrity, version, **kwargs):
         deps = {},
         deps_oss = {},
         deps_cpus = {},
+        deps_libcs = {},
         extra_build_content = None,
         transitive_closure = None,
         root_package = "",
