@@ -272,6 +272,29 @@ npm_translate_lock(
 )
 ```
 
+### Platform-specific packages
+
+Optional dependencies that declare [`os`](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#os),
+[`cpu`](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#cpu) or
+[`libc`](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#libc) in the pnpm-lock.yaml
+are only linked on a target platform they support.
+
+`os` and `cpu` are read from the platform's `@platforms//os` and `@platforms//cpu` constraints.
+`libc` is only checked on linux, as pnpm does, and is read from the `@aspect_rules_js//platforms/libc`
+constraint. A platform which does not set it links both the glibc and musl variants of a package.
+To link only one, add the constraint to the platform:
+
+```starlark
+platform(
+    name = "linux_x86_64_glibc",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        "@aspect_rules_js//platforms/libc:glibc",
+    ],
+)
+```
+
 ### Lifecycles
 
 npm packages have "lifecycle scripts" such as `postinstall` which are documented here:

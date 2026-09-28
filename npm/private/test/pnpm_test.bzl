@@ -440,6 +440,27 @@ def _os_cpu_constraints(ctx):
     )
     return unittest.end(env)
 
+def _os_cpu_libc_constraints(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(
+        env,
+        ["@aspect_rules_js//platforms/pnpm:linux_x64_musl", "@aspect_rules_js//platforms/pnpm:linux_x64_unconstrained"],
+        pnpm.to_bazel_os_cpu_libc_constraints(["linux"], ["x64"], ["musl"]),
+    )
+    asserts.equals(
+        env,
+        ["@aspect_rules_js//platforms/pnpm:linux_arm64_glibc", "@aspect_rules_js//platforms/pnpm:linux_arm64_unconstrained"],
+        pnpm.to_bazel_os_cpu_libc_constraints(["linux"], ["arm64"], ["!musl"]),
+    )
+
+    # pnpm only checks [libc] on linux
+    asserts.equals(
+        env,
+        ["@aspect_rules_js//platforms/pnpm:darwin_x64", "@aspect_rules_js//platforms/pnpm:linux_x64_glibc", "@aspect_rules_js//platforms/pnpm:linux_x64_unconstrained"],
+        pnpm.to_bazel_os_cpu_libc_constraints(["darwin", "linux"], ["x64"], ["glibc"]),
+    )
+    return unittest.end(env)
+
 basic_test = unittest.make(_basic)
 override_test = unittest.make(_override)
 dep_version_with_default_registration_test = unittest.make(_dep_version_with_default_registration)
@@ -466,6 +487,7 @@ latest_version_known_test = unittest.make(_latest_version_known)
 cpu_constraints_test = unittest.make(_cpu_constraints)
 os_constraints_test = unittest.make(_os_constraints)
 os_cpu_constraints_test = unittest.make(_os_cpu_constraints)
+os_cpu_libc_constraints_test = unittest.make(_os_cpu_libc_constraints)
 
 def pnpm_tests(name):
     unittest.suite(
@@ -496,4 +518,5 @@ def pnpm_tests(name):
         cpu_constraints_test,
         os_constraints_test,
         os_cpu_constraints_test,
+        os_cpu_libc_constraints_test,
     )
