@@ -233,6 +233,12 @@ shell_expansion_case(
 )
 
 shell_expansion_case(
+    name = "double_quote_inside_single_quotes",
+    fixed_args = ["'say \"hi\"'"],
+    want_argv = ["say \"hi\""],
+)
+
+shell_expansion_case(
     name = "quoted_flag_value_keeps_space",
     fixed_args = ["--flag='x y'"],
     want_argv = ["--flag=x y"],
@@ -417,6 +423,29 @@ shell_expansion_case(
     bash_only = True,
     fixed_args = ["`echo tick`"],
     want_argv = ["tick"],
+)
+
+# Double quotes keep a substitution that holds a space in one argument.
+shell_expansion_case(
+    name = "double_quoted_command_substitution",
+    bash_only = True,
+    fixed_args = ["\"$(echo hi)\""],
+    want_argv = ["hi"],
+)
+
+# The hermetic launcher has no shell to run it in, so the text arrives as itself.
+shell_expansion_case(
+    name = "double_quoted_command_substitution_is_literal",
+    fixed_args = ["\"$(echo hi)\""],
+    hermetic_only = True,
+    want_argv = ["$(echo hi)"],
+)
+
+# Single quotes keep it from running at all.
+shell_expansion_case(
+    name = "single_quoted_command_substitution",
+    fixed_args = ["'$(echo hi)'"],
+    want_argv = ["$(echo hi)"],
 )
 
 shell_expansion_case(
