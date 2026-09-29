@@ -212,10 +212,8 @@ if (!process.env.JS_BINARY__FS_PATCH_ROOTS) {
 }
 
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
-// child processes can find them.
-// With no PATH, node searches a default one, which setting PATH would lose. Only the hermetic
-// launcher gets here without one; the bash launcher exports bash's default.
-// Empty parts are dropped: an empty PATH entry means the working directory.
+// child processes can find them. If the PATH we inherited was empty then we also provide a
+// reasonable default.
 const inheritedPath =
     process.env.PATH ?? (process.platform === 'win32' ? '' : '/usr/bin:/bin')
 process.env.PATH = [path.dirname(nodeWrapper), npmBinDir, inheritedPath]
