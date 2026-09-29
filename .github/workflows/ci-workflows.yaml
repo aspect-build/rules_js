@@ -244,6 +244,8 @@ jobs:
             # Aspect Workflows runners have their own cache, and fork PRs do not have access to
             # secrets.
             REMOTE_FLAG: ${{ !contains(matrix.workspace.runner, 'self-hosted') && secrets.ASPECT_OSS_API_TOKEN != '' && '--remote' || '' }}
+            # The same, for the plain bazel calls in test.sh scripts.
+            BAZEL_ASPECT_FLAGS: ${{ !contains(matrix.workspace.runner, 'self-hosted') && secrets.ASPECT_OSS_API_TOKEN != '' && '--config=aspect-cloud' || '' }}
             ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
             ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
         steps:
@@ -292,6 +294,12 @@ jobs:
             # Skipped on the flag-flip variants: test.sh scripts invoke plain `bazel`
             # without matrix.bazel.flags, so those legs wouldn't exercise the flag — they
             # would only duplicate the bazel-9 run.
+            #
+            # test.sh shares the output base of the aspect test run above, whose remote
+            # cache hits were never downloaded. It needs the same remote cache to fetch
+            # them, or Bazel 7 fails with "Missing digest"
+            # (https://github.com/bazelbuild/bazel/issues/26657).
+            # TODO: stop passing $BAZEL_ASPECT_FLAGS here when we drop support for Bazel 7
             - name: Optional ./test.sh
               if: matrix.bazel.id != 'bazel-9-no-execroot-entry-point' && matrix.bazel.id != 'bazel-9-hermetic-launcher'
               working-directory: ${{ matrix.workspace.path }}
@@ -299,7 +307,10 @@ jobs:
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
               run: |
                   if [[ -f ./test.sh ]]; then
-                    ./test.sh
+                    # Bazel fails the build rather than create the directory the
+                    # aspect-exec-log group writes into.
+                    mkdir -p .aspect/generated
+                    ./test.sh $BAZEL_ASPECT_FLAGS
                   else
                     echo "No test.sh in ${PWD}; skipping"
                   fi
@@ -324,8 +335,14 @@ jobs:
                     # pre-existing failures. e2e/bzlmod still smoke-tests on both OSes.
                     - os: windows-latest
                       workspace: { path: ., slug: root }
+        permissions:
+            contents: read
+            id-token: write
         env:
             ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+            # Skip Aspect Cloud on Windows and on fork PRs. Windows is not supported by
+            # setup-aspect, and fork PRs do not have access to the necessary secrets.
+            BAZEL_ASPECT_FLAGS: ${{ matrix.os != 'windows-latest' && secrets.ASPECT_OSS_API_TOKEN != '' && '--config=aspect-cloud' || '' }}
         steps:
             - uses: actions/checkout@v6
 
@@ -335,11 +352,23 @@ jobs:
                   disk-cache: ${{ matrix.os }}-${{ matrix.workspace.slug }}
                   repository-cache: true
 
+            - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
+              if: matrix.os != 'windows-latest'
+              with:
+                  aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+                  # setup-bazel above already caches these.
+                  bazelisk-cache: false
+                  disk-cache: false
+                  repository-cache: false
+
             - name: bazel test //...
               shell: bash
               working-directory: ${{ matrix.workspace.path }}
               run: |
-                  bazel test \
+                  # Bazel fails the build rather than create the directory the
+                  # aspect-exec-log group writes into.
+                  mkdir -p .aspect/generated
+                  bazel test $BAZEL_ASPECT_FLAGS \
                     --test_tag_filters=-skip-on-bazel7 \
                     --build_tag_filters=-skip-on-bazel7 \
                     //...

@@ -1,3 +1,7 @@
+# Defines --config=aspect-cloud for the plain `bazel` calls in test.sh scripts. Every e2e
+# workspace sits two levels below the repository root.
+try-import %workspace%/../../.aspect/bazelrc
+
 common --noenable_workspace
 
 # Run with the incompatible flags the BCR presubmit tests so breakages are caught
