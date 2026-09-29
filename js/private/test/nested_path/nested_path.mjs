@@ -16,9 +16,9 @@ const { status, stdout, stderr } = spawnSync(launcher, [], {
     env,
 })
 const match = /^inner PATH (.*)$/m.exec(stdout)
-if (status !== 0 || !match) {
+if (status !== 0 || !match || !/^host tool ok$/m.test(stdout)) {
     process.stderr.write(
-        `expected the nested js_binary to run, got exit code ${status} and:\n${stdout}${stderr}\n`
+        `expected a host tool and the nested js_binary to run, got exit code ${status} and:\n${stdout}${stderr}\n`
     )
     process.exit(1)
 }
