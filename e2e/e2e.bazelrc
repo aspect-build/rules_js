@@ -1,5 +1,3 @@
-# Defines --config=aspect-cloud for the plain `bazel` calls in test.sh scripts. Every e2e
-# workspace sits two levels below the repository root.
 try-import %workspace%/../../.aspect/bazelrc
 
 common --noenable_workspace
