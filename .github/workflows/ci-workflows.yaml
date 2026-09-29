@@ -335,9 +335,6 @@ jobs:
                     # pre-existing failures. e2e/bzlmod still smoke-tests on both OSes.
                     - os: windows-latest
                       workspace: { path: ., slug: root }
-        permissions:
-            contents: read
-            id-token: write
         env:
             ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
             # Skip Aspect Cloud on Windows and on fork PRs. Windows is not supported by
