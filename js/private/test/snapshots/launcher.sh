@@ -25,6 +25,9 @@ export JS_BINARY__COPY_DATA_TO_BIN="1"
 if [[ -z "${JS_BINARY__LOG_FATAL:-}" ]]; then export JS_BINARY__LOG_FATAL="1"; fi
 if [[ -z "${JS_BINARY__LOG_ERROR:-}" ]]; then export JS_BINARY__LOG_ERROR="1"; fi
 
+# With no PATH in the environment bash sets a default; export it so node and its children get it.
+export PATH
+
 # ==============================================================================
 # Handle --bazel-bindir flag
 # ==============================================================================

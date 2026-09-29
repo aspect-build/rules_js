@@ -213,11 +213,10 @@ if (!process.env.JS_BINARY__FS_PATCH_ROOTS) {
 
 // Put the node wrapper directory and optionally the npm wrapper directory on the path so that
 // child processes can find them.
-let PATH = process.env.PATH || ''
-if (npmBinDir) {
-    PATH = `${npmBinDir}${path.delimiter}${PATH}`
-}
-process.env.PATH = `${path.dirname(nodeWrapper)}${path.delimiter}${PATH}`
+// Empty parts are dropped: an empty PATH entry means the working directory.
+process.env.PATH = [path.dirname(nodeWrapper), npmBinDir, process.env.PATH]
+    .filter(Boolean)
+    .join(path.delimiter)
 
 // ==============================================================================
 // Logs

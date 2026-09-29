@@ -1,0 +1,35 @@
+load("//js:defs.bzl", "js_binary", "js_test")
+
+package(default_testonly = True)
+
+js_binary(
+    name = "inner_bin",
+    entry_point = "inner.mjs",
+)
+
+js_binary(
+    name = "outer_bin",
+    data = [":inner_bin"],
+    entry_point = "outer.mjs",
+    fixed_args = ["$(rlocationpath :inner_bin)"],
+)
+
+# A js_binary started with no PATH, as in an action whose env has none, must still give
+# its children a PATH that finds bash, or a nested js_binary launcher cannot start. Whether an
+# action gets a PATH depends on the rule and --incompatible_strict_action_env, so the env is
+# controlled here.
+js_test(
+    name = "nested_path_test",
+    size = "small",
+    data = [
+        ":outer_bin",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "nested_path.mjs",
+    fixed_args = ["$(rlocationpath :outer_bin)"],
+    # Starting a launcher with no PATH relies on the libc default search path finding bash.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)

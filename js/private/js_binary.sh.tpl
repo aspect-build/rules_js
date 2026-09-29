@@ -14,6 +14,9 @@ set -o pipefail -o errexit -o nounset
 
 {{envs}}
 
+# With no PATH in the environment bash sets a default; export it so node and its children get it.
+export PATH
+
 # ==============================================================================
 # Handle --bazel-bindir flag
 # ==============================================================================
