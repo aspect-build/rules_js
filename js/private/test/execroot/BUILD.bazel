@@ -67,3 +67,22 @@ js_test(
         "//conditions:default": [],
     }),
 )
+
+# `bazel run` passes the shell environment through, so BAZEL_BINDIR can arrive as an absolute
+# path. It resolves from the launch directory, as $(BINDIR) does, so from a runfiles tree it
+# names nothing to change into.
+js_test(
+    name = "bindir_absolute_test",
+    size = "small",
+    data = [
+        ":execroot_probe_bin",
+        "//:node_modules/@bazel/runfiles",
+    ],
+    entry_point = "bindir_absolute.mjs",
+    fixed_args = ["$(rlocationpath :execroot_probe_bin)"],
+    # Relies on a runfiles directory next to the launcher.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)

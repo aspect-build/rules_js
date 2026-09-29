@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
@@ -49,4 +49,10 @@ test_suite(
         "@workspace//:js_binary_chdir_test",
         "@workspace//:js_test_chdir_test",
     ],
+)
+
+# Run by test.sh under `bazel run`.
+js_binary(
+    name = "bazel_run_env",
+    entry_point = "bazel_run_env.mjs",
 )
