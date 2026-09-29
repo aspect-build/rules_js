@@ -1,0 +1,41 @@
+load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("//js:defs.bzl", "js_binary")
+load(":run_without_path.bzl", "run_without_path")
+
+package(default_testonly = True)
+
+js_binary(
+    name = "inner_bin",
+    entry_point = "inner.mjs",
+)
+
+js_binary(
+    name = "outer_bin",
+    data = [":inner_bin"],
+    entry_point = "outer.mjs",
+    fixed_args = ["$(rlocationpath :inner_bin)"],
+)
+
+# A js_binary started without a PATH must still give its children a PATH that
+# can locate bash, or else any attempt to invoke another js_binary will fail.
+run_without_path(
+    name = "nested_path",
+    out = "nested_path.txt",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    tool = ":outer_bin",
+)
+
+assert_contains(
+    name = "host_tool_test",
+    actual = ":nested_path",
+    expected = "host tool ok",
+)
+
+assert_contains(
+    name = "nested_js_binary_test",
+    actual = ":nested_path",
+    expected = "inner ok, empty PATH entry: false",
+)
