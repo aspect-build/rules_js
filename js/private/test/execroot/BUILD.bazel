@@ -68,9 +68,7 @@ js_test(
     }),
 )
 
-# `bazel run` passes the shell environment through, so BAZEL_BINDIR can arrive as an absolute
-# path. It resolves from the launch directory, as $(BINDIR) does, so from a runfiles tree it
-# names nothing to change into.
+# The launcher must set up the correct environment when BAZEL_BINDIR is provided as an absolute path.
 js_test(
     name = "bindir_absolute_test",
     size = "small",

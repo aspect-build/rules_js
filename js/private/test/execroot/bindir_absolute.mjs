@@ -1,6 +1,6 @@
 // An absolute BAZEL_BINDIR inherited from the shell under `bazel run` does not resolve from
-// the runfiles tree the launcher starts in, so the launcher must leave the runfiles tree alone
-// and still find the execroot from it.
+// the runfiles tree the launcher starts in. Therefore the launcher must stay in the current
+// working directory (namely the runfiles tree) and still determine the execroot correctly.
 import { execFileSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import { runfiles } from '@bazel/runfiles'
@@ -8,7 +8,7 @@ import { runfiles } from '@bazel/runfiles'
 const launcher = runfiles.resolve(process.argv[2])
 // A runfiles tree, which is where `bazel run` starts a binary.
 const runfilesDir = process.cwd()
-// Any absolute directory that exists will do; it stands in for the workspace directory.
+// Any absolute directory that exists will do.
 const bindir = fs.realpathSync(process.env.TEST_TMPDIR)
 
 const env = {
@@ -45,5 +45,3 @@ if (failures.length) {
     console.error(stdout)
     process.exit(1)
 }
-
-console.log('an absolute BAZEL_BINDIR left the runfiles tree alone')

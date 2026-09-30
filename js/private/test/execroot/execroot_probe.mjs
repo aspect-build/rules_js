@@ -32,8 +32,8 @@ if (!execroot) {
             `cwd '${cwd}' is not under JS_BINARY__EXECROOT '${execroot}'`
         )
     }
-    // Where there is a bindir to change into, the execroot is what it was changed from. An
-    // absolute bindir does not resolve from the launch directory, so there is none.
+    // Where there is a relative (non-absolute) bindir to change into, the execroot is
+    // what it was changed from.
     if (
         bindir &&
         !path.isAbsolute(bindir) &&
