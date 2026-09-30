@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
@@ -51,7 +51,9 @@ test_suite(
     ],
 )
 
-js_binary(
+# This target runs as both a standalone test and a target that we invoke
+# through "bazel run" in test.sh.
+js_test(
     name = "bazel_run_env",
     entry_point = "bazel_run_env.mjs",
 )
