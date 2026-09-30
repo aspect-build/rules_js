@@ -263,7 +263,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
                 ),
             )
 
-        stores_bzl.append("""        store_{i}()""".format(i = i))
+        stores_bzl.append("""    store_{i}()""".format(i = i))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
 
@@ -416,7 +416,15 @@ Valid pnpm workspace projects: {}
 
     if stores_bzl:
         npm_link_all_packages_bzl.append("""    if is_root:""")
-        npm_link_all_packages_bzl.extend(stores_bzl)
+        # Super-hacky - need to have the target start with `.aspect_rules` followed by underscore, so this fits `.aspect_rules_js`.
+        npm_link_all_packages_bzl.append("""        _all_stores(name = ".aspect_rules")""")
+
+    all_stores_bzl = """
+def _all_stores_impl(name, visibility):
+{all_stores}
+
+_all_stores = macro(implementation = _all_stores_impl)""".format(
+        all_stores = "\n".join(stores_bzl))
 
     # Generate one function per pnpm workspace project that performs the linking
     # for that project and returns its (link_targets, scope_targets), collected
@@ -474,6 +482,15 @@ Valid pnpm workspace projects: {}
 
     # Generate catch all & scoped js_library targets
     npm_link_all_packages_bzl.append("""
+
+    _npm_link_all_packages(
+        name = name,
+        link_targets = link_targets,
+        scope_targets = scope_targets,
+        is_importer = is_importer,
+    )
+
+def _npm_link_all_packages_impl(name, visibility, link_targets, scope_targets, is_importer):
     if scope_targets:
         for scope, scoped_targets in scope_targets.items():
             _js_library(
@@ -489,7 +506,16 @@ Valid pnpm workspace projects: {}
             srcs = link_targets if link_targets else [],
             tags = ["manual"],
             visibility = ["//visibility:public"],
-        )""")
+        )
+
+_npm_link_all_packages = macro(
+    implementation = _npm_link_all_packages_impl,
+    attrs = {
+        "link_targets": attr.label_list(configurable = False),
+        "scope_targets": attr.label_list_dict(configurable = False),
+        "is_importer": attr.bool(configurable = False),
+    },
+)""")
 
     npm_link_targets_const, npm_link_targets_bzl = _generate_npm_link_targets(links_targets)
 
@@ -542,6 +568,8 @@ Valid pnpm workspace projects: {}
         npm_link_targets_bzl,
         "",
         "\n\n".join(link_factories_bzl),
+        "",
+        all_stores_bzl,
     ])
 
     rctx_files[_DEFS_BZL_FILENAME] = defs_bzl_contents
