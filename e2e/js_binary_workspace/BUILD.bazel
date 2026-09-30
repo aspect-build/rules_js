@@ -51,7 +51,6 @@ test_suite(
     ],
 )
 
-# Run by test.sh under `bazel run`.
 js_binary(
     name = "bazel_run_env",
     entry_point = "bazel_run_env.mjs",

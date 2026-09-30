@@ -302,8 +302,7 @@ fi
 #
 # The bindir is only there to change into when this really is an execroot; in a runfiles tree,
 # or in a nested js_binary already running in the bindir, there is nothing to do. The preload
-# tells those apart from the broken case by JS_BINARY__CHANGED_TO_BINDIR. Like $(BINDIR), the
-# bindir is relative to the launch directory, so an absolute one never names it.
+# tells those apart from the broken case by JS_BINARY__CHANGED_TO_BINDIR.
 if [ -z "${JS_BINARY__NO_CD_BINDIR:-}" ] && [ "${BAZEL_BINDIR:-}" ] && [ -d "$PWD/$BAZEL_BINDIR" ]; then
     log_debug "changing directory to BAZEL_BINDIR (root of Bazel output tree) $BAZEL_BINDIR"
     export JS_BINARY__CHANGED_TO_BINDIR=1

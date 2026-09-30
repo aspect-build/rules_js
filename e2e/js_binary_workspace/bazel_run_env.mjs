@@ -1,5 +1,4 @@
-// Run by test.sh with `bazel run`, which starts a binary in its runfiles tree with the
-// caller's environment. Checks what the launcher left the program with.
+// Checks that JS_BINARY_EXECROOT and the current working directory are correct.
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 

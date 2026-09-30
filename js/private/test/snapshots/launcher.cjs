@@ -147,8 +147,7 @@ const execroot =
 //
 // The bindir is only there to change into when this really is an execroot; in a runfiles tree,
 // or in a nested js_binary already running in the bindir, there is nothing to do. The preload
-// tells those apart from the broken case by JS_BINARY__CHANGED_TO_BINDIR. Like $(BINDIR), the
-// bindir is relative to the launch directory, so an absolute one never names it.
+// tells those apart from the broken case by JS_BINARY__CHANGED_TO_BINDIR.
 if (
     !process.env.JS_BINARY__NO_CD_BINDIR &&
     process.env.BAZEL_BINDIR &&
