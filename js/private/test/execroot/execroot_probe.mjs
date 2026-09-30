@@ -32,9 +32,11 @@ if (!execroot) {
             `cwd '${cwd}' is not under JS_BINARY__EXECROOT '${execroot}'`
         )
     }
-    // Where there is a bindir to change into, the execroot is what it was changed from.
+    // Where there is a relative (non-absolute) bindir to change into, the execroot is
+    // what it was changed from.
     if (
         bindir &&
+        !path.isAbsolute(bindir) &&
         !process.env.JS_BINARY__NO_CD_BINDIR &&
         cwd !== path.resolve(execroot, bindir)
     ) {
@@ -52,3 +54,4 @@ if (failures.length) {
 }
 
 console.log(`execroot ok: ${execroot}`)
+console.log(`cwd: ${cwd}`)

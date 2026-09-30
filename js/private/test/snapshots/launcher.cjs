@@ -151,7 +151,7 @@ const execroot =
 if (
     !process.env.JS_BINARY__NO_CD_BINDIR &&
     process.env.BAZEL_BINDIR &&
-    isDirectory(process.env.BAZEL_BINDIR)
+    isDirectory(path.join(process.cwd(), process.env.BAZEL_BINDIR))
 ) {
     logDebug(
         `changing directory to BAZEL_BINDIR (root of Bazel output tree) ${process.env.BAZEL_BINDIR}`

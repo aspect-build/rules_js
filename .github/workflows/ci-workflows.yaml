@@ -210,6 +210,14 @@ jobs:
                           workspace: { slug: 'e2e-js_image_oci' },
                           bazel: { id: 'bazel-7' },
                       }
+                    # e2e/js_binary_workspace/test.sh `bazel run`s a target the aspect test step
+                    # above got from the remote cache. Bazel 7 cannot download it without that
+                    # cache and fails with "Missing digest"
+                    # (https://github.com/bazelbuild/bazel/issues/26657).
+                    - {
+                          workspace: { slug: 'e2e-js_binary_workspace' },
+                          bazel: { id: 'bazel-7' },
+                      }
                     # e2e/patch_from_repo has a bazel7-specific absolute label in its MODULE.bazel.
                     - {
                           workspace: { slug: 'e2e-patch_from_repo' },
