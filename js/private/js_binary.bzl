@@ -366,13 +366,6 @@ _NOT_NODE_STARTUP_ENV = [
     "NODE_DISABLE_COMPILE_CACHE",
 ]
 
-# Toolchains of the hermetic launcher, as Labels rather than the bare strings it exposes:
-# under --incompatible_auto_exec_groups a string toolchain type resolves against the
-# repository mapping of whichever module is being built, which need not depend on
-# hermetic_launcher. A Label resolves against this file's own mapping at load time instead.
-_FINALIZER_TOOLCHAIN_TYPE = Label(hermetic_launcher.finalizer_toolchain_type)
-_TEMPLATE_TOOLCHAIN_TYPE = Label(hermetic_launcher.template_toolchain_type)
-
 # Stands in for the launcher on target platforms where hermetic_launcher is not supported.
 _NO_LAUNCHER_PLACEHOLDER = """#!/bin/sh
 echo "ERROR: {target}: no hermetic_launcher stub is registered for this target platform, so this js_binary has no launcher and cannot run. See https://github.com/hermeticbuild/hermetic-launcher for the supported platforms." >&2
@@ -637,32 +630,6 @@ def _bash_launcher(ctx, entry_point_path, log_prefix_rule_set, log_prefix_rule, 
 
     return launcher
 
-def _compile_stub(ctx, embedded_args, transformed_args, output_file):
-    """Stamps a launcher binary from the prebuilt template stub.
-
-    This is `hermetic_launcher.compile_stub` reimplemented so the finalizer toolchain can
-    be named by Label; see the comment on _FINALIZER_TOOLCHAIN_TYPE.
-
-    We can drop this once the upstream fix has made it into a release:
-    https://github.com/hermeticbuild/hermetic-launcher/pull/75
-    """
-    template = ctx.toolchains[_TEMPLATE_TOOLCHAIN_TYPE].templatetoolchaininfo.template_exe
-    args = ctx.actions.args()
-    args.add("--template", template)
-    args.add("-o", output_file)
-    args.add_joined("--transform", transformed_args, join_with = ",")
-    args.add("--")
-    args.add_all(embedded_args)
-    ctx.actions.run(
-        outputs = [output_file],
-        executable = ctx.toolchains[_FINALIZER_TOOLCHAIN_TYPE].finalizer_info.finalizer,
-        arguments = [args],
-        inputs = [template],
-        toolchain = _FINALIZER_TOOLCHAIN_TYPE,
-        mnemonic = "JsLauncher",
-        progress_message = "Stamping launcher %{output}",
-    )
-
 def _is_absolute_path(path):
     """Whether a node_toolchain's target_tool_path names an absolute path.
 
@@ -723,7 +690,7 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
         },
     )
 
-    if not ctx.toolchains[_TEMPLATE_TOOLCHAIN_TYPE] or not ctx.toolchains[_FINALIZER_TOOLCHAIN_TYPE]:
+    if not ctx.toolchains[hermetic_launcher.template_toolchain_type] or not ctx.toolchains[hermetic_launcher.finalizer_toolchain_type]:
         launcher = ctx.actions.declare_file("{}_/{}".format(ctx.label.name, ctx.label.name))
         ctx.actions.write(
             output = launcher,
@@ -788,7 +755,12 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
         ctx.label.name,
         ".exe" if is_windows else "",
     ))
-    _compile_stub(ctx, embedded_args, transformed_args, launcher)
+    hermetic_launcher.compile_stub(
+        ctx = ctx,
+        embedded_args = embedded_args,
+        transformed_args = transformed_args,
+        output_file = launcher,
+    )
     return launcher, launcher_js
 
 def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [], fixed_env = {}):
@@ -1000,8 +972,8 @@ js_binary_lib = struct(
         config_common.toolchain_type("@bazel_tools//tools/sh:toolchain_type", mandatory = False),
         # Optional: only referenced when the hermetic launcher is selected, and absent
         # for a target platform hermetic_launcher publishes no stub for.
-        config_common.toolchain_type(_FINALIZER_TOOLCHAIN_TYPE, mandatory = False),
-        config_common.toolchain_type(_TEMPLATE_TOOLCHAIN_TYPE, mandatory = False),
+        config_common.toolchain_type(hermetic_launcher.finalizer_toolchain_type, mandatory = False),
+        config_common.toolchain_type(hermetic_launcher.template_toolchain_type, mandatory = False),
         "@rules_nodejs//nodejs:runtime_toolchain_type",
     ] + COPY_FILE_TO_BIN_TOOLCHAINS,
 )
