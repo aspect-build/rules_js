@@ -66,6 +66,8 @@ def _js_run_devserver_impl(ctx):
         fail("Either tool or command must be specified")
     if use_tool and ctx.attr.command:
         fail("Only one of tool or command may be specified")
+    if ctx.attr.package_store_mode == "sandbox" and not ctx.attr.patch_node_fs:
+        fail("package_store_mode = \"sandbox\" requires patch_node_fs = True")
 
     transitive_runfiles = [_gather_files_from_js_infos(
         targets = ctx.attr.data,
@@ -289,6 +291,8 @@ def js_run_devserver(
             the application loads the ones in the sandbox. Packages that must only be loaded once
             then break; with Next.js, React fails with "Cannot read properties of null (reading
             'useContext')".
+
+            This mode requires `patch_node_fs = True` (the default).
 
             Package store files use copy-on-write filesystem clones where possible, with a regular
             copy fallback. Both strategies keep sandbox writes isolated from Bazel outputs. On a

@@ -1,12 +1,11 @@
 // Exercises re-syncs of the js_run_devserver sandbox, as ibazel and the watch protocol perform them,
-// against a synthetic runfiles tree whose package store can be changed between syncs.
+// against a synthetic runfiles tree as the node fs patches present it: package store entries are
+// directories and node_modules links between packages are relative symlinks.
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 
 const base = fs.mkdtempSync(path.join(os.tmpdir(), 'devserver-sync-'))
-// Stands in for a package in the package store in bazel-out, which runfiles link to absolutely
-const pkgOut = path.join(base, 'bazel-out', 'pkg')
 const runfiles = path.join(base, 'runfiles')
 const STORE = 'node_modules/.aspect_rules_js/pkg@1.0.0/node_modules/pkg'
 const LINK = 'app/node_modules/pkg'
@@ -18,20 +17,13 @@ function write(p) {
     fs.writeFileSync(p, p)
 }
 
-function resetPackage(files) {
-    fs.rmSync(pkgOut, { recursive: true, force: true })
-    for (const f of files) {
-        write(path.join(pkgOut, f))
-    }
-}
-
 function symlink(target, p) {
     fs.mkdirSync(path.dirname(p), { recursive: true })
     fs.symlinkSync(target, p)
 }
 
 const main = path.join(runfiles, '_main')
-symlink(pkgOut, path.join(main, STORE))
+write(path.join(main, STORE, 'a.js'))
 symlink(
     path.relative(path.join(main, path.dirname(LINK)), path.join(main, STORE)),
     path.join(main, LINK)
@@ -45,45 +37,6 @@ Object.assign(process.env, {
     JS_BINARY__BINDIR: 'bazel-out',
 })
 
-// Each scenario gets its own instance of the module, since it keeps what it has synced into a
-// sandbox in module state, and its own sandbox.
-async function newDevserver(scenario) {
-    const devserver = await import(
-        `../../devserver/js_run_devserver.mjs?${scenario}`
-    )
-    devserver.applyConfig({ package_store_mode: 'sandbox' })
-    const sandbox = path.join(
-        fs.mkdtempSync(path.join(base, 'js_run_devserver-')),
-        '_main'
-    )
-    const sync = async (files) => {
-        devserver.updateEntryPaths(files)
-        await devserver.syncFiles(
-            files,
-            sandbox,
-            false,
-            devserver.syncRecursive
-        )
-    }
-    return { devserver, sandbox, sync }
-}
-
-// Lists the files under a directory, relative to it
-function list(dir) {
-    const files = []
-    const walk = (d, prefix) => {
-        for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-            if (e.isDirectory()) {
-                walk(path.join(d, e.name), prefix + e.name + '/')
-            } else {
-                files.push(prefix + e.name)
-            }
-        }
-    }
-    walk(dir, '')
-    return files.sort().join(' ')
-}
-
 function check(description, actual, expected) {
     if (actual !== expected) {
         console.error(
@@ -93,42 +46,42 @@ function check(description, actual, expected) {
     }
 }
 
-// A dereferenced package is a copy, so files removed from the package must be removed from the
-// sandbox on the next sync, at any depth, or they remain resolvable there.
-for (const protocol of ['ibazel', 'watch']) {
-    resetPackage(['a.js', 'b.js', 'lib/deep.js', 'src/keep.js', 'src/gone.js'])
-    const { devserver, sandbox, sync } = await newDevserver(protocol)
-    await sync([STORE_ENTRY, LINK_ENTRY])
-    check(
-        `${protocol}: initial sync`,
-        list(path.join(sandbox, STORE)),
-        'a.js b.js lib/deep.js src/gone.js src/keep.js'
+// Each scenario gets its own instance of the module, since it keeps what it has synced into a
+// sandbox in module state, and its own sandbox.
+async function newDevserver(scenario) {
+    const devserver = await import(
+        `../../devserver/js_run_devserver.mjs?${scenario}`
     )
-
-    fs.rmSync(path.join(pkgOut, 'b.js'))
-    fs.rmSync(path.join(pkgOut, 'lib'), { recursive: true })
-    fs.rmSync(path.join(pkgOut, 'src', 'gone.js'))
-    write(path.join(pkgOut, 'c.js'))
-    if (protocol === 'ibazel') {
-        await sync([STORE_ENTRY, LINK_ENTRY])
-    } else {
-        const cycle = { sources: { [`_main/${STORE}`]: { is_symlink: true } } }
-        await devserver.cycleSyncRecurse(cycle, STORE, true, sandbox, false)
-    }
-    check(
-        `${protocol}: re-sync after files are removed from the package`,
-        list(path.join(sandbox, STORE)),
-        'a.js c.js src/keep.js'
+    devserver.applyConfig({ package_store_mode: 'sandbox' }, '1')
+    const sandbox = path.join(
+        fs.mkdtempSync(path.join(base, 'js_run_devserver-')),
+        '_main'
     )
+    return { devserver, sandbox }
 }
 
-// A node_modules link takes a different form depending on whether the entry it points at is synced:
-// a symlink to that entry in the sandbox when it is, a copy of its contents when it is not. The link
-// itself does not change in runfiles when the entries do, so it has to be re-evaluated regardless.
+// Sandbox package store mode requires the node fs patches
+{
+    const devserver = await import('../../devserver/js_run_devserver.mjs?nopatch')
+    let error = null
+    try {
+        devserver.applyConfig({ package_store_mode: 'sandbox' }, '0')
+    } catch (e) {
+        error = e
+    }
+    check('applyConfig without fs patches throws', !!error, true)
+    devserver.applyConfig({ package_store_mode: 'execroot' }, '0')
+}
+
+// A node_modules link points at its target in the sandbox when that target is synced, and back out
+// of the sandbox when it is not. The link itself does not change in runfiles when the entries do, so
+// it has to be re-evaluated regardless.
 for (const protocol of ['ibazel', 'watch']) {
-    resetPackage(['a.js'])
-    const { devserver, sandbox } = await newDevserver(`${protocol}-transitions`)
+    const { devserver, sandbox } = await newDevserver(protocol)
     const link = path.join(sandbox, LINK)
+    const inSandbox = () =>
+        fs.lstatSync(link).isSymbolicLink() &&
+        fs.readlinkSync(link) === path.join(sandbox, STORE)
     const withEntry = [STORE_ENTRY, LINK_ENTRY]
     const withoutEntry = [LINK_ENTRY]
 
@@ -169,34 +122,31 @@ for (const protocol of ['ibazel', 'watch']) {
     }
 
     await resync(withEntry)
+    check(`${protocol}: link to a synced entry`, inSandbox(), true)
     check(
-        `${protocol}: link to a synced entry`,
-        fs.lstatSync(link).isSymbolicLink(),
-        true
+        `${protocol}: package copied`,
+        fs.readFileSync(path.join(link, 'a.js'), 'utf8'),
+        path.join(main, STORE, 'a.js')
     )
 
-    // Its target is no longer synced, so it is dereferenced
     await resync(withoutEntry, null)
+    check(`${protocol}: entry no longer synced`, inSandbox(), false)
     check(
-        `${protocol}: symlink replaced by a dereferenced directory`,
-        fs.lstatSync(link).isDirectory() && list(link),
-        'a.js'
+        `${protocol}: package removed`,
+        fs.existsSync(path.join(sandbox, STORE)),
+        false
     )
 
-    // Its target is synced again, so it is a symlink again
+    await resync(withEntry, { is_symlink: true })
+    check(`${protocol}: entry synced again`, inSandbox(), true)
+
+    // An unchanged link is left alone rather than recreated
+    const before = fs.lstatSync(link, { bigint: true }).ino
     await resync(withEntry, { is_symlink: true })
     check(
-        `${protocol}: dereferenced directory replaced by a symlink`,
-        fs.lstatSync(link).isSymbolicLink(),
-        true
-    )
-
-    // And dereferenced once more: files synced into it the first time must be synced again
-    await resync(withoutEntry, null)
-    check(
-        `${protocol}: directory dereferenced a second time`,
-        fs.lstatSync(link).isDirectory() && list(link),
-        'a.js'
+        `${protocol}: unchanged link kept`,
+        fs.lstatSync(link, { bigint: true }).ino,
+        before
     )
 }
 
