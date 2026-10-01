@@ -18,6 +18,7 @@ const {
     JS_BINARY__WORKSPACE,
     JS_BINARY__RUNFILES,
     JS_BINARY__LOG_DEBUG,
+    JS_BINARY__PATCH_NODE_FS,
 } = process.env
 
 const RUNFILES_ROOT = path.join(JS_BINARY__RUNFILES, JS_BINARY__WORKSPACE)
@@ -36,19 +37,11 @@ const entryDirs = new Set()
 
 // When true the package store is materialized inside the sandbox and node_modules symlinks are
 // pointed at it instead of at the execroot. Set from the rule config in main().
+//
+// This relies on the node fs patches: they make lstat report the runfiles entries of the package
+// store as the directories they link to, so they are copied like any other directory. Only the
+// relative node_modules links between packages remain symlinks.
 let sandboxPackageStore = false
-
-// How each node_modules symlink was last synced in sandbox package store mode: the sandbox path it
-// links to, or one of the forms below. That depends on which entries are synced as well as on the
-// symlink itself, so it has to be compared along with the symlink's timestamp to tell whether the
-// symlink is up-to-date.
-const syncedLinks = new Map()
-const DEREFERENCED = '(dereferenced)'
-const UNRESOLVED = '(unresolved)'
-
-// How many levels of symlinked directories will be dereferenced into the sandbox before giving up.
-// Guards against symlinked directories that point at one another, which would recurse forever.
-const MAX_DEREF_DEPTH = 32
 
 // Ensure that a directory exists. If it has not been previously created or does not exist then it
 // creates the directory, first recursively ensuring that its parent directory exists. Intentionally
@@ -120,8 +113,13 @@ function toPosix(p) {
 }
 
 // Applies the settings from the rule config that change how files are synced.
-function applyConfig(config) {
+function applyConfig(config, patchNodeFs = JS_BINARY__PATCH_NODE_FS) {
     sandboxPackageStore = config.package_store_mode === 'sandbox'
+    if (sandboxPackageStore && (!patchNodeFs || patchNodeFs === '0')) {
+        throw new Error(
+            'package_store_mode = "sandbox" requires the node fs patches, but JS_BINARY__PATCH_NODE_FS is disabled'
+        )
+    }
 }
 
 // Records the full set of data files that the current sync will place in the sandbox.
@@ -188,37 +186,27 @@ export function resolveSandboxSymlinkTarget(
     return undefined
 }
 
-// Decides how a node_modules symlink is synced in sandbox package store mode. Runfiles entries for
-// npm packages are symlinks pointing at the package store in the execroot. Recreating them as
-// symlinks would put the package contents outside the sandbox root, so a symlink whose target is
-// not itself synced into the sandbox is dereferenced and its contents materialized instead.
-//
-// Returns the sandbox path to link to in `sandboxSrc`, or the stat of the target to dereference in
-// `followed`, or neither for a broken link, which is recreated as a symlink. `form` identifies the
-// outcome; see syncedLinks.
-async function resolveSandboxLink(file, src, sandbox) {
-    const sandboxSrc = await readSandboxSymlinkTarget(file, src, sandbox)
-    if (sandboxSrc) {
-        return { sandboxSrc, followed: null, form: sandboxSrc }
+// In sandbox package store mode, returns the in-sandbox target for a node_modules symlink, or
+// undefined when there is none and the link keeps pointing at the execroot.
+async function sandboxLinkTarget(file, src, sandbox) {
+    if (!sandboxPackageStore || !isUnderNodeModules(file)) {
+        return undefined
     }
-    const followed = await statFollowingLinks(src, file)
-    return {
-        sandboxSrc: undefined,
-        followed,
-        form: followed ? DEREFERENCED : UNRESOLVED,
+    const target = await readSandboxSymlinkTarget(file, src, sandbox)
+    if (!target) {
+        console.error(
+            `WARNING: ${file} links outside of the js_run_devserver sandbox`
+        )
     }
+    return target
 }
 
-// Stats a path following symlinks, or returns null for a broken link so that the caller can
-// recreate it as a symlink rather than failing the sync.
-async function statFollowingLinks(src, file) {
+// Returns the target of an existing symlink, or undefined if dst is not a symlink.
+async function readlinkIfExists(dst) {
     try {
-        return await fs.promises.stat(src)
+        return await fs.promises.readlink(dst)
     } catch (e) {
-        if (JS_BINARY__LOG_DEBUG) {
-            console.error(`Could not follow symlink ${file}: ${e.message}`)
-        }
-        return null
+        return undefined
     }
 }
 
@@ -298,8 +286,9 @@ export function friendlyFileSize(bytes) {
     )
 }
 
-async function syncSymlink(file, src, dst, sandbox, exists, sandboxSrc) {
+async function syncSymlink(file, src, dst, sandbox, exists) {
     let symlinkMeta = ''
+    const sandboxSrc = await sandboxLinkTarget(file, src, sandbox)
     if (sandboxSrc) {
         // The target is synced into the sandbox, so point at it rather than at the execroot. This
         // keeps realpath() of the link inside the sandbox root, which bundlers that enforce a
@@ -310,9 +299,10 @@ async function syncSymlink(file, src, dst, sandbox, exists, sandboxSrc) {
         let linkPath = await fs.promises.readlink(src)
         const linkAbs = path.resolve(path.dirname(src), linkPath)
         linkPath = path.relative(src, linkAbs) || '.'
-        // Special case for 1p node_modules symlinks
+        // Special case for 1p node_modules symlinks. Sandbox package store mode resolves these from
+        // the entries instead, since the target may be in the middle of being deleted.
         const maybe1pSync = path.join(sandbox, file, linkPath)
-        if (fs.existsSync(maybe1pSync)) {
+        if (!sandboxPackageStore && fs.existsSync(maybe1pSync)) {
             src = maybe1pSync
             symlinkMeta = '1p'
         }
@@ -336,7 +326,10 @@ async function syncSymlink(file, src, dst, sandbox, exists, sandboxSrc) {
         )
     }
     if (exists) {
-        await removeSynced(file, dst)
+        if (sandboxPackageStore && (await readlinkIfExists(dst)) === src) {
+            return 0
+        }
+        await fs.promises.unlink(dst)
     } else {
         // Intentionally synchronous; see comment on mkdirpSync
         mkdirpSync(path.dirname(dst))
@@ -345,14 +338,11 @@ async function syncSymlink(file, src, dst, sandbox, exists, sandboxSrc) {
     return 1
 }
 
-async function syncDirectory(file, src, sandbox, writePerm, derefDepth = 0) {
+async function syncDirectory(file, src, sandbox, writePerm) {
     if (JS_BINARY__LOG_DEBUG) {
         console.error(`Syncing directory ${file}...`)
     }
     const contents = await fs.promises.readdir(src)
-    if (derefDepth > 0) {
-        await pruneRemovedEntries(file, sandbox, contents)
-    }
     return (
         await Promise.all(
             contents.map(
@@ -361,41 +351,11 @@ async function syncDirectory(file, src, sandbox, writePerm, derefDepth = 0) {
                         file + path.sep + entry,
                         undefined,
                         sandbox,
-                        writePerm,
-                        derefDepth
+                        writePerm
                     )
             )
         )
     ).reduce((s, t) => s + t, 0)
-}
-
-// Copies the contents of a symlinked directory into the sandbox in place of the symlink. Files
-// removed from the source are pruned on every sync; see pruneRemovedEntries.
-async function syncDereferencedDirectory(
-    file,
-    src,
-    dst,
-    sandbox,
-    writePerm,
-    exists,
-    derefDepth
-) {
-    if (JS_BINARY__LOG_DEBUG) {
-        console.error(`Dereferencing symlinked directory ${file}`)
-    }
-    if (exists) {
-        const st = await fs.promises.lstat(dst).catch((e) => {
-            if (e.code === 'ENOENT') {
-                return null
-            }
-            throw e
-        })
-        if (st && st.isSymbolicLink()) {
-            // Previously synced as a symlink; writing through it would modify its target.
-            await fs.promises.unlink(dst)
-        }
-    }
-    return syncDirectory(file, src, sandbox, writePerm, derefDepth + 1)
 }
 
 // Materializes src at dst using a copy-on-write clone when possible. Node falls back to a regular
@@ -443,9 +403,8 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
 // Recursively copies a file, symlink or directory to a destination. If the file has been previously
 // synced it is only re-copied if the file's last modified time has changed since the last time that
 // file was copied. Symlinks are not copied but instead a symlink is created under the destination
-// pointing to the source symlink; the exception is sandbox package store mode, where a node_modules
-// symlink that would point out of the sandbox is dereferenced and its contents materialized.
-async function syncRecursive(file, _, sandbox, writePerm, derefDepth = 0) {
+// pointing to the source symlink.
+async function syncRecursive(file, _, sandbox, writePerm) {
     const src = RUNFILES_ROOT + path.sep + file
     const dst = sandbox + path.sep + file
 
@@ -454,40 +413,16 @@ async function syncRecursive(file, _, sandbox, writePerm, derefDepth = 0) {
             () => fs.promises.lstat(src),
             `lstat for ${src}`
         )
-
-        // See resolveSandboxLink
-        let link = null
-        if (
+        // In sandbox package store mode a node_modules link's target depends on the synced entries,
+        // not only on the link, so it is always re-evaluated; syncSymlink skips it if unchanged.
+        const reevaluate =
             sandboxPackageStore &&
             lstat.isSymbolicLink() &&
             isUnderNodeModules(file)
-        ) {
-            link = await resolveSandboxLink(file, src, sandbox)
-        }
-        const sandboxSrc = link ? link.sandboxSrc : undefined
-        const deref = !!(link && link.followed)
-
-        // A dereferenced directory is re-walked on every sync; the files within it do their own
-        // up-to-date checks. The symlink's own mtime says nothing about its contents.
-        const derefDirectory = deref && link.followed.isDirectory()
-
-        if (derefDirectory && derefDepth >= MAX_DEREF_DEPTH) {
-            // Symlinked directories that point at each other would otherwise recurse forever.
-            console.error(
-                `Not dereferencing ${file}: more than ${MAX_DEREF_DEPTH} levels of symlinked directories`
-            )
-            const exists = syncedTime.has(file) || fs.existsSync(dst)
-            return syncSymlink(file, src, dst, sandbox, exists)
-        }
-
-        // The symlink is unchanged, but the entries it is resolved against may not be
-        const linkFormChanged = link && syncedLinks.get(file) !== link.form
-
         const last = syncedTime.get(file)
         if (
             !lstat.isDirectory() &&
-            !derefDirectory &&
-            !linkFormChanged &&
+            !reevaluate &&
             last &&
             lstat.mtimeMs == last
         ) {
@@ -501,23 +436,10 @@ async function syncRecursive(file, _, sandbox, writePerm, derefDepth = 0) {
         }
         const exists = syncedTime.has(file) || fs.existsSync(dst)
         syncedTime.set(file, lstat.mtimeMs)
-        if (link) {
-            syncedLinks.set(file, link.form)
-        }
-        if (derefDirectory) {
-            return syncDereferencedDirectory(
-                file,
-                src,
-                dst,
-                sandbox,
-                writePerm,
-                exists,
-                derefDepth
-            )
-        } else if (lstat.isSymbolicLink() && !deref) {
-            return syncSymlink(file, src, dst, sandbox, exists, sandboxSrc)
+        if (lstat.isSymbolicLink()) {
+            return syncSymlink(file, src, dst, sandbox, exists)
         } else if (lstat.isDirectory()) {
-            return syncDirectory(file, src, sandbox, writePerm, derefDepth)
+            return syncDirectory(file, src, sandbox, writePerm)
         } else {
             if (sandboxPackageStore && isPackageStorePath(file)) {
                 // Package store files are immutable Bazel outputs, so the mtime check above is
@@ -557,79 +479,16 @@ export function isRootedAt(p, folder, sep = path.sep) {
     return next === '/' || next === sep
 }
 
-// Clears any matching files or files rooted at this folder from the syncedTime, syncedChecksum and
-// syncedLinks maps, so that they are synced again if they reappear. With `includeSelf` false only
-// the files rooted at the folder are cleared.
-function forgetSynced(f, includeSelf = true) {
-    for (const synced of [syncedTime, syncedChecksum, syncedLinks]) {
+// Clears any matching files or files rooted at this folder from the syncedTime and syncedChecksum
+// maps, so that they are synced again if they reappear.
+function forgetSynced(f) {
+    for (const synced of [syncedTime, syncedChecksum]) {
         for (const k of synced.keys()) {
-            if ((includeSelf && k == f) || isRootedAt(k, f)) {
+            if (k == f || isRootedAt(k, f)) {
                 synced.delete(k)
             }
         }
     }
-}
-
-// Removes a synced path from the sandbox so that something of a different kind can take its place,
-// such as a dereferenced directory that is now a symlink or the reverse. Unlike unlink, this handles
-// a real directory, and unlike rm it never follows a symlink into its target.
-async function removeSynced(file, dst) {
-    let st
-    try {
-        st = await fs.promises.lstat(dst)
-    } catch (e) {
-        if (e.code === 'ENOENT') {
-            return
-        }
-        throw e
-    }
-    if (st.isDirectory()) {
-        await fs.promises.rm(dst, { recursive: true, force: true })
-        // Forget what was synced beneath it, but not the path itself, which the caller has just
-        // recorded.
-        forgetSynced(file, false)
-        mkdirs.clear()
-    } else {
-        await fs.promises.unlink(dst)
-    }
-}
-
-// A dereferenced directory is a copy rather than a link, so files that are removed from its source
-// have to be removed from the sandbox too, or they remain resolvable there. `contents` is the
-// current listing of the source directory.
-async function pruneRemovedEntries(file, sandbox, contents) {
-    const dst = sandbox + path.sep + file
-    let st
-    try {
-        st = await fs.promises.lstat(dst)
-    } catch (e) {
-        if (e.code === 'ENOENT') {
-            return
-        }
-        throw e
-    }
-    // Never follow a symlink here: pruning its target would delete files outside this directory.
-    if (!st.isDirectory()) {
-        return
-    }
-    const keep = new Set(contents)
-    const stale = (await fs.promises.readdir(dst)).filter((e) => !keep.has(e))
-    if (stale.length === 0) {
-        return
-    }
-    await Promise.all(
-        stale.map(async (entry) => {
-            const f = file + path.sep + entry
-            console.error(`Deleting ${f}`)
-            forgetSynced(f)
-            await fs.promises.rm(dst + path.sep + entry, {
-                recursive: true,
-                force: true,
-            })
-        })
-    )
-    // clear mkdirs since we have deleted files so we re-populate on next sync
-    mkdirs.clear()
 }
 
 // Delete files from sandbox
@@ -1027,25 +886,16 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     let doSync = syncRecursive
 
     // For CYCLE message we have more informatino about what changed and can do minimal syncing.
-    if (cycle.kind == MessageType.CYCLE) {
-        const inCycle = (f) =>
+    // In sandbox package store mode, node_modules link targets depend on the entries, so a change
+    // to the entries re-syncs everything.
+    if (
+        cycle.kind == MessageType.CYCLE &&
+        !(sandboxPackageStore && entriesChanged(oldFiles, newFiles))
+    ) {
+        filesToSync = newFiles.filter(([f]) =>
             cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`)
-        filesToSync = newFiles.filter(([f]) => inCycle(f))
+        )
         doSync = cycleSyncRecurse.bind(null, cycle)
-
-        if (sandboxPackageStore && entriesChanged(oldFiles, newFiles)) {
-            // How a node_modules symlink is synced depends on which entries are synced, so when
-            // those change the symlinks that did not change themselves are re-evaluated too.
-            // syncRecursive skips the ones that are still up-to-date.
-            filesToSync = newFiles.filter(
-                ([f]) => inCycle(f) || isUnderNodeModules(f)
-            )
-            doSync = (file, ...args) =>
-                inCycle(file)
-                    ? cycleSyncRecurse(cycle, file, ...args)
-                    : syncRecursive(file, ...args)
-        }
-
         toDelete = []
         for (const l in cycle.sources) {
             if (cycle.sources[l] === null) {
@@ -1070,6 +920,12 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
 }
 
 async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
+    if (sandboxPackageStore && isUnderNodeModules(file)) {
+        // The cycle reports the unpatched runfiles tree; syncRecursive goes by the patched lstat.
+        syncedTime.delete(file)
+        return syncRecursive(file, undefined, sandbox, writePerm)
+    }
+
     const src = RUNFILES_ROOT + path.sep + file
     const dst = sandbox + path.sep + file
 
@@ -1089,32 +945,6 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     }
 
     if (srcRunfilesInfo.is_symlink) {
-        // See the equivalent handling in syncRecursive.
-        if (sandboxPackageStore && isUnderNodeModules(file)) {
-            const { sandboxSrc, followed, form } = await resolveSandboxLink(
-                file,
-                src,
-                sandbox
-            )
-            syncedLinks.set(file, form)
-            if (!sandboxSrc) {
-                if (followed && followed.isDirectory()) {
-                    return syncDereferencedDirectory(
-                        file,
-                        src,
-                        dst,
-                        sandbox,
-                        writePerm,
-                        exists,
-                        0
-                    )
-                }
-                if (followed) {
-                    return syncFile(file, src, dst, exists, followed, writePerm)
-                }
-            }
-            return syncSymlink(file, src, dst, sandbox, exists, sandboxSrc)
-        }
         return syncSymlink(file, src, dst, sandbox, exists)
     }
 
