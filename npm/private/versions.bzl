@@ -178,6 +178,7 @@ PNPM_VERSIONS = {
     "11.28.0": "sha512-jtI5Nx3oIkS2zM+eICPBjqhDmWHy7D/omJE7n37i52ygpFcXWArKPHmXwTX21PXeRSTL7uGizKxDDAPRNOKkjA==",
     "11.28.1": "sha512-4Cvffvdmv8/VugXMy3vvmTkcyODcZm+AKS5eITIDMiUHcMUyr25gBnUEXq7ZikmwPtSrwTrG+xSj0Ydc8i+9YA==",
     "11.28.2": "sha512-dVzi/jwFv9e7QStCr/PFxVzTjFKcbsqBBHVJeuNnRsVx5LbhgU5ufkuX1+6GS4oORGc8Oyl6UOCsKHccXOFdJw==",
+    "11.28.3": "sha512-1JdgoTsXVZSHdaXUyxvEuocf8tyUGt+FFjDQRO1yL5tb6L5XvvkxZgmMgMcGvWEsKC0FUm3R0K5mAYjAhoIPNQ==",
     "12.0.0": "sha512-ni49w5EZlYaNyUuBdcIXwn6VQI+gO0oidJd48rNPdzt3zdOznt6BcbIvzVO+ajU0Lp+smUimjvWN9kiM6Jp+Zw==",
     "12.1.0": "sha512-2bgnbZf27IbkmBWHf5Hun2PO5h8gY7ME5Dttq4+gfOipr9RtL6zTn5Ieap0Gs8dagTSce4iMLSKIa64CKZAQNw==",
     "12.2.0": "sha512-wmssMTlMo4hw92F9wjfcNY020DG+rpo2QK2kgmGdKQycL6MCYsYW0iV0sQHDyV0br+qGh56jzGu/N8KoN7PE1A==",
