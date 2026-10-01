@@ -3,6 +3,7 @@ import {
     isNodeModulePath,
     is1pPackageStoreDep,
     isPackageStorePath,
+    isRootedAt,
     isUnderNodeModules,
     resolveSandboxSymlinkTarget,
     friendlyFileSize,
@@ -109,6 +110,32 @@ const isUnderNodeModules_false = [
 for (const p of isUnderNodeModules_false) {
     if (isUnderNodeModules(p)) {
         console.error(`ERROR: expected ${p} to not be under node_modules`)
+        process.exit(1)
+    }
+}
+
+// isRootedAt
+const isRootedAt_cases = [
+    // [path, folder, separator, expected]
+    ['node_modules/pkg/index.js', 'node_modules/pkg', '/', true],
+    ['node_modules/pkg/lib/deep.js', 'node_modules/pkg', '/', true],
+    // The files below a directory entry are joined with the platform separator
+    ['node_modules/pkg\\index.js', 'node_modules/pkg', '\\', true],
+    ['node_modules/pkg\\lib\\deep.js', 'node_modules/pkg', '\\', true],
+    ['node_modules/pkg\\lib\\deep.js', 'node_modules/pkg\\lib', '\\', true],
+    // The folder itself is not rooted at itself
+    ['node_modules/pkg', 'node_modules/pkg', '/', false],
+    // A sibling that merely shares the prefix
+    ['node_modules/pkg-extra/index.js', 'node_modules/pkg', '/', false],
+    ['node_modules/pkg-extra\\index.js', 'node_modules/pkg', '\\', false],
+    ['node_modules/other/index.js', 'node_modules/pkg', '/', false],
+]
+for (const [p, folder, sep, expected] of isRootedAt_cases) {
+    const actual = isRootedAt(p, folder, sep)
+    if (actual !== expected) {
+        console.error(
+            `ERROR: expected isRootedAt('${p}', '${folder}', '${sep}') to be ${expected} but got ${actual}`
+        )
         process.exit(1)
     }
 }
