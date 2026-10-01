@@ -84,13 +84,6 @@ function list(dir) {
     return files.sort().join(' ')
 }
 
-// Bumps the mtime of the runfiles symlink so that the next sync does not skip it
-let mtime = Date.now()
-function touchLink() {
-    const t = new Date((mtime += 2000))
-    fs.lutimesSync(path.join(main, LINK), t, t)
-}
-
 function check(description, actual, expected) {
     if (actual !== expected) {
         console.error(
@@ -129,48 +122,79 @@ for (const protocol of ['ibazel', 'watch']) {
     )
 }
 
-// A link changes between a symlink and a dereferenced directory as the entries it points at are
-// added to or removed from the data.
-{
+// A node_modules link takes a different form depending on whether the entry it points at is synced:
+// a symlink to that entry in the sandbox when it is, a copy of its contents when it is not. The link
+// itself does not change in runfiles when the entries do, so it has to be re-evaluated regardless.
+for (const protocol of ['ibazel', 'watch']) {
     resetPackage(['a.js'])
-    const { devserver, sandbox, sync } = await newDevserver('transitions')
+    const { devserver, sandbox } = await newDevserver(`${protocol}-transitions`)
     const link = path.join(sandbox, LINK)
-    await sync([STORE_ENTRY, LINK_ENTRY])
-    check('link to a synced entry', fs.lstatSync(link).isSymbolicLink(), true)
+    const withEntry = [STORE_ENTRY, LINK_ENTRY]
+    const withoutEntry = [LINK_ENTRY]
+
+    // Syncs a changed list of entries the way each protocol does. `storeSource` is what the watch
+    // protocol reports for the store entry, the only path that changed: null once it is deleted.
+    const entriesPath = path.join(base, `${protocol}-entries.json`)
+    const config = {}
+    let previous = []
+    const resync = async (files, storeSource) => {
+        if (protocol === 'ibazel') {
+            devserver.updateEntryPaths(files)
+            await Promise.all([
+                devserver.deleteFiles(previous, files, sandbox),
+                devserver.syncFiles(
+                    files,
+                    sandbox,
+                    false,
+                    devserver.syncRecursive
+                ),
+            ])
+            previous = files
+        } else {
+            fs.writeFileSync(entriesPath, JSON.stringify(files))
+            const cycle =
+                storeSource === undefined
+                    ? { kind: 'CYCLE_RESET', sources: {} }
+                    : {
+                          kind: 'CYCLE',
+                          sources: { [`_main/${STORE}`]: storeSource },
+                      }
+            await devserver.watchProtocolCycle(
+                config,
+                entriesPath,
+                sandbox,
+                cycle
+            )
+        }
+    }
+
+    await resync(withEntry)
+    check(
+        `${protocol}: link to a synced entry`,
+        fs.lstatSync(link).isSymbolicLink(),
+        true
+    )
 
     // Its target is no longer synced, so it is dereferenced
-    await devserver.deleteFiles(
-        [STORE_ENTRY, LINK_ENTRY],
-        [LINK_ENTRY],
-        sandbox
-    )
-    touchLink()
-    await sync([LINK_ENTRY])
+    await resync(withoutEntry, null)
     check(
-        'symlink replaced by a dereferenced directory',
+        `${protocol}: symlink replaced by a dereferenced directory`,
         fs.lstatSync(link).isDirectory() && list(link),
         'a.js'
     )
 
     // Its target is synced again, so it is a symlink again
-    touchLink()
-    await sync([STORE_ENTRY, LINK_ENTRY])
+    await resync(withEntry, { is_symlink: true })
     check(
-        'dereferenced directory replaced by a symlink',
+        `${protocol}: dereferenced directory replaced by a symlink`,
         fs.lstatSync(link).isSymbolicLink(),
         true
     )
 
     // And dereferenced once more: files synced into it the first time must be synced again
-    await devserver.deleteFiles(
-        [STORE_ENTRY, LINK_ENTRY],
-        [LINK_ENTRY],
-        sandbox
-    )
-    touchLink()
-    await sync([LINK_ENTRY])
+    await resync(withoutEntry, null)
     check(
-        'directory dereferenced a second time',
+        `${protocol}: directory dereferenced a second time`,
         fs.lstatSync(link).isDirectory() && list(link),
         'a.js'
     )
