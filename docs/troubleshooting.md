@@ -138,6 +138,64 @@ eslint_bin.eslint_test(
 > NB: We plan to add support for the `.npmrc` `public-hoist-pattern` setting to `rules_js` in a future release.
 > For now, you must emulate public-hoist-pattern in `rules_js` using the `public_hoist_packages` attribute shown above.
 
+## Devserver bundler refuses to compile files "outside of the project directory"
+
+`js_run_devserver` runs the devserver in a custom sandbox under the OS temp directory. By default the
+`node_modules` symlinks in that sandbox point back at the npm package store in the Bazel execroot, so
+third-party packages are resolved without being copied into the sandbox.
+
+Bundlers that resolve modules through `realpath()` and then enforce a project root boundary reject
+that layout, because every third party package physically lives outside the sandbox. Next.js with
+Turbopack (the default since Next.js 16) fails like this:
+
+```
+Error: Next.js inferred your workspace root, but it may not be correct.
+    We couldn't find the Next.js package (next/package.json) from the project directory: ...
+    Note: For security and performance reasons, files outside of the project directory
+    will not be compiled.
+```
+
+Setting `turbopack.root` does not help on its own: no directory contains both the sandbox and the
+execroot.
+
+The fix is to materialize the package store inside the sandbox so that `realpath()` of every
+`node_modules` entry stays under the sandbox root, and to start the devserver from there with
+`command`:
+
+```python
+js_run_devserver(
+    name = "dev",
+    args = ["dev"],
+    chdir = package_name(),
+    command = "./node_modules/.bin/next",
+    data = [...],
+    package_store_mode = "sandbox",
+)
+```
+
+Where the `./node_modules/.bin/next` bin entry is configured with `bins` in `npm_translate_lock`; see
+the `js_run_devserver` documentation.
+
+Do not start it as a `js_binary` `tool` in this mode. A tool runs from the execroot, so Next.js loads
+React from there while the pages load the copy in the sandbox, and rendering fails with:
+
+```
+TypeError: Cannot read properties of null (reading 'useContext')
+```
+
+If `next` is resolved from a `node_modules` above the app directory, as in a monorepo, point
+Turbopack's root at a directory that contains it, such as the workspace root in the sandbox: set
+`turbopack.root`, or `outputFileTracingRoot` on Next.js 15. See
+[e2e/nextjs/v15/mjs/devserver](../e2e/nextjs/v15/mjs/devserver) for a working example.
+
+Package store files use copy-on-write filesystem clones where possible, with a regular copy
+fallback. This keeps devserver writes isolated from Bazel outputs while avoiding duplicate disk
+usage on filesystems that support cloning. On a filesystem without cloning, such as ext4, the
+package store is copied in full each time the devserver starts: for Next.js and React that is
+several hundred MB and takes around half a second. Set the `JS_RUN_DEVSERVER_SANDBOX_DIR`
+environment variable to place the sandbox alongside the execroot and increase the chance that
+cloning is available.
+
 ## Ugly stack traces
 
 Bazel's sandboxing and runfiles directory layouts can make stack traces and logs hard to read. This issue is common in many

@@ -1,0 +1,257 @@
+// Exercises re-syncs of the js_run_devserver sandbox, as ibazel and the watch protocol perform them,
+// against a synthetic runfiles tree as the node fs patches present it: package store entries are
+// directories and node_modules links between packages are relative symlinks.
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
+
+const base = fs.mkdtempSync(path.join(os.tmpdir(), 'devserver-sync-'))
+const runfiles = path.join(base, 'runfiles')
+const STORE = 'node_modules/.aspect_rules_js/pkg@1.0.0/node_modules/pkg'
+const LINK = 'app/node_modules/pkg'
+const STORE_ENTRY = [STORE, 1]
+const LINK_ENTRY = [LINK, 0]
+
+function write(p) {
+    fs.mkdirSync(path.dirname(p), { recursive: true })
+    fs.writeFileSync(p, p)
+}
+
+function symlink(target, p) {
+    fs.mkdirSync(path.dirname(p), { recursive: true })
+    fs.symlinkSync(target, p)
+}
+
+const main = path.join(runfiles, '_main')
+write(path.join(main, STORE, 'a.js'))
+symlink(
+    path.relative(path.join(main, path.dirname(LINK)), path.join(main, STORE)),
+    path.join(main, LINK)
+)
+
+// The module reads these when it is loaded
+Object.assign(process.env, {
+    JS_BINARY__RUNFILES: runfiles,
+    JS_BINARY__WORKSPACE: '_main',
+    JS_BINARY__EXECROOT: base,
+    JS_BINARY__BINDIR: 'bazel-out',
+})
+
+// Lists the files under a directory, relative to it
+function list(dir) {
+    const files = []
+    const walk = (d, prefix) => {
+        for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+            if (e.isDirectory()) {
+                walk(path.join(d, e.name), prefix + e.name + '/')
+            } else {
+                files.push(prefix + e.name)
+            }
+        }
+    }
+    walk(dir, '')
+    return files.sort().join(' ')
+}
+
+function check(description, actual, expected) {
+    if (actual !== expected) {
+        console.error(
+            `ERROR: ${description}: expected '${expected}' but got '${actual}'`
+        )
+        process.exit(1)
+    }
+}
+
+// Each scenario gets its own instance of the module, since it keeps what it has synced into a
+// sandbox in module state, and its own sandbox.
+async function newDevserver(scenario) {
+    const devserver = await import(
+        `../../devserver/js_run_devserver.mjs?${scenario}`
+    )
+    devserver.applyConfig({ package_store_mode: 'sandbox' }, '1')
+    const sandbox = path.join(
+        fs.mkdtempSync(path.join(base, 'js_run_devserver-')),
+        '_main'
+    )
+    return { devserver, sandbox }
+}
+
+// Sandbox package store mode requires the node fs patches
+{
+    const devserver = await import(
+        '../../devserver/js_run_devserver.mjs?nopatch'
+    )
+    let error = null
+    try {
+        devserver.applyConfig({ package_store_mode: 'sandbox' }, '0')
+    } catch (e) {
+        error = e
+    }
+    check('applyConfig without fs patches throws', !!error, true)
+    devserver.applyConfig({ package_store_mode: 'execroot' }, '0')
+}
+
+// A node_modules link points at its target in the sandbox when that target is synced, and back out
+// of the sandbox when it is not. The link itself does not change in runfiles when the entries do, so
+// it has to be re-evaluated regardless.
+for (const protocol of ['ibazel', 'watch']) {
+    const { devserver, sandbox } = await newDevserver(protocol)
+    const link = path.join(sandbox, LINK)
+    const inSandbox = () =>
+        fs.lstatSync(link).isSymbolicLink() &&
+        fs.readlinkSync(link) === path.join(sandbox, STORE)
+    const withEntry = [STORE_ENTRY, LINK_ENTRY]
+    const withoutEntry = [LINK_ENTRY]
+
+    // Syncs a changed list of entries the way each protocol does. `storeSource` is what the watch
+    // protocol reports for the store entry, the only path that changed: null once it is deleted.
+    const entriesPath = path.join(base, `${protocol}-entries.json`)
+    const config = {}
+    let previous = []
+    const resync = async (files, storeSource) => {
+        if (protocol === 'ibazel') {
+            devserver.updateEntryPaths(files)
+            await Promise.all([
+                devserver.deleteFiles(previous, files, sandbox),
+                devserver.syncFiles(
+                    files,
+                    sandbox,
+                    false,
+                    devserver.syncRecursive
+                ),
+            ])
+            previous = files
+        } else {
+            fs.writeFileSync(entriesPath, JSON.stringify(files))
+            const cycle =
+                storeSource === undefined
+                    ? { kind: 'CYCLE_RESET', sources: {} }
+                    : {
+                          kind: 'CYCLE',
+                          sources: { [`_main/${STORE}`]: storeSource },
+                      }
+            await devserver.watchProtocolCycle(
+                config,
+                entriesPath,
+                sandbox,
+                cycle
+            )
+        }
+    }
+
+    await resync(withEntry)
+    check(`${protocol}: link to a synced entry`, inSandbox(), true)
+    check(
+        `${protocol}: package copied`,
+        fs.readFileSync(path.join(link, 'a.js'), 'utf8'),
+        path.join(main, STORE, 'a.js')
+    )
+
+    await resync(withoutEntry, null)
+    check(`${protocol}: entry no longer synced`, inSandbox(), false)
+    check(
+        `${protocol}: package removed`,
+        fs.existsSync(path.join(sandbox, STORE)),
+        false
+    )
+
+    await resync(withEntry, { is_symlink: true })
+    check(`${protocol}: entry synced again`, inSandbox(), true)
+
+    // An unchanged link is left alone rather than recreated
+    const before = fs.lstatSync(link, { bigint: true }).ino
+    await resync(withEntry, { is_symlink: true })
+    check(
+        `${protocol}: unchanged link kept`,
+        fs.lstatSync(link, { bigint: true }).ino,
+        before
+    )
+}
+
+// A package store directory is a copy in the sandbox, so files removed from the package must be
+// removed from the sandbox on the next sync too, at any depth, or they remain resolvable there. A
+// package can change in place, for example when a patch that rules_js applies to it changes.
+for (const protocol of ['ibazel', 'watch']) {
+    const store = `node_modules/.aspect_rules_js/${protocol}@1.0.0/node_modules/${protocol}`
+    const pkg = path.join(main, store)
+    for (const f of [
+        'a.js',
+        'b.js',
+        'lib/deep.js',
+        'src/keep.js',
+        'src/gone.js',
+    ]) {
+        write(path.join(pkg, f))
+    }
+    const { devserver, sandbox } = await newDevserver(`${protocol}-pruning`)
+    const entries = [[store, 1]]
+    devserver.updateEntryPaths(entries)
+    await devserver.syncFiles(entries, sandbox, false, devserver.syncRecursive)
+    check(
+        `${protocol}: package copied`,
+        list(path.join(sandbox, store)),
+        'a.js b.js lib/deep.js src/gone.js src/keep.js'
+    )
+
+    fs.rmSync(path.join(pkg, 'b.js'))
+    fs.rmSync(path.join(pkg, 'lib'), { recursive: true })
+    fs.rmSync(path.join(pkg, 'src', 'gone.js'))
+    write(path.join(pkg, 'c.js'))
+    if (protocol === 'ibazel') {
+        await devserver.syncFiles(
+            entries,
+            sandbox,
+            false,
+            devserver.syncRecursive
+        )
+    } else {
+        const entriesPath = path.join(base, 'pruning-entries.json')
+        fs.writeFileSync(entriesPath, JSON.stringify(entries))
+        const config = { previous_files: entries }
+        const cycle = { kind: 'CYCLE', sources: { [`_main/${store}`]: {} } }
+        await devserver.watchProtocolCycle(config, entriesPath, sandbox, cycle)
+    }
+    check(
+        `${protocol}: files removed from the package are removed from the sandbox`,
+        list(path.join(sandbox, store)),
+        'a.js c.js src/keep.js'
+    )
+}
+
+// A devserver defined in another repository syncs files whose paths start with ../<repo>/, which the
+// sandbox places beside the main repository as the runfiles tree does. Links between its packages
+// stay within the sandbox like those of the main repository.
+{
+    const repo = path.join(runfiles, 'other_repo')
+    const store =
+        '../other_repo/node_modules/.aspect_rules_js/dep@1.0.0/node_modules/dep'
+    const link = '../other_repo/app/node_modules/dep'
+    write(path.join(main, store, 'index.js'))
+    symlink(
+        path.relative(
+            path.join(main, path.dirname(link)),
+            path.join(main, store)
+        ),
+        path.join(main, link)
+    )
+    const { devserver, sandbox } = await newDevserver('other-repo')
+    const entries = [
+        [store, 1],
+        [link, 0],
+    ]
+    devserver.updateEntryPaths(entries)
+    await devserver.syncFiles(entries, sandbox, false, devserver.syncRecursive)
+    check(
+        'link in another repository points at its target in the sandbox',
+        fs.readlinkSync(path.join(sandbox, link)),
+        path.join(sandbox, store)
+    )
+    check(
+        'package in another repository copied into the sandbox',
+        fs.existsSync(path.join(sandbox, store, 'index.js')),
+        true
+    )
+    fs.rmSync(repo, { recursive: true, force: true })
+}
+
+fs.rmSync(base, { recursive: true, force: true })

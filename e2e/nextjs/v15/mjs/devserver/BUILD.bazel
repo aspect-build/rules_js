@@ -1,0 +1,29 @@
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+
+# Next.js devservers run with the package store in the sandbox, which Turbopack requires since it
+# refuses to compile packages whose real path is outside of its root. Exercised by //:test.sh.
+#
+# next is started from the sandbox with `command` rather than as a js_binary `tool`: a tool runs from
+# the execroot, so React would be loaded both from there and from the sandbox.
+[
+    js_run_devserver(
+        name = "dev_" + bundler,
+        args = ["dev"] + (["--turbopack"] if bundler == "turbopack" else []),
+        chdir = package_name(),
+        command = "../node_modules/next/dist/bin/next",
+        data = [
+            "next.config.mjs",
+            "package.json",
+            "pages/index.js",
+            "//v15/mjs:node_modules/next",
+            "//v15/mjs:node_modules/react",
+            "//v15/mjs:node_modules/react-dom",
+        ],
+        env = {"NEXT_TELEMETRY_DISABLED": "1"},
+        package_store_mode = "sandbox",
+    )
+    for bundler in [
+        "turbopack",
+        "webpack",
+    ]
+]
