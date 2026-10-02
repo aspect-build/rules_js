@@ -218,4 +218,40 @@ for (const protocol of ['ibazel', 'watch']) {
     )
 }
 
+// A devserver defined in another repository syncs files whose paths start with ../<repo>/, which the
+// sandbox places beside the main repository as the runfiles tree does. Links between its packages
+// stay within the sandbox like those of the main repository.
+{
+    const repo = path.join(runfiles, 'other_repo')
+    const store =
+        '../other_repo/node_modules/.aspect_rules_js/dep@1.0.0/node_modules/dep'
+    const link = '../other_repo/app/node_modules/dep'
+    write(path.join(main, store, 'index.js'))
+    symlink(
+        path.relative(
+            path.join(main, path.dirname(link)),
+            path.join(main, store)
+        ),
+        path.join(main, link)
+    )
+    const { devserver, sandbox } = await newDevserver('other-repo')
+    const entries = [
+        [store, 1],
+        [link, 0],
+    ]
+    devserver.updateEntryPaths(entries)
+    await devserver.syncFiles(entries, sandbox, false, devserver.syncRecursive)
+    check(
+        'link in another repository points at its target in the sandbox',
+        fs.readlinkSync(path.join(sandbox, link)),
+        path.join(sandbox, store)
+    )
+    check(
+        'package in another repository copied into the sandbox',
+        fs.existsSync(path.join(sandbox, store, 'index.js')),
+        true
+    )
+    fs.rmSync(repo, { recursive: true, force: true })
+}
+
 fs.rmSync(base, { recursive: true, force: true })

@@ -365,7 +365,7 @@ function applyConfig(config, patchNodeFs = JS_BINARY__PATCH_NODE_FS) {
     sandboxPackageStore = config.package_store_mode === 'sandbox';
     if (sandboxPackageStore && (!patchNodeFs || patchNodeFs === '0')) {
         throw new Error(
-            'package_store_mode = "sandbox" requires the node fs patches, but JS_BINARY__PATCH_NODE_FS is disabled'
+            'package_store_mode = "sandbox" requires the node fs patches, which are disabled: by patch_node_fs = False, by JS_BINARY__PATCH_NODE_FS=0, or on Windows, where they are always disabled'
         )
     }
 }
@@ -410,7 +410,10 @@ function resolveSandboxSymlinkTarget(
 ) {
     const target = path.join(sandbox, file, linkPath);
     let rel = toPosix(path.relative(sandbox, target));
-    if (!rel || rel === '..' || rel.startsWith('../')) {
+    // `sandbox` is the main repository's directory in the sandbox. Like the runfiles tree, the
+    // sandbox places other repositories beside it, so a target in ../<repo>/ may be in the sandbox.
+    const fromRoot = toPosix(path.relative(path.dirname(sandbox), target));
+    if (!rel || !fromRoot || fromRoot === '..' || fromRoot.startsWith('../')) {
         // Escapes the sandbox root; nothing we can point at.
         return undefined
     }
@@ -1308,4 +1311,4 @@ function onProcessEnd(callback) {
     // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
 }
 
-export { applyConfig, cycleSyncRecurse, deleteFiles, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, isPackageStorePath, isRootedAt, isUnderNodeModules, resolveSandboxSymlinkTarget, sandboxRelativeChdir, syncFiles, syncRecursive, updateEntryPaths, watchProtocolCycle };
+export { applyConfig, deleteFiles, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, isPackageStorePath, isRootedAt, isUnderNodeModules, resolveSandboxSymlinkTarget, sandboxRelativeChdir, syncFiles, syncRecursive, updateEntryPaths, watchProtocolCycle };
