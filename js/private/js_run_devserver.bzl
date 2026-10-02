@@ -292,7 +292,8 @@ def js_run_devserver(
             then break; with Next.js, React fails with "Cannot read properties of null (reading
             'useContext')".
 
-            This mode requires `patch_node_fs = True` (the default).
+            This mode requires `patch_node_fs = True` (the default). It is not supported on Windows,
+            where the node fs patches are always disabled.
 
             Package store files use copy-on-write filesystem clones where possible, with a regular
             copy fallback. Both strategies keep sandbox writes isolated from Bazel outputs. On a
