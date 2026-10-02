@@ -343,6 +343,9 @@ async function syncDirectory(file, src, sandbox, writePerm) {
         console.error(`Syncing directory ${file}...`)
     }
     const contents = await fs.promises.readdir(src)
+    if (sandboxPackageStore && isPackageStorePath(file)) {
+        await pruneRemovedEntries(file, sandbox, contents)
+    }
     return (
         await Promise.all(
             contents.map(
@@ -489,6 +492,45 @@ function forgetSynced(f) {
             }
         }
     }
+}
+
+// A package store directory is copied into the sandbox, so files removed from its source have to be
+// removed from the sandbox too, or they remain resolvable there. A package can change in place, for
+// example when a patch that rules_js applies to it changes. `contents` is the current listing of
+// the source directory.
+async function pruneRemovedEntries(file, sandbox, contents) {
+    const dst = sandbox + path.sep + file
+    let st
+    try {
+        st = await fs.promises.lstat(dst)
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            return
+        }
+        throw e
+    }
+    // Never follow a symlink here: pruning its target would delete files outside this directory.
+    if (!st.isDirectory()) {
+        return
+    }
+    const keep = new Set(contents)
+    const stale = (await fs.promises.readdir(dst)).filter((e) => !keep.has(e))
+    if (stale.length === 0) {
+        return
+    }
+    await Promise.all(
+        stale.map(async (entry) => {
+            const f = file + path.sep + entry
+            console.error(`Deleting ${f}`)
+            forgetSynced(f)
+            await fs.promises.rm(dst + path.sep + entry, {
+                recursive: true,
+                force: true,
+            })
+        })
+    )
+    // clear mkdirs since we have deleted files so we re-populate on next sync
+    mkdirs.clear()
 }
 
 // Delete files from sandbox

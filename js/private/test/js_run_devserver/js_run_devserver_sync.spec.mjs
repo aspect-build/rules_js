@@ -37,6 +37,22 @@ Object.assign(process.env, {
     JS_BINARY__BINDIR: 'bazel-out',
 })
 
+// Lists the files under a directory, relative to it
+function list(dir) {
+    const files = []
+    const walk = (d, prefix) => {
+        for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+            if (e.isDirectory()) {
+                walk(path.join(d, e.name), prefix + e.name + '/')
+            } else {
+                files.push(prefix + e.name)
+            }
+        }
+    }
+    walk(dir, '')
+    return files.sort().join(' ')
+}
+
 function check(description, actual, expected) {
     if (actual !== expected) {
         console.error(
@@ -62,7 +78,9 @@ async function newDevserver(scenario) {
 
 // Sandbox package store mode requires the node fs patches
 {
-    const devserver = await import('../../devserver/js_run_devserver.mjs?nopatch')
+    const devserver = await import(
+        '../../devserver/js_run_devserver.mjs?nopatch'
+    )
     let error = null
     try {
         devserver.applyConfig({ package_store_mode: 'sandbox' }, '0')
@@ -147,6 +165,56 @@ for (const protocol of ['ibazel', 'watch']) {
         `${protocol}: unchanged link kept`,
         fs.lstatSync(link, { bigint: true }).ino,
         before
+    )
+}
+
+// A package store directory is a copy in the sandbox, so files removed from the package must be
+// removed from the sandbox on the next sync too, at any depth, or they remain resolvable there. A
+// package can change in place, for example when a patch that rules_js applies to it changes.
+for (const protocol of ['ibazel', 'watch']) {
+    const store = `node_modules/.aspect_rules_js/${protocol}@1.0.0/node_modules/${protocol}`
+    const pkg = path.join(main, store)
+    for (const f of [
+        'a.js',
+        'b.js',
+        'lib/deep.js',
+        'src/keep.js',
+        'src/gone.js',
+    ]) {
+        write(path.join(pkg, f))
+    }
+    const { devserver, sandbox } = await newDevserver(`${protocol}-pruning`)
+    const entries = [[store, 1]]
+    devserver.updateEntryPaths(entries)
+    await devserver.syncFiles(entries, sandbox, false, devserver.syncRecursive)
+    check(
+        `${protocol}: package copied`,
+        list(path.join(sandbox, store)),
+        'a.js b.js lib/deep.js src/gone.js src/keep.js'
+    )
+
+    fs.rmSync(path.join(pkg, 'b.js'))
+    fs.rmSync(path.join(pkg, 'lib'), { recursive: true })
+    fs.rmSync(path.join(pkg, 'src', 'gone.js'))
+    write(path.join(pkg, 'c.js'))
+    if (protocol === 'ibazel') {
+        await devserver.syncFiles(
+            entries,
+            sandbox,
+            false,
+            devserver.syncRecursive
+        )
+    } else {
+        const entriesPath = path.join(base, 'pruning-entries.json')
+        fs.writeFileSync(entriesPath, JSON.stringify(entries))
+        const config = { previous_files: entries }
+        const cycle = { kind: 'CYCLE', sources: { [`_main/${store}`]: {} } }
+        await devserver.watchProtocolCycle(config, entriesPath, sandbox, cycle)
+    }
+    check(
+        `${protocol}: files removed from the package are removed from the sandbox`,
+        list(path.join(sandbox, store)),
+        'a.js c.js src/keep.js'
     )
 }
 
