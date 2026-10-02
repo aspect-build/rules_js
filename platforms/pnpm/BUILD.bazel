@@ -1,5 +1,5 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load(":index.bzl", "PNPM_ARCHS", "PNPM_PLATFORMS")
+load(":index.bzl", "PNPM_ARCHS", "PNPM_LIBCS", "PNPM_PLATFORMS")
 
 # Constraints representing the pnpm [os] and [cpu] fields.
 bzl_library(
@@ -46,4 +46,23 @@ bzl_library(
     ]
     for p, ptarget in PNPM_PLATFORMS.items()
     if ptarget
+]
+
+# Supported linux * architecture * libc triples, including an unconstrained libc
+# so that a platform which does not set //platforms/libc matches all of them.
+[
+    [
+        config_setting(
+            name = "linux_{}_{}".format(a, libc),
+            constraint_values = [
+                PNPM_PLATFORMS["linux"],
+                atarget,
+                ltarget,
+            ],
+            visibility = ["//visibility:public"],
+        )
+        for libc, ltarget in PNPM_LIBCS.items() + [("unconstrained", "@aspect_rules_js//platforms/libc:unconstrained")]
+    ]
+    for a, atarget in PNPM_ARCHS.items()
+    if atarget
 ]

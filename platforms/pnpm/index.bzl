@@ -54,3 +54,10 @@ PNPM_PLATFORMS = {
     # See https://github.com/aspect-build/rules_js/issues/2745
     "alpine": None,  # Alpine Linux reports "linux" via process.platform; no distinct bazel constraint
 }
+
+# Node/PNPM libc values and corresponding //platforms/libc constraint values.
+# pnpm only checks the [libc] field on linux, so it is only applied to linux here.
+PNPM_LIBCS = {
+    "glibc": "@aspect_rules_js//platforms/libc:glibc",
+    "musl": "@aspect_rules_js//platforms/libc:musl",
+}
