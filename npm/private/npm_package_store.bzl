@@ -188,11 +188,19 @@ def _npm_package_store_impl(ctx):
     if not version:
         fail("No package version specified to link to. Package version must either be specified explicitly via 'version' attribute or come from the 'src' 'JsInfo|NpmPackageInfo', typically a 'js_library|npm_package' target")
 
+    # Length of the prefix of a dep package store's `File.short_path` to strip so
+    # that only `<pkg>@<ver>/node_modules/<pkg>` (the store-relative tail) remains.
+    # _PACKAGE_STORE_PREFIX_LEN already includes the trailing "/" after the store
+    # root. The package and repo segments each contribute their own trailing "/"
+    # separator, which must be counted too -- omitting them undercounts the prefix
+    # and leaks the tail of the segment (e.g. the "s/" of "rules_js/") into the
+    # symlink target. This is benign in the main repo with no package (prefix is
+    # exact) but corrupts cross-module (external-repo) package stores.
     package_store_prefix_len = _PACKAGE_STORE_PREFIX_LEN
     if ctx.label.package:
-        package_store_prefix_len += len(ctx.label.package)
+        package_store_prefix_len += len(ctx.label.package) + 1  # +1 for the "/" after the package
     if ctx.label.repo_name:
-        package_store_prefix_len += len(ctx.label.repo_name) + 3  # +3 for ../
+        package_store_prefix_len += len(ctx.label.repo_name) + 4  # +3 for ../ and +1 for the "/" after the repo
 
     package_key = "{}@{}".format(package, version)
     package_store_name = utils.package_store_name(package_key)
