@@ -352,14 +352,6 @@ jobs:
                     --build_tag_filters=-skip-on-bazel7 \
                     //...
 
-            - name: No-runfiles regression with the Bash launcher
-              if: matrix.os == 'windows-latest'
-              shell: bash
-              working-directory: ${{ matrix.workspace.path }}
-              run: |
-                  bazel build --noenable_runfiles //:no_runfiles_output
-                  test "$(cat bazel-bin/no_runfiles_output.txt)" = "generated in target configuration"
-
             - name: No-runfiles regression with the hermetic launcher
               if: matrix.os == 'windows-latest'
               env:

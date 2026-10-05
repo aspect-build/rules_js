@@ -1,5 +1,2 @@
 import %workspace%/../../tools/preset.bazelrc
 import %workspace%/../e2e.bazelrc
-
-# The test launchers require runfiles; CI separately builds the generator without them.
-common:windows --enable_runfiles
