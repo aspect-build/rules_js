@@ -290,6 +290,11 @@ export JS_BINARY__RUNFILES
 # launcher preload works out JS_BINARY__EXECROOT for the program and everything it spawns.
 if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
     execroot="$JS_BINARY__EXECROOT"
+elif [ "${JS_BINARY__NO_RUNFILES:-}" ] && [[ "$PWD" == */bazel-out/*".runfiles/_main" ]]; then
+    # bazel test and bazel run start in a runfiles directory that is empty without runfiles.
+    # The execroot's bindir has the same layout, so run from there instead.
+    execroot="${PWD%/bazel-out/*}"
+    cd "$execroot/$JS_BINARY__BINDIR"
 else
     execroot="$PWD"
 fi
