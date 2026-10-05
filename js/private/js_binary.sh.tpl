@@ -230,8 +230,12 @@ function resolve_toolchain_path {
 # or bash needs it to start node at all. The checks that can wait, and the rest of
 # the environment the program sees, are done by the launcher preload once node is up.
 
-if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
     entry_point=$(resolve_execroot_bin_path "{{entry_point_path}}")
+elif [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    # Without runfiles, the entry point remains in the tool's configuration.
+    # BAZEL_BINDIR belongs to the consuming action and controls its working directory.
+    entry_point=$(BAZEL_BINDIR="$JS_BINARY__BINDIR" resolve_execroot_bin_path "{{entry_point_path}}")
 else
     entry_point="$JS_BINARY__RUNFILES/{{workspace_name}}/{{entry_point_path}}"
 fi
