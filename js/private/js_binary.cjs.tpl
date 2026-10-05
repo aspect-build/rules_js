@@ -165,11 +165,15 @@ if (
 // the environment the program sees, are done by the preload once node is up.
 
 let entryPoint
-if (
-    process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT ||
-    process.env.JS_BINARY__NO_RUNFILES
-) {
+if (process.env.JS_BINARY__USE_EXECROOT_ENTRY_POINT) {
     entryPoint = resolveExecrootBinPath(execroot, ENTRY_POINT_PATH)
+} else if (process.env.JS_BINARY__NO_RUNFILES) {
+    // Resolve the tool in its own configuration without changing the action's cwd.
+    entryPoint = resolveExecrootBinPath(
+        execroot,
+        ENTRY_POINT_PATH,
+        process.env.JS_BINARY__BINDIR
+    )
 } else {
     entryPoint = `${process.env.JS_BINARY__RUNFILES}/${WORKSPACE_NAME}/${ENTRY_POINT_PATH}`
 }

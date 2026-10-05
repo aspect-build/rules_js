@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
@@ -161,4 +161,32 @@ js_run_binary(
         "other-module-subpackage-my.css",
     ],
     tool = "@other_module//frontend:lessc",  # A js_binary() tool linked in a sub-package of a different repo
+)
+
+# The tool lives in the exec configuration, while the action writes to the target
+# configuration. Linux exercises the Windows fallback without a runfiles tree.
+js_binary(
+    name = "no_runfiles_generator",
+    entry_point = "no_runfiles_generator.cjs",
+)
+
+js_run_binary(
+    name = "no_runfiles_output",
+    outs = ["no_runfiles_output.txt"],
+    args = ["no_runfiles_output.txt"],
+    env = select({
+        "@platforms//os:windows": {},
+        "//conditions:default": {"JS_BINARY__NO_RUNFILES": "1"},
+    }),
+    # The Linux simulation needs the toolchain paths used by Windows without runfiles.
+    execution_requirements = {"no-sandbox": "1"},
+    set_legacy_environment_variables = True,
+    tool = ":no_runfiles_generator",
+    use_execroot_entry_point = False,
+)
+
+js_test(
+    name = "no_runfiles_entry_point_test",
+    data = [":no_runfiles_output"],
+    entry_point = "no_runfiles_entry_point.test.cjs",
 )
