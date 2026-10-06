@@ -114,8 +114,12 @@ process.env.JS_BINARY__LOG_PREFIX = `${LOG_PREFIX_RULE_SET}[${LOG_PREFIX_RULE}]`
 // Runfiles initialization
 // ==============================================================================
 
-// The hermetic_launcher stub should have already initialized RUNFILES_DIR.
-const runfiles = process.env.RUNFILES_DIR
+// In manifest-only mode the stub resolves its inputs without setting RUNFILES_DIR.
+// Match the Bash launcher's nominal runfiles directory for the program's environment.
+const manifest = process.env.RUNFILES_MANIFEST_FILE
+const runfiles =
+    process.env.RUNFILES_DIR ||
+    (manifest && manifest.replace(/(?:_manifest|[/\\]MANIFEST)$/, ''))
 if (!runfiles) {
     logFatal('RUNFILES_DIR environment variable is not set')
     exitWith(1)
