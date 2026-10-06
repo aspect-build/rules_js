@@ -170,6 +170,11 @@ export JS_BINARY__RUNFILES
 # launcher preload works out JS_BINARY__EXECROOT for the program and everything it spawns.
 if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] && [ "${JS_BINARY__EXECROOT:-}" ]; then
     execroot="$JS_BINARY__EXECROOT"
+elif [ "${JS_BINARY__NO_RUNFILES:-}" ] && [[ "$PWD" == */bazel-out/*".runfiles/{{workspace_name}}" ]]; then
+    # bazel test and bazel run start in a runfiles directory that is empty without runfiles.
+    # The execroot's bindir has the same layout, so run from there instead.
+    execroot="${PWD%/bazel-out/*}"
+    cd "$execroot/$JS_BINARY__BINDIR"
 else
     execroot="$PWD"
 fi
@@ -230,8 +235,12 @@ function resolve_toolchain_path {
 # or bash needs it to start node at all. The checks that can wait, and the rest of
 # the environment the program sees, are done by the launcher preload once node is up.
 
-if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ] || [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+if [ "${JS_BINARY__USE_EXECROOT_ENTRY_POINT:-}" ]; then
     entry_point=$(resolve_execroot_bin_path "{{entry_point_path}}")
+elif [ "${JS_BINARY__NO_RUNFILES:-}" ]; then
+    # Without runfiles, the entry point remains in the tool's configuration.
+    # BAZEL_BINDIR belongs to the consuming action and controls its working directory.
+    entry_point=$(BAZEL_BINDIR="$JS_BINARY__BINDIR" resolve_execroot_bin_path "{{entry_point_path}}")
 else
     entry_point="$JS_BINARY__RUNFILES/{{workspace_name}}/{{entry_point_path}}"
 fi

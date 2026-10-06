@@ -139,17 +139,21 @@ function checkExecutableFile(what, p) {
 }
 
 // Resolve a short path in the Bazel output tree against the execroot the launcher was started in.
-function resolveExecrootBinPath(execroot, shortPath) {
-    if (!process.env.BAZEL_BINDIR) {
+function resolveExecrootBinPath(
+    execroot,
+    shortPath,
+    bindir = process.env.BAZEL_BINDIR
+) {
+    if (!bindir) {
         logFatal(
             'BAZEL_BINDIR must be set in the environment to the makevar $(BINDIR) to resolve a path in the Bazel output tree'
         )
         exitWith(1)
     }
     if (shortPath.startsWith('../')) {
-        return `${execroot}/${process.env.BAZEL_BINDIR}/external/${shortPath.slice(3)}`
+        return `${execroot}/${bindir}/external/${shortPath.slice(3)}`
     }
-    return `${execroot}/${process.env.BAZEL_BINDIR}/${shortPath}`
+    return `${execroot}/${bindir}/${shortPath}`
 }
 
 function resolveExecrootSrcPath(execroot, shortPath) {

@@ -352,6 +352,18 @@ jobs:
                     --build_tag_filters=-skip-on-bazel7 \
                     //...
 
+            - name: No-runfiles regression with the hermetic launcher
+              if: matrix.os == 'windows-latest'
+              env:
+                  USE_BAZEL_VERSION: 9.2.0
+              shell: bash
+              working-directory: ${{ matrix.workspace.path }}
+              run: |
+                  bazel build --noenable_runfiles \
+                    --@aspect_rules_js//js:use_hermetic_launcher=True \
+                    //:no_runfiles_output
+                  test "$(cat bazel-bin/no_runfiles_output.txt)" = "generated in target configuration"
+
     # For branch protection settings, this job provides a "stable" name that can be used to gate PR merges
     # on "all matrix jobs were successful".
     conclusion:
