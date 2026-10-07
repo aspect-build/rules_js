@@ -246,6 +246,22 @@ jobs:
             - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
                   aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+            # Plain `bazel` in the test.sh scripts gets none of the flags `aspect test`
+            # injects, so point it at the same remote cache from the machine rc. Only
+            # when the credential helper works: setup-aspect's login failing is a
+            # warning, and a helper that cannot authenticate fails every build that
+            # reads this rc.
+            - name: Remote cache for plain bazel
+              if: env.REMOTE_FLAG != ''
+              run: |
+                  if echo '{"uri":"https://cache.aspect.build/"}' | aspect get >/dev/null 2>&1; then
+                    {
+                      echo "common --remote_cache=grpcs://cache.aspect.build"
+                      echo "common --credential_helper=cache.aspect.build=aspect"
+                    } >> ~/.bazelrc
+                  else
+                    echo "::warning::Aspect credential helper failed; plain bazel runs without the remote cache"
+                  fi
             - name: Test
               working-directory: ${{ matrix.workspace.path }}
               run: aspect test $REMOTE_FLAG --task:name=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
