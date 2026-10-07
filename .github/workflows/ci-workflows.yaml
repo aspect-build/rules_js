@@ -246,6 +246,15 @@ jobs:
             - uses: aspect-build/setup-aspect@2306377a61c45954ab2df7c7311698b109364352 # v2026.26.9
               with:
                   aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+            # Plain `bazel` in the test.sh scripts gets none of the flags `aspect test`
+            # injects, so point it at the same remote cache from the machine rc.
+            - name: Remote cache for plain bazel
+              if: env.REMOTE_FLAG != ''
+              run: |
+                  {
+                    echo "common --remote_cache=grpcs://cache.aspect.build"
+                    echo "common --credential_helper=cache.aspect.build=aspect"
+                  } >> ~/.bazelrc
             - name: Test
               working-directory: ${{ matrix.workspace.path }}
               run: aspect test $REMOTE_FLAG --task:name=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
