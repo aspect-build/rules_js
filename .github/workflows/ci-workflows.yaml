@@ -142,34 +142,20 @@ jobs:
                       slug=${slug//+/_}
                       slug=${slug//./_}
                     fi
-                    # Slow workspaces get a larger runner: the Aspect Workflows `aspect-large`
-                    # pool. Fork PRs get no repo secrets and must not run on self-hosted
-                    # runners, so they stay on GitHub's 32-core runner.
-                    runner='"ubuntu-latest"'
-                    if [[ "$p" == "." || "$p" == "examples" || "$p" == "e2e/js_image_oci" ]]; then
-                      if [[ "${IS_FORK}" == "true" ]]; then
-                        runner='"ubuntu-22.04-32core"'
-                      else
-                        runner='["self-hosted","aspect-workflows","aspect-large"]'
-                      fi
-                    fi
-                    entries+=( "{\"path\":\"$p\",\"slug\":\"$slug\",\"runner\":$runner}" )
+                    entries+=( "{\"path\":\"$p\",\"slug\":\"$slug\"}" )
                   done
                   printf -v j '%s,' "${entries[@]}"
                   echo "res=[${j%,}]" | tee -a $GITHUB_OUTPUT
               env:
                   ASPECT_GHTESTER_SSH_KEY: ${{ secrets.ASPECT_GHTESTER_SSH_KEY }}
                   ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
-                  # Empty on push and workflow_dispatch, which never come from a fork.
-                  IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
         outputs:
             workspace: ${{ steps.workspace.outputs.res }}
 
     test:
         name: test (${{ matrix.workspace.path }}, ${{ matrix.bazel.id }})
-        runs-on: ${{ matrix.workspace.runner }}
+        runs-on: ubuntu-latest
         needs: e2e-tests-list
-        # Self-hosted runners have no cheap default ceiling; GitHub's is 6h.
         timeout-minutes: 90
         permissions:
             contents: read
@@ -248,10 +234,6 @@ jobs:
                       }
         env:
             USE_BAZEL_VERSION: ${{ matrix.bazel.version }}
-            # Skip the --remote flag on self-hosted runners and fork PRs. Our self-hosted
-            # Aspect Workflows runners have their own cache, and fork PRs do not have access to
-            # secrets.
-            REMOTE_FLAG: ${{ !contains(matrix.workspace.runner, 'self-hosted') && secrets.ASPECT_OSS_API_TOKEN != '' && '--remote' || '' }}
             ASPECT_GH_PACKAGES_AUTH_TOKEN: ${{ secrets.ASPECT_GH_PACKAGES_AUTH_TOKEN }}
             ASPECT_NPM_AUTH_TOKEN: ${{ secrets.ASPECT_NPM_AUTH_TOKEN }}
         steps:
