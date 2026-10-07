@@ -1,6 +1,7 @@
 """Aspect CLI configuration."""
 
 load("@aspect//feature/artifacts.axl", "ArtifactUpload")
+load("@aspect//feature/github_status_comments.axl", "GithubStatusComments")
 load("@aspect//format.axl", "format")
 load("@aspect//traits.axl", "BazelTrait")
 
@@ -56,6 +57,9 @@ def config(ctx: ConfigContext):
         ctx.traits[BazelTrait].extra_flags.extend([
             "--config=ci",
         ])
+
+    # Too many CI tasks for the PR summary comment to be useful.
+    ctx.features[GithubStatusComments].enabled = False
 
     # Register the buildifier alias as a real CLI command.
     ctx.tasks.add(buildifier)
