@@ -39,6 +39,7 @@ expected_packages = {
         },
         "cpu": None,
         "os": None,
+        "libc": None,
     },
     "lodash@file:lodash-4.17.21.tgz": {
         "name": "lodash",
@@ -54,6 +55,7 @@ expected_packages = {
         },
         "cpu": None,
         "os": None,
+        "libc": None,
     },
 }
 

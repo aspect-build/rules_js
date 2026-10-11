@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
-load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_ARCH_ALIASES", "PNPM_PLATFORMS")
+load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_ARCH_ALIASES", "PNPM_LIBCS", "PNPM_PLATFORMS")
 load(":utils.bzl", "utils")
 
 # Metadata about a pnpm "project" (importer).
@@ -37,8 +37,9 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #   resolution: the lockfile resolution field
 #   cpu: list of allowed cpu architectures or None
 #   os: list of allowed operating systems or None
+#   libc: list of allowed libc implementations or None
 
-def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os):
+def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os, libc):
     return {
         "name": name,
         "dependencies": dependencies,
@@ -50,6 +51,7 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "resolution": resolution,
         "cpu": cpu,
         "os": os,
+        "libc": libc,
     }
 
 def _to_bazel_os_cpu_constraints(oss, cpus):
@@ -59,6 +61,23 @@ def _to_bazel_os_cpu_constraints(oss, cpus):
     for cpu in cpus:
         for os in oss:
             r.append("@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu))
+    return r
+
+def _to_bazel_os_cpu_libc_constraints(oss, cpus, libcs):
+    # pnpm only checks [libc] on linux, where each allowed libc gets its own condition.
+    # The unconstrained libc matches a platform that does not set //platforms/libc,
+    # which keeps every libc variant as before.
+    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
+    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
+    libcs = _resolve_pnpm_constraint_values(libcs, PNPM_LIBCS, {}, "libc") + ["unconstrained"]
+    r = []
+    for cpu in cpus:
+        for os in oss:
+            if os == "linux":
+                for libc in libcs:
+                    r.append("@aspect_rules_js//platforms/pnpm:{}_{}_{}".format(os, cpu, libc))
+            else:
+                r.append("@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu))
     return r
 
 def _to_bazel_os_constraints(oss):
@@ -247,6 +266,7 @@ def _convert_v9_packages(packages, snapshots, no_optional):
             resolution = package_data["resolution"],
             cpu = package_data.get("cpu", None),
             os = package_data.get("os", None),
+            libc = package_data.get("libc", None),
         )
 
     return result
@@ -385,6 +405,7 @@ pnpm = struct(
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
     to_bazel_os_cpu_constraints = _to_bazel_os_cpu_constraints,
+    to_bazel_os_cpu_libc_constraints = _to_bazel_os_cpu_libc_constraints,
     to_bazel_os_constraints = _to_bazel_os_constraints,
     to_bazel_cpu_constraints = _to_bazel_cpu_constraints,
 )
