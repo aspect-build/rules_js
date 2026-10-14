@@ -45,6 +45,7 @@ sh_test(
         ":pkg_a.publish",
         ":pkg_b.publish",
     ],
+    env = {"npm_config_unicode": "false"},
     tags = [
         "no-remote-exec",
         "no-sandbox",

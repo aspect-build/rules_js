@@ -18,7 +18,7 @@ bazel_dep(
     dev_dependency = True,
     repo_name = "com_google_googleapis",
 )
-bazel_dep(name = "llvm", version = "0.8.0", dev_dependency = True)
+bazel_dep(name = "llvm", version = "0.8.9", dev_dependency = True)
 bazel_dep(name = "platforms", version = "0.0.10", dev_dependency = True)
 bazel_dep(name = "rules_nodejs", version = "6.7.3", dev_dependency = True)
 bazel_dep(name = "rules_oci", version = "2.3.0", dev_dependency = True)
