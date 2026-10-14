@@ -35,6 +35,7 @@ write_source_files(
         "snapshots/defs.bzl": "@npm//:defs.bzl",
     },
     tags = [
+        "skip-on-bazel10",
         "skip-on-bazel8",
         "skip-on-bazel9",
     ],

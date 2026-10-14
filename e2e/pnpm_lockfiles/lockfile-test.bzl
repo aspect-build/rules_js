@@ -264,5 +264,6 @@ def lockfile_test(npm_link_all_packages, name = None):
         tags = [
             "skip-on-bazel8",
             "skip-on-bazel9",
+            "skip-on-bazel10",
         ],
     )

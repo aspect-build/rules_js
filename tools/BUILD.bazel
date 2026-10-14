@@ -7,6 +7,7 @@ bazelrc_preset(
     doc_link_template = "https://registry.build/flag/bazel?filter={flag}",
     # The output is specific to the version in .bazelversion
     tags = [
+        "skip-on-bazel10",
         "skip-on-bazel8",
         "skip-on-bazel9",
     ],
