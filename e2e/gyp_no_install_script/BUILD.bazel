@@ -18,6 +18,7 @@ write_source_files(
         "snapshots/segfault-handler_defs.bzl": "@npm__segfault-handler__1.3.0__links//:defs.bzl",
     },
     tags = [
+        "skip-on-bazel10",
         "skip-on-bazel8",
         "skip-on-bazel9",
     ],

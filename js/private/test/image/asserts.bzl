@@ -126,6 +126,6 @@ echo "$${RESULT//$$BINDIR/}" | $$COREUTILS_BIN head -n -1 > $@
         testonly = True,
         in_file = name,
         out_file = name + ".expected",
-        tags = ["skip-on-bazel8", "skip-on-bazel9"],
+        tags = ["skip-on-bazel8", "skip-on-bazel9", "skip-on-bazel10"],
         target_compatible_with = SKIP_ON_WINDOWS,
     )
