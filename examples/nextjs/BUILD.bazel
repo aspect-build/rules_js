@@ -129,6 +129,7 @@ write_source_files(
         "snapshots/next_links_defs.bzl": "@npm__next__15.2.6_1816342077__links//:defs.bzl",
     },
     tags = [
+        "skip-on-bazel10",
         "skip-on-bazel8",
         "skip-on-bazel9",
     ],
