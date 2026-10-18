@@ -193,8 +193,8 @@ fallback. This keeps devserver writes isolated from Bazel outputs while avoiding
 usage on filesystems that support cloning. On a filesystem without cloning, such as ext4, the
 package store is copied in full each time the devserver starts: for Next.js and React that is
 several hundred MB and takes around half a second. Set the `JS_RUN_DEVSERVER_SANDBOX_DIR`
-environment variable to place the sandbox alongside the execroot and increase the chance that
-cloning is available.
+environment variable to an absolute path to place the sandbox alongside the execroot and increase
+the chance that cloning is available.
 
 ## Ugly stack traces
 

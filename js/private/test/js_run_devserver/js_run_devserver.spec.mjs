@@ -8,6 +8,7 @@ import {
     resolveSandboxSymlinkTarget,
     friendlyFileSize,
     sandboxRelativeChdir,
+    sandboxParentDir,
 } from '../../devserver/js_run_devserver.mjs'
 
 // isNodeModulePath
@@ -283,6 +284,25 @@ for (const [k, v] of sandboxRelativeChdir_cases) {
     if (a !== v) {
         console.error(
             `Expected sandboxRelativeChdir(${k}) to be '${v}' but got '${a}'`
+        )
+        process.exit(1)
+    }
+}
+
+// sandboxParentDir
+for (const dir of [
+    '.devserver',
+    'some/relative/dir',
+    '/abs/dir',
+    undefined,
+    '',
+]) {
+    const actual = sandboxParentDir(dir)
+    if (!path.isAbsolute(actual)) {
+        console.error(
+            `ERROR: expected sandboxParentDir(${JSON.stringify(
+                dir
+            )}) to be absolute but got '${actual}'`
         )
         process.exit(1)
     }

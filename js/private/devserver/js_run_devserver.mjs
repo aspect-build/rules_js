@@ -383,12 +383,20 @@ function updateEntryPaths(files) {
     }
 }
 
+// Reads a symlink and returns its target relative to the link itself rather than to the directory
+// containing it, so that path.join(dir, file, linkPath) resolves it for the same file under dir.
+async function readLinkFromLink(src) {
+    const linkAbs = path.resolve(
+        path.dirname(src),
+        await fs.promises.readlink(src)
+    );
+    return path.relative(src, linkAbs) || '.'
+}
+
 // Reads a symlink in the runfiles tree and resolves it to the equivalent path inside the sandbox,
 // or undefined when the target is not something this devserver syncs into the sandbox.
 async function readSandboxSymlinkTarget(file, src, sandbox) {
-    let linkPath = await fs.promises.readlink(src);
-    const linkAbs = path.resolve(path.dirname(src), linkPath);
-    linkPath = path.relative(src, linkAbs) || '.';
+    const linkPath = await readLinkFromLink(src);
     return resolveSandboxSymlinkTarget(
         sandbox,
         file,
@@ -520,6 +528,17 @@ function sandboxRelativeChdir(chdir) {
         : chdir
 }
 
+// The directory in which the sandbox is created: the OS temp dir by default. JS_RUN_DEVSERVER_SANDBOX_DIR
+// moves it elsewhere; placing it on the same filesystem as the execroot may allow package-store files
+// to use copy-on-write clones rather than full copies. The result is always absolute, since sandbox
+// symlinks are created with targets inside the sandbox and a relative target would resolve from the
+// directory of the link instead.
+function sandboxParentDir(
+    dir = process.env.JS_RUN_DEVSERVER_SANDBOX_DIR
+) {
+    return path.resolve(dir || os.tmpdir())
+}
+
 // Converts a size in bytes to a human readable friendly number such as "24 KiB"
 function friendlyFileSize(bytes) {
     if (!bytes) {
@@ -547,9 +566,7 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
         src = sandboxSrc;
         symlinkMeta = 'sandbox';
     } else if (isNodeModulePath(file)) {
-        let linkPath = await fs.promises.readlink(src);
-        const linkAbs = path.resolve(path.dirname(src), linkPath);
-        linkPath = path.relative(src, linkAbs) || '.';
+        const linkPath = await readLinkFromLink(src);
         // Special case for 1p node_modules symlinks. Sandbox package store mode resolves these from
         // the entries instead, since the target may be in the middle of being deleted.
         const maybe1pSync = path.join(sandbox, file, linkPath);
@@ -1179,15 +1196,10 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     let doSync = syncRecursive;
 
     // For CYCLE message we have more informatino about what changed and can do minimal syncing.
-    // In sandbox package store mode, node_modules link targets depend on the entries, so a change
-    // to the entries re-syncs everything.
-    if (
-        cycle.kind == MessageType.CYCLE &&
-        !(sandboxPackageStore && entriesChanged(oldFiles, newFiles))
-    ) {
-        filesToSync = newFiles.filter(([f]) =>
-            cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`)
-        );
+    if (cycle.kind == MessageType.CYCLE) {
+        const inCycle = (f) =>
+            cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`);
+        filesToSync = newFiles.filter(([f]) => inCycle(f));
         doSync = cycleSyncRecurse.bind(null, cycle);
         toDelete = [];
         for (const l in cycle.sources) {
@@ -1199,6 +1211,26 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
             }
         }
         toKeep = [];
+
+        if (sandboxPackageStore && entriesChanged(oldFiles, newFiles)) {
+            // In sandbox package store mode, where a node_modules link points depends on which
+            // entries are synced. When entries are added or removed, re-evaluate the links along
+            // with the added entries, and delete the removed ones. Package store directories that
+            // are unchanged are not walked again; syncRecursive skips links that are up-to-date.
+            const previous = new Set(oldFiles.map(([f]) => f));
+            filesToSync = newFiles.filter(
+                ([f, isDirectory]) =>
+                    inCycle(f) ||
+                    !previous.has(f) ||
+                    (!isDirectory && isUnderNodeModules(f))
+            );
+            doSync = (file, ...args) =>
+                inCycle(file)
+                    ? cycleSyncRecurse(cycle, file, ...args)
+                    : syncRecursive(file, ...args);
+            toDelete = oldFiles;
+            toKeep = newFiles;
+        }
     }
 
     await Promise.all([
@@ -1257,11 +1289,7 @@ async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
     onProcessEnd(() => sandbox && removeSandbox(sandbox) && (sandbox = null));
 
     try {
-        // The sandbox lives under the OS temp dir by default. JS_RUN_DEVSERVER_SANDBOX_DIR moves it
-        // elsewhere; placing it on the same filesystem as the execroot may allow package-store
-        // files to use copy-on-write clones rather than full copies.
-        const sandboxParent =
-            process.env.JS_RUN_DEVSERVER_SANDBOX_DIR || os.tmpdir();
+        const sandboxParent = sandboxParentDir();
         // Intentionally synchronous; see comment on mkdirpSync
         mkdirpSync(sandboxParent);
         sandbox = await fs.promises.mkdtemp(
@@ -1311,4 +1339,4 @@ function onProcessEnd(callback) {
     // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
 }
 
-export { applyConfig, deleteFiles, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, isPackageStorePath, isRootedAt, isUnderNodeModules, resolveSandboxSymlinkTarget, sandboxRelativeChdir, syncFiles, syncRecursive, updateEntryPaths, watchProtocolCycle };
+export { applyConfig, deleteFiles, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, isPackageStorePath, isRootedAt, isUnderNodeModules, resolveSandboxSymlinkTarget, sandboxParentDir, sandboxRelativeChdir, syncFiles, syncRecursive, updateEntryPaths, watchProtocolCycle };

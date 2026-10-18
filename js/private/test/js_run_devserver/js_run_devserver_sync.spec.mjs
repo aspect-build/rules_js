@@ -254,4 +254,85 @@ for (const protocol of ['ibazel', 'watch']) {
     fs.rmSync(repo, { recursive: true, force: true })
 }
 
+// When a watch cycle adds or removes entries, only the added entries and the node_modules links are
+// synced, not every package store directory. A link whose target entry is added without being
+// reported by the cycle is still re-evaluated.
+{
+    const store =
+        'node_modules/.aspect_rules_js/targeted@1.0.0/node_modules/targeted'
+    const link = 'app/node_modules/targeted'
+    const other = 'node_modules/.aspect_rules_js/other@1.0.0/node_modules/other'
+    const source = 'app/added.js'
+    write(path.join(main, store, 'index.js'))
+    write(path.join(main, other, 'index.js'))
+    write(path.join(main, source))
+    symlink(
+        path.relative(
+            path.join(main, path.dirname(link)),
+            path.join(main, store)
+        ),
+        path.join(main, link)
+    )
+    const { devserver, sandbox } = await newDevserver('targeted')
+    const entriesPath = path.join(base, 'targeted-entries.json')
+    const cycleWith = async (files, sources) => {
+        fs.writeFileSync(entriesPath, JSON.stringify(files))
+        await devserver.watchProtocolCycle(config, entriesPath, sandbox, {
+            kind: 'CYCLE',
+            sources,
+        })
+    }
+    const config = {}
+    const initial = [
+        [other, 1],
+        [link, 0],
+    ]
+    fs.writeFileSync(entriesPath, JSON.stringify(initial))
+    await devserver.watchProtocolCycle(config, entriesPath, sandbox, {
+        kind: 'CYCLE_RESET',
+        sources: {},
+    })
+    check(
+        'targeted: link to an entry that is not synced points out of the sandbox',
+        fs.readlinkSync(path.join(sandbox, link)) === path.join(sandbox, store),
+        false
+    )
+
+    // Add a file to the sandbox copy of an unchanged package; walking it again would prune it
+    write(path.join(sandbox, other, 'marker.js'))
+
+    // The store entry is added to the data but only the new source file is reported as changed
+    await cycleWith([...initial, [store, 1], [source, 0]], {
+        [`_main/${source}`]: {},
+    })
+    check(
+        'targeted: added entry synced although not in the cycle',
+        fs.existsSync(path.join(sandbox, store, 'index.js')),
+        true
+    )
+    check(
+        'targeted: link re-evaluated when its target entry is added',
+        fs.readlinkSync(path.join(sandbox, link)),
+        path.join(sandbox, store)
+    )
+    check(
+        'targeted: unchanged package store directory not walked again',
+        fs.existsSync(path.join(sandbox, other, 'marker.js')),
+        true
+    )
+
+    // The store entry is removed from the data without being reported by the cycle
+    await cycleWith([...initial, [source, 0]], {})
+    check(
+        'targeted: removed entry deleted from the sandbox',
+        fs.existsSync(path.join(sandbox, store)),
+        false
+    )
+    check(
+        'targeted: link re-evaluated when its target entry is removed',
+        fs.readlinkSync(path.join(sandbox, link)) === path.join(sandbox, store),
+        false
+    )
+}
+
 fs.rmSync(base, { recursive: true, force: true })

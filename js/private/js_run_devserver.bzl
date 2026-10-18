@@ -28,6 +28,11 @@ _attrs = js_binary_lib.attrs | {
     ),
 }
 
+def _file_to_entry_json_unfiltered(f):
+    # Used when package_store_mode is "sandbox"; third party package store deps must be synced into
+    # the custom sandbox so that node_modules symlinks can point at them there.
+    return json.encode([f.short_path, 1 if f.is_directory else 0])
+
 def _file_to_entry_json(f):
     if "/.aspect_rules_js/" in f.short_path:
         # Special handling for package store deps; we only include 1st party deps since copying
@@ -42,12 +47,7 @@ def _file_to_entry_json(f):
         if len(path_segments) <= package_name_segment or "@0.0.0" not in path_segments[package_name_segment]:
             return None
 
-    return json.encode([f.short_path, 1 if f.is_directory else 0])
-
-def _file_to_entry_json_unfiltered(f):
-    # Used when package_store_mode is "sandbox"; third party package store deps must be synced into
-    # the custom sandbox so that node_modules symlinks can point at them there.
-    return json.encode([f.short_path, 1 if f.is_directory else 0])
+    return _file_to_entry_json_unfiltered(f)
 
 def _js_run_devserver_impl(ctx):
     config_file = ctx.actions.declare_file("{}_config.json".format(ctx.label.name))
@@ -301,7 +301,8 @@ def js_run_devserver(
             the devserver starts: for Next.js and React that is several hundred MB and takes around
             half a second. Set the `JS_RUN_DEVSERVER_SANDBOX_DIR` environment variable to place the
             sandbox on the same filesystem as the execroot and increase the chance that
-            copy-on-write cloning is available.
+            copy-on-write cloning is available. Use an absolute path: a relative one is resolved
+            against the devserver's working directory, which is inside its runfiles tree.
 
         use_execroot_entry_point: Use the `entry_point` script of the `js_binary` `tool` that is in the execroot output tree
             instead of the copy that is in runfiles.
