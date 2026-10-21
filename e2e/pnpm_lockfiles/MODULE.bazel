@@ -22,6 +22,7 @@ PNPM_LOCK_TEST_CASES = [
     "rerooted-nested-projects-v10/root",
     "workspace-peer-v9",
     "multi-document-v11",
+    "devengines-runtime-v11",
 ]
 
 bazel_dep(name = "bazel_lib", version = "3.0.0")
