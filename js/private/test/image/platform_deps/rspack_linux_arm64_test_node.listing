@@ -17,4 +17,4 @@ drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/plat
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/bin/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/bin/nodejs/
 drwxr-xr-x  0 0      0           0 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/bin/nodejs/bin/
--r-xr-xr-x  0 0      0   120592136 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/bin/nodejs/bin/node
+-r-xr-xr-x  0 0      0   122293360 Jan  1  1970 ./app/js/private/test/image/platform_deps/bin.runfiles/rules_nodejs++node+nodejs_linux_arm64/bin/nodejs/bin/node

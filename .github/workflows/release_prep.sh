@@ -48,7 +48,7 @@ use_repo(pnpm, "pnpm")
 By default you get the node version from \`DEFAULT_NODE_VERSION\` in \`@rules_nodejs//nodejs:repositories.bzl\`
 Optionally you can pin a different version using \`rules_nodejs\`:
 \`\`\`starlark
-bazel_dep(name = "rules_nodejs", version = "6.7.3")
+bazel_dep(name = "rules_nodejs", version = "6.7.7")
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "24.13.0")
 \`\`\`

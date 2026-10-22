@@ -5,7 +5,7 @@ local_path_override(
 )
 
 bazel_dep(name = "platforms", version = "1.0.0", dev_dependency = True)
-bazel_dep(name = "rules_nodejs", version = "6.7.3", dev_dependency = True)
+bazel_dep(name = "rules_nodejs", version = "6.7.7", dev_dependency = True)
 
 register_toolchains("//toolchains:all")
 

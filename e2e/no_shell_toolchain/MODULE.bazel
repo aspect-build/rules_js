@@ -3,7 +3,7 @@ module(name = "no_shell_toolchain")
 bazel_dep(name = "aspect_rules_js", version = "0.0.0", dev_dependency = True)
 bazel_dep(name = "bazel_skylib", version = "1.8.1", dev_dependency = True)
 bazel_dep(name = "platforms", version = "0.0.11", dev_dependency = True)
-bazel_dep(name = "rules_nodejs", version = "6.6.0", dev_dependency = True)
+bazel_dep(name = "rules_nodejs", version = "6.7.7", dev_dependency = True)
 
 local_path_override(
     module_name = "aspect_rules_js",
