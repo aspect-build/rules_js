@@ -10,6 +10,7 @@ _IMPORTER_PACKAGES = [""]
 
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
+    # type: (...) -> None
     if name != "node_modules":
         fail("npm_link_all_packages: customizing 'name' is not supported")
     if not prod and not dev:
@@ -63,6 +64,7 @@ _LINK_TARGETS = {}
 
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
+    # type: (...) -> list[str]
     if name != "node_modules":
         fail("npm_link_targets: customizing 'name' is not supported")
     if not prod and not dev:
