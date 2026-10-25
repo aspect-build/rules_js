@@ -72,7 +72,6 @@ const {
 setEnv("JS_BINARY__BINDIR", JS_IMAGE_LAYER ? process.cwd() : "bazel-out/k8-fastbuild/bin")
 setEnv("JS_BINARY__COMPILATION_MODE", "fastbuild")
 setEnv("JS_BINARY__TARGET_CPU", JS_IMAGE_LAYER ? os.machine() : "k8")
-setEnv("JS_BINARY__BUILD_FILE_PATH", "js/private/test/BUILD.bazel")
 setEnv("JS_BINARY__PACKAGE", "js/private/test")
 setEnv("JS_BINARY__TARGET_NAME", "shellcheck_launcher")
 setEnv("JS_BINARY__TARGET", "//js/private/test:shellcheck_launcher")
