@@ -138,6 +138,7 @@ def _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, d
     result = {}
     for name, version in deps.items():
         if version.startswith("runtime:"):
+            # We will get the Node runtime through a Bazel toolchain.
             continue
         result[name] = _convert_pnpm_v9_package_dependency_version(packages, snapshots, snapshot_key, name, version)
     return result
@@ -147,8 +148,8 @@ def _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, deps):
     for name, attributes in deps.items():
         version = attributes["version"]
 
-        # pnpm 11 devEngines.runtime packages (node/deno/bun); Bazel gets these from toolchains. See #3060.
         if version.startswith("runtime:"):
+            # We will get the Node runtime through a Bazel toolchain.
             continue
 
         if version.startswith("link:"):
@@ -231,6 +232,7 @@ def _convert_v9_packages(packages, snapshots, no_optional):
         version_index = static_key.index("@", 1)
         name = static_key[:version_index]
         if static_key[version_index + 1:].startswith("runtime:"):
+            # We will get the Node runtime through a Bazel toolchain.
             continue
 
         optional = package_snapshot.get("optional", False)
