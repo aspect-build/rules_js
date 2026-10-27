@@ -6,12 +6,14 @@ exports_files(["pnpm-lock.yaml"])
 devengines_runtime_v11_link_all()
 
 # pnpm 11 records a `devEngines.runtime` Node as a `node@runtime:` package with
-# a `type: variations` resolution; rules_js must translate the rest of the lockfile.
+# a `type: variations` resolution, under the root importer and under any package
+# (here the file: dep mylib) that depends on it; rules_js must translate the rest.
 # https://github.com/aspect-build/rules_js/issues/3060
 build_test(
     name = "devengines_runtime_v11",
     targets = [
         ":node_modules",
         ":node_modules/ms",
+        ":node_modules/mylib",
     ],
 )

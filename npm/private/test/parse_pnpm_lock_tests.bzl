@@ -168,7 +168,9 @@ def _parse_lockfile_v9_runtime_test_impl(ctx):
     }
   },
   "snapshots": {
-    "@aspect-test/a@5.0.0": {},
+    "@aspect-test/a@5.0.0": {
+      "dependencies": {"node": "runtime:24.22.1"}
+    },
     "node@runtime:24.22.1": {}
   }
 }

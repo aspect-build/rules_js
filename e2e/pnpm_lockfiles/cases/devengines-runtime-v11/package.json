@@ -2,7 +2,8 @@
     "name": "devengines-runtime-v11",
     "version": "0.0.0",
     "dependencies": {
-        "ms": "^2.1.3"
+        "ms": "^2.1.3",
+        "mylib": "file:./mylib"
     },
     "devEngines": {
         "runtime": {
