@@ -231,7 +231,7 @@ def _convert_v9_packages(packages, snapshots, no_optional):
         # the raw name + version are the key, not including peerDeps+patch
         version_index = static_key.index("@", 1)
         name = static_key[:version_index]
-        if static_key[version_index + 1:].startswith("runtime:"):
+        if static_key.startswith("runtime:", version_index + 1):
             # We will get the Node runtime through a Bazel toolchain.
             continue
 
