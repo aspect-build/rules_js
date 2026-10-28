@@ -276,19 +276,17 @@ const syncedTime = new Map();
 const syncedChecksum = new Map();
 const mkdirs = new Set();
 
-// Set of all data file paths (workspace-relative, posix separators) that the sandbox is expected to
-// contain after the current sync, and the set of directories containing them. Used to resolve
-// node_modules symlinks to their in-sandbox targets without depending on the order in which entries
-// happen to be synced.
-const entryPaths = new Set();
-const entryDirs = new Set();
+// What syncPackageStore last placed at each node_modules entry in the sandbox: the target of a
+// link, or the inode and mtime of the copied file or directory.
+const packageStoreSynced = new Map();
 
 // When true the package store is materialized inside the sandbox and node_modules symlinks are
-// pointed at it instead of at the execroot. Set from the rule config in main().
+// pointed at it instead of at the execroot. syncPackageStore syncs every node_modules entry. Set
+// from the rule config in main().
 //
 // This relies on the node fs patches: they make lstat report the runfiles entries of the package
-// store as the directories they link to, so they are copied like any other directory. Only the
-// relative node_modules links between packages remain symlinks.
+// store as the directories they link to. Only the relative node_modules links between packages
+// remain symlinks.
 let sandboxPackageStore = false;
 
 // Ensure that a directory exists. If it has not been previously created or does not exist then it
@@ -342,12 +340,6 @@ function is1pPackageStoreDep(p) {
     return unscoped1p.test(p) || scoped1p.test(p)
 }
 
-// Determines if a file path is within the rules_js package store.
-// See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
-function isPackageStorePath(p) {
-    return p.includes('/.aspect_rules_js/')
-}
-
 // Determines if a file path is anywhere under a node_modules tree, including paths such as
 // node_modules/.bin/next and files within the contents of a package, which isNodeModulePath does
 // not match since it only matches the package directory itself.
@@ -367,105 +359,6 @@ function applyConfig(config, patchNodeFs = JS_BINARY__PATCH_NODE_FS) {
         throw new Error(
             'package_store_mode = "sandbox" requires the node fs patches, which are disabled: by patch_node_fs = False, by JS_BINARY__PATCH_NODE_FS=0, or on Windows, where they are always disabled'
         )
-    }
-}
-
-// Records the full set of data files that the current sync will place in the sandbox.
-function updateEntryPaths(files) {
-    entryPaths.clear();
-    entryDirs.clear();
-    for (const [file] of files) {
-        let p = toPosix(file);
-        entryPaths.add(p);
-        while ((p = path.posix.dirname(p)) !== '.' && !entryDirs.has(p)) {
-            entryDirs.add(p);
-        }
-    }
-}
-
-// Reads a symlink and returns its target relative to the link itself rather than to the directory
-// containing it, so that path.join(dir, file, linkPath) resolves it for the same file under dir.
-async function readLinkFromLink(src) {
-    const linkAbs = path.resolve(
-        path.dirname(src),
-        await fs.promises.readlink(src)
-    );
-    return path.relative(src, linkAbs) || '.'
-}
-
-// Reads a symlink in the runfiles tree and resolves it to the equivalent path inside the sandbox,
-// or undefined when the target is not something this devserver syncs into the sandbox.
-async function readSandboxSymlinkTarget(file, src, sandbox) {
-    const linkPath = await readLinkFromLink(src);
-    return resolveSandboxSymlinkTarget(
-        sandbox,
-        file,
-        linkPath,
-        entryPaths,
-        entryDirs
-    )
-}
-
-// Resolves the target of a symlink to a path inside the sandbox, or returns undefined
-// if the target is not something this devserver syncs into the sandbox. `linkPath` is the symlink
-// target relative to the link itself, as computed by readSandboxSymlinkTarget.
-function resolveSandboxSymlinkTarget(
-    sandbox,
-    file,
-    linkPath,
-    entries,
-    dirs = new Set()
-) {
-    const target = path.join(sandbox, file, linkPath);
-    let rel = toPosix(path.relative(sandbox, target));
-    // `sandbox` is the main repository's directory in the sandbox. Like the runfiles tree, the
-    // sandbox places other repositories beside it, so a target in ../<repo>/ may be in the sandbox.
-    const fromRoot = toPosix(path.relative(path.dirname(sandbox), target));
-    if (!rel || !fromRoot || fromRoot === '..' || fromRoot.startsWith('../')) {
-        // Escapes the sandbox root; nothing we can point at.
-        return undefined
-    }
-    // A directory whose files are synced, such as the source directory that a first-party package
-    // store entry links to. Linking to it rather than copying it keeps the package live: files
-    // removed from it are deleted from the sandbox along with their entries.
-    if (dirs.has(rel)) {
-        return target
-    }
-    // The target is in the sandbox if it, or a directory entry containing it, is synced.
-    while (rel && rel !== '.') {
-        if (entries.has(rel)) {
-            return target
-        }
-        const parent = path.posix.dirname(rel);
-        if (parent === rel) {
-            break
-        }
-        rel = parent;
-    }
-    return undefined
-}
-
-// In sandbox package store mode, returns the in-sandbox target for a node_modules symlink, or
-// undefined when there is none and the link keeps pointing at the execroot.
-async function sandboxLinkTarget(file, src, sandbox) {
-    if (!sandboxPackageStore || !isUnderNodeModules(file)) {
-        return undefined
-    }
-    const target = await readSandboxSymlinkTarget(file, src, sandbox);
-    if (!target) {
-        console.error(
-            `WARNING: ${file} links outside of the js_run_devserver sandbox`
-        );
-    }
-    return target
-}
-
-// Returns the target of an existing symlink, or undefined if dst is not a symlink.
-async function readlinkIfExists(dst) {
-    try {
-        return await fs.promises.readlink(dst)
-    } catch (e) {
-        return undefined
     }
 }
 
@@ -558,19 +451,13 @@ function friendlyFileSize(bytes) {
 
 async function syncSymlink(file, src, dst, sandbox, exists) {
     let symlinkMeta = '';
-    const sandboxSrc = await sandboxLinkTarget(file, src, sandbox);
-    if (sandboxSrc) {
-        // The target is synced into the sandbox, so point at it rather than at the execroot. This
-        // keeps realpath() of the link inside the sandbox root, which bundlers that enforce a
-        // project-root boundary (e.g. Turbopack) require.
-        src = sandboxSrc;
-        symlinkMeta = 'sandbox';
-    } else if (isNodeModulePath(file)) {
-        const linkPath = await readLinkFromLink(src);
-        // Special case for 1p node_modules symlinks. Sandbox package store mode resolves these from
-        // the entries instead, since the target may be in the middle of being deleted.
+    if (isNodeModulePath(file)) {
+        let linkPath = await fs.promises.readlink(src);
+        const linkAbs = path.resolve(path.dirname(src), linkPath);
+        linkPath = path.relative(src, linkAbs) || '.';
+        // Special case for 1p node_modules symlinks
         const maybe1pSync = path.join(sandbox, file, linkPath);
-        if (!sandboxPackageStore && fs.existsSync(maybe1pSync)) {
+        if (fs.existsSync(maybe1pSync)) {
             src = maybe1pSync;
             symlinkMeta = '1p';
         }
@@ -594,9 +481,6 @@ async function syncSymlink(file, src, dst, sandbox, exists) {
         );
     }
     if (exists) {
-        if (sandboxPackageStore && (await readlinkIfExists(dst)) === src) {
-            return 0
-        }
         await fs.promises.unlink(dst);
     } else {
         // Intentionally synchronous; see comment on mkdirpSync
@@ -611,9 +495,6 @@ async function syncDirectory(file, src, sandbox, writePerm) {
         console.error(`Syncing directory ${file}...`);
     }
     const contents = await fs.promises.readdir(src);
-    if (sandboxPackageStore && isPackageStorePath(file)) {
-        await pruneRemovedEntries(file, sandbox, contents);
-    }
     return (
         await Promise.all(
             contents.map(
@@ -627,13 +508,6 @@ async function syncDirectory(file, src, sandbox, writePerm) {
             )
         )
     ).reduce((s, t) => s + t, 0)
-}
-
-// Materializes src at dst using a copy-on-write clone when possible. Node falls back to a regular
-// copy when the filesystem does not support cloning. Unlike a hardlink, both forms create a new
-// inode, so a devserver can chmod or modify the sandbox file without mutating the Bazel output.
-async function materializeFile(src, dst) {
-    await fs.promises.copyFile(src, dst, fs.constants.COPYFILE_FICLONE);
 }
 
 async function syncFile(file, src, dst, exists, lstat, writePerm) {
@@ -652,7 +526,7 @@ async function syncFile(file, src, dst, exists, lstat, writePerm) {
     }
 
     await withRetry(
-        () => materializeFile(src, dst),
+        () => fs.promises.copyFile(src, dst),
         `copyFile from ${src} to ${dst}`
     );
 
@@ -684,19 +558,8 @@ async function syncRecursive(file, _, sandbox, writePerm) {
             () => fs.promises.lstat(src),
             `lstat for ${src}`
         );
-        // In sandbox package store mode a node_modules link's target depends on the synced entries,
-        // not only on the link, so it is always re-evaluated; syncSymlink skips it if unchanged.
-        const reevaluate =
-            sandboxPackageStore &&
-            lstat.isSymbolicLink() &&
-            isUnderNodeModules(file);
         const last = syncedTime.get(file);
-        if (
-            !lstat.isDirectory() &&
-            !reevaluate &&
-            last &&
-            lstat.mtimeMs == last
-        ) {
+        if (!lstat.isDirectory() && last && lstat.mtimeMs == last) {
             // this file is already up-to-date
             if (JS_BINARY__LOG_DEBUG) {
                 console.error(
@@ -712,11 +575,6 @@ async function syncRecursive(file, _, sandbox, writePerm) {
         } else if (lstat.isDirectory()) {
             return syncDirectory(file, src, sandbox, writePerm)
         } else {
-            if (sandboxPackageStore && isPackageStorePath(file)) {
-                // Package store files are immutable Bazel outputs, so the mtime check above is
-                // sufficient. Skip hashing them; there can be a very large number of them.
-                return syncFile(file, src, dst, exists, lstat, writePerm)
-            }
             const lastChecksum = syncedChecksum.get(file);
             const checksum = await generateChecksum(src);
             if (lastChecksum && checksum == lastChecksum) {
@@ -739,68 +597,6 @@ async function syncRecursive(file, _, sandbox, writePerm) {
     }
 }
 
-// Determines if a synced path is rooted at a folder. Entries always use '/', while the paths of the
-// files below a directory entry are built with the platform separator, so either may follow it.
-// See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
-function isRootedAt(p, folder, sep = path.sep) {
-    if (!p.startsWith(folder)) {
-        return false
-    }
-    const next = p[folder.length];
-    return next === '/' || next === sep
-}
-
-// Clears any matching files or files rooted at this folder from the syncedTime and syncedChecksum
-// maps, so that they are synced again if they reappear.
-function forgetSynced(f) {
-    for (const synced of [syncedTime, syncedChecksum]) {
-        for (const k of synced.keys()) {
-            if (k == f || isRootedAt(k, f)) {
-                synced.delete(k);
-            }
-        }
-    }
-}
-
-// A package store directory is copied into the sandbox, so files removed from its source have to be
-// removed from the sandbox too, or they remain resolvable there. A package can change in place, for
-// example when a patch that rules_js applies to it changes. `contents` is the current listing of
-// the source directory.
-async function pruneRemovedEntries(file, sandbox, contents) {
-    const dst = sandbox + path.sep + file;
-    let st;
-    try {
-        st = await fs.promises.lstat(dst);
-    } catch (e) {
-        if (e.code === 'ENOENT') {
-            return
-        }
-        throw e
-    }
-    // Never follow a symlink here: pruning its target would delete files outside this directory.
-    if (!st.isDirectory()) {
-        return
-    }
-    const keep = new Set(contents);
-    const stale = (await fs.promises.readdir(dst)).filter((e) => !keep.has(e));
-    if (stale.length === 0) {
-        return
-    }
-    await Promise.all(
-        stale.map(async (entry) => {
-            const f = file + path.sep + entry;
-            console.error(`Deleting ${f}`);
-            forgetSynced(f);
-            await fs.promises.rm(dst + path.sep + entry, {
-                recursive: true,
-                force: true,
-            });
-        })
-    );
-    // clear mkdirs since we have deleted files so we re-populate on next sync
-    mkdirs.clear();
-}
-
 // Delete files from sandbox
 async function deleteFiles(previousFiles, updatedFiles, sandbox) {
     const startTime = perf_hooks.performance.now();
@@ -819,7 +615,19 @@ async function deleteFiles(previousFiles, updatedFiles, sandbox) {
 
         console.error(`Deleting ${f}`);
 
-        forgetSynced(f);
+        // clear any matching files or files rooted at this folder from the
+        // syncedTime and syncedChecksum maps
+        const fSlash = f + '/';
+        for (const k of syncedTime.keys()) {
+            if (k == f || k.startsWith(fSlash)) {
+                syncedTime.delete(k);
+            }
+        }
+        for (const k of syncedChecksum.keys()) {
+            if (k == f || k.startsWith(fSlash)) {
+                syncedChecksum.delete(k);
+            }
+        }
 
         // clear mkdirs if we have deleted any files so we re-populate on next sync
         mkdirs.clear();
@@ -930,6 +738,133 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     );
 }
 
+// In sandbox package store mode, the node_modules entries are synced by syncPackageStore rather than
+// with the other files.
+function withoutPackageStore(files) {
+    return sandboxPackageStore
+        ? files.filter(([f]) => !isUnderNodeModules(f))
+        : files
+}
+
+// Syncs the node_modules entries in sandbox package store mode. Bazel replaces a package rather than
+// changing it in place, so its copy is up-to-date while the inode and mtime of its source are
+// unchanged, and is replaced as a whole otherwise. A link keeps its relative target, so it points
+// inside the sandbox wherever its target is synced.
+async function syncPackageStore(files, sandbox, writePerm) {
+    if (!sandboxPackageStore) {
+        return
+    }
+    const startTime = perf_hooks.performance.now();
+
+    const entries = files.filter(([f]) => isUnderNodeModules(f));
+    const current = new Set(entries.map(([f]) => f));
+    const removed = [...packageStoreSynced.keys()].filter(
+        (f) => !current.has(f)
+    );
+    await Promise.all(
+        removed.map((f) => {
+            console.error(`Deleting ${f}`);
+            packageStoreSynced.delete(f);
+            return fs.promises.rm(path.join(sandbox, f), {
+                recursive: true,
+                force: true,
+            })
+        })
+    );
+
+    const links = [];
+    const synced = (
+        await Promise.all(
+            entries.map(([f]) =>
+                syncPackageStoreEntry(f, sandbox, writePerm, links)
+            )
+        )
+    ).reduce((s, t) => s + t, 0);
+    for (const f of links) {
+        if (!fs.existsSync(path.join(sandbox, f))) {
+            console.error(
+                `WARNING: ${f} links to a path that is not in the js_run_devserver sandbox`
+            );
+        }
+    }
+
+    const endTime = perf_hooks.performance.now();
+    if (synced > 0 || removed.length > 0) {
+        console.error(
+            `${synced} node_modules entries synced and ${
+                removed.length
+            } deleted in ${Math.round(endTime - startTime)} ms`
+        );
+    }
+}
+
+async function syncPackageStoreEntry(file, sandbox, writePerm, links) {
+    const src = RUNFILES_ROOT + path.sep + file;
+    const dst = sandbox + path.sep + file;
+    const lstat = await withRetry(
+        () => fs.promises.lstat(src),
+        `lstat for ${src}`
+    );
+
+    const linkTarget =
+        lstat.isSymbolicLink() && (await sandboxLinkTarget(src));
+    const synced = linkTarget || `${lstat.ino}:${lstat.mtimeMs}`;
+    if (packageStoreSynced.get(file) === synced) {
+        return 0
+    }
+
+    if (JS_BINARY__LOG_DEBUG) {
+        console.error(`Syncing node_modules entry ${file}`);
+    }
+    await fs.promises.rm(dst, { recursive: true, force: true });
+    await fs.promises.mkdir(path.dirname(dst), { recursive: true });
+    if (linkTarget) {
+        await fs.promises.symlink(linkTarget, dst);
+        links.push(file);
+    } else {
+        await copyTree(src, dst, writePerm);
+    }
+    packageStoreSynced.set(file, synced);
+    return 1
+}
+
+// The target for the sandbox copy of a runfiles link: the same relative target, which keeps
+// realpath() of the link inside the sandbox root as bundlers that enforce a project-root boundary
+// (e.g. Turbopack) require. A target outside the runfiles tree is kept absolute.
+async function sandboxLinkTarget(src) {
+    const target = path.resolve(
+        path.dirname(src),
+        await fs.promises.readlink(src)
+    );
+    const fromRoot = path.relative(JS_BINARY__RUNFILES, target);
+    if (fromRoot === '..' || fromRoot.startsWith('..' + path.sep)) {
+        return target
+    }
+    return path.relative(path.dirname(src), target) || '.'
+}
+
+// Copies a file, or a directory with its contents. Files are copy-on-write clones where the
+// filesystem supports it. Unlike a hardlink, both forms create a new inode, so a devserver can chmod
+// or modify the sandbox file without mutating the Bazel output.
+async function copyTree(src, dst, writePerm) {
+    const lstat = await fs.promises.lstat(src);
+    if (lstat.isDirectory()) {
+        await fs.promises.mkdir(dst);
+        await Promise.all(
+            (await fs.promises.readdir(src)).map((e) =>
+                copyTree(path.join(src, e), path.join(dst, e), writePerm)
+            )
+        );
+    } else if (lstat.isSymbolicLink()) {
+        await fs.promises.symlink(await fs.promises.readlink(src), dst);
+    } else {
+        await fs.promises.copyFile(src, dst, fs.constants.COPYFILE_FICLONE);
+        if (writePerm) {
+            await fs.promises.chmod(dst, lstat.mode | fs.constants.S_IWUSR);
+        }
+    }
+}
+
 function isWindowsScript(tool) {
     const toolExtension = path.extname(tool);
     const isScriptFile = toolExtension === '.bat' || toolExtension === '.cmd';
@@ -1012,16 +947,17 @@ async function runIBazelProtocol(
     toolArgs,
     env
 ) {
-    const initialFiles = await fs.promises
-        .readFile(entriesPath)
-        .then(JSON.parse);
-    updateEntryPaths(initialFiles);
-
+    const files = await fs.promises.readFile(entriesPath).then(JSON.parse);
     await syncFiles(
-        initialFiles,
+        withoutPackageStore(files),
         sandbox,
         config.grant_sandbox_write_permissions,
         syncRecursive
+    );
+    await syncPackageStore(
+        files,
+        sandbox,
+        config.grant_sandbox_write_permissions
     );
 
     return new Promise((resolve) => {
@@ -1061,32 +997,9 @@ async function runIBazelProtocol(
                         console.error('IBAZEL_BUILD_COMPLETED SUCCESS');
                     }
 
-                    const oldFiles = config.previous_files || [];
-
-                    // Re-parse the config file to get the latest list of data files to copy
-                    const updatedDataFiles = await fs.promises
-                        .readFile(entriesPath)
-                        .then(JSON.parse);
-                    updateEntryPaths(updatedDataFiles);
-
-                    // Await promises to catch any exceptions, and wait for the
-                    // sync to be complete before writing to stdin of the child
-                    // process
-                    await Promise.all([
-                        // Remove files that were previously synced but are no longer in the updated list of files to sync
-                        deleteFiles(oldFiles, updatedDataFiles, sandbox),
-
-                        // Sync changed files
-                        syncFiles(
-                            updatedDataFiles,
-                            sandbox,
-                            config.grant_sandbox_write_permissions,
-                            syncRecursive
-                        ),
-                    ]);
-
-                    // The latest state of copied data files
-                    config.previous_files = updatedDataFiles;
+                    // Wait for the sync to be complete before writing to
+                    // stdin of the child process
+                    await ibazelBuildCompleted(config, entriesPath, sandbox);
                 } else if (chunkString.includes('IBAZEL_BUILD_STARTED')) {
                     if (JS_BINARY__LOG_DEBUG) {
                         console.error('IBAZEL_BUILD_STARTED');
@@ -1109,6 +1022,36 @@ async function runIBazelProtocol(
             }
         }
     })
+}
+
+async function ibazelBuildCompleted(config, entriesPath, sandbox) {
+    const oldFiles = config.previous_files || [];
+
+    // Re-parse the config file to get the latest list of data files to copy
+    const allFiles = await fs.promises.readFile(entriesPath).then(JSON.parse);
+    const updatedDataFiles = withoutPackageStore(allFiles);
+
+    // Await promises to catch any exceptions
+    await Promise.all([
+        // Remove files that were previously synced but are no longer in the updated list of files to sync
+        deleteFiles(oldFiles, updatedDataFiles, sandbox),
+
+        // Sync changed files
+        syncFiles(
+            updatedDataFiles,
+            sandbox,
+            config.grant_sandbox_write_permissions,
+            syncRecursive
+        ),
+    ]);
+    await syncPackageStore(
+        allFiles,
+        sandbox,
+        config.grant_sandbox_write_permissions
+    );
+
+    // The latest state of copied data files
+    config.previous_files = updatedDataFiles;
 }
 
 async function runWatchProtocol(
@@ -1169,22 +1112,10 @@ async function runWatchProtocol(
     return await procPromise
 }
 
-// Determines if two lists of data files name different files.
-function entriesChanged(previousFiles, updatedFiles) {
-    if (previousFiles.length !== updatedFiles.length) {
-        return true
-    }
-    const previous = new Set();
-    for (const [f] of previousFiles) {
-        previous.add(f);
-    }
-    return updatedFiles.some(([f]) => !previous.has(f))
-}
-
 async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     // Re-parse the config file to get the latest list of data files to copy
-    const newFiles = await fs.promises.readFile(entriesPath).then(JSON.parse);
-    updateEntryPaths(newFiles);
+    const allFiles = await fs.promises.readFile(entriesPath).then(JSON.parse);
+    const newFiles = withoutPackageStore(allFiles);
 
     const oldFiles = config.previous_files || [];
     config.previous_files = newFiles;
@@ -1197,10 +1128,9 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
 
     // For CYCLE message we have more informatino about what changed and can do minimal syncing.
     if (cycle.kind == MessageType.CYCLE) {
-        const inCycle = (f) =>
-            cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`);
-        filesToSync = newFiles.filter(([f]) => inCycle(f));
-        doSync = cycleSyncRecurse.bind(null, cycle);
+        filesToSync = newFiles.filter(([f]) =>
+            cycle.sources.hasOwnProperty(`${JS_BINARY__WORKSPACE}/${f}`)
+        );
         toDelete = [];
         for (const l in cycle.sources) {
             if (cycle.sources[l] === null) {
@@ -1210,27 +1140,9 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
                 ]);
             }
         }
+        toDelete = withoutPackageStore(toDelete);
         toKeep = [];
-
-        if (sandboxPackageStore && entriesChanged(oldFiles, newFiles)) {
-            // In sandbox package store mode, where a node_modules link points depends on which
-            // entries are synced. When entries are added or removed, re-evaluate the links along
-            // with the added entries, and delete the removed ones. Package store directories that
-            // are unchanged are not walked again; syncRecursive skips links that are up-to-date.
-            const previous = new Set(oldFiles.map(([f]) => f));
-            filesToSync = newFiles.filter(
-                ([f, isDirectory]) =>
-                    inCycle(f) ||
-                    !previous.has(f) ||
-                    (!isDirectory && isUnderNodeModules(f))
-            );
-            doSync = (file, ...args) =>
-                inCycle(file)
-                    ? cycleSyncRecurse(cycle, file, ...args)
-                    : syncRecursive(file, ...args);
-            toDelete = oldFiles;
-            toKeep = newFiles;
-        }
+        doSync = cycleSyncRecurse.bind(null, cycle);
     }
 
     await Promise.all([
@@ -1242,15 +1154,14 @@ async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
             doSync
         ),
     ]);
+    await syncPackageStore(
+        allFiles,
+        sandbox,
+        config.grant_sandbox_write_permissions
+    );
 }
 
 async function cycleSyncRecurse(cycle, file, isDirectory, sandbox, writePerm) {
-    if (sandboxPackageStore && isUnderNodeModules(file)) {
-        // The cycle reports the unpatched runfiles tree; syncRecursive goes by the patched lstat.
-        syncedTime.delete(file);
-        return syncRecursive(file, undefined, sandbox, writePerm)
-    }
-
     const src = RUNFILES_ROOT + path.sep + file;
     const dst = sandbox + path.sep + file;
 
@@ -1339,4 +1250,4 @@ function onProcessEnd(callback) {
     // Do not invoke on uncaught exception or errors to allow inspecting the sandbox
 }
 
-export { applyConfig, deleteFiles, friendlyFileSize, is1pPackageStoreDep, isNodeModulePath, isPackageStorePath, isRootedAt, isUnderNodeModules, resolveSandboxSymlinkTarget, sandboxParentDir, sandboxRelativeChdir, syncFiles, syncRecursive, updateEntryPaths, watchProtocolCycle };
+export { applyConfig, friendlyFileSize, ibazelBuildCompleted, is1pPackageStoreDep, isNodeModulePath, isUnderNodeModules, sandboxParentDir, sandboxRelativeChdir, watchProtocolCycle };

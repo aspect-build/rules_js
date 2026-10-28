@@ -91,63 +91,60 @@ async function newDevserver(scenario) {
     devserver.applyConfig({ package_store_mode: 'execroot' }, '0')
 }
 
-// A node_modules link points at its target in the sandbox when that target is synced, and back out
-// of the sandbox when it is not. The link itself does not change in runfiles when the entries do, so
-// it has to be re-evaluated regardless.
+// Syncs a list of entries the way a protocol does after a build. `sources` is what the watch
+// protocol reports as changed; without it, the watch protocol resyncs everything.
+async function resync(devserver, protocol, sandbox, config, files, sources) {
+    const entriesPath = path.join(sandbox, '..', 'entries.json')
+    fs.writeFileSync(entriesPath, JSON.stringify(files))
+    if (protocol === 'ibazel') {
+        await devserver.ibazelBuildCompleted(config, entriesPath, sandbox)
+    } else {
+        await devserver.watchProtocolCycle(
+            config,
+            entriesPath,
+            sandbox,
+            sources === undefined
+                ? { kind: 'CYCLE_RESET', sources: {} }
+                : { kind: 'CYCLE', sources }
+        )
+    }
+}
+
+// Determines if a link resolves to a target
+function resolvesTo(link, target) {
+    return (
+        fs.existsSync(link) &&
+        fs.realpathSync(link) === fs.realpathSync(target)
+    )
+}
+
+// A node_modules link keeps its relative target, so it resolves inside the sandbox when its target
+// is synced there. The node_modules entries are synced from the list of entries, also when a watch
+// cycle reports no change to them.
 for (const protocol of ['ibazel', 'watch']) {
     const { devserver, sandbox } = await newDevserver(protocol)
     const link = path.join(sandbox, LINK)
-    const inSandbox = () =>
-        fs.lstatSync(link).isSymbolicLink() &&
-        fs.readlinkSync(link) === path.join(sandbox, STORE)
+    const inSandbox = () => resolvesTo(link, path.join(sandbox, STORE))
     const withEntry = [STORE_ENTRY, LINK_ENTRY]
     const withoutEntry = [LINK_ENTRY]
-
-    // Syncs a changed list of entries the way each protocol does. `storeSource` is what the watch
-    // protocol reports for the store entry, the only path that changed: null once it is deleted.
-    const entriesPath = path.join(base, `${protocol}-entries.json`)
     const config = {}
-    let previous = []
-    const resync = async (files, storeSource) => {
-        if (protocol === 'ibazel') {
-            devserver.updateEntryPaths(files)
-            await Promise.all([
-                devserver.deleteFiles(previous, files, sandbox),
-                devserver.syncFiles(
-                    files,
-                    sandbox,
-                    false,
-                    devserver.syncRecursive
-                ),
-            ])
-            previous = files
-        } else {
-            fs.writeFileSync(entriesPath, JSON.stringify(files))
-            const cycle =
-                storeSource === undefined
-                    ? { kind: 'CYCLE_RESET', sources: {} }
-                    : {
-                          kind: 'CYCLE',
-                          sources: { [`_main/${STORE}`]: storeSource },
-                      }
-            await devserver.watchProtocolCycle(
-                config,
-                entriesPath,
-                sandbox,
-                cycle
-            )
-        }
-    }
+    const sync = (files) =>
+        resync(devserver, protocol, sandbox, config, files, {})
 
-    await resync(withEntry)
+    await resync(devserver, protocol, sandbox, config, withEntry)
     check(`${protocol}: link to a synced entry`, inSandbox(), true)
+    check(
+        `${protocol}: link target relative`,
+        path.isAbsolute(fs.readlinkSync(link)),
+        false
+    )
     check(
         `${protocol}: package copied`,
         fs.readFileSync(path.join(link, 'a.js'), 'utf8'),
         path.join(main, STORE, 'a.js')
     )
 
-    await resync(withoutEntry, null)
+    await sync(withoutEntry)
     check(`${protocol}: entry no longer synced`, inSandbox(), false)
     check(
         `${protocol}: package removed`,
@@ -155,12 +152,12 @@ for (const protocol of ['ibazel', 'watch']) {
         false
     )
 
-    await resync(withEntry, { is_symlink: true })
+    await sync(withEntry)
     check(`${protocol}: entry synced again`, inSandbox(), true)
 
     // An unchanged link is left alone rather than recreated
     const before = fs.lstatSync(link, { bigint: true }).ino
-    await resync(withEntry, { is_symlink: true })
+    await sync(withEntry)
     check(
         `${protocol}: unchanged link kept`,
         fs.lstatSync(link, { bigint: true }).ino,
@@ -168,53 +165,80 @@ for (const protocol of ['ibazel', 'watch']) {
     )
 }
 
-// A package store directory is a copy in the sandbox, so files removed from the package must be
-// removed from the sandbox on the next sync too, at any depth, or they remain resolvable there. A
-// package can change in place, for example when a patch that rules_js applies to it changes.
+// Bazel replaces a package directory as a whole when it rebuilds it, rather than changing it in
+// place, for example when a patch that rules_js applies to the package changes. The sandbox copy is
+// replaced as a whole too, so files removed from the package are not left behind at any depth.
 for (const protocol of ['ibazel', 'watch']) {
     const store = `node_modules/.aspect_rules_js/${protocol}@1.0.0/node_modules/${protocol}`
     const pkg = path.join(main, store)
-    for (const f of [
-        'a.js',
-        'b.js',
-        'lib/deep.js',
-        'src/keep.js',
-        'src/gone.js',
-    ]) {
+    for (const f of ['a.js', 'b.js', 'lib/deep.js', 'src/keep.js', 'src/gone.js']) {
         write(path.join(pkg, f))
     }
-    const { devserver, sandbox } = await newDevserver(`${protocol}-pruning`)
+    const { devserver, sandbox } = await newDevserver(`${protocol}-rebuilt`)
+    const config = {}
     const entries = [[store, 1]]
-    devserver.updateEntryPaths(entries)
-    await devserver.syncFiles(entries, sandbox, false, devserver.syncRecursive)
+    await resync(devserver, protocol, sandbox, config, entries)
     check(
         `${protocol}: package copied`,
         list(path.join(sandbox, store)),
         'a.js b.js lib/deep.js src/gone.js src/keep.js'
     )
 
-    fs.rmSync(path.join(pkg, 'b.js'))
-    fs.rmSync(path.join(pkg, 'lib'), { recursive: true })
-    fs.rmSync(path.join(pkg, 'src', 'gone.js'))
-    write(path.join(pkg, 'c.js'))
-    if (protocol === 'ibazel') {
-        await devserver.syncFiles(
-            entries,
-            sandbox,
-            false,
-            devserver.syncRecursive
-        )
-    } else {
-        const entriesPath = path.join(base, 'pruning-entries.json')
-        fs.writeFileSync(entriesPath, JSON.stringify(entries))
-        const config = { previous_files: entries }
-        const cycle = { kind: 'CYCLE', sources: { [`_main/${store}`]: {} } }
-        await devserver.watchProtocolCycle(config, entriesPath, sandbox, cycle)
-    }
+    // Unchanged packages are not copied again
+    write(path.join(sandbox, store, 'marker.js'))
+    await resync(devserver, protocol, sandbox, config, entries, {})
     check(
-        `${protocol}: files removed from the package are removed from the sandbox`,
+        `${protocol}: unchanged package not copied again`,
+        fs.existsSync(path.join(sandbox, store, 'marker.js')),
+        true
+    )
+
+    fs.rmSync(pkg, { recursive: true })
+    for (const f of ['a.js', 'c.js', 'src/keep.js']) {
+        write(path.join(pkg, f))
+    }
+    await resync(devserver, protocol, sandbox, config, entries, {
+        [`_main/${store}`]: {},
+    })
+    check(
+        `${protocol}: rebuilt package replaces its copy`,
         list(path.join(sandbox, store)),
         'a.js c.js src/keep.js'
+    )
+}
+
+// A package can change between a directory and a link, for example when a dependency on an npm
+// package is replaced with one on a first-party package.
+for (const protocol of ['ibazel', 'watch']) {
+    const store = `node_modules/.aspect_rules_js/${protocol}-kind@1.0.0/node_modules/${protocol}-kind`
+    const source = `${protocol}-kind-src`
+    write(path.join(main, store, 'index.js'))
+    write(path.join(main, source, 'index.js'))
+    const { devserver, sandbox } = await newDevserver(`${protocol}-kind`)
+    const config = {}
+    const entries = [
+        [store, 1],
+        [`${source}/index.js`, 0],
+    ]
+    await resync(devserver, protocol, sandbox, config, entries)
+    check(
+        `${protocol}: package directory copied`,
+        fs.lstatSync(path.join(sandbox, store)).isDirectory(),
+        true
+    )
+
+    fs.rmSync(path.join(main, store), { recursive: true })
+    symlink(
+        path.relative(path.join(main, path.dirname(store)), path.join(main, source)),
+        path.join(main, store)
+    )
+    await resync(devserver, protocol, sandbox, config, entries, {
+        [`_main/${store}`]: { is_symlink: true },
+    })
+    check(
+        `${protocol}: package directory replaced with a link`,
+        resolvesTo(path.join(sandbox, store), path.join(sandbox, source)),
+        true
     )
 }
 
@@ -235,16 +259,14 @@ for (const protocol of ['ibazel', 'watch']) {
         path.join(main, link)
     )
     const { devserver, sandbox } = await newDevserver('other-repo')
-    const entries = [
+    await resync(devserver, 'ibazel', sandbox, {}, [
         [store, 1],
         [link, 0],
-    ]
-    devserver.updateEntryPaths(entries)
-    await devserver.syncFiles(entries, sandbox, false, devserver.syncRecursive)
+    ])
     check(
         'link in another repository points at its target in the sandbox',
-        fs.readlinkSync(path.join(sandbox, link)),
-        path.join(sandbox, store)
+        resolvesTo(path.join(sandbox, link), path.join(sandbox, store)),
+        true
     )
     check(
         'package in another repository copied into the sandbox',
@@ -254,83 +276,64 @@ for (const protocol of ['ibazel', 'watch']) {
     fs.rmSync(repo, { recursive: true, force: true })
 }
 
-// When a watch cycle adds or removes entries, only the added entries and the node_modules links are
-// synced, not every package store directory. A link whose target entry is added without being
-// reported by the cycle is still re-evaluated.
+// A link to a target outside the runfiles tree keeps its absolute target, since a relative one
+// would resolve to an unrelated path outside the sandbox.
 {
-    const store =
-        'node_modules/.aspect_rules_js/targeted@1.0.0/node_modules/targeted'
-    const link = 'app/node_modules/targeted'
-    const other = 'node_modules/.aspect_rules_js/other@1.0.0/node_modules/other'
-    const source = 'app/added.js'
-    write(path.join(main, store, 'index.js'))
-    write(path.join(main, other, 'index.js'))
-    write(path.join(main, source))
-    symlink(
-        path.relative(
-            path.join(main, path.dirname(link)),
-            path.join(main, store)
-        ),
-        path.join(main, link)
+    const outside = path.join(base, 'outside')
+    const link = 'app/node_modules/outside'
+    write(path.join(outside, 'index.js'))
+    symlink(outside, path.join(main, link))
+    const { devserver, sandbox } = await newDevserver('outside')
+    await resync(devserver, 'ibazel', sandbox, {}, [[link, 0]])
+    check(
+        'link outside the runfiles tree kept absolute',
+        fs.readlinkSync(path.join(sandbox, link)),
+        outside
     )
-    const { devserver, sandbox } = await newDevserver('targeted')
-    const entriesPath = path.join(base, 'targeted-entries.json')
-    const cycleWith = async (files, sources) => {
-        fs.writeFileSync(entriesPath, JSON.stringify(files))
-        await devserver.watchProtocolCycle(config, entriesPath, sandbox, {
-            kind: 'CYCLE',
-            sources,
-        })
-    }
+}
+
+// A file that a watch cycle reports as deleted is removed from the sandbox, also when the same
+// cycle adds or removes entries.
+{
+    const dir = 'app/lib'
+    const deleted = `${dir}/deleted.js`
+    const added = 'app/added_with_deletion.js'
+    write(path.join(main, deleted))
+    write(path.join(main, added))
+    const { devserver, sandbox } = await newDevserver('cycle-deletion')
+    const entriesPath = path.join(base, 'cycle-deletion-entries.json')
     const config = {}
-    const initial = [
-        [other, 1],
-        [link, 0],
-    ]
-    fs.writeFileSync(entriesPath, JSON.stringify(initial))
+    fs.writeFileSync(entriesPath, JSON.stringify([[dir, 1]]))
     await devserver.watchProtocolCycle(config, entriesPath, sandbox, {
         kind: 'CYCLE_RESET',
         sources: {},
     })
     check(
-        'targeted: link to an entry that is not synced points out of the sandbox',
-        fs.readlinkSync(path.join(sandbox, link)) === path.join(sandbox, store),
-        false
+        'cycle-deletion: file under a directory entry synced',
+        fs.existsSync(path.join(sandbox, deleted)),
+        true
     )
 
-    // Add a file to the sandbox copy of an unchanged package; walking it again would prune it
-    write(path.join(sandbox, other, 'marker.js'))
-
-    // The store entry is added to the data but only the new source file is reported as changed
-    await cycleWith([...initial, [store, 1], [source, 0]], {
-        [`_main/${source}`]: {},
+    fs.rmSync(path.join(main, deleted))
+    fs.writeFileSync(
+        entriesPath,
+        JSON.stringify([
+            [dir, 1],
+            [added, 0],
+        ])
+    )
+    await devserver.watchProtocolCycle(config, entriesPath, sandbox, {
+        kind: 'CYCLE',
+        sources: { [`_main/${deleted}`]: null, [`_main/${added}`]: {} },
     })
     check(
-        'targeted: added entry synced although not in the cycle',
-        fs.existsSync(path.join(sandbox, store, 'index.js')),
+        'cycle-deletion: added entry synced',
+        fs.existsSync(path.join(sandbox, added)),
         true
     )
     check(
-        'targeted: link re-evaluated when its target entry is added',
-        fs.readlinkSync(path.join(sandbox, link)),
-        path.join(sandbox, store)
-    )
-    check(
-        'targeted: unchanged package store directory not walked again',
-        fs.existsSync(path.join(sandbox, other, 'marker.js')),
-        true
-    )
-
-    // The store entry is removed from the data without being reported by the cycle
-    await cycleWith([...initial, [source, 0]], {})
-    check(
-        'targeted: removed entry deleted from the sandbox',
-        fs.existsSync(path.join(sandbox, store)),
-        false
-    )
-    check(
-        'targeted: link re-evaluated when its target entry is removed',
-        fs.readlinkSync(path.join(sandbox, link)) === path.join(sandbox, store),
+        'cycle-deletion: deleted file removed from the sandbox',
+        fs.existsSync(path.join(sandbox, deleted)),
         false
     )
 }
