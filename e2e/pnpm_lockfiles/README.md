@@ -12,3 +12,4 @@ cases run on each of those lockfiles.
 -   `override-with-alias-url-v9` - a package overridden with a different package
 -   `docusaurus-direct-peer-v*` - a direct dependency with a (peer=123) in the `importers` including within `npm:` dependencies
 -   `versionless-patch-v9`: pnpm v9.7+ allows patches without a version specifier
+-   `devengines-runtime-v11`: pnpm 11 records a `devEngines.runtime` Node as a `node@runtime:` package with a `type: variations` resolution

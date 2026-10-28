@@ -134,9 +134,15 @@ def _convert_pnpm_v9_package_dependency_version(packages, snapshots, snapshot_ke
 
     fail("Unknown package {} ({}) not in snapshots: {}".format(name, version, snapshots.keys()))
 
+def _is_runtime_version(version):
+    # We will get the Node runtime through a Bazel toolchain.
+    return version.startswith("runtime:")
+
 def _convert_pnpm_v9_package_dependency_map(packages, snapshots, snapshot_key, deps):
     result = {}
     for name, version in deps.items():
+        if _is_runtime_version(version):
+            continue
         result[name] = _convert_pnpm_v9_package_dependency_version(packages, snapshots, snapshot_key, name, version)
     return result
 
@@ -144,6 +150,9 @@ def _convert_pnpm_v9_importer_dependency_map(snapshots, import_path, deps):
     result = {}
     for name, attributes in deps.items():
         version = attributes["version"]
+
+        if _is_runtime_version(version):
+            continue
 
         if version.startswith("link:"):
             workspace_rel_link = paths.normalize(paths.join(import_path, version[5:]))
@@ -232,6 +241,8 @@ def _convert_v9_packages(packages, snapshots, no_optional):
 
         # Extract the version including peerDeps+patch from the key
         version = snapshot_key[snapshot_key.index("@", 1) + 1:]
+        if _is_runtime_version(version):
+            continue
 
         # package_data can have the resolved "version" for things like https:// deps
         friendly_version = package_data["version"] if "version" in package_data else static_key[version_index + 1:]

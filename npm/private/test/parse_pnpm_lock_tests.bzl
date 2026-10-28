@@ -117,6 +117,83 @@ def _parse_lockfile_v9_test_impl(ctx):
     return unittest.end(env)
 
 # buildifier: disable=function-docstring
+def _parse_lockfile_v9_runtime_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    # pnpm 11 devEngines.runtime entries are dropped, see #3060
+    parsed_json = pnpm.parse_pnpm_lock_json("""\
+{
+  "lockfileVersion": "9.0",
+  "importers": {
+    ".": {
+      "dependencies": {
+        "@aspect-test/a": {
+          "specifier": "5.0.0",
+          "version": "5.0.0"
+        }
+      },
+      "devDependencies": {
+        "node": {
+          "specifier": "runtime:24",
+          "version": "runtime:24.22.1"
+        }
+      }
+    }
+  },
+  "packages": {
+    "@aspect-test/a@5.0.0": {
+      "resolution": {
+        "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
+      },
+      "hasBin": true
+    },
+    "node@runtime:24.22.1": {
+      "resolution": {
+        "type": "variations",
+        "variants": [
+          {
+            "resolution": {
+              "archive": "tarball",
+              "bin": {"node": "bin/node"},
+              "integrity": "sha256-9ie20HmCnmSKS4AP+oidN9viORNQcDADDbhaqGFZGiY=",
+              "type": "binary",
+              "url": "https://nodejs.org/download/release/v24.22.1/node-v24.22.1-linux-x64.tar.gz"
+            },
+            "targets": [{"cpu": "x64", "os": "linux"}]
+          }
+        ]
+      },
+      "version": "24.22.1",
+      "hasBin": true
+    }
+  },
+  "snapshots": {
+    "@aspect-test/a@5.0.0": {
+      "dependencies": {"node": "runtime:24.22.1"}
+    },
+    "node@runtime:24.22.1": {}
+  }
+}
+""", False, False)
+
+    expected = (
+        {
+            ".": {
+                "dependencies": {"@aspect-test/a": "@aspect-test/a@5.0.0"},
+                "dev_dependencies": {},
+                "optional_dependencies": {},
+            },
+        },
+        {"@aspect-test/a@5.0.0": expected_packages["@aspect-test/a@5.0.0"]},
+        {},
+        None,
+    )
+
+    asserts.equals(env, expected, parsed_json)
+
+    return unittest.end(env)
+
+# buildifier: disable=function-docstring
 def _test_version_supported(ctx):
     env = unittest.begin(ctx)
 
@@ -142,11 +219,13 @@ def _test_version_supported(ctx):
 a_test = unittest.make(_parse_empty_lock_test_impl, attrs = {})
 d_test = unittest.make(_parse_lockfile_v9_test_impl, attrs = {})
 e_test = unittest.make(_test_version_supported, attrs = {})
+f_test = unittest.make(_parse_lockfile_v9_runtime_test_impl, attrs = {})
 
 TESTS = [
     a_test,
     d_test,
     e_test,
+    f_test,
 ]
 
 def parse_pnpm_lock_tests(name):

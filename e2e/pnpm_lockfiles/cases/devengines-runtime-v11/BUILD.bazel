@@ -1,0 +1,17 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@devengines-runtime-v11//:defs.bzl", devengines_runtime_v11_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+devengines_runtime_v11_link_all()
+
+# pnpm 11 records a `devEngines.runtime` Node as a `node@runtime:` package with
+# a `type: variations` resolution.
+build_test(
+    name = "devengines_runtime_v11",
+    targets = [
+        ":node_modules",
+        ":node_modules/ms",
+        ":node_modules/mylib",
+    ],
+)
