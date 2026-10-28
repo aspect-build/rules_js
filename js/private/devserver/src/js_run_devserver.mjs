@@ -29,7 +29,7 @@ const syncedChecksum = new Map()
 const mkdirs = new Set()
 
 // What syncPackageStore last placed at each node_modules entry in the sandbox: the target of a
-// link, or the inode and mtime of the copied file or directory.
+// link, or the inode and ctime of the copied file or directory.
 const packageStoreSynced = new Map()
 
 // When true the package store is materialized inside the sandbox and node_modules symlinks are
@@ -97,11 +97,7 @@ export function is1pPackageStoreDep(p) {
 // not match since it only matches the package directory itself.
 // See js/private/test/js_run_devserver/js_run_devserver.spec.mjs for examples.
 export function isUnderNodeModules(p) {
-    return /(^|\/)node_modules\//.test(toPosix(p))
-}
-
-function toPosix(p) {
-    return path.sep === '/' ? p : p.split(path.sep).join('/')
+    return /(^|\/)node_modules\//.test(p)
 }
 
 // Applies the settings from the rule config that change how files are synced.
@@ -499,7 +495,7 @@ function withoutPackageStore(files) {
 }
 
 // Syncs the node_modules entries in sandbox package store mode. Bazel replaces a package rather than
-// changing it in place, so its copy is up-to-date while the inode and mtime of its source are
+// changing it in place, so its copy is up-to-date while the inode and ctime of its source are
 // unchanged, and is replaced as a whole otherwise. A link keeps its relative target, so it points
 // inside the sandbox wherever its target is synced.
 async function syncPackageStore(files, sandbox, writePerm) {
@@ -560,7 +556,7 @@ async function syncPackageStoreEntry(file, sandbox, writePerm, links) {
 
     const linkTarget =
         lstat.isSymbolicLink() && (await sandboxLinkTarget(src))
-    const synced = linkTarget || `${lstat.ino}:${lstat.mtimeMs}`
+    const synced = linkTarget || `${lstat.ino}:${lstat.ctimeMs}`
     if (packageStoreSynced.get(file) === synced) {
         return 0
     }
@@ -568,14 +564,26 @@ async function syncPackageStoreEntry(file, sandbox, writePerm, links) {
     if (JS_BINARY__LOG_DEBUG) {
         console.error(`Syncing node_modules entry ${file}`)
     }
-    await fs.promises.rm(dst, { recursive: true, force: true })
+    // Copy beside dst and swap the copies, so that the entry is only missing between two renames.
+    const tmp = `${dst}.js_run_devserver-new`
+    const old = `${dst}.js_run_devserver-old`
+    await Promise.all(
+        [tmp, old].map((p) =>
+            fs.promises.rm(p, { recursive: true, force: true })
+        )
+    )
     await fs.promises.mkdir(path.dirname(dst), { recursive: true })
     if (linkTarget) {
-        await fs.promises.symlink(linkTarget, dst)
+        await fs.promises.symlink(linkTarget, tmp)
         links.push(file)
     } else {
-        await copyTree(src, dst, writePerm)
+        await copyTree(src, tmp, writePerm)
     }
+    await fs.promises.rename(dst, old).catch((e) => {
+        if (e.code !== 'ENOENT') throw e
+    })
+    await fs.promises.rename(tmp, dst)
+    await fs.promises.rm(old, { recursive: true, force: true })
     packageStoreSynced.set(file, synced)
     return 1
 }

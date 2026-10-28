@@ -205,6 +205,11 @@ for (const protocol of ['ibazel', 'watch']) {
         list(path.join(sandbox, store)),
         'a.js c.js src/keep.js'
     )
+    check(
+        `${protocol}: no copies left beside the rebuilt package`,
+        fs.readdirSync(path.dirname(path.join(sandbox, store))).join(' '),
+        protocol
+    )
 }
 
 // A package can change between a directory and a link, for example when a dependency on an npm
@@ -239,6 +244,11 @@ for (const protocol of ['ibazel', 'watch']) {
         `${protocol}: package directory replaced with a link`,
         resolvesTo(path.join(sandbox, store), path.join(sandbox, source)),
         true
+    )
+    check(
+        `${protocol}: no copies left beside the replaced package`,
+        fs.readdirSync(path.dirname(path.join(sandbox, store))).join(' '),
+        `${protocol}-kind`
     )
 }
 
