@@ -248,7 +248,6 @@ if (process.env.JS_BINARY__LOG_DEBUG) {
     logDebug(`JS_BINARY__NODE_OPTIONS ${process.execArgv.slice(2).join(' ')}`)
     for (const name of [
         'JS_BINARY__BINDIR',
-        'JS_BINARY__BUILD_FILE_PATH',
         'JS_BINARY__COMPILATION_MODE',
         'JS_BINARY__NODE_BINARY',
         'JS_BINARY__NODE_WRAPPER',

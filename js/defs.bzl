@@ -66,7 +66,6 @@ def js_binary(**kwargs):
 
     The following environment variables are made available to the Node.js runtime based on the rule context:
 
-    * JS_BINARY__BUILD_FILE_PATH: the path to the BUILD file of the Bazel target being run; equivalent to `ctx.build_file_path` of the `js_binary` target's rule context
     * JS_BINARY__PACKAGE: the package of the Bazel target being run; equivalent to `ctx.label.package` of the `js_binary` target's rule context
     * JS_BINARY__TARGET: the full label of the Bazel target being run; a stringified version of `ctx.label` of the `js_binary` target's rule context
     * JS_BINARY__TARGET_NAME: the name of the Bazel target being run; equivalent to `ctx.label.name` of the `js_binary` target's rule context

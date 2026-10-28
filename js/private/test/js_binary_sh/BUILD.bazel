@@ -72,12 +72,6 @@ assert_contains(
 )
 
 assert_contains(
-    name = "JS_BINARY__BUILD_FILE_PATH_test",
-    actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
-)
-
-assert_contains(
     name = "JS_BINARY__PACKAGE_test",
     actual = ":stderr",
     expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__PACKAGE js/private/test/js_binary_sh",

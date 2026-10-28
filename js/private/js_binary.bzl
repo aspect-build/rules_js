@@ -513,7 +513,6 @@ def _launcher_envs(ctx, fixed_env, is_windows):
 
     # Add rule context variables to the environment
     builtins = {
-        "JS_BINARY__BUILD_FILE_PATH": ctx.build_file_path,
         "JS_BINARY__PACKAGE": ctx.label.package,
         "JS_BINARY__TARGET_NAME": ctx.label.name,
         "JS_BINARY__TARGET": "{}//{}:{}".format(
