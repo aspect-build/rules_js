@@ -167,7 +167,7 @@ async function split() {
     /*{{VARIABLES}}*/
 
     const resolveTasks = []
-    const splitterUnusedInputs = createWriteStream('{{UNUSED_INPUTS}}')
+    const splitterUnusedInputs = []
 
     for (const key in entries) {
         if (typeof entries[key] == 'string') {
@@ -189,7 +189,7 @@ async function split() {
         if (is_source) {
             mtree.add(_mtree_file_line(key, dest))
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
-            splitterUnusedInputs.write(destBuf)
+            splitterUnusedInputs.push(dest + '\n')
             continue
         }
 
@@ -210,7 +210,7 @@ async function split() {
             // Just add the file as a regular file.
             mtree.add(_mtree_file_line(key, dest))
             // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
-            splitterUnusedInputs.write(destBuf)
+            splitterUnusedInputs.push(dest + '\n')
             continue
         }
 
@@ -251,7 +251,7 @@ async function split() {
                 // If we can't resolve the symlink, we just add the file as a regular file.
                 mtree.add(_mtree_file_line(key, dest))
                 // Splitter does not care about this file since its not a symlink, so prune it for better cache hit rate.
-                splitterUnusedInputs.write(destBuf)
+                splitterUnusedInputs.push(dest + '\n')
             }
         })
         resolveTasks.push(resolveTask)
@@ -259,7 +259,10 @@ async function split() {
 
     await Promise.all(resolveTasks)
 
+    // Symlink resolution finishes in filesystem-dependent order. Write the
+    // unused-input list only after all paths are collected, in a stable order.
     await Promise.all([
+        writeFile('{{UNUSED_INPUTS}}', splitterUnusedInputs.sort().join('')),
         /*{{WRITE_STATEMENTS}}*/
     ])
 }

@@ -1,6 +1,7 @@
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_binary")
+load("//js:defs.bzl", "js_binary", "js_test")
 load(":asserts.bzl", "SKIP_ON_WINDOWS", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
 
 package(default_testonly = True)
@@ -140,4 +141,19 @@ platform_transition_filegroup(
     srcs = [":js_image_layer_untransitioned"],
     target_compatible_with = SKIP_ON_WINDOWS,
     target_platform = ":linux_arm64",
+)
+
+copy_file(
+    name = "splitter_template",
+    src = "//js/private:js_image_layer.mjs",
+    out = "splitter_template.mjs",
+)
+
+js_test(
+    name = "splitter_unused_inputs_test",
+    size = "small",
+    args = ["$(rootpath :splitter_template)"],
+    data = [":splitter_template"],
+    entry_point = "splitter_unused_inputs_test.mjs",
+    target_compatible_with = SKIP_ON_WINDOWS,
 )
