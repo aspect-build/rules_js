@@ -1,8 +1,11 @@
+import * as path from 'node:path'
 import {
     isNodeModulePath,
     is1pPackageStoreDep,
+    isUnderNodeModules,
     friendlyFileSize,
     sandboxRelativeChdir,
+    sandboxParentDir,
 } from '../../devserver/js_run_devserver.mjs'
 
 // isNodeModulePath
@@ -54,6 +57,37 @@ for (const p of is1pPackageStoreDep_false) {
     }
 }
 
+// isUnderNodeModules
+const isUnderNodeModules_true = [
+    'some/path/node_modules/next',
+    'some/path/node_modules/@types/node',
+    // .bin entries and files within a package's contents are not package directories, but they are
+    // still resolved through node_modules and so must not point outside the sandbox.
+    'some/path/node_modules/.bin/next',
+    'node_modules/.bin/next',
+    'some/path/node_modules/next/dist/bin/next',
+    'node_modules/.aspect_rules_js/next@16.2.1/node_modules/next/package.json',
+]
+for (const p of isUnderNodeModules_true) {
+    if (!isUnderNodeModules(p)) {
+        console.error(`ERROR: expected ${p} to be under node_modules`)
+        process.exit(1)
+    }
+}
+const isUnderNodeModules_false = [
+    'some/path/some-file.js',
+    'src/app/page.tsx',
+    // A directory that merely ends in node_modules is not a node_modules tree.
+    'some/path/not_node_modules',
+    'node_modules',
+]
+for (const p of isUnderNodeModules_false) {
+    if (isUnderNodeModules(p)) {
+        console.error(`ERROR: expected ${p} to not be under node_modules`)
+        process.exit(1)
+    }
+}
+
 // friendlyFileSize
 const friendlyFileSize_cases = new Map()
 friendlyFileSize_cases.set(0, '0 B')
@@ -94,6 +128,25 @@ for (const [k, v] of sandboxRelativeChdir_cases) {
     if (a !== v) {
         console.error(
             `Expected sandboxRelativeChdir(${k}) to be '${v}' but got '${a}'`
+        )
+        process.exit(1)
+    }
+}
+
+// sandboxParentDir
+for (const dir of [
+    '.devserver',
+    'some/relative/dir',
+    '/abs/dir',
+    undefined,
+    '',
+]) {
+    const actual = sandboxParentDir(dir)
+    if (!path.isAbsolute(actual)) {
+        console.error(
+            `ERROR: expected sandboxParentDir(${JSON.stringify(
+                dir
+            )}) to be absolute but got '${actual}'`
         )
         process.exit(1)
     }
