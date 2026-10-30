@@ -733,6 +733,7 @@ def _npm_import_links_rule_impl(rctx):
     # NOTE: will include the main target, /ref and /pkg all in one map for simplicity.
     deps_oss = {}
     deps_cpus = {}
+    deps_libcs = {}
 
     has_lifecycle_build_target = bool(rctx.attr.lifecycle_build_target)
     has_transitive_closure = len(rctx.attr.transitive_closure) > 0
@@ -753,6 +754,9 @@ def _npm_import_links_rule_impl(rctx):
         dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
         if dep_cpus:
             deps_cpus[dep_store_target] = dep_cpus
+        dep_libcs = rctx.attr.deps_libcs.get(dep_key, None)
+        if dep_libcs:
+            deps_libcs[dep_store_target] = dep_libcs
 
     self_ref_names = None
 
@@ -778,6 +782,9 @@ def _npm_import_links_rule_impl(rctx):
             dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
             if dep_cpus:
                 deps_cpus[dep_store_target] = dep_cpus
+            dep_libcs = rctx.attr.deps_libcs.get(dep_key, None)
+            if dep_libcs:
+                deps_libcs[dep_store_target] = dep_libcs
     else:
         # regular deps pattern; reference each direct dependency's main store target
         for (dep_name, dep_key) in rctx.attr.deps.items():
@@ -796,6 +803,9 @@ def _npm_import_links_rule_impl(rctx):
             dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
             if dep_cpus:
                 deps_cpus[dep_store_target] = dep_cpus
+            dep_libcs = rctx.attr.deps_libcs.get(dep_key, None)
+            if dep_libcs:
+                deps_libcs[dep_store_target] = dep_libcs
 
     if has_lifecycle_build_target:
         # Lifecycle hooks require a self-reference. Use the regular package name if not named via transitive_closure.
@@ -856,9 +866,9 @@ def _npm_import_links_rule_impl(rctx):
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
     npm_link_pkg_bzl_vars = dict(
-        deps = _to_deps_attr(deps, deps_oss, deps_cpus),
+        deps = _to_deps_attr(deps, deps_oss, deps_cpus, deps_libcs),
         npm_package_target = npm_package_target,
-        lc_deps = _to_deps_attr(lc_deps, deps_oss, deps_cpus) if has_lifecycle_build_target else "{}",
+        lc_deps = _to_deps_attr(lc_deps, deps_oss, deps_cpus, deps_libcs) if has_lifecycle_build_target else "{}",
         has_lifecycle_build_target = has_lifecycle_build_target,
         has_transitive_closure = has_transitive_closure,
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
@@ -867,7 +877,7 @@ def _npm_import_links_rule_impl(rctx):
         public_visibility = str(public_visibility),
         package_key = rctx.attr.key,
         package = rctx.attr.package,
-        ref_deps = _to_deps_attr(ref_deps, deps_oss, deps_cpus),
+        ref_deps = _to_deps_attr(ref_deps, deps_oss, deps_cpus, deps_libcs),
         root_package = rctx.attr.root_package,
         version = rctx.attr.version,
         package_store_name = package_store_name,
@@ -899,9 +909,9 @@ def _npm_import_links_rule_impl(rctx):
 
     return rctx.repo_metadata(reproducible = True)
 
-def _to_deps_attr(deps, deps_oss, deps_cpus):
+def _to_deps_attr(deps, deps_oss, deps_cpus, deps_libcs):
     # Must split the deps into groups that share the same constraints based on
-    # cpu and os conditions.
+    # cpu, os and libc conditions.
     # A bazel select() can only have one truthy condition so constraints such as:
     #    ['windows', 'windows && x86_64']
     # can not be expressed in a single select().
@@ -910,10 +920,16 @@ def _to_deps_attr(deps, deps_oss, deps_cpus):
         "os": {},
         "cpu": {},
         "both": {},
+        "libc": {},
     }
 
     for k, v in deps.items():
-        if k in deps_oss and k in deps_cpus:
+        if k in deps_oss and k in deps_cpus and k in deps_libcs:
+            for condition in pnpm.to_bazel_os_cpu_libc_constraints(deps_oss[k], deps_cpus[k], deps_libcs[k]):
+                if condition not in constrained["libc"]:
+                    constrained["libc"][condition] = {}
+                constrained["libc"][condition][k] = v
+        elif k in deps_oss and k in deps_cpus:
             for condition in pnpm.to_bazel_os_cpu_constraints(deps_oss[k], deps_cpus[k]):
                 if condition not in constrained["both"]:
                     constrained["both"][condition] = {}
@@ -1207,6 +1223,7 @@ npm_import_links_rule = repository_rule(
     attrs = _ATTRS_LINKS | _INTERNAL_COMMON_ATTRS | {
         "deps_oss": attr.string_list_dict(),
         "deps_cpus": attr.string_list_dict(),
+        "deps_libcs": attr.string_list_dict(),
         "transitive_closure": attr.string_list_dict(doc = "Mapping of package store entry labels to a list of names to reference that package as"),
     },
 )
@@ -1231,6 +1248,7 @@ def npm_import(
         deps,
         deps_oss,
         deps_cpus,
+        deps_libcs,
         extra_build_content,
         transitive_closure,
         root_package,
@@ -1301,6 +1319,7 @@ def npm_import(
         deps = deps,
         deps_oss = deps_oss,
         deps_cpus = deps_cpus,
+        deps_libcs = deps_libcs,
         transitive_closure = transitive_closure,
         lifecycle_build_target = has_lifecycle_hooks or has_custom_postinstall,
         lifecycle_hooks_env = lifecycle_hooks_env,
