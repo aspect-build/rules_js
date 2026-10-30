@@ -39,68 +39,64 @@ if (process.argv[2] === '--run-splitter') {
     syncBuiltinESMExports()
     await import(pathToFileURL(process.argv[3]))
 } else {
+    // Paths of the generated splitter and its entries.json, as rootpaths then
+    // execpaths. The splitter reads entries.json and writes its outputs next to
+    // it, by execpath relative to its cwd.
+    const files = process.argv.slice(2)
+    const generated = files
+        .slice(0, files.length / 2)
+        .find((f) => f.endsWith('_js_image_layer_splitter.mjs'))
+    const entriesJson = files
+        .slice(files.length / 2)
+        .find((f) => f.endsWith('_entries.json'))
+    const outputDir = path.dirname(entriesJson)
+
     test('splitter unused inputs do not depend on lookup completion order', async () => {
-        const directory = await fs.mkdtemp(
-            path.join(process.env.TEST_TMPDIR || tmpdir(), 'splitter-')
-        )
-        try {
-            const entries = {
-                'app/source': { dest: 'source.txt', is_source: true },
-                'app/a': {
-                    dest: 'bazel-out/test/bin/a',
-                    is_source: false,
-                    root: 'bazel-out/test',
-                },
-                'app/b': {
-                    dest: 'bazel-out/test/bin/b',
-                    is_source: false,
-                    root: 'bazel-out/test',
-                },
-                'app/source-copy': { dest: 'source.txt', is_source: true },
-            }
-            await fs.mkdir(path.join(directory, 'bazel-out/test/bin'), {
-                recursive: true,
-            })
-            for (const { dest } of Object.values(entries)) {
-                await fs.writeFile(path.join(directory, dest), 'content')
-            }
-            await fs.writeFile(
-                path.join(directory, 'entries.json'),
-                JSON.stringify(entries)
+        const entries = {
+            'app.runfiles/_main/source': { dest: 'source.txt', is_source: true },
+            'app.runfiles/_main/node_modules/a': {
+                dest: 'bazel-out/test/bin/a',
+                is_source: false,
+                root: 'bazel-out/test',
+            },
+            'app.runfiles/_main/node_modules/b': {
+                dest: 'bazel-out/test/bin/b',
+                is_source: false,
+                root: 'bazel-out/test',
+            },
+            'app.runfiles/_main/source-copy': {
+                dest: 'source.txt',
+                is_source: true,
+            },
+        }
+        const runs = []
+        for (const order of [
+            ['a', 'b'],
+            ['b', 'a'],
+        ]) {
+            const directory = await fs.mkdtemp(
+                path.join(process.env.TEST_TMPDIR || tmpdir(), 'splitter-')
             )
-            // Expand the production template with one catch-all layer.
-            let splitter = await fs.readFile(process.argv[2], 'utf8')
-            const substitutions = {
-                '{{UID}}': '0',
-                '{{GID}}': '0',
-                '{{DIRECTORY_MODE}}': '0755',
-                '{{FILE_MODE}}': '0644',
-                '{{RUNFILES_DIR}}': 'app',
-                '{{REPO_NAME}}': '_main',
-                '{{ENTRIES}}': 'entries.json',
-                '{{PRESERVE_SYMLINKS}}': '.*',
-                '{{UNUSED_INPUTS}}': 'unused_inputs.txt',
-                '/*{{VARIABLES}}*/': 'const layer = new Set(["#mtree"]);',
-                '/*{{PICK_STATEMENTS}}*/': 'mtree = layer;',
-                '/*{{WRITE_STATEMENTS}}*/':
-                    'writeFile("layer.mtree", Array.from(layer).sort().join("\\n")),',
-            }
-            for (const [key, value] of Object.entries(substitutions)) {
-                splitter = splitter.replaceAll(key, value)
-            }
-            const script = path.join(directory, 'splitter.mjs')
-            await fs.writeFile(script, splitter)
-            const outputs = []
-            for (const order of [
-                ['a', 'b'],
-                ['b', 'a'],
-            ]) {
+            try {
+                await fs.mkdir(path.join(directory, 'bazel-out/test/bin'), {
+                    recursive: true,
+                })
+                for (const { dest } of Object.values(entries)) {
+                    await fs.writeFile(path.join(directory, dest), 'content')
+                }
+                await fs.mkdir(path.join(directory, outputDir), {
+                    recursive: true,
+                })
+                await fs.writeFile(
+                    path.join(directory, entriesJson),
+                    JSON.stringify(entries)
+                )
                 const result = spawnSync(
                     process.execPath,
                     [
                         fileURLToPath(import.meta.url),
                         '--run-splitter',
-                        script,
+                        path.resolve(generated),
                         JSON.stringify(order),
                     ],
                     { cwd: directory, encoding: 'utf8', timeout: 10000 }
@@ -110,29 +106,41 @@ if (process.argv[2] === '--run-splitter') {
                     0,
                     result.stderr || String(result.error)
                 )
-                outputs.push({
-                    unused: await fs.readFile(
-                        path.join(directory, 'unused_inputs.txt'),
-                        'utf8'
-                    ),
-                    mtree: await fs.readFile(
-                        path.join(directory, 'layer.mtree'),
-                        'utf8'
-                    ),
-                })
+                const outputs = {}
+                for (const name of await fs.readdir(
+                    path.join(directory, outputDir)
+                )) {
+                    if (name.endsWith('.mtree') || name.endsWith('.txt')) {
+                        outputs[name] = await fs.readFile(
+                            path.join(directory, outputDir, name),
+                            'utf8'
+                        )
+                    }
+                }
+                runs.push(outputs)
+            } finally {
+                await fs.rm(directory, { recursive: true, force: true })
             }
-            assert.equal(outputs[0].mtree, outputs[1].mtree)
-            assert.equal(
-                outputs[0].unused,
-                outputs[1].unused,
-                'unused-input bytes must not depend on lookup completion order'
-            )
-            assert.equal(
-                outputs[0].unused,
-                'bazel-out/test/bin/a\nbazel-out/test/bin/b\nsource.txt\nsource.txt\n'
-            )
-        } finally {
-            await fs.rm(directory, { recursive: true, force: true })
         }
+        assert.deepEqual(
+            runs[0],
+            runs[1],
+            'splitter outputs must not depend on lookup completion order'
+        )
+        const output = (suffix) =>
+            Object.entries(runs[0]).find(([name]) => name.endsWith(suffix))[1]
+        assert.equal(
+            output('_splitter_unused_inputs.txt'),
+            'bazel-out/test/bin/a\nbazel-out/test/bin/b\nsource.txt\nsource.txt\n'
+        )
+        // Each layer lists every entry it doesn't own, in entry order.
+        assert.equal(
+            output('_app_unused_inputs.txt'),
+            'bazel-out/test/bin/a\nbazel-out/test/bin/b\n'
+        )
+        assert.equal(
+            output('_node_modules_unused_inputs.txt'),
+            'source.txt\nsource.txt\n'
+        )
     })
 }

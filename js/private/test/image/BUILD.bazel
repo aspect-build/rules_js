@@ -1,8 +1,8 @@
 load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
-load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//js:defs.bzl", "js_binary", "js_test")
+load("//js:defs.bzl", "js_binary", "js_image_layer", "js_test")
 load(":asserts.bzl", "SKIP_ON_WINDOWS", "assert_checksum", "assert_js_image_layer_listings", "make_js_image_layer")
+load(":splitter.bzl", "js_image_layer_splitter")
 
 package(default_testonly = True)
 
@@ -143,17 +143,27 @@ platform_transition_filegroup(
     target_platform = ":linux_arm64",
 )
 
-copy_file(
-    name = "splitter_template",
-    src = "//js/private:js_image_layer.mjs",
-    out = "splitter_template.mjs",
+# Case 6: the generated splitter's unused inputs don't depend on lookup order
+js_image_layer(
+    name = "splitter_layer",
+    binary = ":bin",
+    target_compatible_with = SKIP_ON_WINDOWS,
+)
+
+js_image_layer_splitter(
+    name = "splitter",
+    js_image_layer = ":splitter_layer",
+    target_compatible_with = SKIP_ON_WINDOWS,
 )
 
 js_test(
     name = "splitter_unused_inputs_test",
     size = "small",
-    args = ["$(rootpath :splitter_template)"],
-    data = [":splitter_template"],
+    args = [
+        "$(rootpaths :splitter)",
+        "$(execpaths :splitter)",
+    ],
+    data = [":splitter"],
     entry_point = "splitter_unused_inputs_test.mjs",
     target_compatible_with = SKIP_ON_WINDOWS,
 )
