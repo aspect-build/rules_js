@@ -11,7 +11,6 @@ module(
 bazel_dep(name = "tar.bzl", version = "0.10.4")
 bazel_dep(name = "yq.bzl", version = "0.3.4")
 bazel_dep(name = "jq.bzl", version = "0.4.0")
-bazel_dep(name = "aspect_tools_telemetry", version = "0.5.2")
 bazel_dep(name = "bazel_features", version = "1.41.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "platforms", version = "1.0.0")
@@ -34,9 +33,6 @@ bazel_dep(name = "protobuf", version = "3.19.6")
 # https://github.com/bazel-contrib/bazel-lib/commit/e56aa707b72364bb1cc6f92580cb12ff88dfc1b4
 # https://github.com/bazel-contrib/bazel-lib/commit/2befef614904d0ebe5161beb271ac31c83e82fd2
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5", repo_name = None)
-
-tel = use_extension("@aspect_tools_telemetry//:extension.bzl", "telemetry")
-use_repo(tel, "aspect_tools_telemetry_report")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 use_repo(
