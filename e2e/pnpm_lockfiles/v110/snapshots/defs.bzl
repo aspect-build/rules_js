@@ -165,7 +165,7 @@ load("@lock-<LOCKVERSION>__wrap-ansi__7.0.0__links//:defs.bzl", store_161 = "npm
 load("@lock-<LOCKVERSION>__wrap-ansi__8.1.0__links//:defs.bzl", store_162 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
+load("@aspect_rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
@@ -226,184 +226,43 @@ def _link_pkg_0():
     _fp_link_6()
     _fp_link_7()
     _fp_link_8()
-    return [
-        ":node_modules/@aspect-test-a-bad-scope",
-        ":node_modules/@aspect-test-custom-scope/a",
-        ":node_modules/@aspect-test/a",
-        ":node_modules/@aspect-test/a2",
-        ":node_modules/aspect-test-a-no-scope",
-        ":node_modules/aspect-test-a/no-at",
-        ":node_modules/@aspect-test/c",
-        ":node_modules/@aspect-test/e",
-        ":node_modules/@aspect-test/h-is-only-optional",
-        ":node_modules/jsonify",
-        ":node_modules/@isaacs/cliui",
-        ":node_modules/rollup-plugin-with-peers",
-        ":node_modules/@vscode/vsce-sign",
-        ":node_modules/debug",
-        ":node_modules/esbuild",
-        ":node_modules/highlightjs-git-https-notar",
-        ":node_modules/is-odd-v0",
-        ":node_modules/is-odd-v1",
-        ":node_modules/is-odd-v2",
-        ":node_modules/is-odd-v3",
-        ":node_modules/is-odd",
-        ":node_modules/is-odd-alias",
-        ":node_modules/jquery-git-https-763ade6",
-        ":node_modules/jquery-git-ssh-399b201",
-        ":node_modules/jquery-github",
-        ":node_modules/jquery-git-ssh-e61fccb",
-        ":node_modules/jquery-http-git-f85d521",
-        ":node_modules/lodash",
-        ":node_modules/meaning-of-life",
-        ":node_modules/rollup",
-        ":node_modules/rollup3",
-        ":node_modules/tslib",
-        ":node_modules/typescript",
-        ":node_modules/uvu",
-        ":node_modules/@scoped/c",
-        ":node_modules/@scoped/a",
-        ":node_modules/alias-project-a",
-        ":node_modules/@scoped/b",
-        ":node_modules/scoped/bad",
-        ":node_modules/@scoped/d",
-        ":node_modules/alternate-versions",
-        ":node_modules/test-c200-d200",
-        ":node_modules/test-c201-d200",
-        ":node_modules/test-peer-types",
-        ":node_modules/@aspect-test/b",
-        ":node_modules/@types/archiver",
-        ":node_modules/@types/node",
-        ":node_modules/alias-types-node",
-        ":node_modules/alias-only-sizzle",
-        ":node_modules/sass-embedded",
-    ], {
-        "@aspect-test-a-bad-scop": [":node_modules/@aspect-test-a-bad-scope"],
-        "@aspect-test-custom-scope": [":node_modules/@aspect-test-custom-scope/a"],
-        "@aspect-test": [
-            ":node_modules/@aspect-test/a",
-            ":node_modules/@aspect-test/a2",
-            ":node_modules/@aspect-test/b",
-            ":node_modules/@aspect-test/c",
-            ":node_modules/@aspect-test/e",
-            ":node_modules/@aspect-test/h-is-only-optional",
-        ],
-        "@isaacs": [":node_modules/@isaacs/cliui"],
-        "@types": [
-            ":node_modules/@types/archiver",
-            ":node_modules/@types/node",
-        ],
-        "@vscode": [":node_modules/@vscode/vsce-sign"],
-        "@scoped": [
-            ":node_modules/@scoped/c",
-            ":node_modules/@scoped/a",
-            ":node_modules/@scoped/b",
-            ":node_modules/@scoped/d",
-        ],
-    }
 
 def _link_pkg_1():
     link_2()
     link_5()
-    return [
-        ":node_modules/@aspect-test/c",
-        ":node_modules/@aspect-test/d",
-    ], {
-        "@aspect-test": [
-            ":node_modules/@aspect-test/c",
-            ":node_modules/@aspect-test/d",
-        ],
-    }
 
 def _link_pkg_2():
     link_3()
     link_6()
-    return [
-        ":node_modules/@aspect-test/c",
-        ":node_modules/@aspect-test/d",
-    ], {
-        "@aspect-test": [
-            ":node_modules/@aspect-test/c",
-            ":node_modules/@aspect-test/d",
-        ],
-    }
 
 def _link_pkg_3():
     link_37("jsonify", dev=True)
     _fp_link_0()
     _fp_link_2()
     _fp_link_3()
-    return [
-        ":node_modules/jsonify",
-        ":node_modules/@scoped/c",
-        ":node_modules/@scoped/a",
-        ":node_modules/@scoped/b",
-    ], {
-        "@scoped": [
-            ":node_modules/@scoped/c",
-            ":node_modules/@scoped/a",
-            ":node_modules/@scoped/b",
-        ],
-    }
 
 def _link_pkg_4():
     link_59()
-    return [":node_modules/@types/node"], {
-        "@types": [":node_modules/@types/node"],
-    }
 
 def _link_pkg_5():
     link_59(dev=True)
     _fp_link_2()
     _fp_link_9()
-    return [
-        ":node_modules/@scoped/a",
-        ":node_modules/@types/node",
-        ":node_modules/a-types",
-    ], {
-        "@types": [":node_modules/@types/node"],
-        "@scoped": [":node_modules/@scoped/a"],
-    }
 
 def _link_pkg_6():
     link_110()
     link_111("lodash-4.17.20")
     link_112("lodash-4.17.21")
     link_113("lodash-4.17.21-file")
-    return [
-        ":node_modules/lodash",
-        ":node_modules/lodash-4.17.20",
-        ":node_modules/lodash-4.17.21",
-        ":node_modules/lodash-4.17.21-file",
-    ], None
 
 def _link_pkg_7():
     _fp_link_2()
     _fp_link_3()
     _fp_link_9()
-    return [
-        ":node_modules/@scoped/a",
-        ":node_modules/@scoped/b",
-        ":node_modules/a-types",
-    ], {
-        "@scoped": [
-            ":node_modules/@scoped/a",
-            ":node_modules/@scoped/b",
-        ],
-    }
 
 def _link_pkg_8():
     _fp_link_2()
     _fp_link_3()
-    return [
-        ":node_modules/@scoped/a",
-        ":node_modules/@scoped/b",
-    ], {
-        "@scoped": [
-            ":node_modules/@scoped/a",
-            ":node_modules/@scoped/b",
-        ],
-    }
 
 _LINK_PACKAGE_FNS = {
     "<LOCKVERSION>": _link_pkg_0,
@@ -420,11 +279,6 @@ _LINK_PACKAGE_FNS = {
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     # type: (...) -> None
-    if name != "node_modules":
-        fail("npm_link_all_packages: customizing 'name' is not supported")
-    if not prod and not dev:
-        fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
-
     bazel_package = native.package_name()
     root_package = "<LOCKVERSION>"
     is_root = bazel_package == root_package
@@ -709,41 +563,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
 
-    link_targets = None
-    scope_targets = None
-
+    link_targets = []
     if is_importer:
-        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
-        if _link_pkg_fn:
-            link_targets, scope_targets = _link_pkg_fn()
-    for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
-        if not link_targets:
-            link_targets = []
-        link_targets.extend(new_link_targets)
-        for _scope, _targets in new_scope_targets.items():
-            if not scope_targets:
-                scope_targets = {}
-            if _scope not in scope_targets:
-                scope_targets[_scope] = []
-            scope_targets[_scope].extend(_targets)
-
-    if scope_targets:
-        for scope, scoped_targets in scope_targets.items():
-            _js_library(
-                name = "node_modules/{}".format(scope),
-                srcs = scoped_targets,
-                tags = ["manual"],
-                visibility = ["//visibility:public"],
-            )
-
-    if is_importer:
-        _js_library(
-            name = "node_modules",
-            srcs = link_targets if link_targets else [],
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
+        link_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if link_fn:
+            link_fn()
+        entry = _LINK_TARGETS.get(bazel_package, {})
+        link_targets = entry.get("prod", []) + entry.get("dev", [])
+    _npm_link_all_packages(name, imported_links, prod, dev, link_targets, is_importer)
 
 _LINK_TARGETS = {
     "<LOCKVERSION>": {
@@ -858,20 +685,8 @@ _LINK_TARGETS = {
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     # type: (...) -> list[str]
-    if name != "node_modules":
-        fail("npm_link_targets: customizing 'name' is not supported")
-    if not prod and not dev:
-        fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
-
     bazel_package = package if package != None else native.package_name()
-
-    entry = _LINK_TARGETS.get(bazel_package, {})
-    link_targets = []
-    if prod and "prod" in entry:
-        link_targets.extend(entry["prod"])
-    if dev and "dev" in entry:
-        link_targets.extend(entry["dev"])
-    return ["//%s%s" % (bazel_package, target) for target in link_targets]
+    return _npm_link_targets(name, bazel_package, prod, dev, _LINK_TARGETS.get(bazel_package, {}))
 
 # Generated npm_link_package_store for linking of first-party "@scoped/c" package
 # buildifier: disable=function-docstring

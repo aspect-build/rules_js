@@ -4,17 +4,13 @@ load("@npm__chalk__5.3.0__links//:defs.bzl", link_0 = "npm_link_imported_package
 load("@npm__lodash__4.17.21__links//:defs.bzl", link_1 = "npm_link_imported_package_store_internal", store_1 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
+load("@aspect_rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
 
 _IMPORTER_PACKAGES = [""]
 
 def _link_pkg_0():
     link_0()
     link_1()
-    return [
-        ":node_modules/chalk",
-        ":node_modules/lodash",
-    ], None
 
 _LINK_PACKAGE_FNS = {
     "": _link_pkg_0,
@@ -23,11 +19,6 @@ _LINK_PACKAGE_FNS = {
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     # type: (...) -> None
-    if name != "node_modules":
-        fail("npm_link_all_packages: customizing 'name' is not supported")
-    if not prod and not dev:
-        fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
-
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
@@ -40,41 +31,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
         store_0()
         store_1()
 
-    link_targets = None
-    scope_targets = None
-
+    link_targets = []
     if is_importer:
-        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
-        if _link_pkg_fn:
-            link_targets, scope_targets = _link_pkg_fn()
-    for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
-        if not link_targets:
-            link_targets = []
-        link_targets.extend(new_link_targets)
-        for _scope, _targets in new_scope_targets.items():
-            if not scope_targets:
-                scope_targets = {}
-            if _scope not in scope_targets:
-                scope_targets[_scope] = []
-            scope_targets[_scope].extend(_targets)
-
-    if scope_targets:
-        for scope, scoped_targets in scope_targets.items():
-            _js_library(
-                name = "node_modules/{}".format(scope),
-                srcs = scoped_targets,
-                tags = ["manual"],
-                visibility = ["//visibility:public"],
-            )
-
-    if is_importer:
-        _js_library(
-            name = "node_modules",
-            srcs = link_targets if link_targets else [],
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
+        link_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if link_fn:
+            link_fn()
+        entry = _LINK_TARGETS.get(bazel_package, {})
+        link_targets = entry.get("prod", []) + entry.get("dev", [])
+    _npm_link_all_packages(name, imported_links, prod, dev, link_targets, is_importer)
 
 _LINK_TARGETS = {
     "": {
@@ -88,17 +52,5 @@ _LINK_TARGETS = {
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     # type: (...) -> list[str]
-    if name != "node_modules":
-        fail("npm_link_targets: customizing 'name' is not supported")
-    if not prod and not dev:
-        fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
-
     bazel_package = package if package != None else native.package_name()
-
-    entry = _LINK_TARGETS.get(bazel_package, {})
-    link_targets = []
-    if prod and "prod" in entry:
-        link_targets.extend(entry["prod"])
-    if dev and "dev" in entry:
-        link_targets.extend(entry["dev"])
-    return ["//%s%s" % (bazel_package, target) for target in link_targets]
+    return _npm_link_targets(name, bazel_package, prod, dev, _LINK_TARGETS.get(bazel_package, {}))

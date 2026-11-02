@@ -909,7 +909,7 @@ load("@npm-no_dev__yocto-queue__0.1.0__links//:defs.bzl", store_905 = "npm_impor
 load("@npm-no_dev__zod__3.21.4__links//:defs.bzl", store_906 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//js:defs.bzl", _js_library = "js_library")
+load("@aspect_rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
 
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
@@ -923,117 +923,46 @@ def _link_pkg_0():
     link_118()
     link_120()
     link_126()
-    return [
-        ":node_modules/@pnpm/lifecycle",
-        ":node_modules/@pnpm/logger",
-        ":node_modules/@pnpm/read-package-json",
-    ], {
-        "@pnpm": [
-            ":node_modules/@pnpm/lifecycle",
-            ":node_modules/@pnpm/logger",
-            ":node_modules/@pnpm/read-package-json",
-        ],
-    }
 
 def _link_pkg_1():
     link_179()
     link_180()
-    return [
-        ":node_modules/@rspack/cli",
-        ":node_modules/@rspack/core",
-    ], {
-        "@rspack": [
-            ":node_modules/@rspack/cli",
-            ":node_modules/@rspack/core",
-        ],
-    }
 
 def _link_pkg_2():
     link_197()
     link_546()
-    return [
-        ":node_modules/@types/node",
-        ":node_modules/jasmine",
-    ], {
-        "@types": [":node_modules/@types/node"],
-    }
 
 def _link_pkg_3():
     link_206()
     link_207()
     link_750()
-    return [
-        ":node_modules/@vscode/vsce-sign-alpine-arm64",
-        ":node_modules/@vscode/vsce-sign-alpine-x64",
-        ":node_modules/sass-embedded-all-unknown",
-    ], {
-        "@vscode": [
-            ":node_modules/@vscode/vsce-sign-alpine-arm64",
-            ":node_modules/@vscode/vsce-sign-alpine-x64",
-        ],
-    }
 
 def _link_pkg_4():
     link_219()
     _fp_link_2()
     _fp_link_3()
-    return [
-        ":node_modules/acorn",
-        ":node_modules/@image-test/a",
-        ":node_modules/@image-test/d",
-    ], {
-        "@image-test": [
-            ":node_modules/@image-test/a",
-            ":node_modules/@image-test/d",
-        ],
-    }
 
 def _link_pkg_5():
     link_269()
-    return [":node_modules/c8"], None
 
 def _link_pkg_6():
     link_280()
     link_281("chalk-alt")
-    return [
-        ":node_modules/chalk",
-        ":node_modules/chalk-alt",
-    ], None
 
 def _link_pkg_7():
     link_472()
     link_843()
-    return [
-        ":node_modules/google-protobuf",
-        ":node_modules/tslib",
-    ], None
 
 def _link_pkg_8():
     link_869()
-    return [":node_modules/uuid"], None
 
 def _link_pkg_9():
     link_869()
     _fp_link_2()
-    return [
-        ":node_modules/uuid",
-        ":node_modules/@image-test/a",
-    ], {
-        "@image-test": [":node_modules/@image-test/a"],
-    }
 
 def _link_pkg_10():
     _fp_link_4()
     _fp_link_5()
-    return [
-        ":node_modules/@subs/a",
-        ":node_modules/@subs/b",
-    ], {
-        "@subs": [
-            ":node_modules/@subs/a",
-            ":node_modules/@subs/b",
-        ],
-    }
 
 _LINK_PACKAGE_FNS = {
     "npm/private/lifecycle": _link_pkg_0,
@@ -1052,11 +981,6 @@ _LINK_PACKAGE_FNS = {
 # buildifier: disable=function-docstring
 def npm_link_all_packages(name = "node_modules", imported_links = [], prod = True, dev = True):
     # type: (...) -> None
-    if name != "node_modules":
-        fail("npm_link_all_packages: customizing 'name' is not supported")
-    if not prod and not dev:
-        fail("npm_link_all_packages: at least one of 'prod' or 'dev' must be True")
-
     bazel_package = native.package_name()
     root_package = ""
     is_root = bazel_package == root_package
@@ -2038,41 +1962,14 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             tags = ["manual"],
         )
 
-    link_targets = None
-    scope_targets = None
-
+    link_targets = []
     if is_importer:
-        _link_pkg_fn = _LINK_PACKAGE_FNS.get(bazel_package)
-        if _link_pkg_fn:
-            link_targets, scope_targets = _link_pkg_fn()
-    for link_fn in imported_links:
-        new_link_targets, new_scope_targets = link_fn(name, prod, dev)
-        if not link_targets:
-            link_targets = []
-        link_targets.extend(new_link_targets)
-        for _scope, _targets in new_scope_targets.items():
-            if not scope_targets:
-                scope_targets = {}
-            if _scope not in scope_targets:
-                scope_targets[_scope] = []
-            scope_targets[_scope].extend(_targets)
-
-    if scope_targets:
-        for scope, scoped_targets in scope_targets.items():
-            _js_library(
-                name = "node_modules/{}".format(scope),
-                srcs = scoped_targets,
-                tags = ["manual"],
-                visibility = ["//visibility:public"],
-            )
-
-    if is_importer:
-        _js_library(
-            name = "node_modules",
-            srcs = link_targets if link_targets else [],
-            tags = ["manual"],
-            visibility = ["//visibility:public"],
-        )
+        link_fn = _LINK_PACKAGE_FNS.get(bazel_package)
+        if link_fn:
+            link_fn()
+        entry = _LINK_TARGETS.get(bazel_package, {})
+        link_targets = entry.get("prod", []) + entry.get("dev", [])
+    _npm_link_all_packages(name, imported_links, prod, dev, link_targets, is_importer)
 
 _LINK_TARGETS = {
     "npm/private/lifecycle": {
@@ -2143,20 +2040,8 @@ _LINK_TARGETS = {
 # buildifier: disable=function-docstring
 def npm_link_targets(name = "node_modules", package = None, prod = True, dev = True):
     # type: (...) -> list[str]
-    if name != "node_modules":
-        fail("npm_link_targets: customizing 'name' is not supported")
-    if not prod and not dev:
-        fail("npm_link_targets: at least one of 'prod' or 'dev' must be True")
-
     bazel_package = package if package != None else native.package_name()
-
-    entry = _LINK_TARGETS.get(bazel_package, {})
-    link_targets = []
-    if prod and "prod" in entry:
-        link_targets.extend(entry["prod"])
-    if dev and "dev" in entry:
-        link_targets.extend(entry["dev"])
-    return ["//%s%s" % (bazel_package, target) for target in link_targets]
+    return _npm_link_targets(name, bazel_package, prod, dev, _LINK_TARGETS.get(bazel_package, {}))
 
 # Generated npm_link_package_store for linking of first-party "@image-test/a" package
 # buildifier: disable=function-docstring

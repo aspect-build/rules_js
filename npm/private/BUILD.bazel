@@ -243,3 +243,11 @@ bzl_library(
     name = "versions",
     srcs = ["versions.bzl"],
 )
+
+bzl_library(
+    name = "npm_link_all_packages",
+    srcs = ["npm_link_all_packages.bzl"],
+    # It's referenced by generated repositories.
+    visibility = ["//visibility:public"],
+    deps = ["//js:defs"],
+)
