@@ -103,9 +103,59 @@ def _to_conditional_dict_attr(
     else:
         return " | ".join(parts)
 
+_IDENTIFIER_ALNUM = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+_IDENTIFIER_ESCAPES = {
+    "_": "__",
+    "-": "_d",
+    ".": "_p",
+    "/": "_s",
+    "@": "_a",
+    "+": "_l",
+    ":": "_c",
+    "(": "_o",
+    ")": "_r",
+    "=": "_e",
+    "~": "_t",
+    "!": "_b",
+    "%": "_m",
+    "^": "_h",
+    "&": "_n",
+    "'": "_q",
+    "[": "_i",
+    "]": "_f",
+    "{": "_v",
+    "}": "_w",
+    "$": "_g",
+    ",": "_k",
+    ";": "_j",
+    "#": "_x",
+    "|": "_y",
+    "<": "_u",
+    ">": "_z",
+}
+
+def _identifier(name):
+    """Escape a name into a Starlark identifier fragment.
+
+    The escaping is injective: `_` is the only escape character and is always
+    followed by exactly one character that says what it stands for, so distinct
+    names map to distinct identifiers and each identifier depends on its name alone.
+    """
+    chars = []
+    for c in name.elems():
+        if c in _IDENTIFIER_ALNUM:
+            chars.append(c)
+        elif c in _IDENTIFIER_ESCAPES:
+            chars.append(_IDENTIFIER_ESCAPES[c])
+        else:
+            fail("Unsupported character '{}' in name '{}'".format(c, name))
+    return "".join(chars)
+
 starlark_codegen_utils = struct(
     to_list_attr = _to_list_attr,
     to_dict_attr = _to_dict_attr,
     to_dict_list_attr = _to_dict_list_attr,
     to_conditional_dict_attr = _to_conditional_dict_attr,
+    identifier = _identifier,
 )
