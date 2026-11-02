@@ -13,3 +13,4 @@ cases run on each of those lockfiles.
 -   `docusaurus-direct-peer-v*` - a direct dependency with a (peer=123) in the `importers` including within `npm:` dependencies
 -   `versionless-patch-v9`: pnpm v9.7+ allows patches without a version specifier
 -   `devengines-runtime-v11`: pnpm 11 records a `devEngines.runtime` Node as a `node@runtime:` package with a `type: variations` resolution
+-   `scalar-constraints-v10`: optional dependencies whose `os`, `cpu` or `libc` field is a scalar string instead of a list, as pnpm writes for packages declaring a single value (sass-embedded-linux-\*)

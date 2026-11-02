@@ -1,5 +1,6 @@
 node_modules/
 cases/versionless-patch-v9/node_modules
+cases/scalar-constraints-v10/node_modules
 cases/docusaurus-direct-peer-v9/node_modules
 cases/rerooted-nested-projects-v10/node_modules
 cases/rerooted-nested-projects-v10/lib/node_modules

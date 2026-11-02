@@ -29,3 +29,17 @@ assert_js_image_layer_listings(
     name = "rspack_linux_arm64_test",
     js_image_layer = ":rspack_linux_arm64",
 )
+
+# Verify that the musl binding is selected when targeting linux/arm64 with musl libc.
+# bazel run //js/private/test/image/platform_deps:rspack_linux_arm64_musl_test_update_all
+make_js_image_layer(
+    name = "rspack_linux_arm64_musl",
+    binary = ":bin",
+    platform = "//js/private/test/image:linux_arm64_musl",
+    root = "/app",
+)
+
+assert_js_image_layer_listings(
+    name = "rspack_linux_arm64_musl_test",
+    js_image_layer = ":rspack_linux_arm64_musl",
+)

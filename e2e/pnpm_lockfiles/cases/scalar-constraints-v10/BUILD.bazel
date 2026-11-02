@@ -1,0 +1,15 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@scalar-constraints-v10//:defs.bzl", scalar_constraints_link_all = "npm_link_all_packages")
+
+exports_files(["pnpm-lock.yaml"])
+
+scalar_constraints_link_all()
+
+build_test(
+    name = "scalar-constraints-v10",
+    targets = [
+        ":node_modules",
+        ":node_modules/sass-embedded",
+        ":.aspect_rules_js/node_modules/sass-embedded@1.97.3",
+    ],
+)

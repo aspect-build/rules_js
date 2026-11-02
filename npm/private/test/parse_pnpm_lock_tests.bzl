@@ -22,10 +22,45 @@ expected_importers = {
             "lodash": "lodash@file:lodash-4.17.21.tgz",
         },
         "dev_dependencies": {},
-        "optional_dependencies": {},
+        "optional_dependencies": {
+            "@aspect-test/linux-x64-glibc": "@aspect-test/linux-x64-glibc@1.0.0",
+            "@aspect-test/linux-x64-musl": "@aspect-test/linux-x64-musl@1.0.0",
+        },
     },
 }
 expected_packages = {
+    "@aspect-test/linux-x64-glibc@1.0.0": {
+        "name": "@aspect-test/linux-x64-glibc",
+        "dependencies": {},
+        "optional_dependencies": {},
+        "has_bin": False,
+        "optional": True,
+        "version": "1.0.0",
+        "friendly_version": "1.0.0",
+        "resolution": {
+            "integrity": "sha512-Kwqwc/jSSlcpRjULAOVbndqEy2GBzo6OBmmuBVINWUaJLJ8Kczz3vIsDUWLfWz/kTEw9FHBSiL0WCtYLVAXSLg==",
+        },
+        # lockfile has the array form: cpu: [x64], os: [linux], libc: [glibc]
+        "cpu": ["x64"],
+        "os": ["linux"],
+        "libc": ["glibc"],
+    },
+    "@aspect-test/linux-x64-musl@1.0.0": {
+        "name": "@aspect-test/linux-x64-musl",
+        "dependencies": {},
+        "optional_dependencies": {},
+        "has_bin": False,
+        "optional": True,
+        "version": "1.0.0",
+        "friendly_version": "1.0.0",
+        "resolution": {
+            "integrity": "sha512-4BJucJBGbuGnH6q7kpPqGJGzZnYrpAzRd60HQSt3OpX/6/YVgSsJnNzR8Ot74io50SeVT4CtCWe/RYIAymFPwA==",
+        },
+        # lockfile has the scalar form for libc: libc: musl (not an array)
+        "cpu": ["x64"],
+        "os": ["linux"],
+        "libc": ["musl"],
+    },
     "@aspect-test/a@5.0.0": {
         "name": "@aspect-test/a",
         "dependencies": {},
@@ -39,6 +74,7 @@ expected_packages = {
         },
         "cpu": None,
         "os": None,
+        "libc": None,
     },
     "lodash@file:lodash-4.17.21.tgz": {
         "name": "lodash",
@@ -54,12 +90,16 @@ expected_packages = {
         },
         "cpu": None,
         "os": None,
+        "libc": None,
     },
 }
 
 def _parse_lockfile_v9_test_impl(ctx):
     env = unittest.begin(ctx)
 
+    # pnpm copies the os, cpu and libc fields from package.json verbatim, so each may be an
+    # array or a scalar string. linux-x64-glibc uses arrays, linux-x64-musl a scalar libc.
+    # Both must parse to lists, see expected_packages.
     parsed_json = pnpm.parse_pnpm_lock_json("""\
 {
   "lockfileVersion": "9.0",
@@ -78,6 +118,16 @@ def _parse_lockfile_v9_test_impl(ctx):
           "specifier": "file:lodash-4.17.21.tgz",
           "version": "file:lodash-4.17.21.tgz"
         }
+      },
+      "optionalDependencies": {
+        "@aspect-test/linux-x64-glibc": {
+          "specifier": "1.0.0",
+          "version": "1.0.0"
+        },
+        "@aspect-test/linux-x64-musl": {
+          "specifier": "1.0.0",
+          "version": "1.0.0"
+        }
       }
     }
   },
@@ -87,6 +137,22 @@ def _parse_lockfile_v9_test_impl(ctx):
         "integrity": "sha512-t/lwpVXG/jmxTotGEsmjwuihC2Lvz/Iqt63o78SI3O5XallxtFp5j2WM2M6HwkFiii9I42KdlAF8B3plZMz0Fw=="
       },
       "hasBin": true
+    },
+    "@aspect-test/linux-x64-glibc@1.0.0": {
+      "resolution": {
+        "integrity": "sha512-Kwqwc/jSSlcpRjULAOVbndqEy2GBzo6OBmmuBVINWUaJLJ8Kczz3vIsDUWLfWz/kTEw9FHBSiL0WCtYLVAXSLg=="
+      },
+      "cpu": ["x64"],
+      "os": ["linux"],
+      "libc": ["glibc"]
+    },
+    "@aspect-test/linux-x64-musl@1.0.0": {
+      "resolution": {
+        "integrity": "sha512-4BJucJBGbuGnH6q7kpPqGJGzZnYrpAzRd60HQSt3OpX/6/YVgSsJnNzR8Ot74io50SeVT4CtCWe/RYIAymFPwA=="
+      },
+      "cpu": ["x64"],
+      "os": ["linux"],
+      "libc": "musl"
     },
     "lodash@file:lodash-4.17.21.tgz": {
       "resolution": {
@@ -99,6 +165,12 @@ def _parse_lockfile_v9_test_impl(ctx):
   "snapshots": {
     "@aspect-test/a@5.0.0": {
       "dependencies": {}
+    },
+    "@aspect-test/linux-x64-glibc@1.0.0": {
+      "optional": true
+    },
+    "@aspect-test/linux-x64-musl@1.0.0": {
+      "optional": true
     },
     "lodash@file:lodash-4.17.21.tgz": { }
   }

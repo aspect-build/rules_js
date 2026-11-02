@@ -7,6 +7,7 @@ load("@npm__meaning-of-life__1.0.0__links//:defs.bzl", "npm_link_imported_packag
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load(":generated_pkg_json_test.bzl", "generated_pkg_json_test")
 load(":npm_auth_test.bzl", "npm_auth_failure_test_suite", "npm_auth_test_suite")
+load(":npm_import_tests.bzl", "npm_import_tests")
 load(":npm_package_visibility_test.bzl", "npm_package_visibility_tests")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":parse_pnpm_lock_tests.bzl", "parse_pnpm_lock_tests")
@@ -32,6 +33,8 @@ utils_tests(name = "test_utils")
 npmrc_tests(name = "test_npmrc")
 
 pnpm_tests(name = "test_pnpm")
+
+npm_import_tests(name = "test_npm_import")
 
 transitive_closure_tests(name = "test_transitive_closure")
 
