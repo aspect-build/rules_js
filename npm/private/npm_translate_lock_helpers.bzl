@@ -495,6 +495,11 @@ def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclud
             elif dep_package not in package_importers[dep_package_key][link_package]:
                 package_importers[dep_package_key][link_package].append(dep_package)
 
+    closure_members = {}
+    for package_info in packages.values():
+        for member_key in package_info.get("transitive_closure", {}).keys() + package_info.get("transitive_optional_closure", {}).keys():
+            closure_members[member_key] = True
+
     patches_used = []
     result = []
     for package_key, package_info in packages.items():
@@ -668,6 +673,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             npm_auth_username = npm_auth_username,
             npm_auth_password = npm_auth_password,
             transitive_closure = transitive_closure if len(transitive_closure) else None,
+            in_transitive_closure = package_key in closure_members,
             url = url,
             commit = commit,
             version = version,

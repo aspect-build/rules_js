@@ -29,10 +29,21 @@ build_test(
     ],
 )
 
+# @aspect-test/a and @aspect-test/b depend on each other and pnpm overrides put local
+# packages into that cycle's transitive closure: the workspace package @aspect-test/c
+# and the file: directory package vendored-a
+build_test(
+    name = "circular_with_local_deps",
+    targets = [
+        "//:node_modules/@aspect-test/a",
+    ],
+)
+
 write_source_files(
     name = "repos",
     files = {
         "snapshots/defs.bzl": "@npm//:defs.bzl",
+        "snapshots/aspect_test_a_links_defs.bzl": "@npm__at_aspect-test_a__5.0.2__links//:defs.bzl",
     },
     tags = [
         "skip-on-bazel10",

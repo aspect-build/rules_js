@@ -23,7 +23,7 @@ load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link
 # buildifier: disable=bzl-visibility
 load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
 
-_IMPORTER_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d", "lib/d/e", "lib/d/f"]
+_IMPORTER_PACKAGES = ["", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/aspect-test-c", "lib/b", "lib/c", "lib/d", "lib/d/e", "lib/d/f"]
 
 def _link_pkg_0():
     link_0()
@@ -36,23 +36,24 @@ def _link_pkg_1():
     link_0()
     link_6()
     _fp_link_2()
+    _fp_link_3()
 
 def _link_pkg_2():
     link_0()
     link_6()
-    _fp_link_4()
+    _fp_link_5()
 
 def _link_pkg_3():
     link_3()
     link_8("alias-2")
-    _fp_link_6()
     _fp_link_7()
+    _fp_link_8()
 
 def _link_pkg_4():
     link_4()
     _fp_link_0()
     _fp_link_1()
-    _fp_link_3()
+    _fp_link_4()
 
 def _link_pkg_5():
     link_5()
@@ -63,12 +64,12 @@ def _link_pkg_6():
 
 def _link_pkg_7():
     link_6()
-    _fp_link_5()
+    _fp_link_6()
 
 def _link_pkg_8():
     link_7()
-    _fp_link_3()
-    _fp_link_3("@lib/b_alias")
+    _fp_link_4()
+    _fp_link_4("@lib/b_alias")
 
 _LINK_PACKAGE_FNS = {
     "": _link_pkg_0,
@@ -126,6 +127,15 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             deps = {
                 "//:.aspect_rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
             },
+            visibility = ["//visibility:public"],
+            tags = ["manual"],
+        )
+        _npm_local_package_store(
+            package_store_name = "@aspect-test+c@0.0.0",
+            src = "//lib/aspect-test-c:pkg",
+            package = "@aspect-test/c",
+            version = "0.0.0",
+            deps = {},
             visibility = ["//visibility:public"],
             tags = ["manual"],
         )
@@ -222,6 +232,7 @@ _LINK_TARGETS = {
         "prod": [
             ":node_modules/@aspect-test/a",
             ":node_modules/@aspect-test/g",
+            ":node_modules/@aspect-test/c",
             ":node_modules/@lib/a",
         ],
     },
@@ -296,9 +307,18 @@ def _fp_link_1(alias = None):
         src = "//:.aspect_rules_js/node_modules/vendored-b@file+vendored+b_@lib+b@lib+b",
     )
 
-# Generated npm_link_package_store for linking of first-party "@lib/a" package
+# Generated npm_link_package_store for linking of first-party "@aspect-test/c" package
 # buildifier: disable=function-docstring
 def _fp_link_2(alias = None):
+    _npm_local_link_package_store(
+        name = "node_modules/@aspect-test/c" if alias == None else "node_modules/{}".format(alias),
+        package = alias,
+        src = "//:.aspect_rules_js/node_modules/@aspect-test+c@0.0.0",
+    )
+
+# Generated npm_link_package_store for linking of first-party "@lib/a" package
+# buildifier: disable=function-docstring
+def _fp_link_3(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
@@ -307,7 +327,7 @@ def _fp_link_2(alias = None):
 
 # Generated npm_link_package_store for linking of first-party "@lib/b" package
 # buildifier: disable=function-docstring
-def _fp_link_3(alias = None):
+def _fp_link_4(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/b" if alias == None else "node_modules/{}".format(alias),
         package = alias,
@@ -316,7 +336,7 @@ def _fp_link_3(alias = None):
 
 # Generated npm_link_package_store for linking of first-party "@lib/c" package
 # buildifier: disable=function-docstring
-def _fp_link_4(alias = None):
+def _fp_link_5(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/c" if alias == None else "node_modules/{}".format(alias),
         package = alias,
@@ -325,7 +345,7 @@ def _fp_link_4(alias = None):
 
 # Generated npm_link_package_store for linking of first-party "@lib/d" package
 # buildifier: disable=function-docstring
-def _fp_link_5(alias = None):
+def _fp_link_6(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/d" if alias == None else "node_modules/{}".format(alias),
         package = alias,
@@ -334,7 +354,7 @@ def _fp_link_5(alias = None):
 
 # Generated npm_link_package_store for linking of first-party "@lib/e" package
 # buildifier: disable=function-docstring
-def _fp_link_6(alias = None):
+def _fp_link_7(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/e" if alias == None else "node_modules/{}".format(alias),
         package = alias,
@@ -343,7 +363,7 @@ def _fp_link_6(alias = None):
 
 # Generated npm_link_package_store for linking of first-party "@lib/f" package
 # buildifier: disable=function-docstring
-def _fp_link_7(alias = None):
+def _fp_link_8(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/f" if alias == None else "node_modules/{}".format(alias),
         package = alias,

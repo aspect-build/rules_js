@@ -29,8 +29,11 @@ def npm_imported_package_store_internal():
         lc_deps = {
             ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg_pre_lc_lite": "fsevents",
         },
+        links_deps = {},
+        shared_links = {},
         has_lifecycle_build_target = True,
         has_transitive_closure = False,
+        has_links = False,
         npm_package_target = "@@_main~npm~npm__fsevents__2.3.3//:pkg",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {},

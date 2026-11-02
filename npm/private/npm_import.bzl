@@ -24,7 +24,7 @@ load(
 load(":exclude_package_contents_presets.bzl", "EXCLUDE_PACKAGE_CONTENTS_PRESETS")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
-load(":npm_package_store_internal.bzl", "npm_package_store_internal")
+load(":npm_package_store_internal.bzl", "npm_package_store_internal", "npm_package_store_links")
 load(":pnpm.bzl", "pnpm")
 load(":starlark_codegen_utils.bzl", "starlark_codegen_utils")
 load(":utils.bzl", "utils")
@@ -69,8 +69,11 @@ def npm_imported_package_store_internal():
         deps = {deps},
         ref_deps = {ref_deps},
         lc_deps = {lc_deps},
+        links_deps = {links_deps},
+        shared_links = {shared_links},
         has_lifecycle_build_target = {has_lifecycle_build_target},
         has_transitive_closure = {has_transitive_closure},
+        has_links = {has_links},
         npm_package_target = "{npm_package_target}",
         package_store_name = _PACKAGE_STORE_NAME,
         lifecycle_hooks_env = {lifecycle_hooks_env},
@@ -92,8 +95,11 @@ def npm_imported_package_store_internal(
         deps,
         ref_deps,
         lc_deps,
+        links_deps,
+        shared_links,
         has_lifecycle_build_target,
         has_transitive_closure,
+        has_links,
         npm_package_target,
         package_store_name,
         lifecycle_hooks_env,
@@ -141,6 +147,16 @@ def npm_imported_package_store_internal(
         exclude_package_contents = expanded_exclude_patterns,
     )
 
+    if has_links:
+        # direct dependency symlinks of this package's store entry, shared by the terminal
+        # targets of every package whose transitive closure includes this package
+        npm_package_store_links(
+            name = "{}/links".format(store_target_name),
+            key = key,
+            deps = links_deps,
+            tags = ["manual"],
+        )
+
     # package store target with transitive closure of all npm package dependencies
     npm_package_store_internal(
         name = store_target_name,
@@ -149,6 +165,7 @@ def npm_imported_package_store_internal(
         package = package,
         version = version,
         deps = deps,
+        shared_links = shared_links,
         visibility = ["//visibility:public"],
         tags = ["manual"],
         exclude_package_contents = expanded_exclude_patterns,
@@ -724,99 +741,137 @@ def _mnemonic_for_bin(bin_name):
     bin_words = bin_name.split("_")
     return "".join([word.capitalize() for word in bin_words])
 
-def _npm_import_links_rule_impl(rctx):
+def _dep_store_target(dep_key, suffix = ""):
+    return '":{}/node_modules/{}{}"'.format(utils.package_store_root, utils.package_store_name(dep_key), suffix)
+
+def _store_deps(attr):
+    """Computes the package store targets generated for an npm package and their dependency edges.
+
+    Returns a struct of dicts mapping quoted store target labels to comma separated names the
+    dependency is linked as, plus the os/cpu constraints keyed by the same labels.
+    """
     ref_deps = {}
     lc_deps = {}
     deps = {}
+    links_deps = {}
+    shared_links = {}
 
     # Dependency constraints map from target name to constraints.
     # NOTE: will include the main target, /ref and /pkg all in one map for simplicity.
     deps_oss = {}
     deps_cpus = {}
 
-    has_lifecycle_build_target = bool(rctx.attr.lifecycle_build_target)
-    has_transitive_closure = len(rctx.attr.transitive_closure) > 0
+    has_lifecycle_build_target = bool(attr.lifecycle_build_target)
+    has_transitive_closure = len(attr.transitive_closure) > 0
 
-    # Construct the /ref for all deps to construct this package's /ref target
-    for (dep_name, dep_key) in rctx.attr.deps.items():
-        dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/ref"'.format(
-            package_store_name = utils.package_store_name(dep_key),
-            package_store_root = utils.package_store_root,
-        )
+    # Construct the /ref for all deps to construct this package's /ref target and
+    # the /pkg for all deps to construct this package's /links target
+    for (dep_name, dep_key) in attr.deps.items():
+        dep_store_target = _dep_store_target(dep_key, "/ref")
         if not dep_store_target in ref_deps:
             ref_deps[dep_store_target] = []
         ref_deps[dep_store_target].append(dep_name)
 
-        dep_oss = rctx.attr.deps_oss.get(dep_key, None)
+        dep_pkg_target = _dep_store_target(dep_key, "/pkg")
+        if not dep_pkg_target in links_deps:
+            links_deps[dep_pkg_target] = []
+        links_deps[dep_pkg_target].append(dep_name)
+
+        dep_oss = attr.deps_oss.get(dep_key, None)
         if dep_oss:
             deps_oss[dep_store_target] = dep_oss
-        dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
+            deps_oss[dep_pkg_target] = dep_oss
+        dep_cpus = attr.deps_cpus.get(dep_key, None)
         if dep_cpus:
             deps_cpus[dep_store_target] = dep_cpus
+            deps_cpus[dep_pkg_target] = dep_cpus
+
+    has_links = attr.in_transitive_closure
+    if not has_links:
+        links_deps = {}
 
     self_ref_names = None
 
     if has_transitive_closure:
         # transitive_closure deps pattern is used for breaking circular dependencies
         # reference each transitive /pkg target instead of the full direct deps graph
-        for (dep_key, dep_names) in rctx.attr.transitive_closure.items():
-            if dep_key == rctx.attr.key:
+        for (dep_key, dep_names) in attr.transitive_closure.items():
+            dep_links_target = _dep_store_target(dep_key, "/links")
+            shared_links[dep_links_target] = ""
+
+            if dep_key == attr.key:
                 # self-reference added later along with other self-references
                 self_ref_names = dep_names
                 continue
 
-            dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/pkg"'.format(
-                package_store_name = utils.package_store_name(dep_key),
-                package_store_root = utils.package_store_root,
-            )
+            dep_store_target = _dep_store_target(dep_key, "/pkg")
 
             deps[dep_store_target] = dep_names
 
-            dep_oss = rctx.attr.deps_oss.get(dep_key, None)
+            dep_oss = attr.deps_oss.get(dep_key, None)
             if dep_oss:
                 deps_oss[dep_store_target] = dep_oss
-            dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
+                deps_oss[dep_links_target] = dep_oss
+            dep_cpus = attr.deps_cpus.get(dep_key, None)
             if dep_cpus:
                 deps_cpus[dep_store_target] = dep_cpus
+                deps_cpus[dep_links_target] = dep_cpus
     else:
         # regular deps pattern; reference each direct dependency's main store target
-        for (dep_name, dep_key) in rctx.attr.deps.items():
-            dep_store_target = '":{package_store_root}/node_modules/{package_store_name}"'.format(
-                package_store_name = utils.package_store_name(dep_key),
-                package_store_root = utils.package_store_root,
-            )
+        for (dep_name, dep_key) in attr.deps.items():
+            dep_store_target = _dep_store_target(dep_key)
 
             if dep_store_target not in deps:
                 deps[dep_store_target] = []
             deps[dep_store_target].append(dep_name)
 
-            dep_oss = rctx.attr.deps_oss.get(dep_key, None)
+            dep_oss = attr.deps_oss.get(dep_key, None)
             if dep_oss:
                 deps_oss[dep_store_target] = dep_oss
-            dep_cpus = rctx.attr.deps_cpus.get(dep_key, None)
+            dep_cpus = attr.deps_cpus.get(dep_key, None)
             if dep_cpus:
                 deps_cpus[dep_store_target] = dep_cpus
 
     if has_lifecycle_build_target:
         # Lifecycle hooks require a self-reference. Use the regular package name if not named via transitive_closure.
-        self_ref_names = self_ref_names if self_ref_names else [rctx.attr.package]
+        self_ref_names = self_ref_names if self_ref_names else [attr.package]
 
         # special case for lifecycle transitive closure deps; do not depend on
         # the __pkg of this package as that will be the output directory
         # of the lifecycle action
-        self_lc_dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/pkg_pre_lc_lite"'.format(
-            package_store_name = utils.package_store_name(rctx.attr.key),
-            package_store_root = utils.package_store_root,
-        )
+        self_lc_dep_store_target = _dep_store_target(attr.key, "/pkg_pre_lc_lite")
         lc_deps = {self_lc_dep_store_target: self_ref_names} | deps
 
     if self_ref_names:
         # Self references in the main target to the /pkg target due to lifecycle hooks or transitive closures
-        self_dep_store_target = '":{package_store_root}/node_modules/{package_store_name}/pkg"'.format(
-            package_store_name = utils.package_store_name(rctx.attr.key),
-            package_store_root = utils.package_store_root,
-        )
+        self_dep_store_target = _dep_store_target(attr.key, "/pkg")
         deps = {self_dep_store_target: self_ref_names} | deps
+
+    # collapse alias lists to comma separated strings for each store target
+    for dep in deps.keys():
+        deps[dep] = ",".join(deps[dep])
+    for dep in lc_deps.keys():
+        lc_deps[dep] = ",".join(lc_deps[dep])
+    for dep in ref_deps.keys():
+        ref_deps[dep] = ",".join(ref_deps[dep])
+    for dep in links_deps.keys():
+        links_deps[dep] = ",".join(links_deps[dep])
+
+    return struct(
+        deps = deps,
+        ref_deps = ref_deps,
+        lc_deps = lc_deps,
+        links_deps = links_deps,
+        shared_links = shared_links,
+        deps_oss = deps_oss,
+        deps_cpus = deps_cpus,
+        has_links = has_links,
+        has_lifecycle_build_target = has_lifecycle_build_target,
+        has_transitive_closure = has_transitive_closure,
+    )
+
+def _npm_import_links_rule_impl(rctx):
+    store_deps = _store_deps(rctx.attr)
 
     package_store_name = utils.package_store_name(rctx.attr.key)
 
@@ -829,14 +884,6 @@ def _npm_import_links_rule_impl(rctx):
         npm_package_target = "@@{}//:pkg".format(
             npm_import_sources_repo_name,
         )
-
-    # collapse alias lists to comma separated strings for each store target
-    for dep in deps.keys():
-        deps[dep] = ",".join(deps[dep])
-    for dep in lc_deps.keys():
-        lc_deps[dep] = ",".join(lc_deps[dep])
-    for dep in ref_deps.keys():
-        ref_deps[dep] = ",".join(ref_deps[dep])
 
     lifecycle_hooks_env = {}
     for env in rctx.attr.lifecycle_hooks_env:
@@ -856,18 +903,21 @@ def _npm_import_links_rule_impl(rctx):
     public_visibility = ("//visibility:public" in rctx.attr.package_visibility)
 
     npm_link_pkg_bzl_vars = dict(
-        deps = _to_deps_attr(deps, deps_oss, deps_cpus),
+        deps = _to_deps_attr(store_deps.deps, store_deps.deps_oss, store_deps.deps_cpus),
         npm_package_target = npm_package_target,
-        lc_deps = _to_deps_attr(lc_deps, deps_oss, deps_cpus) if has_lifecycle_build_target else "{}",
-        has_lifecycle_build_target = has_lifecycle_build_target,
-        has_transitive_closure = has_transitive_closure,
+        lc_deps = _to_deps_attr(store_deps.lc_deps, store_deps.deps_oss, store_deps.deps_cpus) if store_deps.has_lifecycle_build_target else "{}",
+        links_deps = _to_deps_attr(store_deps.links_deps, store_deps.deps_oss, store_deps.deps_cpus),
+        shared_links = _to_deps_attr(store_deps.shared_links, store_deps.deps_oss, store_deps.deps_cpus),
+        has_lifecycle_build_target = store_deps.has_lifecycle_build_target,
+        has_transitive_closure = store_deps.has_transitive_closure,
+        has_links = store_deps.has_links,
         lifecycle_hooks_execution_requirements = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_execution_requirements, 2),
         lifecycle_hooks_env = starlark_codegen_utils.to_dict_attr(lifecycle_hooks_env),
         link_visibility = rctx.attr.package_visibility,
         public_visibility = str(public_visibility),
         package_key = rctx.attr.key,
         package = rctx.attr.package,
-        ref_deps = _to_deps_attr(ref_deps, deps_oss, deps_cpus),
+        ref_deps = _to_deps_attr(store_deps.ref_deps, store_deps.deps_oss, store_deps.deps_cpus),
         root_package = rctx.attr.root_package,
         version = rctx.attr.version,
         package_store_name = package_store_name,
@@ -1202,12 +1252,17 @@ Read more: [Configuring Bazel's Downloader](https://blog.aspect.build/configurin
 """,
 )
 
+npm_import_testonly = struct(
+    store_deps = _store_deps,
+)
+
 npm_import_links_rule = repository_rule(
     implementation = _npm_import_links_rule_impl,
     attrs = _ATTRS_LINKS | _INTERNAL_COMMON_ATTRS | {
         "deps_oss": attr.string_list_dict(),
         "deps_cpus": attr.string_list_dict(),
         "transitive_closure": attr.string_list_dict(doc = "Mapping of package store entry labels to a list of names to reference that package as"),
+        "in_transitive_closure": attr.bool(doc = "Whether this package is in the transitive closure of a package with circular dependencies"),
     },
 )
 
@@ -1257,7 +1312,8 @@ def npm_import(
         generate_package_json_bzl,
         extract_full_archive,
         exclude_package_contents,
-        exclude_package_contents_presets):
+        exclude_package_contents_presets,
+        in_transitive_closure = False):
     # By convention, the `{name}` repository contains the actual npm
     # package sources downloaded from the registry and extracted
     npm_import_rule(
@@ -1302,6 +1358,7 @@ def npm_import(
         deps_oss = deps_oss,
         deps_cpus = deps_cpus,
         transitive_closure = transitive_closure,
+        in_transitive_closure = in_transitive_closure,
         lifecycle_build_target = has_lifecycle_hooks or has_custom_postinstall,
         lifecycle_hooks_env = lifecycle_hooks_env,
         lifecycle_hooks_execution_requirements = lifecycle_hooks_execution_requirements,
