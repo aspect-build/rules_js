@@ -169,7 +169,3 @@ This third approach has trade-offs.
     `js_run_binary` sets this automatically, and custom rules that invoke a `js_binary` directly should use the
     `js_binary_lib.run_binary_action` helper (see `js/libs.bzl`) instead of calling `ctx.actions.run` themselves so
     this detail stays hidden.
-
-# Telemetry & privacy policy
-
-This ruleset collects limited usage data via [`tools_telemetry`](https://github.com/aspect-build/tools_telemetry), which is reported to Aspect Build Inc and governed by our [privacy policy](https://www.aspect.build/privacy-policy).
