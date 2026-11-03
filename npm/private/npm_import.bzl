@@ -916,36 +916,24 @@ def _to_deps_attr(deps, deps_oss, deps_cpus, deps_libcs):
     #    ['windows', 'windows && x86_64']
     # can not be expressed in a single select().
     unconstrained = {}
+
+    # Ordered so each group's select() keeps its place in the generated code.
     constrained = {
         "os": {},
         "cpu": {},
-        "both": {},
-        "libc": {},
+        "os_cpu": {},
+        "os_cpu_libc": {},
     }
 
     for k, v in deps.items():
-        if k in deps_oss and k in deps_cpus and k in deps_libcs:
-            for condition in pnpm.to_bazel_os_cpu_libc_constraints(deps_oss[k], deps_cpus[k], deps_libcs[k]):
-                if condition not in constrained["libc"]:
-                    constrained["libc"][condition] = {}
-                constrained["libc"][condition][k] = v
-        elif k in deps_oss and k in deps_cpus:
-            for condition in pnpm.to_bazel_os_cpu_constraints(deps_oss[k], deps_cpus[k]):
-                if condition not in constrained["both"]:
-                    constrained["both"][condition] = {}
-                constrained["both"][condition][k] = v
-        elif k in deps_oss:
-            for condition in pnpm.to_bazel_os_constraints(deps_oss[k]):
-                if condition not in constrained["os"]:
-                    constrained["os"][condition] = {}
-                constrained["os"][condition][k] = v
-        elif k in deps_cpus:
-            for condition in pnpm.to_bazel_cpu_constraints(deps_cpus[k]):
-                if condition not in constrained["cpu"]:
-                    constrained["cpu"][condition] = {}
-                constrained["cpu"][condition][k] = v
-        else:
+        group, conditions = pnpm.to_bazel_constraints(deps_oss.get(k), deps_cpus.get(k), deps_libcs.get(k))
+        if not group:
             unconstrained[k] = v
+            continue
+        for condition in conditions:
+            if condition not in constrained[group]:
+                constrained[group][condition] = {}
+            constrained[group][condition][k] = v
 
     return starlark_codegen_utils.to_conditional_dict_attr(
         unconstrained,

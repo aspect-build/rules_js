@@ -459,6 +459,44 @@ def _os_cpu_libc_constraints(ctx):
         ["@aspect_rules_js//platforms/pnpm:darwin_x64", "@aspect_rules_js//platforms/pnpm:linux_x64_glibc", "@aspect_rules_js//platforms/pnpm:linux_x64_unconstrained"],
         pnpm.to_bazel_os_cpu_libc_constraints(["darwin", "linux"], ["x64"], ["glibc"]),
     )
+
+    # aix maps to the linux constraint, so it shares linux's conditions rather than overlapping them
+    asserts.equals(
+        env,
+        ["@aspect_rules_js//platforms/pnpm:linux_x64_musl", "@aspect_rules_js//platforms/pnpm:linux_x64_unconstrained"],
+        pnpm.to_bazel_os_cpu_libc_constraints(["aix", "linux"], ["x64"], ["musl"]),
+    )
+
+    # A missing [cpu] allows every cpu
+    no_cpu = pnpm.to_bazel_os_cpu_libc_constraints(["linux"], None, ["musl"])
+    asserts.true(env, "@aspect_rules_js//platforms/pnpm:linux_arm64_musl" in no_cpu)
+    asserts.true(env, "@aspect_rules_js//platforms/pnpm:linux_x64_musl" in no_cpu)
+    asserts.false(env, "@aspect_rules_js//platforms/pnpm:linux_x64_glibc" in no_cpu)
+
+    # A missing [os] allows every os, and libc only narrows linux
+    no_os = pnpm.to_bazel_os_cpu_libc_constraints(None, ["x64"], ["musl"])
+    asserts.true(env, "@aspect_rules_js//platforms/pnpm:darwin_x64" in no_os)
+    asserts.true(env, "@aspect_rules_js//platforms/pnpm:win32_x64" in no_os)
+    asserts.true(env, "@aspect_rules_js//platforms/pnpm:linux_x64_musl" in no_os)
+    asserts.false(env, "@aspect_rules_js//platforms/pnpm:linux_x64_glibc" in no_os)
+    asserts.false(env, "@aspect_rules_js//platforms/pnpm:aix_x64" in no_os)
+    return unittest.end(env)
+
+def _constraints(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(env, (None, None), pnpm.to_bazel_constraints(None, None, None))
+    asserts.equals(env, ("os", ["@aspect_rules_js//platforms/pnpm:darwin"]), pnpm.to_bazel_constraints(["darwin"], None, None))
+    asserts.equals(env, ("cpu", ["@aspect_rules_js//platforms/pnpm:arm64"]), pnpm.to_bazel_constraints(None, ["arm64"], None))
+    asserts.equals(env, ("os_cpu", ["@aspect_rules_js//platforms/pnpm:darwin_arm64"]), pnpm.to_bazel_constraints(["darwin"], ["arm64"], None))
+    asserts.equals(
+        env,
+        ("os_cpu_libc", ["@aspect_rules_js//platforms/pnpm:linux_x64_glibc", "@aspect_rules_js//platforms/pnpm:linux_x64_unconstrained"]),
+        pnpm.to_bazel_constraints(["linux"], ["x64"], ["glibc"]),
+    )
+
+    # [libc] with only one of [os] and [cpu] still goes in the libc group
+    asserts.equals(env, "os_cpu_libc", pnpm.to_bazel_constraints(None, ["x64"], ["glibc"])[0])
+    asserts.equals(env, "os_cpu_libc", pnpm.to_bazel_constraints(["linux"], None, ["glibc"])[0])
     return unittest.end(env)
 
 basic_test = unittest.make(_basic)
@@ -488,6 +526,7 @@ cpu_constraints_test = unittest.make(_cpu_constraints)
 os_constraints_test = unittest.make(_os_constraints)
 os_cpu_constraints_test = unittest.make(_os_cpu_constraints)
 os_cpu_libc_constraints_test = unittest.make(_os_cpu_libc_constraints)
+constraints_test = unittest.make(_constraints)
 
 def pnpm_tests(name):
     unittest.suite(
@@ -519,4 +558,5 @@ def pnpm_tests(name):
         os_constraints_test,
         os_cpu_constraints_test,
         os_cpu_libc_constraints_test,
+        constraints_test,
     )

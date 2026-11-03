@@ -67,9 +67,17 @@ def _to_bazel_os_cpu_libc_constraints(oss, cpus, libcs):
     # pnpm only checks [libc] on linux, where each allowed libc gets its own condition.
     # The unconstrained libc matches a platform that does not set //platforms/libc,
     # which keeps every libc variant as before.
-    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
-    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
+    #
+    # A missing [os] or [cpu] allows all of them, as it does in pnpm. Every condition
+    # here must be mutually exclusive since they share one select(), so an os that
+    # maps to the linux constraint (aix) is folded into linux.
+    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os") if oss else _known_values(PNPM_PLATFORMS)
+    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu") if cpus else _known_values(PNPM_ARCHS)
     libcs = _resolve_pnpm_constraint_values(libcs, PNPM_LIBCS, {}, "libc") + ["unconstrained"]
+    oss = {
+        ("linux" if PNPM_PLATFORMS[os] == PNPM_PLATFORMS["linux"] else os): True
+        for os in oss
+    }.keys()
     r = []
     for cpu in cpus:
         for os in oss:
@@ -80,6 +88,29 @@ def _to_bazel_os_cpu_libc_constraints(oss, cpus, libcs):
                 r.append("@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu))
     return r
 
+def _to_bazel_constraints(oss, cpus, libcs):
+    """Converts a package's pnpm [os], [cpu] and [libc] fields to bazel conditions.
+
+    Args:
+        oss: the [os] values or None
+        cpus: the [cpu] values or None
+        libcs: the [libc] values or None
+
+    Returns:
+        A (group, conditions) tuple, or (None, None) for an unconstrained package.
+        Packages in the same group can share a select(), since their conditions
+        are of the same kind and so never overlap.
+    """
+    if libcs:
+        return "os_cpu_libc", _to_bazel_os_cpu_libc_constraints(oss, cpus, libcs)
+    if oss and cpus:
+        return "os_cpu", _to_bazel_os_cpu_constraints(oss, cpus)
+    if oss:
+        return "os", _to_bazel_os_constraints(oss)
+    if cpus:
+        return "cpu", _to_bazel_cpu_constraints(cpus)
+    return None, None
+
 def _to_bazel_os_constraints(oss):
     oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
     return ["@aspect_rules_js//platforms/pnpm:{}".format(os) for os in oss]
@@ -87,6 +118,16 @@ def _to_bazel_os_constraints(oss):
 def _to_bazel_cpu_constraints(cpus):
     cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
     return ["@aspect_rules_js//platforms/pnpm:{}".format(cpu) for cpu in cpus]
+
+def _known_values(known_map):
+    return [x for x in known_map.keys() if known_map[x]]
+
+def _constraint_list(value):
+    # package.json allows [os], [cpu] and [libc] to be a single string or a list,
+    # and pnpm keeps the form the package used.
+    if types.is_string(value):
+        return [value]
+    return value
 
 def _resolve_pnpm_constraint_values(values, known_map, aliases_map, kind):
     if not values:
@@ -275,9 +316,9 @@ def _convert_v9_packages(packages, snapshots, no_optional):
             has_bin = package_data.get("hasBin", False),
             optional = optional,
             resolution = package_data["resolution"],
-            cpu = package_data.get("cpu", None),
-            os = package_data.get("os", None),
-            libc = package_data.get("libc", None),
+            cpu = _constraint_list(package_data.get("cpu", None)),
+            os = _constraint_list(package_data.get("os", None)),
+            libc = _constraint_list(package_data.get("libc", None)),
         )
 
     return result
@@ -417,6 +458,7 @@ pnpm = struct(
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
     to_bazel_os_cpu_constraints = _to_bazel_os_cpu_constraints,
     to_bazel_os_cpu_libc_constraints = _to_bazel_os_cpu_libc_constraints,
+    to_bazel_constraints = _to_bazel_constraints,
     to_bazel_os_constraints = _to_bazel_os_constraints,
     to_bazel_cpu_constraints = _to_bazel_cpu_constraints,
 )

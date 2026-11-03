@@ -218,16 +218,55 @@ def _test_version_supported(ctx):
 
     return unittest.end(env)
 
+def _parse_lockfile_v9_constraints_test_impl(ctx):
+    env = unittest.begin(ctx)
+
+    # package.json allows [os], [cpu] and [libc] as a string or a list, and pnpm keeps
+    # the form the package used (e.g. sass-embedded's "libc": "glibc").
+    _, packages, _, _ = pnpm.parse_pnpm_lock_json("""\
+{
+  "lockfileVersion": "9.0",
+  "importers": {},
+  "packages": {
+    "a-linux-x64-gnu@1.0.0": {
+      "resolution": {"integrity": "sha512-a"},
+      "os": "linux",
+      "cpu": "x64",
+      "libc": "glibc"
+    },
+    "a-linux-x64-musl@1.0.0": {
+      "resolution": {"integrity": "sha512-b"},
+      "os": ["linux"],
+      "cpu": ["x64"],
+      "libc": ["musl"]
+    }
+  },
+  "snapshots": {
+    "a-linux-x64-gnu@1.0.0": {"optional": true},
+    "a-linux-x64-musl@1.0.0": {"optional": true}
+  }
+}
+""", False, False)
+
+    for key, libc in [("a-linux-x64-gnu@1.0.0", "glibc"), ("a-linux-x64-musl@1.0.0", "musl")]:
+        asserts.equals(env, ["linux"], packages[key]["os"])
+        asserts.equals(env, ["x64"], packages[key]["cpu"])
+        asserts.equals(env, [libc], packages[key]["libc"])
+
+    return unittest.end(env)
+
 a_test = unittest.make(_parse_empty_lock_test_impl, attrs = {})
 d_test = unittest.make(_parse_lockfile_v9_test_impl, attrs = {})
 e_test = unittest.make(_test_version_supported, attrs = {})
 f_test = unittest.make(_parse_lockfile_v9_runtime_test_impl, attrs = {})
+g_test = unittest.make(_parse_lockfile_v9_constraints_test_impl, attrs = {})
 
 TESTS = [
     a_test,
     d_test,
     e_test,
     f_test,
+    g_test,
 ]
 
 def parse_pnpm_lock_tests(name):
