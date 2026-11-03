@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@rules_js//js:defs.bzl", "js_library")
 
 # The sources of this js_library will be included transitively in the terminal
 # //npm_package/packages/pkg_a npm_package for this package via the

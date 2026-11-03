@@ -4,7 +4,7 @@ js_binary examples
 Simple examples of running JS programs in node with js_binary, js_run_binary, and js_test.
 """
 
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_lib//lib:directory_path.bzl", "directory_path")

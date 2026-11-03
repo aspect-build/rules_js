@@ -1,6 +1,6 @@
 # NOTE: keep in sync with e2e/pnpm_workspace(_rerooted)
 
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+load("@rules_js//js:defs.bzl", "js_binary", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 

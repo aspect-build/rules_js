@@ -10,14 +10,14 @@ local_path_override(
     path = "../lodash_module",
 )
 
-bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+bazel_dep(name = "rules_js", version = "0.0.0")
 local_path_override(
-    module_name = "aspect_rules_js",
+    module_name = "rules_js",
     path = "../../..",
 )
 
 npm_utils = use_extension(
-    "@aspect_rules_js//npm:extensions.bzl",
+    "@rules_js//npm:extensions.bzl",
     "npm",
 )
 npm_utils.npm_translate_lock(

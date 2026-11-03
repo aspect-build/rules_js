@@ -344,7 +344,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 
             In your patches folder add a BUILD.bazel file containing.
             ```
-            load("@aspect_rules_js//npm:repositories.bzl", "list_patches")
+            load("@rules_js//npm:repositories.bzl", "list_patches")
 
             list_patches(
                 name = "patches",

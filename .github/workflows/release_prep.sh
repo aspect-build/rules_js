@@ -28,10 +28,10 @@ Just comment on our [Adoption Discussion](https://github.com/aspect-build/rules_
 
 Add to your \`MODULE.bazel\` file:
 \`\`\`starlark
-bazel_dep(name = "aspect_rules_js", version = "${TAG:1}")
+bazel_dep(name = "rules_js", version = "${TAG:1}")
 
 # Translate the pnpm-lock.yaml file to bazel targets
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm = use_extension("@rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",
     pnpm_lock = "//:pnpm-lock.yaml",
@@ -41,7 +41,7 @@ use_repo(npm, "npm")
 
 # Allows developers to use the matching pnpm version, for example:
 # bazel run -- @pnpm --dir $PWD install
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
+pnpm = use_extension("@rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
 use_repo(pnpm, "pnpm")
 \`\`\`
 

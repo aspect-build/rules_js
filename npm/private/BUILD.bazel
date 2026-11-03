@@ -1,6 +1,6 @@
 "Internal implementation details"
 
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 package(default_visibility = ["//npm:__subpackages__"])
@@ -77,7 +77,7 @@ bzl_library(
         ":pnpm",
         ":starlark_codegen_utils",
         ":utils",
-        "@aspect_rules_js//js:defs",
+        "@rules_js//js:defs",
         "@bazel_lib//lib:directory_path",
         "@bazel_lib//lib:repo_utils",
         "@bazel_lib//lib:repositories",

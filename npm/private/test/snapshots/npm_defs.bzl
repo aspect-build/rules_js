@@ -909,16 +909,16 @@ load("@npm__yocto-queue__0.1.0__links//:defs.bzl", store_905 = "npm_imported_pac
 load("@npm__zod__3.21.4__links//:defs.bzl", store_906 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
+load("@rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
+load("@rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
+load("@rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
+load("@rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")
 
 _IMPORTER_PACKAGES = ["", "js/private/coverage/bundle", "js/private/devserver/src", "js/private/test/image", "js/private/test/image-fixture-a", "js/private/test/image-fixture-d", "js/private/test/image/platform_deps", "js/private/test/js_run_devserver", "js/private/test/node-patches", "js/private/worker/src", "npm/private/lifecycle", "npm/private/test", "npm/private/test/npm_package", "npm/private/test/npm_package_publish", "npm/private/test/subs"]
 

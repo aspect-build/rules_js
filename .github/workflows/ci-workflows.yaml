@@ -299,12 +299,12 @@ jobs:
                     - {
                           id: 'bazel-9-no-execroot-entry-point',
                           version: '9.x',
-                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_execroot_entry_point=False',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@rules_js//js:use_execroot_entry_point=False',
                       }
                     - {
                           id: 'bazel-9-hermetic-launcher',
                           version: '9.x',
-                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@aspect_rules_js//js:use_hermetic_launcher=True',
+                          flags: '--bazel-flag=--test_tag_filters=-skip-on-bazel9 --bazel-flag=--@rules_js//js:use_hermetic_launcher=True',
                       }
                     - {
                           id: 'bazel-10',
@@ -325,8 +325,8 @@ jobs:
                           workspace: { slug: 'e2e-patch_from_repo' },
                           bazel: { id: 'bazel-10' },
                       }
-                    # e2e/repo_mapping renames aspect_rules_js, so a flag beginning with
-                    # --@aspect_rules_js// (as used by the no-execroot-entry-point and
+                    # e2e/repo_mapping renames rules_js, so a flag beginning with
+                    # --@rules_js// (as used by the no-execroot-entry-point and
                     # hermetic-launcher variants) doesn't resolve.
                     - {
                           workspace: { slug: 'e2e-repo_mapping' },
@@ -387,7 +387,7 @@ jobs:
               working-directory: ${{ matrix.workspace.path }}
               run: |
                   bazel build --noenable_runfiles \
-                    --@aspect_rules_js//js:use_hermetic_launcher=True \
+                    --@rules_js//js:use_hermetic_launcher=True \
                     //:no_runfiles_output
                   test "$(cat bazel-bin/no_runfiles_output.txt)" = "generated in target configuration"
 

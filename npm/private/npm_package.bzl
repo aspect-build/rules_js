@@ -4,7 +4,7 @@ Rules for linking npm dependencies and packaging and linking first-party deps.
 Load these with,
 
 ```starlark
-load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@rules_js//npm:defs.bzl", "npm_package")
 ```
 """
 
@@ -444,7 +444,7 @@ def npm_package(
     if publishable:
         js_binary(
             name = "{}.publish".format(name),
-            entry_point = Label("@aspect_rules_js//npm/private:npm_publish_mjs"),
+            entry_point = Label("@rules_js//npm/private:npm_publish_mjs"),
             fixed_args = [
                 "./$(rootpath :{})".format(name),
             ],

@@ -1,6 +1,6 @@
 "custom_test rule"
 
-load("@aspect_rules_js//js:libs.bzl", "js_binary_lib", "js_lib_helpers")
+load("@rules_js//js:libs.bzl", "js_binary_lib", "js_lib_helpers")
 
 def _custom_test_impl(ctx):
     fixed_args = ["--arg1", "--arg2"]
@@ -11,7 +11,7 @@ def _custom_test_impl(ctx):
 
     launcher = js_binary_lib.create_launcher(
         ctx,
-        log_prefix_rule_set = "aspect_rules_js",
+        log_prefix_rule_set = "rules_js",
         log_prefix_rule = "custom_test",
         fixed_args = fixed_args,
         fixed_env = fixed_env,

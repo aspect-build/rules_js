@@ -7,7 +7,7 @@ users of this library to resolve the `one.d.ts` file.
 The `main` key is another commonly used field in `package.json` which would require including it in the library.
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@rules_js//js:defs.bzl", "js_library")
 
 js_library(
     name = "one",

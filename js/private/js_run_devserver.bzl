@@ -55,7 +55,7 @@ def _js_run_devserver_impl(ctx):
 
     launcher = js_binary_lib.create_launcher(
         ctx,
-        log_prefix_rule_set = "aspect_rules_js",
+        log_prefix_rule_set = "rules_js",
         log_prefix_rule = "js_run_devserver",
         fixed_args = [config_file.short_path, entries_json_file.short_path],
     )
@@ -169,7 +169,7 @@ def js_run_devserver(
     A simple http-server, for example, can be setup as follows,
 
     ```
-    load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+    load("@rules_js//js:defs.bzl", "js_run_devserver")
     load("@npm//:http-server/package_json.bzl", http_server_bin = "bin")
 
     http_server_bin.http_server_binary(
@@ -339,7 +339,7 @@ def js_run_devserver(
             Label("@bazel_lib//lib:enable_runfiles"): True,
             "//conditions:default": False,
         }),
-        entry_point = Label("@aspect_rules_js//js/private/devserver:js_devserver_entrypoint"),
+        entry_point = Label("@rules_js//js/private/devserver:js_devserver_entrypoint"),
         # This rule speaks the ibazel protocol, supports live reload, supports incremental-build-protocol
         tags = kwargs.pop("tags", []) + [
             "ibazel_live_reload",

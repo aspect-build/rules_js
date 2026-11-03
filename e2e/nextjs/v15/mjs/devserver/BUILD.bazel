@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@rules_js//js:defs.bzl", "js_run_devserver")
 
 # Next.js devservers run with the package store in the sandbox, which Turbopack requires since it
 # refuses to compile packages whose real path is outside of its root. Exercised by //:test.sh.

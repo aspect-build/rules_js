@@ -1,5 +1,5 @@
-load("@aspect_rules_js//js:proto.bzl", "js_proto_toolchain")
-load("@aspect_rules_js//js:rpc.bzl", "js_rpc_toolchain")
+load("@rules_js//js:proto.bzl", "js_proto_toolchain")
+load("@rules_js//js:rpc.bzl", "js_rpc_toolchain")
 load("@npm//tools:@bufbuild/protoc-gen-es/package_json.bzl", gen_es = "bin")
 load("@npm//tools:@connectrpc/protoc-gen-connect-query/package_json.bzl", connect_query = "bin")
 

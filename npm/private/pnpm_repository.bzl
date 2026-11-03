@@ -136,8 +136,8 @@ process.exit(result.status === null ? 1 : result.status)
 """)
 
     rctx.file("BUILD.bazel", "\n".join([
-        """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
-        """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", "npm_package_internal")""",
+        """load("@rules_js//js:defs.bzl", "js_binary")""",
+        """load("@rules_js//npm/private:npm_package_internal.bzl", "npm_package_internal")""",
         # The package target referenced by the links repository, same as npm_import.
         """npm_package_internal(
     name = "pkg",
@@ -224,7 +224,7 @@ def pnpm_repository(name, pnpm_version, include_npm, integrity, patches = [], pa
             patches = patches,
             patch_args = patch_args,
             extra_build_content = "\n".join([
-                """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
+                """load("@rules_js//js:defs.bzl", "js_binary")""",
                 """js_binary(
     name = "pnpm",
     data = glob(["package/**"]),

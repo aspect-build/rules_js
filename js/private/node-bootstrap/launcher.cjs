@@ -138,7 +138,7 @@ if (bazelOutSegment && (!bindir || !isDirectory(path.join(startCwd, bindir)))) {
                     'calling ctx.actions.run yourself so that BAZEL_BINDIR is set correctly. If this ' +
                     "is not a build action you can set the BAZEL_BINDIR to '.' instead to supress " +
                     'this error. For more context on this design decision, please read the ' +
-                    'aspect_rules_js README ' +
+                    'rules_js README ' +
                     'https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs.'
             )
         }

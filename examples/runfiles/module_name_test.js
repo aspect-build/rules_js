@@ -66,12 +66,12 @@ describe('runfile resolution', () => {
 
     it('should properly resolve a runfile within a direct module dependency', () => {
         const fsPatchPath = runfiles.resolve(
-            'aspect_rules_js/js/private/node-bootstrap/fs.cjs'
+            'rules_js/js/private/node-bootstrap/fs.cjs'
         )
 
         assert(!!fsPatchPath, `Expected to find fs patches`)
         assert(
-            fsPatchPath.indexOf('/aspect_rules_js/') == -1,
+            fsPatchPath.indexOf('/rules_js/') == -1,
             `Expected to find fs patches in a resolved bzlmod directory`
         )
     })

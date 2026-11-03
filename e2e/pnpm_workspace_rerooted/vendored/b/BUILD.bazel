@@ -1,6 +1,6 @@
 # NOTE: keep in sync with e2e/pnpm_workspace(_rerooted)
 
-load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@rules_js//npm:defs.bzl", "npm_package")
 
 npm_package(
     name = "pkg",

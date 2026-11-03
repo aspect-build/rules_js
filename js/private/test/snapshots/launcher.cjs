@@ -30,7 +30,7 @@ const WORKSPACE_NAME = "_main"
 const ENTRY_POINT_PATH = "js/private/test/shellcheck.js"
 const NODE_PATH = "../rules_nodejs++node+nodejs_linux_amd64/bin/nodejs/bin/node"
 const NPM_PATH = ""
-const LOG_PREFIX_RULE_SET = "aspect_rules_js"
+const LOG_PREFIX_RULE_SET = "rules_js"
 const LOG_PREFIX_RULE = "js_binary"
 // The node options the launcher's own process was already started with, by the native stub.
 const STUB_NODE_OPTIONS = ["--preserve-symlinks-main"]

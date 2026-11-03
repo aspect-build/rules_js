@@ -15,13 +15,13 @@ load("@npm__typescript__5.9.3__links//:defs.bzl", link_11 = "npm_link_imported_p
 load("@npm__undici-types__6.21.0__links//:defs.bzl", store_12 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
+load("@rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
+load("@rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
+load("@rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")
 
 _IMPORTER_PACKAGES = ["root", "", "app/a", "app/b", "app/c", "app/d", "lib/a", "lib/b", "lib/c", "lib/d", "lib/d/e", "lib/d/f"]
 

@@ -99,8 +99,8 @@ the same proto files, which are provided by a `js_library` that lists the same
 Example:
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
-load("@aspect_rules_js//js:rpc.bzl", "js_rpc_library")
+load("@rules_js//js:defs.bzl", "js_library", "js_test")
+load("@rules_js//js:rpc.bzl", "js_rpc_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
 proto_library(

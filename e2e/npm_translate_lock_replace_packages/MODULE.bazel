@@ -4,12 +4,12 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "aspect_rules_js", version = "0.0.0")
+bazel_dep(name = "rules_js", version = "0.0.0")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 
 local_path_override(
-    module_name = "aspect_rules_js",
+    module_name = "rules_js",
     path = "../..",
 )
 
@@ -36,7 +36,7 @@ local_path_override(
 )
 
 npm = use_extension(
-    "@aspect_rules_js//npm:extensions.bzl",
+    "@rules_js//npm:extensions.bzl",
     "npm",
     dev_dependency = True,
 )

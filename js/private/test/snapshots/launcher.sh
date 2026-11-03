@@ -99,7 +99,7 @@ fi
 # fails.
 LOG_ERROR_CAPTURE="${STDERR_CAPTURE_IS_TEMP:+$STDERR_CAPTURE}"
 
-export JS_BINARY__LOG_PREFIX="aspect_rules_js[js_binary]"
+export JS_BINARY__LOG_PREFIX="rules_js[js_binary]"
 
 # Emit a log line to $1, or to the real stderr when $1 is empty.
 function log_to {

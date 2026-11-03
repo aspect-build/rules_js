@@ -65,7 +65,7 @@ The `:node_modules/{package}` targets accessible to a package align with how Nod
 In `MODULE.bazel`, use the `npm` extension pointing to your `pnpm-lock.yaml` file:
 
 ```starlark
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+npm = use_extension("@rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 
 # Uses the pnpm-lock.yaml file to automate creation of npm_import rules
 npm.npm_translate_lock(

@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@rules_js//js:defs.bzl", "js_library")
 load("@npm//:typescript/package_json.bzl", typescript_bin = "bin")
 
 # Generate the js and d.ts files for this js_library from typescript code

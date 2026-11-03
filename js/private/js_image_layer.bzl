@@ -3,7 +3,7 @@
 For example, this js_image_layer target outputs `node_modules.tar` and `app.tar` with `/app` prefix.
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_image_layer")
+load("@rules_js//js:defs.bzl", "js_image_layer")
 
 js_image_layer(
     name = "layers",
@@ -78,7 +78,7 @@ js_image_layer supports transitioning to specific `platform` to allow building m
 **A partial example using rules_oci with transition to linux/amd64 platform.**
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
+load("@rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 
 js_binary(
@@ -114,7 +114,7 @@ oci_image(
 **A partial example using rules_oci to create multi-platform images.**
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
+load("@rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index")
 
 js_binary(
@@ -576,7 +576,7 @@ js_image_layer_lib = struct(
             doc = """Label to a js_binary target.
 
             A custom rule built on `js_binary_lib.create_launcher` works too. Under
-            `--@aspect_rules_js//js:use_hermetic_launcher` it must also republish
+            `--@rules_js//js:use_hermetic_launcher` it must also republish
             `launcher_js` in an output group the way `js_binary` does.""",
         ),
         "root": attr.string(

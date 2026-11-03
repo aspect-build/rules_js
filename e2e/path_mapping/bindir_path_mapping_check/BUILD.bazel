@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@rules_js//js:defs.bzl", "js_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load(":bindir_path_mapping_check.bzl", "bindir_path_mapping_check")
 

@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 
 # Same as //js_run_binary_path_mapping_check in the root module, but in a
 # subpackage of an external module, where the bin-directory layout gains an

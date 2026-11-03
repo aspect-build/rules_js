@@ -26,7 +26,7 @@ Just write `proto_library` targets as usual, or have Gazelle generate them.
 Then reference them anywhere a `js_library` could appear, for example:
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@rules_js//js:defs.bzl", "js_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
 proto_library(

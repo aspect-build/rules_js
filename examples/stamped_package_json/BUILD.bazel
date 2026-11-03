@@ -1,4 +1,4 @@
-load("@aspect_rules_js//npm:defs.bzl", "stamped_package_json")
+load("@rules_js//npm:defs.bzl", "stamped_package_json")
 load("@jq.bzl//jq:jq.bzl", "jq", "jq_test")
 
 stamped_package_json(

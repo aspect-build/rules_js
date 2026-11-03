@@ -1,4 +1,4 @@
-load("@aspect_rules_js//npm:repositories.bzl", "list_patches")
+load("@rules_js//npm:repositories.bzl", "list_patches")
 
 list_patches(
     name = "patches",

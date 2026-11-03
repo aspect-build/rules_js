@@ -54,7 +54,7 @@ Yes, just run `bazel run -- @pnpm//:pnpm --dir $PWD` followed by the usual argum
 Add these lines to your MODULE.bazel:
 
 ```starlark
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
+pnpm = use_extension("@rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
 
 use_repo(pnpm, "pnpm")
 ```

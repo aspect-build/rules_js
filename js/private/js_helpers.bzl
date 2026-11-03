@@ -88,7 +88,7 @@ See https://docs.aspect.build/bazel/javascript/rules_js for more context on why 
 Either move {file_basename} to '{this_package}', or add a 'js_library'
 target in {file_basename}'s package and add that target to the deps of {this_target}:
 
-buildozer 'new_load @aspect_rules_js//js:defs.bzl js_library' {file_package}:__pkg__
+buildozer 'new_load @rules_js//js:defs.bzl js_library' {file_package}:__pkg__
 buildozer 'new js_library {new_target_name}' {file_package}:__pkg__
 buildozer 'add srcs {file_basename}' {file_package}:{new_target_name}
 buildozer 'add visibility {this_package}:__pkg__' {file_package}:{new_target_name}

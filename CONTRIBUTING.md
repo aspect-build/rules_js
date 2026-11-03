@@ -21,7 +21,7 @@ Otherwise later tooling on CI will yell at you about formatting/linting violatio
 ## Using this as a development dependency of other rules
 
 You'll commonly find that you develop in another MODULE, such as
-some other ruleset that depends on `@aspect_rules_js`, or in a nested
+some other ruleset that depends on `@rules_js`, or in a nested
 MODULE in the integration_tests folder.
 
 To always tell Bazel to use this directory rather than some release
@@ -29,11 +29,11 @@ artifact or a version fetched from the internet, run this from this
 directory:
 
 ```sh
-OVERRIDE="--override_repository=aspect_rules_js=$(pwd)/rules_js"
+OVERRIDE="--override_repository=rules_js=$(pwd)/rules_js"
 echo "common:override $OVERRIDE" >> ~/.bazelrc
 ```
 
-This means that any usage of `@aspect_rules_js` on your system will point to this folder, if you
+This means that any usage of `@rules_js` on your system will point to this folder, if you
 pass the `--config=override` flag to Bazel.
 (We don't want to enable this for all builds, since you'll later forget this was done and wonder
 why you don't reproduce the same behavior as others.)

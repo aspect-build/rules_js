@@ -1,7 +1,7 @@
 "aspect-build/rules_js"
 
 module(
-    name = "aspect_rules_js",
+    name = "rules_js",
     bazel_compatibility = [">=7.6.0"],
     compatibility_level = 1,
 )
@@ -49,7 +49,7 @@ use_repo(
 )
 
 # The default + public version of pnpm used by default.
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm = use_extension("@rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(name = "pnpm")
 use_repo(pnpm, "pnpm", "pnpm__links")
 
@@ -100,7 +100,7 @@ register_toolchains(
 )
 
 # Dev-only pnpm used for local testing
-pnpm10 = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
+pnpm10 = use_extension("@rules_js//npm:extensions.bzl", "pnpm", dev_dependency = True)
 pnpm10.pnpm(
     name = "pnpm10",
     pnpm_version = "10.22.0",
@@ -169,7 +169,7 @@ node_dev.toolchain(
 )
 
 npm = use_extension(
-    "@aspect_rules_js//npm:extensions.bzl",
+    "@rules_js//npm:extensions.bzl",
     "npm",
     dev_dependency = True,
 )
