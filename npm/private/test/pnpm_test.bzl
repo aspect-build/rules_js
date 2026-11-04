@@ -407,37 +407,54 @@ def _latest_version_known(ctx):
 
 def _cpu_constraints(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64"], pnpm.to_bazel_cpu_constraints(["arm64"]))
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64", "@aspect_rules_js//platforms/pnpm:riscv64"], pnpm.to_bazel_cpu_constraints(["arm64", "riscv64"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64"], pnpm.to_bazel_constraints(cpus = ["arm64"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:arm64", "@aspect_rules_js//platforms/pnpm:riscv64"], pnpm.to_bazel_constraints(cpus = ["arm64", "riscv64"]))
     asserts.equals(
         env,
         ["@aspect_rules_js//platforms/pnpm:ppc", "@aspect_rules_js//platforms/pnpm:ppc64", "@aspect_rules_js//platforms/pnpm:s390x", "@aspect_rules_js//platforms/pnpm:ia32", "@aspect_rules_js//platforms/pnpm:mips", "@aspect_rules_js//platforms/pnpm:wasm32"],
-        pnpm.to_bazel_cpu_constraints(["!arm", "!arm64", "!riscv64", "!x64"]),
+        pnpm.to_bazel_constraints(cpus = ["!arm", "!arm64", "!riscv64", "!x64"]),
     )
     return unittest.end(env)
 
 def _os_constraints(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin"]))
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["win32", "linux"]))
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin", "sunos"]))
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:android", "@aspect_rules_js//platforms/pnpm:netbsd"], pnpm.to_bazel_os_constraints(["!linux", "!darwin", "!freebsd", "!openbsd", "!aix"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_constraints(oss = ["darwin"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:linux"], pnpm.to_bazel_constraints(oss = ["win32", "linux"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_constraints(oss = ["darwin", "sunos"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:win32", "@aspect_rules_js//platforms/pnpm:android", "@aspect_rules_js//platforms/pnpm:netbsd"], pnpm.to_bazel_constraints(oss = ["!linux", "!darwin", "!freebsd", "!openbsd", "!aix"]))
 
     # "alpine" is not a Node.js process.platform value but is used by some packages (e.g. @vscode/vsce-sign-alpine-*).
     # It should be recognized as a known (but unsupported) OS value and filtered out, not cause a hard failure.
     # See https://github.com/aspect-build/rules_js/issues/2745
-    asserts.equals(env, [], pnpm.to_bazel_os_constraints(["alpine"]))
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["alpine", "linux"]))
+    asserts.equals(env, [], pnpm.to_bazel_constraints(oss = ["alpine"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:linux"], pnpm.to_bazel_constraints(oss = ["alpine", "linux"]))
     return unittest.end(env)
 
 def _os_cpu_constraints(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin_arm64"], pnpm.to_bazel_os_cpu_constraints(["darwin"], ["arm64"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:darwin_arm64"], pnpm.to_bazel_constraints(["darwin"], ["arm64"]))
     asserts.equals(
         env,
         ["@aspect_rules_js//platforms/pnpm:win32_x64", "@aspect_rules_js//platforms/pnpm:linux_x64"],
-        pnpm.to_bazel_os_cpu_constraints(["win32", "linux"], ["x64"]),
+        pnpm.to_bazel_constraints(["win32", "linux"], ["x64"]),
     )
+    return unittest.end(env)
+
+def _libc_constraints(ctx):
+    env = unittest.begin(ctx)
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:glibc"], pnpm.to_bazel_constraints(libcs = ["glibc"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:glibc"], pnpm.to_bazel_constraints(libcs = ["!musl"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:glibc", "@aspect_rules_js//platforms/pnpm:musl"], pnpm.to_bazel_constraints(libcs = ["glibc", "musl"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:linux_glibc"], pnpm.to_bazel_constraints(oss = ["linux"], libcs = ["glibc"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:x64_musl"], pnpm.to_bazel_constraints(cpus = ["x64"], libcs = ["musl"]))
+    asserts.equals(env, ["@aspect_rules_js//platforms/pnpm:linux_x64_glibc"], pnpm.to_bazel_constraints(["linux"], ["x64"], ["glibc"]))
+    asserts.equals(
+        env,
+        ["@aspect_rules_js//platforms/pnpm:linux_arm64_musl", "@aspect_rules_js//platforms/pnpm:linux_x64_musl"],
+        pnpm.to_bazel_constraints(["linux"], ["arm64", "x64"], ["!glibc"]),
+    )
+    asserts.equals(env, [], pnpm.to_bazel_constraints())
+    asserts.equals(env, [], pnpm.to_bazel_constraints(oss = ["sunos"], libcs = ["glibc"]))
     return unittest.end(env)
 
 basic_test = unittest.make(_basic)
@@ -466,6 +483,7 @@ latest_version_known_test = unittest.make(_latest_version_known)
 cpu_constraints_test = unittest.make(_cpu_constraints)
 os_constraints_test = unittest.make(_os_constraints)
 os_cpu_constraints_test = unittest.make(_os_cpu_constraints)
+libc_constraints_test = unittest.make(_libc_constraints)
 
 def pnpm_tests(name):
     unittest.suite(
@@ -496,4 +514,5 @@ def pnpm_tests(name):
         cpu_constraints_test,
         os_constraints_test,
         os_cpu_constraints_test,
+        libc_constraints_test,
     )

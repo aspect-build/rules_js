@@ -23,6 +23,7 @@ PNPM_LOCK_TEST_CASES = [
     "workspace-peer-v9",
     "multi-document-v11",
     "devengines-runtime-v11",
+    "scalar-constraints-v10",
 ]
 
 bazel_dep(name = "bazel_lib", version = "3.0.0")

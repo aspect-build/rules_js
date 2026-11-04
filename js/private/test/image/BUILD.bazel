@@ -34,6 +34,16 @@ platform(
     visibility = ["//js/private/test/image:__subpackages__"],
 )
 
+platform(
+    name = "linux_arm64_musl",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+        "//platforms/libc:musl",
+    ],
+    visibility = ["//js/private/test/image:__subpackages__"],
+)
+
 # All these golden files can be updated with
 # bazel run //js/private/test/image:default_test_update_all
 # bazel run //js/private/test/image:custom_owner_test_update_all

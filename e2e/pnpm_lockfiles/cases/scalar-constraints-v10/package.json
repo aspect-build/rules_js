@@ -1,0 +1,8 @@
+{
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
+    "dependencies": {
+        "sass-embedded": "1.97.3"
+    }
+}

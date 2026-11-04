@@ -31,20 +31,6 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/sync-child-process@1.0.2": "sync-child-process",
             ":.aspect_rules_js/node_modules/varint@6.0.0": "varint",
         } | select({
-            "@aspect_rules_js//platforms/pnpm:aix": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
-            },
-            "@aspect_rules_js//platforms/pnpm:freebsd": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
-            },
-            "@aspect_rules_js//platforms/pnpm:openbsd": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
-            },
-            "@aspect_rules_js//platforms/pnpm:netbsd": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
-            },
-            "//conditions:default": {},
-        }) | select({
             "@aspect_rules_js//platforms/pnpm:ppc": {
                 ":.aspect_rules_js/node_modules/sass-embedded-all-unknown@1.97.3": "sass-embedded-all-unknown",
             },
@@ -62,6 +48,20 @@ def npm_imported_package_store_internal():
             },
             "@aspect_rules_js//platforms/pnpm:wasm32": {
                 ":.aspect_rules_js/node_modules/sass-embedded-all-unknown@1.97.3": "sass-embedded-all-unknown",
+            },
+            "//conditions:default": {},
+        }) | select({
+            "@aspect_rules_js//platforms/pnpm:aix": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
+            },
+            "@aspect_rules_js//platforms/pnpm:freebsd": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
+            },
+            "@aspect_rules_js//platforms/pnpm:openbsd": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
+            },
+            "@aspect_rules_js//platforms/pnpm:netbsd": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3": "sass-embedded-unknown-all",
             },
             "//conditions:default": {},
         }) | select({
@@ -116,20 +116,6 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/sync-child-process@1.0.2/ref": "sync-child-process",
             ":.aspect_rules_js/node_modules/varint@6.0.0/ref": "varint",
         } | select({
-            "@aspect_rules_js//platforms/pnpm:aix": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
-            },
-            "@aspect_rules_js//platforms/pnpm:freebsd": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
-            },
-            "@aspect_rules_js//platforms/pnpm:openbsd": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
-            },
-            "@aspect_rules_js//platforms/pnpm:netbsd": {
-                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
-            },
-            "//conditions:default": {},
-        }) | select({
             "@aspect_rules_js//platforms/pnpm:ppc": {
                 ":.aspect_rules_js/node_modules/sass-embedded-all-unknown@1.97.3/ref": "sass-embedded-all-unknown",
             },
@@ -147,6 +133,20 @@ def npm_imported_package_store_internal():
             },
             "@aspect_rules_js//platforms/pnpm:wasm32": {
                 ":.aspect_rules_js/node_modules/sass-embedded-all-unknown@1.97.3/ref": "sass-embedded-all-unknown",
+            },
+            "//conditions:default": {},
+        }) | select({
+            "@aspect_rules_js//platforms/pnpm:aix": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
+            },
+            "@aspect_rules_js//platforms/pnpm:freebsd": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
+            },
+            "@aspect_rules_js//platforms/pnpm:openbsd": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
+            },
+            "@aspect_rules_js//platforms/pnpm:netbsd": {
+                ":.aspect_rules_js/node_modules/sass-embedded-unknown-all@1.97.3/ref": "sass-embedded-unknown-all",
             },
             "//conditions:default": {},
         }) | select({

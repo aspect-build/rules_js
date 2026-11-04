@@ -1,12 +1,6 @@
 constraint_setting(
     name = "libc",
-    default_constraint_value = "unconstrained",
-    visibility = ["//visibility:public"],
-)
-
-constraint_value(
-    name = "unconstrained",
-    constraint_setting = "libc",
+    default_constraint_value = "glibc",
     visibility = ["//visibility:public"],
 )
 
@@ -19,5 +13,23 @@ constraint_value(
 constraint_value(
     name = "musl",
     constraint_setting = "libc",
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "linux_glibc",
+    constraint_values = [
+        "@platforms//os:linux",
+        ":glibc",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "linux_musl",
+    constraint_values = [
+        "@platforms//os:linux",
+        ":musl",
+    ],
     visibility = ["//visibility:public"],
 )

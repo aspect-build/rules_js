@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
-load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_ARCH_ALIASES", "PNPM_PLATFORMS")
+load("//platforms/pnpm:index.bzl", "PNPM_ARCHS", "PNPM_ARCH_ALIASES", "PNPM_LIBCS", "PNPM_PLATFORMS")
 load(":utils.bzl", "utils")
 
 # Metadata about a pnpm "project" (importer).
@@ -37,8 +37,9 @@ def _new_import_info(dependencies, dev_dependencies, optional_dependencies):
 #   resolution: the lockfile resolution field
 #   cpu: list of allowed cpu architectures or None
 #   os: list of allowed operating systems or None
+#   libc: list of allowed libc implementations or None
 
-def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os):
+def _new_package_info(name, dependencies, optional_dependencies, has_bin, optional, version, friendly_version, resolution, cpu, os, libc):
     return {
         "name": name,
         "dependencies": dependencies,
@@ -50,24 +51,23 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "resolution": resolution,
         "cpu": cpu,
         "os": os,
+        "libc": libc,
     }
 
-def _to_bazel_os_cpu_constraints(oss, cpus):
-    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
-    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
+# Convert pnpm [os], [cpu] and [libc] constraints to the //platforms/pnpm config_setting labels
+# matching every combination of the given dimensions, named "{os}_{cpu}_{libc}" with absent dimensions omitted.
+def _to_bazel_constraints(oss = None, cpus = None, libcs = None):
+    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os") if oss else [None]
+    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu") if cpus else [None]
+    libcs = _resolve_pnpm_constraint_values(libcs, PNPM_LIBCS, {}, "libc") if libcs else [None]
     r = []
     for cpu in cpus:
         for os in oss:
-            r.append("@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu))
+            for libc in libcs:
+                name = "_".join([part for part in [os, cpu, libc] if part])
+                if name:
+                    r.append("@aspect_rules_js//platforms/pnpm:{}".format(name))
     return r
-
-def _to_bazel_os_constraints(oss):
-    oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
-    return ["@aspect_rules_js//platforms/pnpm:{}".format(os) for os in oss]
-
-def _to_bazel_cpu_constraints(cpus):
-    cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
-    return ["@aspect_rules_js//platforms/pnpm:{}".format(cpu) for cpu in cpus]
 
 def _resolve_pnpm_constraint_values(values, known_map, aliases_map, kind):
     if not values:
@@ -184,6 +184,12 @@ def _convert_v9_importers(importers, snapshots, no_dev, no_optional):
         )
     return result
 
+# pnpm copies package.json os/cpu/libc fields verbatim, so a package declaring a single value yields a scalar string
+def _constraint_list(value):
+    if value == None or types.is_list(value):
+        return value
+    return [value]
+
 def _convert_v9_packages(packages, snapshots, no_optional):
     # Convert pnpm lockfile v9 importers to the rules_js structure.
 
@@ -256,8 +262,9 @@ def _convert_v9_packages(packages, snapshots, no_optional):
             has_bin = package_data.get("hasBin", False),
             optional = optional,
             resolution = package_data["resolution"],
-            cpu = package_data.get("cpu", None),
-            os = package_data.get("os", None),
+            cpu = _constraint_list(package_data.get("cpu", None)),
+            os = _constraint_list(package_data.get("os", None)),
+            libc = _constraint_list(package_data.get("libc", None)),
         )
 
     return result
@@ -395,7 +402,5 @@ pnpm = struct(
     assert_lockfile_version = _assert_lockfile_version,
     parse_pnpm_lock_json = _parse_pnpm_lock_json,
     parse_pnpm_workspace_json = _parse_pnpm_workspace_json,
-    to_bazel_os_cpu_constraints = _to_bazel_os_cpu_constraints,
-    to_bazel_os_constraints = _to_bazel_os_constraints,
-    to_bazel_cpu_constraints = _to_bazel_cpu_constraints,
+    to_bazel_constraints = _to_bazel_constraints,
 )
