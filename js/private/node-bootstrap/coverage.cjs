@@ -122,7 +122,7 @@ function startCollection() {
 
     // A node without inspector support, or a program that already holds the session,
     // makes this throw. Report empty coverage rather than take down a program that would
-    // otherwise have run: this preload is in every js_binary under `bazel coverage`, so a
+    // otherwise have run: this preload is in every collecting js_binary under `bazel coverage`, so a
     // throw here fails the target before its own code starts.
     try {
         session = new (require('node:inspector').Session)()
@@ -153,7 +153,10 @@ function startCollection() {
             const now = Date.now()
             mkdirSync(dir, { recursive: true })
             writeFileSync(
-                path.join(dir, `coverage-${process.pid}-${now}-${threadId}.json`),
+                path.join(
+                    dir,
+                    `coverage-${process.pid}-${now}-${threadId}.json`
+                ),
                 JSON.stringify({
                     result,
                     timestamp: now,

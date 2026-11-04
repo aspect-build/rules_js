@@ -357,10 +357,16 @@ If it is accompanied by
 WARNING: no coverage report was generated in the test action, reporting empty coverage.
 ```
 
-then either the target is `testonly = False`, which rules_js does not collect
-coverage for, or it is a custom test rule that reuses only part of rules_js's
-coverage support. In the latter case use `js_test`, or the test rule provided by the
-ruleset for your test framework, rather than assembling one from rules_js internals.
+then rules_js generated no report for the target, for one of these reasons:
+
+-   The target is `testonly = False`, which rules_js does not generate a report for.
+-   The target sets `collect_coverage = False`, and its program wrote no report of its
+    own. Under `--experimental_split_coverage_postprocessing`, Bazel discards what the
+    program wrote; see
+    [Test frameworks that report their own coverage](#test-frameworks-that-report-their-own-coverage).
+-   It is a custom test rule that reuses only part of rules_js's coverage support. Use
+    `js_test`, or the test rule provided by the ruleset for your test framework, rather
+    than assembling one from rules_js internals.
 
 ### First-party code repackaged with `npm_package`
 

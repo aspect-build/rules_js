@@ -160,19 +160,17 @@ _ATTRS = {
         default = True,
     ),
     "collect_coverage": attr.bool(
-        doc = """Under `bazel coverage`, collect V8 coverage for this node program, its child
-        processes and its worker threads, and for `js_test`, generate the lcov report from it.
+        doc = """Under `bazel coverage`, collect V8 coverage for this program, its child processes
+        and its worker threads into `COVERAGE_DIR`. `js_test` generates its lcov report from it.
 
-        Enabled by default for every rule built on `js_binary`, including custom test rules
-        that never read the result: the profiles are written to `COVERAGE_DIR` either way.
-        Collection is not narrowed by `--instrumentation_filter` or `--instrument_test_targets`.
+        On by default for every rule built on `js_binary`, including custom test rules that
+        never read the profiles. `--instrumentation_filter` and `--instrument_test_targets`
+        do not narrow collection.
 
-        Disable this for a program that collects and reports its own coverage, such as a
-        test runner that writes `COVERAGE_OUTPUT_FILE` itself. The program still gets
-        `COVERAGE_DIR` and `COVERAGE_OUTPUT_FILE`, but rules_js neither profiles it nor
-        generates a report, so a `js_test` that writes no report of its own reports no
-        coverage. A custom test rule that always reports its own coverage can default this
-        attribute to False.
+        Set to False for a program that collects and reports its own coverage. It still gets
+        `COVERAGE_DIR` and `COVERAGE_OUTPUT_FILE`, but rules_js does not profile it, even when
+        a collecting process starts it, and generates no report. A custom test rule that
+        always reports its own coverage can default this to False.
 
         Has no effect outside of `bazel coverage`.""",
         default = True,
@@ -578,9 +576,13 @@ def _launcher_envs(ctx, fixed_env, is_windows):
             False,
         ))
     elif ctx.configuration.coverage_enabled and not ctx.attr.collect_coverage:
-        # Child node processes inherit this, so the opt-out covers the whole process tree.
         # Set only under coverage so that other actions keep their cache keys.
         envs.append(("JS_BINARY__NO_COVERAGE", "1", False))
+
+        # Node collects from an inherited NODE_V8_COVERAGE before any preload runs. Empty,
+        # not unset: child_process restores the parent's value when the key is absent. As a
+        # NODE_ variable, it also makes the hermetic launcher restart node with it.
+        envs.append(("NODE_V8_COVERAGE", "", False))
 
     return envs, normalized_chdir
 
@@ -838,7 +840,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
     # The coverage bootstrap code is required in the root node process, which will enable
     # coverage for child processes by setting NODE_V8_COVERAGE. Any js_binary could in
     # principle be the root node process (for example if it is invoked by an sh_test), so we
-    # need to include the coverage bootstrap for every js_binary target. It ships with the
+    # need to include the coverage bootstrap for every js_binary target that collects. It ships with the
     # launcher so that rules such as js_run_devserver get it as well.
     if _collects_coverage(ctx):
         launcher_files.append(ctx.file._coverage_bootstrap)

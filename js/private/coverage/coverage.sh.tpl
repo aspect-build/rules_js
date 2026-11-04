@@ -27,8 +27,9 @@ elif [ -s "$stash" ]; then
     # cp, not mv: an executor is free to materialize COVERAGE_DIR read-only.
     cp "$stash" "$COVERAGE_OUTPUT_FILE"
 elif [ ! -e "$stash" ]; then
-    # No stash at all: coverage.js never ran, so the test rule is missing a
-    # _coverage_report attr. An empty stash means it ran with nothing to report.
+    # No stash at all: coverage.js never ran, because the test rule is missing a
+    # _coverage_report attr or the target sets collect_coverage = False. An empty
+    # stash means it ran with nothing to report.
     printf "WARNING: no coverage report was generated in the test action, reporting empty coverage. See https://github.com/aspect-build/rules_js/issues/2901\n" >&2
 fi
 

@@ -1,4 +1,4 @@
-// Runs in both the root process of the opt_out test and the child it spawns.
+// Runs in both processes of the opt_out test and as the entry point of opt_out_bin.
 const assert = require('node:assert')
 
 if (process.env.COVERAGE_DIR) {
@@ -12,7 +12,6 @@ if (process.env.COVERAGE_DIR) {
         `expected no v8 coverage session, got NODE_V8_COVERAGE '${process.env.NODE_V8_COVERAGE}'`
     )
 } else {
-    // Outside of `bazel coverage` the launcher sets nothing, so the action is unchanged.
     assert.ok(
         !process.env.JS_BINARY__NO_COVERAGE,
         'expected JS_BINARY__NO_COVERAGE to be set only under coverage'
