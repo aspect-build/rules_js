@@ -9,7 +9,7 @@ const packageStoreLink = process.argv
     .flatMap((arg) => arg.split(' '))
     .find(
         (arg) =>
-            arg.includes('.aspect_rules_js') &&
+            arg.includes('.rules_js') &&
             arg.endsWith('node_modules/@lib/test2')
     )
 assert.ok(packageStoreLink, 'first-party package store link should be present')

@@ -68,7 +68,7 @@ async function resolveSymlink(p) {
         // that means the symlink has multiple indirection within sandbox
         // but we want to hop only once, for example first party deps.
         //  -> js/private/test/image/node_modules/@mycorp/pkg-d
-        //      -> ../../../../../../node_modules/.aspect_rules_js/@mycorp+pkg-d@0.0.0/node_modules/@mycorp/pkg-d    <- WE WANT TO STOP RIGHT HERE.
+        //      -> ../../../../../../node_modules/.rules_js/@mycorp+pkg-d@0.0.0/node_modules/@mycorp/pkg-d    <- WE WANT TO STOP RIGHT HERE.
         //          -> ../../../../../../examples/npm_package/packages/pkg_d
         if (nextHop != prevHop && hopped) {
             return prevHop
@@ -233,7 +233,7 @@ async function split() {
                 // Look in all entries for symlinks since they may be in other layers
                 let linkname = findKeyByValue(entries, output_path)
 
-                // Symlinks may resolve to a directory (e.g. node_modules/acorn → .aspect_rules_js/acorn@x/node_modules/acorn)
+                // Symlinks may resolve to a directory (e.g. node_modules/acorn → .rules_js/acorn@x/node_modules/acorn)
                 // that has no single reverse-map entry. Fall back to computing the runfiles path
                 // using the same logic as _to_rlocation_path in js_image_layer.bzl:
                 //   external files: bazel-out/<cfg>/bin/external/<repo>/... → <repo>/...

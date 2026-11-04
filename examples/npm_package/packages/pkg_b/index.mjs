@@ -26,7 +26,7 @@ export function sandboxAssert() {
     }
 
     // Use of npm_package() copies files into the npm package store.
-    if (!/[/\\]node_modules[/\\]\.aspect_rules_js[/\\]/.test(__filename)) {
+    if (!/[/\\]node_modules[/\\]\.rules_js[/\\]/.test(__filename)) {
         throw new Error(`Not in package store: ${__filename}`)
     }
 
@@ -45,7 +45,7 @@ export function sandboxAssert() {
     if (!sandboxRe.test(uuid_path)) {
         throw new Error(`uuid not in sandbox: ${uuid_path}`)
     }
-    if (!/[/\\]node_modules[/\\]\.aspect_rules_js[/\\]uuid@/.test(uuid_path)) {
+    if (!/[/\\]node_modules[/\\]\.rules_js[/\\]uuid@/.test(uuid_path)) {
         throw new Error(`uuid not in package store: ${uuid_path}`)
     }
     if (process.env.TEST_WORKSPACE && process.platform !== 'win32') {

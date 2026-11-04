@@ -24,13 +24,13 @@ def npm_imported_package_store_internal():
         root_package = _ROOT_PACKAGE,
         deps = select({
             "@rules_js//platforms/pnpm:darwin": {
-                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
+                ":.rules_js/node_modules/fsevents@2.3.3": "fsevents",
             },
             "//conditions:default": {},
         }),
         ref_deps = select({
             "@rules_js//platforms/pnpm:darwin": {
-                ":.aspect_rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
+                ":.rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
             },
             "//conditions:default": {},
         }),

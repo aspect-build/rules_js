@@ -24,7 +24,7 @@ js_test(
 )
 
 # First-party code repackaged with npm_package and imported by name
-# (require("@repro/lib")): resolves through the .aspect_rules_js store to a copy with
+# (require("@repro/lib")): resolves through the .rules_js store to a copy with
 # no link back to source. Coverage of this is UNSUPPORTED (use js_library linking
 # instead, as first_party_jslib_test does) — see docs/troubleshooting.md, test.sh,
 # and https://github.com/aspect-build/rules_js/issues/2933.

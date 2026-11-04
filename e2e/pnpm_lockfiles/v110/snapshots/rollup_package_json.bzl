@@ -2,8 +2,8 @@
 
 load("@rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")
 
-_store_target = Label("@@//<LOCKVERSION>:.aspect_rules_js/node_modules/rollup@2.14.0")
-_store_target_dir = Label("@@//<LOCKVERSION>:.aspect_rules_js/node_modules/rollup@2.14.0/dir")
+_store_target = Label("@@//<LOCKVERSION>:.rules_js/node_modules/rollup@2.14.0")
+_store_target_dir = Label("@@//<LOCKVERSION>:.rules_js/node_modules/rollup@2.14.0/dir")
 
 def rollup(name, **kwargs):
     bin_internal(

@@ -23,11 +23,11 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
+            ":.rules_js/node_modules/fsevents@2.3.3/pkg": "fsevents",
         },
         ref_deps = {},
         lc_deps = {
-            ":.aspect_rules_js/node_modules/fsevents@2.3.3/pkg_pre_lc_lite": "fsevents",
+            ":.rules_js/node_modules/fsevents@2.3.3/pkg_pre_lc_lite": "fsevents",
         },
         has_lifecycle_build_target = True,
         has_transitive_closure = False,

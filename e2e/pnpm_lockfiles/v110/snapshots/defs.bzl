@@ -457,8 +457,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@scoped/c",
             version = "file:../projects/c(@scoped/b@projects+b)",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
+                "//<LOCKVERSION>:.rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -487,7 +487,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@scoped/b",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -498,8 +498,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@scoped/d",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
+                "//<LOCKVERSION>:.rules_js/node_modules/@scoped+a@0.0.0": "@scoped/a",
+                "//<LOCKVERSION>:.rules_js/node_modules/@scoped+b@0.0.0": "@scoped/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -510,10 +510,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "alternate-versions",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.0.1": "lodash",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.17.20": "lodash-4.17.20",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@4.17.21": "lodash-4.17.21",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz": "lodash-4.17.21-file",
+                "//<LOCKVERSION>:.rules_js/node_modules/lodash@4.0.1": "lodash",
+                "//<LOCKVERSION>:.rules_js/node_modules/lodash@4.17.20": "lodash-4.17.20",
+                "//<LOCKVERSION>:.rules_js/node_modules/lodash@4.17.21": "lodash-4.17.21",
+                "//<LOCKVERSION>:.rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz": "lodash-4.17.21-file",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -524,8 +524,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "test-c200-d200",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+c@2.0.0": "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0": "@aspect-test/d",
+                "//<LOCKVERSION>:.rules_js/node_modules/@aspect-test+c@2.0.0": "@aspect-test/c",
+                "//<LOCKVERSION>:.rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0": "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -536,8 +536,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "test-c201-d200",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+c@2.0.1": "@aspect-test/c",
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.1": "@aspect-test/d",
+                "//<LOCKVERSION>:.rules_js/node_modules/@aspect-test+c@2.0.1": "@aspect-test/c",
+                "//<LOCKVERSION>:.rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.1": "@aspect-test/d",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -557,7 +557,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "a-types",
             version = "0.0.0",
             deps = {
-                "//<LOCKVERSION>:.aspect_rules_js/node_modules/@types+node@22.18.13": "@types/node",
+                "//<LOCKVERSION>:.rules_js/node_modules/@types+node@22.18.13": "@types/node",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -694,7 +694,7 @@ def _fp_link_0(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/c" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/a" package
@@ -703,7 +703,7 @@ def _fp_link_2(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+a@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/@scoped+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/b" package
@@ -712,7 +712,7 @@ def _fp_link_3(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/b" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+b@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/@scoped+b@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@scoped/d" package
@@ -721,7 +721,7 @@ def _fp_link_4(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@scoped/d" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/@scoped+d@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/@scoped+d@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "alternate-versions" package
@@ -730,7 +730,7 @@ def _fp_link_5(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/alternate-versions" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/alternate-versions@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/alternate-versions@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-c200-d200" package
@@ -739,7 +739,7 @@ def _fp_link_6(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-c200-d200" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/test-c200-d200@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-c201-d200" package
@@ -748,7 +748,7 @@ def _fp_link_7(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-c201-d200" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/test-c201-d200@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-peer-types" package
@@ -757,7 +757,7 @@ def _fp_link_8(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-peer-types" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/test-peer-types@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/test-peer-types@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "a-types" package
@@ -766,5 +766,5 @@ def _fp_link_9(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/a-types" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//<LOCKVERSION>:.aspect_rules_js/node_modules/a-types@0.0.0",
+        src = "//<LOCKVERSION>:.rules_js/node_modules/a-types@0.0.0",
     )

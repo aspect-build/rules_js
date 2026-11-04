@@ -1752,7 +1752,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "is-odd",
             version = "file:npm/private/test/vendored/is-odd",
             deps = {
-                "//:.aspect_rules_js/node_modules/is-number@6.0.0": "is-number",
+                "//:.rules_js/node_modules/is-number@6.0.0": "is-number",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -1763,8 +1763,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "semver-max",
             version = "file:npm/private/test/vendored/semver-max",
             deps = {
-                "//:.aspect_rules_js/node_modules/is-odd@file+npm+private+test+vendored+is-odd": "is-odd",
-                "//:.aspect_rules_js/node_modules/semver@5.7.2": "semver",
+                "//:.rules_js/node_modules/is-odd@file+npm+private+test+vendored+is-odd": "is-odd",
+                "//:.rules_js/node_modules/semver@5.7.2": "semver",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -1775,7 +1775,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@image-test/a",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/uuid@8.3.2": "uuid",
+                "//:.rules_js/node_modules/uuid@8.3.2": "uuid",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -1786,8 +1786,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@image-test/d",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/@image-test+a@0.0.0": "@image-test/a",
-                "//:.aspect_rules_js/node_modules/uuid@8.3.2": "uuid",
+                "//:.rules_js/node_modules/@image-test+a@0.0.0": "@image-test/a",
+                "//:.rules_js/node_modules/uuid@8.3.2": "uuid",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -1798,8 +1798,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "test-npm_package",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/chalk@5.0.1": "chalk",
-                "//:.aspect_rules_js/node_modules/chalk@5.1.1": "chalk-alt",
+                "//:.rules_js/node_modules/chalk@5.0.1": "chalk",
+                "//:.rules_js/node_modules/chalk@5.1.1": "chalk-alt",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -1986,7 +1986,7 @@ def _fp_link_2(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@image-test/a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@image-test+a@0.0.0",
+        src = "//:.rules_js/node_modules/@image-test+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@image-test/d" package
@@ -1995,7 +1995,7 @@ def _fp_link_3(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@image-test/d" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@image-test+d@0.0.0",
+        src = "//:.rules_js/node_modules/@image-test+d@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "test-npm_package" package
@@ -2004,7 +2004,7 @@ def _fp_link_4(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/test-npm_package" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/test-npm_package@0.0.0",
+        src = "//:.rules_js/node_modules/test-npm_package@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@subs/a" package
@@ -2013,7 +2013,7 @@ def _fp_link_5(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@subs/a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@subs+a@0.0.0",
+        src = "//:.rules_js/node_modules/@subs+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@subs/b" package
@@ -2022,5 +2022,5 @@ def _fp_link_6(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@subs/b" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@subs+b@0.0.0",
+        src = "//:.rules_js/node_modules/@subs+b@0.0.0",
     )

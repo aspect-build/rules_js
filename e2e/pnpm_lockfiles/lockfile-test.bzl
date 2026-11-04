@@ -146,8 +146,8 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/test-c200-d200",
             ":node_modules/test-c201-d200",
             ":node_modules/test-peer-types",
-            ":.aspect_rules_js/node_modules/test-c200-d200@0.0.0",
-            ":.aspect_rules_js/node_modules/test-c201-d200@0.0.0",
+            ":.rules_js/node_modules/test-c200-d200@0.0.0",
+            ":.rules_js/node_modules/test-c201-d200@0.0.0",
 
             # link:, workspace:, file:, ./rel/path
             ":node_modules/@scoped",  # target for the scope
@@ -155,25 +155,25 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/@scoped/b",
             ":node_modules/@scoped/c",
             ":node_modules/@scoped/d",
-            ":.aspect_rules_js/node_modules/@scoped+a@0.0.0",
-            ":.aspect_rules_js/node_modules/@scoped+b@0.0.0",
+            ":.rules_js/node_modules/@scoped+a@0.0.0",
+            ":.rules_js/node_modules/@scoped+b@0.0.0",
             # Workaround for peer suffixes changing in pnpm 11. We may want to
             # revisit this depending on the outcome of:
             # https://github.com/pnpm/pnpm/issues/11272
-            ":.aspect_rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
-            ":.aspect_rules_js/node_modules/@scoped+d@0.0.0",
+            ":.rules_js/node_modules/@scoped+c@file+..+projects+c_@scoped+b@projects+b",
+            ":.rules_js/node_modules/@scoped+d@0.0.0",
 
             # file: 4.17.21.tgz tarbal
             ":node_modules/lodash",
-            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz",
-            ":.aspect_rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/dir",
+            ":.rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz",
+            ":.rules_js/node_modules/lodash@file+..+vendored+lodash-4.17.21.tgz/dir",
             "@%s__lodash__file_.._vendored_lodash-4.17.21.tgz//:pkg" % lock_repo,
             "@%s__lodash__file_.._vendored_lodash-4.17.21.tgz__links//:defs.bzl" % lock_repo,
 
             # Packages involving overrides
             ":node_modules/is-odd",
-            ":.aspect_rules_js/node_modules/is-odd@3.0.1",
-            ":.aspect_rules_js/node_modules/is-number@file+..+vendored+is-number",
+            ":.rules_js/node_modules/is-odd@3.0.1",
+            ":.rules_js/node_modules/is-number@file+..+vendored+is-number",
 
             # Odd git/http versions
             ":node_modules/debug",
@@ -202,37 +202,37 @@ def lockfile_test(npm_link_all_packages, name = None):
             ":node_modules/is-odd-v1",
             ":node_modules/is-odd-v2",
             ":node_modules/is-odd-v3",
-            ":.aspect_rules_js/node_modules/is-odd@0.1.0",
-            ":.aspect_rules_js/node_modules/is-odd@1.0.0",
-            ":.aspect_rules_js/node_modules/is-odd@2.0.0",
-            ":.aspect_rules_js/node_modules/is-odd@3.0.0",
+            ":.rules_js/node_modules/is-odd@0.1.0",
+            ":.rules_js/node_modules/is-odd@1.0.0",
+            ":.rules_js/node_modules/is-odd@2.0.0",
+            ":.rules_js/node_modules/is-odd@3.0.0",
 
             # npm: alias to package not listed elsewhere
             ":node_modules/alias-only-sizzle",
-            ":.aspect_rules_js/node_modules/@types+sizzle@2.3.10",
+            ":.rules_js/node_modules/@types+sizzle@2.3.10",
             "@%s__at_types_sizzle__2.3.10//:pkg" % lock_repo,
             "@%s__at_types_sizzle__2.3.10__links//:defs.bzl" % lock_repo,
 
             # Targets within the virtual store...
             # Direct dep targets
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2",
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/dir",
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/pkg",
-            ":.aspect_rules_js/node_modules/@aspect-test+a@5.0.2/ref",
+            ":.rules_js/node_modules/@aspect-test+a@5.0.2",
+            ":.rules_js/node_modules/@aspect-test+a@5.0.2/dir",
+            ":.rules_js/node_modules/@aspect-test+a@5.0.2/pkg",
+            ":.rules_js/node_modules/@aspect-test+a@5.0.2/ref",
 
             # Direct deps with lifecycles
-            ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/lc",
-            ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc",
+            ":.rules_js/node_modules/@aspect-test+c@2.0.2/lc",
+            ":.rules_js/node_modules/@aspect-test+c@2.0.2/pkg_lc",
 
             # Patched dependencies
-            ":.aspect_rules_js/node_modules/meaning-of-life@1.0.0_%s" % ("1287509853" if lock_version == "v90" else "124257499"),
+            ":.rules_js/node_modules/meaning-of-life@1.0.0_%s" % ("1287509853" if lock_version == "v90" else "124257499"),
             "@%s__meaning-of-life__1.0.0_%s//:pkg" % (lock_repo, "1287509853" if lock_version == "v90" else "124257499"),
 
             # Direct deps from custom registry
-            ":.aspect_rules_js/node_modules/@types+node@22.18.13",
+            ":.rules_js/node_modules/@types+node@22.18.13",
 
             # Direct deps with peers
-            ":.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0",
+            ":.rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.0",
             "@%s__at_aspect-test_d__2.0.0_at_aspect-test_c_2.0.2//:pkg" % lock_repo,
         ],
     )

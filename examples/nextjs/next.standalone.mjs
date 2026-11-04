@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 
-// Must include the parent .aspect_rules_js package store when tracing for standalone output
+// Must include the parent .rules_js package store when tracing for standalone output
 const outputFileTracingRoot = join(import.meta.dirname, '../')
 
 /** @type {import('next').NextConfig} */

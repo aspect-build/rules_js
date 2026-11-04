@@ -19,8 +19,8 @@ load("@tar.bzl//tar:tar.bzl", "tar_lib")
 
 _DEFAULT_LAYER_GROUPS = {
     "node": "/js/private/node-bootstrap/|/bin/nodejs/",
-    "package_store_3p": "/\\.aspect_rules_js/(?!.*@0\\.0\\.0).*/node_modules",
-    "package_store_1p": "\\.aspect_rules_js/.*@0\\.0\\.0/node_modules",
+    "package_store_3p": "/\\.rules_js/(?!.*@0\\.0\\.0).*/node_modules",
+    "package_store_1p": "\\.rules_js/.*@0\\.0\\.0/node_modules",
     "node_modules": "/node_modules/",
     "app": "",  # empty means just match anything.
 }
@@ -42,15 +42,15 @@ js_image_layer creates up to 5 layers depending on what files are included in th
 `binary` target.
 
 1. `node` layer contains the Node.js toolchain
-2. `package_store_3p` layer contains all 3p npm deps in the `node_modules/.aspect_rules_js` package store
-3. `package_store_1p` layer contains all 1p npm deps in the `node_modules/.aspect_rules_js` package store
+2. `package_store_3p` layer contains all 3p npm deps in the `node_modules/.rules_js` package store
+3. `package_store_1p` layer contains all 1p npm deps in the `node_modules/.rules_js` package store
 4. `node_modules` layer contains all `node_modules/*` symlinks which point into the package store
 5. `app` layer contains all files that don't fall into any of the above layers
 
 If no files are found in the runfiles of the `binary` target for one of the layers above, that
 layer is not generated. All generated layer tarballs are provided as `DefaultInfo` files.
 
-> The rules_js `node_modules/.aspect_rules_js` package store follows the same pattern as the pnpm
+> The rules_js `node_modules/.rules_js` package store follows the same pattern as the pnpm
 > `node_modules/.pnpm` virtual store. For more information see https://pnpm.io/symlinked-node-modules-structure.
 
 js_image_layer also provides an `OutputGroupInfo` with outputs for each of the layers above which
@@ -172,8 +172,8 @@ The default layer groups are as follows and always created.
 ```
 {
     "node": "/js/private/node-bootstrap/|/bin/nodejs/",
-    "package_store_1p": "\\.aspect_rules_js/.*@0\\.0\\.0/node_modules",
-    "package_store_3p": "\\.aspect_rules_js/.*/node_modules",
+    "package_store_1p": "\\.rules_js/.*@0\\.0\\.0/node_modules",
+    "package_store_3p": "\\.rules_js/.*/node_modules",
     "node_modules": "/node_modules/",
     "app": "", # empty means just match anything.
 }

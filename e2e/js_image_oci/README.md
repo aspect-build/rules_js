@@ -27,7 +27,7 @@ app
 |   |-- _main
 |   |   |-- main.sh
 |   |   |-- node_modules
-|   |   |   `-- chalk -> /app/main.sh.runfiles/_main/node_modules/.aspect_rules_js/chalk@4.1.2/node_modules/chalk
+|   |   |   `-- chalk -> /app/main.sh.runfiles/_main/node_modules/.rules_js/chalk@4.1.2/node_modules/chalk
 |   |   `-- src
 |   |       |-- ascii.art
 |   |       `-- main.js

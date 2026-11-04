@@ -23,56 +23,56 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/node_modules/chalk@5.1.1": "chalk",
-            ":.aspect_rules_js/node_modules/google-closure-compiler-java@20251111.0.0": "google-closure-compiler-java",
-            ":.aspect_rules_js/node_modules/minimist@1.2.8": "minimist",
-            ":.aspect_rules_js/node_modules/vinyl@3.0.1": "vinyl",
-            ":.aspect_rules_js/node_modules/vinyl-sourcemaps-apply@0.2.1": "vinyl-sourcemaps-apply",
+            ":.rules_js/node_modules/chalk@5.1.1": "chalk",
+            ":.rules_js/node_modules/google-closure-compiler-java@20251111.0.0": "google-closure-compiler-java",
+            ":.rules_js/node_modules/minimist@1.2.8": "minimist",
+            ":.rules_js/node_modules/vinyl@3.0.1": "vinyl",
+            ":.rules_js/node_modules/vinyl-sourcemaps-apply@0.2.1": "vinyl-sourcemaps-apply",
         } | select({
             "@rules_js//platforms/pnpm:linux_ia32": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0": "google-closure-compiler-linux",
+                ":.rules_js/node_modules/google-closure-compiler-linux@20251111.0.0": "google-closure-compiler-linux",
             },
             "@rules_js//platforms/pnpm:linux_x64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0": "google-closure-compiler-linux",
+                ":.rules_js/node_modules/google-closure-compiler-linux@20251111.0.0": "google-closure-compiler-linux",
             },
             "@rules_js//platforms/pnpm:linux_arm64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-linux-arm64@20251111.0.0": "google-closure-compiler-linux-arm64",
+                ":.rules_js/node_modules/google-closure-compiler-linux-arm64@20251111.0.0": "google-closure-compiler-linux-arm64",
             },
             "@rules_js//platforms/pnpm:darwin_arm64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-macos@20251111.0.0": "google-closure-compiler-macos",
+                ":.rules_js/node_modules/google-closure-compiler-macos@20251111.0.0": "google-closure-compiler-macos",
             },
             "@rules_js//platforms/pnpm:win32_ia32": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
+                ":.rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
             },
             "@rules_js//platforms/pnpm:win32_x64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
+                ":.rules_js/node_modules/google-closure-compiler-windows@20251111.0.0": "google-closure-compiler-windows",
             },
             "//conditions:default": {},
         }),
         ref_deps = {
-            ":.aspect_rules_js/node_modules/chalk@5.1.1/ref": "chalk",
-            ":.aspect_rules_js/node_modules/google-closure-compiler-java@20251111.0.0/ref": "google-closure-compiler-java",
-            ":.aspect_rules_js/node_modules/minimist@1.2.8/ref": "minimist",
-            ":.aspect_rules_js/node_modules/vinyl@3.0.1/ref": "vinyl",
-            ":.aspect_rules_js/node_modules/vinyl-sourcemaps-apply@0.2.1/ref": "vinyl-sourcemaps-apply",
+            ":.rules_js/node_modules/chalk@5.1.1/ref": "chalk",
+            ":.rules_js/node_modules/google-closure-compiler-java@20251111.0.0/ref": "google-closure-compiler-java",
+            ":.rules_js/node_modules/minimist@1.2.8/ref": "minimist",
+            ":.rules_js/node_modules/vinyl@3.0.1/ref": "vinyl",
+            ":.rules_js/node_modules/vinyl-sourcemaps-apply@0.2.1/ref": "vinyl-sourcemaps-apply",
         } | select({
             "@rules_js//platforms/pnpm:linux_ia32": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0/ref": "google-closure-compiler-linux",
+                ":.rules_js/node_modules/google-closure-compiler-linux@20251111.0.0/ref": "google-closure-compiler-linux",
             },
             "@rules_js//platforms/pnpm:linux_x64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-linux@20251111.0.0/ref": "google-closure-compiler-linux",
+                ":.rules_js/node_modules/google-closure-compiler-linux@20251111.0.0/ref": "google-closure-compiler-linux",
             },
             "@rules_js//platforms/pnpm:linux_arm64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-linux-arm64@20251111.0.0/ref": "google-closure-compiler-linux-arm64",
+                ":.rules_js/node_modules/google-closure-compiler-linux-arm64@20251111.0.0/ref": "google-closure-compiler-linux-arm64",
             },
             "@rules_js//platforms/pnpm:darwin_arm64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-macos@20251111.0.0/ref": "google-closure-compiler-macos",
+                ":.rules_js/node_modules/google-closure-compiler-macos@20251111.0.0/ref": "google-closure-compiler-macos",
             },
             "@rules_js//platforms/pnpm:win32_ia32": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0/ref": "google-closure-compiler-windows",
+                ":.rules_js/node_modules/google-closure-compiler-windows@20251111.0.0/ref": "google-closure-compiler-windows",
             },
             "@rules_js//platforms/pnpm:win32_x64": {
-                ":.aspect_rules_js/node_modules/google-closure-compiler-windows@20251111.0.0/ref": "google-closure-compiler-windows",
+                ":.rules_js/node_modules/google-closure-compiler-windows@20251111.0.0/ref": "google-closure-compiler-windows",
             },
             "//conditions:default": {},
         }),

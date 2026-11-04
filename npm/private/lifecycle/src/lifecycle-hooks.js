@@ -189,8 +189,8 @@ async function main(args) {
 
     // Resolve the path to the node_modules folder for this package in the symlinked node_modules
     // tree. Output path is of the format,
-    //    .../node_modules/.aspect_rules_js/package@version/node_modules/package
-    //    .../node_modules/.aspect_rules_js/@scope+package@version/node_modules/@scope/package
+    //    .../node_modules/.rules_js/package@version/node_modules/package
+    //    .../node_modules/.rules_js/@scope+package@version/node_modules/@scope/package
     // Path to node_modules is one or two segments up from the output path depending on the packageName
     const segmentsUp = Array(packageName.split('/').length).fill('..')
     const nodeModulesPath = path.resolve(path.join(outputDir, ...segmentsUp))
@@ -274,7 +274,7 @@ async function main(args) {
 
     const rulesJsJson = JSON.parse(
         await fs.promises.readFile(
-            path.join(packageDir, 'aspect_rules_js_metadata.json')
+            path.join(packageDir, 'rules_js_metadata.json')
         )
     )
 

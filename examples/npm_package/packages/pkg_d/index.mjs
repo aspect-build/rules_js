@@ -28,7 +28,7 @@ export function sandboxAssert() {
     if (!sandboxRe.test(uuid_path)) {
         throw new Error(`uuid not in sandbox: ${uuid_path}`)
     }
-    if (!/[/\\]node_modules[/\\]\.aspect_rules_js[/\\]uuid@/.test(uuid_path)) {
+    if (!/[/\\]node_modules[/\\]\.rules_js[/\\]uuid@/.test(uuid_path)) {
         throw new Error(`uuid not in package store: ${uuid_path}`)
     }
     if (process.platform !== 'win32' && !uuid_path.startsWith(process.env.RUNFILES_DIR)) {

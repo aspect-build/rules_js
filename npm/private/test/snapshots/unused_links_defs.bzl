@@ -23,12 +23,12 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.aspect_rules_js/node_modules/esprima@1.0.0": "esprima",
-            ":.aspect_rules_js/node_modules/optimist@0.6.0": "optimist",
+            ":.rules_js/node_modules/esprima@1.0.0": "esprima",
+            ":.rules_js/node_modules/optimist@0.6.0": "optimist",
         },
         ref_deps = {
-            ":.aspect_rules_js/node_modules/esprima@1.0.0/ref": "esprima",
-            ":.aspect_rules_js/node_modules/optimist@0.6.0/ref": "optimist",
+            ":.rules_js/node_modules/esprima@1.0.0/ref": "esprima",
+            ":.rules_js/node_modules/optimist@0.6.0/ref": "optimist",
         },
         lc_deps = {},
         has_lifecycle_build_target = False,

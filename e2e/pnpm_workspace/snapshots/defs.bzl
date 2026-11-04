@@ -113,7 +113,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "vendored-a",
             version = "file:vendored/a",
             deps = {
-                "//:.aspect_rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
+                "//:.rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -124,7 +124,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "vendored-b",
             version = "file:vendored/b(@lib/b@lib+b)",
             deps = {
-                "//:.aspect_rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
+                "//:.rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -135,10 +135,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@lib/a",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/@aspect-test+e@1.0.0": "@aspect-test/e",
-                "//:.aspect_rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
-                "//:.aspect_rules_js/node_modules/vendored-a@file+vendored+a": "vendored-a",
-                "//:.aspect_rules_js/node_modules/vendored-b@file+vendored+b_@lib+b@lib+b": "vendored-b",
+                "//:.rules_js/node_modules/@aspect-test+e@1.0.0": "@aspect-test/e",
+                "//:.rules_js/node_modules/@lib+b@0.0.0": "@lib/b",
+                "//:.rules_js/node_modules/vendored-a@file+vendored+a": "vendored-a",
+                "//:.rules_js/node_modules/vendored-b@file+vendored+b_@lib+b@lib+b": "vendored-b",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -149,8 +149,8 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@lib/b",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
-                "//:.aspect_rules_js/node_modules/@types+sizzle@2.3.8": "alias-1",
+                "//:.rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
+                "//:.rules_js/node_modules/@types+sizzle@2.3.8": "alias-1",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -161,7 +161,7 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@lib/c",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
+                "//:.rules_js/node_modules/@aspect-test+f@1.0.0": "@aspect-test/f",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -172,10 +172,10 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
             package = "@lib/d",
             version = "0.0.0",
             deps = {
-                "//:.aspect_rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2": "@aspect-test/d",
-                "//:.aspect_rules_js/node_modules/@lib+e@0.0.0": "@lib/e",
-                "//:.aspect_rules_js/node_modules/@lib+f@0.0.0": "@lib/f",
-                "//:.aspect_rules_js/node_modules/@types+node@22.18.13": "alias-2",
+                "//:.rules_js/node_modules/@aspect-test+d@2.0.0_@aspect-test+c@2.0.2": "@aspect-test/d",
+                "//:.rules_js/node_modules/@lib+e@0.0.0": "@lib/e",
+                "//:.rules_js/node_modules/@lib+f@0.0.0": "@lib/f",
+                "//:.rules_js/node_modules/@types+node@22.18.13": "alias-2",
             },
             visibility = ["//visibility:public"],
             tags = ["manual"],
@@ -284,7 +284,7 @@ def _fp_link_0(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/vendored-a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/vendored-a@file+vendored+a",
+        src = "//:.rules_js/node_modules/vendored-a@file+vendored+a",
     )
 
 # Generated npm_link_package_store for linking of first-party "vendored-b" package
@@ -293,7 +293,7 @@ def _fp_link_1(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/vendored-b" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/vendored-b@file+vendored+b_@lib+b@lib+b",
+        src = "//:.rules_js/node_modules/vendored-b@file+vendored+b_@lib+b@lib+b",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/a" package
@@ -302,7 +302,7 @@ def _fp_link_2(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/a" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+a@0.0.0",
+        src = "//:.rules_js/node_modules/@lib+a@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/b" package
@@ -311,7 +311,7 @@ def _fp_link_3(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/b" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+b@0.0.0",
+        src = "//:.rules_js/node_modules/@lib+b@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/c" package
@@ -320,7 +320,7 @@ def _fp_link_4(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/c" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+c@0.0.0",
+        src = "//:.rules_js/node_modules/@lib+c@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/d" package
@@ -329,7 +329,7 @@ def _fp_link_5(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/d" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+d@0.0.0",
+        src = "//:.rules_js/node_modules/@lib+d@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/e" package
@@ -338,7 +338,7 @@ def _fp_link_6(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/e" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+e@0.0.0",
+        src = "//:.rules_js/node_modules/@lib+e@0.0.0",
     )
 
 # Generated npm_link_package_store for linking of first-party "@lib/f" package
@@ -347,5 +347,5 @@ def _fp_link_7(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/@lib/f" if alias == None else "node_modules/{}".format(alias),
         package = alias,
-        src = "//:.aspect_rules_js/node_modules/@lib+f@0.0.0",
+        src = "//:.rules_js/node_modules/@lib+f@0.0.0",
     )
