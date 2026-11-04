@@ -17,7 +17,13 @@ if (!process.env.NODE_DISABLE_COMPILE_CACHE) {
 // Code coverage. We load this early on so that the coverage session sees as much of this
 // process compiled under it as possible. We require coverage.cjs conditionally to cut
 // down on code size for non-test targets.
-if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
+//
+// JS_BINARY__NO_COVERAGE (collect_coverage = False) skips the reporter along with the
+// collector: a report generated without the profiles would mark every source uncovered.
+if (
+    !process.env.JS_BINARY__NO_COVERAGE &&
+    (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR)
+) {
     require('./coverage.cjs')
 }
 

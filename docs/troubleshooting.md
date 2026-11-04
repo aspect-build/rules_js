@@ -295,9 +295,24 @@ tests, etc.) at extraction time; see
 
 ## Code coverage
 
-Under `bazel coverage`, `js_test` produces its lcov report as the test program
-exits, where the V8 coverage data and the instrumented sources are both available.
-The `_lcov_merger` step only publishes that report.
+Under `bazel coverage` (or `bazel test --collect_code_coverage`), rules_js collects
+V8 coverage by default for every node program it launches in a test action. That
+includes `js_test`, a `js_binary` run by another test such as an `sh_test`, and
+custom test rules built on `js_binary_lib`, such as those for Jest or Vitest. The
+launcher's preload starts a V8 precise coverage session with call and block counts,
+and sets `NODE_V8_COVERAGE` so child processes collect too. On exit, each process
+and worker thread writes a `coverage-<pid>-<timestamp>-<thread>.json` profile into
+`COVERAGE_DIR`. `--instrumentation_filter` and `--instrument_test_targets` do not
+narrow collection; they only decide which sources the report covers.
+
+Only `js_test` turns those profiles into a report. It produces the lcov report as the
+test program exits, where the V8 coverage data and the instrumented sources are both
+available, and the `_lcov_merger` step only publishes it. Under any other rule the
+profiles stay in `COVERAGE_DIR` unread. They are still test outputs, so they are
+uploaded with the test's results, and with
+`--experimental_fetch_all_coverage_outputs` they are downloaded too. To turn
+collection off for a target or a rule, set `collect_coverage = False`; see
+[Test frameworks that report their own coverage](#test-frameworks-that-report-their-own-coverage).
 
 ### Coverage runs count against the test's timeout
 
@@ -373,3 +388,17 @@ wrote there and publishes the report rules_js generated instead. Rulesets in tha
 situation, such as
 [rules_jest](https://github.com/aspect-build/rules_jest), handle coverage themselves
 rather than relying on the rules_js implementation.
+
+Such a framework brings its own collector, either V8 or Istanbul instrumentation,
+and rules_js does not know about it. Unless told otherwise, rules_js profiles the same
+processes as well. For example, a Vitest or Jest rule built on `js_binary_lib` runs
+under `bazel coverage` with two collectors in every process the framework starts. The
+framework's coverage becomes the published report, while the rules_js profiles are
+written to `COVERAGE_DIR` and never read. The second collector still adds runtime
+overhead. Its profiles grow with the amount of code each process loads, and they are
+uploaded as test outputs.
+
+Set `collect_coverage = False` on the target, or default it to `False` in a custom
+test rule built on `js_binary_lib`, so that the framework's collector is the only one
+running. With it disabled, rules_js writes no V8 profiles to `COVERAGE_DIR` and
+generates no report, so the framework must write the report.
