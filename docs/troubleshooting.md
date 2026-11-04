@@ -331,6 +331,24 @@ ERROR: ...: coverage report generator '...' not found; code coverage requires a 
 
 The test itself still passes; enable runfiles to collect coverage for it.
 
+### V8 profiles are deleted after the report
+
+Each node process in the test writes a V8 profile,
+`coverage-<pid>-<timestamp>-<thread>.json`, into `COVERAGE_DIR`. Once the lcov report
+is generated, the profiles it was generated from are deleted, so they do not become
+outputs of the test action. If the report fails, they are kept.
+
+To keep them anyway, for example to find out why a file reports no coverage or maps
+to the wrong lines, set `JS_BINARY__KEEP_COVERAGE_PROFILES`:
+
+```sh
+bazel coverage --test_env=JS_BINARY__KEEP_COVERAGE_PROFILES=1 //path/to:test
+```
+
+The profiles are then in the test's `_coverage` directory under `bazel-testlogs`.
+With `--remote_download_minimal`, also pass `--experimental_fetch_all_coverage_outputs`
+to download them.
+
 ### Empty coverage reports
 
 An empty `coverage.dat` usually means nothing was instrumented — see
