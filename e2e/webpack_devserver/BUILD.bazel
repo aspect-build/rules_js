@@ -1,7 +1,7 @@
-load("@rules_js//js:defs.bzl", "js_run_devserver")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//:webpack/package_json.bzl", webpack_bin = "bin")
+load("@rules_js//js:defs.bzl", "js_run_devserver")
 
 npm_link_all_packages()
 

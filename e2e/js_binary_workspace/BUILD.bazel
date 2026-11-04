@@ -1,5 +1,5 @@
-load("@rules_js//js:defs.bzl", "js_run_binary", "js_test")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_js//js:defs.bzl", "js_run_binary", "js_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 js_run_binary(

@@ -1,5 +1,5 @@
-load("@rules_js//js:defs.bzl", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_js//js:defs.bzl", "js_test")
 
 npm_link_all_packages()
 

@@ -1,6 +1,6 @@
-load("@rules_js//js:defs.bzl", "js_binary")
 load("@bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
+load("@rules_js//js:defs.bzl", "js_binary")
 load(":defs.bzl", "pi_rule")
 
 copy_file(

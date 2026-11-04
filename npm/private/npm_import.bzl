@@ -9,7 +9,6 @@ See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API 
 for a given lockfile.
 """
 
-load("@rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
 load("@bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
 load("@bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -21,6 +20,7 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
+load("@rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
 load(":exclude_package_contents_presets.bzl", "EXCLUDE_PACKAGE_CONTENTS_PRESETS")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")

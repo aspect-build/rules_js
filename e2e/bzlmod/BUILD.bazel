@@ -1,10 +1,10 @@
-load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//:jasmine/package_json.bzl", jasmine_bin = "bin")
 load("@npm_meaning-of-life__links//:defs.bzl", npm_link_meaning_of_life = "npm_link_imported_package")
 load("@other_module//:less.bzl", "lessc")
+load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 
 not_windows = select({
     "@platforms//os:windows": ["@platforms//:incompatible"],

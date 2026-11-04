@@ -1,6 +1,6 @@
-load("@rules_js//js:defs.bzl", "js_library", "js_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//webpack_cli:webpack-cli/package_json.bzl", "bin")
+load("@rules_js//js:defs.bzl", "js_library", "js_test")
 
 npm_link_all_packages()
 

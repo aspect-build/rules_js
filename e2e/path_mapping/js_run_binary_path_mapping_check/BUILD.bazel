@@ -1,6 +1,6 @@
-load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 
 # Verifies that a js_run_binary target supports path mapping. This requires
 # set_legacy_environment_variables to be disabled, and args must avoid Make

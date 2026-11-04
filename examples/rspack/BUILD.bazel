@@ -1,7 +1,7 @@
-load("@rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//rspack:@rspack/cli/package_json.bzl", "bin")
+load("@rules_js//js:defs.bzl", "js_binary", "js_image_layer", "js_library")
 
 npm_link_all_packages()
 
