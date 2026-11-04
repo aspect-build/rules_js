@@ -1,7 +1,8 @@
 // Code coverage
 //
-// Collects this process's V8 coverage, and, for a test that reports, runs coverage.js on
-// exit to turn the collected profiles into an lcov report.
+// Loaded only in the root process of a test that generates the lcov report. Collects this
+// process's V8 coverage, and runs coverage.js on exit to turn the collected profiles into
+// the report.
 //
 // We enable collection via the inspector rather than by setting the NODE_V8_COVERAGE
 // environment variable. This allows us to start collection in-process without relying on any
@@ -14,8 +15,9 @@ const { logError } = require('./util.cjs')
 
 const collecting = startCollection()
 
-// Child node processes re-enter bootstrap.cjs with an inherited environment. Only the root
-// process reports, once every child has exited and written its profile.
+// Child node processes re-enter bootstrap.cjs with an inherited environment. Removing this
+// keeps them from loading this file, so only the root process reports, once every child
+// has exited and written its profile.
 const { JS_BINARY__COVERAGE_REPORT } = process.env
 delete process.env.JS_BINARY__COVERAGE_REPORT
 
@@ -122,7 +124,7 @@ function startCollection() {
 
     // A node without inspector support, or a program that already holds the session,
     // makes this throw. Report empty coverage rather than take down a program that would
-    // otherwise have run: this preload is in every collecting js_binary under `bazel coverage`, so a
+    // otherwise have run: this preload is in every js_test under `bazel coverage`, so a
     // throw here fails the target before its own code starts.
     try {
         session = new (require('node:inspector').Session)()

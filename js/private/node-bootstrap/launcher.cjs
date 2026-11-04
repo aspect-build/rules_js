@@ -260,9 +260,6 @@ if (process.env.JS_BINARY__LOG_DEBUG) {
     if (process.env.JS_BINARY__NO_RUNFILES) {
         logDebug(`JS_BINARY__NO_RUNFILES ${process.env.JS_BINARY__NO_RUNFILES}`)
     }
-    if (process.env.JS_BINARY__NO_COVERAGE) {
-        logDebug(`JS_BINARY__NO_COVERAGE ${process.env.JS_BINARY__NO_COVERAGE}`)
-    }
     for (const name of [
         'JS_BINARY__PACKAGE',
         'JS_BINARY__TARGET_CPU',
