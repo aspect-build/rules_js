@@ -116,7 +116,13 @@ def js_test(**kwargs):
     creating temporary files.
 
     LCOV coverage reports can be written to `COVERAGE_OUTPUT_FILE` when running under `bazel coverage`
-    or if the `--coverage` flag is set.
+    or with `--collect_code_coverage`.
+
+    Under `bazel coverage`, rules_js collects V8 coverage for the test program, its child
+    processes and its worker threads, and generates the lcov report from it when the program
+    exits. A test runner that collects and reports its own coverage, such as Jest or Vitest,
+    belongs in a rule for that framework instead, or both collectors run. See
+    [Code coverage](https://github.com/aspect-build/rules_js/blob/main/docs/troubleshooting.md#code-coverage).
 
     See the Bazel [Test encyclopedia](https://bazel.build/reference/test-encyclopedia) for details on
     the contract between Bazel and a test runner.

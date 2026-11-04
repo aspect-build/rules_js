@@ -15,9 +15,9 @@ if (!process.env.NODE_DISABLE_COMPILE_CACHE) {
 }
 
 // Code coverage. We load this early on so that the coverage session sees as much of this
-// process compiled under it as possible. We require coverage.cjs conditionally to cut
-// down on code size for non-test targets.
-if (process.env.JS_BINARY__COVERAGE_REPORT || process.env.COVERAGE_DIR) {
+// process compiled under it as possible. Only the root process of a test that generates
+// the report loads it; its child processes collect from the NODE_V8_COVERAGE it sets.
+if (process.env.JS_BINARY__COVERAGE_REPORT) {
     require('./coverage.cjs')
 }
 

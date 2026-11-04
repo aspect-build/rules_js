@@ -295,9 +295,16 @@ tests, etc.) at extraction time; see
 
 ## Code coverage
 
-Under `bazel coverage`, `js_test` produces its lcov report as the test program
-exits, where the V8 coverage data and the instrumented sources are both available.
-The `_lcov_merger` step only publishes that report.
+Under `bazel coverage` (or `bazel test --collect_code_coverage`), `js_test` collects
+V8 coverage for the test program, its child processes and its worker threads. It
+produces its lcov report as the test program exits, where the V8 coverage data and the
+instrumented sources are both available. The `_lcov_merger` step only publishes that
+report.
+
+rules_js collects coverage only for tests that generate this report. A `js_binary` run
+by another kind of test, such as an `sh_test`, and a custom test rule built on
+`js_binary_lib` without the rules_js reporter, such as a Jest or Vitest rule, are not
+profiled, unless a process that is collecting starts them.
 
 ### Coverage runs count against the test's timeout
 
@@ -373,3 +380,9 @@ wrote there and publishes the report rules_js generated instead. Rulesets in tha
 situation, such as
 [rules_jest](https://github.com/aspect-build/rules_jest), handle coverage themselves
 rather than relying on the rules_js implementation.
+
+Such a framework brings its own collector, so run it with the test rule provided by its
+ruleset, or with a custom rule built on `js_binary_lib`; rules_js collects nothing for
+either. Run directly as a `js_test`, the framework's collector and rules_js both profile
+every process the framework starts. The second collector adds runtime overhead, and
+rules_js generates a report that the framework's own report replaces.
