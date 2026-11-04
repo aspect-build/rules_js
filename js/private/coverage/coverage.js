@@ -3,17 +3,17 @@
 var path = require('path');
 var require$$2$1 = require('node:url');
 var require$$1$1 = require('node:path');
-var require$$0$1 = require('fs');
+var fs = require('fs');
 var require$$4 = require('node:fs');
 var require$$5 = require('node:fs/promises');
 var require$$0 = require('node:events');
 var require$$1 = require('node:stream');
 var require$$2 = require('node:string_decoder');
 var require$$2$2 = require('util');
-var require$$0$2 = require('os');
+var require$$0$1 = require('os');
 var require$$1$2 = require('tty');
 var require$$1$3 = require('url');
-var require$$0$3 = require('assert');
+var require$$0$2 = require('assert');
 var require$$12 = require('module');
 
 var c8 = {};
@@ -4808,7 +4808,7 @@ function requireCommonjs$1 () {
 	const lru_cache_1 = /*@__PURE__*/ requireCommonjs$3();
 	const node_path_1 = require$$1$1;
 	const node_url_1 = require$$2$1;
-	const fs_1 = require$$0$1;
+	const fs_1 = fs;
 	const actualFS = __importStar(require$$4);
 	const realpathSync = fs_1.realpathSync.native;
 	// TODO: test perf of fs/promises realpath vs realpathCB,
@@ -10535,7 +10535,7 @@ var hasRequiredMakeDir;
 function requireMakeDir () {
 	if (hasRequiredMakeDir) return makeDir.exports;
 	hasRequiredMakeDir = 1;
-	const fs = require$$0$1;
+	const fs$1 = fs;
 	const path$1 = path;
 	const {promisify} = require$$2$2;
 	const semverGte = requireGte();
@@ -10559,7 +10559,7 @@ function requireMakeDir () {
 	const processOptions = options => {
 		const defaults = {
 			mode: 0o777,
-			fs
+			fs: fs$1
 		};
 
 		return {
@@ -10586,7 +10586,7 @@ function requireMakeDir () {
 		const mkdir = promisify(options.fs.mkdir);
 		const stat = promisify(options.fs.stat);
 
-		if (useNativeRecursiveOption && options.fs.mkdir === fs.mkdir) {
+		if (useNativeRecursiveOption && options.fs.mkdir === fs$1.mkdir) {
 			const pth = path$1.resolve(input);
 
 			await mkdir(pth, {
@@ -10643,10 +10643,10 @@ function requireMakeDir () {
 		checkPath(input);
 		options = processOptions(options);
 
-		if (useNativeRecursiveOption && options.fs.mkdirSync === fs.mkdirSync) {
+		if (useNativeRecursiveOption && options.fs.mkdirSync === fs$1.mkdirSync) {
 			const pth = path$1.resolve(input);
 
-			fs.mkdirSync(pth, {
+			fs$1.mkdirSync(pth, {
 				mode: options.mode,
 				recursive: true
 			});
@@ -10714,7 +10714,7 @@ var hasRequiredSupportsColor;
 function requireSupportsColor () {
 	if (hasRequiredSupportsColor) return supportsColor_1;
 	hasRequiredSupportsColor = 1;
-	const os = require$$0$2;
+	const os = require$$0$1;
 	const tty = require$$1$2;
 	const hasFlag = requireHasFlag();
 
@@ -10862,7 +10862,7 @@ function requireFileWriter () {
 	 Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 	 */
 	const path$1 = path;
-	const fs = require$$0$1;
+	const fs$1 = fs;
 	const mkdirp = requireMakeDir();
 	const supportsColor = requireSupportsColor();
 
@@ -10913,11 +10913,11 @@ function requireFileWriter () {
 	    }
 
 	    write(str) {
-	        fs.writeSync(this.fd, str);
+	        fs$1.writeSync(this.fd, str);
 	    }
 
 	    close() {
-	        fs.closeSync(this.fd);
+	        fs$1.closeSync(this.fd);
 	    }
 	}
 
@@ -11018,11 +11018,11 @@ function requireFileWriter () {
 	        mkdirp.sync(path$1.dirname(dest));
 	        let contents;
 	        if (header) {
-	            contents = header + fs.readFileSync(source, 'utf8');
+	            contents = header + fs$1.readFileSync(source, 'utf8');
 	        } else {
-	            contents = fs.readFileSync(source);
+	            contents = fs$1.readFileSync(source);
 	        }
-	        fs.writeFileSync(dest, contents);
+	        fs$1.writeFileSync(dest, contents);
 	    }
 
 	    /**
@@ -11040,7 +11040,7 @@ function requireFileWriter () {
 	        }
 	        file = path$1.resolve(this.baseDir, file);
 	        mkdirp.sync(path$1.dirname(file));
-	        return new FileContentWriter(fs.openSync(file, 'w'));
+	        return new FileContentWriter(fs$1.openSync(file, 'w'));
 	    }
 	}
 
@@ -11796,7 +11796,7 @@ function requireContext () {
 	 Copyright 2012-2015, Yahoo Inc.
 	 Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 	 */
-	const fs = require$$0$1;
+	const fs$1 = fs;
 	const FileWriter = requireFileWriter();
 	const XMLWriter = requireXmlWriter();
 	const tree = requireTree();
@@ -11805,7 +11805,7 @@ function requireContext () {
 
 	function defaultSourceLookup(path) {
 	    try {
-	        return fs.readFileSync(path, 'utf8');
+	        return fs$1.readFileSync(path, 'utf8');
 	    } catch (ex) {
 	        throw new Error(`Unable to lookup source: ${path} (${ex.message})`);
 	    }
@@ -12149,7 +12149,7 @@ function requireSourceMapFromFile () {
 	// https://github.com/nodejs/node/blob/master/lib/internal/source_map/source_map_cache.js
 	// we should to upstream and downstream fixes.
 
-	const { readFileSync } = require$$0$1;
+	const { readFileSync } = fs;
 	const { fileURLToPath, pathToFileURL } = require$$1$3;
 	const util = require$$2$2;
 	const debuglog = util.debuglog('c8');
@@ -14189,7 +14189,7 @@ var hasRequiredV8ToIstanbul$1;
 function requireV8ToIstanbul$1 () {
 	if (hasRequiredV8ToIstanbul$1) return v8ToIstanbul$1;
 	hasRequiredV8ToIstanbul$1 = 1;
-	const assert = require$$0$3;
+	const assert = require$$0$2;
 	const convertSourceMap = requireConvertSourceMap();
 	const util = require$$2$2;
 	const debuglog = util.debuglog('c8');
@@ -14200,7 +14200,7 @@ function requireV8ToIstanbul$1 () {
 	const CovSource = requireSource();
 	const { sliceRange } = requireRange();
 	const compatError = Error(`requires Node.js ${require$$9.engines.node}`);
-	const { readFileSync } = require$$0$1;
+	const { readFileSync } = fs;
 	let readFile = () => { throw compatError };
 	try {
 	  readFile = require('fs').promises.readFile;
@@ -15519,9 +15519,9 @@ function requireReport () {
 	try {
 	  ;({ readFile } = require('fs/promises'));
 	} catch (err) {
-({ readFile } = require$$0$1.promises);
+({ readFile } = fs.promises);
 	}
-	const { readdirSync, readFileSync, statSync } = require$$0$1;
+	const { readdirSync, readFileSync, statSync } = fs;
 	const { isAbsolute, resolve, extname } = path;
 	const { pathToFileURL, fileURLToPath } = require$$1$3;
 	const getSourceMapFromFile = requireSourceMapFromFile();
@@ -16081,7 +16081,21 @@ function logDebug(message) {
 
 const started = process.hrtime.bigint();
 
-const include = require$$0$1
+// The name node and coverage.cjs give each V8 profile: coverage-<pid>-<timestamp>-<thread>.json.
+const PROFILE = /^coverage-\d+-\d+-\d+\.json$/;
+
+// Every node process in the test has exited by now, so these are the profiles the report
+// reads. Listed up front so that only they are deleted, not other files in COVERAGE_DIR.
+let profiles = [];
+try {
+    profiles = fs
+        .readdirSync(process.env.COVERAGE_DIR)
+        .filter((f) => PROFILE.test(f));
+} catch (e) {
+    if (e.code !== 'ENOENT') throw e
+}
+
+const include = fs
     .readFileSync(process.env.COVERAGE_MANIFEST)
     .toString('utf8')
     .split('\n')
@@ -16098,7 +16112,16 @@ process.chdir(pwd);
 // Same list as COVERAGE_EXTENSIONS in js/private/coverage/extensions.bzl, which is what
 // decides the contents of COVERAGE_MANIFEST. c8 drops a manifest entry whose extension is
 // not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
-const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx']);
+const extensions = new Set([
+    '.mjs',
+    '.mts',
+    '.cjs',
+    '.cts',
+    '.ts',
+    '.js',
+    '.jsx',
+    '.tsx',
+]);
 
 // We provide our own implementation of the TestExclude class from here:
 // https://github.com/istanbuljs/test-exclude/blob/3a37faa17cc4f0f602a7c1ec23ef0b0fcf44ab37/index.js
@@ -16134,7 +16157,9 @@ class ManifestExclude {
                 `coverage report requested for ${cwd}, but the manifest describes ${this.root}`
             )
         }
-        return this.files.filter((f) => require$$0$1.existsSync(path.resolve(this.root, f)))
+        return this.files.filter((f) =>
+            fs.existsSync(path.resolve(this.root, f))
+        )
     }
 }
 
@@ -16159,8 +16184,26 @@ logDebug(
 report
     .run()
     .then(() => {
-        require$$0$1.renameSync(path.join(process.env.COVERAGE_DIR, 'lcov.info'), stash);
-        const total = (Number(process.hrtime.bigint() - started) / 1e6).toFixed(0);
+        fs.renameSync(path.join(process.env.COVERAGE_DIR, 'lcov.info'), stash);
+
+        // Nothing reads the profiles once the report exists, and whatever is left in
+        // COVERAGE_DIR becomes an output of the test action. A failed report never gets
+        // here, so it keeps them.
+        if (process.env.JS_BINARY__KEEP_COVERAGE_PROFILES) {
+            logDebug(
+                `kept ${profiles.length} V8 profiles in ${process.env.COVERAGE_DIR}`
+            );
+        } else {
+            for (const f of profiles) {
+                fs.rmSync(path.join(process.env.COVERAGE_DIR, f), {
+                    force: true,
+                });
+            }
+            logDebug(`deleted ${profiles.length} V8 profiles`);
+        }
+        const total = (Number(process.hrtime.bigint() - started) / 1e6).toFixed(
+            0
+        );
         logDebug(`coverage report generated in ${total}ms`);
     })
     .catch((err) => {

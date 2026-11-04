@@ -16,6 +16,20 @@ function logDebug(message) {
 
 const started = process.hrtime.bigint()
 
+// The name node and coverage.cjs give each V8 profile: coverage-<pid>-<timestamp>-<thread>.json.
+const PROFILE = /^coverage-\d+-\d+-\d+\.json$/
+
+// Every node process in the test has exited by now, so these are the profiles the report
+// reads. Listed up front so that only they are deleted, not other files in COVERAGE_DIR.
+let profiles = []
+try {
+    profiles = fs
+        .readdirSync(process.env.COVERAGE_DIR)
+        .filter((f) => PROFILE.test(f))
+} catch (e) {
+    if (e.code !== 'ENOENT') throw e
+}
+
 const include = fs
     .readFileSync(process.env.COVERAGE_MANIFEST)
     .toString('utf8')
@@ -33,7 +47,16 @@ process.chdir(pwd)
 // Same list as COVERAGE_EXTENSIONS in js/private/coverage/extensions.bzl, which is what
 // decides the contents of COVERAGE_MANIFEST. c8 drops a manifest entry whose extension is
 // not listed here, so the two must agree; c8's own default list has neither .mts nor .cts.
-const extensions = new Set(['.mjs', '.mts', '.cjs', '.cts', '.ts', '.js', '.jsx', '.tsx'])
+const extensions = new Set([
+    '.mjs',
+    '.mts',
+    '.cjs',
+    '.cts',
+    '.ts',
+    '.js',
+    '.jsx',
+    '.tsx',
+])
 
 // We provide our own implementation of the TestExclude class from here:
 // https://github.com/istanbuljs/test-exclude/blob/3a37faa17cc4f0f602a7c1ec23ef0b0fcf44ab37/index.js
@@ -69,7 +92,9 @@ class ManifestExclude {
                 `coverage report requested for ${cwd}, but the manifest describes ${this.root}`
             )
         }
-        return this.files.filter((f) => fs.existsSync(path.resolve(this.root, f)))
+        return this.files.filter((f) =>
+            fs.existsSync(path.resolve(this.root, f))
+        )
     }
 }
 
@@ -95,7 +120,25 @@ report
     .run()
     .then(() => {
         fs.renameSync(path.join(process.env.COVERAGE_DIR, 'lcov.info'), stash)
-        const total = (Number(process.hrtime.bigint() - started) / 1e6).toFixed(0)
+
+        // Nothing reads the profiles once the report exists, and whatever is left in
+        // COVERAGE_DIR becomes an output of the test action. A failed report never gets
+        // here, so it keeps them.
+        if (process.env.JS_BINARY__KEEP_COVERAGE_PROFILES) {
+            logDebug(
+                `kept ${profiles.length} V8 profiles in ${process.env.COVERAGE_DIR}`
+            )
+        } else {
+            for (const f of profiles) {
+                fs.rmSync(path.join(process.env.COVERAGE_DIR, f), {
+                    force: true,
+                })
+            }
+            logDebug(`deleted ${profiles.length} V8 profiles`)
+        }
+        const total = (Number(process.hrtime.bigint() - started) / 1e6).toFixed(
+            0
+        )
         logDebug(`coverage report generated in ${total}ms`)
     })
     .catch((err) => {
