@@ -1,7 +1,11 @@
 {
     "private": true,
     "pnpm": {
-        "onlyBuiltDependencies": []
+        "onlyBuiltDependencies": [],
+        "overrides": {
+            "@aspect-test/a>@aspect-test/c": "link:lib/aspect-test-c",
+            "@aspect-test/a>@aspect-test/d": "file:vendored/a"
+        }
     },
     "dependencies": {
         "typescript": "^5.9.2",

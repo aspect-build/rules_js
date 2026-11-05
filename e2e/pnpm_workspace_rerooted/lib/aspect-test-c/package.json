@@ -1,0 +1,6 @@
+{
+    "name": "@aspect-test/c",
+    "private": true,
+    "description": "workspace stand-in for the registry @aspect-test/c, linked into the @aspect-test/a <-> @aspect-test/b dependency cycle by a pnpm override",
+    "main": "index.js"
+}

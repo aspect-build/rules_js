@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@aspect-test/a>@aspect-test/c': link:../lib/aspect-test-c
+  '@aspect-test/a>@aspect-test/d': file:../vendored/a
+
 importers:
 
   .: {}
@@ -33,6 +37,9 @@ importers:
       '@aspect-test/a':
         specifier: 5.0.2
         version: 5.0.2
+      '@aspect-test/c':
+        specifier: workspace:*
+        version: link:../../lib/aspect-test-c
       '@aspect-test/g':
         specifier: 1.0.0
         version: 1.0.0
@@ -87,6 +94,8 @@ importers:
       vendored-b:
         specifier: file:../../vendored/b
         version: file:../vendored/b(@lib/b@lib+b)
+
+  ../lib/aspect-test-c: {}
 
   ../lib/b:
     dependencies:
@@ -189,8 +198,8 @@ snapshots:
   '@aspect-test/a@5.0.2':
     dependencies:
       '@aspect-test/b': 5.0.2
-      '@aspect-test/c': 2.0.2
-      '@aspect-test/d': 2.0.0(@aspect-test/c@2.0.2)
+      '@aspect-test/c': link:../lib/aspect-test-c
+      '@aspect-test/d': vendored-a@file:../vendored/a
 
   '@aspect-test/b@5.0.2':
     dependencies:

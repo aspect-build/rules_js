@@ -199,6 +199,7 @@ def _npm_package_store_impl(ctx):
     # files required to create the package store entry
     files = []
     transitive_files_depsets = []
+    shared_link_files = []
 
     # sources, types and npm_sources depsets gathered from the JsInfo of the
     # package and all deps required to run
@@ -365,6 +366,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
         # deps; this pattern is used to break circular dependencies between 3rd party npm deps; it
         # is not used for 1st party deps
+        shared_links = ctx.attr.shared_links
+        shared_link_files = [target[DefaultInfo].files for target in shared_links]
+
         deps_map = {}
         deps_with_ref_deps = []
         for dep, _dep_aliases in ctx.attr.deps.items():
@@ -384,7 +388,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_info.package]
                 direct_ref_deps[dep] = dep_aliases
 
-            if dep_info.ref_deps:
+            # dep symlinks of each closure member come from shared_links when set;
+            # otherwise they are created below for this target alone
+            if dep_info.ref_deps and not shared_links:
                 deps_with_ref_deps.append(dep_info)
 
             # Include the store and js info of all dependencies expected to be linked;
@@ -443,9 +449,9 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
     sources_depset = depset(transitive = sources_depsets)
     types_depset = depset(transitive = types_depsets)
-    npm_sources = depset(files, transitive = npm_sources_depsets)
-    transitive_files_depset = depset(files, transitive = transitive_files_depsets)
-    files_depset = depset(files)
+    npm_sources = depset(files, transitive = npm_sources_depsets + shared_link_files)
+    transitive_files_depset = depset(files, transitive = transitive_files_depsets + shared_link_files)
+    files_depset = depset(files, transitive = shared_link_files)
 
     providers = [
         JsInfo(
@@ -482,9 +488,24 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
     return providers
 
+def _npm_package_store_links_impl(ctx):
+    package_store_prefix_len = len(utils.package_store_prefix(ctx.label.repo_name, ctx.label.package))
+    package_store_name = utils.package_store_name(ctx.attr.key)
+
+    files = []
+    for dep, _dep_aliases in ctx.attr.deps.items():
+        dep_info = dep[NpmPackageStoreInfo]
+        dep_aliases = _dep_aliases.split(",") if _dep_aliases else [dep_info.package]
+        target = dep_info.package_store_directory.short_path[package_store_prefix_len:]
+        for dep_alias in dep_aliases:
+            files.append(_symlink_package_store(ctx, package_store_name, target, dep_alias))
+
+    return [DefaultInfo(files = depset(files))]
+
 npm_package_store_lib = struct(
     attrs = _ATTRS,
     implementation = _npm_package_store_impl,
+    links_implementation = _npm_package_store_links_impl,
     provides = [DefaultInfo, NpmPackageStoreInfo],
     toolchains = [
         Label("@bazel_lib//lib:copy_directory_toolchain_type"),
@@ -527,6 +548,15 @@ def npm_local_package_store_internal(package_store_name, package, version, src, 
         name = "{}/pkg".format(store_target_name),
         actual = store_target_name,
         visibility = visibility,
+    )
+
+    # Local packages link their own deps so there are no symlinks to share with
+    # terminal targets of circular dependency closures that contain this package.
+    native.filegroup(
+        name = "{}/links".format(store_target_name),
+        srcs = [],
+        visibility = visibility,
+        tags = tags,
     )
 
 # Util for creating the symlink for a package store dependency referencing

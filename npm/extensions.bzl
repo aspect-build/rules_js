@@ -186,6 +186,7 @@ def _npm_translate_lock_bzlmod(module_ctx, mod, attr, exclude_package_contents_c
             replace_package = i.replace_package,
             root_package = state.root_package(),
             transitive_closure = i.transitive_closure,
+            in_transitive_closure = i.in_transitive_closure,
             url = i.url,
             version = i.version,
         )

@@ -1,6 +1,7 @@
 "npm_package_store_internal rule"
 
 load(":npm_package_store.bzl", _npm_package_store_lib = "npm_package_store_lib")
+load(":npm_package_store_info.bzl", "NpmPackageStoreInfo")
 
 _INTERNAL_ATTRS_STORE = _npm_package_store_lib.attrs | {
     "key": attr.string(mandatory = True),
@@ -27,6 +28,13 @@ _INTERNAL_ATTRS_STORE = _npm_package_store_lib.attrs | {
         Takes precedence over the package version in the `NpmPackageInfo` src.""",
         mandatory = True,
     ),
+    "shared_links": attr.label_keyed_string_dict(
+        doc = """`npm_package_store_links` targets providing the dependency symlinks of every package
+        in the transitive closure of a terminal `npm_package_store_internal` target.
+
+        When set, the terminal target does not create those symlinks itself.""",
+        providers = [DefaultInfo],
+    ),
 }
 
 npm_package_store_internal = rule(
@@ -34,4 +42,19 @@ npm_package_store_internal = rule(
     attrs = _INTERNAL_ATTRS_STORE,
     provides = _npm_package_store_lib.provides,
     toolchains = _npm_package_store_lib.toolchains,
+)
+
+npm_package_store_links = rule(
+    doc = """Creates the symlinks from one package's package store entry to its direct dependencies.
+
+    Terminal `npm_package_store_internal` targets with a transitive closure of circular dependencies
+    share these instead of each re-creating the symlinks of every package in the closure.""",
+    implementation = _npm_package_store_lib.links_implementation,
+    attrs = {
+        "key": attr.string(mandatory = True),
+        "deps": attr.label_keyed_string_dict(
+            doc = "Dependency package store targets mapped to the comma separated names to link them as",
+            providers = [NpmPackageStoreInfo],
+        ),
+    },
 )
