@@ -274,12 +274,23 @@ jobs:
               working-directory: ${{ matrix.workspace.path }}
               env:
                   ASPECT_RULES_JS_FROZEN_PNPM_LOCK: 1
+                  # Where e2e/js_run_devserver/serve_test.sh saves remote cache gRPC logs.
+                  BAZEL_GRPC_LOG_DIR: ${{ runner.temp }}/grpc-log
               run: |
                   if [[ -f ./test.sh ]]; then
                     ./test.sh
                   else
                     echo "No test.sh in ${PWD}; skipping"
                   fi
+
+            - name: Upload remote cache gRPC logs
+              if: always()
+              uses: actions/upload-artifact@v6
+              with:
+                  name: grpc-log-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }}
+                  path: ${{ runner.temp }}/grpc-log
+                  if-no-files-found: ignore
+                  retention-days: 14
 
     # GitHub caps a single job matrix at 256 entries; the flag-flip and Bazel 10
     # lanes run here so neither matrix exceeds it with every e2e workspace.
