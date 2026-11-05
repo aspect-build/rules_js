@@ -21,79 +21,78 @@ const collecting = startCollection()
 const { JS_BINARY__COVERAGE_REPORT } = process.env
 delete process.env.JS_BINARY__COVERAGE_REPORT
 
-// The exit hook runs coverage.js, the executable that turns the V8 profiles in COVERAGE_DIR
-// into the lcov report the _lcov_merger publishes.
-if (JS_BINARY__COVERAGE_REPORT) {
-    // Snapshot the environment and cwd now: the program under test may mutate either before it
-    // exits, and the reporter must see what the launcher set up.
-    //
-    // NODE_V8_COVERAGE is blanked so the reporter writes no profile of its own alongside the
-    // ones it reads. It has to be emptied rather than deleted: child_process always propagates
-    // NODE_V8_COVERAGE from the parent, and only skips doing so when the env passed to it has
-    // the key as a property.
-    const env = {
-        ...process.env,
-        JS_COVERAGE__RUNFILES: process.env.JS_BINARY__RUNFILES,
-        NODE_V8_COVERAGE: '',
-    }
-    const cwd = process.cwd()
-    // Not process.execPath, which bootstrap.cjs patched to the node wrapper; that would
-    // re-apply the bootstrap in the reporter process.
-    const nodeBinary = process.env.JS_BINARY__NODE_BINARY
-    const report = require('node:path').resolve(
-        process.env.JS_BINARY__RUNFILES,
-        JS_BINARY__COVERAGE_REPORT
-    )
-
-    // This listener is registered by a --require preload, so it runs before any
-    // 'exit' listener the program itself registers.  takeCoverage() below
-    // therefore snapshots the profile before those listeners run, and code the
-    // program executes from one of them is reported as uncovered.
-    process.on('exit', function onExitCoverageReport() {
-        try {
-            const fs = require('node:fs')
-            const { spawnSync } = require('node:child_process')
-
-            // A test reporting its own coverage owns it, except under split
-            // post-processing, where bazel drops what the test wrote.
-            if (
-                env.SPLIT_COVERAGE_POST_PROCESSING !== '1' &&
-                env.COVERAGE_OUTPUT_FILE
-            ) {
-                const stat = fs.statSync(env.COVERAGE_OUTPUT_FILE, {
-                    throwIfNoEntry: false,
-                })
-                if (stat && stat.size > 0) return
-            }
-            if (!fs.existsSync(report)) {
-                // Report empty coverage rather than fail an otherwise passing test.
-                logError(
-                    `coverage report generator '${report}' not found; code coverage requires a runfiles tree`
-                )
-                return
-            }
-            // When we collect, our own profile is already on disk: startCollection
-            // registered its exit listener before this one. node instead writes it during
-            // teardown, after this handler, so ask for it here. Deliberately no
-            // v8.stopCoverage(): node's teardown asks V8 for coverage regardless, and
-            // errors out once it has stopped.
-            if (!collecting) {
-                require('node:v8').takeCoverage()
-            }
-            const { status, error } = spawnSync(nodeBinary, [report], {
-                cwd,
-                env,
-                stdio: 'inherit',
-            })
-            if (error || status !== 0) {
-                throw error || new Error(`exit code ${status}`)
-            }
-        } catch (e) {
-            // Throwing here would skip every later 'exit' listener, including the program's own.
-            logErrorAndFail(`coverage report generation failed: ${e.message}`)
-        }
-    })
+// Snapshot the environment and cwd now: the program under test may mutate either before it
+// exits, and the reporter must see what the launcher set up.
+//
+// NODE_V8_COVERAGE is blanked so the reporter writes no profile of its own alongside the
+// ones it reads. It has to be emptied rather than deleted: child_process always propagates
+// NODE_V8_COVERAGE from the parent, and only skips doing so when the env passed to it has
+// the key as a property.
+const env = {
+    ...process.env,
+    JS_COVERAGE__RUNFILES: process.env.JS_BINARY__RUNFILES,
+    NODE_V8_COVERAGE: '',
 }
+const cwd = process.cwd()
+// Not process.execPath, which bootstrap.cjs patched to the node wrapper; that would
+// re-apply the bootstrap in the reporter process.
+const nodeBinary = process.env.JS_BINARY__NODE_BINARY
+const report = require('node:path').resolve(
+    process.env.JS_BINARY__RUNFILES,
+    JS_BINARY__COVERAGE_REPORT
+)
+
+// Runs coverage.js, which turns the V8 profiles in COVERAGE_DIR into the lcov report the
+// _lcov_merger publishes.
+//
+// This listener is registered by a --require preload, so it runs before any
+// 'exit' listener the program itself registers.  takeCoverage() below
+// therefore snapshots the profile before those listeners run, and code the
+// program executes from one of them is reported as uncovered.
+process.on('exit', function onExitCoverageReport() {
+    try {
+        const fs = require('node:fs')
+        const { spawnSync } = require('node:child_process')
+
+        // A test reporting its own coverage owns it, except under split
+        // post-processing, where bazel drops what the test wrote.
+        if (
+            env.SPLIT_COVERAGE_POST_PROCESSING !== '1' &&
+            env.COVERAGE_OUTPUT_FILE
+        ) {
+            const stat = fs.statSync(env.COVERAGE_OUTPUT_FILE, {
+                throwIfNoEntry: false,
+            })
+            if (stat && stat.size > 0) return
+        }
+        if (!fs.existsSync(report)) {
+            // Report empty coverage rather than fail an otherwise passing test.
+            logError(
+                `coverage report generator '${report}' not found; code coverage requires a runfiles tree`
+            )
+            return
+        }
+        // When we collect, our own profile is already on disk: startCollection
+        // registered its exit listener before this one. node instead writes it during
+        // teardown, after this handler, so ask for it here. Deliberately no
+        // v8.stopCoverage(): node's teardown asks V8 for coverage regardless, and
+        // errors out once it has stopped.
+        if (!collecting) {
+            require('node:v8').takeCoverage()
+        }
+        const { status, error } = spawnSync(nodeBinary, [report], {
+            cwd,
+            env,
+            stdio: 'inherit',
+        })
+        if (error || status !== 0) {
+            throw error || new Error(`exit code ${status}`)
+        }
+    } catch (e) {
+        // Throwing here would skip every later 'exit' listener, including the program's own.
+        logErrorAndFail(`coverage report generation failed: ${e.message}`)
+    }
+})
 
 // Starts a V8 precise coverage session for this process, unless node is already collecting.
 // Returns whether we are the collector.
