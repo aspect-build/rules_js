@@ -7,4 +7,4 @@ import %workspace%/../e2e.bazelrc
 build --build_runfile_links
 
 # Used by serve_test.sh on CI. bazel truncates this file at the start of every command.
-common:grpc_log --experimental_remote_grpc_log=grpc_log.binpb
+common:grpc_log --remote_grpc_log=grpc_log.binpb
