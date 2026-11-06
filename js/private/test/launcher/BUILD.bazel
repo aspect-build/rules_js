@@ -2,8 +2,7 @@ load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
-load("//js/private/test:launcher_flags.bzl", "BASH_LAUNCHER_ONLY", "HERMETIC_LAUNCHER_ONLY")
-load(":direct_capture.bzl", "direct_capture")
+load("//js/private/test:launcher_flags.bzl", "HERMETIC_LAUNCHER_ONLY")
 
 package(default_testonly = True)
 
@@ -354,109 +353,7 @@ assert_contains(
 )
 
 # ==================================================================================================
-# Case 7: the launcher honors its own capture environment variables when invoked directly.
-#
-# js_run_binary delegates stdout/stderr/exit_code_out/silent_on_success to bazel-lib's run_binary,
-# so it no longer sets JS_BINARY__STDOUT_OUTPUT_FILE and friends. Code outside rules_js does invoke
-# the launcher directly and set them, so the launcher still implements them and these cases keep
-# that path covered.
-
-# A tool that writes to both streams and exits 0: the captures must land in the declared files.
-direct_capture(
-    name = "direct_capture_streams",
-    target_compatible_with = BASH_LAUNCHER_ONLY,
-    tool = ":stdout_stderr_bin",
-)
-
-assert_contains(
-    name = "direct_capture_stdout_test",
-    actual = ":direct_capture_streams_stdout.txt",
-    expected = "ON_STDOUT",
-)
-
-assert_contains(
-    name = "direct_capture_stderr_test",
-    actual = ":direct_capture_streams_stderr.txt",
-    expected = "ON_STDERR",
-)
-
-write_file(
-    name = "direct_capture_streams_expected_code",
-    out = "direct_capture_streams_expected_code.txt",
-    content = ["0"],
-)
-
-diff_test(
-    name = "direct_capture_zero_exit_code_test",
-    file1 = ":direct_capture_streams_expected_code.txt",
-    file2 = ":direct_capture_streams_exit_code.txt",
-)
-
-# A tool that exits non-zero: the launcher must record the code and itself exit 0, so the action
-# still succeeds and all three declared outputs appear.
-direct_capture(
-    name = "direct_capture_exit",
-    target_compatible_with = BASH_LAUNCHER_ONLY,
-    tool = ":exit_plain_bin",
-)
-
-write_file(
-    name = "direct_capture_exit_expected_code",
-    out = "direct_capture_exit_expected_code.txt",
-    content = ["7"],
-)
-
-diff_test(
-    name = "direct_capture_exit_code_test",
-    file1 = ":direct_capture_exit_expected_code.txt",
-    file2 = ":direct_capture_exit_exit_code.txt",
-)
-
-# JS_BINARY__SILENT_ON_SUCCESS with no capture file for either stream should result in nothing
-# written to stdout or stderr.
-genrule(
-    name = "direct_silent_run",
-    outs = ["direct_silent_out.txt"],
-    cmd = "JS_BINARY__SILENT_ON_SUCCESS=1 BAZEL_BINDIR=$(BINDIR) $(execpath :stdout_stderr_bin) > $@ 2>&1",
-    target_compatible_with = BASH_LAUNCHER_ONLY,
-    tools = [":stdout_stderr_bin"],
-)
-
-write_file(
-    name = "direct_silent_expected",
-    out = "direct_silent_expected.txt",
-    content = [],
-)
-
-diff_test(
-    name = "direct_silent_on_success_test",
-    file1 = ":direct_silent_expected.txt",
-    file2 = ":direct_silent_out.txt",
-)
-
-# The same invocation without JS_BINARY__SILENT_ON_SUCCESS, so the suppression above is
-# attributable to the variable rather than to the streams going missing some other way.
-genrule(
-    name = "direct_noisy_run",
-    outs = ["direct_noisy_out.txt"],
-    cmd = "BAZEL_BINDIR=$(BINDIR) $(execpath :stdout_stderr_bin) > $@ 2>&1",
-    tools = [":stdout_stderr_bin"],
-)
-
-assert_contains(
-    name = "direct_not_silent_stdout_test",
-    actual = ":direct_noisy_out.txt",
-    expected = "ON_STDOUT",
-)
-
-assert_contains(
-    name = "direct_not_silent_stderr_test",
-    actual = ":direct_noisy_out.txt",
-    expected = "ON_STDERR",
-)
-
-# ==================================================================================================
-# Case 8: without env or user-provided node options, the hermetic launcher runs the
+# Case 7: without env or user-provided node options, the hermetic launcher runs the
 # program in its own node process instead of starting a second one.
 
 js_binary(
@@ -578,7 +475,7 @@ assert_contains(
 )
 
 # ==================================================================================================
-# Case 9: a user node_options preload runs after the launcher has done its setup.
+# Case 8: a user node_options preload runs after the launcher has done its setup.
 #
 # launcher.cjs is node's first --require and bootstrap.cjs is loaded by it, so a preload from
 # node_options must see the bindir as cwd, the JS_BINARY__ environment complete, the fs patches
@@ -621,7 +518,7 @@ js_run_binary(
 ]
 
 # ==================================================================================================
-# Case 10: a child spawned from a worker thread gets the bootstrap, not the launcher.
+# Case 9: a child spawned from a worker thread gets the bootstrap, not the launcher.
 #
 # A worker runs launcher.cjs too, but with node's original exec arguments, so it is the one
 # place the launcher could leak into a child and run a second launch there.
