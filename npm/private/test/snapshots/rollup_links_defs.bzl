@@ -48,29 +48,6 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:freebsd_x64": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-x64@4.55.2": "@rollup/rollup-freebsd-x64",
             },
-            "@aspect_rules_js//platforms/pnpm:linux_arm": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2": "@rollup/rollup-linux-arm-gnueabihf",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2": "@rollup/rollup-linux-arm-musleabihf",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_arm64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2": "@rollup/rollup-linux-arm64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2": "@rollup/rollup-linux-arm64-musl",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_ppc64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2": "@rollup/rollup-linux-ppc64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2": "@rollup/rollup-linux-ppc64-musl",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_riscv64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2": "@rollup/rollup-linux-riscv64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2": "@rollup/rollup-linux-riscv64-musl",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_s390x": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2": "@rollup/rollup-linux-s390x-gnu",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_x64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2": "@rollup/rollup-linux-x64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2": "@rollup/rollup-linux-x64-musl",
-            },
             "@aspect_rules_js//platforms/pnpm:openbsd_x64": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-openbsd-x64@4.55.2": "@rollup/rollup-openbsd-x64",
             },
@@ -83,6 +60,64 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:win32_x64": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2": "@rollup/rollup-win32-x64-gnu",
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2": "@rollup/rollup-win32-x64-msvc",
+            },
+            "//conditions:default": {},
+        }) | select({
+            "@aspect_rules_js//platforms/pnpm:linux_arm_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2": "@rollup/rollup-linux-arm-gnueabihf",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2": "@rollup/rollup-linux-arm-gnueabihf",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2": "@rollup/rollup-linux-arm-musleabihf",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2": "@rollup/rollup-linux-arm-musleabihf",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2": "@rollup/rollup-linux-arm64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2": "@rollup/rollup-linux-arm64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2": "@rollup/rollup-linux-arm64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2": "@rollup/rollup-linux-arm64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_ppc64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2": "@rollup/rollup-linux-ppc64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_ppc64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2": "@rollup/rollup-linux-ppc64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2": "@rollup/rollup-linux-ppc64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_ppc64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2": "@rollup/rollup-linux-ppc64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_riscv64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2": "@rollup/rollup-linux-riscv64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_riscv64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2": "@rollup/rollup-linux-riscv64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2": "@rollup/rollup-linux-riscv64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_riscv64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2": "@rollup/rollup-linux-riscv64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_s390x_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2": "@rollup/rollup-linux-s390x-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_s390x_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2": "@rollup/rollup-linux-s390x-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_x64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2": "@rollup/rollup-linux-x64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_x64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2": "@rollup/rollup-linux-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2": "@rollup/rollup-linux-x64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_x64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2": "@rollup/rollup-linux-x64-musl",
             },
             "//conditions:default": {},
         }),
@@ -112,29 +147,6 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:freebsd_x64": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-x64@4.55.2/ref": "@rollup/rollup-freebsd-x64",
             },
-            "@aspect_rules_js//platforms/pnpm:linux_arm": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2/ref": "@rollup/rollup-linux-arm-gnueabihf",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2/ref": "@rollup/rollup-linux-arm-musleabihf",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_arm64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2/ref": "@rollup/rollup-linux-arm64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2/ref": "@rollup/rollup-linux-arm64-musl",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_ppc64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2/ref": "@rollup/rollup-linux-ppc64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2/ref": "@rollup/rollup-linux-ppc64-musl",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_riscv64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2/ref": "@rollup/rollup-linux-riscv64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2/ref": "@rollup/rollup-linux-riscv64-musl",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_s390x": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2/ref": "@rollup/rollup-linux-s390x-gnu",
-            },
-            "@aspect_rules_js//platforms/pnpm:linux_x64": {
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2/ref": "@rollup/rollup-linux-x64-gnu",
-                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2/ref": "@rollup/rollup-linux-x64-musl",
-            },
             "@aspect_rules_js//platforms/pnpm:openbsd_x64": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-openbsd-x64@4.55.2/ref": "@rollup/rollup-openbsd-x64",
             },
@@ -147,6 +159,64 @@ def npm_imported_package_store_internal():
             "@aspect_rules_js//platforms/pnpm:win32_x64": {
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2/ref": "@rollup/rollup-win32-x64-gnu",
                 ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2/ref": "@rollup/rollup-win32-x64-msvc",
+            },
+            "//conditions:default": {},
+        }) | select({
+            "@aspect_rules_js//platforms/pnpm:linux_arm_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2/ref": "@rollup/rollup-linux-arm-gnueabihf",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2/ref": "@rollup/rollup-linux-arm-gnueabihf",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2/ref": "@rollup/rollup-linux-arm-musleabihf",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2/ref": "@rollup/rollup-linux-arm-musleabihf",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2/ref": "@rollup/rollup-linux-arm64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2/ref": "@rollup/rollup-linux-arm64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2/ref": "@rollup/rollup-linux-arm64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_arm64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2/ref": "@rollup/rollup-linux-arm64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_ppc64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2/ref": "@rollup/rollup-linux-ppc64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_ppc64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2/ref": "@rollup/rollup-linux-ppc64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2/ref": "@rollup/rollup-linux-ppc64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_ppc64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2/ref": "@rollup/rollup-linux-ppc64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_riscv64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2/ref": "@rollup/rollup-linux-riscv64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_riscv64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2/ref": "@rollup/rollup-linux-riscv64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2/ref": "@rollup/rollup-linux-riscv64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_riscv64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2/ref": "@rollup/rollup-linux-riscv64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_s390x_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2/ref": "@rollup/rollup-linux-s390x-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_s390x_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2/ref": "@rollup/rollup-linux-s390x-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_x64_glibc": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2/ref": "@rollup/rollup-linux-x64-gnu",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_x64_unconstrained": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2/ref": "@rollup/rollup-linux-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2/ref": "@rollup/rollup-linux-x64-musl",
+            },
+            "@aspect_rules_js//platforms/pnpm:linux_x64_musl": {
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2/ref": "@rollup/rollup-linux-x64-musl",
             },
             "//conditions:default": {},
         }),
