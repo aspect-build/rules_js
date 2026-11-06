@@ -9,9 +9,15 @@
         },
         {
             "name": "Jason Bedard",
-            "email": "jason@aspect.build",
+            "email": "jason@jbedard.ca",
             "github": "jbedard",
             "github_user_id": 89246
+        },
+        {
+            "name": "Adam Cozzette",
+            "email": "adamc@aspect.build",
+            "github": "acozzette",
+            "github_user_id": 1115459
         }
     ],
     "repository": ["github:aspect-build/rules_js"],
