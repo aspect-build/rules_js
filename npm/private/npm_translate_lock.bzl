@@ -223,7 +223,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
 
             `@scope:registry` entries route scoped packages to their registry. With pnpm 11 and newer, declare
             registries with the `registries` setting of `pnpm-workspace.yaml` instead; routing from `.npmrc` is
-            kept for older pnpm versions and will be removed in rules_js 4.
+            kept for older pnpm versions and will be removed in a future major release.
 
             A [`tokenHelper`](https://pnpm.io/npmrc#urltokenhelper) is also honored: rules_js runs the executable it
             names and uses the token it prints on stdout. The helper path may be absolute or relative to this
