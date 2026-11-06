@@ -504,8 +504,11 @@ async function syncPackageStore(files, sandbox, writePerm) {
     }
     const startTime = perf_hooks.performance.now()
 
-    const entries = files.filter(([f]) => isUnderNodeModules(f))
-    const current = new Set(entries.map(([f]) => f))
+    // A path can be listed more than once, by different artifacts with the same short path. Sync it
+    // once, since concurrent syncs of one path race on the same temporary copy.
+    const current = new Set(
+        files.map(([f]) => f).filter((f) => isUnderNodeModules(f))
+    )
     const removed = [...packageStoreSynced.keys()].filter(
         (f) => !current.has(f)
     )
@@ -523,7 +526,7 @@ async function syncPackageStore(files, sandbox, writePerm) {
     const links = []
     const synced = (
         await Promise.all(
-            entries.map(([f]) =>
+            [...current].map((f) =>
                 syncPackageStoreEntry(f, sandbox, writePerm, links)
             )
         )
