@@ -62,7 +62,7 @@ def generate_repository_files(attr, state, npm_imports):
 
     rctx_files = {
         "BUILD.bazel": [
-            """load("@aspect_rules_js//js:defs.bzl", "js_binary")""",
+            """load("@rules_js//js:defs.bzl", "js_binary")""",
             """load("@bazel_skylib//:bzl_library.bzl", "bzl_library")""",
             """load("@bazel_skylib//rules:write_file.bzl", "write_file")""",
             """
@@ -420,20 +420,20 @@ Valid pnpm workspace projects: {}
 
     defs_bzl_header.append("")
     defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-    defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")""")
+    defs_bzl_header.append("""load("@rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")""")
 
     if fp_links:
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")""")
+        defs_bzl_header.append("""load("@rules_js//npm/private:npm_link_package_store.bzl", _npm_local_link_package_store = "npm_local_link_package_store_internal")""")
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")""")
+        defs_bzl_header.append("""load("@rules_js//npm/private:npm_package_store.bzl", _npm_local_package_store = "npm_local_package_store_internal")""")
 
     if has_package_visibility:
         defs_bzl_header.append("")
         defs_bzl_header.append("# buildifier: disable=bzl-visibility")
-        defs_bzl_header.append("""load("@aspect_rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
+        defs_bzl_header.append("""load("@rules_js//npm/private:npm_package_visibility.bzl", _npm_validate_package_visibility = "validate_npm_package_visibility")""")
 
     # Build the defs.bzl file contents
     defs_bzl_contents = [

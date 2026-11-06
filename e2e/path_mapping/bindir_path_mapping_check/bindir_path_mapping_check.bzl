@@ -1,7 +1,7 @@
 """Test-only rule that drives a js_binary tool with a path-mapped --bazel-bindir arg.
 """
 
-load("@aspect_rules_js//js:libs.bzl", "js_binary_lib")
+load("@rules_js//js:libs.bzl", "js_binary_lib")
 
 def _bindir_path_mapping_check_impl(ctx):
     output = ctx.actions.declare_directory(ctx.label.name)

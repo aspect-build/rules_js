@@ -1,5 +1,5 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
-load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("@rules_js//js:defs.bzl", "js_library", "js_test")
+load("@rules_js//npm:defs.bzl", "npm_link_package")
 
 js_library(
     name = "lib",

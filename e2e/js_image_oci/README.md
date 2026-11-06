@@ -31,7 +31,7 @@ app
 |   |   `-- src
 |   |       |-- ascii.art
 |   |       `-- main.js
-|   |-- aspect_rules_js
+|   |-- rules_js
 |   |   `-- js
 |   |       `-- private
 |   |           `-- node-bootstrap

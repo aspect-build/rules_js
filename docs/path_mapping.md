@@ -31,7 +31,7 @@ below). To set up a `js_run_binary` target for path mapping:
  - Pass `set_legacy_environment_variables = False`. This will disable the
    setting of environment variables such as `BAZEL_COMPILATION_MODE` that would
    otherwise be problematic. Alternatively, you can change the default for all
-   targets by passing `--@aspect_rules_js//js:set_legacy_environment_variables=False`
+   targets by passing `--@rules_js//js:set_legacy_environment_variables=False`
    on the command line; individual targets can still override this default by
    setting the attribute explicitly.
  - Avoid using [Make
@@ -54,7 +54,7 @@ while the action runs against `bazel-out/cfg/bin`.
 
 For custom rules that invoke a `js_binary`:
  - Use the helper function `js_binary_lib.run_binary_action()` from
-   `@aspect_rules_js//js:libs.bzl`. This is a thin wrapper around
+   `@rules_js//js:libs.bzl`. This is a thin wrapper around
    `ctx.actions.run()` that handles some internal implementation details in a
    path-mapping-friendly way.
  - Set `execution_requirements = {"supports-path-mapping": "1"}` to opt into

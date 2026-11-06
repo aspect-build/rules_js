@@ -1,6 +1,6 @@
 """A dummy pi rule for end-to-end testing of worker library"""
 
-load("@aspect_rules_js//js:libs.bzl", "js_binary_lib")
+load("@rules_js//js:libs.bzl", "js_binary_lib")
 
 def _pi_impl(ctx):
     output = ctx.actions.declare_file(ctx.label.name)

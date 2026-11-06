@@ -1,6 +1,6 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
 
 npm_link_all_packages()
 

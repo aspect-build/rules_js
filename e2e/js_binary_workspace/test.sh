@@ -14,7 +14,7 @@ run() {
     fi
 }
 
-for launcher_flag in --@aspect_rules_js//js:use_hermetic_launcher=false --@aspect_rules_js//js:use_hermetic_launcher=true; do
+for launcher_flag in --@rules_js//js:use_hermetic_launcher=false --@rules_js//js:use_hermetic_launcher=true; do
     (unset BAZEL_BINDIR && run "$launcher_flag")
     BAZEL_BINDIR="$PWD" run "$launcher_flag"
 done

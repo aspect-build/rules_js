@@ -9,7 +9,6 @@ See [`npm_translate_lock`](#npm_translate_lock) for the primary user-facing API 
 for a given lockfile.
 """
 
-load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
 load("@bazel_lib//lib:directory_path.bzl", _directory_path = "directory_path")
 load("@bazel_lib//lib:repo_utils.bzl", "patch", "repo_utils")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -21,6 +20,7 @@ load(
     _git_init = "init",
     _git_reset = "reset",
 )
+load("@rules_js//js:defs.bzl", _js_binary = "js_binary", _js_run_binary = "js_run_binary", _js_test = "js_test")
 load(":exclude_package_contents_presets.bzl", "EXCLUDE_PACKAGE_CONTENTS_PRESETS")
 load(":npm_link_package_store.bzl", "npm_link_package_store")
 load(":npm_package_internal.bzl", "npm_package_internal")
@@ -44,7 +44,7 @@ def _expand_exclude_package_contents_presets(patterns, presets):
 _LINK_JS_PACKAGE_LOADS_TMPL = """\
 # buildifier: disable=bzl-visibility
 load(
-    "@aspect_rules_js//npm/private:npm_import.bzl",
+    "@rules_js//npm/private:npm_import.bzl",
     _npm_imported_package_store_internal = "npm_imported_package_store_internal",
     _npm_link_imported_package_internal = "npm_link_imported_package_internal",
     _npm_link_imported_package_store_internal = "npm_link_imported_package_store_internal",
@@ -204,23 +204,23 @@ def npm_imported_package_store_internal(
                        "../../../$(@D)",
                    ] +
                    select({
-                       Label("@aspect_rules_js//platforms/os:osx"): ["--platform=darwin"],
-                       Label("@aspect_rules_js//platforms/os:linux"): ["--platform=linux"],
-                       Label("@aspect_rules_js//platforms/os:windows"): ["--platform=win32"],
+                       Label("@rules_js//platforms/os:osx"): ["--platform=darwin"],
+                       Label("@rules_js//platforms/os:linux"): ["--platform=linux"],
+                       Label("@rules_js//platforms/os:windows"): ["--platform=win32"],
                        "//conditions:default": [],
                    }) +
                    select({
-                       Label("@aspect_rules_js//platforms/cpu:arm64"): ["--arch=arm64"],
-                       Label("@aspect_rules_js//platforms/cpu:x86_64"): ["--arch=x64"],
+                       Label("@rules_js//platforms/cpu:arm64"): ["--arch=arm64"],
+                       Label("@rules_js//platforms/cpu:x86_64"): ["--arch=x64"],
                        "//conditions:default": [],
                    }) +
                    select({
-                       Label("@aspect_rules_js//platforms/libc:glibc"): ["--libc=glibc"],
-                       Label("@aspect_rules_js//platforms/libc:musl"): ["--libc=musl"],
+                       Label("@rules_js//platforms/libc:glibc"): ["--libc=glibc"],
+                       Label("@rules_js//platforms/libc:musl"): ["--libc=musl"],
                        "//conditions:default": [],
                    }),
             copy_srcs_to_bin = False,
-            tool = Label("@aspect_rules_js//npm/private/lifecycle/min:bin"),
+            tool = Label("@rules_js//npm/private/lifecycle/min:bin"),
             out_dirs = [lifecycle_output_dir],
             tags = ["manual"],
             execution_requirements = lifecycle_hooks_execution_requirements,
@@ -450,7 +450,7 @@ bzl_library(
     name = "{name}_bzl_library",
     srcs = ["{src}"],
     deps = [
-        "@aspect_rules_js//npm/private:npm_import",
+        "@rules_js//npm/private:npm_import",
     ],
     visibility = ["//visibility:public"],
 )"""
@@ -621,7 +621,7 @@ def _npm_import_rule_impl(rctx):
     rctx_files = {
         "BUILD.bazel": [
             generated_by_prefix,
-            """load("@aspect_rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")""",
+            """load("@rules_js//npm/private:npm_package_internal.bzl", _npm_package_internal = "npm_package_internal")""",
         ],
     }
 
@@ -645,7 +645,7 @@ def _npm_import_rule_impl(rctx):
             package_name_no_scope = rctx.attr.package.rsplit("/", 1)[-1]
             bin_bzl = [
                 generated_by_prefix,
-                """load("@aspect_rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
+                """load("@rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")""",
                 "",
                 '_store_target = Label("@%s//%s:%s/node_modules/%s")' % (rctx.attr.link_workspace, rctx.attr.root_package, utils.package_store_root, package_store_name),
                 '_store_target_dir = Label("@%s//%s:%s/node_modules/%s/dir")' % (rctx.attr.link_workspace, rctx.attr.root_package, utils.package_store_root, package_store_name),
@@ -1097,7 +1097,7 @@ def _get_bin_entries(pkg_json, package):
 
 def _make_generated_by_prefix(package_key):
     # empty line after bzl docstring since buildifier expects this if this file is vendored in
-    return "\"@generated by @aspect_rules_js//npm/private:npm_import.bzl for npm package {package_key}\"\n".format(
+    return "\"@generated by @rules_js//npm/private:npm_import.bzl for npm package {package_key}\"\n".format(
         package_key = package_key,
     )
 

@@ -36,8 +36,8 @@ with proto deps to generate message serialization code, and `js_rpc_library` to 
 the RPC client stubs:
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@aspect_rules_js//js:rpc.bzl", "js_rpc_library")
+load("@rules_js//js:defs.bzl", "js_library")
+load("@rules_js//js:rpc.bzl", "js_rpc_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
 proto_library(

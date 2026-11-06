@@ -58,16 +58,16 @@ def _to_bazel_os_cpu_constraints(oss, cpus):
     r = []
     for cpu in cpus:
         for os in oss:
-            r.append("@aspect_rules_js//platforms/pnpm:{}_{}".format(os, cpu))
+            r.append("@rules_js//platforms/pnpm:{}_{}".format(os, cpu))
     return r
 
 def _to_bazel_os_constraints(oss):
     oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
-    return ["@aspect_rules_js//platforms/pnpm:{}".format(os) for os in oss]
+    return ["@rules_js//platforms/pnpm:{}".format(os) for os in oss]
 
 def _to_bazel_cpu_constraints(cpus):
     cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
-    return ["@aspect_rules_js//platforms/pnpm:{}".format(cpu) for cpu in cpus]
+    return ["@rules_js//platforms/pnpm:{}".format(cpu) for cpu in cpus]
 
 def _resolve_pnpm_constraint_values(values, known_map, aliases_map, kind):
     if not values:

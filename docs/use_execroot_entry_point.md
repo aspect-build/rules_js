@@ -66,12 +66,12 @@ then your build will work reliably even in cross-platform situations.
 To disable `use_execroot_entry_point` by default, pass the build flag:
 
 ```
---@aspect_rules_js//js:use_execroot_entry_point=False
+--@rules_js//js:use_execroot_entry_point=False
 ```
 
 You may want to set it in your `.bazelrc` as follows:
 ```
-common --@aspect_rules_js//js:use_execroot_entry_point=False
+common --@rules_js//js:use_execroot_entry_point=False
 ```
 
 Individual targets can still override the flag by explicitly setting

@@ -7,7 +7,7 @@ rules_js does invoke the launcher directly and set them (see #2955), so the laun
 them and this rule keeps that path covered.
 """
 
-load("@aspect_rules_js//js:libs.bzl", "js_binary_lib")
+load("@rules_js//js:libs.bzl", "js_binary_lib")
 
 def _direct_capture_impl(ctx):
     stdout = ctx.outputs.stdout

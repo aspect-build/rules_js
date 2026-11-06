@@ -6,7 +6,7 @@ and adds attributes and features specific to rules_js's js_binary.
 Load this with,
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_run_binary")
+load("@rules_js//js:defs.bzl", "js_run_binary")
 ```
 """
 
@@ -97,7 +97,7 @@ def js_run_binary(
             This overrides the chdir value if set on the `js_binary` tool target.
 
             By default, `js_binary` tools run in the root of the output tree. For more context on why, please read the
-            aspect_rules_js README
+            rules_js README
             https://github.com/aspect-build/rules_js/tree/dbb5af0d2a9a2bb50e4cf4a96dbc582b27567155#running-nodejs-programs.
 
             To run in the directory containing the js_run_binary in the output tree, use

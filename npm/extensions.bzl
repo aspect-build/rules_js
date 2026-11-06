@@ -14,11 +14,11 @@ node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version_from_nvmrc = "//:.nvmrc")
 use_repo(node, "nodejs_toolchains")
 
-pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm = use_extension("@rules_js//npm:extensions.bzl", "pnpm")
 use_repo(pnpm, "pnpm")
 pnpm.pnpm(pnpm_version_from = "//:package.json")
 
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm = use_extension("@rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",
     npmrc = "//:.npmrc",

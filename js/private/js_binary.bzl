@@ -283,26 +283,26 @@ _ATTRS = {
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
     "_node_patches_files": attr.label_list(
         allow_files = True,
-        default = [Label("@aspect_rules_js//js/private/node-bootstrap:fs.cjs")],
+        default = [Label("@rules_js//js/private/node-bootstrap:fs.cjs")],
     ),
     "_node_patches": attr.label(
         allow_single_file = True,
-        default = Label("@aspect_rules_js//js/private/node-bootstrap:bootstrap.cjs"),
+        default = Label("@rules_js//js/private/node-bootstrap:bootstrap.cjs"),
     ),
     # Per-launch setup, loaded by both launchers as node's first --require.
     "_launcher_preload": attr.label(
         allow_single_file = True,
-        default = Label("@aspect_rules_js//js/private/node-bootstrap:launcher.cjs"),
+        default = Label("@rules_js//js/private/node-bootstrap:launcher.cjs"),
     ),
     # Helpers shared by _launcher_preload and the generated JS launcher.
     "_launcher_util": attr.label(
         allow_single_file = True,
-        default = Label("@aspect_rules_js//js/private/node-bootstrap:util.cjs"),
+        default = Label("@rules_js//js/private/node-bootstrap:util.cjs"),
     ),
     # Required by bootstrap.cjs only under `bazel coverage`
     "_coverage_bootstrap": attr.label(
         allow_single_file = True,
-        default = Label("@aspect_rules_js//js/private/node-bootstrap:coverage.cjs"),
+        default = Label("@rules_js//js/private/node-bootstrap:coverage.cjs"),
     ),
 }
 
@@ -857,7 +857,7 @@ def _create_launcher(ctx, log_prefix_rule_set, log_prefix_rule, fixed_args = [],
 def _js_binary_impl(ctx):
     launcher = _create_launcher(
         ctx,
-        log_prefix_rule_set = "aspect_rules_js",
+        log_prefix_rule_set = "rules_js",
         log_prefix_rule = "js_test" if ctx.attr.testonly else "js_binary",
         fixed_args = ctx.attr.fixed_args,
     )

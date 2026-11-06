@@ -1,5 +1,5 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_js//js:defs.bzl", "js_binary")
 load(":bindir_path_mapping_check.bzl", "bindir_path_mapping_check")
 
 # Verifies that the --bazel-bindir <path> argument is correctly transformed by

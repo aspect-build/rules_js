@@ -4,7 +4,7 @@ For example, this binary references the `acorn` npm package which was already li
 using an API like `npm_link_all_packages`.
 
 ```starlark
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
+load("@rules_js//js:defs.bzl", "js_binary", "js_test")
 
 js_binary(
     name = "bin",

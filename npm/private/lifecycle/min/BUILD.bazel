@@ -1,6 +1,6 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_js//js:defs.bzl", "js_binary")
 
 # Copy the bundle into this isolated min/ directory
 write_source_files(

@@ -1,7 +1,7 @@
-load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 load("@bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@repo_npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_js//js:defs.bzl", "js_binary", "js_image_layer")
 
 package(default_visibility = ["//visibility:public"])
 

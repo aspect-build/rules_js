@@ -1,5 +1,8 @@
 # Bazel rules for JavaScript
 
+> [!IMPORTANT]
+> This module was previously published as `aspect_rules_js`. To upgrade, replace `aspect_rules_js` with `rules_js` in your `bazel_dep`, `load()` statements and flags.
+
 > [!NOTE]
 > This repository uses the [Aspect CLI](https://github.com/aspect-build/aspect-cli) for CI and local development.
 > See the [docs](https://docs.aspect.build/cli/overview) and [install instructions](https://docs.aspect.build/cli/install) to get started.
@@ -82,7 +85,7 @@ rules_js replaces some parts of [bazelbuild/rules_nodejs](https://github.com/baz
 | Layer                           | Legacy                        | Modern                  |
 | ------------------------------- | ----------------------------- | ----------------------- |
 | Custom rules                    | `npm:@bazel/typescript`, etc. | `aspect_rules_ts`, etc. |
-| Package manager and Basic rules | `build_bazel_rules_nodejs`    | `aspect_rules_js`       |
+| Package manager and Basic rules | `build_bazel_rules_nodejs`    | `rules_js`       |
 | Toolchain and core providers    | `rules_nodejs`                | `rules_nodejs`          |
 
 The common layer here is the `rules_nodejs` Bazel module, documented as the "core" in

@@ -10,7 +10,7 @@ all where there is no bash.
 The hermetic launcher is an experimental alternative, off by default. To enable it:
 
 ```sh
-bazel build //... --@aspect_rules_js//js:use_hermetic_launcher
+bazel build //... --@rules_js//js:use_hermetic_launcher
 ```
 
 With the flag on, a `js_binary`'s executable is a small native binary stamped by

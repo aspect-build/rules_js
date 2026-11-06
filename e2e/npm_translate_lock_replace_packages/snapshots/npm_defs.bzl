@@ -4,7 +4,7 @@ load("@npm__chalk__5.3.0__links//:defs.bzl", link_0 = "npm_link_imported_package
 load("@npm__lodash__4.17.21__links//:defs.bzl", link_1 = "npm_link_imported_package_store_internal", store_1 = "npm_imported_package_store_internal")
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
+load("@rules_js//npm/private:npm_link_all_packages.bzl", _npm_link_all_packages = "npm_link_all_packages_internal", _npm_link_targets = "npm_link_targets_internal")
 
 _IMPORTER_PACKAGES = [""]
 

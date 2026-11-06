@@ -26,73 +26,73 @@ js_run_binary(
 assert_contains(
     name = "BAZEL_BINDIR_change_directory_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: changing directory to BAZEL_BINDIR",
+    expected = "DEBUG: rules_js[js_binary]: changing directory to BAZEL_BINDIR",
 )
 
 assert_contains(
     name = "BAZEL_BINDIR_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_BINDIR bazel-out/",
+    expected = "DEBUG: rules_js[js_binary]: BAZEL_BINDIR bazel-out/",
 )
 
 assert_contains(
     name = "BAZEL_BUILD_FILE_PATH_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
+    expected = "DEBUG: rules_js[js_binary]: BAZEL_BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
 )
 
 assert_contains(
     name = "BAZEL_PACKAGE_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_PACKAGE js/private/test/js_binary_sh",
+    expected = "DEBUG: rules_js[js_binary]: BAZEL_PACKAGE js/private/test/js_binary_sh",
 )
 
 assert_contains(
     name = "BAZEL_TARGET_test",
     actual = ":stderr",
-    expected = "INFO: aspect_rules_js[js_binary]: BAZEL_TARGET //js/private/test/js_binary_sh:capture_stderr",
+    expected = "INFO: rules_js[js_binary]: BAZEL_TARGET //js/private/test/js_binary_sh:capture_stderr",
 )
 
 assert_contains(
     name = "BAZEL_TARGET_NAME_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_TARGET_NAME capture_stderr",
+    expected = "DEBUG: rules_js[js_binary]: BAZEL_TARGET_NAME capture_stderr",
 )
 
 assert_contains(
     name = "BAZEL_WORKSPACE_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: BAZEL_WORKSPACE _main",
+    expected = "DEBUG: rules_js[js_binary]: BAZEL_WORKSPACE _main",
 )
 
 assert_contains(
     name = "JS_BINARY__BINDIR_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__BINDIR bazel-out/",
+    expected = "DEBUG: rules_js[js_binary]: JS_BINARY__BINDIR bazel-out/",
 )
 
 assert_contains(
     name = "JS_BINARY__PACKAGE_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__PACKAGE js/private/test/js_binary_sh",
+    expected = "DEBUG: rules_js[js_binary]: JS_BINARY__PACKAGE js/private/test/js_binary_sh",
 )
 
 assert_contains(
     name = "JS_BINARY__TARGET_test",
     actual = ":stderr",
-    expected = "INFO: aspect_rules_js[js_binary]: JS_BINARY__TARGET //js/private/test/js_binary_sh:one",
+    expected = "INFO: rules_js[js_binary]: JS_BINARY__TARGET //js/private/test/js_binary_sh:one",
 )
 
 assert_contains(
     name = "JS_BINARY__TARGET_NAME_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__TARGET_NAME one",
+    expected = "DEBUG: rules_js[js_binary]: JS_BINARY__TARGET_NAME one",
 )
 
 assert_contains(
     name = "JS_BINARY__WORKSPACE_test",
     actual = ":stderr",
-    expected = "DEBUG: aspect_rules_js[js_binary]: JS_BINARY__WORKSPACE _main",
+    expected = "DEBUG: rules_js[js_binary]: JS_BINARY__WORKSPACE _main",
 )
 
 # js_binary with interesting args: https://github.com/aspect-build/rules_js/issues/1045

@@ -1,5 +1,5 @@
-load("@aspect_rules_js//js:proto.bzl", "js_proto_toolchain")
-load("@aspect_rules_js//js:rpc.bzl", "js_rpc_toolchain")
+load("@rules_js//js:proto.bzl", "js_proto_toolchain")
+load("@rules_js//js:rpc.bzl", "js_rpc_toolchain")
 
 js_proto_toolchain(
     name = "google_protobuf_toolchain",
