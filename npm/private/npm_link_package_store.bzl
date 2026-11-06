@@ -7,7 +7,7 @@ load(":utils.bzl", "utils")
 _DOC = """Links an npm package that is backed by an npm_package_store into a node_modules tree as a direct dependency.
 
 This is used in conjunction with the npm_package_store rule that outputs an npm package into the
-node_modules/.rules_js package store in a pnpm style symlinked node_modules structure.
+node_modules/.aspect_rules_js package store in a pnpm style symlinked node_modules structure.
 
 The term "package" is defined at
 <https://nodejs.org/docs/latest-v22.x/api/packages.html>

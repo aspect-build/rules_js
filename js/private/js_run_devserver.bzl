@@ -34,11 +34,11 @@ def _file_to_entry_json_unfiltered(f):
     return json.encode([f.short_path, 1 if f.is_directory else 0])
 
 def _file_to_entry_json(f):
-    if "/.rules_js/" in f.short_path:
+    if "/.aspect_rules_js/" in f.short_path:
         # Special handling for package store deps; we only include 1st party deps since copying
         # all 3rd party node_modules over is expensive for typical graphs
         path_segments = f.path.split("/")
-        package_name_segment = path_segments.index(".rules_js") + 1
+        package_name_segment = path_segments.index(".aspect_rules_js") + 1
 
         # TODO: @0.0.0 is by default the version of all 1p linked packages, however, it can be overridden by users
         # if they are manually linking a 1p package and not using workspace. A more robust solution would be to

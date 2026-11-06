@@ -85,10 +85,10 @@ export function isNodeModulePath(p) {
 export function is1pPackageStoreDep(p) {
     // unscoped1p: https://regex101.com/r/hBR08J/1
     const unscoped1p =
-        /^.+\/\.rules_js\/([^@\/]+)@0\.0\.0\/node_modules\/\1$/
+        /^.+\/\.aspect_rules_js\/([^@\/]+)@0\.0\.0\/node_modules\/\1$/
     // scoped1p: https://regex101.com/r/bWS7Hl/1
     const scoped1p =
-        /^.+\/\.rules_js\/@([^@+\/]+)\+([^@+\/]+)@0\.0\.0\/node_modules\/@\1\/\2$/
+        /^.+\/\.aspect_rules_js\/@([^@+\/]+)\+([^@+\/]+)@0\.0\.0\/node_modules\/@\1\/\2$/
     return unscoped1p.test(p) || scoped1p.test(p)
 }
 

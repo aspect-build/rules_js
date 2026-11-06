@@ -29,8 +29,8 @@ for (const p of isNodeModulePath_false) {
 
 // is1pPackageStoreDep
 const is1pPackageStoreDep_true = [
-    'some/path/node_modules/.rules_js/@mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
-    'some/path/node_modules/.rules_js/mycorp-pkg@0.0.0/node_modules/mycorp-pkg',
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/mycorp-pkg@0.0.0/node_modules/mycorp-pkg',
 ]
 for (const p of is1pPackageStoreDep_true) {
     if (!is1pPackageStoreDep(p)) {
@@ -39,16 +39,16 @@ for (const p of is1pPackageStoreDep_true) {
     }
 }
 const is1pPackageStoreDep_false = [
-    'some/path/node_modules/.rules_js/@mycorp+pkg@0.0.0/node_modules/mycorp/pkg',
-    'some/path/node_modules/.rules_js/@mycorp+pkg0.0.0/node_modules/@mycorp/pkg',
-    'some/path/node_modules/.rules_js/mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
-    'some/path/node_modules/.rules_js/mycorp-pkg0.0.0/node_modules/mycorp-pkg',
-    'some/path/node_modules/.rules_js/@mycorp+pkg@0.0.0/node_modules/acorn',
-    'some/path/node_modules/.rules_js/mycorp-pkg@0.0.0/node_modules/acorn',
-    'some/path/node_modules/.rules_js/@babel+runtime@7.21.0/node_modules/@babel/runtime',
-    'some/path/node_modules/.rules_js/@babel+runtime@7.21.0/node_modules/acorn',
-    'some/path/node_modules/.rules_js/eval@0.1.6/node_modules/eval',
-    'some/path/node_modules/.rules_js/eval@0.1.6/node_modules/acorn',
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg0.0.0/node_modules/@mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/mycorp+pkg@0.0.0/node_modules/@mycorp/pkg',
+    'some/path/node_modules/.aspect_rules_js/mycorp-pkg0.0.0/node_modules/mycorp-pkg',
+    'some/path/node_modules/.aspect_rules_js/@mycorp+pkg@0.0.0/node_modules/acorn',
+    'some/path/node_modules/.aspect_rules_js/mycorp-pkg@0.0.0/node_modules/acorn',
+    'some/path/node_modules/.aspect_rules_js/@babel+runtime@7.21.0/node_modules/@babel/runtime',
+    'some/path/node_modules/.aspect_rules_js/@babel+runtime@7.21.0/node_modules/acorn',
+    'some/path/node_modules/.aspect_rules_js/eval@0.1.6/node_modules/eval',
+    'some/path/node_modules/.aspect_rules_js/eval@0.1.6/node_modules/acorn',
 ]
 for (const p of is1pPackageStoreDep_false) {
     if (is1pPackageStoreDep(p)) {
@@ -66,7 +66,7 @@ const isUnderNodeModules_true = [
     'some/path/node_modules/.bin/next',
     'node_modules/.bin/next',
     'some/path/node_modules/next/dist/bin/next',
-    'node_modules/.rules_js/next@16.2.1/node_modules/next/package.json',
+    'node_modules/.aspect_rules_js/next@16.2.1/node_modules/next/package.json',
 ]
 for (const p of isUnderNodeModules_true) {
     if (!isUnderNodeModules(p)) {

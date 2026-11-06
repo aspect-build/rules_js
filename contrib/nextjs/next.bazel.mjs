@@ -31,7 +31,7 @@ log(`Wrapping config: ${nextjsStandaloneConfig}`)
 log(`Output dir: ${NEXTJS_OUTDIR}`)
 
 /**
- * NextJs within bazel copies node_modules symlinks pointing into .rules_js within the sandbox.
+ * NextJs within bazel copies node_modules symlinks pointing into .aspect_rules_js within the sandbox.
  * Clear all `standalone/node_modules` and assume the bazel rule will include the necessary npm packages.
  */
 function nextjsFixSymlinks() {

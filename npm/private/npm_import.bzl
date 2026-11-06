@@ -458,7 +458,7 @@ bzl_library(
 _TARBALL_FILENAME = "package.tgz"
 _EXTRACT_TO_DIRNAME = "package"
 _EXTRACT_TO_PACKAGE_JSON = "{}/package.json".format(_EXTRACT_TO_DIRNAME)
-_EXTRACT_TO_RULES_JS_METADATA = "{}/rules_js_metadata.json".format(_EXTRACT_TO_DIRNAME)
+_EXTRACT_TO_RULES_JS_METADATA = "{}/aspect_rules_js_metadata.json".format(_EXTRACT_TO_DIRNAME)
 _DEFS_BZL_FILENAME = "defs.bzl"
 _PACKAGE_JSON_BZL_FILENAME = "package_json.bzl"
 
@@ -538,7 +538,7 @@ def _download_and_extract_archive(rctx, package_json_only):
     coreutils = rctx.path(Label("@coreutils_{}//:coreutils{}".format(repo_utils.platform(rctx), ".exe" if is_windows else "")))
 
     # Create the extract directory using rctx.file() which creates parent dirs automatically
-    _mkdir_marker = _EXTRACT_TO_DIRNAME + "/.rules_js_mkdir_marker"
+    _mkdir_marker = _EXTRACT_TO_DIRNAME + "/.aspect_rules_js_mkdir_marker"
     rctx.file(_mkdir_marker, "")
     rctx.delete(_mkdir_marker)
 

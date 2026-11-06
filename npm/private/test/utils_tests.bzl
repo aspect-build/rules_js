@@ -223,13 +223,13 @@ def test_hex_to_base64(ctx):
 def test_package_store_prefix(ctx):
     env = unittest.begin(ctx)
 
-    asserts.equals(env, "node_modules/.rules_js/", utils.package_store_prefix("", ""))
-    asserts.equals(env, "frontend/node_modules/.rules_js/", utils.package_store_prefix("", "frontend"))
-    asserts.equals(env, "../other_module+/node_modules/.rules_js/", utils.package_store_prefix("other_module+", ""))
-    asserts.equals(env, "../other_module+/frontend/node_modules/.rules_js/", utils.package_store_prefix("other_module+", "frontend"))
+    asserts.equals(env, "node_modules/.aspect_rules_js/", utils.package_store_prefix("", ""))
+    asserts.equals(env, "frontend/node_modules/.aspect_rules_js/", utils.package_store_prefix("", "frontend"))
+    asserts.equals(env, "../other_module+/node_modules/.aspect_rules_js/", utils.package_store_prefix("other_module+", ""))
+    asserts.equals(env, "../other_module+/frontend/node_modules/.aspect_rules_js/", utils.package_store_prefix("other_module+", "frontend"))
 
     # the prefix is stripped from a dependency's package store short_path to form the relative symlink target
-    short_path = "../other_module+/frontend/node_modules/.rules_js/less@4.1.3/node_modules/less"
+    short_path = "../other_module+/frontend/node_modules/.aspect_rules_js/less@4.1.3/node_modules/less"
     asserts.equals(env, "less@4.1.3/node_modules/less", short_path[len(utils.package_store_prefix("other_module+", "frontend")):])
 
     return unittest.end(env)

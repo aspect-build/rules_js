@@ -102,7 +102,7 @@ sleep 10
 
 echo "Checking log file $ibazel_logs"
 
-count=$(grep -c "Syncing symlink node_modules/.rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib (1p)" "$ibazel_logs" || true)
+count=$(grep -c "Syncing symlink node_modules/.aspect_rules_js/@mycorp+mylib@0.0.0/node_modules/@mycorp/mylib (1p)" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
     echo "==========="
     cat "$ibazel_logs"
@@ -111,7 +111,7 @@ if [[ "$count" -ne 1 ]]; then
     exit 1
 fi
 
-count=$(grep -c "Syncing file node_modules/.rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js" "$ibazel_logs" || true)
+count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js" "$ibazel_logs" || true)
 if [[ "$count" -ne 2 ]]; then
     echo "==========="
     cat "$ibazel_logs"
@@ -129,7 +129,7 @@ if [[ "$count" -ne 2 ]]; then
     exit 1
 fi
 
-count=$(grep -c "Skipping file node_modules/.rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js since its timestamp has not changed" "$ibazel_logs" || true)
+count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/index.js since its timestamp has not changed" "$ibazel_logs" || true)
 if [[ "$count" -ne 4 ]]; then
     echo "==========="
     cat "$ibazel_logs"
@@ -138,7 +138,7 @@ if [[ "$count" -ne 4 ]]; then
     exit 1
 fi
 
-count=$(grep -c "Syncing file node_modules/.rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json" "$ibazel_logs" || true)
+count=$(grep -c "Syncing file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
     echo "==========="
     cat "$ibazel_logs"
@@ -147,7 +147,7 @@ if [[ "$count" -ne 1 ]]; then
     exit 1
 fi
 
-count=$(grep -c "Skipping file node_modules/.rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since its timestamp has not changed" "$ibazel_logs" || true)
+count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since its timestamp has not changed" "$ibazel_logs" || true)
 if [[ "$count" -ne 4 ]]; then
     echo "==========="
     cat "$ibazel_logs"
@@ -156,7 +156,7 @@ if [[ "$count" -ne 4 ]]; then
     exit 1
 fi
 
-count=$(grep -c "Skipping file node_modules/.rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since contents have not changed" "$ibazel_logs" || true)
+count=$(grep -c "Skipping file node_modules/.aspect_rules_js/@mycorp+mypkg@0.0.0/node_modules/@mycorp/mypkg/package.json since contents have not changed" "$ibazel_logs" || true)
 if [[ "$count" -ne 1 ]]; then
     echo "==========="
     cat "$ibazel_logs"

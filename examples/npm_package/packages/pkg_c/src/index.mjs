@@ -14,7 +14,7 @@ export function sandboxAssert() {
     }
 
     // Use of npm_package() copies files into the npm package store.
-    if (!/[/\\]node_modules[/\\]\.rules_js[/\\]/.test(__filename)) {
+    if (!/[/\\]node_modules[/\\]\.aspect_rules_js[/\\]/.test(__filename)) {
         throw new Error(`Not in package store: ${__filename}`)
     }
 

@@ -2,8 +2,8 @@
 
 load("@rules_js//npm/private:npm_import.bzl", "bin_binary_internal", "bin_internal", "bin_test_internal")
 
-_store_target = Label("@@//:.rules_js/node_modules/webpack-bundle-analyzer@4.5.0_bufferutil@4.0.8")
-_store_target_dir = Label("@@//:.rules_js/node_modules/webpack-bundle-analyzer@4.5.0_bufferutil@4.0.8/dir")
+_store_target = Label("@@//:.aspect_rules_js/node_modules/webpack-bundle-analyzer@4.5.0_bufferutil@4.0.8")
+_store_target_dir = Label("@@//:.aspect_rules_js/node_modules/webpack-bundle-analyzer@4.5.0_bufferutil@4.0.8/dir")
 
 def webpack_bundle_analyzer(name, **kwargs):
     bin_internal(

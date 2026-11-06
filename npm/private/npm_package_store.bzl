@@ -44,11 +44,11 @@ _ATTRS = {
         You can find all the package store link targets in your repository with
 
         ```
-        bazel query ... | grep :.rules_js | grep -v /dir | grep -v /pkg | grep -v /ref
+        bazel query ... | grep :.aspect_rules_js | grep -v /dir | grep -v /pkg | grep -v /ref
         ```
 
         Package store link targets names for 3rd party packages that come from `npm_translate_lock`
-        start with `.rules_js/` then the name passed to the `npm_link_all_packages` macro
+        start with `.aspect_rules_js/` then the name passed to the `npm_link_all_packages` macro
         (typically `node_modules`) followed by `/<package>/<version>` where `package` is the
         package name (including @scope segment if any) and `version` is the specific version of
         the package that comes from the pnpm-lock.yaml file.
@@ -56,23 +56,23 @@ _ATTRS = {
         For example,
 
         ```
-        //:.rules_js/node_modules/cliui/7.0.4
+        //:.aspect_rules_js/node_modules/cliui/7.0.4
         ```
 
         The version may include peer dep(s),
 
         ```
-        //:.rules_js/node_modules/debug/4.3.4_supports-color@8.1.1
+        //:.aspect_rules_js/node_modules/debug/4.3.4_supports-color@8.1.1
         ```
 
         It could be also be a url based version,
 
         ```
-        //:.rules_js/node_modules/debug/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
+        //:.aspect_rules_js/node_modules/debug/github.com/ngokevin/debug/9742c5f383a6f8046241920156236ade8ec30d53
         ```
 
         Package store link targets names for 3rd party package that come directly from an
-        `npm_import` start with `.rules_js/` then the name passed to the `npm_import`'s `npm_link_imported_package`
+        `npm_import` start with `.aspect_rules_js/` then the name passed to the `npm_import`'s `npm_link_imported_package`
         macro (typically `node_modules`) followed by `/<package>/<version>` where `package`
         matches the `package` attribute in the npm_import of the package and `version` matches the
         `version` attribute.
@@ -80,7 +80,7 @@ _ATTRS = {
         For example,
 
         ```
-        //:.rules_js/node_modules/cliui/7.0.4
+        //:.aspect_rules_js/node_modules/cliui/7.0.4
         ```
 
         Package store link targets names for 1st party packages automatically linked by `npm_link_all_packages`
@@ -90,16 +90,16 @@ _ATTRS = {
         For example,
 
         ```
-        //:.rules_js/node_modules/@mycorp/mypkg/0.0.0
+        //:.aspect_rules_js/node_modules/@mycorp/mypkg/0.0.0
         ```
 
         Package store link targets names for 1st party packages manually linked with `npm_link_package`
-        start with `.rules_js/` followed by the name passed to the `npm_link_package`.
+        start with `.aspect_rules_js/` followed by the name passed to the `npm_link_package`.
 
         For example,
 
         ```
-        //:.rules_js/node_modules/@mycorp/mypkg
+        //:.aspect_rules_js/node_modules/@mycorp/mypkg
         ```
 
         > In typical usage, a node.js program sometimes requires modules which were

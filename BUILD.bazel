@@ -6,7 +6,7 @@ load("//js:defs.bzl", "js_library")
 
 # Link all packages from the /MODULE npm_translate_lock(name = "npm") and also packages from
 # manual /MODULE npm_import rules to bazel-bin/node_modules as well as the package store
-# bazel-bin/node_modules/.rules_js since /pnpm-lock.yaml is the root of the pnpm workspace
+# bazel-bin/node_modules/.aspect_rules_js since /pnpm-lock.yaml is the root of the pnpm workspace
 npm_link_all_packages(
     imported_links = [
         npm_link_pnpm,

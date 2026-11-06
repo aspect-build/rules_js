@@ -7,7 +7,7 @@ import * as path from 'node:path'
 
 const base = fs.mkdtempSync(path.join(os.tmpdir(), 'devserver-sync-'))
 const runfiles = path.join(base, 'runfiles')
-const STORE = 'node_modules/.rules_js/pkg@1.0.0/node_modules/pkg'
+const STORE = 'node_modules/.aspect_rules_js/pkg@1.0.0/node_modules/pkg'
 const LINK = 'app/node_modules/pkg'
 const STORE_ENTRY = [STORE, 1]
 const LINK_ENTRY = [LINK, 0]
@@ -169,7 +169,7 @@ for (const protocol of ['ibazel', 'watch']) {
 // place, for example when a patch that rules_js applies to the package changes. The sandbox copy is
 // replaced as a whole too, so files removed from the package are not left behind at any depth.
 for (const protocol of ['ibazel', 'watch']) {
-    const store = `node_modules/.rules_js/${protocol}@1.0.0/node_modules/${protocol}`
+    const store = `node_modules/.aspect_rules_js/${protocol}@1.0.0/node_modules/${protocol}`
     const pkg = path.join(main, store)
     for (const f of ['a.js', 'b.js', 'lib/deep.js', 'src/keep.js', 'src/gone.js']) {
         write(path.join(pkg, f))
@@ -215,7 +215,7 @@ for (const protocol of ['ibazel', 'watch']) {
 // A package can change between a directory and a link, for example when a dependency on an npm
 // package is replaced with one on a first-party package.
 for (const protocol of ['ibazel', 'watch']) {
-    const store = `node_modules/.rules_js/${protocol}-kind@1.0.0/node_modules/${protocol}-kind`
+    const store = `node_modules/.aspect_rules_js/${protocol}-kind@1.0.0/node_modules/${protocol}-kind`
     const source = `${protocol}-kind-src`
     write(path.join(main, store, 'index.js'))
     write(path.join(main, source, 'index.js'))
@@ -258,7 +258,7 @@ for (const protocol of ['ibazel', 'watch']) {
 {
     const repo = path.join(runfiles, 'other_repo')
     const store =
-        '../other_repo/node_modules/.rules_js/dep@1.0.0/node_modules/dep'
+        '../other_repo/node_modules/.aspect_rules_js/dep@1.0.0/node_modules/dep'
     const link = '../other_repo/app/node_modules/dep'
     write(path.join(main, store, 'index.js'))
     symlink(

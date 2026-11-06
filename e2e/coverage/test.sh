@@ -8,7 +8,7 @@ set -o errexit -o nounset -o pipefail
 #
 # //:first_party_npmpkg_test is an UNSUPPORTED scenario, kept as executable
 # documentation: first-party code repackaged with npm_package runs from a copy in
-# the .rules_js store with no link back to source, so coverage comes out
+# the .aspect_rules_js store with no link back to source, so coverage comes out
 # empty. Use js_library linking (//:first_party_jslib_test) for first-party
 # coverage. See docs/troubleshooting.md and
 # https://github.com/aspect-build/rules_js/issues/2933.

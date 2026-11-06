@@ -12,7 +12,7 @@ describe(`first-party packages (package_store_mode = "${process.env.PACKAGE_STOR
         sandboxRoot,
         process.env.JS_BINARY__WORKSPACE
     )
-    const store = path.join(workspaceRoot, 'node_modules/.rules_js')
+    const store = path.join(workspaceRoot, 'node_modules/.aspect_rules_js')
     const aSource = path.join(workspaceRoot, 'js/private/test/image-fixture-a')
     const aStoreEntry = path.join(
         store,

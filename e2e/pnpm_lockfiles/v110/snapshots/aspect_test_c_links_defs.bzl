@@ -23,11 +23,11 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.rules_js/node_modules/@aspect-test+c@2.0.0/pkg": "@aspect-test/c",
+            ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.0/pkg": "@aspect-test/c",
         },
         ref_deps = {},
         lc_deps = {
-            ":.rules_js/node_modules/@aspect-test+c@2.0.0/pkg_pre_lc_lite": "@aspect-test/c",
+            ":.aspect_rules_js/node_modules/@aspect-test+c@2.0.0/pkg_pre_lc_lite": "@aspect-test/c",
         },
         has_lifecycle_build_target = True,
         has_transitive_closure = False,

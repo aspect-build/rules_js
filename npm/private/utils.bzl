@@ -19,7 +19,7 @@ DEFAULT_EXTERNAL_REPOSITORY_ACTION_CACHE = ".aspect/rules/external_repository_ac
 # Maximum package store name length before hashing to prevent long paths.
 #
 # pnpm uses 120 because its virtual store lives at a short, fixed path (node_modules/.pnpm). rules_js
-# nests the store much deeper, under bazel-out/<config>/bin/node_modules/.rules_js, and the
+# nests the store much deeper, under bazel-out/<config>/bin/node_modules/.aspect_rules_js, and the
 # package name is repeated in the trailing node_modules/<name> segment of the store path, so a
 # shorter limit is required to keep the package extraction path under the Windows MAX_PATH (260) limit.
 # https://github.com/pnpm/pnpm/blob/9d4c16876f899146a45f21d93f041b42e3413011/packages/dependency-path/src/index.ts#L165
@@ -382,7 +382,7 @@ def _hex_to_base64(hex_string):
 
     return "".join(output)
 
-_PACKAGE_STORE_ROOT = ".rules_js"
+_PACKAGE_STORE_ROOT = ".aspect_rules_js"
 _PACKAGE_STORE_PREFIX = "node_modules/{}/".format(_PACKAGE_STORE_ROOT)
 
 def _package_store_prefix(repo_name, package):

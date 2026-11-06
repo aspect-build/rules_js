@@ -23,130 +23,130 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = {
-            ":.rules_js/node_modules/@types+estree@1.0.8": "@types/estree",
+            ":.aspect_rules_js/node_modules/@types+estree@1.0.8": "@types/estree",
         } | select({
             "@rules_js//platforms/pnpm:darwin": {
-                ":.rules_js/node_modules/fsevents@2.3.3": "fsevents",
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3": "fsevents",
             },
             "//conditions:default": {},
         }) | select({
             "@rules_js//platforms/pnpm:android_arm": {
-                ":.rules_js/node_modules/@rollup+rollup-android-arm-eabi@4.55.2": "@rollup/rollup-android-arm-eabi",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm-eabi@4.55.2": "@rollup/rollup-android-arm-eabi",
             },
             "@rules_js//platforms/pnpm:android_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-android-arm64@4.55.2": "@rollup/rollup-android-arm64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm64@4.55.2": "@rollup/rollup-android-arm64",
             },
             "@rules_js//platforms/pnpm:darwin_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-darwin-arm64@4.55.2": "@rollup/rollup-darwin-arm64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-darwin-arm64@4.55.2": "@rollup/rollup-darwin-arm64",
             },
             "@rules_js//platforms/pnpm:darwin_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-darwin-x64@4.55.2": "@rollup/rollup-darwin-x64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-darwin-x64@4.55.2": "@rollup/rollup-darwin-x64",
             },
             "@rules_js//platforms/pnpm:freebsd_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-freebsd-arm64@4.55.2": "@rollup/rollup-freebsd-arm64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-arm64@4.55.2": "@rollup/rollup-freebsd-arm64",
             },
             "@rules_js//platforms/pnpm:freebsd_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-freebsd-x64@4.55.2": "@rollup/rollup-freebsd-x64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-x64@4.55.2": "@rollup/rollup-freebsd-x64",
             },
             "@rules_js//platforms/pnpm:linux_arm": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2": "@rollup/rollup-linux-arm-gnueabihf",
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2": "@rollup/rollup-linux-arm-musleabihf",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2": "@rollup/rollup-linux-arm-gnueabihf",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2": "@rollup/rollup-linux-arm-musleabihf",
             },
             "@rules_js//platforms/pnpm:linux_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2": "@rollup/rollup-linux-arm64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2": "@rollup/rollup-linux-arm64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2": "@rollup/rollup-linux-arm64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2": "@rollup/rollup-linux-arm64-musl",
             },
             "@rules_js//platforms/pnpm:linux_ppc64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2": "@rollup/rollup-linux-ppc64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2": "@rollup/rollup-linux-ppc64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2": "@rollup/rollup-linux-ppc64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2": "@rollup/rollup-linux-ppc64-musl",
             },
             "@rules_js//platforms/pnpm:linux_riscv64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2": "@rollup/rollup-linux-riscv64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2": "@rollup/rollup-linux-riscv64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2": "@rollup/rollup-linux-riscv64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2": "@rollup/rollup-linux-riscv64-musl",
             },
             "@rules_js//platforms/pnpm:linux_s390x": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2": "@rollup/rollup-linux-s390x-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2": "@rollup/rollup-linux-s390x-gnu",
             },
             "@rules_js//platforms/pnpm:linux_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2": "@rollup/rollup-linux-x64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2": "@rollup/rollup-linux-x64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2": "@rollup/rollup-linux-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2": "@rollup/rollup-linux-x64-musl",
             },
             "@rules_js//platforms/pnpm:openbsd_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-openbsd-x64@4.55.2": "@rollup/rollup-openbsd-x64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-openbsd-x64@4.55.2": "@rollup/rollup-openbsd-x64",
             },
             "@rules_js//platforms/pnpm:win32_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-win32-arm64-msvc@4.55.2": "@rollup/rollup-win32-arm64-msvc",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-arm64-msvc@4.55.2": "@rollup/rollup-win32-arm64-msvc",
             },
             "@rules_js//platforms/pnpm:win32_ia32": {
-                ":.rules_js/node_modules/@rollup+rollup-win32-ia32-msvc@4.55.2": "@rollup/rollup-win32-ia32-msvc",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-ia32-msvc@4.55.2": "@rollup/rollup-win32-ia32-msvc",
             },
             "@rules_js//platforms/pnpm:win32_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2": "@rollup/rollup-win32-x64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2": "@rollup/rollup-win32-x64-msvc",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2": "@rollup/rollup-win32-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2": "@rollup/rollup-win32-x64-msvc",
             },
             "//conditions:default": {},
         }),
         ref_deps = {
-            ":.rules_js/node_modules/@types+estree@1.0.8/ref": "@types/estree",
+            ":.aspect_rules_js/node_modules/@types+estree@1.0.8/ref": "@types/estree",
         } | select({
             "@rules_js//platforms/pnpm:darwin": {
-                ":.rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
+                ":.aspect_rules_js/node_modules/fsevents@2.3.3/ref": "fsevents",
             },
             "//conditions:default": {},
         }) | select({
             "@rules_js//platforms/pnpm:android_arm": {
-                ":.rules_js/node_modules/@rollup+rollup-android-arm-eabi@4.55.2/ref": "@rollup/rollup-android-arm-eabi",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm-eabi@4.55.2/ref": "@rollup/rollup-android-arm-eabi",
             },
             "@rules_js//platforms/pnpm:android_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-android-arm64@4.55.2/ref": "@rollup/rollup-android-arm64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-android-arm64@4.55.2/ref": "@rollup/rollup-android-arm64",
             },
             "@rules_js//platforms/pnpm:darwin_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-darwin-arm64@4.55.2/ref": "@rollup/rollup-darwin-arm64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-darwin-arm64@4.55.2/ref": "@rollup/rollup-darwin-arm64",
             },
             "@rules_js//platforms/pnpm:darwin_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-darwin-x64@4.55.2/ref": "@rollup/rollup-darwin-x64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-darwin-x64@4.55.2/ref": "@rollup/rollup-darwin-x64",
             },
             "@rules_js//platforms/pnpm:freebsd_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-freebsd-arm64@4.55.2/ref": "@rollup/rollup-freebsd-arm64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-arm64@4.55.2/ref": "@rollup/rollup-freebsd-arm64",
             },
             "@rules_js//platforms/pnpm:freebsd_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-freebsd-x64@4.55.2/ref": "@rollup/rollup-freebsd-x64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-freebsd-x64@4.55.2/ref": "@rollup/rollup-freebsd-x64",
             },
             "@rules_js//platforms/pnpm:linux_arm": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2/ref": "@rollup/rollup-linux-arm-gnueabihf",
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2/ref": "@rollup/rollup-linux-arm-musleabihf",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-gnueabihf@4.55.2/ref": "@rollup/rollup-linux-arm-gnueabihf",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm-musleabihf@4.55.2/ref": "@rollup/rollup-linux-arm-musleabihf",
             },
             "@rules_js//platforms/pnpm:linux_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2/ref": "@rollup/rollup-linux-arm64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2/ref": "@rollup/rollup-linux-arm64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-gnu@4.55.2/ref": "@rollup/rollup-linux-arm64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-arm64-musl@4.55.2/ref": "@rollup/rollup-linux-arm64-musl",
             },
             "@rules_js//platforms/pnpm:linux_ppc64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2/ref": "@rollup/rollup-linux-ppc64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2/ref": "@rollup/rollup-linux-ppc64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-gnu@4.55.2/ref": "@rollup/rollup-linux-ppc64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-ppc64-musl@4.55.2/ref": "@rollup/rollup-linux-ppc64-musl",
             },
             "@rules_js//platforms/pnpm:linux_riscv64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2/ref": "@rollup/rollup-linux-riscv64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2/ref": "@rollup/rollup-linux-riscv64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-gnu@4.55.2/ref": "@rollup/rollup-linux-riscv64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-riscv64-musl@4.55.2/ref": "@rollup/rollup-linux-riscv64-musl",
             },
             "@rules_js//platforms/pnpm:linux_s390x": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2/ref": "@rollup/rollup-linux-s390x-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-s390x-gnu@4.55.2/ref": "@rollup/rollup-linux-s390x-gnu",
             },
             "@rules_js//platforms/pnpm:linux_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2/ref": "@rollup/rollup-linux-x64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2/ref": "@rollup/rollup-linux-x64-musl",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-gnu@4.55.2/ref": "@rollup/rollup-linux-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-linux-x64-musl@4.55.2/ref": "@rollup/rollup-linux-x64-musl",
             },
             "@rules_js//platforms/pnpm:openbsd_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-openbsd-x64@4.55.2/ref": "@rollup/rollup-openbsd-x64",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-openbsd-x64@4.55.2/ref": "@rollup/rollup-openbsd-x64",
             },
             "@rules_js//platforms/pnpm:win32_arm64": {
-                ":.rules_js/node_modules/@rollup+rollup-win32-arm64-msvc@4.55.2/ref": "@rollup/rollup-win32-arm64-msvc",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-arm64-msvc@4.55.2/ref": "@rollup/rollup-win32-arm64-msvc",
             },
             "@rules_js//platforms/pnpm:win32_ia32": {
-                ":.rules_js/node_modules/@rollup+rollup-win32-ia32-msvc@4.55.2/ref": "@rollup/rollup-win32-ia32-msvc",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-ia32-msvc@4.55.2/ref": "@rollup/rollup-win32-ia32-msvc",
             },
             "@rules_js//platforms/pnpm:win32_x64": {
-                ":.rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2/ref": "@rollup/rollup-win32-x64-gnu",
-                ":.rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2/ref": "@rollup/rollup-win32-x64-msvc",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-gnu@4.55.2/ref": "@rollup/rollup-win32-x64-gnu",
+                ":.aspect_rules_js/node_modules/@rollup+rollup-win32-x64-msvc@4.55.2/ref": "@rollup/rollup-win32-x64-msvc",
             },
             "//conditions:default": {},
         }),
