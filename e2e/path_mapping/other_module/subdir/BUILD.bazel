@@ -17,7 +17,6 @@ js_run_binary(
     chdir = package_name(),
     exit_code_out = "exit_code.txt",
     mnemonic = "JsRunBinaryOtherModulePathMappingCheck",
-    set_legacy_environment_variables = False,
     silent_on_success = False,
     stderr = "stderr.txt",
     stdout = "stdout.txt",

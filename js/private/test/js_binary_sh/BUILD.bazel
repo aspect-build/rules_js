@@ -15,11 +15,23 @@ js_binary(
     entry_point = "one.js",
 )
 
+# Legacy BAZEL_* environment variables are not set by default; BAZEL_BINDIR must
+# still be set by the launcher from the --bazel-bindir argument.
 js_run_binary(
     name = "capture_stderr",
     log_level = "debug",
     silent_on_success = False,
     stderr = "stderr",
+    tool = ":one",
+)
+
+# Opts in to the deprecated legacy BAZEL_* environment variables.
+js_run_binary(
+    name = "capture_stderr_legacy",
+    log_level = "debug",
+    set_legacy_environment_variables = True,
+    silent_on_success = False,
+    stderr = "stderr_legacy",
     tool = ":one",
 )
 
@@ -37,31 +49,31 @@ assert_contains(
 
 assert_contains(
     name = "BAZEL_BUILD_FILE_PATH_test",
-    actual = ":stderr",
+    actual = ":stderr_legacy",
     expected = "DEBUG: rules_js[js_binary]: BAZEL_BUILD_FILE_PATH js/private/test/js_binary_sh/BUILD.bazel",
 )
 
 assert_contains(
     name = "BAZEL_PACKAGE_test",
-    actual = ":stderr",
+    actual = ":stderr_legacy",
     expected = "DEBUG: rules_js[js_binary]: BAZEL_PACKAGE js/private/test/js_binary_sh",
 )
 
 assert_contains(
     name = "BAZEL_TARGET_test",
-    actual = ":stderr",
-    expected = "INFO: rules_js[js_binary]: BAZEL_TARGET //js/private/test/js_binary_sh:capture_stderr",
+    actual = ":stderr_legacy",
+    expected = "INFO: rules_js[js_binary]: BAZEL_TARGET //js/private/test/js_binary_sh:capture_stderr_legacy",
 )
 
 assert_contains(
     name = "BAZEL_TARGET_NAME_test",
-    actual = ":stderr",
-    expected = "DEBUG: rules_js[js_binary]: BAZEL_TARGET_NAME capture_stderr",
+    actual = ":stderr_legacy",
+    expected = "DEBUG: rules_js[js_binary]: BAZEL_TARGET_NAME capture_stderr_legacy",
 )
 
 assert_contains(
     name = "BAZEL_WORKSPACE_test",
-    actual = ":stderr",
+    actual = ":stderr_legacy",
     expected = "DEBUG: rules_js[js_binary]: BAZEL_WORKSPACE _main",
 )
 
