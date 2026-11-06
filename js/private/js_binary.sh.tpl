@@ -269,7 +269,7 @@ set -e
 
 if [ "$RESULT" != "$JS_BINARY__EXPECTED_EXIT_CODE" ]; then
     log_error "expected exit code to be '$JS_BINARY__EXPECTED_EXIT_CODE', but got '$RESULT'"
-    if [ $RESULT -eq 0 ]; then
+    if [ "$RESULT" -eq 0 ]; then
         # This exit code is handled specially by Bazel:
         # https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
         readonly BAZEL_EXIT_TESTS_FAILED=3
