@@ -182,9 +182,9 @@ def _dep_version_with_default_registration(ctx):
     # module (rules_js itself, which always registers `pnpm.pnpm(name = "pnpm")`)
     # carries the default version.
     #
-    # The rules_js registration comes first in BFS order ("rules_js" sorts
-    # before nearly all module names) and must not mask the explicit request,
-    # even when the explicit request is for a lower version than the default.
+    # The rules_js registration can come before the explicit request in BFS
+    # order and must not mask it, even when the explicit request is for a
+    # lower version than the default.
     # See https://github.com/aspect-build/rules_js/pull/2349#discussion_r3362093839
     return _resolve_test(
         ctx,
