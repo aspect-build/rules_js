@@ -1,7 +1,8 @@
 import { join, dirname } from 'node:path'
 import { rmSync, existsSync } from 'node:fs'
 
-const bazelPackage = process.env['BAZEL_PACKAGE']
+// Set by the nextjs_standalone_build macro to the package of the Next.js app.
+const bazelPackage = process.env['NEXTJS_BAZEL_PACKAGE']
 if (!process.cwd().endsWith(bazelPackage)) {
     throw new Error('This script must be run from Next.js app root')
 }
@@ -35,7 +36,7 @@ log(`Output dir: ${NEXTJS_OUTDIR}`)
  * Clear all `standalone/node_modules` and assume the bazel rule will include the necessary npm packages.
  */
 function nextjsFixSymlinks() {
-    for (let p = process.env['BAZEL_PACKAGE']; ; p = dirname(p)) {
+    for (let p = bazelPackage; ; p = dirname(p)) {
         const d = join(NEXTJS_OUTDIR, 'standalone', p, 'node_modules')
         if (existsSync(d)) {
             log(`Removing ${d}`)
