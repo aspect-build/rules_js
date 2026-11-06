@@ -23,21 +23,22 @@ export PORT
 
 echo "$$: TEST - $0: $TARGET @ $PORT"
 
-# Record remote cache calls when CI asks for them. ibazel only forwards allowlisted bazel flags,
-# so the log flag is set by a config in .bazelrc.
-rm -f grpc_log.binpb
-# shellcheck disable=SC2086
-./node_modules/.bin/ibazel run ${BAZEL_GRPC_LOG_DIR:+--config=grpc_log} "$TARGET" 2>&1 &
+# Build first so the devserver startup timeout below excludes fetching outputs from the cache.
+# On CI, log this build's remote cache calls.
+if [[ -n "${BAZEL_GRPC_LOG_DIR:-}" ]]; then
+    mkdir -p "$BAZEL_GRPC_LOG_DIR"
+    bazel build "--remote_grpc_log=$BAZEL_GRPC_LOG_DIR/js_run_devserver-${TARGET//[\/:]/_}.binpb" "$TARGET"
+else
+    bazel build "$TARGET"
+fi
+
+./node_modules/.bin/ibazel run "$TARGET" 2>&1 &
 ibazel_pid="$!"
 
 function _exit {
     echo "$$: Cleanup..."
     kill "$ibazel_pid"
     wait "$ibazel_pid"
-    if [[ -n "${BAZEL_GRPC_LOG_DIR:-}" && -f grpc_log.binpb ]]; then
-        mkdir -p "$BAZEL_GRPC_LOG_DIR"
-        mv grpc_log.binpb "$BAZEL_GRPC_LOG_DIR/js_run_devserver-${TARGET//[\/:]/_}-$$.binpb"
-    fi
     git checkout src/index.html src/BUILD.bazel
     rm -f src/new.html
 }
