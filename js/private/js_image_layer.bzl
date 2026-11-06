@@ -267,8 +267,8 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
         VARIABLES += """
     const {name}_re = new RegExp({});
     const {name}mtree = new Set(["#mtree"]);
-    const {name}unusedinputs = createWriteStream({});
-""".format(json.encode(match), json.encode(unused_inputs.path), name = name)
+    const {name}unusedinputs = [];
+""".format(json.encode(match), name = name)
 
         STMT = "else if" if PICK_STATEMENTS != "" else "if"
 
@@ -287,13 +287,14 @@ def _run_splitter(ctx, runfiles_dir, files, entries_json, layer_groups):
             IF_STMT,
             name,
             "\n".join([
-                "    %sunusedinputs.write(destBuf);" % oname
+                "    %sunusedinputs.push(line);" % oname
                 for oname in layer_groups.keys()
                 if oname != name
             ]),
         )
 
         WRITE_STATEMENTS += """writeFile("%s", Array.from(%smtree).sort().concat(["\\n"]).join("\\n")),\n""" % (mtree.path, name)
+        WRITE_STATEMENTS += """writeFile(%s, %sunusedinputs.join("")),\n""" % (json.encode(unused_inputs.path), name)
 
         expected_layer_groups.append((name, mtree, unused_inputs))
 
@@ -304,7 +305,7 @@ else {
     continue
 }""" % (
         "\n".join([
-            "    %sunusedinputs.write(destBuf);" % oname
+            "    %sunusedinputs.push(line);" % oname
             for oname in layer_groups.keys()
         ])
     )
