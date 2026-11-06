@@ -133,14 +133,12 @@ _ATTRS = {
     "log_level": attr.string(
         doc = """Set the logging level.
 
-        Log from are written to stderr. They will be supressed on success when running as the tool
+        Logs are written to stderr. They will be suppressed on success when running as the tool
         of a js_run_binary when silent_on_success is True. In that case, they will be shown
         only on a build failure along with the stdout & stderr of the node tool being run.
 
-        When js_run_binary captures stderr to an output file, info and debug logs are written to
-        that file along with the stderr of the node tool being run, and are not echoed to the
-        terminal even on a build failure. Fatal and error logs are always written to the real stderr
-        in that case, since Bazel discards the output file of a failed action.
+        When js_run_binary captures stderr to an output file, logs are written to that file along
+        with the stderr of the node tool being run.
 
         Log levels: {}""".format(", ".join(LOG_LEVELS.keys())),
         values = LOG_LEVELS.keys(),
@@ -645,9 +643,8 @@ def _js_launcher(ctx, nodeinfo, entry_point_path, log_prefix_rule_set, log_prefi
     """The hermetic launcher: a native stub that execs node on a generated JavaScript launcher.
 
     The stub can only execve, so everything the bash launcher did in shell is done by the
-    generated `.cjs` instead -- an almost literal translation of js_binary.sh.tpl, minus
-    the stdout/stderr/exit code capture and silent_on_success that js_run_binary no longer
-    asks the launcher for. See docs/hermetic_launcher.md.
+    generated `.cjs` instead -- an almost literal translation of js_binary.sh.tpl. See
+    docs/hermetic_launcher.md.
 
     Returns:
         an (executable, launcher_js) tuple

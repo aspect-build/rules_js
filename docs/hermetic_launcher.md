@@ -17,14 +17,3 @@ With the flag on, a `js_binary`'s executable is a small native binary stamped by
 [hermetic_launcher](https://github.com/hermeticbuild/hermetic-launcher) which
 does nothing but resolve its runfiles and `execve` node on a generated
 JavaScript file, `<name>_/<name>.cjs`.
-
-## Unsupported deprecated features
-
-The hermetic launcher does not implement the deprecated stdout capture, stderr
-capture, exit code capture, or `silent_on_success` options. It ignores
-`JS_BINARY__STDOUT_OUTPUT_FILE`, `JS_BINARY__STDERR_OUTPUT_FILE`,
-`JS_BINARY__EXIT_CODE_OUTPUT_FILE` and `JS_BINARY__SILENT_ON_SUCCESS`.
-
-These features are also deprecated on the bash launcher. They were originally
-necessary for implementing the corresponding functionality on `js_run_binary`,
-but that functionality has now moved into the underlying `run_binary` macro.

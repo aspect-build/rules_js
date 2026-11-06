@@ -36,118 +36,42 @@ if [ $# -gt 0 ] && [ "$1" = "--bazel-bindir" ]; then
 fi
 
 # ==============================================================================
-# Prepare stdout capture, stderr capture && logging
+# Logging
 # ==============================================================================
-
-# Convert stdout, stderr and exit_code capture outputs paths to absolute paths.
-# A path not starting with "bazel-out/" is relative to the bin directory; joining
-# it with BAZEL_BINDIR here (rather than baking in bazel-out/<config>/bin at
-# analysis time) keeps it correct when path mapping is active. This must happen
-# before any directory changes below since it resolves against $PWD.
-function resolve_capture_path {
-    case "$1" in
-    bazel-out/*) echo "$PWD/$1" ;;
-    *) echo "$PWD/$BAZEL_BINDIR/$1" ;;
-    esac
-}
-
-# TODO(4.0): remove support for capturing stderr, stdout, and exit code. The
-# js_run_binary macro now handles this in a way that does not require help from
-# the launcher.
-if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDOUT_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDOUT_OUTPUT_FILE")"
-fi
-if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__STDERR_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__STDERR_OUTPUT_FILE")"
-fi
-if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
-    JS_BINARY__EXIT_CODE_OUTPUT_FILE="$(resolve_capture_path "$JS_BINARY__EXIT_CODE_OUTPUT_FILE")"
-fi
-
-# A stream with a declared output file is written straight to that file so that
-# nothing has to run after node exits and this shell can exec node.
-#
-# A stream that is only subject to silent_on_success has no final destination, so
-# it is buffered in a temp file and replayed on failure.
-if [ "${JS_BINARY__STDOUT_OUTPUT_FILE:-}" ]; then
-    STDOUT_CAPTURE="$JS_BINARY__STDOUT_OUTPUT_FILE"
-elif [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-    STDOUT_CAPTURE=$(mktemp)
-    STDOUT_CAPTURE_IS_TEMP=1
-fi
-
-if [ "${JS_BINARY__STDERR_OUTPUT_FILE:-}" ]; then
-    STDERR_CAPTURE="$JS_BINARY__STDERR_OUTPUT_FILE"
-elif [ "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-    STDERR_CAPTURE=$(mktemp)
-    STDERR_CAPTURE_IS_TEMP=1
-fi
-
-# FATAL and ERROR diagnostics from this launcher only go into the stderr capture
-# if that capture is a temp file that will get replayed on failure. Otherwise,
-# we write these straight to stderr so that they do not get lost if the action
-# fails.
-LOG_ERROR_CAPTURE="${STDERR_CAPTURE_IS_TEMP:+$STDERR_CAPTURE}"
 
 export JS_BINARY__LOG_PREFIX="{{log_prefix_rule_set}}[{{log_prefix_rule}}]"
 
-# Emit a log line to $1, or to the real stderr when $1 is empty.
-function log_to {
-    local capture="$1"
-    local level="$2"
-    local message="$3"
-    if [ "$capture" ]; then
-        printf "%s: %s: %s\n" "$level" "$JS_BINARY__LOG_PREFIX" "$message" >>"$capture"
-    else
-        printf "%s: %s: %s\n" "$level" "$JS_BINARY__LOG_PREFIX" "$message" >&2
-    fi
+function log {
+    printf "%s: %s: %s\n" "$1" "$JS_BINARY__LOG_PREFIX" "$2" >&2
 }
 
 function log_fatal {
     if [ "${JS_BINARY__LOG_FATAL:-}" ]; then
-        log_to "${LOG_ERROR_CAPTURE:-}" FATAL "$1"
+        log FATAL "$1"
     fi
 }
 
 function log_error {
     if [ "${JS_BINARY__LOG_ERROR:-}" ]; then
-        log_to "${LOG_ERROR_CAPTURE:-}" ERROR "$1"
+        log ERROR "$1"
     fi
 }
 
 function log_info {
     if [ "${JS_BINARY__LOG_INFO:-}" ]; then
-        log_to "${STDERR_CAPTURE:-}" INFO "$1"
+        log INFO "$1"
     fi
 }
 
 function log_debug {
     if [ "${JS_BINARY__LOG_DEBUG:-}" ]; then
-        log_to "${STDERR_CAPTURE:-}" DEBUG "$1"
+        log DEBUG "$1"
     fi
 }
 
 _exit() {
     EXIT_CODE=$?
-
-    # Streams captured to a declared output file were written there directly and
-    # need no mop up. Only the temp files that back silent_on_success do.
-    if [ "${STDERR_CAPTURE_IS_TEMP:-}" ]; then
-        if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-            cat "$STDERR_CAPTURE" >&2
-        fi
-        rm "$STDERR_CAPTURE"
-    fi
-
-    if [ "${STDOUT_CAPTURE_IS_TEMP:-}" ]; then
-        if [ "$EXIT_CODE" != 0 ] || [ -z "${JS_BINARY__SILENT_ON_SUCCESS:-}" ]; then
-            cat "$STDOUT_CAPTURE"
-        fi
-        rm "$STDOUT_CAPTURE"
-    fi
-
     log_debug "exit code: $EXIT_CODE"
-
     exit "$EXIT_CODE"
 }
 
@@ -297,40 +221,19 @@ if [ "${JS_BINARY__LOG_INFO:-}" ]; then
     log_info "$(echo -n "running" "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"})"
 fi
 
-# De-export capture-related vars so child processes (e.g. a nested js_binary)
-# do not inherit them. The bash script has already consumed them above to set up
-# STDOUT_CAPTURE / STDERR_CAPTURE; leaking them would cause a nested js_binary
-# to silently swallow its own stdout or write to the wrong output file.
-# export -n keeps the value accessible to the _exit trap while removing it from
-# the environment seen by node and any processes it spawns.
-export -n JS_BINARY__STDOUT_OUTPUT_FILE JS_BINARY__STDERR_OUTPUT_FILE JS_BINARY__EXIT_CODE_OUTPUT_FILE JS_BINARY__SILENT_ON_SUCCESS
-
 set +e
 
-if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ] && [ -z "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ] &&
-    [ -z "${STDOUT_CAPTURE_IS_TEMP:-}" ] && [ -z "${STDERR_CAPTURE_IS_TEMP:-}" ]; then
+if [ -z "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
     # Nothing must run after node exits, so replace this shell with node. Signals
     # and terminal control are then delivered directly to node instead of being
     # proxied through a backgrounded child.
-    if [ "${STDOUT_CAPTURE:-}" ]; then
-        exec 1>>"$STDOUT_CAPTURE"
-    fi
-    if [ "${STDERR_CAPTURE:-}" ]; then
-        exec 2>>"$STDERR_CAPTURE"
-    fi
     exec "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"}
     exit 127
 fi
 
-if [ "${STDOUT_CAPTURE:-}" ] && [ "${STDERR_CAPTURE:-}" ]; then
-    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" 2>>"$STDERR_CAPTURE" &
-elif [ "${STDOUT_CAPTURE:-}" ]; then
-    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 >>"$STDOUT_CAPTURE" &
-elif [ "${STDERR_CAPTURE:-}" ]; then
-    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 2>>"$STDERR_CAPTURE" &
-else
-    "${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
-fi
+# With expected_exit_code set, this shell must observe node's exit code in order
+# to remap it, so node runs as a child.
+"${node_cmd[@]}" ${JS_BINARY__NODE_OPTIONS[@]+"${JS_BINARY__NODE_OPTIONS[@]}"} -- "$entry_point" ${ARGS[@]+"${ARGS[@]}"} <&0 &
 
 # ==============================================================================
 # Wait for program to finish
@@ -364,25 +267,15 @@ set -e
 # Mop up after main program
 # ==============================================================================
 
-if [ "${JS_BINARY__EXPECTED_EXIT_CODE:-}" ]; then
-    if [ "$RESULT" != "$JS_BINARY__EXPECTED_EXIT_CODE" ]; then
-        log_error "expected exit code to be '$JS_BINARY__EXPECTED_EXIT_CODE', but got '$RESULT'"
-        if [ $RESULT -eq 0 ]; then
-            # This exit code is handled specially by Bazel:
-            # https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
-            readonly BAZEL_EXIT_TESTS_FAILED=3
-            exit $BAZEL_EXIT_TESTS_FAILED
-        fi
-        exit $RESULT
-    else
-        exit 0
+if [ "$RESULT" != "$JS_BINARY__EXPECTED_EXIT_CODE" ]; then
+    log_error "expected exit code to be '$JS_BINARY__EXPECTED_EXIT_CODE', but got '$RESULT'"
+    if [ "$RESULT" -eq 0 ]; then
+        # This exit code is handled specially by Bazel:
+        # https://github.com/bazelbuild/bazel/blob/486206012a664ecb20bdb196a681efc9a9825049/src/main/java/com/google/devtools/build/lib/util/ExitCode.java#L44
+        readonly BAZEL_EXIT_TESTS_FAILED=3
+        exit $BAZEL_EXIT_TESTS_FAILED
     fi
-fi
-
-if [ "${JS_BINARY__EXIT_CODE_OUTPUT_FILE:-}" ]; then
-    # Exit zero if the exit code was captured
-    echo -n "$RESULT" >"$JS_BINARY__EXIT_CODE_OUTPUT_FILE"
-    exit 0
-else
     exit $RESULT
 fi
+
+exit 0
