@@ -1,0 +1,15 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+
+js_library(
+    name = "lib",
+    srcs = ["index.js"],
+    deps = ["//:node_modules/chalk"],
+)
+
+npm_package(
+    name = "pkg",
+    srcs = [":lib"],
+    package = "@e2e/lib",
+    visibility = ["//visibility:public"],
+)

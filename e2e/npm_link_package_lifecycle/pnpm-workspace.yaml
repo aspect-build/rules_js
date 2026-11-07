@@ -1,0 +1,6 @@
+packages:
+    - '.'
+
+# chalk has no install scripts, but listing it here still gives it a lifecycle build target
+onlyBuiltDependencies:
+    - 'chalk'
