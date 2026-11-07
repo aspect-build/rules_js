@@ -11,6 +11,7 @@ load(":npm_package_visibility_test.bzl", "npm_package_visibility_tests")
 load(":npmrc_test.bzl", "npmrc_tests")
 load(":parse_pnpm_lock_tests.bzl", "parse_pnpm_lock_tests")
 load(":pnpm_test.bzl", "pnpm_tests")
+load(":starlark_codegen_utils_tests.bzl", "starlark_codegen_utils_tests")
 load(":transitive_closure_tests.bzl", "transitive_closure_tests")
 load(":translate_lock_helpers_tests.bzl", "translate_lock_helpers_tests")
 load(":utils_tests.bzl", "utils_tests")
@@ -32,6 +33,8 @@ utils_tests(name = "test_utils")
 npmrc_tests(name = "test_npmrc")
 
 pnpm_tests(name = "test_pnpm")
+
+starlark_codegen_utils_tests(name = "test_starlark_codegen_utils")
 
 transitive_closure_tests(name = "test_transitive_closure")
 

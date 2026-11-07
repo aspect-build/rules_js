@@ -30,7 +30,7 @@ _FP_DIRECT_TMPL = \
     """\
 # Generated npm_link_package_store for linking of first-party "{pkg}" package
 # buildifier: disable=function-docstring
-def _fp_link_{i}(alias = None):
+def _fp_link_{sym}(alias = None):
     _npm_local_link_package_store(
         name = "node_modules/{pkg}" if alias == None else "node_modules/{{}}".format(alias),
         package = alias,
@@ -241,24 +241,25 @@ def npm_link_all_packages(name = "node_modules", imported_links = [], prod = Tru
     links_targets = {}
 
     # Generate the store_bzl and associated links_* code for every npm package
-    for (i, _import) in enumerate(npm_imports):
+    for _import in npm_imports:
+        sym = starlark_codegen_utils.identifier(_import.repo_name.split("__", 1)[-1])
         defs_bzl = "@%s%s//:defs.bzl" % (_import.repo_name, utils.links_repo_suffix)
         if _import.link_packages:
             defs_bzl_header.append(
-                """load("{defs_bzl}", link_{i} = "npm_link_imported_package_store_internal", store_{i} = "npm_imported_package_store_internal")""".format(
+                """load("{defs_bzl}", _link_{sym} = "npm_link_imported_package_store_internal", _store_{sym} = "npm_imported_package_store_internal")""".format(
                     defs_bzl = defs_bzl,
-                    i = i,
+                    sym = sym,
                 ),
             )
         else:
             defs_bzl_header.append(
-                """load("{defs_bzl}", store_{i} = "npm_imported_package_store_internal")""".format(
+                """load("{defs_bzl}", _store_{sym} = "npm_imported_package_store_internal")""".format(
                     defs_bzl = defs_bzl,
-                    i = i,
+                    sym = sym,
                 ),
             )
 
-        stores_bzl.append("""        store_{i}()""".format(i = i))
+        stores_bzl.append("""        _store_{sym}()""".format(sym = sym))
         for link_package, _link_aliases in _import.link_packages.items():
             link_aliases = _link_aliases or [_import.package]
 
@@ -285,8 +286,8 @@ Valid pnpm workspace projects: {}
                 is_alias = link_alias != _import.package
                 is_dev = link_alias not in link_importer["dependencies"] and link_alias not in link_importer["optional_dependencies"]
 
-                links_pkg_bzl[link_package].append("""    link_{i}({maybe_alias}{maybe_dev})""".format(
-                    i = i,
+                links_pkg_bzl[link_package].append("""    _link_{sym}({maybe_alias}{maybe_dev})""".format(
+                    sym = sym,
                     maybe_alias = '"{}"'.format(link_alias) if is_alias else "",
                     maybe_dev = (", " if is_alias else "") + "dev=True" if is_dev else "",
                 ))
@@ -338,7 +339,8 @@ Valid pnpm workspace projects: {}
                     )]
 
     # Generate the first-party package stores and linking of first-party packages
-    for i, fp_link in enumerate(fp_links.values()):
+    for fp_id, fp_link in fp_links.items():
+        fp_sym = starlark_codegen_utils.identifier(fp_id)
         fp_key = fp_link["key"]
         fp_package = fp_link["package"]
         fp_version = fp_link["version"]
@@ -376,7 +378,7 @@ Valid pnpm workspace projects: {}
                 package_visibility = None
 
             link_factories_bzl.append(_FP_DIRECT_TMPL.format(
-                i = i,
+                sym = fp_sym,
                 maybe_visibility = "\n        link_visibility = {},".format(package_visibility) if package_visibility else "",
                 pkg = fp_package,
                 root_package = root_package,
@@ -389,9 +391,9 @@ Valid pnpm workspace projects: {}
                 links_pkg_bzl[link_package] = []
             for alias in aliases.keys():
                 if alias == fp_package:
-                    links_pkg_bzl[link_package].append("""    _fp_link_{i}()""".format(i = i))
+                    links_pkg_bzl[link_package].append("""    _fp_link_{sym}()""".format(sym = fp_sym))
                 else:
-                    links_pkg_bzl[link_package].append("""    _fp_link_{i}("{alias}")""".format(i = i, alias = alias))
+                    links_pkg_bzl[link_package].append("""    _fp_link_{sym}("{alias}")""".format(sym = fp_sym, alias = alias))
 
     if stores_bzl:
         npm_link_all_packages_bzl.append("""    if is_root:""")
@@ -401,8 +403,9 @@ Valid pnpm workspace projects: {}
     # for that project, collected into the `_LINK_PACKAGE_FNS` dict for dispatch by package name.
     link_pkg_fns_bzl = []
     link_pkg_dispatch = {}
-    for i, (link_package, bzl) in enumerate(links_pkg_bzl.items()):
-        fn_name = "_link_pkg_%d" % i
+    for link_package in sorted(links_pkg_bzl.keys()):
+        bzl = links_pkg_bzl[link_package]
+        fn_name = "_importer_" + starlark_codegen_utils.identifier(link_package)
         link_pkg_dispatch[link_package] = fn_name
         link_pkg_fns_bzl.append("\n".join(["""def {fn_name}():""".format(fn_name = fn_name)] + bzl))
 
@@ -485,7 +488,8 @@ def _generate_npm_link_targets(links_targets):
         npm_link_targets_bzl is the npm_link_targets() macro definition.
     """
     link_targets_const_lines = []
-    for link_package, lists in links_targets.items():
+    for link_package in sorted(links_targets.keys()):
+        lists = links_targets[link_package]
         if not lists["prod"] and not lists["dev"]:
             continue
         link_targets_const_lines.append("""    "{pkg}": {{""".format(pkg = link_package))
@@ -553,5 +557,5 @@ def _generate_npm_package_locations(fp_links, npm_imports):
                         location_to_packages[link_package].append(alias)
 
     return "_NPM_PACKAGE_LOCATIONS = {}".format(
-        starlark_codegen_utils.to_dict_attr(location_to_packages, 0, quote_value = False),
+        starlark_codegen_utils.to_dict_attr({k: location_to_packages[k] for k in sorted(location_to_packages.keys())}, 0, quote_value = False),
     )
