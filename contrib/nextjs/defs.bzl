@@ -432,7 +432,7 @@ def nextjs_standalone_server(name, app, pkg = None, data = [], **kwargs):
     # See https://nextjs.org/docs/pages/api-reference/config/next-config-js/output#automatically-copying-traced-files
     copy_to_directory(
         name = "_{}.standalone".format(name),
-        srcs = [app] + native.glob(["public/**"]),
+        srcs = [app] + native.glob(["public/**"], allow_empty = True),
         include_srcs_patterns = [
             "public/**",
             "{}/static/**".format(app_dir),
