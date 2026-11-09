@@ -201,8 +201,8 @@ def npm_package(
     for more details).
 
     `npm_package` can also include npm packages sources and default runfiles from `srcs` which `copy_to_directory` does not.
-    These behaviors can be configured with the `include_npm_sources` and `include_runfiles` attributes
-    respectively.
+    These behaviors can be enabled with the `include_npm_sources` and `include_runfiles` attributes
+    respectively; both are off by default.
 
     The default `include_srcs_packages`, `[".", "./**"]`, prevents files from outside of the target's
     package and subpackages from being included.
@@ -398,9 +398,10 @@ def npm_package(
             - to work-around issues with rules that don't provide everything needed in sources, transitive_sources, types & transitive_types
             - to depend on the runfiles targets that don't use JsInfo
 
-            NB: The default value will be flipped to False in the next major release as runfiles are not needed in the general case
-            and adding them to the list of files available to copy can add noticeable overhead to the analysis phase in a large
-            repository with many npm_package targets.
+            Defaults to False since runfiles are not needed in the general case and adding them to the list of files
+            available to copy can add noticeable overhead to the analysis phase in a large repository with many
+            npm_package targets. Set `include_runfiles = True` if the package needs runfiles from `srcs` targets that
+            do not provide `JsInfo`.
 
         hardlink: Controls when to use hardlinks to files instead of making copies.
 
