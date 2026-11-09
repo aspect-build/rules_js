@@ -50,7 +50,10 @@ def js_run_binary(
 
     This rule does not require Bash `native.genrule`.
 
-    The following environment variables are made available to the Node.js runtime if set_legacy_environment_variables is enabled. They are deprecated and will be removed in a future release:
+    The following environment variables are made available to the Node.js runtime only if
+    `set_legacy_environment_variables` is enabled, which is off by default. They are deprecated
+    and will be removed in a future release. `BAZEL_BINDIR` is always set by the `js_binary`
+    launcher regardless of this setting.
 
     * BAZEL_BINDIR: the bazel bin directory; equivalent to the `$(BINDIR)` Make variable of the `js_run_binary` target
     * BAZEL_COMPILATION_MODE: One of `fastbuild`, `dbg`, or `opt` as set by [`--compilation_mode`](https://bazel.build/docs/user-manual#compilation-mode); equivalent to `$(COMPILATION_MODE)` Make variable of the `js_run_binary` target
@@ -262,10 +265,19 @@ def js_run_binary(
             environment variables.
 
             If `None` (the default), the behavior is controlled by the
-            `//js:set_legacy_environment_variables` build flag, which defaults to `True`.
+            `//js:set_legacy_environment_variables` build flag, which defaults to `False`.
 
-            These variables are deprecated and setting them will default to False in a future
-            release. Set this to False to opt out now.
+            These variables are deprecated. To opt back in, set this attribute to `True` on
+            individual targets, or pass
+            `--@rules_js//js:set_legacy_environment_variables=True` to opt in for all
+            targets that leave this attribute unset.
+
+            `BAZEL_BINDIR` remains available to the tool either way, since the `js_binary`
+            launcher sets it from the `--bazel-bindir` argument that `js_run_binary` always
+            passes.
+
+            These variables are populated with Make variable expansion, which is not
+            path-mapping-aware, so enabling them prevents the action from using path mapping.
 
         **kwargs: Additional arguments
     """
@@ -312,8 +324,8 @@ def js_run_binary(
 
     fixed_env = {}
 
-    # These environment variables are deprecated and will default to not being set in a future
-    # release; see the `set_legacy_environment_variables` docstring.
+    # These environment variables are deprecated and are not set by default; see the
+    # `set_legacy_environment_variables` docstring.
     # When set_legacy_environment_variables is None, behavior is controlled by the
     # //js:set_legacy_environment_variables flag.
     legacy_env = {}

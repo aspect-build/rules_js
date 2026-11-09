@@ -331,6 +331,7 @@ def nextjs_standalone_build(name, config, srcs, next_js_binary, data = [], use_e
     # Wrap the config file to add necessary bazel logic
     env = kwargs.pop("env", {})
     env["NEXTJS_STANDALONE_CONFIG"] = "$(locations :_%s.original_config_file)" % name
+    env["NEXTJS_BAZEL_PACKAGE"] = native.package_name()
     copy_file(
         name = "_%s.standalone_config_file" % name,
         src = _next_standalone_config,

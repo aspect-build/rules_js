@@ -21,11 +21,13 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
-# This flag controls the default behavior of the set_legacy_environment_variables flag
-# on js_run_binary.
+# This flag controls the default behavior of the set_legacy_environment_variables attribute
+# on js_run_binary. It defaults to False, so the deprecated BAZEL_* environment variables are
+# not set unless a target opts in with `set_legacy_environment_variables = True`, or all
+# targets opt in with `--@rules_js//js:set_legacy_environment_variables=True`.
 bool_flag(
     name = "set_legacy_environment_variables",
-    build_setting_default = True,
+    build_setting_default = False,
     scope = "universal",
     visibility = ["//visibility:public"],
 )
