@@ -52,22 +52,28 @@ def _new_package_info(name, dependencies, optional_dependencies, has_bin, option
         "os": os,
     }
 
+def _pnpm_platform_label(name):
+    # Canonical label string (e.g. "@@rules_js+//platforms/pnpm:linux"). The result is written into
+    # select() keys in generated .bzl files, where an apparent name like "@rules_js" would resolve
+    # against the repository calling the generated macro, which may not see rules_js under that name.
+    return str(Label("//platforms/pnpm:{}".format(name)))
+
 def _to_bazel_os_cpu_constraints(oss, cpus):
     oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
     cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
     r = []
     for cpu in cpus:
         for os in oss:
-            r.append("@rules_js//platforms/pnpm:{}_{}".format(os, cpu))
+            r.append(_pnpm_platform_label("{}_{}".format(os, cpu)))
     return r
 
 def _to_bazel_os_constraints(oss):
     oss = _resolve_pnpm_constraint_values(oss, PNPM_PLATFORMS, {}, "os")
-    return ["@rules_js//platforms/pnpm:{}".format(os) for os in oss]
+    return [_pnpm_platform_label(os) for os in oss]
 
 def _to_bazel_cpu_constraints(cpus):
     cpus = _resolve_pnpm_constraint_values(cpus, PNPM_ARCHS, PNPM_ARCH_ALIASES, "cpu")
-    return ["@rules_js//platforms/pnpm:{}".format(cpu) for cpu in cpus]
+    return [_pnpm_platform_label(cpu) for cpu in cpus]
 
 def _resolve_pnpm_constraint_values(values, known_map, aliases_map, kind):
     if not values:
