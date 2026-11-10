@@ -407,35 +407,35 @@ def _latest_version_known(ctx):
 
 def _cpu_constraints(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ["@rules_js//platforms/pnpm:arm64"], pnpm.to_bazel_cpu_constraints(["arm64"]))
-    asserts.equals(env, ["@rules_js//platforms/pnpm:arm64", "@rules_js//platforms/pnpm:riscv64"], pnpm.to_bazel_cpu_constraints(["arm64", "riscv64"]))
+    asserts.equals(env, ["@@//platforms/pnpm:arm64"], pnpm.to_bazel_cpu_constraints(["arm64"]))
+    asserts.equals(env, ["@@//platforms/pnpm:arm64", "@@//platforms/pnpm:riscv64"], pnpm.to_bazel_cpu_constraints(["arm64", "riscv64"]))
     asserts.equals(
         env,
-        ["@rules_js//platforms/pnpm:ppc", "@rules_js//platforms/pnpm:ppc64", "@rules_js//platforms/pnpm:s390x", "@rules_js//platforms/pnpm:ia32", "@rules_js//platforms/pnpm:mips", "@rules_js//platforms/pnpm:wasm32"],
+        ["@@//platforms/pnpm:ppc", "@@//platforms/pnpm:ppc64", "@@//platforms/pnpm:s390x", "@@//platforms/pnpm:ia32", "@@//platforms/pnpm:mips", "@@//platforms/pnpm:wasm32"],
         pnpm.to_bazel_cpu_constraints(["!arm", "!arm64", "!riscv64", "!x64"]),
     )
     return unittest.end(env)
 
 def _os_constraints(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ["@rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin"]))
-    asserts.equals(env, ["@rules_js//platforms/pnpm:win32", "@rules_js//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["win32", "linux"]))
-    asserts.equals(env, ["@rules_js//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin", "sunos"]))
-    asserts.equals(env, ["@rules_js//platforms/pnpm:win32", "@rules_js//platforms/pnpm:android", "@rules_js//platforms/pnpm:netbsd"], pnpm.to_bazel_os_constraints(["!linux", "!darwin", "!freebsd", "!openbsd", "!aix"]))
+    asserts.equals(env, ["@@//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin"]))
+    asserts.equals(env, ["@@//platforms/pnpm:win32", "@@//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["win32", "linux"]))
+    asserts.equals(env, ["@@//platforms/pnpm:darwin"], pnpm.to_bazel_os_constraints(["darwin", "sunos"]))
+    asserts.equals(env, ["@@//platforms/pnpm:win32", "@@//platforms/pnpm:android", "@@//platforms/pnpm:netbsd"], pnpm.to_bazel_os_constraints(["!linux", "!darwin", "!freebsd", "!openbsd", "!aix"]))
 
     # "alpine" is not a Node.js process.platform value but is used by some packages (e.g. @vscode/vsce-sign-alpine-*).
     # It should be recognized as a known (but unsupported) OS value and filtered out, not cause a hard failure.
     # See https://github.com/aspect-build/rules_js/issues/2745
     asserts.equals(env, [], pnpm.to_bazel_os_constraints(["alpine"]))
-    asserts.equals(env, ["@rules_js//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["alpine", "linux"]))
+    asserts.equals(env, ["@@//platforms/pnpm:linux"], pnpm.to_bazel_os_constraints(["alpine", "linux"]))
     return unittest.end(env)
 
 def _os_cpu_constraints(ctx):
     env = unittest.begin(ctx)
-    asserts.equals(env, ["@rules_js//platforms/pnpm:darwin_arm64"], pnpm.to_bazel_os_cpu_constraints(["darwin"], ["arm64"]))
+    asserts.equals(env, ["@@//platforms/pnpm:darwin_arm64"], pnpm.to_bazel_os_cpu_constraints(["darwin"], ["arm64"]))
     asserts.equals(
         env,
-        ["@rules_js//platforms/pnpm:win32_x64", "@rules_js//platforms/pnpm:linux_x64"],
+        ["@@//platforms/pnpm:win32_x64", "@@//platforms/pnpm:linux_x64"],
         pnpm.to_bazel_os_cpu_constraints(["win32", "linux"], ["x64"]),
     )
     return unittest.end(env)

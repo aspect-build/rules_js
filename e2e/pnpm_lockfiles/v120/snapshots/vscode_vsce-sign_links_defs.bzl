@@ -23,49 +23,49 @@ def npm_imported_package_store_internal():
         version = VERSION,
         root_package = _ROOT_PACKAGE,
         deps = select({
-            "@rules_js//platforms/pnpm:darwin_arm64": {
+            "@@rules_js~//platforms/pnpm:darwin_arm64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-darwin-arm64@2.0.6": "@vscode/vsce-sign-darwin-arm64",
             },
-            "@rules_js//platforms/pnpm:darwin_x64": {
+            "@@rules_js~//platforms/pnpm:darwin_x64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-darwin-x64@2.0.6": "@vscode/vsce-sign-darwin-x64",
             },
-            "@rules_js//platforms/pnpm:linux_arm": {
+            "@@rules_js~//platforms/pnpm:linux_arm": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-linux-arm@2.0.6": "@vscode/vsce-sign-linux-arm",
             },
-            "@rules_js//platforms/pnpm:linux_arm64": {
+            "@@rules_js~//platforms/pnpm:linux_arm64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-linux-arm64@2.0.6": "@vscode/vsce-sign-linux-arm64",
             },
-            "@rules_js//platforms/pnpm:linux_x64": {
+            "@@rules_js~//platforms/pnpm:linux_x64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-linux-x64@2.0.6": "@vscode/vsce-sign-linux-x64",
             },
-            "@rules_js//platforms/pnpm:win32_arm64": {
+            "@@rules_js~//platforms/pnpm:win32_arm64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-win32-arm64@2.0.6": "@vscode/vsce-sign-win32-arm64",
             },
-            "@rules_js//platforms/pnpm:win32_x64": {
+            "@@rules_js~//platforms/pnpm:win32_x64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-win32-x64@2.0.6": "@vscode/vsce-sign-win32-x64",
             },
             "//conditions:default": {},
         }),
         ref_deps = select({
-            "@rules_js//platforms/pnpm:darwin_arm64": {
+            "@@rules_js~//platforms/pnpm:darwin_arm64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-darwin-arm64@2.0.6/ref": "@vscode/vsce-sign-darwin-arm64",
             },
-            "@rules_js//platforms/pnpm:darwin_x64": {
+            "@@rules_js~//platforms/pnpm:darwin_x64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-darwin-x64@2.0.6/ref": "@vscode/vsce-sign-darwin-x64",
             },
-            "@rules_js//platforms/pnpm:linux_arm": {
+            "@@rules_js~//platforms/pnpm:linux_arm": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-linux-arm@2.0.6/ref": "@vscode/vsce-sign-linux-arm",
             },
-            "@rules_js//platforms/pnpm:linux_arm64": {
+            "@@rules_js~//platforms/pnpm:linux_arm64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-linux-arm64@2.0.6/ref": "@vscode/vsce-sign-linux-arm64",
             },
-            "@rules_js//platforms/pnpm:linux_x64": {
+            "@@rules_js~//platforms/pnpm:linux_x64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-linux-x64@2.0.6/ref": "@vscode/vsce-sign-linux-x64",
             },
-            "@rules_js//platforms/pnpm:win32_arm64": {
+            "@@rules_js~//platforms/pnpm:win32_arm64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-win32-arm64@2.0.6/ref": "@vscode/vsce-sign-win32-arm64",
             },
-            "@rules_js//platforms/pnpm:win32_x64": {
+            "@@rules_js~//platforms/pnpm:win32_x64": {
                 ":.aspect_rules_js/node_modules/@vscode+vsce-sign-win32-x64@2.0.6/ref": "@vscode/vsce-sign-win32-x64",
             },
             "//conditions:default": {},

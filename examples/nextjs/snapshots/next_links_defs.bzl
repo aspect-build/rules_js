@@ -34,24 +34,24 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/styled-jsx@5.1.6_react@19.2.4": "styled-jsx",
             ":.aspect_rules_js/node_modules/sharp@0.33.5": "sharp",
         } | select({
-            "@rules_js//platforms/pnpm:darwin_arm64": {
+            "@@rules_js~//platforms/pnpm:darwin_arm64": {
                 ":.aspect_rules_js/node_modules/@next+swc-darwin-arm64@15.2.5": "@next/swc-darwin-arm64",
             },
-            "@rules_js//platforms/pnpm:darwin_x64": {
+            "@@rules_js~//platforms/pnpm:darwin_x64": {
                 ":.aspect_rules_js/node_modules/@next+swc-darwin-x64@15.2.5": "@next/swc-darwin-x64",
             },
-            "@rules_js//platforms/pnpm:linux_arm64": {
+            "@@rules_js~//platforms/pnpm:linux_arm64": {
                 ":.aspect_rules_js/node_modules/@next+swc-linux-arm64-gnu@15.2.5": "@next/swc-linux-arm64-gnu",
                 ":.aspect_rules_js/node_modules/@next+swc-linux-arm64-musl@15.2.5": "@next/swc-linux-arm64-musl",
             },
-            "@rules_js//platforms/pnpm:linux_x64": {
+            "@@rules_js~//platforms/pnpm:linux_x64": {
                 ":.aspect_rules_js/node_modules/@next+swc-linux-x64-gnu@15.2.5": "@next/swc-linux-x64-gnu",
                 ":.aspect_rules_js/node_modules/@next+swc-linux-x64-musl@15.2.5": "@next/swc-linux-x64-musl",
             },
-            "@rules_js//platforms/pnpm:win32_arm64": {
+            "@@rules_js~//platforms/pnpm:win32_arm64": {
                 ":.aspect_rules_js/node_modules/@next+swc-win32-arm64-msvc@15.2.5": "@next/swc-win32-arm64-msvc",
             },
-            "@rules_js//platforms/pnpm:win32_x64": {
+            "@@rules_js~//platforms/pnpm:win32_x64": {
                 ":.aspect_rules_js/node_modules/@next+swc-win32-x64-msvc@15.2.5": "@next/swc-win32-x64-msvc",
             },
             "//conditions:default": {},
@@ -68,24 +68,24 @@ def npm_imported_package_store_internal():
             ":.aspect_rules_js/node_modules/styled-jsx@5.1.6_react@19.2.4/ref": "styled-jsx",
             ":.aspect_rules_js/node_modules/sharp@0.33.5/ref": "sharp",
         } | select({
-            "@rules_js//platforms/pnpm:darwin_arm64": {
+            "@@rules_js~//platforms/pnpm:darwin_arm64": {
                 ":.aspect_rules_js/node_modules/@next+swc-darwin-arm64@15.2.5/ref": "@next/swc-darwin-arm64",
             },
-            "@rules_js//platforms/pnpm:darwin_x64": {
+            "@@rules_js~//platforms/pnpm:darwin_x64": {
                 ":.aspect_rules_js/node_modules/@next+swc-darwin-x64@15.2.5/ref": "@next/swc-darwin-x64",
             },
-            "@rules_js//platforms/pnpm:linux_arm64": {
+            "@@rules_js~//platforms/pnpm:linux_arm64": {
                 ":.aspect_rules_js/node_modules/@next+swc-linux-arm64-gnu@15.2.5/ref": "@next/swc-linux-arm64-gnu",
                 ":.aspect_rules_js/node_modules/@next+swc-linux-arm64-musl@15.2.5/ref": "@next/swc-linux-arm64-musl",
             },
-            "@rules_js//platforms/pnpm:linux_x64": {
+            "@@rules_js~//platforms/pnpm:linux_x64": {
                 ":.aspect_rules_js/node_modules/@next+swc-linux-x64-gnu@15.2.5/ref": "@next/swc-linux-x64-gnu",
                 ":.aspect_rules_js/node_modules/@next+swc-linux-x64-musl@15.2.5/ref": "@next/swc-linux-x64-musl",
             },
-            "@rules_js//platforms/pnpm:win32_arm64": {
+            "@@rules_js~//platforms/pnpm:win32_arm64": {
                 ":.aspect_rules_js/node_modules/@next+swc-win32-arm64-msvc@15.2.5/ref": "@next/swc-win32-arm64-msvc",
             },
-            "@rules_js//platforms/pnpm:win32_x64": {
+            "@@rules_js~//platforms/pnpm:win32_x64": {
                 ":.aspect_rules_js/node_modules/@next+swc-win32-x64-msvc@15.2.5/ref": "@next/swc-win32-x64-msvc",
             },
             "//conditions:default": {},
