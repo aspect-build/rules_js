@@ -380,7 +380,7 @@ def _load_npmrc(priv, rctx, attr, npmrc_path, npmrc_label):
 
     (registries, auth) = helpers.get_npm_auth(contents, npmrc_path, rctx)
 
-    # TODO(v4): drop `.npmrc` registry routing once pnpm < 11 support is dropped;
+    # TODO: drop `.npmrc` registry routing once pnpm < 11 support is dropped;
     # pnpm 11 declares registries in pnpm-workspace.yaml
     priv["npm_registries"].update(registries)
     priv["npm_auth"].update(auth)
