@@ -382,7 +382,7 @@ jobs:
             - name: No-runfiles regression with the hermetic launcher
               if: matrix.os == 'windows-latest'
               env:
-                  USE_BAZEL_VERSION: 9.2.0
+                  USE_BAZEL_VERSION: 9.3.1
               shell: bash
               working-directory: ${{ matrix.workspace.path }}
               run: |
