@@ -177,10 +177,7 @@ def _npm_package_store_impl(ctx):
             msg = "Expected src of '{}' to provide either NpmPackageInfo or JsInfo".format(ctx.label)
             fail(msg)
     else:
-        # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
-        # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
-        # deps; this pattern is used to break circular dependencies between 3rd party npm deps; it
-        # is not used for 1st party deps
+        # ctx.attr.src is unspecified for a 3p package store from npm_package_store_internal
         package = ctx.attr.package
         version = ctx.attr.version
 
@@ -361,10 +358,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
             else:
                 direct_ref_deps[dep] = dep_aliases
     elif not ctx.attr.src:
-        # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when it is _not_
-        # set, this is a terminal 3p package with ctx.attr.deps being the transitive closure of
-        # deps; this pattern is used to break circular dependencies between 3rd party npm deps; it
-        # is not used for 1st party deps
+        # ctx.attr.src is unspecified for a 3p package store from npm_package_store_internal
         deps_map = {}
         deps_with_ref_deps = []
         for dep, _dep_aliases in ctx.attr.deps.items():
@@ -375,7 +369,7 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
                 deps_map[dep_info.key] = dep_info
 
                 if package_key == dep_info.key:
-                    # provide the node_modules directory for this package if found in the transitive_closure
+                    # This dep is the package's own /pkg target
                     package_store_directory = dep_info.package_store_directory
             else:
                 # this is a ref npm_link_package, a downstream terminal npm_link_package for this npm
@@ -386,15 +380,6 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
 
             if dep_info.ref_deps:
                 deps_with_ref_deps.append(dep_info)
-
-            # Include the store and js info of all dependencies expected to be linked;
-            # because deps is the transitive closure, the flat (non-transitive) sources
-            # and types of each dep are sufficient
-            dep_js_info = dep[JsInfo]
-            sources_depsets.append(dep_js_info.sources)
-            types_depsets.append(dep_js_info.types)
-            npm_sources_depsets.append(dep_js_info.npm_sources)
-            npm_package_store_infos.append(dep_info)
 
         for dep_info in deps_with_ref_deps:
             dep_package_store_name = utils.package_store_name(dep_info.key)
@@ -418,28 +403,15 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
         files.append(package_store_directory)
 
     # Include the store and js info of all dependencies expected to be linked
-    if ctx.attr.src:
-        for target in ctx.attr.deps:
-            dep_js_info = target[JsInfo]
-            sources_depsets.append(dep_js_info.transitive_sources)
-            types_depsets.append(dep_js_info.transitive_types)
-            npm_sources_depsets.append(dep_js_info.npm_sources)
-            npm_package_store_infos.append(target[NpmPackageStoreInfo])
+    for target in ctx.attr.deps:
+        dep_js_info = target[JsInfo]
+        sources_depsets.append(dep_js_info.transitive_sources)
+        types_depsets.append(dep_js_info.transitive_types)
+        npm_sources_depsets.append(dep_js_info.npm_sources)
+        npm_package_store_infos.append(target[NpmPackageStoreInfo])
 
-        for npm_package_store_info in npm_package_store_infos:
-            transitive_files_depsets.append(npm_package_store_info.transitive_files)
-    else:
-        # ctx.attr.src can be unspecified when the rule is a npm_package_store_internal; when ctx.attr.src is
-        # _not_ set, this is a terminal 3p package with ctx.attr.deps being the transitive closure
-        # of deps; this pattern is used to break circular dependencies between 3rd party npm deps;
-        # it is not used for 1st party deps; because npm_package_store_infos is the transitive
-        # closure of all the entire package store deps, we can safely add just the flat `sources`,
-        # `types` and `files` from each of these to the transitive depsets; doing so reduces the
-        # size of the transitive depsets significantly and reduces analysis time and Bazel memory
-        # usage during analysis; the flat sources and types are already gathered while iterating
-        # the deps above
-        for npm_package_store_info in npm_package_store_infos:
-            transitive_files_depsets.append(npm_package_store_info.files)
+    for npm_package_store_info in npm_package_store_infos:
+        transitive_files_depsets.append(npm_package_store_info.transitive_files)
 
     sources_depset = depset(transitive = sources_depsets)
     types_depset = depset(transitive = types_depsets)
