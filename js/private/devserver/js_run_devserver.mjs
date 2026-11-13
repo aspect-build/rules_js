@@ -734,6 +734,14 @@ async function syncFiles(files, sandbox, writePerm, doSync) {
     );
 }
 
+// Reads the list of files to sync. A path can be listed more than once, by different artifacts with
+// the same short path. It is kept once, since concurrent syncs of one path race on the same
+// destination.
+async function readEntries(entriesPath) {
+    const entries = await fs.promises.readFile(entriesPath).then(JSON.parse);
+    return [...new Map(entries.map((e) => [e[0], e])).values()]
+}
+
 // In sandbox package store mode, the node_modules entries are synced by syncPackageStore rather than
 // with the other files.
 function withoutPackageStore(files) {
@@ -752,11 +760,8 @@ async function syncPackageStore(files, sandbox, writePerm) {
     }
     const startTime = perf_hooks.performance.now();
 
-    // A path can be listed more than once, by different artifacts with the same short path. Sync it
-    // once, since concurrent syncs of one path race on the same temporary copy.
-    const current = new Set(
-        files.map(([f]) => f).filter((f) => isUnderNodeModules(f))
-    );
+    const entries = files.filter(([f]) => isUnderNodeModules(f));
+    const current = new Set(entries.map(([f]) => f));
     const removed = [...packageStoreSynced.keys()].filter(
         (f) => !current.has(f)
     );
@@ -774,7 +779,7 @@ async function syncPackageStore(files, sandbox, writePerm) {
     const links = [];
     const synced = (
         await Promise.all(
-            [...current].map((f) =>
+            entries.map(([f]) =>
                 syncPackageStoreEntry(f, sandbox, writePerm, links)
             )
         )
@@ -958,7 +963,7 @@ async function runIBazelProtocol(
     toolArgs,
     env
 ) {
-    const files = await fs.promises.readFile(entriesPath).then(JSON.parse);
+    const files = await readEntries(entriesPath);
     await syncFiles(
         withoutPackageStore(files),
         sandbox,
@@ -1039,7 +1044,7 @@ async function ibazelBuildCompleted(config, entriesPath, sandbox) {
     const oldFiles = config.previous_files || [];
 
     // Re-parse the config file to get the latest list of data files to copy
-    const allFiles = await fs.promises.readFile(entriesPath).then(JSON.parse);
+    const allFiles = await readEntries(entriesPath);
     const updatedDataFiles = withoutPackageStore(allFiles);
 
     // Await promises to catch any exceptions
@@ -1125,7 +1130,7 @@ async function runWatchProtocol(
 
 async function watchProtocolCycle(config, entriesPath, sandbox, cycle) {
     // Re-parse the config file to get the latest list of data files to copy
-    const allFiles = await fs.promises.readFile(entriesPath).then(JSON.parse);
+    const allFiles = await readEntries(entriesPath);
     const newFiles = withoutPackageStore(allFiles);
 
     const oldFiles = config.previous_files || [];

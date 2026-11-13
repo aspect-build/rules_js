@@ -165,12 +165,27 @@ for (const protocol of ['ibazel', 'watch']) {
     )
 }
 
-// A node_modules entry can be listed more than once, by different artifacts with the same short path.
-// It is synced once rather than by concurrent copies that race on the same temporary path.
+// An entry can be listed more than once, by different artifacts with the same short path. It is
+// synced once rather than by concurrent copies that race on the same destination.
+const DUPLICATE_FILE = 'app/duplicate.js'
+write(path.join(main, DUPLICATE_FILE))
 for (const protocol of ['ibazel', 'watch']) {
     const { devserver, sandbox } = await newDevserver(`${protocol}-duplicate`)
-    const entries = [STORE_ENTRY, LINK_ENTRY, STORE_ENTRY, LINK_ENTRY]
+    const fileEntry = [DUPLICATE_FILE, 0]
+    const entries = [
+        STORE_ENTRY,
+        LINK_ENTRY,
+        fileEntry,
+        STORE_ENTRY,
+        LINK_ENTRY,
+        fileEntry,
+    ]
     await resync(devserver, protocol, sandbox, {}, entries)
+    check(
+        `${protocol}: duplicate file synced`,
+        fs.readFileSync(path.join(sandbox, DUPLICATE_FILE), 'utf8'),
+        path.join(main, DUPLICATE_FILE)
+    )
     check(
         `${protocol}: duplicate entry synced`,
         resolvesTo(path.join(sandbox, LINK), path.join(sandbox, STORE)),
