@@ -165,6 +165,39 @@ for (const protocol of ['ibazel', 'watch']) {
     )
 }
 
+// An entry can be listed more than once, by different artifacts with the same short path. It is
+// synced once rather than by concurrent copies that race on the same destination.
+const DUPLICATE_FILE = 'app/duplicate.js'
+write(path.join(main, DUPLICATE_FILE))
+for (const protocol of ['ibazel', 'watch']) {
+    const { devserver, sandbox } = await newDevserver(`${protocol}-duplicate`)
+    const fileEntry = [DUPLICATE_FILE, 0]
+    const entries = [
+        STORE_ENTRY,
+        LINK_ENTRY,
+        fileEntry,
+        STORE_ENTRY,
+        LINK_ENTRY,
+        fileEntry,
+    ]
+    await resync(devserver, protocol, sandbox, {}, entries)
+    check(
+        `${protocol}: duplicate file synced`,
+        fs.readFileSync(path.join(sandbox, DUPLICATE_FILE), 'utf8'),
+        path.join(main, DUPLICATE_FILE)
+    )
+    check(
+        `${protocol}: duplicate entry synced`,
+        resolvesTo(path.join(sandbox, LINK), path.join(sandbox, STORE)),
+        true
+    )
+    check(
+        `${protocol}: no copies left beside the duplicate entry`,
+        fs.readdirSync(path.dirname(path.join(sandbox, STORE))).join(' '),
+        'pkg'
+    )
+}
+
 // Bazel replaces a package directory as a whole when it rebuilds it, rather than changing it in
 // place, for example when a patch that rules_js applies to the package changes. The sandbox copy is
 // replaced as a whole too, so files removed from the package are not left behind at any depth.
