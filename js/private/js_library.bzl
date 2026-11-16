@@ -23,6 +23,7 @@ js_library(
 | Python sources and provides a `PyInfo`.
 """
 
+load("@bazel_lib//lib:copy_file.bzl", "copy_file_action")
 load("@bazel_lib//lib:copy_to_bin.bzl", "COPY_FILE_TO_BIN_TOOLCHAINS")
 load("//js/private/coverage:extensions.bzl", "COVERAGE_EXTENSIONS")
 load(":js_helpers.bzl", "copy_js_file_to_bin_action", "gather_runfiles")
@@ -131,9 +132,70 @@ a runtime dependency on this target.
         doc = """When True, `data` files are copied to the Bazel output tree before being passed as inputs to runfiles.""",
         default = True,
     ),
+    "source_copy_batch_size": attr.int(
+        doc = """Opt in to copying source files in bounded actions of up to this many files; 0 (the default) copies each file separately.
+
+Only use this for libraries whose source files are not also copied by another target in the same package: different
+batch memberships cannot share ownership of the same output. Files listed in `data` are always copied separately.
+Declaration-only files are batched separately from runtime files, so consumers of types need not download runtime outputs.
+""",
+        default = 0,
+    ),
 }
 
-def _gather_sources_and_types(ctx, targets, files):
+_COREUTILS_TOOLCHAIN = Label("@bazel_lib//lib:coreutils_toolchain_type")
+_DECLARATION_SUFFIXES = (".d.ts", ".d.ts.map", ".d.mts", ".d.mts.map", ".d.cts", ".d.cts.map")
+
+def _copy_sources_to_bin(ctx):
+    """Declare each source output once, even if it occurs in both srcs and types."""
+    batch_size = ctx.attr.source_copy_batch_size
+    if batch_size < 0:
+        fail("source_copy_batch_size must not be negative")
+    if not batch_size:
+        return None
+
+    copied = {}
+    batches = {}
+    data_files = {file: True for file in ctx.files.data} if ctx.attr.copy_data_to_bin else {}
+    for file in ctx.files.srcs + ctx.files.types:
+        if not file.is_source or file in copied:
+            continue
+        if file in data_files:
+            copied[file] = copy_js_file_to_bin_action(ctx, file)
+            continue
+        if ctx.label.repo_name != file.owner.repo_name or ctx.label.package != file.owner.package:
+            copy_js_file_to_bin_action(ctx, file)  # Report the standard cross-package error.
+        output = ctx.actions.declare_file(file.basename, sibling = file)
+        copied[file] = output
+        key = (file.dirname, file.basename.endswith(_DECLARATION_SUFFIXES))
+        batches.setdefault(key, []).append((file.basename, file, output))
+
+    if batches:
+        coreutils = ctx.toolchains[_COREUTILS_TOOLCHAIN].coreutils_info
+        for entries in batches.values():
+            entries = sorted(entries)
+            for start in range(0, len(entries), batch_size):
+                group = entries[start:start + batch_size]
+                if len(group) == 1:
+                    copy_file_action(ctx, group[0][1], group[0][2])
+                    continue
+                args = ctx.actions.args()
+                args.add("cp")
+                args.add_all([src for _, src, _ in group])
+                args.add(group[0][2].dirname)
+                ctx.actions.run(
+                    executable = coreutils.bin,
+                    arguments = [args],
+                    inputs = [src for _, src, _ in group],
+                    outputs = [dst for _, _, dst in group],
+                    mnemonic = "CopyFile",
+                    progress_message = "Copying JavaScript sources for %{label}",
+                    execution_requirements = {"supports-path-mapping": "1"},
+                    toolchain = _COREUTILS_TOOLCHAIN,
+                )
+    return copied
+
+def _gather_sources_and_types(ctx, targets, files, copied = None):
     """Gathers sources and types from a list of targets
 
     Args:
@@ -147,6 +209,8 @@ def _gather_sources_and_types(ctx, targets, files):
 
             These typically come from the `srcs` and/or `data` attributes of a rule
 
+        copied: Optional map of source files to their copied outputs.
+
     Returns:
         Sources & declaration files depsets in the sequence (sources, types)
     """
@@ -155,7 +219,7 @@ def _gather_sources_and_types(ctx, targets, files):
 
     for file in files:
         if file.is_source:
-            file = copy_js_file_to_bin_action(ctx, file)
+            file = copied[file] if copied != None else copy_js_file_to_bin_action(ctx, file)
 
         if file.is_directory:
             # assume a directory contains types since we can't know that it doesn't
@@ -195,16 +259,19 @@ def _gather_sources_and_types(ctx, targets, files):
     return (sources, types)
 
 def _js_library_impl(ctx):
+    copied = _copy_sources_to_bin(ctx)
     sources, types = _gather_sources_and_types(
         ctx = ctx,
         targets = ctx.attr.srcs,
         files = ctx.files.srcs,
+        copied = copied,
     )
 
     additional_sources, additional_types = _gather_sources_and_types(
         ctx = ctx,
         targets = ctx.attr.types,
         files = ctx.files.types,
+        copied = copied,
     )
 
     # Direct sources and types

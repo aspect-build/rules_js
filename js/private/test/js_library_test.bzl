@@ -114,12 +114,34 @@ def _data_in_runfiles_test_impl(ctx):
 
     return analysistest.end(env)
 
+def _batched_source_copies_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    actions = analysistest.target_actions(env)
+
+    # A data/source overlap registers the same single-file copy twice, as in the default path.
+    asserts.equals(env, 5, len(actions))
+    asserts.equals(env, 3, len(target[JsInfo].sources.to_list()))
+    asserts.equals(env, 4, len(target[JsInfo].types.to_list()))
+
+    outputs = []
+    for action in actions:
+        asserts.equals(env, "CopyFile", action.mnemonic)
+        batch_outputs = action.outputs.to_list()
+        asserts.true(env, len(batch_outputs) <= 2)
+        declaration_count = len([file for file in batch_outputs if ".d." in file.basename])
+        asserts.true(env, declaration_count == 0 or declaration_count == len(batch_outputs))
+        outputs.extend([file.basename for file in batch_outputs])
+    asserts.equals(env, ["one.d.ts", "one.js", "three.d.cts", "three.js", "three.js", "two.d.mts", "two.js"], sorted(outputs))
+    return analysistest.end(env)
+
 # Test types
 _types_test = analysistest.make(_types_test_impl)
 _explicit_types_test = analysistest.make(_explicit_types_test_impl)
 _types_empty_srcs_test = analysistest.make(_types_empty_srcs_test_impl)
 _srcs_not_in_runfiles_test = analysistest.make(_srcs_not_in_runfiles_test_impl)
 _data_in_runfiles_test = analysistest.make(_data_in_runfiles_test_impl)
+_batched_source_copies_test = analysistest.make(_batched_source_copies_test_impl)
 
 def js_library_test_suite(name):
     """Test suite including all tests and data
@@ -192,6 +214,19 @@ def js_library_test_suite(name):
         target_under_test = ":data_only",
     )
 
+    js_library(
+        name = "batched_sources",
+        srcs = ["one.js", "two.js", "three.js", "one.d.ts", "two.d.mts", "three.d.cts"],
+        types = ["one.js"],
+        data = ["three.js"],
+        source_copy_batch_size = 2,
+        tags = ["manual"],
+    )
+    _batched_source_copies_test(
+        name = "batched_source_copies_test",
+        target_under_test = ":batched_sources",
+    )
+
     native.test_suite(
         name = name,
         tests = [
@@ -200,5 +235,6 @@ def js_library_test_suite(name):
             ":transitive_type_deps_empty_srcs_test",
             ":srcs_not_in_runfiles_test",
             ":data_in_runfiles_test",
+            ":batched_source_copies_test",
         ],
     )
