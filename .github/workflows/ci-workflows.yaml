@@ -77,6 +77,7 @@ jobs:
                     e2e/no_shell_toolchain
                     e2e/npm_link_package
                     e2e/npm_link_package-rerooted
+                    e2e/npm_link_package_lifecycle
                     e2e/npm_translate_lock
                     e2e/npm_translate_lock_replace_packages
                     e2e/npm_translate_lock_empty

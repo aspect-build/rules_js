@@ -1,0 +1,18 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages()
+
+npm_link_package(
+    name = "node_modules/@e2e/lib",
+    src = "//lib:pkg",
+)
+
+# The indirect deps of chalk reach the runfiles only through the transitive_files of its package
+# store, so this test must not depend on //:node_modules/chalk directly
+js_test(
+    name = "test",
+    data = [":node_modules/@e2e/lib"],
+    entry_point = "test.js",
+)
