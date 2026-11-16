@@ -98,25 +98,35 @@ function add_parents(mtree, dest) {
     }
 }
 
+// Matches any character that is not printable ASCII (0x21-0x7e). That includes every non-ASCII character, since each of its UTF-8 bytes needs escaping.
+const NON_PRINTABLE_CHAR_PATTERN = /[^\x21-\x7e]/
+
+// The escaped form of every byte value, indexed by byte. Printable ASCII (33-126) maps to itself and any other byte to a backslash followed by its three-digit octal code.
+// Used to escape strings that contain characters outside the printable range, one UTF-8 byte at a time.
+const PRINTABLE_FORM_BY_BYTE = Array.from({ length: 256 }, (_, byte) =>
+    byte < 33 || byte > 126
+        ? '\\' + byte.toString(8).padStart(3, '0')
+        : String.fromCharCode(byte)
+)
+
 /**
  * @param {string} str
  * @returns {string}
  */
 function vis(str) {
-    let result = ''
+    if (!NON_PRINTABLE_CHAR_PATTERN.test(str)) {
+        return str
+    }
     // There is no way to iterate over byte-by-byte UTF-8 characters in JS
     // so we have to use Buffer to get the bytes.
     // Rust has this https://doc.rust-lang.org/std/string/struct.String.html#method.as_bytes
     // and the equivalent in nodejs is Buffer.
-    for (const char of Buffer.from(str)) {
-        if (char < 33 || char > 126) {
-            // Non-printable
-            result += '\\' + char.toString(8).padStart(3, '0')
-        } else {
-            result += String.fromCharCode(char)
-        }
+    const bytes = Buffer.from(str)
+    const parts = new Array(bytes.length)
+    for (let i = 0; i < bytes.length; i++) {
+        parts[i] = PRINTABLE_FORM_BY_BYTE[bytes[i]]
     }
-    return result
+    return parts.join('')
 }
 
 function _mtree_dir_line(dir) {
