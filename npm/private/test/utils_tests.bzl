@@ -234,6 +234,49 @@ def test_package_store_prefix(ctx):
 
     return unittest.end(env)
 
+# buildifier: disable=function-docstring
+def test_rewrite_patch_paths(ctx):
+    env = unittest.begin(ctx)
+
+    # git-style, -p1: the directory lands right after the stripped `a/` / `b/`
+    git_patch = "\n".join([
+        "diff --git a/index.js b/index.js",
+        "index a8653a9..ae967de 100644",
+        "--- a/index.js",
+        "+++ b/index.js",
+        "@@ -1 +1 @@",
+        "-module.exports = 42",
+        '+module.exports = "forty two"',
+        "",
+    ])
+    asserts.equals(env, "\n".join([
+        "diff --git a/package/index.js b/package/index.js",
+        "index a8653a9..ae967de 100644",
+        "--- a/package/index.js",
+        "+++ b/package/index.js",
+        "@@ -1 +1 @@",
+        "-module.exports = 42",
+        '+module.exports = "forty two"',
+        "",
+    ]), utils.rewrite_patch_paths(git_patch, 1, "package"))
+
+    # -p0: the directory leads
+    asserts.equals(env, "--- package/main.js\n+++ package/main.js\n", utils.rewrite_patch_paths("--- main.js\n+++ main.js\n", 0, "package"))
+
+    # a deeper strip (e2e/verify_patches uses -p4) inserts after the fourth component
+    asserts.equals(env, "--- a/node_modules/@s/t/package/main.js\n", utils.rewrite_patch_paths("--- a/node_modules/@s/t/main.js\n", 4, "package"))
+
+    # /dev/null (a new or deleted file) and a timestamp trailer are left alone
+    asserts.equals(env, "--- /dev/null\n+++ b/package/new.js\t2024-01-01 00:00:00\n", utils.rewrite_patch_paths("--- /dev/null\n+++ b/new.js\t2024-01-01 00:00:00\n", 1, "package"))
+
+    # a path shorter than the strip is left alone (the patcher rejects it either way)
+    asserts.equals(env, "--- a/x\n", utils.rewrite_patch_paths("--- a/x\n", 2, "package"))
+
+    # hunk bodies that happen to start like a header are untouched
+    asserts.equals(env, "@@ -1 +1 @@\n---- not a header\n", utils.rewrite_patch_paths("@@ -1 +1 @@\n---- not a header\n", 1, "package"))
+
+    return unittest.end(env)
+
 t2_test = unittest.make(test_package_store_and_target_name)
 t3_test = unittest.make(test_friendly_name)
 t6_test = unittest.make(test_parse_package_name)
@@ -242,6 +285,7 @@ t8_test = unittest.make(test_npm_registry_url)
 t9_test = unittest.make(test_package_store_name_link_versions)
 t10_test = unittest.make(test_hex_to_base64)
 t11_test = unittest.make(test_package_store_prefix)
+t12_test = unittest.make(test_rewrite_patch_paths)
 
 def utils_tests(name):
     unittest.suite(
@@ -254,4 +298,5 @@ def utils_tests(name):
         t9_test,
         t10_test,
         t11_test,
+        t12_test,
     )

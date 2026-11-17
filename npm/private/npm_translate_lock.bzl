@@ -242,7 +242,13 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             If there are no matches then the package's generated node_modules link targets default to public visibility
             (`["//visibility:public"]`).
         """),
-        "patch_tool": attr.label(doc = "The patch tool to use. If not specified, the `patch` from `PATH` is used."),
+        "patch_tool": attr.label(doc = """
+            The patch tool to use.
+
+            If not specified and a package's `patch_args` hold only `-p<N>` flags, Bazel's native
+            patch implementation applies its patches and no `patch` program is needed on the host.
+            Otherwise the `patch` from `PATH` is used.
+        """),
         "patch_args": attr.string_list_dict(default = {"*": ["-p0"]}, doc = """
             A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list arguments to pass to the patch tool. The most specific match wins.

@@ -385,6 +385,50 @@ def _hex_to_base64(hex_string):
 _PACKAGE_STORE_ROOT = ".aspect_rules_js"
 _PACKAGE_STORE_PREFIX = "node_modules/{}/".format(_PACKAGE_STORE_ROOT)
 
+def _insert_path_component(path, strip, component):
+    """`a/b/c` with strip 1 and component `d` is `a/d/b/c`: `d` sits right after the components a patch tool strips."""
+    parts = path.split("/")
+    if len(parts) <= strip:
+        return path
+    return "/".join(parts[:strip] + [component] + parts[strip:])
+
+_PATCH_FILE_HEADERS = ("--- ", "+++ ")
+_PATCH_GIT_HEADER = "diff --git "
+
+def _rewrite_patch_line(line, strip, directory):
+    for header in _PATCH_FILE_HEADERS:
+        if line.startswith(header):
+            path, sep, trailer = line[len(header):].partition("\t")
+            if path == "/dev/null":
+                return line
+            return header + _insert_path_component(path, strip, directory) + sep + trailer
+    if line.startswith(_PATCH_GIT_HEADER):
+        paths = line[len(_PATCH_GIT_HEADER):].split(" ")
+        if len(paths) == 2:
+            return _PATCH_GIT_HEADER + " ".join([_insert_path_component(p, strip, directory) for p in paths])
+    return line
+
+def _rewrite_patch_paths(patch_text, strip, directory):
+    """Rewrite a unified diff so that, once `strip` leading components are stripped, every path is under `directory`.
+
+    Bazel's native `repository_ctx.patch` applies relative to the repository root and has no
+    working-directory option, while npm_import extracts a package into a subdirectory. Inserting
+    `directory` as the component right after the stripped ones gives the native patcher the same
+    paths a `patch -d <directory>` would have resolved.
+
+    Rewrites the `--- ` / `+++ ` file headers (a `/dev/null` side and anything after a tab are
+    left alone) and the `diff --git a/x b/y` line; every other line is returned verbatim.
+
+    Args:
+        patch_text: the patch file's contents
+        strip: the `-p<N>` the patch is meant to be applied with
+        directory: repository-relative directory the patched files live in
+
+    Returns:
+        the rewritten patch text
+    """
+    return "\n".join([_rewrite_patch_line(line, strip, directory) for line in patch_text.split("\n")])
+
 def _package_store_prefix(repo_name, package):
     """Path of the package store of a repository package, relative to the main repository."""
     prefix = _PACKAGE_STORE_PREFIX
@@ -420,6 +464,7 @@ utils = struct(
     replace_npmrc_token_envvar = _replace_npmrc_token_envvar,
     is_tarball_extension = _is_tarball_extension,
     hex_to_base64 = _hex_to_base64,
+    rewrite_patch_paths = _rewrite_patch_paths,
 )
 
 # Exported only to be tested

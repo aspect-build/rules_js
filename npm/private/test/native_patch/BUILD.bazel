@@ -1,0 +1,12 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@npm__meaning-of-life-native-patch__1.0.0__links//:defs.bzl", "npm_link_imported_package")
+
+# Links the /MODULE npm_import() of meaning-of-life patched with no `patch_tool`:
+# Bazel's native patcher applied `meaning-of-life@1.0.0.patch`.
+npm_link_imported_package()
+
+js_test(
+    name = "native_patch_test",
+    data = [":node_modules/meaning-of-life"],
+    entry_point = "native_patch_test.js",
+)
