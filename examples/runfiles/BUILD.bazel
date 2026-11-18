@@ -116,8 +116,22 @@ js_test(
 sh_test(
     name = "manifest_only_runfiles",
     srcs = ["manifest_only_test.sh"],
+    args = ["$(rootpath :test_binary)"],
     data = [
         "test_fixture.md",
         ":test_binary",
     ],
+    # Covers the bash launcher, which Windows only runs behind a native wrapper.
+    target_compatible_with = select({
+        ":use_hermetic_launcher": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }) + select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+config_setting(
+    name = "use_hermetic_launcher",
+    flag_values = {"@rules_js//js:use_hermetic_launcher": "True"},
 )
