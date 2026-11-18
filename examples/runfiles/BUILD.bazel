@@ -1,6 +1,7 @@
 load("@bazel_lib//lib:testing.bzl", "assert_contains")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 npm_link_all_packages()
 
@@ -110,4 +111,13 @@ js_test(
         ":test_binary",
     ],
     entry_point = "outer.js",
+)
+
+sh_test(
+    name = "manifest_only_runfiles",
+    srcs = ["manifest_only_test.sh"],
+    data = [
+        "test_fixture.md",
+        ":test_binary",
+    ],
 )

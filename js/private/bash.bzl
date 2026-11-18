@@ -56,18 +56,33 @@ if [ "${TEST_SRCDIR:-}" ]; then
     # Case 4, bazel has identified runfiles for us.
     RUNFILES=$(_normalize_path "$TEST_SRCDIR")
 elif [ "${RUNFILES_MANIFEST_FILE:-}" ]; then
-    RUNFILES=$(_normalize_path "$RUNFILES_MANIFEST_FILE")
-    if [[ "${RUNFILES}" == *.runfiles_manifest ]]; then
+    _manifest=$(_normalize_path "$RUNFILES_MANIFEST_FILE")
+    RUNFILES=""
+    if [[ "${_manifest}" == *.runfiles_manifest ]]; then
         # Bazel puts the manifest besides the runfiles with the suffix .runfiles_manifest.
         # For example, the runfiles directory is named my_binary.runfiles then the manifest is beside the
         # runfiles directory and named my_binary.runfiles_manifest
-        RUNFILES=${RUNFILES%_manifest}
-    elif [[ "${RUNFILES}" == */MANIFEST ]]; then
+        RUNFILES=${_manifest%_manifest}
+    elif [[ "${_manifest}" == */MANIFEST ]]; then
         # Bazel for windows puts the manifest file named MANIFEST in the runfiles directory
-        RUNFILES=${RUNFILES%/MANIFEST}
-    else
-        log_fatal "Unexpected RUNFILES_MANIFEST_FILE value $RUNFILES_MANIFEST_FILE"
-        exit 1
+        RUNFILES=${_manifest%/MANIFEST}
+    fi
+    if [ -z "${RUNFILES}" ] || [ ! -d "${RUNFILES}" ]; then
+        # Manifest-only runfiles: build a runfiles tree from the manifest.
+        if [ ! -f "${_manifest}" ]; then
+            log_fatal "RUNFILES_MANIFEST_FILE $RUNFILES_MANIFEST_FILE does not exist"
+            exit 1
+        fi
+        RUNFILES=$(_normalize_path "$(mktemp -d "$(_normalize_path "${TEST_TMPDIR:-${TMPDIR:-/tmp}}")/js_binary_runfiles.XXXXXX")")
+        while IFS= read -r _line || [ -n "$_line" ]; do
+            [ -z "$_line" ] && continue
+            _key=${_line%% *}
+            _target=${_line#* }
+            [ "$_key" = "$_line" ] && continue
+            [ -z "$_key" ] || [ -z "$_target" ] && continue
+            mkdir -p "$RUNFILES/$(dirname "$_key")"
+            ln -s "$(_normalize_path "$_target")" "$RUNFILES/$_key"
+        done <"${_manifest}"
     fi
 else
     case "$0" in
