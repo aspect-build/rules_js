@@ -31,14 +31,15 @@ run() {
     [ "$out" = "[]" ] || fail "unexpected output: $out"
 }
 
-only_tree() {
+# Prints the runfiles trees and fails unless there are $1 of them.
+trees() {
     local trees=("$TEST_TMPDIR"/js_binary_runfiles.*/*)
-    [ ${#trees[@]} -eq 1 ] && [ -d "${trees[0]}" ] || fail "expected one runfiles tree, found: ${trees[*]}"
-    echo "${trees[0]}"
+    [ ${#trees[@]} -eq "$1" ] && [ -d "${trees[0]}" ] || fail "expected $1 runfiles trees, found: ${trees[*]}"
+    printf '%s\n' "${trees[@]}"
 }
 
 run "$manifest"
-tree=$(only_tree)
+tree=$(trees 1)
 [ "$(cat "$tree/_main/runfiles/test_fixture.md")" = "$(cat "$PWD/runfiles/test_fixture.md")" ] ||
     fail "test_fixture.md is missing from the runfiles tree"
 [ -f "$tree/_main/runfiles/empty_file" ] && [ ! -L "$tree/_main/runfiles/empty_file" ] && [ ! -s "$tree/_main/runfiles/empty_file" ] ||
@@ -49,13 +50,22 @@ tree=$(only_tree)
 # A second launch with the same manifest reuses the tree.
 touch "$tree/reused"
 run "$manifest"
-[ "$(only_tree)" = "$tree" ] && [ -e "$tree/reused" ] || fail "runfiles tree was not reused"
+[ "$(trees 1)" = "$tree" ] && [ -e "$tree/reused" ] || fail "runfiles tree was not reused"
 
-# A changed manifest at the same path replaces the tree.
+# A tree that lost files and its completion mark, as to a cleaner of temporary
+# files, is rebuilt.
+rm -rf "${tree:?}/_main" "$tree/.js_binary_runfiles_complete"
+run "$manifest"
+[ "$(trees 1)" = "$tree" ] && [ -f "$tree/_main/runfiles/empty_file" ] && [ ! -e "$tree/reused" ] ||
+    fail "partial runfiles tree was not rebuilt"
+
+# A changed manifest at the same path gets a new tree, and the old one is kept
+# for processes that may still use it.
 printf '%s\n' '_main/runfiles/other_empty_file ' >>"$manifest"
 run "$manifest"
-new_tree=$(only_tree)
-[ "$new_tree" != "$tree" ] && [ -f "$new_tree/_main/runfiles/other_empty_file" ] ||
+all_trees=$(trees 2)
+new_tree=$(grep -vxF "$tree" <<<"$all_trees")
+[ -f "$new_tree/_main/runfiles/other_empty_file" ] && [ -d "$tree/_main" ] ||
     fail "runfiles tree was not rebuilt for a changed manifest"
 
 # A line whose key unescapes to nothing is rejected, and leaves nothing behind.
@@ -64,4 +74,4 @@ printf '%s\n' '  /nonexistent/target' >"$bad_manifest"
 if RUNFILES_MANIFEST_FILE="$bad_manifest" "$binary"; then
     fail "a manifest line with an empty key was accepted"
 fi
-[ "$(only_tree)" = "$new_tree" ] || fail "a failed launch left a runfiles tree behind"
+[ "$(trees 2)" = "$all_trees" ] || fail "a failed launch left a runfiles tree behind"

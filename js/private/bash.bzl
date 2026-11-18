@@ -29,12 +29,16 @@ function _normalize_path {
     return
 }
 
-# Builds the runfiles tree $3 from the manifest $1, removing other trees named
-# $2.* that were built from earlier contents of the same manifest path.
+# Marks a runfiles tree built from a manifest as complete.
+_RUNFILES_TREE_COMPLETE=".js_binary_runfiles_complete"
+
+# Builds the runfiles tree $3 from the manifest $1, in a temporary directory
+# named $2.tmp.*.
 #
-# The tree is built in a temporary directory and renamed into place once it is
-# complete, so a launch that finds $3 can use it as is, even while other
-# launches race to build it. Each entry costs one bash iteration: parent
+# The tree is marked complete last and then renamed into place, so a launch
+# that finds a marked $3 can use it as is, even while other launches race to
+# build it. A $3 without the mark, such as one a cleaner of temporary files
+# emptied, is replaced. Each entry costs one bash iteration: parent
 # directories are made by one batched mkdir, and the symlinks of a directory
 # whose names match their targets' names are made by one ln.
 function _build_runfiles_tree {
@@ -135,26 +139,25 @@ function _build_runfiles_tree {
             ln -s "${group[@]}" "$group_dir/" || _fail "Cannot create runfiles symlinks in $tmp/$group_dir"
         fi
 
+        : >"$_RUNFILES_TREE_COMPLETE"
+
         # Windows cannot rename the working directory of a process.
         cd /
         if [ -e "$tree" ]; then
-            # Another launch built it first.
-            exit 0
+            if [ -f "$tree/$_RUNFILES_TREE_COMPLETE" ]; then
+                # Another launch built it first.
+                exit 0
+            fi
+            # A partial tree: move it out of the way. Another launch replacing it
+            # at the same time may have moved it already.
+            partial=$(mktemp -d "$prefix.tmp.XXXXXX")
+            mv "$tree" "$partial/" 2>/dev/null || true
+            rm -rf "$partial"
         fi
         mv "$tmp" "$tree"
         # A launch that renamed its tree into place after the check above made mv
         # move this one into that tree instead; remove it from there.
         rm -rf "${tree:?}/${tmp##*/}"
-        stale=()
-        for old in "$prefix".*; do
-            case "$old" in
-            "$tree" | "$prefix".tmp.*) ;;
-            *) [ -e "$old" ] && stale+=("$old") ;;
-            esac
-        done
-        if [ ${#stale[@]} -gt 0 ]; then
-            rm -rf "${stale[@]}"
-        fi
     )
 }
 
@@ -164,21 +167,26 @@ function _build_runfiles_tree {
 # Trees live in a per-user directory and are named after the path and the
 # content of the manifest, so later launches with the same manifest reuse the
 # tree instead of leaving a new one behind every time; this script ends in
-# `exec`, so a trap could not remove a per-launch tree.
+# `exec`, so a trap could not remove a per-launch tree. Trees for earlier
+# contents of a manifest are left to the cleaner of temporary files, since a
+# process started from one may still be running.
 function _runfiles_from_manifest {
-    local manifest="$1" sums path_crc path_len content_crc content_len base prefix
-    sums=$(cksum - "$manifest" <<<"$manifest")
-    read -r path_crc path_len _ <<<"${sums%%$'\n'*}"
-    read -r content_crc content_len _ <<<"${sums#*$'\n'}"
+    local manifest="$1" crc len path_sum content_sum base prefix
+    # cksum prints "<crc> <length>" for its standard input. BSD cksum reads a
+    # `-` argument as a file name, so each sum is taken from standard input.
+    read -r crc len _ <<<"$(printf '%s' "$manifest" | cksum)"
+    path_sum="${crc}_${len}"
+    read -r crc len _ <<<"$(cksum <"$manifest")"
+    content_sum="${crc}_${len}"
     base="$(_normalize_path "${TEST_TMPDIR:-${TMPDIR:-/tmp}}")/js_binary_runfiles.$UID"
     mkdir -m 700 "$base" 2>/dev/null || true
     if [ -L "$base" ] || [ ! -d "$base" ] || [ ! -O "$base" ]; then
         log_fatal "Cannot build a runfiles tree from RUNFILES_MANIFEST_FILE $manifest: $base is not a directory owned by the current user"
         exit 1
     fi
-    prefix="$base/${path_crc}_${path_len}"
-    RUNFILES="$prefix.${content_crc}_${content_len}"
-    if [ ! -d "$RUNFILES" ]; then
+    prefix="$base/$path_sum"
+    RUNFILES="$prefix.$content_sum"
+    if [ ! -f "$RUNFILES/$_RUNFILES_TREE_COMPLETE" ]; then
         _build_runfiles_tree "$manifest" "$prefix" "$RUNFILES"
     fi
 }
