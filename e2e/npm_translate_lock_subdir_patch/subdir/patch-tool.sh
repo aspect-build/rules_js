@@ -7,4 +7,4 @@ if [[ "${1:-}" != "apply" ]]; then
 fi
 shift
 patch "$@"
-printf '\nmodule.exports.PATCH_TOOL = true\n' >> index.js
+printf '\nmodule.exports.PATCH_TOOL = true\n' >>index.js
