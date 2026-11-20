@@ -551,8 +551,10 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch)
             patches.append(patch_path)
 
-            # pnpm patches are always applied with -p1
-            patch_args = ["-p1"]
+            # Preserve pnpm's -p1 default unless this package has an override.
+            patch_args, patch_args_keys = _gather_values_from_matching_names(False, attr.patch_args, name, friendly_name, unfriendly_name)
+            if not patch_args_keys:
+                patch_args = ["-p1"]
         elif len(translate_patches) > 0:
             patches = translate_patches
             patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
@@ -642,6 +644,11 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
 
         deps_oss, deps_cpus = _collect_dep_constraints(packages, package_info)
 
+        patch_tool = attr.patch_tool
+        for patch_name in [name, friendly_name, unfriendly_name]:
+            if patch_name in attr.patch_tools:
+                patch_tool = attr.patch_tools[patch_name]
+
         result_pkg = struct(
             custom_postinstall = custom_postinstall,
             deps = package_info["dependencies"] | package_info["optional_dependencies"],
@@ -654,7 +661,7 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             package_key = package_key,
             package = name,
             package_visibility = package_visibility,
-            patch_tool = attr.patch_tool,
+            patch_tool = patch_tool,
             patch_args = patch_args,
             patches = patches,
             exclude_package_contents = exclude_package_contents_result.patterns,

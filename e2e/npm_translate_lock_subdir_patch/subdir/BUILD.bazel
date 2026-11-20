@@ -1,11 +1,14 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_js//js:defs.bzl", "js_test")
 
+exports_files(["patch-tool.sh"])
+
 npm_link_all_packages()
 
 js_test(
     name = "test",
     data = [
+        ":node_modules/@aspect-test/e",
         ":node_modules/debug",
     ],
     entry_point = "test.js",

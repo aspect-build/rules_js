@@ -1,0 +1,10 @@
+diff --git a/index.js b/index.js
+index 0e29dc2..6ae6e90 100644
+--- a/index.js
++++ b/index.js
+@@ -1,4 +1,5 @@
+ const packageJson = require('./package.json')
+ module.exports = {
+   id: () => `${packageJson.name}@${packageJson.version}`,
++  PATCHED: 123,
+ }
