@@ -254,15 +254,16 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             Patches from `pnpm.patchedDependencies` default to `-p1` and only use package-specific
             entries; the `*` entry applies to patches in the `patches` attribute.
 
-            Read more: [patching](/docs/pnpm.md#patching)
+            Read more: [patching](/docs/pnpm.md#patching-via-pnpmpatcheddependencies)
         """),
         "patches": attr.string_list_dict(doc = """
             A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list of patches to apply to the downloaded npm package. Multiple matches are additive.
 
-            These patches are applied after any patches in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies).
+            Do not use this attribute and [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies)
+            to patch the same package version.
 
-            Read more: [patching](/docs/pnpm.md#patching)
+            Read more: [patching](/docs/pnpm.md#patching-via-patches-attribute)
         """),
         "use_pnpm": attr.label(default = "@pnpm//:package/bin/pnpm.cjs", doc = "label of the pnpm entry point to use."),
         "pnpm_lock": attr.label(doc = "The `pnpm-lock.yaml` file, containing resolved and pinned package versions."),

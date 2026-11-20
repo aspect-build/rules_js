@@ -607,8 +607,11 @@ def _npm_import_rule_impl(rctx):
         if rctx.attr.integrity:
             reproducible = True
 
-    # apply patches to the extracted package before reading the package.json incase
-    # the patch targets the package.json itself
+    # Resolving the tool's path alone does not track edits to it on Bazel 8+.
+    if has_patches and rctx.attr.patch_tool:
+        rctx.watch(rctx.attr.patch_tool)
+
+    # A patch may change package.json, so apply it before reading the manifest.
     patch(
         rctx,
         patch_tool = rctx.path(rctx.attr.patch_tool) if rctx.attr.patch_tool else "patch",

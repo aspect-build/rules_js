@@ -546,7 +546,6 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             )
             fail(msg)
 
-        # Apply patch from `pnpm.patchedDependencies` first
         if pnpm_patched:
             patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch)
             patches.append(patch_path)

@@ -26,7 +26,7 @@ npm.npm_translate_lock(
         ],
     },
     patch_tools = {
-        "@aspect-test/e": "//subdir:patch-tool.sh",
+        "@aspect-test/e": "@rules_js//npm/private/test:patch_tool.sh",
         "@aspect-test/e@1.0.0": "//subdir:patch-tool.sh",
     },
     pnpm_lock = "//subdir:pnpm-lock.yaml",
