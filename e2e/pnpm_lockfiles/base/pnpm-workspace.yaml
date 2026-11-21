@@ -13,7 +13,7 @@ configDependencies:
 # maintain support for pnpm 9. Once we drop support for pnpm 9, we should
 # delete that information from package.json.
 patchedDependencies:
-    meaning-of-life@1.0.0: patches/meaning-of-life@1.0.0-pnpm.patch
+    meaning-of-life@1.0.0: ../base/patches/meaning-of-life@1.0.0-pnpm.patch
 
 allowBuilds:
     '@aspect-test/c': true

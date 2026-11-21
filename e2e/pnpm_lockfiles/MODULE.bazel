@@ -52,10 +52,12 @@ npm = use_extension(
         name = "lock-%s" % version,
         data = [
             "//%s:package.json" % version,
-            "//%s:patches/meaning-of-life@1.0.0-pnpm.patch" % version,
+            # All lockfile versions reference the same patch outside their Bazel package.
+            "//:base/patches/meaning-of-life@1.0.0-pnpm.patch",
         ],
         pnpm_lock = "//%s:pnpm-lock.yaml" % version,
         verify_node_modules_ignored = "//:.bazelignore",
+        verify_patches = "//:base/patches.list",
     )
     for version in PNPM_LOCK_VERSIONS
 ]

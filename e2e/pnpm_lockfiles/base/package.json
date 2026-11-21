@@ -62,7 +62,7 @@
     },
     "pnpm": {
         "patchedDependencies": {
-            "meaning-of-life@1.0.0": "patches/meaning-of-life@1.0.0-pnpm.patch"
+            "meaning-of-life@1.0.0": "../base/patches/meaning-of-life@1.0.0-pnpm.patch"
         },
         "onlyBuiltDependencies": [
             "@aspect-test/c"

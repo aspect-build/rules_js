@@ -127,10 +127,9 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             Only used when `update_pnpm_lock` is True. Requires pnpm 11 or newer.
         """),
         "data": attr.label_list(doc = """
-            Data files required by this repository rule when auto-updating the pnpm lock file.
-
-            Only needed when `update_pnpm_lock` is True.
-            Read more: [using update_pnpm_lock](/docs/pnpm.md#update_pnpm_lock)
+            Input files for [updating the pnpm lockfile](/docs/pnpm.md#update_pnpm_lock).
+            Also declare [pnpm patches](/docs/pnpm.md#patching-via-pnpmpatcheddependencies) owned by
+            another Bazel package in the same repository here, even when `update_pnpm_lock` is False.
         """),
         "external_repository_action_cache": attr.string(default = utils.default_external_repository_action_cache(), doc = """
             The location of the external repository action cache to write to when `update_pnpm_lock` = True.
@@ -253,7 +252,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             A map of package names or package names with their version (e.g., "my-package" or "my-package@v1.2.3")
             to a label list of patches to apply to the downloaded npm package. Multiple matches are additive.
 
-            These patches are applied after any patches in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies).
+            For any given package, use either this attribute or [pnpm.patchedDependencies](https://pnpm.io/cli/patch#patcheddependencies).
 
             Read more: [patching](/docs/pnpm.md#patching)
         """),
@@ -331,7 +330,7 @@ For more about how to use npm_translate_lock, read [pnpm and rules_js](/docs/pnp
             See https://github.com/bazelbuild/bazel/issues/8106
         """),
         "verify_patches": attr.label(doc = """
-            Label to a patch list file.
+            Label to a file listing patch paths relative to the Bazel repository root.
 
             Use this together with the `list_patches` macro to guarantee that all patches in a patch folder
             are included in the `patches` attribute.

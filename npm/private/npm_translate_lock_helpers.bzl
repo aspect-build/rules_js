@@ -460,6 +460,17 @@ def _lifecycle_attrs(attr):
     return all_lifecycle_hooks, all_lifecycle_hooks_execution_requirements, all_lifecycle_hooks_use_default_shell_env
 
 ################################################################################
+def _pnpm_patch_label(lock, patch, data_by_path):
+    # pnpm paths are relative to the lockfile. Only the caller's label tells
+    # us where the owning Bazel package starts.
+    path = paths.normalize(paths.join(lock.package, patch))
+    if path in data_by_path:
+        return data_by_path[path]
+    if ".." in patch.split("/"):
+        fail("Declare the Bazel label for pnpm patch %s in npm_translate_lock(data) in the same repository as %s" % (patch, lock))
+    return lock.same_package_label(patch)
+
+################################################################################
 def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclude_package_contents_config, rctx = None):
     "Converts packages from the lockfile to a struct of attributes for npm_import"
 
@@ -495,6 +506,12 @@ def _get_npm_imports(state, replace_packages, attr, registries, npm_auth, exclud
             elif dep_package not in package_importers[dep_package_key][link_package]:
                 package_importers[dep_package_key][link_package].append(dep_package)
 
+    lock = state.pnpm_lock_label()
+    data_by_path = {
+        paths.join(label.package, label.name): label
+        for label in attr.data
+        if label.repo_name == lock.repo_name
+    }
     patches_used = []
     result = []
     for package_key, package_info in packages.items():
@@ -546,21 +563,16 @@ ERROR: can not apply both `pnpm.patchedDependencies` and `npm_translate_lock(pat
             )
             fail(msg)
 
-        # Apply patch from `pnpm.patchedDependencies` first
         if pnpm_patched:
-            patch_path = "//%s:%s" % (attr.pnpm_lock.package, pnpm_patch)
-            patches.append(patch_path)
+            patches.append(_pnpm_patch_label(lock, pnpm_patch, data_by_path))
 
             # pnpm patches are always applied with -p1
             patch_args = ["-p1"]
         elif len(translate_patches) > 0:
-            patches = translate_patches
+            # Resolve explicit patch label strings in the lockfile's repository.
+            patches = [lock.relative(patch) for patch in translate_patches]
             patch_args, _ = _gather_values_from_matching_names(False, attr.patch_args, "*", name, friendly_name, unfriendly_name)
             patches_used.extend(patches_keys)
-
-        # Resolve string patch labels relative to the root respository rather than relative to rules_js.
-        # https://docs.google.com/document/d/1N81qfCa8oskCk5LqTW-LNthy6EBrDot7bdUsjz6JFC4/
-        patches = [attr.pnpm_lock.relative(patch) for patch in patches]
 
         exclude_package_contents_result = _gather_package_content_excludes(exclude_package_contents_config, name, friendly_name, unfriendly_name)
 
@@ -829,8 +841,12 @@ def _verify_patches(rctx, attr, state):
         verify_patches_content = rctx.read(rctx.path(attr.verify_patches)).strip(" \t\n\r")
         verify_patches = sets.make(verify_patches_content.split("\n"))
 
-        # Patches in `patches` or `pnpm.patchedDependencies`
-        declared_patches = sets.make(state.pnpm_patches())
+        # list_patches writes repository-relative paths even for a nested lock.
+        lock_package = state.pnpm_lock_label().package
+        declared_patches = sets.make([
+            paths.normalize(paths.join(lock_package, patch))
+            for patch in state.pnpm_patches()
+        ])
 
         # Patches in `npm_translate_lock(patches)`
         for patches in attr.patches.values():
