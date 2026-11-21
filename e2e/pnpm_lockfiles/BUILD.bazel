@@ -1,4 +1,5 @@
 exports_files([
     "base/patched-dependencies-test.js",
     "base/aliases-test.js",
+    "base/patches/meaning-of-life@1.0.0-pnpm.patch",
 ])

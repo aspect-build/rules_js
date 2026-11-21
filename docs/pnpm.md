@@ -205,29 +205,33 @@ git config --global merge.ours.driver true
 
 ### Patching via pnpm.patchedDependencies
 
-Patches included in [pnpm.patchedDependencies](https://pnpm.io/next/package_json#pnpmpatcheddependencies) are automatically applied by rules_js.
+rules_js applies the patches selected by pnpm's [`patchedDependencies`](https://pnpm.io/cli/patch#patcheddependencies).
+To share a patch across pnpm workspaces in the same Bazel repository, export the
+file from its owning Bazel package and include its label in `npm_translate_lock(data)`.
 
-These patches must be included in the `data` attribute of `npm_translate_lock`, for example:
-
-```json
-{
-    ...
-    "pnpm": {
-        "patchedDependencies": {
-            "fum@0.0.1": "patches/fum@0.0.1.patch"
-        }
-    }
-}
+```yaml
+# app/pnpm-workspace.yaml
+patchedDependencies:
+    fum@0.0.1: ../shared/patches/fum@0.0.1.patch
 ```
 
 ```starlark
-npm_translate_lock(
-    ...
+# shared/BUILD.bazel
+exports_files(["patches/fum@0.0.1.patch"])
+
+# MODULE.bazel
+npm.npm_translate_lock(
+    name = "app_npm",
+    pnpm_lock = "//app:pnpm-lock.yaml",
     data = [
-        "//:patches/fum@0.0.1.patch",
+        "//app:pnpm-workspace.yaml",
+        "//shared:patches/fum@0.0.1.patch",
     ],
 )
 ```
+
+The label must name the file at the path pnpm uses. Listing a file in `data`
+doesn't apply it to a workspace that hasn't selected it in `patchedDependencies`.
 
 Patching applied by rules_js may slightly deviate from standard pnpm patching behavior.
 The [bazel-lib patch util](https://registry.bazel.build/modules/bazel_lib/latest/docs/lib/repo_utils.bzl/patch)
@@ -253,7 +257,7 @@ In case multiple entries in `patches` match, the list of patches are additive.
 (More specific matches are appended to previous matches.)
 However if multiple entries in `patch_args` match, then the more specific name matches take precedence.
 
-Patches in `patches` are applied after any patches included in `pnpm.patchedDependencies`.
+For any given package, use either `patches` or `pnpm.patchedDependencies`.
 
 For example,
 

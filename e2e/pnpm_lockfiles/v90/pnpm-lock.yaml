@@ -14,7 +14,7 @@ overrides:
 patchedDependencies:
   meaning-of-life@1.0.0:
     hash: o3deharooos255qt5xdujc3cuq
-    path: patches/meaning-of-life@1.0.0-pnpm.patch
+    path: ../base/patches/meaning-of-life@1.0.0-pnpm.patch
 
 importers:
 
