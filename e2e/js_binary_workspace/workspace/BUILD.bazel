@@ -1,6 +1,12 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@rules_js//js:defs.bzl", "js_binary", "js_run_binary", "js_test")
+load("@rules_js//js:defs.bzl", "js_binary", "js_library", "js_run_binary", "js_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+js_library(
+    name = "lib",
+    srcs = ["index.js"],
+    visibility = ["//app:__pkg__"],
+)
 
 js_binary(
     name = "bin",

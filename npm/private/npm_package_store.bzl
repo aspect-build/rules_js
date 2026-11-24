@@ -320,24 +320,17 @@ deps of npm_package_store must be in the same package.""" % (ctx.label.package, 
     elif ctx.attr.src and JsInfo in ctx.attr.src:
         jsinfo = ctx.attr.src[JsInfo]
 
-        # Symlink to the directory of the target that created this JsInfo
-        if ctx.label.repo_name and ctx.label.package:
-            symlink_path = "external/{}/{}/{}".format(ctx.label.repo_name, ctx.label.package, package_store_directory_path)
-        elif ctx.label.repo_name:
-            symlink_path = "external/{}/{}".format(ctx.label.repo_name, package_store_directory_path)
-        else:
-            symlink_path = package_store_directory_path
-
         # The package JsInfo including all direct and transitive sources, store info etc.
         sources_depsets.append(jsinfo.transitive_sources)
         types_depsets.append(jsinfo.transitive_types)
         npm_sources_depsets.append(jsinfo.npm_sources)
 
+        # Symlink to the directory of the target that created this JsInfo
         if jsinfo.target.repo_name:
             target_path = "{}/external/{}/{}".format(ctx.bin_dir.path, jsinfo.target.repo_name, jsinfo.target.package)
         else:
             target_path = "{}/{}".format(ctx.bin_dir.path, jsinfo.target.package)
-        package_store_directory = utils.make_directory_symlink(ctx, symlink_path, target_path)
+        package_store_directory = utils.make_directory_symlink(ctx, package_store_directory_path, target_path)
 
         # Link this first-party package's direct deps into its package store's
         # nested node_modules, mirroring the NpmPackageInfo branch above. Without

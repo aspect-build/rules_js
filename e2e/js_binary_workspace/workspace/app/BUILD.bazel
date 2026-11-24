@@ -1,0 +1,14 @@
+load("@rules_js//js:defs.bzl", "js_test")
+load("@rules_js//npm:defs.bzl", "npm_link_package")
+
+npm_link_package(
+    name = "node_modules/lib",
+    src = "//:lib",
+    package = "lib",
+)
+
+js_test(
+    name = "package_store_test",
+    data = [":node_modules/lib"],
+    entry_point = "package_store_test.cjs",
+)
